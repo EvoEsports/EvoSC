@@ -4,10 +4,10 @@ namespace esc\classes;
 
 class ModuleHandler
 {
-    public static function loadModules()
+    public static function loadModules($loadFrom = 'modules')
     {
         foreach (array_diff(scandir('modules'), array('..', '.')) as $item) {
-            $dir = 'modules/' . $item;
+            $dir = $loadFrom . '/' . $item;
 
             if (!file_exists($dir . '/module.json')) {
                 Log::error("Missing module.json for [$item]");

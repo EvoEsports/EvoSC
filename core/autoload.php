@@ -3,13 +3,7 @@ function esc_autoloader($className)
 {
     $classNameExplode = explode("\\", $className);
 
-    $realClassName = '';
-
-    if($classNameExplode[0] == 'esc'){
-        $realClassName = "core";
-    }elseif ($classNameExplode[0] == 'module'){
-        $realClassName = "modules";
-    }
+    $realClassName = "core";
 
     for ($i = 1; $i < count($classNameExplode); $i++) {
         $realClassName .= "/" . $classNameExplode[$i];

@@ -1,5 +1,6 @@
 .idea/
 vendor/
 modules/
+core/modules/
 maps/
 logs/
