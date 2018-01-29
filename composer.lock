@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4eba09b97932de37836ee2484b5aaffb",
-    "content-hash": "f22aa33685faba0f73a96b0e0a445549",
+    "hash": "d52dfb29377a6bb468df4684130d2484",
+    "content-hash": "8d28c7b4d9496338f26d2982cb6ee027",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -279,6 +279,54 @@
             "time": "2017-12-24 20:02:59"
         },
         {
+            "name": "maniaplanet/dedicated-server-api",
+            "version": "v5.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maniaplanet/dedicated-server-api.git",
+                "reference": "88907459f89411caef9cbd99a03995f7be143db8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maniaplanet/dedicated-server-api/zipball/88907459f89411caef9cbd99a03995f7be143db8",
+                "reference": "88907459f89411caef9cbd99a03995f7be143db8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Maniaplanet\\": "libraries/Maniaplanet"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "NadeoLive",
+                    "email": "livedev@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "XML-RPC library to connect to ManiaPlanet server",
+            "homepage": "https://github.com/maniaplanet/dedicated-server-api",
+            "keywords": [
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania"
+            ],
+            "time": "2017-08-02 12:10:48"
+        },
+        {
             "name": "nesbot/carbon",
             "version": "1.22.1",
             "source": {
@@ -489,16 +537,16 @@
         },
         {
             "name": "symfony/translation",
-            "version": "v3.4.3",
+            "version": "v3.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation.git",
-                "reference": "17b5962d252b2d6d1d37a2485ebb7ddc5b2bef0a"
+                "reference": "10b32cf0eae28b9b39fe26c456c42b19854c4b84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation/zipball/17b5962d252b2d6d1d37a2485ebb7ddc5b2bef0a",
-                "reference": "17b5962d252b2d6d1d37a2485ebb7ddc5b2bef0a",
+                "url": "https://api.github.com/repos/symfony/translation/zipball/10b32cf0eae28b9b39fe26c456c42b19854c4b84",
+                "reference": "10b32cf0eae28b9b39fe26c456c42b19854c4b84",
                 "shasum": ""
             },
             "require": {
@@ -553,7 +601,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-01-03 07:37:34"
+            "time": "2018-01-18 22:16:57"
         }
     ],
     "packages-dev": [],

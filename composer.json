@@ -1,5 +1,6 @@
 {
     "require": {
-        "illuminate/database": "^5.5"
+        "illuminate/database": "^5.5",
+        "maniaplanet/dedicated-server-api": "^5.0"
     }
 }

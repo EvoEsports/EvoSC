@@ -24,6 +24,11 @@ class Log
 
     public static function error($message)
     {
-        self::logAddLine(sprintf("ERROR: %s", $message));
+        self::logAddLine(sprintf("[!] ERROR: %s", $message));
+    }
+
+    public static function warning($message)
+    {
+        self::logAddLine(sprintf("Warning: %s", $message));
     }
 }

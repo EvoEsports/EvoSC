@@ -19,7 +19,6 @@ class EventHandler
     public static function callEvent($event)
     {
         if(!array_key_exists($event, self::$events)){
-            Log::error("Unregistered event called: $event");
             return;
         }
 

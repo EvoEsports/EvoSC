@@ -6,7 +6,7 @@ class ModuleHandler
 {
     public static function loadModules($loadFrom = 'modules')
     {
-        foreach (array_diff(scandir('modules'), array('..', '.')) as $item) {
+        foreach (array_diff(scandir('modules'), array('..', '.', '.gitignore')) as $item) {
             $dir = $loadFrom . '/' . $item;
 
             if (!file_exists($dir . '/module.json')) {
