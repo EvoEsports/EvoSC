@@ -1,6 +1,7 @@
 {
     "require": {
         "illuminate/database": "^5.5",
-        "maniaplanet/dedicated-server-api": "^5.0"
+        "maniaplanet/dedicated-server-api": "^5.0",
+        "BluePsyduck/ManiaScript": "^1.1"
     }
 }

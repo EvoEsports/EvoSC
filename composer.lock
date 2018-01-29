@@ -4,9 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d52dfb29377a6bb468df4684130d2484",
-    "content-hash": "8d28c7b4d9496338f26d2982cb6ee027",
+    "hash": "8ffb3e10ea26a957af0cb20d517edcfd",
+    "content-hash": "e920283481012739fa6fc048cf1cd7c5",
     "packages": [
+        {
+            "name": "bluepsyduck/maniascript",
+            "version": "1.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/BluePsyduck/ManiaScript.git",
+                "reference": "ee5f9948912513750f5293bfe4db375a96a4f94d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/BluePsyduck/ManiaScript/zipball/ee5f9948912513750f5293bfe4db375a96a4f94d",
+                "reference": "ee5f9948912513750f5293bfe4db375a96a4f94d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "ManiaScript\\": "src/",
+                    "ManiaScriptTests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Marcel",
+                    "email": "marcel@mania-community.de",
+                    "homepage": "http://www.mania-community.de/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Lib helping you with building up the ManiaScript of a ManiaLink.",
+            "keywords": [
+                "ManiaPlanet",
+                "ManiaScript"
+            ],
+            "time": "2014-12-26 11:20:12"
+        },
         {
             "name": "doctrine/inflector",
             "version": "v1.3.0",

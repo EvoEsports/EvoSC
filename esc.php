@@ -14,13 +14,13 @@ Log::info("Starting...");
 
 try {
     ModuleHandler::loadModules('core/modules');
-    ModuleHandler::loadModules('modules');
+//    ModuleHandler::loadModules('modules');
 
     Log::info("Loading config files.");
     Config::loadConfigFiles();
 
     try{
-        Log::info("Connecting to server.");
+        Log::info("Connecting to server...");
         $rpc = Connection::factory(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
         $rpc->enableCallbacks();
         Log::info("Connection established.");
@@ -32,7 +32,7 @@ try {
     while (true) {
         Timer::startCycle();
 
-        EventHandler::callEvent('tick');
+        EventHandler::handleCallbacks($rpc->executeCallbacks());
 
         usleep(Timer::getNextCyclePause());
     }

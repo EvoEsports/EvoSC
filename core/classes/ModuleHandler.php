@@ -6,7 +6,7 @@ class ModuleHandler
 {
     public static function loadModules($loadFrom = 'modules')
     {
-        foreach (array_diff(scandir('modules'), array('..', '.', '.gitignore')) as $item) {
+        foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
             $dir = $loadFrom . '/' . $item;
 
             if (!file_exists($dir . '/module.json')) {
@@ -16,9 +16,11 @@ class ModuleHandler
             $module = json_decode(file_get_contents($dir . '/module.json'));
 
             try {
-                require_once "modules/$item/$module->main.php";
-                $className = "\\modules\\$item\\$module->main()";
+                require_once "$loadFrom/$item/$module->main.php";
+                $className = "\\$loadFrom\\$item\\$module->main()";
                 $test = new $module->main();
+
+                Log::info("Loaded module: $item");
             } catch (\Exception $e) {
                 Log::error("Could not load ($item)");
             }
