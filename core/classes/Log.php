@@ -31,4 +31,9 @@ class Log
     {
         self::logAddLine(sprintf("Warning: %s", $message));
     }
+
+    public static function hook($message)
+    {
+        self::logAddLine(sprintf("Hook: %s", $message));
+    }
 }

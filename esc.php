@@ -6,6 +6,7 @@ use esc\classes\Timer;
 use esc\classes\ModuleHandler;
 use \esc\classes\EventHandler;
 use Maniaplanet\DedicatedServer\Connection;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 include 'core/autoload.php';
 include 'vendor/autoload.php';
@@ -18,6 +19,30 @@ try {
 
     Log::info("Loading config files.");
     Config::loadConfigFiles();
+
+    \esc\controllers\HookController::initialize();
+
+    Log::info("Connecting to database...");
+    $capsule = new Capsule;
+    $capsule->addConnection([
+        'driver'    => 'mysql',
+        'host'      => Config::get('db.host'),
+        'database'  => Config::get('db.db'),
+        'username'  => Config::get('db.user'),
+        'password'  => Config::get('db.password'),
+        'charset'   => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+        'prefix'    => '',
+    ]);
+
+    // Make this Capsule instance available globally via static methods... (optional)
+    $capsule->setAsGlobal();
+
+    // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
+    $capsule->bootEloquent();
+    Log::info("Database connected.");
+
+    \esc\controllers\PlayerController::initialize();
 
     try{
         Log::info("Connecting to server...");
@@ -32,7 +57,7 @@ try {
     while (true) {
         Timer::startCycle();
 
-        EventHandler::handleCallbacks($rpc->executeCallbacks());
+        \esc\controllers\HookController::handleCallbacks($rpc->executeCallbacks());
 
         usleep(Timer::getNextCyclePause());
     }

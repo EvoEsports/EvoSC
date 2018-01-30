@@ -13,7 +13,7 @@ class Config
         $config = array_shift($variableExplode);
 
         if(!array_key_exists($config, self::$configs)){
-            Log::error("Trying to access unloaded config: $config.");
+            Log::error("Trying to access unloaded config: $variable");
             return null;
         }
 
