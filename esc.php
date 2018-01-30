@@ -4,7 +4,6 @@ use esc\classes\Config;
 use esc\classes\Log;
 use esc\classes\Timer;
 use esc\classes\ModuleHandler;
-use \esc\classes\EventHandler;
 use Maniaplanet\DedicatedServer\Connection;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -12,6 +11,8 @@ include 'core/autoload.php';
 include 'vendor/autoload.php';
 
 Log::info("Starting...");
+
+mb_internal_encoding("UTF-8");
 
 try {
     ModuleHandler::loadModules('core/modules');
@@ -21,6 +22,7 @@ try {
     Config::loadConfigFiles();
 
     \esc\controllers\HookController::initialize();
+    \esc\controllers\ChatController::initialize();
 
     Log::info("Connecting to database...");
     $capsule = new Capsule;
