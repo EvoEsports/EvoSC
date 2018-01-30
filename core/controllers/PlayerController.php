@@ -3,7 +3,6 @@
 namespace esc\controllers;
 
 
-use esc\classes\EventHandler;
 use esc\classes\Log;
 use esc\models\Player;
 
@@ -11,6 +10,7 @@ class PlayerController
 {
     public static function initialize()
     {
+        HookController::add('ManiaPlanet.PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
         HookController::add('ManiaPlanet.PlayerInfoChanged', '\esc\controllers\PlayerController::playerInfoChanged');
     }
 
@@ -26,7 +26,7 @@ class PlayerController
             Log::info("New player ($login)");
         }
 
-        $player->increment('visits');
+        $player->increment('Visits');
 
         return $player;
     }
@@ -39,8 +39,6 @@ class PlayerController
             $player = self::playerConnect($infoplayerInfo['Login']);
         }
 
-        $player->nickname = $infoplayerInfo['NickName'];
-        $player->lp = $infoplayerInfo['LadderScore'];
-        $player->save();
+        $player->update($infoplayerInfo);
     }
 }
