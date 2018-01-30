@@ -1,9 +1,9 @@
 # Evolution Server Controller
 
-A modular server controller for Trackmania² based on PHP 7.0 and Maniaplanet 4 support.
+A modular server controller for Trackmania² based on PHP 7.2 and Maniaplanet 4 support.
 
 ### Requirements
-* PHP >= 7.0
+* PHP 7.2
 * Composer installed
 
 ### Installation
