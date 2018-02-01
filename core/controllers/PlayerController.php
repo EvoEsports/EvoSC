@@ -27,7 +27,7 @@ class PlayerController
         return self::$players;
     }
 
-    public static function playerConnect($login): Player
+    public static function playerConnect($login, $isSpectator): Player
     {
         try {
             $player = Player::whereLogin($login)->firstOrFail();
@@ -37,6 +37,7 @@ class PlayerController
             $player->save();
         }
 
+        $player->spectator = $isSpectator;
         $player->increment('Visits');
 
         self::getPlayers()->add($player);
@@ -49,10 +50,10 @@ class PlayerController
 
     public static function playerFinish($uid, $login, $score)
     {
-        if($score > 0){
+        if ($score > 0) {
             $player = self::getPlayerByLogin($login);
 
-            if(!$player){
+            if (!$player) {
                 return;
             }
 
@@ -65,7 +66,7 @@ class PlayerController
     {
         $player = self::getPlayerByLogin($login);
 
-        if($player){
+        if ($player) {
             Log::info($player->nick(true) . " ($login) left the server.");
             self::$players = self::getPlayers()->diff([$player]);
         }
@@ -75,7 +76,7 @@ class PlayerController
     {
         $player = self::getPlayerByLogin($infoplayerInfo['Login']);
 
-        if($player){
+        if ($player) {
             $player->update($infoplayerInfo);
         }
     }
@@ -86,7 +87,7 @@ class PlayerController
             return $value->Login = $login;
         });
 
-        if($playersFound->isNotEmpty() && $playersFound->count() == 1){
+        if ($playersFound->isNotEmpty() && $playersFound->count() == 1) {
             return $playersFound->first();
         }
 
@@ -95,10 +96,11 @@ class PlayerController
         return null;
     }
 
-    public static function sendScoreboard(){
+    public static function sendScoreboard()
+    {
         $manialink = new Manialink(-160, 90, "LiveRanking", 1);
-        $manialink->addQuad(0, 0, 50, 80, '0003', -1);
-        $manialink->addLabel(3, -3, 50,10, "\$mPlayers", 0.7);
+        $manialink->addQuad(0, 0, 50, 80, '0005', -1);
+        $manialink->addLabel(3, -3, 50, 10, "\$mPlayers", 0.7);
 
         $row = 0;
         foreach (self::getPlayers() as $player) {
