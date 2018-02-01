@@ -12,59 +12,57 @@ include 'vendor/autoload.php';
 
 Log::info("Starting...");
 
-mb_internal_encoding("UTF-8");
-
-try {
-    ModuleHandler::loadModules('core/modules');
+ModuleHandler::loadModules('core/modules');
 //    ModuleHandler::loadModules('modules');
 
-    Log::info("Loading config files.");
-    Config::loadConfigFiles();
+Log::info("Loading config files.");
+Config::loadConfigFiles();
 
-    \esc\controllers\HookController::initialize();
-    \esc\controllers\ChatController::initialize();
+\esc\controllers\HookController::initialize();
+\esc\controllers\ChatController::initialize();
 
-    Log::info("Connecting to database...");
-    $capsule = new Capsule;
-    $capsule->addConnection([
-        'driver'    => 'mysql',
-        'host'      => Config::get('db.host'),
-        'database'  => Config::get('db.db'),
-        'username'  => Config::get('db.user'),
-        'password'  => Config::get('db.password'),
-        'charset'   => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-        'prefix'    => '',
-    ]);
+Log::info("Connecting to database...");
+$capsule = new Capsule;
+$capsule->addConnection([
+    'driver'    => 'mysql',
+    'host'      => Config::get('db.host'),
+    'database'  => Config::get('db.db'),
+    'username'  => Config::get('db.user'),
+    'password'  => Config::get('db.password'),
+    'charset'   => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix'    => '',
+]);
 
-    // Make this Capsule instance available globally via static methods... (optional)
-    $capsule->setAsGlobal();
+// Make this Capsule instance available globally via static methods... (optional)
+$capsule->setAsGlobal();
 
-    // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
-    $capsule->bootEloquent();
-    Log::info("Database connected.");
+// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
+$capsule->bootEloquent();
+Log::info("Database connected.");
 
-    \esc\controllers\PlayerController::initialize();
+\esc\controllers\PlayerController::initialize();
 
-    try{
-        Log::info("Connecting to server...");
-        $rpc = Connection::factory(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
-        $rpc->enableCallbacks();
-        Log::info("Connection established.");
-    }catch(\Exception $e){
-        Log::error("Connection to server failed.");
-        throw new Exception("Connection to server failed.");
-    }
+try{
+    Log::info("Connecting to server...");
+    $rpc = Connection::factory(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
+    \esc\controllers\RpcController::initialize(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
+    Log::info("Connection established.");
+}catch(\Exception $e){
+    Log::error("Connection to server failed.");
+    throw new Exception("Connection to server failed.");
+}
 
-    while (true) {
-        Timer::startCycle();
+foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
+    \esc\controllers\PlayerController::playerConnect($player->login);
+}
 
-        \esc\controllers\HookController::handleCallbacks($rpc->executeCallbacks());
+while (true) {
+    Timer::startCycle();
 
-        usleep(Timer::getNextCyclePause());
-    }
-} catch (Exception $e) {
-    Log::error("Fatal error. Restarting...");
+    \esc\controllers\HookController::handleCallbacks(\esc\controllers\RpcController::executeCallbacks());
+
+    usleep(Timer::getNextCyclePause());
 }
 
 Log::info("Shutting down.");

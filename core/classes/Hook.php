@@ -20,8 +20,8 @@ class Hook
     {
         call_user_func_array($this->function, $arguments);
         Log::hook("Execute: $this->function");
-        Log::hook("  +ARGS: " . (is_array($arguments) ? implode(', ', array_keys($arguments)) : $arguments));
-        Log::hook("+VALUES: " . (is_array($arguments) ? implode(', ', array_values($arguments)) : $arguments));
+//        Log::hook("  +ARGS: " . (is_array($arguments) ? implode(', ', array_keys($arguments)) : $arguments));
+//        Log::hook("+VALUES: " . (is_array($arguments) ? implode(', ', array_values($arguments)) : $arguments));
     }
 
     public function getEvent(): string
