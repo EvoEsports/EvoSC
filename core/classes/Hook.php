@@ -16,7 +16,7 @@ class Hook
         $this->name = $name;
     }
 
-    public function execute($arguments = null)
+    public function execute(...$arguments)
     {
         call_user_func_array($this->function, $arguments);
         Log::hook("Execute: $this->function");

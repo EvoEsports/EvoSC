@@ -12,6 +12,7 @@ function esc_autoloader($className)
     $file = $realClassName . '.php';
 
     if (file_exists($file)) {
+//        echo "[[AUTOLOAD]] --------------------------------------> ".str_pad($className, 40, ' ',STR_PAD_RIGHT)." from $file\n";
         require_once $file;
     }
 }

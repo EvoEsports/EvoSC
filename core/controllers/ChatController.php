@@ -9,7 +9,7 @@ class ChatController
 {
     public static function initialize()
     {
-        HookController::add('ManiaPlanet.PlayerChat', 'esc\controllers\ChatController::logChat');
+        HookController::add('PlayerChat', 'esc\controllers\ChatController::logChat');
     }
 
     //int PlayerUid, string Login, string Text, bool IsRegistredCmd

@@ -14,77 +14,61 @@ class PlayerController
 
     public static function initialize()
     {
-        HookController::add('ManiaPlanet.PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
-        HookController::add('ManiaPlanet.PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
-        HookController::add('ManiaPlanet.PlayerInfoChanged', '\esc\controllers\PlayerController::playerInfoChanged');
-        HookController::add('TrackMania.PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
+        HookController::add('PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
+        HookController::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
+        HookController::add('PlayerInfoChanged', '\esc\controllers\PlayerController::playerInfoChanged');
+        HookController::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
         self::$players = new Collection();
     }
 
-    private static function getPlayers(): Collection
+    public static function getPlayers(): Collection
     {
         return self::$players;
     }
 
-    public static function playerConnect($login, $isSpectator): Player
+    public static function playerConnect(Player $player): Player
     {
-        try {
-            $player = Player::whereLogin($login)->firstOrFail();
-        } catch (\Exception $e) {
-            $player = new Player();
-            $player->login = $login;
-            $player->save();
-        }
-
-        $player->spectator = $isSpectator;
         $player->increment('Visits');
 
         self::getPlayers()->add($player);
-        Log::info($player->nick(true) . " ($login) joined the server.");
+        Log::info($player->nick(true) . " ($player->Login) joined the server.");
 
         self::sendScoreboard();
 
         return $player;
     }
 
-    public static function playerFinish($uid, $login, $score)
+    public static function playerFinish(Player $player, $score)
     {
         if ($score > 0) {
-            $player = self::getPlayerByLogin($login);
-
-            if (!$player) {
-                return;
-            }
-
             $player->setScore($score);
             self::sendScoreboard();
         }
     }
 
-    public static function playerDisconnect($login, $disconnectReason)
+    public static function playerDisconnect(Player $player, $disconnectReason)
     {
-        $player = self::getPlayerByLogin($login);
-
-        if ($player) {
-            Log::info($player->nick(true) . " ($login) left the server.");
-            self::$players = self::getPlayers()->diff([$player]);
-        }
+        Log::info($player->nick(true) . " ($player->Login) left the server.");
+        self::$players = self::getPlayers()->diff([$player]);
     }
 
     public static function playerInfoChanged($infoplayerInfo)
     {
-        $player = self::getPlayerByLogin($infoplayerInfo['Login']);
-
-        if ($player) {
-            $player->update($infoplayerInfo);
+        foreach ($infoplayerInfo as $info) {
+            try {
+                $player = Player::whereLogin($info['Login'])->firstOrFail();
+                $player->update($info);
+            } catch (\Exception $e) {
+                return;
+            }
         }
     }
 
     public static function getPlayerByLogin(string $login): ?Player
     {
         $playersFound = self::getPlayers()->filter(function ($value, $key) use ($login) {
-            return $value->Login = $login;
+            return $value->Login == $login;
         });
 
         if ($playersFound->isNotEmpty() && $playersFound->count() == 1) {
@@ -102,10 +86,12 @@ class PlayerController
         $manialink->addQuad(0, 0, 50, 80, '0005', -1);
         $manialink->addLabel(3, -3, 50, 10, "\$mPlayers", 0.7);
 
+        $players = self::getPlayers()->sortBy('score');
+
         $row = 0;
-        foreach (self::getPlayers() as $player) {
-            $manialink->addLabel(3, -($row * 3.5 + 8), 50, 10, $player->nick(), 0.6);
-            $manialink->addLabel(45, -($row * 3.5 + 8), 50, 10, $player->getTime(), 0.6, 0, 'right');
+        foreach ($players as $player) {
+            $manialink->addLabel(3, -($row * 5 + 8), 50, 10, $player->nick(), 0.6);
+            $manialink->addLabel(45, -($row * 5 + 8), 50, 10, $player->getTime(), 0.6, 0, 'right');
             $row++;
         }
 
