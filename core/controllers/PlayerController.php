@@ -4,7 +4,11 @@ namespace esc\controllers;
 
 
 use esc\classes\Log;
+use esc\classes\ManiaBuilder;
 use esc\classes\Manialink;
+use esc\ManiaLink\Box;
+use esc\ManiaLink\Label;
+use esc\ManiaLink\Row;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -94,8 +98,22 @@ class PlayerController
 
     public static function sendScoreboard()
     {
+        $builder = new ManiaBuilder('LiveScore', 0, -50, 50, 80);
+
+        $title = new Row(50, 5);
+        $title->setElement(Label::create('Scoreboard', 1.2));
+        $title->setBackground('000d');
+        $builder->addRow($title);
+
+
+
+        $builder->addRow($title);
+        $builder->sendToAll();
+
+
+        //old
         $manialink = new Manialink(-160, 90, "LiveRanking", 1);
-        $manialink->addQuad(0, 0, 50, 80, '0005', -1);
+        $manialink->addQuad(0, 0, 50, 80, '0003', -1);
         $manialink->addLabel(3, -3, 50, 10, "\$mPlayers", 0.7);
 
         $players = self::getPlayers()->sortBy('spectator')->sortBy('score');
