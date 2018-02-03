@@ -88,4 +88,8 @@ class Player extends Model
     {
         return $this->spectator;
     }
+
+    public function locals(){
+        return $this->hasMany('esc\models\LocalRecord', 'player');
+    }
 }

@@ -12,4 +12,8 @@ class Map extends Model
     protected $primaryKey = 'UId';
 
     public $timestamps = false;
+
+    public function locals(){
+        return $this->hasMany('esc\models\LocalRecord', 'map');
+    }
 }
