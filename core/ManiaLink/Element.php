@@ -14,7 +14,7 @@ class Element
         return 0;
     }
 
-    public function toString($offsetX, $offsetY, $padding): string
+    public function toString($offsetX, $offsetY, $iwdth, $padding): string
     {
         return "";
     }

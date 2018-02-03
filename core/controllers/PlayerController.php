@@ -73,14 +73,15 @@ class PlayerController
 
         foreach ($infoplayerInfo as $info) {
             try {
-                $player = Player::findOrFail($info['Login']);
+                $player = self::getPlayerByLogin($info['Login']);
                 $player->update($info);
             } catch (\Exception $e) {
                 $player = Player::create($info);
+                self::$players->add($player);
             }
 
-            if($player){
-                $player->setIsSpectator($info['SpectatorStatus']);
+            if ($player) {
+                $player->setIsSpectator($info['SpectatorStatus'] > 0);
             }
         }
 
@@ -98,40 +99,40 @@ class PlayerController
 
     public static function sendScoreboard()
     {
-        $builder = new ManiaBuilder('LiveScore', 0, -50, 50, 80);
+        $players = self::getPlayers()->sortBy('score');
 
-        $title = new Row(50, 5);
-        $title->setElement(Label::create('Scoreboard', 1.2));
-        $title->setBackground('000d');
+        $builder = new ManiaBuilder('LiveScore', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 60, 80);
+
+        $title = new Row(2);
+        $title->setElement(Label::create('Scoreboard', 0.8));
+        $title->setBackground('000c');
         $builder->addRow($title);
 
-
-
-        $builder->addRow($title);
-        $builder->sendToAll();
-
-
-        //old
-        $manialink = new Manialink(-160, 90, "LiveRanking", 1);
-        $manialink->addQuad(0, 0, 50, 80, '0003', -1);
-        $manialink->addLabel(3, -3, 50, 10, "\$mPlayers", 0.7);
-
-        $players = self::getPlayers()->sortBy('spectator')->sortBy('score');
-
-        $row = 0;
+        $i = 1;
         foreach ($players as $player) {
-            $manialink->addLabel(3, -($row * 5 + 8), 50, 10, $player->nick(), 0.6);
-            $manialink->addLabel(45, -($row * 5 + 8), 50, 10, $player->getTime(), 0.6, 0, 'right');
-            $row++;
+            $nick = $player->nick();
+            $time = $player->getTime();
+
+            $ply = new Row(2);
+            $position = "$i.";
+            if($player->isSpectator()){
+                $position = "📷";
+            }
+            $ply->setElement(Label::create("$position   $time   $nick", 0.6));
+            $ply->setBackground('0009');
+
+            $builder->addRow($ply);
+            $i++;
         }
 
+            $builder->sendToAll();
         //Do not send identical manialinks more than once, reduce network traffic
-        $hash = md5(serialize($manialink));
-        if (self::$lastManialinkHash != $hash) {
-            $manialink->sendToAll();
-            self::$lastManialinkHash = $hash;
-        }else{
-            Log::info("Manialink identical, not sending.");
-        }
+//        $hash = md5(serialize($builder));
+//        if (self::$lastManialinkHash != $hash) {
+//            $builder->sendToAll();
+//            self::$lastManialinkHash = $hash;
+//        } else {
+//            Log::info("Manialink identical, not sending.");
+//        }
     }
 }

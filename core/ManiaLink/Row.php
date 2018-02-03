@@ -7,13 +7,11 @@ class Row
 {
     private $padding;
     private $element;
-    private $width;
     private $background;
 
-    public function __construct(float $width, float $padding = 0.1)
+    public function __construct(float $padding = 0.1)
     {
         $this->padding = $padding;
-        $this->width = $width;
     }
 
     public function getPadding()
@@ -36,13 +34,13 @@ class Row
         $this->element = $element;
     }
 
-    public function toString($offset)
+    public function toString($width, $offset)
     {
         $x = 0;
         $y = -$offset;
 
-        $xml = '<quad pos="' . $x . ' ' . $y . '" z-index="-1" size="' . $this->width . ' ' . ($this->getElement()->getHeight() + 2 * $this->padding) . '" bgcolor="' . $this->background . '"/>';
-        $xml .= $this->getElement()->toString($this->padding, $offset + $this->padding, $this->padding);
+        $xml = '<quad pos="' . $x . ' ' . $y . '" z-index="-1" size="' . $width . ' ' . ($this->getElement()->getHeight() + 2 * $this->padding) . '" bgcolor="' . $this->background . '"/>';
+        $xml .= $this->getElement()->toString($this->padding, $offset + $this->padding, $width, $this->padding);
 
         return $xml;
     }

@@ -33,8 +33,12 @@ class Player extends Model
         return $this->NickName;
     }
 
-    public function getTime()
+    public function getTime(bool $asSeconds = false)
     {
+        if($asSeconds){
+            return $this->score;
+        }
+
         return $this->getTimeFormatted();
     }
 
@@ -45,16 +49,8 @@ class Player extends Model
 
     private function getTimeFormatted()
     {
-        if ($this->spectator) {
-            if ($this->afk) {
-                return "AFK";
-            }
-
-            return "SPEC";
-        }
-
         if ($this->score == 0) {
-            return '-,---';
+            $time = '0.00,000';
         }
 
         $minutes = 0;
@@ -67,10 +63,12 @@ class Player extends Model
         }
 
         if ($minutes == 0) {
-            return sprintf('%d.%03d', $seconds, $ms);
+            $time = sprintf('%02d.%03d', $seconds, $ms);
+        }else{
+            $time = sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
         }
 
-        return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
+        return $time;
     }
 
     public static function exists(string $login)
@@ -84,9 +82,9 @@ class Player extends Model
         $this->spectator = $isSpectator;
     }
 
-    public function isSpectator()
+    public function isSpectator(): bool
     {
-        return $this->spectator;
+        return $this->spectator > 0;
     }
 
     public function locals(){

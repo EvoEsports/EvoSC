@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ManiaBuilder
 {
-    const STICK_LEFT = 1;
-    const STICK_RIGHT = 2;
-    const STICK_TOP = 3;
-    const STICK_BOTTOM = 4;
+    const STICK_LEFT = 1001;
+    const STICK_RIGHT = 1002;
+    const STICK_TOP = 1003;
+    const STICK_BOTTOM = 1004;
 
     private $id;
     private $x;
@@ -33,6 +33,19 @@ class ManiaBuilder
         $this->height = $height;
         $this->scale = $scale;
         $this->rows = new Collection();
+
+        if($x == ManiaBuilder::STICK_LEFT){
+            $this->x = -160;
+        }
+        if($x == ManiaBuilder::STICK_RIGHT){
+            $this->x = 160 - $width;
+        }
+        if($y == ManiaBuilder::STICK_TOP){
+            $this->y = 90;
+        }
+        if($y == ManiaBuilder::STICK_BOTTOM){
+            $this->y = -90;
+        }
     }
 
     public function addRow(Row $row)
@@ -62,7 +75,7 @@ class ManiaBuilder
         $offset = 0;
         $inner = '';
         foreach ($this->rows as $row) {
-            $inner .= $row->toString($offset);
+            $inner .= $row->toString($this->width, $offset);
             $offset += $row->getHeight();
         }
 

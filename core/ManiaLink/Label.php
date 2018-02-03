@@ -25,10 +25,10 @@ class Label extends Element
         return new Label($text, $textSize);
     }
 
-    public function toString($offsetX, $offsetY, $padding): string
+    public function toString($offsetX, $offsetY, $width, $padding): string
     {
         $height = $this->getHeight();
-        return '<label pos="' . $offsetX . ' ' . -$offsetY . '" z-index="' . 0 . '" size="' . 50 . ' ' . $height . '" scale="' . $this->textSize . '" text="' . $this->text . '" halign="' . $this->alignment . '" />';
+        return '<label pos="' . $offsetX . ' ' . -$offsetY . '" z-index="' . 0 . '" size="' . $width . ' ' . $height . '" scale="' . $this->textSize . '" text="' . $this->text . '" halign="' . $this->alignment . '" />';
     }
 
     public function getHeight(): float
