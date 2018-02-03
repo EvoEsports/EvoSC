@@ -9,7 +9,11 @@ class Player extends Model
 {
     protected $table = 'players';
 
-    protected $fillable = ['NickName', 'LadderScore'];
+    protected $fillable = ['Login', 'NickName', 'LadderScore'];
+
+    protected $primaryKey = 'Login';
+
+    public $timestamps = false;
 
     public $spectator = false;
     public $afk = false;
@@ -69,4 +73,19 @@ class Player extends Model
         return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
     }
 
+    public static function exists(string $login)
+    {
+        $player = self::whereLogin($login)->first();
+        return $player->exists;
+    }
+
+    public function setIsSpectator(bool $isSpectator)
+    {
+        $this->spectator = $isSpectator;
+    }
+
+    public function isSpectator()
+    {
+        return $this->spectator;
+    }
 }

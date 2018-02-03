@@ -4,6 +4,7 @@ namespace esc\controllers;
 
 
 use esc\classes\Log;
+use esc\models\Player;
 
 class ChatController
 {
@@ -12,8 +13,8 @@ class ChatController
         HookController::add('PlayerChat', 'esc\controllers\ChatController::logChat');
     }
 
-    //int PlayerUid, string Login, string Text, bool IsRegistredCmd
-    public static function logChat($playerId, $login, $text, $isRegisteredCmd){
-        Log::chat($login, $text);
+    public static function logChat(Player $player, $text, $isRegisteredCmd)
+    {
+        Log::chat($player->nick(true), $text);
     }
 }

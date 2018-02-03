@@ -5,6 +5,7 @@ namespace esc\controllers;
 
 use esc\classes\Hook;
 use esc\classes\Log;
+use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -15,9 +16,13 @@ class HookController
     private static $eventMap = [
         'ManiaPlanet.PlayerConnect' => 'PlayerConnect',
         'ManiaPlanet.PlayerDisconnect' => 'PlayerDisconnect',
-        'ManiaPlanet.PlayerInfoChanged' => 'PlayerInfoChanged',
+        'ManiaPlanet.PlayerInfoChanged' => 'ManiaPlanet.PlayerInfoChanged',
+        'ManiaPlanet.PlayerChat' => 'PlayerChat',
+        'ManiaPlanet.BeginMap' => 'BeginMap',
+        'ManiaPlanet.EndMap' => 'EndMap',
+        'TrackMania.PlayerCheckpoint' => 'PlayerCheckpoint',
         'TrackMania.PlayerFinish' => 'PlayerFinish',
-        'ManiaPlanet.PlayerChat' => 'PlayerChat'
+        'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
     ];
 
     public static function initialize()
@@ -50,6 +55,11 @@ class HookController
 
     private static function fire(string $hook, $arguments = null)
     {
+        if($hook == 'ManiaPlanet.PlayerInfoChanged'){
+            PlayerController::playerInfoChanged($arguments);
+            $hook = 'PlayerInfoChanged';
+        }
+
         echo "Hook called: $hook\n";
 
         $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
@@ -57,37 +67,67 @@ class HookController
         });
 
         switch ($hook) {
-            case 'PlayerConnect':
-                try {
-                    $player = Player::whereLogin($arguments[0])->firstOrFail();
-                } catch (\Exception $e) {
-                    $player = new Player();
-                    $player->login = $arguments[0];
-                    $player->saveOrFail();
+            case 'BeginMap':
+                //SMapInfo Map
+                echo "New map: " . $arguments[0]['UId'] . "\n";
+//                $map = Map::findOrFail($arguments['Uid']);
+//                self::fireHookBatch($hooks, $map);
+                break;
+
+            case 'EndMap':
+                //SMapInfo Map
+                echo "Map ended: " . $arguments[0]['UId'] . "\n";
+//                $map = Map::findOrFail($arguments['Uid']);
+//                self::fireHookBatch($hooks, $map);
+                break;
+
+            case 'PlayerInfoChanged':
+                //SPlayerInfo PlayerInfo
+                $players = new Collection();
+                foreach($arguments as $playerInfo){
+                    $players->add(PlayerController::getPlayerByLogin($playerInfo['Login']));
                 }
+                self::fireHookBatch($hooks, $players);
+                break;
+
+            case 'PlayerConnect':
+                //string Login, bool IsSpectator
+                $player = Player::find($arguments[0]);
                 $player->spectator = $arguments[1];
                 self::fireHookBatch($hooks, $player);
                 break;
 
             case 'PlayerDisconnect':
+                //string Login, string DisconnectionReason
                 $player = PlayerController::getPlayerByLogin($arguments[0]);
                 self::fireHookBatch($hooks, $player, $arguments[1]);
                 break;
 
-            case 'PlayerInfoChanged':
-                self::fireHookBatch($hooks, $arguments);
+            case 'PlayerChat':
+                //int PlayerUid, string Login, string Text, bool IsRegistredCmd
+                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3]);
+                break;
+
+            case 'PlayerCheckpoint':
+                //int PlayerUid, string Login, int TimeOrScore, int CurLap, int CheckpointIndex
+                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3], $arguments[4]);
                 break;
 
             case 'PlayerFinish':
+                //int PlayerUid, string Login, int TimeOrScore
                 $player = PlayerController::getPlayerByLogin($arguments[1]);
                 if($player == null){
-                    $player = Player::whereLogin($arguments[1])->first();
+                    $player = Player::find($arguments[1]);
                 }
                 self::fireHookBatch($hooks, $player, $arguments[2]);
                 break;
 
-            case 'ManiaPlanet.PlayerChat':
-                self::fireHookBatch($hooks, $arguments);
+            case 'PlayerIncoherence':
+                //int PlayerUid, string Login
+                $player = PlayerController::getPlayerByLogin($arguments['Login']);
+                self::fireHookBatch($hooks, $player);
                 break;
         }
     }
@@ -95,6 +135,11 @@ class HookController
     public static function call($event, $arguments = null)
     {
         echo "Event called: $event\n";
+
+        if($event == 'ManiaPlanet.ModeScriptCallbackArray'){
+            var_dump($arguments);
+            return;
+        }
 
         if (array_key_exists($event, self::$eventMap)) {
             $hook = self::$eventMap[$event];

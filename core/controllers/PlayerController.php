@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Collection;
 class PlayerController
 {
     private static $players;
+    private static $lastManialinkHash;
 
     public static function initialize()
     {
         HookController::add('PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
         HookController::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
-        HookController::add('PlayerInfoChanged', '\esc\controllers\PlayerController::playerInfoChanged');
         HookController::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
         self::$players = new Collection();
@@ -32,7 +32,7 @@ class PlayerController
         $player->increment('Visits');
 
         self::getPlayers()->add($player);
-        Log::info($player->nick(true) . " ($player->Login) joined the server.");
+        Log::info($player->nick(true) . " joined the server.");
 
         self::sendScoreboard();
 
@@ -49,20 +49,38 @@ class PlayerController
 
     public static function playerDisconnect(Player $player, $disconnectReason)
     {
-        Log::info($player->nick(true) . " ($player->Login) left the server.");
+        Log::info($player->nick(true) . " left the server [$disconnectReason].");
         self::$players = self::getPlayers()->diff([$player]);
     }
 
     public static function playerInfoChanged($infoplayerInfo)
     {
+        /*  struct SPlayerInfo
+            {
+              string Login;
+              string NickName;
+              int PlayerId;
+              int TeamId;
+              int SpectatorStatus;
+              int LadderRanking;
+              int Flags;
+            }
+        */
+
         foreach ($infoplayerInfo as $info) {
             try {
-                $player = Player::whereLogin($info['Login'])->firstOrFail();
+                $player = Player::findOrFail($info['Login']);
                 $player->update($info);
             } catch (\Exception $e) {
-                return;
+                $player = Player::create($info);
+            }
+
+            if($player){
+                $player->setIsSpectator($info['SpectatorStatus']);
             }
         }
+
+        self::sendScoreboard();
     }
 
     public static function getPlayerByLogin(string $login): ?Player
@@ -71,13 +89,7 @@ class PlayerController
             return $value->Login == $login;
         });
 
-        if ($playersFound->isNotEmpty() && $playersFound->count() == 1) {
-            return $playersFound->first();
-        }
-
-        Log::warning("Player not found ($login).");
-
-        return null;
+        return $playersFound->first();
     }
 
     public static function sendScoreboard()
@@ -86,7 +98,7 @@ class PlayerController
         $manialink->addQuad(0, 0, 50, 80, '0005', -1);
         $manialink->addLabel(3, -3, 50, 10, "\$mPlayers", 0.7);
 
-        $players = self::getPlayers()->sortBy('score');
+        $players = self::getPlayers()->sortBy('spectator')->sortBy('score');
 
         $row = 0;
         foreach ($players as $player) {
@@ -95,6 +107,13 @@ class PlayerController
             $row++;
         }
 
-        $manialink->sendToAll();
+        //Do not send identical manialinks more than once, reduce network traffic
+        $hash = md5(serialize($manialink));
+        if (self::$lastManialinkHash != $hash) {
+            $manialink->sendToAll();
+            self::$lastManialinkHash = $hash;
+        }else{
+            Log::info("Manialink identical, not sending.");
+        }
     }
 }

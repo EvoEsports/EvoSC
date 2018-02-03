@@ -17,7 +17,7 @@ class Log
 
         $line = "$time $string";
 
-        if($echo){
+        if ($echo) {
             echo "$line\n";
         }
 
@@ -44,18 +44,10 @@ class Log
         self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message));
     }
 
-    public static function chat($login, $message)
+    public static function chat($nick, $message)
     {
-        try {
-            $player = Player::whereLogin($login)->firstOrFail();
-            $line = $player->plainNick() . " ($login): ";
-        } catch (\Exception $e) {
-            Log::error("Trying to access non-existent player ($login).");
-            $line = "($login): ";
-        }
-
+        $line = "$nick: ";
         $line .= $message;
-
         self::logAddLine($line, true);
     }
 }

@@ -54,7 +54,7 @@ try{
 }
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
-    $ply = \esc\models\Player::whereLogin($player->login)->first();
+    $ply = \esc\models\Player::find($player->login);
     if($ply){
         \esc\controllers\PlayerController::playerConnect($ply);
     }
