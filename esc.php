@@ -12,9 +12,6 @@ include 'vendor/autoload.php';
 
 Log::info("Starting...");
 
-ModuleHandler::loadModules('core/modules');
-//    ModuleHandler::loadModules('modules');
-
 Log::info("Loading config files.");
 Config::loadConfigFiles();
 
@@ -52,6 +49,9 @@ try{
     Log::error("Connection to server failed.");
     throw new Exception("Connection to server failed.");
 }
+
+ModuleHandler::loadModules('core/modules');
+//    ModuleHandler::loadModules('modules');
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     $ply = \esc\models\Player::find($player->login);

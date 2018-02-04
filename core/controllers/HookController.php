@@ -93,8 +93,10 @@ class HookController
             case 'PlayerConnect':
                 //string Login, bool IsSpectator
                 $player = Player::find($arguments[0]);
-                $player->spectator = $arguments[1];
-                self::fireHookBatch($hooks, $player);
+                if($player){
+                    $player->spectator = $arguments[1];
+                    self::fireHookBatch($hooks, $player);
+                }
                 break;
 
             case 'PlayerDisconnect':

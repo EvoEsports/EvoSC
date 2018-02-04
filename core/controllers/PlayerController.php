@@ -5,8 +5,6 @@ namespace esc\controllers;
 
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
-use esc\classes\Manialink;
-use esc\ManiaLink\Box;
 use esc\ManiaLink\Label;
 use esc\ManiaLink\Row;
 use esc\models\Player;
@@ -74,13 +72,13 @@ class PlayerController
         foreach ($infoplayerInfo as $info) {
             try {
                 $player = self::getPlayerByLogin($info['Login']);
-                $player->update($info);
             } catch (\Exception $e) {
                 $player = Player::create($info);
                 self::$players->add($player);
             }
 
             if ($player) {
+                $player->update($info);
                 $player->setIsSpectator($info['SpectatorStatus'] > 0);
             }
         }
@@ -99,17 +97,15 @@ class PlayerController
 
     public static function sendScoreboard()
     {
-        $players = self::getPlayers()->sortBy('score');
-
         $builder = new ManiaBuilder('LiveScore', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 60, 80);
 
         $title = new Row(2);
         $title->setElement(Label::create('Scoreboard', 0.8));
-        $title->setBackground('000c');
+        $title->setBackground('0008');
         $builder->addRow($title);
 
         $i = 1;
-        foreach ($players as $player) {
+        foreach (self::getPlayers()->sortBy('score') as $player) {
             $nick = $player->nick();
             $time = $player->getTime();
 
@@ -119,20 +115,19 @@ class PlayerController
                 $position = "📷";
             }
             $ply->setElement(Label::create("$position   $time   $nick", 0.6));
-            $ply->setBackground('0009');
+            $ply->setBackground('0005');
 
             $builder->addRow($ply);
             $i++;
         }
 
-            $builder->sendToAll();
         //Do not send identical manialinks more than once, reduce network traffic
-//        $hash = md5(serialize($builder));
-//        if (self::$lastManialinkHash != $hash) {
-//            $builder->sendToAll();
-//            self::$lastManialinkHash = $hash;
-//        } else {
-//            Log::info("Manialink identical, not sending.");
-//        }
+        $hash = md5(serialize($builder));
+        if (self::$lastManialinkHash != $hash) {
+            $builder->sendToAll();
+            self::$lastManialinkHash = $hash;
+        } else {
+            Log::info("Manialink identical, not sending.");
+        }
     }
 }
