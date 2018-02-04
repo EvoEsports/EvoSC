@@ -3,6 +3,7 @@
 namespace esc\models;
 
 
+use esc\controllers\PlayerController;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
@@ -13,11 +14,14 @@ class Player extends Model
 
     protected $primaryKey = 'Login';
 
+    public $incrementing = false;
+
     public $timestamps = false;
 
     public $spectator = false;
     public $afk = false;
     public $score = 0;
+    private $online = false;
 
     private function plainNick(): string
     {
@@ -33,13 +37,18 @@ class Player extends Model
         return $this->NickName;
     }
 
-    public function getTime(bool $asSeconds = false)
+    public function getTime(bool $asMilliseconds = false)
     {
-        if($asSeconds){
+        if ($asMilliseconds) {
             return $this->score;
         }
 
-        return $this->getTimeFormatted();
+        $seconds = floor($this->score / 1000);
+        $ms = $this->score - ($seconds * 1000);
+        $minutes = floor($seconds / 60);
+        $seconds -= $minutes * 60;
+
+        return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
     }
 
     public function setScore($score)
@@ -47,34 +56,10 @@ class Player extends Model
         $this->score = $score;
     }
 
-    private function getTimeFormatted()
-    {
-        if ($this->score == 0) {
-            $time = '0.00,000';
-        }
-
-        $minutes = 0;
-        $seconds = floor($this->score / 1000);
-        $ms = $this->score % 1000;
-
-        if ($seconds >= 60) {
-            $minutes = $seconds / 60;
-            $seconds = $seconds % 60;
-        }
-
-        if ($minutes == 0) {
-            $time = sprintf('%02d.%03d', $seconds, $ms);
-        }else{
-            $time = sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
-        }
-
-        return $time;
-    }
-
     public static function exists(string $login)
     {
         $player = self::whereLogin($login)->first();
-        return $player->exists;
+        return $player != null;
     }
 
     public function setIsSpectator(bool $isSpectator)
@@ -87,7 +72,28 @@ class Player extends Model
         return $this->spectator > 0;
     }
 
-    public function locals(){
+    public function isOnline(): bool
+    {
+        return $this->online;
+    }
+
+    public function setOnline()
+    {
+        $this->online = true;
+    }
+
+    public function setOffline()
+    {
+        $this->online = false;
+    }
+
+    public function hasFinished(): bool
+    {
+        return $this->score > 0;
+    }
+
+    public function locals()
+    {
         return $this->hasMany('esc\models\LocalRecord', 'player');
     }
 }

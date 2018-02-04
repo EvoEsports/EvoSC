@@ -3,6 +3,7 @@
 namespace esc\controllers;
 
 
+use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
 use esc\ManiaLink\Label;
@@ -17,9 +18,9 @@ class PlayerController
 
     public static function initialize()
     {
-        HookController::add('PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
-        HookController::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
-        HookController::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
+//        Hook::add('PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
+        Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
+        Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
         self::$players = new Collection();
     }
@@ -32,6 +33,7 @@ class PlayerController
     public static function playerConnect(Player $player): Player
     {
         $player->increment('Visits');
+        $player->setOnline();
 
         self::getPlayers()->add($player);
         Log::info($player->nick(true) . " joined the server.");
@@ -45,6 +47,7 @@ class PlayerController
     {
         if ($score > 0) {
             $player->setScore($score);
+            Log::info($player->nick() . " finished with time ($score) " . $player->getTime());
             self::sendScoreboard();
         }
     }
@@ -52,7 +55,7 @@ class PlayerController
     public static function playerDisconnect(Player $player, $disconnectReason)
     {
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
-        self::$players = self::getPlayers()->diff([$player]);
+        $player->setOffline();
     }
 
     public static function playerInfoChanged($infoplayerInfo)
@@ -69,18 +72,28 @@ class PlayerController
             }
         */
 
+
         foreach ($infoplayerInfo as $info) {
-            try {
-                $player = self::getPlayerByLogin($info['Login']);
-            } catch (\Exception $e) {
-                $player = Player::create($info);
-                self::$players->add($player);
+            $player = self::getPlayerByLogin($info['Login']);
+
+            if(!$player){
+                if (Player::exists($info['Login'])) {
+                    $player = Player::find($info['Login']);
+                } else {
+                    $player = new \esc\models\Player();
+                    $player->Login = $info['Login'];
+                    $player->NickName = $info['NickName'];
+                    $player->LadderScore = $info['LadderScore'];
+                    $player->save();
+                }
             }
 
-            if ($player) {
-                $player->update($info);
-                $player->setIsSpectator($info['SpectatorStatus'] > 0);
+            if (!$player->isOnline()) {
+                $player->setOnline();
             }
+
+            $player->update($info);
+            $player->setIsSpectator($info['SpectatorStatus'] > 0);
         }
 
         self::sendScoreboard();
@@ -88,46 +101,49 @@ class PlayerController
 
     public static function getPlayerByLogin(string $login): ?Player
     {
-        $playersFound = self::getPlayers()->filter(function ($value, $key) use ($login) {
-            return $value->Login == $login;
-        });
-
-        return $playersFound->first();
+        echo "GET: $login ";
+        $player = self::getPlayers()->where('Login', $login)->first();
+        echo "FOUND: (" . $player->Login . ") " . $player->nick(true) . "\n";
+        return $player;
     }
 
     public static function sendScoreboard()
     {
-        $builder = new ManiaBuilder('LiveScore', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 60, 80);
+        //create template
+        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 60, 80);
 
         $title = new Row(2);
-        $title->setElement(Label::create('Scoreboard', 0.8));
+        $title->setElement(Label::create('Live rankings', 0.8));
         $title->setBackground('0008');
         $builder->addRow($title);
 
+        $players = self::getPlayers()->filter(function (Player $player, $key) {
+            return $player->score > 0;
+        });
+
+        $notFinished = self::getPlayers()->filter(function (Player $player, $key) {
+            return $player->score == 0;
+        });
+
         $i = 1;
-        foreach (self::getPlayers()->sortBy('score') as $player) {
-            $nick = $player->nick();
-            $time = $player->getTime();
+        foreach([$players, $notFinished] as $collection){
+            foreach ($collection as $player) {
+                $nick = $player->nick();
+                $time = $player->getTime();
 
-            $ply = new Row(2);
-            $position = "$i.";
-            if($player->isSpectator()){
-                $position = "📷";
+                $ply = new Row(2);
+                $position = "$i.";
+                if ($player->isSpectator()) {
+                    $position = "📷";
+                }
+                $ply->setElement(Label::create("$position   $time   $nick", 0.6));
+                $ply->setBackground('0005');
+
+                $builder->addRow($ply);
+                $i++;
             }
-            $ply->setElement(Label::create("$position   $time   $nick", 0.6));
-            $ply->setBackground('0005');
-
-            $builder->addRow($ply);
-            $i++;
         }
 
-        //Do not send identical manialinks more than once, reduce network traffic
-        $hash = md5(serialize($builder));
-        if (self::$lastManialinkHash != $hash) {
-            $builder->sendToAll();
-            self::$lastManialinkHash = $hash;
-        } else {
-            Log::info("Manialink identical, not sending.");
-        }
+        $builder->sendToAll();
     }
 }

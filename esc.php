@@ -55,8 +55,17 @@ ModuleHandler::loadModules('core/modules');
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     $ply = \esc\models\Player::find($player->login);
+    if(!\esc\models\Player::exists($player->login)){
+        $ply = new \esc\models\Player();
+        $ply->Login = $player->login;
+        $ply->NickName = $player->nickName;
+        $ply->LadderScore = $player->ladderRanking;
+        $ply->save();
+    }
+
     if($ply){
         \esc\controllers\PlayerController::playerConnect($ply);
+        $ply->setScore(0);
     }
 }
 

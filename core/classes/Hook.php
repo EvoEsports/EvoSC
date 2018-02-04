@@ -3,6 +3,8 @@
 namespace esc\classes;
 
 
+use esc\controllers\HookController;
+
 class Hook
 {
     private $name;
@@ -27,5 +29,10 @@ class Hook
     public function getEvent(): string
     {
         return $this->event;
+    }
+
+    public static function add(string $event, string $function)
+    {
+        HookController::add($event, $function);
     }
 }

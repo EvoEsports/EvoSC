@@ -3,8 +3,6 @@
 namespace esc\classes;
 
 
-use esc\models\Player;
-
 class Log
 {
     private static $prefix = '[ESC]';
@@ -21,7 +19,7 @@ class Log
             echo "$line\n";
         }
 
-        FileHandler::fileAppendLine($logFile, $line);
+        File::fileAppendLine($logFile, $line);
     }
 
     public static function info($message)

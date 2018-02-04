@@ -24,6 +24,9 @@ class ManiaBuilder
 
     private $rows;
 
+    private $lastManiaLink;
+    private static $manialinkCache;
+
     public function __construct(string $id, int $x = 0, int $y = 0, int $width, int $height, float $scale = 1.0)
     {
         $this->id = $id;
@@ -34,18 +37,37 @@ class ManiaBuilder
         $this->scale = $scale;
         $this->rows = new Collection();
 
-        if($x == ManiaBuilder::STICK_LEFT){
+        ManiaBuilder::createCache();
+
+        if ($x == ManiaBuilder::STICK_LEFT) {
             $this->x = -160;
         }
-        if($x == ManiaBuilder::STICK_RIGHT){
+        if ($x == ManiaBuilder::STICK_RIGHT) {
             $this->x = 160 - $width;
         }
-        if($y == ManiaBuilder::STICK_TOP){
+        if ($y == ManiaBuilder::STICK_TOP) {
             $this->y = 90;
         }
-        if($y == ManiaBuilder::STICK_BOTTOM){
+        if ($y == ManiaBuilder::STICK_BOTTOM) {
             $this->y = -90;
         }
+    }
+
+    public static function createCache(){
+        if(self::$manialinkCache == null){
+            self::$manialinkCache = new Collection();
+        }
+    }
+
+    public static function cacheSave(ManiaBuilder $builder)
+    {
+        self::$manialinkCache->add($builder);
+    }
+
+    public static function cacheLoad(string $id): ?ManiaBuilder
+    {
+        $out = self::$manialinkCache->first();
+        return $out;
     }
 
     public function addRow(Row $row)
@@ -61,7 +83,13 @@ class ManiaBuilder
 
     public function sendToAll()
     {
-        RpcController::call('SendDisplayManialinkPage', [$this->toString(), 0, false]);
+        $hash = md5(serialize($this));
+        if ($this->lastManiaLink != $hash) {
+            RpcController::call('SendDisplayManialinkPage', [$this->toString(), 0, false]);
+            $this->lastManiaLink = $hash;
+        } else {
+            Log::info("Manialink identical, not sending.");
+        }
     }
 
     public function toString()
