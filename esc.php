@@ -51,7 +51,7 @@ try{
 }
 
 ModuleHandler::loadModules('core/modules');
-//    ModuleHandler::loadModules('modules');
+ModuleHandler::loadModules('modules');
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     $ply = \esc\models\Player::find($player->login);

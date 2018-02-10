@@ -5,17 +5,31 @@ namespace esc\ManiaLink;
 
 class Element
 {
-    public function getHeight()
-    {
-        if ($this instanceof Label) {
-            return $this->getHeight();
-        }
+    private $style;
 
-        return 0;
+    public function __construct()
+    {
+        $this->style = new ManiaStyle();
     }
 
-    public function toString($offsetX, $offsetY, $iwdth, $padding): string
+    public function setStyle(array $style = null)
     {
-        return "";
+        if ($style) {
+            $this->style->setBatch($style);
+        }
+    }
+
+    public function getStyle(): ?ManiaStyle
+    {
+        return $this->style;
+    }
+
+    public function getWidth(): ?float
+    {
+        if ($this->style) {
+            return $this->style->getWidth();
+        }
+
+        return null;
     }
 }

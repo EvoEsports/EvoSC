@@ -23,17 +23,8 @@ class Player extends Model
     public $score = 0;
     private $online = false;
 
-    private function plainNick(): string
-    {
-        return preg_replace('/\$[a-f\d]{3}|\$i|\$s|\$w|\$n|\$m|\$g|\$o|\$z|\$t/i', '', $this->NickName);
-    }
-
     public function nick($plain = false)
     {
-        if ($plain) {
-            return $this->plainNick();
-        }
-
         return $this->NickName;
     }
 

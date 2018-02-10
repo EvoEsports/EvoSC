@@ -13,7 +13,7 @@ class Log
         $time = date("[H:i:s]", time());
         $logFile = sprintf("logs/%s.txt", $date);
 
-        $line = "$time $string";
+        $line = preg_replace('/\$[a-f\d]{3}|\$i|\$s|\$w|\$n|\$m|\$g|\$o|\$z|\$t|\$l\[.+\]/i', '', "$time $string");
 
         if ($echo) {
             echo "$line\n";
@@ -30,6 +30,7 @@ class Log
     public static function error($message)
     {
         self::logAddLine(sprintf(self::$prefix . " [!] ERROR: %s", $message), true);
+        self::debug($message);
     }
 
     public static function warning($message)
@@ -40,6 +41,11 @@ class Log
     public static function hook($message)
     {
         self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message));
+    }
+
+    private static function debug($message)
+    {
+        self::logAddLine(sprintf(self::$prefix . " Debug: %s", $message));
     }
 
     public static function chat($nick, $message)

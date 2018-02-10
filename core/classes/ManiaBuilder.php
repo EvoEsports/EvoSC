@@ -4,6 +4,8 @@ namespace esc\classes;
 
 
 use esc\controllers\RpcController;
+use esc\ManiaLink\Element;
+use esc\ManiaLink\ManiaStyle;
 use esc\ManiaLink\Row;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,11 +25,12 @@ class ManiaBuilder
     private $scale;
 
     private $rows;
+    private $style;
 
     private $lastManiaLink;
     private static $manialinkCache;
 
-    public function __construct(string $id, int $x = 0, int $y = 0, int $width, int $height, float $scale = 1.0)
+    public function __construct(string $id, int $x = 0, int $y = 0, int $width, int $height, float $scale = 1.0, array $style = null)
     {
         $this->id = $id;
         $this->x = $x;
@@ -51,10 +54,16 @@ class ManiaBuilder
         if ($y == ManiaBuilder::STICK_BOTTOM) {
             $this->y = -90;
         }
+
+        $this->style = new ManiaStyle();
+        if ($style) {
+            $this->style->setBatch($style);
+        }
     }
 
-    public static function createCache(){
-        if(self::$manialinkCache == null){
+    public static function createCache()
+    {
+        if (self::$manialinkCache == null) {
             self::$manialinkCache = new Collection();
         }
     }
@@ -70,8 +79,14 @@ class ManiaBuilder
         return $out;
     }
 
-    public function addRow(Row $row)
+    public function addRow(Element ...$elements)
     {
+        $row = new Row();
+
+        foreach($elements as $e){
+            $row->addElement($e);
+        }
+
         $this->rows->add($row);
     }
 
@@ -83,6 +98,7 @@ class ManiaBuilder
 
     public function sendToAll()
     {
+//        RpcController::call('SendDisplayManialinkPage', [$this->toString(), 0, false]);
         $hash = md5(serialize($this));
         if ($this->lastManiaLink != $hash) {
             RpcController::call('SendDisplayManialinkPage', [$this->toString(), 0, false]);
@@ -94,19 +110,23 @@ class ManiaBuilder
 
     public function toString()
     {
-        $ml = '<manialink id="' . $this->id . '" version="3">
-        <frame pos="' . $this->x . ' ' . $this->y . '" scale="' . $this->scale . '">
-        %s
-        </frame>
-        </manialink>';
+        $xml = '<manialink id="' . $this->id . '" version="3"><frame pos="%.2f %.2f" scale="%.2f"><quad pos="0 0" z-index="%d" size="%.2f %.2f" bgcolor="%s"/>%s</frame></manialink>';
 
-        $offset = 0;
+        $layer = 0;
+        $padding = $this->style->getPadding();
+        $background = $this->style->getBackground();
+
         $inner = '';
+        $offsetTop = $padding;
         foreach ($this->rows as $row) {
-            $inner .= $row->toString($this->width, $offset);
-            $offset += $row->getHeight();
+            $inner .= $row->toString($padding, $offsetTop, $layer + 1);
+            $offsetTop += $row->getHeight();
         }
 
-        return sprintf($ml, $inner);
+        $manialink = sprintf($xml, $this->x, $this->y, $this->scale, $layer, $this->width, $this->height, $background, $inner);
+
+//        echo str_replace('><', ">\n<", $manialink) . "\n";
+
+        return $manialink;
     }
 }

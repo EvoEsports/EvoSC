@@ -3,50 +3,51 @@
 namespace esc\ManiaLink;
 
 
+use Illuminate\Database\Eloquent\Collection;
+
 class Row
 {
-    private $padding;
-    private $element;
-    private $background;
+    private $elements;
 
-    public function __construct(float $padding = 0.1)
+    public function __construct()
     {
-        $this->padding = $padding;
+        $this->elements = new Collection();
     }
 
-    public function getPadding()
+    public function addElement(Element ...$element)
     {
-        return $this->padding;
+        foreach ($element as $e) {
+            $this->elements->add($e);
+        }
     }
 
     public function getHeight()
     {
-        return $this->getElement()->getHeight() + (2 * $this->padding);
+        $max = 0;
+
+        foreach ($this->elements as $element) {
+            $height = $element->getHeight();
+
+            if ($height > $max) {
+                $max = $height;
+            }
+        }
+
+        return $max;
     }
 
-    public function getElement(): Element
+    public function toString(float $offsetLeft = 0.0, float $offsetTop = 0.0, int $layer)
     {
-        return $this->element;
-    }
+        $xml = '<frame z-index="%d" pos="%.2f %.2f">%s</frame>';
 
-    public function setElement(Element $element)
-    {
-        $this->element = $element;
-    }
+        $out = '';
+        $xOffset = 0;
 
-    public function toString($width, $offset)
-    {
-        $x = 0;
-        $y = -$offset;
+        foreach ($this->elements as $element) {
+            $out .= $element->toString($xOffset, $layer + 1);
+            $xOffset += $element->getWidth();
+        }
 
-        $xml = '<quad pos="' . $x . ' ' . $y . '" z-index="-1" size="' . $width . ' ' . ($this->getElement()->getHeight() + 2 * $this->padding) . '" bgcolor="' . $this->background . '"/>';
-        $xml .= $this->getElement()->toString($this->padding, $offset + $this->padding, $width, $this->padding);
-
-        return $xml;
-    }
-
-    public function setBackground(string $background)
-    {
-        $this->background = $background;
+        return sprintf($xml, $layer, $offsetLeft, -$offsetTop, $out);
     }
 }

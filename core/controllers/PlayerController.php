@@ -6,10 +6,11 @@ namespace esc\controllers;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
-use esc\ManiaLink\Label;
-use esc\ManiaLink\Row;
+use esc\ManiaLink\Elements\Label;
+use esc\ManiaLink\ManiaStyle;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
+use Maniaplanet\DedicatedServer\Xmlrpc\ParseException;
 
 class PlayerController
 {
@@ -76,7 +77,7 @@ class PlayerController
         foreach ($infoplayerInfo as $info) {
             $player = self::getPlayerByLogin($info['Login']);
 
-            if(!$player){
+            if (!$player) {
                 if (Player::exists($info['Login'])) {
                     $player = Player::find($info['Login']);
                 } else {
@@ -90,6 +91,7 @@ class PlayerController
 
             if (!$player->isOnline()) {
                 $player->setOnline();
+                self::$players = self::getPlayers()->add($player)->unique();
             }
 
             $player->update($info);
@@ -103,47 +105,33 @@ class PlayerController
     {
         echo "GET: $login ";
         $player = self::getPlayers()->where('Login', $login)->first();
-        echo "FOUND: (" . $player->Login . ") " . $player->nick(true) . "\n";
+        if ($player) {
+            echo "FOUND: (" . $player->Login . ") " . $player->nick(true) . "\n";
+        } else {
+            echo "Player not found.\n";
+        }
         return $player;
     }
 
     public static function sendScoreboard()
     {
-        //create template
-        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 60, 80);
+        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 70, 80, .6, ['padding' => 3, 'bgcolor' => '0006']);
 
-        $title = new Row(2);
-        $title->setElement(Label::create('Live rankings', 0.8));
-        $title->setBackground('0008');
-        $builder->addRow($title);
+        $label = new Label("Playerlist", ['width' => '30', 'textsize' => 5, 'height' => 12]);
+        $builder->addRow($label);
 
-        $players = self::getPlayers()->filter(function (Player $player, $key) {
-            return $player->score > 0;
-        });
-
-        $notFinished = self::getPlayers()->filter(function (Player $player, $key) {
-            return $player->score == 0;
-        });
-
-        $i = 1;
-        foreach([$players, $notFinished] as $collection){
-            foreach ($collection as $player) {
-                $nick = $player->nick();
-                $time = $player->getTime();
-
-                $ply = new Row(2);
-                $position = "$i.";
-                if ($player->isSpectator()) {
-                    $position = "📷";
-                }
-                $ply->setElement(Label::create("$position   $time   $nick", 0.6));
-                $ply->setBackground('0005');
-
-                $builder->addRow($ply);
-                $i++;
-            }
+        foreach (self::getPlayers() as $index => $player) {
+            $position = new Label(($index + 1) . '.', ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
+            $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
+            $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
+            $nick = new Label($player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
+            $builder->addRow($position, $score, $nick);
         }
 
-        $builder->sendToAll();
+        try {
+            $builder->sendToAll();
+        } catch (ParseException $e) {
+            Log::error($e);
+        }
     }
 }
