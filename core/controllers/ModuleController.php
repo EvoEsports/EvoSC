@@ -1,8 +1,10 @@
 <?php
 
-namespace esc\classes;
+namespace esc\controllers;
 
-class ModuleHandler
+use esc\classes\Log;
+
+class ModuleController
 {
     public static function loadModules($loadFrom = 'modules')
     {

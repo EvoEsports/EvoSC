@@ -3,7 +3,6 @@
 use esc\classes\Config;
 use esc\classes\Log;
 use esc\classes\Timer;
-use esc\classes\ModuleHandler;
 use Maniaplanet\DedicatedServer\Connection;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -54,8 +53,8 @@ try{
 \esc\controllers\ChatController::initialize();
 \esc\controllers\MapController::initialize();
 
-ModuleHandler::loadModules('core/modules');
-ModuleHandler::loadModules('modules');
+\esc\controllers\ModuleController::loadModules('core/Modules');
+\esc\controllers\ModuleController::loadModules('modules');
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     if(!\esc\models\Player::exists($player->login)){
