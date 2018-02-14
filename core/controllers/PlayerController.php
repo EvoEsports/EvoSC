@@ -57,6 +57,7 @@ class PlayerController
     {
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
         $player->setOffline();
+        self::sendScoreboard();
     }
 
     public static function playerInfoChanged($infoplayerInfo)
@@ -91,6 +92,7 @@ class PlayerController
 
             if (!$player->isOnline()) {
                 $player->setOnline();
+                $player->increment('visits');
                 self::$players = self::getPlayers()->add($player)->unique();
             }
 
@@ -103,19 +105,13 @@ class PlayerController
 
     public static function getPlayerByLogin(string $login): ?Player
     {
-        echo "GET: $login ";
         $player = self::getPlayers()->where('Login', $login)->first();
-        if ($player) {
-            echo "FOUND: (" . $player->Login . ") " . $player->nick(true) . "\n";
-        } else {
-            echo "Player not found.\n";
-        }
         return $player;
     }
 
     public static function sendScoreboard()
     {
-        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 70, 80, .6, ['padding' => 3, 'bgcolor' => '0006']);
+        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 75, 80, .6, ['padding' => 3, 'bgcolor' => '0006']);
 
         $label = new Label("Playerlist", ['width' => '30', 'textsize' => 5, 'height' => 12]);
         $builder->addRow($label);
@@ -124,7 +120,10 @@ class PlayerController
             $position = new Label(($index + 1) . '.', ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
             $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
             $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
-            $nick = new Label($player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
+            $nick = new Label($player->isOnline() ? $player->NickName : '$n(left)$m' . $player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
+
+            echo $player->NickName . ' is ' . ($player->isOnline() ? 'online' : 'offline') . "\n     ";
+
             $builder->addRow($position, $score, $nick);
         }
 

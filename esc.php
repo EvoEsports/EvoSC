@@ -16,7 +16,6 @@ Log::info("Loading config files.");
 Config::loadConfigFiles();
 
 \esc\controllers\HookController::initialize();
-\esc\controllers\ChatController::initialize();
 
 Log::info("Connecting to database...");
 $capsule = new Capsule;
@@ -38,6 +37,8 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 Log::info("Database connected.");
 
+include 'core/modules/local-records/tables.php';
+
 \esc\controllers\PlayerController::initialize();
 
 try{
@@ -50,11 +51,13 @@ try{
     throw new Exception("Connection to server failed.");
 }
 
+\esc\controllers\ChatController::initialize();
+\esc\controllers\MapController::initialize();
+
 ModuleHandler::loadModules('core/modules');
 ModuleHandler::loadModules('modules');
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
-    $ply = \esc\models\Player::find($player->login);
     if(!\esc\models\Player::exists($player->login)){
         $ply = new \esc\models\Player();
         $ply->Login = $player->login;
@@ -63,11 +66,15 @@ foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
         $ply->save();
     }
 
+    $ply = \esc\models\Player::find($player->login);
+
     if($ply){
         \esc\controllers\PlayerController::playerConnect($ply);
         $ply->setScore(0);
     }
 }
+
+//\esc\controllers\PlayerController::playerConnect(\esc\models\Player::find('reaby')->setOffline());
 
 while (true) {
     Timer::startCycle();

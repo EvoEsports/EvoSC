@@ -68,14 +68,16 @@ class Player extends Model
         return $this->online;
     }
 
-    public function setOnline()
+    public function setOnline(): Player
     {
         $this->online = true;
+        return $this;
     }
 
-    public function setOffline()
+    public function setOffline(): Player
     {
         $this->online = false;
+        return $this;
     }
 
     public function hasFinished(): bool
