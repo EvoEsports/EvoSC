@@ -54,12 +54,13 @@ class Database
     public static function create(string $table, $callback)
     {
         if (!self::hasTable($table)) {
+            Log::info("Creating table $table.");
             self::getConnection()->getSchemaBuilder()->create($table, $callback);
         }
     }
 
     public static function hasTable(string $table): bool
     {
-        return self::getConnection()->getSchemaBuilder()->hasTable('maps');
+        return self::getConnection()->getSchemaBuilder()->hasTable($table);
     }
 }

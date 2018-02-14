@@ -33,7 +33,8 @@ class PlayerController
         }
 
         $player->afk = !$player->afk;
-        self::sendScoreboard();
+
+        self::displayPlayerlist();
     }
 
     public static function getPlayers(): Collection
@@ -49,7 +50,7 @@ class PlayerController
         self::getPlayers()->add($player);
         Log::info($player->nick(true) . " joined the server.");
 
-        self::sendScoreboard();
+        self::displayPlayerlist();
 
         return $player;
     }
@@ -59,7 +60,7 @@ class PlayerController
         if ($score > 0) {
             $player->setScore($score);
             Log::info($player->nick() . " finished with time ($score) " . $player->getTime());
-            self::sendScoreboard();
+            self::displayPlayerlist();
         }
     }
 
@@ -67,7 +68,7 @@ class PlayerController
     {
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
         $player->setOffline();
-        self::sendScoreboard();
+        self::displayPlayerlist();
         ChatController::messageAll("$player->NickName left the server.");
     }
 
@@ -112,7 +113,7 @@ class PlayerController
             $player->setIsSpectator($info['SpectatorStatus'] > 0);
         }
 
-        self::sendScoreboard();
+        self::displayPlayerlist();
     }
 
     public static function getPlayerByLogin(string $login): ?Player
@@ -121,26 +122,56 @@ class PlayerController
         return $player;
     }
 
-    public static function sendScoreboard()
+    private static function sortPlayerList(Player $p1, Player $p2)
     {
-        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 90, 80, .55, ['padding' => 3, 'bgcolor' => '0006']);
+        var_dump($p1);
+    }
+
+    public static function displayPlayerlist()
+    {
+        $builder = new ManiaBuilder('Playerlist', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 90, 60, .55, ['padding' => 3, 'bgcolor' => '0009']);
 
         $label = new Label("Playerlist", ['width' => '30', 'textsize' => 5, 'height' => 12]);
         $builder->addRow($label);
 
-        foreach (self::getPlayers() as $index => $player) {
-            $position = new Label(($index + 1) . '.', ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
+        $players = self::getPlayers()->sort(function (Player $a, Player $b) {
+            if ($a->score == 0) {
+                return 10;
+            }
+
+            if ($a->score < $b->score) {
+                return -1;
+            } else if ($a->score > $b->score) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        $i = 1;
+        foreach ($players as $index => $player) {
+            $position = new Label("$i.", ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
             $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
             $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
 
-            $nickname = $player->isOnline() ? trim($player->NickName) : '$f00⌫$z' . $player->NickName;
+            $nickname = $player->NickName;
 
-            if (isset($player->afk) && $player->afk == true) {
-                $nickname = '$n$o$f66AFK$z ' . $nickname;
+            if($player->isOnline()){
+                if (isset($player->afk) && $player->afk == true) {
+                    $nickname = '$n$o$e33afk$z ' . $nickname;
+                }
+
+                if ($player->isSpectator()) {
+                    $nickname = '$eee📷$z ' . $nickname;
+                }
+            }else{
+                $nickname = '$n$o$e33⌫$z ' . $nickname;
             }
 
             $nick = new Label($nickname, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
             $builder->addRow($position, $score, $nick);
+
+            $i++;
         }
 
         try {

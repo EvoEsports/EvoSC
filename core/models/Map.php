@@ -14,6 +14,6 @@ class Map extends Model
     public $timestamps = false;
 
     public function locals(){
-        return $this->hasMany('esc\models\LocalRecord', 'map');
+        return $this->hasMany('LocalRecord', 'Map', 'id');
     }
 }

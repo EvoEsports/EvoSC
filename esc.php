@@ -39,6 +39,10 @@ try{
 
 \esc\controllers\PlayerController::initialize();
 
+\esc\controllers\MapController::beginMap(\esc\models\Map::where('FileName', \esc\controllers\RpcController::getRpc()->getCurrentMapInfo()->fileName)->first());
+
+LocalRecords::displayLocalRecords();
+
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     if(!\esc\models\Player::exists($player->login)){
         $ply = new \esc\models\Player();
@@ -55,8 +59,6 @@ foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
         $ply->setScore(0);
     }
 }
-
-//\esc\controllers\PlayerController::playerConnect(\esc\models\Player::find('reaby')->setOffline());
 
 while (true) {
     Timer::startCycle();

@@ -33,7 +33,7 @@ class Timer
      */
     public static function textTimeToMinutes(string $durationShort): int
     {
-        if(preg_match('/^\d+$/', $durationShort)){
+        if (preg_match('/^\d+$/', $durationShort)) {
             return intval($durationShort);
         }
 
@@ -56,5 +56,15 @@ class Timer
         }
 
         return $time;
+    }
+
+    public static function formatScore(int $score): string
+    {
+        $seconds = floor($score / 1000);
+        $ms = $score - ($seconds * 1000);
+        $minutes = floor($seconds / 60);
+        $seconds -= $minutes * 60;
+
+        return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
     }
 }

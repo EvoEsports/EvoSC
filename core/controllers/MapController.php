@@ -6,15 +6,21 @@ namespace esc\controllers;
 use esc\classes\Config;
 use esc\classes\Database;
 use esc\classes\File;
+use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\models\Map;
+use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 class MapController
 {
+    private static $currentMap;
+
     public static function initialize()
     {
         self::createTables();
+
+        Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
 
         ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx by it\'s id', '@');
     }
@@ -29,13 +35,23 @@ class MapController
         });
     }
 
+    public static function beginMap(Map $map)
+    {
+        self::$currentMap = $map;
+    }
+
+    public static function getCurrentMap(): Map
+    {
+        return self::$currentMap;
+    }
+
     public static function addMap(string ...$arguments)
     {
-        $mxId = intval($arguments[1]);
+        $mxId = intval($arguments[2]);
 
         if ($mxId == 0) {
-            Log::warning("Requested map with invalid id: " . $arguments[1]);
-            ChatController::messageAll("Requested map with invalid id: " . $arguments[1]);
+            Log::warning("Requested map with invalid id: " . $arguments[2]);
+            ChatController::messageAll("Requested map with invalid id: " . $arguments[2]);
             return;
         }
 
@@ -77,14 +93,16 @@ class MapController
 
     public static function setNext(Map $map = null)
     {
-        $maps = collect(RpcController::getRpc()->getMapList());
-//        var_dump($maps);
-//        RpcController::getRpc()->setNextMapIndex($map->FileName);
-//        ChatController::messageAll("Next map changed to $map->Name");
+        RpcController::getRpc()->chooseNextMap($map->FileName);
+        ChatController::messageAll("Next map changed to $map->Name");
     }
 
     public static function next()
     {
-        RpcController::getRpc()->nextMap();
+        try {
+            RpcController::getRpc()->nextMap();
+        } catch (FaultException $e) {
+            Log::error("$e");
+        }
     }
 }

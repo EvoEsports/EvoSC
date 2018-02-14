@@ -7,6 +7,7 @@ use esc\classes\ChatCommand;
 use esc\classes\Log;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
+use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 class ChatController
 {
@@ -40,7 +41,7 @@ $$: Writes a dollarsign
 
     public static function showHelp(Player $player)
     {
-        foreach(self::$chatCommands as $chatCommand){
+        foreach (self::$chatCommands as $chatCommand) {
             self::message($player, $chatCommand->getHelp());
         }
     }
@@ -82,7 +83,11 @@ $$: Writes a dollarsign
 
         $text = preg_replace('/\$[nb]/', '', $text);
 
-        $chatText = sprintf('%s: $fe2%s', $nick, $text);
+        if ($player->isSpectator()) {
+            $nick = '$eee📷$z ' . $nick;
+        }
+
+        $chatText = sprintf('$z$s%s: $fe2$z$s%s', $nick, $text);
 
         echo "$chatText\n";
 
@@ -141,11 +146,19 @@ $$: Writes a dollarsign
 
     public static function messageAll(string $message)
     {
-        RpcController::getRpc()->chatSendServerMessage(['$18f' . $message]);
+        try {
+            RpcController::getRpc()->chatSendServerMessage('$18f' . $message);
+        } catch (FaultException $e) {
+            Log::error($e);
+        }
     }
 
     public static function message(Player $player, string $message)
     {
-        RpcController::getRpc()->chatSendServerMessage($message, $player->Login);
+        try {
+            RpcController::getRpc()->chatSendServerMessage($message, $player->Login);
+        } catch (FaultException $e) {
+            Log::error($e);
+        }
     }
 }
