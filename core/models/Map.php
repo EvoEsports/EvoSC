@@ -9,7 +9,7 @@ class Map extends Model
 {
     protected $table = 'maps';
 
-    protected $primaryKey = 'UId';
+    protected $fillable = ['MxId', 'Name', 'FileName'];
 
     public $timestamps = false;
 

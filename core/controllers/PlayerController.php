@@ -7,7 +7,6 @@ use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
 use esc\ManiaLink\Elements\Label;
-use esc\ManiaLink\ManiaStyle;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\ParseException;
@@ -19,11 +18,22 @@ class PlayerController
 
     public static function initialize()
     {
-//        Hook::add('PlayerConnect', '\esc\controllers\PlayerController::playerConnect');
         Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
+        ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
+
         self::$players = new Collection();
+    }
+
+    public static function toggleAfk(Player $player)
+    {
+        if (!isset($player->afk)) {
+            $player->afk = true;
+        }
+
+        $player->afk = !$player->afk;
+        self::sendScoreboard();
     }
 
     public static function getPlayers(): Collection
@@ -58,6 +68,7 @@ class PlayerController
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
         $player->setOffline();
         self::sendScoreboard();
+        ChatController::messageAll("$player->NickName left the server.");
     }
 
     public static function playerInfoChanged($infoplayerInfo)
@@ -94,6 +105,7 @@ class PlayerController
                 $player->setOnline();
                 $player->increment('visits');
                 self::$players = self::getPlayers()->add($player)->unique();
+                ChatController::messageAll("$player->NickName joined the server.");
             }
 
             $player->update($info);
@@ -111,7 +123,7 @@ class PlayerController
 
     public static function sendScoreboard()
     {
-        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 75, 80, .6, ['padding' => 3, 'bgcolor' => '0006']);
+        $builder = new ManiaBuilder('LiveRankings', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 90, 80, .55, ['padding' => 3, 'bgcolor' => '0006']);
 
         $label = new Label("Playerlist", ['width' => '30', 'textsize' => 5, 'height' => 12]);
         $builder->addRow($label);
@@ -120,7 +132,14 @@ class PlayerController
             $position = new Label(($index + 1) . '.', ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
             $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
             $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
-            $nick = new Label($player->isOnline() ? $player->NickName : '$n$f00⌫$z' . $player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
+
+            $nickname = $player->isOnline() ? trim($player->NickName) : '$f00⌫$z' . $player->NickName;
+
+            if (isset($player->afk) && $player->afk == true) {
+                $nickname = '$n$o$f66AFK$z ' . $nickname;
+            }
+
+            $nick = new Label($nickname, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
             $builder->addRow($position, $score, $nick);
         }
 

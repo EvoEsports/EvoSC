@@ -13,6 +13,7 @@ class ModuleController
 
             if (!file_exists($dir . '/module.json')) {
                 Log::error("Missing module.json for [$item]");
+                return;
             }
 
             $module = json_decode(file_get_contents($dir . '/module.json'));
@@ -22,9 +23,9 @@ class ModuleController
                 $className = "\\$loadFrom\\$item\\$module->main()";
                 $test = new $module->main();
 
-                Log::info("Loaded module: $item");
+                Log::info("Loaded module $item");
             } catch (\Exception $e) {
-                Log::error("Could not load ($item)");
+                Log::error("Could not load module $item");
             }
         }
     }

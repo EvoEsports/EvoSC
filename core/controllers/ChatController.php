@@ -34,12 +34,21 @@ $$: Writes a dollarsign
         RpcController::call('ChatEnableManualRouting', [true, false]);
 
         HookController::add('PlayerChat', 'esc\controllers\ChatController::playerChat');
+
+        self::addCommand('help', '\esc\controllers\ChatController::showHelp', 'Show this help');
+    }
+
+    public static function showHelp(Player $player)
+    {
+        foreach(self::$chatCommands as $chatCommand){
+            self::message($player, $chatCommand->getHelp());
+        }
     }
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
         if (in_array(substr($text, 0, 1), self::$triggers)) {
-            if (self::executeChatCommand($text)) {
+            if (self::executeChatCommand($player, $text)) {
                 return;
             }
         }
@@ -59,7 +68,7 @@ $$: Writes a dollarsign
                 $urlName = array_shift($restOfString);
                 $short = substr($urlName, 0, 28) . '..' . substr($urlName, -10);
                 $short = preg_replace('/^https?:\/\//', '', $short);
-                if(preg_match('/^https/', $matches[1])){
+                if (preg_match('/^https/', $matches[1])) {
                     $short = "🔒" . $short;
                 }
                 $newUrl = $short . '$z $s' . implode(' ', $restOfString);
@@ -71,6 +80,8 @@ $$: Writes a dollarsign
             $text .= $matches[0];
         }
 
+        $text = preg_replace('/\$[nb]/', '', $text);
+
         $chatText = sprintf('%s: $fe2%s', $nick, $text);
 
         echo "$chatText\n";
@@ -78,7 +89,7 @@ $$: Writes a dollarsign
         RpcController::call('ChatSendServerMessage', [$chatText]);
     }
 
-    private static function executeChatCommand(string $text): bool
+    private static function executeChatCommand(Player $player, string $text): bool
     {
         $isValidCommand = false;
 
@@ -102,6 +113,8 @@ $$: Writes a dollarsign
             ->where('trigger', $trigger)
             ->first();
 
+        array_unshift($arguments, $player);
+
         if ($command) {
             call_user_func_array($command->callback, $arguments);
             $isValidCommand = true;
@@ -110,7 +123,7 @@ $$: Writes a dollarsign
         return $isValidCommand;
     }
 
-    public static function addCommand(string $command, string $callback, string $trigger = '/')
+    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/')
     {
         if (strlen($trigger) != 1) {
             Log::error('Trigger must be one character.');
@@ -120,9 +133,19 @@ $$: Writes a dollarsign
             array_push(self::$triggers, $trigger);
         }
 
-        $chatCommand = new ChatCommand($trigger, $command, $callback);
+        $chatCommand = new ChatCommand($trigger, $command, $callback, $description);
         self::$chatCommands->add($chatCommand);
 
         Log::info("Chat command added: $trigger $command -> $callback");
+    }
+
+    public static function messageAll(string $message)
+    {
+        RpcController::getRpc()->chatSendServerMessage(['$18f' . $message]);
+    }
+
+    public static function message(Player $player, string $message)
+    {
+        RpcController::getRpc()->chatSendServerMessage($message, $player->Login);
     }
 }

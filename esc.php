@@ -4,7 +4,6 @@ use esc\classes\Config;
 use esc\classes\Log;
 use esc\classes\Timer;
 use Maniaplanet\DedicatedServer\Connection;
-use Illuminate\Database\Capsule\Manager as Capsule;
 
 include 'core/autoload.php';
 include 'vendor/autoload.php';
@@ -16,29 +15,7 @@ Config::loadConfigFiles();
 
 \esc\controllers\HookController::initialize();
 
-Log::info("Connecting to database...");
-$capsule = new Capsule;
-$capsule->addConnection([
-    'driver'    => 'mysql',
-    'host'      => Config::get('db.host'),
-    'database'  => Config::get('db.db'),
-    'username'  => Config::get('db.user'),
-    'password'  => Config::get('db.password'),
-    'charset'   => 'utf8',
-    'collation' => 'utf8_unicode_ci',
-    'prefix'    => '',
-]);
-
-// Make this Capsule instance available globally via static methods... (optional)
-$capsule->setAsGlobal();
-
-// Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
-$capsule->bootEloquent();
-Log::info("Database connected.");
-
-include 'core/modules/local-records/tables.php';
-
-\esc\controllers\PlayerController::initialize();
+\esc\classes\Database::initialize();
 
 try{
     Log::info("Connecting to server...");
@@ -51,10 +28,16 @@ try{
 }
 
 \esc\controllers\ChatController::initialize();
+
 \esc\controllers\MapController::initialize();
 
 \esc\controllers\ModuleController::loadModules('core/Modules');
 \esc\controllers\ModuleController::loadModules('modules');
+
+\esc\classes\RestClient::initialize();
+\esc\classes\RestClient::$serverName = 'Brakers dev server LOGIN brakertest2';
+
+\esc\controllers\PlayerController::initialize();
 
 foreach(\esc\controllers\RpcController::getRpc()->getPlayerList() as $player){
     if(!\esc\models\Player::exists($player->login)){

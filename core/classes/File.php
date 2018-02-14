@@ -16,7 +16,7 @@ class File
 
     public static function put(string $fileName, string $content)
     {
-        file_put_contents('cache/' . $fileName, $content);
+        file_put_contents($fileName, $content);
     }
 
     public static function fileAppendLine($fileName, $line)
@@ -30,5 +30,13 @@ class File
         $data .= "\n" . $line;
 
         file_put_contents($fileName, $data);
+    }
+
+    public static function createDirectory(string $name)
+    {
+        if (!is_dir($name)) {
+            Log::info("Creating directory: $name");
+            mkdir($name);
+        }
     }
 }
