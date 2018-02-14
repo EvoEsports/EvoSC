@@ -120,10 +120,7 @@ class PlayerController
             $position = new Label(($index + 1) . '.', ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
             $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
             $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
-            $nick = new Label($player->isOnline() ? $player->NickName : '$n(left)$m' . $player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
-
-            echo $player->NickName . ' is ' . ($player->isOnline() ? 'online' : 'offline') . "\n     ";
-
+            $nick = new Label($player->isOnline() ? $player->NickName : '$n$f00⌫$z' . $player->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
             $builder->addRow($position, $score, $nick);
         }
 

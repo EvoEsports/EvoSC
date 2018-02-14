@@ -3,3 +3,4 @@ vendor/
 modules/
 maps/
 logs/
+config/
