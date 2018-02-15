@@ -6,30 +6,54 @@ use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\controllers\ServerController;
 use esc\models\Map;
+use esc\models\Player;
+use Illuminate\Support\Collection;
 
 class Dedimania
 {
+    private static $dedis;
     private static $sessionId;
 
     public function __construct()
     {
+        include_once __DIR__ . '/Models/Dedi.php';
+
         $this->authenticateAndValidateAccount();
+
+        self::$dedis = new Collection();
 
         Hook::add('BeginMap', 'Dedimania::beginMap');
     }
 
     public static function beginMap(Map $map)
     {
-        echo "Check dedis\n";
-
-        var_dump(self::call('dedimania.GetChallengeInfo', [
+        $data = self::call('dedimania.GetChallengeInfo', [
             'UId' => $map->UId
-        ]));
+        ]);
+
+        $records = $data->params->param->value->struct->member[5]->value->array->data->value;
+
+        foreach ($records as $record) {
+            $login = $record->struct->member[0]->value->string;
+            $nickname = $record->struct->member[1]->value->string;
+            $best = $record->struct->member[2]->value->string;
+            $rank = $record->struct->member[3]->value->string;
+
+            $player = Player::firstOrCreate(['Login' => (string)$login]);
+
+            if (!$player->NickName) {
+                $player->update(['NickName' => (string)$nickname]);
+            }
+
+            self::$dedis->push(new Dedi($player, (int)$best, (int)$rank));
+        }
+
+        var_dump(self::$dedis);
     }
 
     private function authenticateAndValidateAccount()
     {
-        $response = Dedimania::call('dedimania.OpenSession', [
+        $response = Dedimania::callStruct('dedimania.OpenSession', [
             'Game' => 'TM2',
             'Login' => Config::get('dedimania.login'),
             'Code' => Config::get('dedimania.key'),
@@ -52,6 +76,43 @@ class Dedimania
      * @return null|SimpleXMLElement
      */
     public static function call(string $method, array $parameters = null): ?SimpleXMLElement
+    {
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
+        $xml->addChild('methodName', $method);
+
+        $params = $xml->addChild('params');
+
+        if ($parameters) {
+            foreach ($parameters as $key => $param) {
+                $member = $params->addChild('member');
+                $member->addChild('name', $key);
+                $member->addChild('value')->addChild('string', $param);
+            }
+        }
+
+        $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
+            'headers' => [
+                'Content-Type' => 'text/xml; charset=UTF8'
+            ],
+            'body' => $xml->asXML()
+        ]);
+
+        if ($response->getStatusCode() != 200) {
+            Log::error($response->getReasonPhrase());
+            return null;
+        }
+
+        return new SimpleXMLElement($response->getBody());
+    }
+
+    /**
+     * Call a method on dedimania server
+     * See documentation at http://dedimania.net:8082/Dedimania
+     * @param string $method
+     * @param array|null $parameters
+     * @return null|SimpleXMLElement
+     */
+    public static function callStruct(string $method, array $parameters = null): ?SimpleXMLElement
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'system.multicall');
