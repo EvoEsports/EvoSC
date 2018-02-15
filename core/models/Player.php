@@ -25,6 +25,10 @@ class Player extends Model
 
     public function nick($plain = false)
     {
+        if ($plain) {
+            return preg_replace('/\$[0-9a-f]{3}/', '', $this->NickName);
+        }
+
         return $this->NickName;
     }
 
