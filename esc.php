@@ -10,6 +10,7 @@ use esc\controllers\MapController;
 use esc\controllers\ModuleController;
 use esc\controllers\PlayerController;
 use esc\controllers\RpcController;
+use esc\controllers\TemplateController;
 use Maniaplanet\DedicatedServer\Connection;
 
 include 'core/autoload.php';
@@ -43,6 +44,8 @@ try {
     ChatController::initialize();
 
     MapController::initialize();
+
+    TemplateController::init();
 
     ModuleController::loadModules('core/Modules');
     ModuleController::loadModules('modules');

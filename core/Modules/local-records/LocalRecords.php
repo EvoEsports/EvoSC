@@ -1,9 +1,11 @@
 <?php
 
 use esc\classes\Database;
+use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
+use esc\classes\Template;
 use esc\classes\Timer;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
@@ -20,6 +22,8 @@ class LocalRecords
         $this->createTables();
 
         include_once 'Models/LocalRecord.php';
+
+        Template::add('locals', File::get(__DIR__ . '/Templates/locals.blade.xml'));
 
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('PlayerConnect', 'LocalRecords::playerConnect');
@@ -87,6 +91,7 @@ class LocalRecords
 
     public static function displayLocalRecords()
     {
+
         $map = MapController::getCurrentMap();
 
         $builder = new ManiaBuilder('LocalRecords', ManiaBuilder::STICK_LEFT, 56, 90, 120, 0.55, ['padding' => 3, 'bgcolor' => '0009']);
@@ -110,5 +115,9 @@ class LocalRecords
         } catch (ParseException $e) {
             Log::error($e);
         }
+
+        $template = Template::get('locals');
+        $template->fill($map->locals()->orderBy('Score')->get());
+        var_dump($template->template);
     }
 }
