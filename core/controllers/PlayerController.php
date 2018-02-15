@@ -7,13 +7,10 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
-use esc\classes\ManiaBuilder;
 use esc\classes\Template;
-use esc\ManiaLink\Elements\Label;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
-use Maniaplanet\DedicatedServer\Xmlrpc\ParseException;
 
 class PlayerController
 {
@@ -27,7 +24,7 @@ class PlayerController
         Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
-        Template::add('players', File::get(__DIR__ . '/Templates/locals.latte.xml'));
+        Template::add('players', File::get(__DIR__ . '/Templates/players.latte.xml'));
 
         ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
 
@@ -93,19 +90,6 @@ class PlayerController
 
     public static function playerInfoChanged($infoplayerInfo)
     {
-        /*  struct SPlayerInfo
-            {
-              string Login;
-              string NickName;
-              int PlayerId;
-              int TeamId;
-              int SpectatorStatus;
-              int LadderRanking;
-              int Flags;
-            }
-        */
-
-
         foreach ($infoplayerInfo as $info) {
             $player = self::getPlayerByLogin($info['Login']);
 
@@ -150,7 +134,7 @@ class PlayerController
     {
         $players = self::getPlayers()->sort(function (Player $a, Player $b) {
             if ($a->score == 0) {
-                return 10;
+                return 1000;
             }
 
             if ($a->score < $b->score) {
