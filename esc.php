@@ -9,7 +9,7 @@ use esc\controllers\HookController;
 use esc\controllers\MapController;
 use esc\controllers\ModuleController;
 use esc\controllers\PlayerController;
-use esc\controllers\RpcController;
+use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
 use Maniaplanet\DedicatedServer\Connection;
 
@@ -34,7 +34,7 @@ try {
         Log::info("Connecting to server...");
 
 //        $rpc = Connection::factory(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
-        RpcController::initialize(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
+        ServerController::initialize(Config::get('server.ip'), Config::get('server.port'), 5, Config::get('server.rpc.login'), Config::get('server.rpc.password'));
 
         Log::info("Connection established.");
     } catch (\Exception $e) {
@@ -55,14 +55,14 @@ try {
 
     PlayerController::initialize();
 
-    $map = \esc\models\Map::where('FileName', RpcController::getRpc()->getCurrentMapInfo()->fileName)->first();
+    $map = \esc\models\Map::where('FileName', ServerController::getRpc()->getCurrentMapInfo()->fileName)->first();
     if ($map) {
         MapController::beginMap($map);
     }
 
     LocalRecords::displayLocalRecords();
 
-    foreach (RpcController::getRpc()->getPlayerList() as $player) {
+    foreach (ServerController::getRpc()->getPlayerList() as $player) {
         if (!\esc\models\Player::exists($player->login)) {
             $ply = new \esc\models\Player();
             $ply->Login = $player->login;
@@ -82,7 +82,7 @@ try {
     while (true) {
         Timer::startCycle();
 
-        HookController::handleCallbacks(RpcController::executeCallbacks());
+        HookController::handleCallbacks(ServerController::executeCallbacks());
 
         usleep(Timer::getNextCyclePause());
     }

@@ -3,7 +3,7 @@
 namespace esc\classes;
 
 
-use esc\controllers\RpcController;
+use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
 
 class Template
@@ -20,7 +20,7 @@ class Template
     public static function sendToAll(string $index, array $values)
     {
         $xml = TemplateController::getTemplate($index, $values);
-        RpcController::getRpc()->sendDisplayManialinkPage('', $xml);
+        ServerController::getRpc()->sendDisplayManialinkPage('', $xml);
     }
 
     public static function add(string $index, string $template)

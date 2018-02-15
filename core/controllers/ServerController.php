@@ -4,8 +4,9 @@ namespace esc\controllers;
 
 
 use Maniaplanet\DedicatedServer\Connection;
+use Maniaplanet\DedicatedServer\Structures\Map;
 
-class RpcController
+class ServerController
 {
     private static $rpc;
 
@@ -30,5 +31,21 @@ class RpcController
     public static function call(string $rpc_func, $args = null)
     {
         self::getRpc()->execute($rpc_func, $args);
+    }
+
+
+    public static function getNextMapInfo(): Map
+    {
+        return self::getRpc()->getNextMapInfo();
+    }
+
+    public static function getCurrentMapInfo(): Map
+    {
+        return self::getRpc()->getCurrentMapInfo();
+    }
+
+    public static function getMapInfo(string $fileName): Map
+    {
+        return self::getRpc()->getMapInfo($fileName);
     }
 }

@@ -65,7 +65,7 @@ class Player extends Model
 
     public function isOnline(): bool
     {
-        return $this->online;
+        return PlayerController::getPlayerByLogin($this->Login) != null;
     }
 
     public function setOnline(): Player

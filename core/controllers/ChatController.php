@@ -32,7 +32,7 @@ $$: Writes a dollarsign
         self::$triggers = [];
         self::$chatCommands = new Collection();
 
-        RpcController::call('ChatEnableManualRouting', [true, false]);
+        ServerController::call('ChatEnableManualRouting', [true, false]);
 
         HookController::add('PlayerChat', 'esc\controllers\ChatController::playerChat');
 
@@ -91,7 +91,7 @@ $$: Writes a dollarsign
 
         echo "$chatText\n";
 
-        RpcController::call('ChatSendServerMessage', [$chatText]);
+        ServerController::call('ChatSendServerMessage', [$chatText]);
     }
 
     private static function executeChatCommand(Player $player, string $text): bool
@@ -147,7 +147,7 @@ $$: Writes a dollarsign
     public static function messageAll(string $message)
     {
         try {
-            RpcController::getRpc()->chatSendServerMessage('$18f' . $message);
+            ServerController::getRpc()->chatSendServerMessage('$18f' . $message);
         } catch (FaultException $e) {
             Log::error($e);
         }
@@ -156,7 +156,7 @@ $$: Writes a dollarsign
     public static function message(Player $player, string $message)
     {
         try {
-            RpcController::getRpc()->chatSendServerMessage($message, $player->Login);
+            ServerController::getRpc()->chatSendServerMessage($message, $player->Login);
         } catch (FaultException $e) {
             Log::error($e);
         }

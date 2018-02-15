@@ -25,7 +25,7 @@ class MapController
 
         self::loadMaps();
 
-        Template::add('map', File::get(__DIR__ . '/Templates/map.latte.xml'));
+        Template::add('map', File::get('core/Templates/map.latte.xml'));
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
 
@@ -36,18 +36,26 @@ class MapController
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
-            $table->string('MxId')->nullable();
-            $table->string('Name');
+            $table->integer('MxId')->nullable();
+            $table->string('Name')->nullable();
+            $table->string('Author')->nullable();
             $table->string('FileName')->unique();
             $table->integer('Plays')->default(0);
+            $table->string('Mood')->nullable();
+            $table->boolean('LapRace')->nullable();
         });
     }
 
     public static function beginMap(Map $map)
     {
-        self::$currentMap = $map;
+        $map->update(ServerController::getCurrentMapInfo()->toArray());
         $map->increment('Plays');
-        Template::sendToAll('map', ['map' => $map, 'next' => null]);
+        self::$currentMap = $map;
+
+        $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
+        self::$nextMap = $nextMap;
+
+        Template::sendToAll('map', ['map' => $map, 'next' => $nextMap]);
     }
 
     public static function getCurrentMap(): ?Map
@@ -90,7 +98,7 @@ class MapController
             'FileName' => $fileName
         ]);
 
-        RpcController::getRpc()->insertMap($map->FileName);
+        ServerController::getRpc()->insertMap($map->FileName);
 
         ChatController::messageAll("Admin added map \$eee$name.");
     }
@@ -103,7 +111,7 @@ class MapController
 
     public static function setNext(Map $map = null)
     {
-        RpcController::getRpc()->chooseNextMap($map->FileName);
+        ServerController::getRpc()->chooseNextMap($map->FileName);
         ChatController::messageAll("Next map changed to $map->Name");
         self::$nextMap = $map;
         Template::sendToAll('map', ['map' => self::$currentMap, 'next' => $map]);
@@ -112,7 +120,7 @@ class MapController
     public static function next()
     {
         try {
-            RpcController::getRpc()->nextMap();
+            ServerController::getRpc()->nextMap();
         } catch (FaultException $e) {
             Log::error("$e");
         }
@@ -124,18 +132,11 @@ class MapController
             return preg_match('/^.+.Gbx$/', $fileName);
         });
 
-        foreach($mapFiles as $mapFile){
+        foreach ($mapFiles as $mapFile) {
             $map = Map::where('FileName', $mapFile)->first();
-            if(!$map){
-                Map::insert([
-                    'FileName' => $mapFile,
-                    'Name' => preg_replace('/\.Map\.Gbx$/', '', $mapFile)
-                ]);
-            }
-
-            try{
-                RpcController::getRpc()->addMap($map->FileName);
-            }catch(AlreadyInListException $e){
+            if (!$map) {
+                $mapInfo = ServerController::getMapInfo($mapFile)->toArray();
+                Map::create($mapInfo);
             }
         }
     }

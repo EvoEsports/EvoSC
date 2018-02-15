@@ -69,10 +69,8 @@ class HookController
         switch ($hook) {
             case 'BeginMap':
                 //SMapInfo Map
-                echo "New map: " . $arguments[0]['UId'] . "\n";
-                var_dump($arguments);
-//                $map = Map::findOrFail($arguments['Uid']);
-//                self::fireHookBatch($hooks, $map);
+                $map = Map::where('FileName', $arguments[0]['FileName'])->first();
+                self::fireHookBatch($hooks, $map);
                 break;
 
             case 'EndMap':

@@ -24,7 +24,7 @@ class PlayerController
         Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
-        Template::add('players', File::get(__DIR__ . '/Templates/players.latte.xml'));
+        Template::add('players', File::get('core/Templates/players.latte.xml'));
 
         ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
 
@@ -123,11 +123,6 @@ class PlayerController
     {
         $player = self::getPlayers()->where('Login', $login)->first();
         return $player;
-    }
-
-    private static function sortPlayerList(Player $p1, Player $p2)
-    {
-        var_dump($p1);
     }
 
     public static function displayPlayerlist()

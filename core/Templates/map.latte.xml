@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="CurrentMap" version="3">
+<frame pos="120 89" scale="0.8">
+    <quad pos="0 0" z-index="0" size="50 17" bgcolor="0009"/>
+    <label pos="2 -2" z-index="1" size="48 3" text="now playing" textsize="1"/>
+    <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="2B69"/>
+
+    <label pos="2 -8" z-index="1" size="58 3" text="$o{$map->Name}" textsize="1.2"/>
+    <label pos="2 -12" z-index="1" size="58 3" text="Next: {$next ? $next->Name : 'none'}" textsize="1"/>
+
+</frame>
+</manialink>
