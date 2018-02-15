@@ -52,6 +52,11 @@ class MapController
         $map->increment('Plays');
         self::$currentMap = $map;
 
+        if(self::$nextMap && $map->FileName != self::$nextMap->FileName){
+            Log::warning("Skipping incompatible map " . self::$nextMap->Name);
+            ChatController::messageAll("Skipping incompatible map " . self::$nextMap->Name);
+        }
+
         $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
         self::$nextMap = $nextMap;
 
@@ -137,6 +142,11 @@ class MapController
             if (!$map) {
                 $mapInfo = ServerController::getMapInfo($mapFile)->toArray();
                 Map::create($mapInfo);
+            }
+
+            try{
+                ServerController::getRpc()->addMap($mapFile);
+            }catch(\Exception $e){
             }
         }
     }

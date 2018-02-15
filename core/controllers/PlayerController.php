@@ -39,6 +39,7 @@ class PlayerController
             $table->string('NickName')->default("unset");
             $table->integer('Visits')->default(0);
             $table->float('LadderScore')->default(0);
+            $table->float('Group')->default(4);
         });
     }
 
