@@ -48,23 +48,23 @@ $$: Writes a dollarsign
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
-        if (in_array(substr($text, 0, 1), self::$triggers)) {
+        $chatCommandPattern = '/^(';
+        foreach(self::$triggers as $trigger){
+            $chatCommandPattern .= '\\' . implode('\\', str_split($trigger)) . '|';
+        }
+        $chatCommandPattern .= ')/';
+
+        if (preg_match($chatCommandPattern, $text)) {
             if (self::executeChatCommand($player, $text)) {
                 return;
             }
         }
 
         Log::chat($player->NickName, $text);
-
         $nick = $player->NickName;
-//        $nick = preg_replace('/\$[0-9a-f]{3}/', '', $player->NickName);
-
-        $nick = '$18f' . $nick;
-
-        //18f-Guest 1f3-SA
 
         if (preg_match('/\$l\[(http.+)\](http.+)[ ]?/', $text, $matches)) {
-            if (strlen($matches[2]) > 40) {
+            if (strlen($matches[2]) > 50) {
                 $restOfString = explode(' ', $matches[2]);
                 $urlName = array_shift($restOfString);
                 $short = substr($urlName, 0, 28) . '..' . substr($urlName, -10);
@@ -141,7 +141,7 @@ $$: Writes a dollarsign
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description);
         self::$chatCommands->add($chatCommand);
 
-        Log::info("Chat command added: $trigger $command -> $callback");
+        Log::info("Chat command added: $trigger$command -> $callback");
     }
 
     public static function messageAll(string $message)

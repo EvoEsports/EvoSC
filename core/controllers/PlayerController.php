@@ -79,6 +79,11 @@ class PlayerController
             Log::info($player->nick() . " finished with time ($score) " . $player->getTime());
             self::displayPlayerlist();
         }
+
+        if($player->isSpectator()){
+            ServerController::getRpc()->forceSpectator($player->Login, 2);
+            ServerController::getRpc()->forceSpectator($player->Login, 0);
+        }
     }
 
     public static function playerDisconnect(Player $player, $disconnectReason)
