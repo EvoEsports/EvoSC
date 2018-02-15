@@ -1,9 +1,11 @@
 <?php
 
 use esc\classes\Config;
+use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\controllers\ServerController;
+use esc\models\Map;
 
 class Dedimania
 {
@@ -12,6 +14,17 @@ class Dedimania
     public function __construct()
     {
         $this->authenticateAndValidateAccount();
+
+        Hook::add('BeginMap', 'Dedimania::beginMap');
+    }
+
+    public static function beginMap(Map $map)
+    {
+        echo "Check dedis\n";
+
+        var_dump(self::call('dedimania.GetChallengeInfo', [
+            'UId' => $map->UId
+        ]));
     }
 
     private function authenticateAndValidateAccount()
@@ -28,7 +41,7 @@ class Dedimania
             'Path' => ServerController::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
-        self::$sessionId = (string) $response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
+        self::$sessionId = (string)$response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
     }
 
     /**
@@ -61,7 +74,7 @@ class Dedimania
             $structArrayMember->addChild('name', 'params');
             $structArray = $structArrayMember->addChild('value')->addChild('array')->addChild('data')->addChild('value')->addChild('struct');
 
-            foreach($parameters as $key => $param){
+            foreach ($parameters as $key => $param) {
                 $subMember = $structArray->addChild('member');
                 $subMember->addChild('name', $key);
                 $subMember->addChild('value')->addChild('string', $param);

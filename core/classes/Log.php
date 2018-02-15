@@ -38,9 +38,9 @@ class Log
         self::logAddLine(sprintf(self::$prefix . " Warning: %s", $message), true);
     }
 
-    public static function hook($message)
+    public static function hook($message, $echo = false)
     {
-        self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message));
+        self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message), $echo);
     }
 
     private static function debug($message)

@@ -24,12 +24,11 @@ $t: Changes the text to capitals
 $$: Writes a dollarsign
      */
 
-    private static $triggers;
+    private static $pattern;
     private static $chatCommands;
 
     public static function initialize()
     {
-        self::$triggers = [];
         self::$chatCommands = new Collection();
 
         ServerController::call('ChatEnableManualRouting', [true, false]);
@@ -48,13 +47,7 @@ $$: Writes a dollarsign
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
-        $chatCommandPattern = '/^(';
-        foreach(self::$triggers as $trigger){
-            $chatCommandPattern .= '\\' . implode('\\', str_split($trigger)) . '|';
-        }
-        $chatCommandPattern .= ')/';
-
-        if (preg_match($chatCommandPattern, $text)) {
+        if (preg_match(self::$pattern, $text, $matches)) {
             if (self::executeChatCommand($player, $text)) {
                 return;
             }
@@ -106,16 +99,15 @@ $$: Writes a dollarsign
         }
 
         $arguments = explode(' ', $text);
-        $trigger = substr($arguments[0], 0, 1);
-        $cmd = substr($arguments[0], 1);
 
         foreach ($arguments as $key => $argument) {
             $arguments[$key] = str_replace(';:;', ' ', $argument);
         }
 
         $command = self::$chatCommands
-            ->where('command', $cmd)
-            ->where('trigger', $trigger)
+            ->filter(function(ChatCommand $cmd) use ($arguments){
+                return "$cmd->trigger$cmd->command" == $arguments[0];
+            })
             ->first();
 
         array_unshift($arguments, $player);
@@ -130,12 +122,16 @@ $$: Writes a dollarsign
 
     public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/')
     {
-        if (!in_array($trigger, self::$triggers)) {
-            array_push(self::$triggers, $trigger);
-        }
-
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description);
         self::$chatCommands->add($chatCommand);
+
+        $triggers = [];
+        $chatCommandPattern = '/^(';
+        foreach(self::$chatCommands as $cmd){
+            array_push($triggers, '\\' . implode('\\', str_split($cmd->trigger)) . $cmd->command);
+        }
+        $chatCommandPattern .= implode('|', $triggers) . ')/';
+        self::$pattern = $chatCommandPattern;
 
         Log::info("Chat command added: $trigger$command -> $callback");
     }

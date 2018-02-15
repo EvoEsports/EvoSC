@@ -36,6 +36,7 @@ class MapController
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
+            $table->string('UId')->nullable();
             $table->integer('MxId')->nullable();
             $table->string('Name')->nullable();
             $table->string('Author')->nullable();
