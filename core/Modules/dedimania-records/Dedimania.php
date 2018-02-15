@@ -1,12 +1,34 @@
 <?php
 
+use esc\classes\Config;
 use esc\classes\Log;
 use esc\classes\RestClient;
+use esc\controllers\ServerController;
 
 class Dedimania
 {
+    private static $sessionId;
+
     public function __construct()
     {
+        $this->authenticateAndValidateAccount();
+    }
+
+    private function authenticateAndValidateAccount()
+    {
+        $response = Dedimania::call('dedimania.OpenSession', [
+            'Game' => 'TM2',
+            'Login' => Config::get('dedimania.login'),
+            'Code' => Config::get('dedimania.key'),
+            'Tool' => 'EvoSC',
+            'Version' => '0.6.1',
+            'Packmask' => 'Stadium',
+            'ServerVersion' => ServerController::getRpc()->getVersion()->version,
+            'ServerBuild' => ServerController::getRpc()->getVersion()->build,
+            'Path' => ServerController::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
+        ]);
+
+        self::$sessionId = (string) $response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
     }
 
     /**
@@ -19,13 +41,30 @@ class Dedimania
     public static function call(string $method, array $parameters = null): ?SimpleXMLElement
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
-        $methodCall = $xml->addChild('methodCall');
-        $methodCall->addChild('methodName', $method);
+        $xml->addChild('methodName', 'system.multicall');
+
+        $struct = $xml
+            ->addChild('params')
+            ->addChild('param')
+            ->addChild('value')
+            ->addChild('array')
+            ->addChild('data')
+            ->addChild('value')
+            ->addChild('struct');
+
+        $member = $struct->addChild('member');
+        $member->addChild('name', 'methodName');
+        $member->addChild('value')->addChild('string', $method);
 
         if ($parameters) {
-            $params = $methodCall->addChild('params');
-            foreach ($parameters as $param) {
-                $params->addChild('param', $param);
+            $structArrayMember = $struct->addChild('member');
+            $structArrayMember->addChild('name', 'params');
+            $structArray = $structArrayMember->addChild('value')->addChild('array')->addChild('data')->addChild('value')->addChild('struct');
+
+            foreach($parameters as $key => $param){
+                $subMember = $structArray->addChild('member');
+                $subMember->addChild('name', $key);
+                $subMember->addChild('value')->addChild('string', $param);
             }
         }
 

@@ -47,12 +47,11 @@ while(true){
         ChatController::initialize();
         GroupController::init();
         MapController::initialize();
+        RestClient::initialize();
+        RestClient::$serverName = 'Brakers dev server LOGIN brakertest2';
 
         ModuleController::loadModules('core/Modules');
         ModuleController::loadModules('modules');
-
-        RestClient::initialize();
-        RestClient::$serverName = 'Brakers dev server LOGIN brakertest2';
 
         PlayerController::initialize();
 

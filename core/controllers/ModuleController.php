@@ -25,7 +25,7 @@ class ModuleController
 
                 Log::info("Loaded module $item");
             } catch (\Exception $e) {
-                Log::error("Could not load module $item");
+                Log::error("Could not load module $item: $e");
             }
         }
     }
