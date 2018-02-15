@@ -5,7 +5,6 @@ namespace esc\classes;
 
 use esc\controllers\RpcController;
 use esc\controllers\TemplateController;
-use Philo\Blade\Blade;
 
 class Template
 {
@@ -18,23 +17,14 @@ class Template
         $this->template = $template;
     }
 
-    public function fill(...$values)
+    public static function sendToAll(string $index, array $values)
     {
-        $blade = new Blade();
-    }
-
-    public function sendToAll()
-    {
-        RpcController::call('SendDisplayManialinkPage', [$this->template, 0, false]);
+        $xml = TemplateController::getTemplate($index, $values);
+        RpcController::getRpc()->sendDisplayManialinkPage('', $xml);
     }
 
     public static function add(string $index, string $template)
     {
         TemplateController::addTemplate($index, $template);
-    }
-
-    public static function get(string $index): ?Template
-    {
-        return TemplateController::getTemplate($index);
     }
 }

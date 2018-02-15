@@ -26,6 +26,8 @@ try {
 
     HookController::initialize();
 
+    TemplateController::init();
+
     \esc\classes\Database::initialize();
 
     try {
@@ -44,8 +46,6 @@ try {
     ChatController::initialize();
 
     MapController::initialize();
-
-    TemplateController::init();
 
     ModuleController::loadModules('core/Modules');
     ModuleController::loadModules('modules');

@@ -9,19 +9,23 @@ use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\RestClient;
+use esc\classes\Template;
 use esc\models\Map;
+use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
-use Maniaplanet\DedicatedServer\Xmlrpc\GbxRemote;
 
 class MapController
 {
     private static $currentMap;
+    private static $nextMap;
 
     public static function initialize()
     {
         self::createTables();
 
         self::loadMaps();
+
+        Template::add('map', File::get(__DIR__ . '/Templates/map.latte.xml'));
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
 
@@ -35,12 +39,15 @@ class MapController
             $table->string('MxId')->nullable();
             $table->string('Name');
             $table->string('FileName')->unique();
+            $table->integer('Plays')->default(0);
         });
     }
 
     public static function beginMap(Map $map)
     {
         self::$currentMap = $map;
+        $map->increment('Plays');
+        Template::sendToAll('map', ['map' => $map, 'next' => null]);
     }
 
     public static function getCurrentMap(): ?Map
@@ -98,6 +105,8 @@ class MapController
     {
         RpcController::getRpc()->chooseNextMap($map->FileName);
         ChatController::messageAll("Next map changed to $map->Name");
+        self::$nextMap = $map;
+        Template::sendToAll('map', ['map' => self::$currentMap, 'next' => $map]);
     }
 
     public static function next()
@@ -122,6 +131,11 @@ class MapController
                     'FileName' => $mapFile,
                     'Name' => preg_replace('/\.Map\.Gbx$/', '', $mapFile)
                 ]);
+            }
+
+            try{
+                RpcController::getRpc()->addMap($map->FileName);
+            }catch(AlreadyInListException $e){
             }
         }
     }

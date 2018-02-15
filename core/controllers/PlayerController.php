@@ -4,9 +4,11 @@ namespace esc\controllers;
 
 
 use esc\classes\Database;
+use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
+use esc\classes\Template;
 use esc\ManiaLink\Elements\Label;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,6 +27,8 @@ class PlayerController
         Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
+        Template::add('players', File::get(__DIR__ . '/Templates/locals.latte.xml'));
+
         ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
 
         self::$players = new Collection();
@@ -32,7 +36,7 @@ class PlayerController
 
     private static function createTables()
     {
-        Database::create('players', function(Blueprint $table){
+        Database::create('players', function (Blueprint $table) {
             $table->increments('id');
             $table->string('Login')->unique();
             $table->string('NickName')->default("unset");
@@ -144,11 +148,6 @@ class PlayerController
 
     public static function displayPlayerlist()
     {
-        $builder = new ManiaBuilder('Playerlist', ManiaBuilder::STICK_LEFT, ManiaBuilder::STICK_TOP, 90, 60, .55, ['padding' => 3, 'bgcolor' => '0009']);
-
-        $label = new Label("Playerlist", ['width' => '30', 'textsize' => 5, 'height' => 12]);
-        $builder->addRow($label);
-
         $players = self::getPlayers()->sort(function (Player $a, Player $b) {
             if ($a->score == 0) {
                 return 10;
@@ -163,36 +162,6 @@ class PlayerController
             return 0;
         });
 
-        $i = 1;
-        foreach ($players as $index => $player) {
-            $position = new Label("$i.", ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
-            $textcolor = $player->getTime(true) > 0 ? 'FFFF' : 'FFF5';
-            $score = new Label($player->getTime(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => $textcolor]);
-
-            $nickname = $player->NickName;
-
-            if ($player->isOnline()) {
-                if (isset($player->afk) && $player->afk == true) {
-                    $nickname = '$n$o$e33afk$z ' . $nickname;
-                }
-
-                if ($player->isSpectator()) {
-                    $nickname = '$eee📷$z ' . $nickname;
-                }
-            } else {
-                $nickname = '$n$o$e33⌫$z ' . $nickname;
-            }
-
-            $nick = new Label($nickname, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
-            $builder->addRow($position, $score, $nick);
-
-            $i++;
-        }
-
-        try {
-            $builder->sendToAll();
-        } catch (ParseException $e) {
-            Log::error($e);
-        }
+        Template::sendToAll('players', ['players' => $players]);
     }
 }

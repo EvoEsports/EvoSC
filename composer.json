@@ -5,6 +5,7 @@
         "BluePsyduck/ManiaScript": "^1.1",
         "symfony/console": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
-        "philo/laravel-blade": "3.*"
+        "philo/laravel-blade": "3.*",
+        "latte/latte": "^2.4"
     }
 }

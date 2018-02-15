@@ -9,7 +9,7 @@ class Map extends Model
 {
     protected $table = 'maps';
 
-    protected $fillable = ['MxId', 'Name', 'FileName'];
+    protected $fillable = ['MxId', 'Name', 'FileName', 'Plays'];
 
     public $timestamps = false;
 

@@ -3,31 +3,34 @@
 namespace esc\controllers;
 
 
-use esc\classes\Template;
 use Illuminate\Support\Collection;
+use Latte\Engine;
+use Latte\Loaders\StringLoader;
 
 class TemplateController
 {
+    private static $latte;
     private static $templates;
+
+    private static function getTemplates(): Collection
+    {
+        return self::getTemplates();
+    }
 
     public static function init()
     {
         self::$templates = new Collection();
-    }
-
-    private static function templates(): Collection
-    {
-        return self::$templates;
+        self::$latte = new Engine();
     }
 
     public static function addTemplate(string $index, string $templateString)
     {
-        $template = new Template($index, $templateString);
-        self::templates()->push($template);
+        self::$templates->put($index, $templateString);
+        self::$latte->setLoader(new StringLoader(self::$templates->toArray()));
     }
 
-    public static function getTemplate(string $index): ?Template
+    public static function getTemplate(string $index, $values): string
     {
-        return self::templates()->where('index', $index)->first();
+        return self::$latte->renderToString($index, $values);
     }
 }
