@@ -130,10 +130,6 @@ $$: Writes a dollarsign
 
     public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/')
     {
-        if (strlen($trigger) != 1) {
-            Log::error('Trigger must be one character.');
-        }
-
         if (!in_array($trigger, self::$triggers)) {
             array_push(self::$triggers, $trigger);
         }

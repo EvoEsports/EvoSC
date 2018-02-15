@@ -146,7 +146,8 @@ class MapController
 
             try{
                 ServerController::getRpc()->addMap($mapFile);
-            }catch(\Exception $e){
+            }catch(AlreadyInListException $e){
+                Log::warning("Map $mapFile already added.");
             }
         }
     }
