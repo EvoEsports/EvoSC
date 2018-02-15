@@ -3,12 +3,14 @@
 namespace esc\controllers;
 
 
+use esc\classes\Database;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaBuilder;
 use esc\ManiaLink\Elements\Label;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Schema\Blueprint;
 use Maniaplanet\DedicatedServer\Xmlrpc\ParseException;
 
 class PlayerController
@@ -18,12 +20,25 @@ class PlayerController
 
     public static function initialize()
     {
+        self::createTables();
+
         Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
 
         ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
 
         self::$players = new Collection();
+    }
+
+    private static function createTables()
+    {
+        Database::create('players', function(Blueprint $table){
+            $table->increments('id');
+            $table->string('Login')->unique();
+            $table->string('NickName')->default("unset");
+            $table->integer('Visits')->default(0);
+            $table->float('LadderScore')->default(0);
+        });
     }
 
     public static function toggleAfk(Player $player)
@@ -156,7 +171,7 @@ class PlayerController
 
             $nickname = $player->NickName;
 
-            if($player->isOnline()){
+            if ($player->isOnline()) {
                 if (isset($player->afk) && $player->afk == true) {
                     $nickname = '$n$o$e33afk$z ' . $nickname;
                 }
@@ -164,7 +179,7 @@ class PlayerController
                 if ($player->isSpectator()) {
                     $nickname = '$eee📷$z ' . $nickname;
                 }
-            }else{
+            } else {
                 $nickname = '$n$o$e33⌫$z ' . $nickname;
             }
 

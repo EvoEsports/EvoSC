@@ -4,6 +4,7 @@
         "maniaplanet/dedicated-server-api": "^5.0",
         "BluePsyduck/ManiaScript": "^1.1",
         "symfony/console": "^4.0",
-        "guzzlehttp/guzzle": "^6.3"
+        "guzzlehttp/guzzle": "^6.3",
+        "philo/laravel-blade": "3.*"
     }
 }

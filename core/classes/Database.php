@@ -51,11 +51,18 @@ class Database
         return self::$capsule->getConnection();
     }
 
-    public static function create(string $table, $callback)
+    public static function create(string $table, $callback, array $seed = null)
     {
         if (!self::hasTable($table)) {
             Log::info("Creating table $table.");
             self::getConnection()->getSchemaBuilder()->create($table, $callback);
+
+            if($seed){
+                Log::info("Seeding table $table.");
+                foreach($seed as $item){
+                    self::getConnection()->table($table)->insert($item);
+                }
+            }
         }
     }
 

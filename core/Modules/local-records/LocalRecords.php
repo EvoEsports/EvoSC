@@ -94,13 +94,15 @@ class LocalRecords
         $label = new Label("LocalRecords", ['width' => 70, 'textsize' => 5, 'height' => 12]);
         $builder->addRow($label);
 
-        $i = 1;
-        foreach ($map->locals()->orderBy('Score')->get() as $localRecord) {
-            $index = new Label("$i.", ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
-            $score = new Label($localRecord->getScore(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => 'FFFF']);
-            $nick = new Label($localRecord->getPlayer()->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
-            $builder->addRow($index, $score, $nick);
-            $i++;
+        if($map){
+            $i = 1;
+            foreach ($map->locals()->orderBy('Score')->get() as $localRecord) {
+                $index = new Label("$i.", ['width' => 8, 'textsize' => 3, 'valign' => 'center', 'halign' => 'right']);
+                $score = new Label($localRecord->getScore(), ['width' => '22', 'textsize' => 3, 'valign' => 'center', 'padding-left' => 3, 'textcolor' => 'FFFF']);
+                $nick = new Label($localRecord->getPlayer()->NickName, ['textsize' => 3, 'valign' => 'center', 'padding-left' => 2]);
+                $builder->addRow($index, $score, $nick);
+                $i++;
+            }
         }
 
         try {

@@ -11,6 +11,7 @@ use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\models\Map;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
+use Maniaplanet\DedicatedServer\Xmlrpc\GbxRemote;
 
 class MapController
 {
@@ -19,6 +20,8 @@ class MapController
     public static function initialize()
     {
         self::createTables();
+
+        self::loadMaps();
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
 
@@ -29,9 +32,9 @@ class MapController
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
-            $table->string('MxId')->unique();
+            $table->string('MxId')->nullable();
             $table->string('Name');
-            $table->string('FileName');
+            $table->string('FileName')->unique();
         });
     }
 
@@ -40,7 +43,7 @@ class MapController
         self::$currentMap = $map;
     }
 
-    public static function getCurrentMap(): Map
+    public static function getCurrentMap(): ?Map
     {
         return self::$currentMap;
     }
@@ -104,5 +107,24 @@ class MapController
         } catch (FaultException $e) {
             Log::error("$e");
         }
+    }
+
+    private static function loadMaps()
+    {
+        $mapFiles = File::getDirectoryContents(Config::get('server.maps'))->filter(function ($fileName) {
+            return preg_match('/^.+.Gbx$/', $fileName);
+        });
+
+        foreach($mapFiles as $mapFile){
+            $map = Map::where('FileName', $mapFile)->first();
+            if(!$map){
+                Map::insert([
+                    'FileName' => $mapFile,
+                    'Name' => preg_replace('/\.Map\.Gbx$/', '', $mapFile)
+                ]);
+            }
+        }
+
+
     }
 }

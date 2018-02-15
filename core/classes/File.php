@@ -3,6 +3,8 @@
 namespace esc\classes;
 
 
+use Illuminate\Support\Collection;
+
 class File
 {
     public static function get(string $fileName): ?string
@@ -38,5 +40,12 @@ class File
             Log::info("Creating directory: $name");
             mkdir($name);
         }
+    }
+
+    public static function getDirectoryContents(string $path): Collection
+    {
+
+        $files = collect(scandir($path));
+        return $files;
     }
 }
