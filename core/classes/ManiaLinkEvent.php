@@ -45,6 +45,8 @@ class ManiaLinkEvent
 
     public static function call(Player $ply, string $action)
     {
+        Log::info("MLE: $action");
+
         if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 

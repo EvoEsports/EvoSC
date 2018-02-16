@@ -5,7 +5,7 @@ namespace esc\classes;
 
 class Timer
 {
-    private static $interval = 100; //one tick each X milliseconds
+    private static $interval = 10; //one tick each X milliseconds
     private static $uStart;
 
     public static function startCycle()

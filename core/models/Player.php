@@ -121,4 +121,9 @@ class Player extends Model
     {
         return $this->hasOne('esc\models\Group', 'id', 'Group');
     }
+
+    public function hasGroup(array $groups)
+    {
+        return in_array($this->group->Name, $groups);
+    }
 }

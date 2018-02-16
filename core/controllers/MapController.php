@@ -117,6 +117,13 @@ class MapController
         ChatController::messageAll("Admin added map \$eee$name.");
     }
 
+    public static function deleteMap(Map $map)
+    {
+        ServerController::getRpc()->removeMap($map->FileName);
+        File::delete(Config::get('server.maps') . '/' . $map->FileName);
+        $map->delete();
+    }
+
     public static function setRandomNext()
     {
         $map = Map::all()->random();

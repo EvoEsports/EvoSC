@@ -48,4 +48,9 @@ class File
         $files = collect(scandir($path));
         return $files;
     }
+
+    public static function delete(string $path)
+    {
+        unlink($path);
+    }
 }
