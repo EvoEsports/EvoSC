@@ -121,7 +121,7 @@ class PlayerController
                 $player->setOnline();
                 $player->increment('visits');
                 self::$players = self::getPlayers()->add($player)->unique();
-                ChatController::messageAll("$player->NickName joined the server.");
+                ChatController::messageAll("$18f" . $player->group->Name . " $player->NickName \$z\$s$18fjoined the server.");
             }
 
             $player->update($info);
