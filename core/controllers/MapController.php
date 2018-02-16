@@ -30,7 +30,7 @@ class MapController
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
         Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
 
-        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx by it\'s id', '//', ['Admin', 'SuperAdmin']);
+        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', ['Admin', 'SuperAdmin']);
     }
 
     private static function createTables()
@@ -122,12 +122,6 @@ class MapController
         ServerController::getRpc()->removeMap($map->FileName);
         File::delete(Config::get('server.maps') . '/' . $map->FileName);
         $map->delete();
-    }
-
-    public static function setRandomNext()
-    {
-        $map = Map::all()->random();
-        self::setNext($map);
     }
 
     public static function setNext(Map $map = null)

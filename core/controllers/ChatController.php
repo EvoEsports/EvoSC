@@ -51,7 +51,7 @@ $$: Writes a dollarsign
     {
         $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
             return $command->hasAccess($player);
-        });
+        })->sortBy('trigger');
 
         Template::show($player, 'help', ['commands' => $commands]);
     }

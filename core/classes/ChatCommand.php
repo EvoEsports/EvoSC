@@ -11,7 +11,7 @@ class ChatCommand
     public $command;
     public $callback;
     public $description;
-    private $access;
+    public $access;
 
     public function __construct(string $trigger, string $command, string $callback, string $description = '', array $access = null)
     {

@@ -3,7 +3,7 @@
 <frame pos="-160 40" scale="0.8">
     <quad pos="0 0" z-index="0" size="50 60" bgcolor="0009"/>
     <label pos="2 -2" z-index="1" size="48 3" text="local records" textsize="1"/>
-    <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="2B69"/>
+    <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="18f9"/>
 
     {if isset($locals)}
     {foreach $locals as $local}
