@@ -4,7 +4,9 @@ namespace esc\controllers;
 
 
 use esc\classes\ChatCommand;
+use esc\classes\File;
 use esc\classes\Log;
+use esc\classes\Template;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
@@ -35,14 +37,23 @@ $$: Writes a dollarsign
 
         HookController::add('PlayerChat', 'esc\controllers\ChatController::playerChat');
 
+        Template::add('help', File::get('core/Templates/help.latte.xml'));
+
         self::addCommand('help', '\esc\controllers\ChatController::showHelp', 'Show this help');
+    }
+
+    private static function getChatCommands(): Collection
+    {
+        return self::$chatCommands;
     }
 
     public static function showHelp(Player $player)
     {
-        foreach (self::$chatCommands as $chatCommand) {
-            self::message($player, $chatCommand->getHelp());
-        }
+        $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
+            return $command->hasAccess($player);
+        });
+
+        Template::show($player, 'help', ['commands' => $commands]);
     }
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
@@ -105,7 +116,7 @@ $$: Writes a dollarsign
         }
 
         $command = self::$chatCommands
-            ->filter(function(ChatCommand $cmd) use ($arguments){
+            ->filter(function (ChatCommand $cmd) use ($arguments) {
                 return "$cmd->trigger$cmd->command" == $arguments[0];
             })
             ->first();
@@ -120,14 +131,14 @@ $$: Writes a dollarsign
         return $isValidCommand;
     }
 
-    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/')
+    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/', array $access = null)
     {
-        $chatCommand = new ChatCommand($trigger, $command, $callback, $description);
+        $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
         self::$chatCommands->add($chatCommand);
 
         $triggers = [];
         $chatCommandPattern = '/^(';
-        foreach(self::$chatCommands as $cmd){
+        foreach (self::$chatCommands as $cmd) {
             array_push($triggers, '\\' . implode('\\', str_split($cmd->trigger)) . $cmd->command);
         }
         $chatCommandPattern .= implode('|', $triggers) . ')/';

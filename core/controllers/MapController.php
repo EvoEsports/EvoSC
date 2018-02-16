@@ -30,7 +30,7 @@ class MapController
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
         Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
 
-        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx by it\'s id', '//');
+        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx by it\'s id', '//', ['Admin', 'SuperAdmin']);
     }
 
     private static function createTables()

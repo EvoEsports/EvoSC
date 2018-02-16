@@ -3,26 +3,31 @@
 namespace esc\classes;
 
 
+use esc\models\Player;
+
 class ChatCommand
 {
     public $trigger;
     public $command;
     public $callback;
     public $description;
+    private $access;
 
-    public function __construct(string $trigger, string $command, string $callback, string $description = '')
+    public function __construct(string $trigger, string $command, string $callback, string $description = '', array $access = null)
     {
         $this->trigger = $trigger;
         $this->command = $command;
         $this->callback = $callback;
         $this->description = $description;
+        $this->access = $access;
     }
 
-    public function getHelp(): string
+    public function hasAccess(Player $player): bool
     {
-        $out = '-> ';
-        $out .= str_pad($this->trigger . $this->command, 20, ' ', STR_PAD_RIGHT);
-        $out .= $this->description;
-        return $out;
+        if ($this->access == null) {
+            return true;
+        }
+
+        return in_array($player->group->Name, $this->access);
     }
 }
