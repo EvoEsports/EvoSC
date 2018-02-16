@@ -2,26 +2,27 @@
 <manialink id="MapList" version="3">
     <frame scale="0.8">
         <quad pos="-90 70" z-index="-1" size="180 140" bgcolor="000c"/>
-        <quad pos="80 68" z-index="0" size="7 7" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
 
-        <label pos="-80 60" z-index="0" size="79 5" textsize="1.3" text="$oMap"/>
-        <label pos="-40 60" z-index="0" size="79 5" textsize="1.3" text="$oLocal"/>
+        <quad pos="80 68" z-index="0" size="7 7" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
+        <label pos="-85 66" z-index="0" size="79 5" textsize="3" text="$s$oMaplist"/>
+        <label pos="-85 55" z-index="0" size="79 5" textsize="1.3" text="$oMap"/>
+        <label pos="-35 55" z-index="0" size="79 5" textsize="1.3" text="$oLocal"/>
 
         {if isset($maps)}
         {foreach $maps as $map}
-        <frame pos="-80 {60 - $iterator->counter * 4}" z-index="1">
-            <label pos="0 0" size="79 5" textsize="1.5" text="{$map->Name}"/>
+        <frame pos="-84 {53 - $iterator->counter * 5}" z-index="1">
+            <label pos="0 0" size="40 5" textsize="1.5" text="{$map->Name}"/>
 
             {if $map->locals()->where('Player', $player->id)->first() != null}
-            <label pos="40 0" size="79 5" textsize="1.5" text="{formatScore($map->locals()->where('Player', $player->id)->first()->Score)}"/>
+            <label pos="50 0" size="20 5" textsize="1.5" text="{formatScore($map->locals()->where('Player', $player->id)->first()->Score)}"/>
             {else}
-            <label pos="40 0" size="79 5" textsize="1.5" text="-"/>
+            <label pos="50 0" size="20 5" textsize="1.5" text="-"/>
             {/if}
 
-            <label pos="100 0" size="30 3" textsize="1.5" text="$18fSet as next" action="maplist.queue,{$map->id}"/>
+            <label pos="100 0" size="20 3" textsize="1.5" text="$18fSet as next" action="maplist.queue,{$map->id}"/>
 
             {if $player->hasGroup(['Admin', 'SuperAdmin'])}
-            <label pos="130 0" size="30 3" textsize="1.5" text="$f00Delete" action="map.delete,{$map->id}"/>
+            <label pos="130 0" size="10 3" textsize="1.5" text="$f00Delete" action="map.delete,{$map->id}"/>
             {/if}
         </frame>
         {/foreach}
