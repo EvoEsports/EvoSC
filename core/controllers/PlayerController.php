@@ -63,8 +63,11 @@ class PlayerController
     public static function playerConnect(Player $player): Player
     {
         $player->increment('Visits');
-        $player->setOnline();
-        $player->setScore(0);
+
+        if(!$player->Online){
+            $player->setOnline();
+            $player->setScore(0);
+        }
 
         self::getPlayers()->add($player);
         Log::info($player->nick(true) . " joined the server.");
@@ -92,6 +95,7 @@ class PlayerController
     {
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
         $player->setOffline();
+        $player->setScore(0);
         self::displayPlayerlist();
         ChatController::messageAll("$player->NickName left the server.");
     }
