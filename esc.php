@@ -75,6 +75,7 @@ while (true) {
         }
 
         LocalRecords::displayLocalRecords();
+        Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
 
         while (true) {
             Timer::startCycle();

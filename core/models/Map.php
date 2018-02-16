@@ -17,4 +17,8 @@ class Map extends Model
     {
         return $this->hasMany('LocalRecord', 'Map', 'id');
     }
+
+    public function dedis(){
+        return $this->hasMany('Dedi', 'Map');
+    }
 }

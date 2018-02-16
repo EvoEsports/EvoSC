@@ -6,13 +6,15 @@
     <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="18f9"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
 
-    {if isset($locals)}
+    {if count($locals)}
     {foreach $locals as $local}
     <label pos="8 -{$iterator->counter * 4 + 4}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" halign="right"/>
     <label pos="9 -{$iterator->counter * 4 + 4}" z-index="1" size="13 3" text="{$local->getScore()}" textcolor="{$local->getPlayer()->Online ? 'FFFF' : '888F'}" textsize="1.2" halign="left"/>
-    <label pos="22 -{$iterator->counter * 4 + 4}" z-index="1" size="30 3" text="{$local->getPlayer()->NickName}" textsize="1.2"
+    <label pos="22 -{$iterator->counter * 4 + 4}" z-index="1" size="25 3" text="{$local->getPlayer()->NickName}" textsize="1.2"
            halign="left"/>
     {/foreach}
+    {else}
+    <label pos="2 -9" z-index="1" size="40 3" text="$iNo local records. Be the first one." textsize="0.8" halign="left"/>
     {/if}
 
 </frame>

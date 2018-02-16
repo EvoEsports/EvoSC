@@ -1,12 +1,17 @@
 <?php
 
 use esc\classes\Config;
+use esc\classes\Database;
+use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\RestClient;
+use esc\classes\Template;
+use esc\controllers\MapController;
 use esc\controllers\ServerController;
 use esc\models\Map;
 use esc\models\Player;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
 class Dedimania
@@ -16,13 +21,29 @@ class Dedimania
 
     public function __construct()
     {
-//        include_once __DIR__ . '/Models/Dedi.php';
-//
-//        $this->authenticateAndValidateAccount();
-//
-//        self::$dedis = new Collection();
-//
-//        Hook::add('BeginMap', 'Dedimania::beginMap');
+        $this->createTables();
+
+        include_once __DIR__ . '/Models/Dedi.php';
+
+        $this->authenticateAndValidateAccount();
+
+        self::$dedis = new Collection();
+
+        Hook::add('BeginMap', 'Dedimania::beginMap');
+
+        Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
+    }
+
+    private function createTables()
+    {
+        Database::create('dedi-records', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('Map');
+            $table->integer('Player');
+            $table->integer('Score');
+            $table->integer('Rank');
+            $table->unique(['Map', 'Rank']);
+        });
     }
 
     public static function beginMap(Map $map)
@@ -36,19 +57,27 @@ class Dedimania
         foreach ($records as $record) {
             $login = $record->struct->member[0]->value->string;
             $nickname = $record->struct->member[1]->value->string;
-            $best = $record->struct->member[2]->value->string;
-            $rank = $record->struct->member[3]->value->string;
+            $score = (int)$record->struct->member[2]->value->int;
+            $rank = (int)$record->struct->member[3]->value->int;
 
-            $player = Player::firstOrCreate(['Login' => (string)$login]);
+            $player = Player::firstOrCreate(['Login' => (string)$login, 'NickName' => (string)$nickname]);
 
-            if (!$player->NickName) {
-                $player->update(['NickName' => (string)$nickname]);
-            }
-
-            self::$dedis->push(new Dedi($player, (int)$best, (int)$rank));
+            Dedi::updateOrCreate([
+                'Map' => $map->id,
+                'Player' => $player->id,
+                'Score' => $score,
+                'Rank' => $rank
+            ]);
         }
 
-        var_dump(self::$dedis);
+        self::displayDedis();
+    }
+
+    public static function displayDedis()
+    {
+        $map = MapController::getCurrentMap();
+        $dedis = $map->dedis->take(13);
+        Template::showAll('dedis', ['dedis' => $dedis]);
     }
 
     private function authenticateAndValidateAccount()

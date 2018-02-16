@@ -2,16 +2,21 @@
 
 use esc\models\Player;
 
-class Dedi
+class Dedi extends \Illuminate\Database\Eloquent\Model
 {
-    public $rank;
-    public $score;
-    public $player;
+    protected $table = 'dedi-records';
 
-    public function __construct(Player $player, int $score, int $rank)
+    protected $fillable = ['Map', 'Player', 'Score', 'Rank'];
+
+    public $timestamps = false;
+
+    public function map()
     {
-        $this->player = $player;
-        $this->score = $score;
-        $this->rank = $rank;
+        return $this->hasOne('esc\models\Map', 'id', 'Map');
+    }
+
+    public function player()
+    {
+        return $this->hasOne('esc\models\Player', 'id', 'Player');
     }
 }
