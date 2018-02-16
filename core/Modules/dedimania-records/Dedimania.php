@@ -16,13 +16,13 @@ class Dedimania
 
     public function __construct()
     {
-        include_once __DIR__ . '/Models/Dedi.php';
-
-        $this->authenticateAndValidateAccount();
-
-        self::$dedis = new Collection();
-
-        Hook::add('BeginMap', 'Dedimania::beginMap');
+//        include_once __DIR__ . '/Models/Dedi.php';
+//
+//        $this->authenticateAndValidateAccount();
+//
+//        self::$dedis = new Collection();
+//
+//        Hook::add('BeginMap', 'Dedimania::beginMap');
     }
 
     public static function beginMap(Map $map)

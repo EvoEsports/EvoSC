@@ -12,7 +12,6 @@ use esc\controllers\ModuleController;
 use esc\controllers\PlayerController;
 use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
-use Maniaplanet\DedicatedServer\Connection;
 
 include 'core/autoload.php';
 include 'vendor/autoload.php';
@@ -60,24 +59,16 @@ while(true){
             MapController::beginMap($map);
         }
 
-        LocalRecords::displayLocalRecords();
-
         foreach (ServerController::getRpc()->getPlayerList() as $player) {
-            if (!\esc\models\Player::exists($player->login)) {
-                $ply = new \esc\models\Player();
-                $ply->Login = $player->login;
-                $ply->NickName = $player->nickName;
-                $ply->LadderScore = $player->ladderRanking;
-                $ply->save();
-            }
-
-            $ply = \esc\models\Player::find($player->login);
+            $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
+            $ply->update($player->toArray());
 
             if ($ply) {
                 PlayerController::playerConnect($ply);
-                $ply->setScore(0);
             }
         }
+
+        LocalRecords::displayLocalRecords();
 
         while (true) {
             Timer::startCycle();

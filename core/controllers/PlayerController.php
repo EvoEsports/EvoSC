@@ -38,8 +38,9 @@ class PlayerController
             $table->string('Login')->unique();
             $table->string('NickName')->default("unset");
             $table->integer('Visits')->default(0);
-            $table->float('LadderScore')->default(0);
-            $table->float('Group')->default(4);
+            $table->integer('Group')->default(4);
+            $table->integer('LastScore')->default(0);
+            $table->boolean('Online')->default(false);
         });
     }
 
@@ -63,6 +64,7 @@ class PlayerController
     {
         $player->increment('Visits');
         $player->setOnline();
+        $player->setScore(0);
 
         self::getPlayers()->add($player);
         Log::info($player->nick(true) . " joined the server.");

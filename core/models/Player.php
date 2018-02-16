@@ -3,26 +3,26 @@
 namespace esc\models;
 
 
+use esc\classes\Timer;
 use esc\controllers\PlayerController;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
     protected $table = 'players';
-
-    protected $fillable = ['Login', 'NickName', 'LadderScore'];
-
+    protected $fillable = ['Login', 'NickName', 'LastScore', 'Online'];
     protected $primaryKey = 'Login';
-
     public $incrementing = false;
-
     public $timestamps = false;
 
     public $spectator = false;
     public $afk = false;
-    public $score = 0;
-    private $online = false;
 
+    /**
+     * Returns nickname of player, stripped of colors if true
+     * @param bool $plain
+     * @return mixed
+     */
     public function nick($plain = false)
     {
         if ($plain) {
@@ -32,23 +32,27 @@ class Player extends Model
         return $this->NickName;
     }
 
+    /**
+     * Gets the players current time (formatted)
+     * @param bool $asMilliseconds
+     * @return mixed|string
+     */
     public function getTime(bool $asMilliseconds = false)
     {
         if ($asMilliseconds) {
-            return $this->score;
+            return $this->LastScore;
         }
 
-        $seconds = floor($this->score / 1000);
-        $ms = $this->score - ($seconds * 1000);
-        $minutes = floor($seconds / 60);
-        $seconds -= $minutes * 60;
-
-        return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
+        return Timer::formatScore($this->LastScore ?: 0);
     }
 
+    /**
+     * Sets the current time of the player
+     * @param $score
+     */
     public function setScore($score)
     {
-        $this->score = $score;
+        $this->update(['LastScore' => $score]);
     }
 
     public static function exists(string $login)
@@ -57,38 +61,66 @@ class Player extends Model
         return $player != null;
     }
 
+    /**
+     * Set spectator status
+     * @param bool $isSpectator
+     */
     public function setIsSpectator(bool $isSpectator)
     {
         $this->spectator = $isSpectator;
     }
 
+    /**
+     * Get spectator status
+     * @return bool
+     */
     public function isSpectator(): bool
     {
         return $this->spectator > 0;
     }
 
+    /**
+     * Checks if player is online (OBSOLETE WILL BE REMOVED, use $player->Online)
+     * @return bool
+     */
     public function isOnline(): bool
     {
-        return PlayerController::getPlayerByLogin($this->Login) != null;
+        return $this->Online;
     }
 
+    /**
+     * Sets player online
+     * @return Player
+     */
     public function setOnline(): Player
     {
-        $this->online = true;
+        $this->update(['Online' => true]);
         return $this;
     }
 
+    /**
+     * Sets player offline
+     * @return Player
+     */
     public function setOffline(): Player
     {
-        $this->online = false;
+        $this->update(['Online' => false]);
         return $this;
     }
 
+    /**
+     * Checks if player finished
+     * @return bool
+     */
     public function hasFinished(): bool
     {
-        return $this->score > 0;
+        return $this->LastScore > 0;
     }
 
+    /**
+     * Get players locals
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function locals()
     {
         return $this->hasMany('esc\models\LocalRecord', 'player');
