@@ -5,6 +5,7 @@ namespace esc\classes;
 
 use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
+use esc\models\Player;
 
 class Template
 {
@@ -17,10 +18,36 @@ class Template
         $this->template = $template;
     }
 
-    public static function sendToAll(string $index, array $values)
+    public static function showAll(string $index, array $values = null)
     {
+        if(!$values){
+            $values = [];
+        }
+
         $xml = TemplateController::getTemplate($index, $values);
         ServerController::getRpc()->sendDisplayManialinkPage('', $xml);
+    }
+
+    public static function hideAll(string $index)
+    {
+        $xml = TemplateController::getBlankTemplate($index);
+        ServerController::getRpc()->sendDisplayManialinkPage('', $xml);
+    }
+
+    public static function show(Player $player, string $index, array $values = null)
+    {
+        if(!$values){
+            $values = [];
+        }
+
+        $xml = TemplateController::getTemplate($index, $values);
+        ServerController::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
+    }
+
+    public static function hide(Player $player, string $index)
+    {
+        $xml = TemplateController::getBlankTemplate($index);
+        ServerController::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
     }
 
     public static function add(string $index, string $template)

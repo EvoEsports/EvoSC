@@ -28,6 +28,7 @@ class MapController
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
+        Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
 
         ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx by it\'s id', '//');
     }
@@ -47,13 +48,20 @@ class MapController
         });
     }
 
+    public static function endMap(Map $map)
+    {
+        foreach (PlayerController::getPlayers() as $player) {
+            $player->setScore(0);
+        }
+    }
+
     public static function beginMap(Map $map)
     {
         $map->update(ServerController::getCurrentMapInfo()->toArray());
         $map->increment('Plays');
         self::$currentMap = $map;
 
-        if(self::$nextMap && $map->FileName != self::$nextMap->FileName){
+        if (self::$nextMap && $map->FileName != self::$nextMap->FileName) {
             Log::warning("Skipping incompatible map " . self::$nextMap->Name);
             ChatController::messageAll("Skipping incompatible map " . self::$nextMap->Name);
         }
@@ -61,7 +69,7 @@ class MapController
         $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
         self::$nextMap = $nextMap;
 
-        Template::sendToAll('map', ['map' => $map, 'next' => $nextMap]);
+        Template::showAll('map', ['map' => $map, 'next' => $nextMap]);
     }
 
     public static function getCurrentMap(): ?Map
@@ -118,9 +126,8 @@ class MapController
     public static function setNext(Map $map = null)
     {
         ServerController::getRpc()->chooseNextMap($map->FileName);
-        ChatController::messageAll("Next map changed to $map->Name");
         self::$nextMap = $map;
-        Template::sendToAll('map', ['map' => self::$currentMap, 'next' => $map]);
+        Template::showAll('map', ['map' => self::$currentMap, 'next' => $map]);
     }
 
     public static function next()
@@ -145,9 +152,9 @@ class MapController
                 Map::create($mapInfo);
             }
 
-            try{
+            try {
                 ServerController::getRpc()->addMap($mapFile);
-            }catch(AlreadyInListException $e){
+            } catch (AlreadyInListException $e) {
                 Log::warning("Map $mapFile already added.");
             }
         }

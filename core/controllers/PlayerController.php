@@ -64,7 +64,7 @@ class PlayerController
     {
         $player->increment('Visits');
 
-        if(!$player->Online){
+        if (!$player->Online) {
             $player->setOnline();
             $player->setScore(0);
         }
@@ -85,7 +85,7 @@ class PlayerController
             self::displayPlayerlist();
         }
 
-        if($player->isSpectator()){
+        if ($player->isSpectator()) {
             ServerController::getRpc()->forceSpectator($player->Login, 2);
             ServerController::getRpc()->forceSpectator($player->Login, 0);
         }
@@ -117,7 +117,7 @@ class PlayerController
                 }
             }
 
-            if (!$player->isOnline()) {
+            if (!$player->Online) {
                 $player->setOnline();
                 $player->increment('visits');
                 self::$players = self::getPlayers()->add($player)->unique();
@@ -153,6 +153,6 @@ class PlayerController
             return 0;
         });
 
-        Template::sendToAll('players', ['players' => $players]);
+        Template::showAll('players', ['players' => $players]);
     }
 }

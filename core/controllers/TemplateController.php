@@ -33,4 +33,9 @@ class TemplateController
     {
         return self::$latte->renderToString($index, $values);
     }
+
+    public static function getBlankTemplate(string $index): string
+    {
+        return substr(self::$templates[$index], 0, strpos(self::$templates[$index], '<frame')) . '</manialink>';
+    }
 }

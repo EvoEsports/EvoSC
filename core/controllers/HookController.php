@@ -23,6 +23,7 @@ class HookController
         'TrackMania.PlayerCheckpoint' => 'PlayerCheckpoint',
         'TrackMania.PlayerFinish' => 'PlayerFinish',
         'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
+        'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
     ];
 
     public static function initialize()
@@ -75,7 +76,6 @@ class HookController
 
             case 'EndMap':
                 //SMapInfo Map
-                echo "Map ended: " . $arguments[0]['UId'] . "\n";
                 $map = Map::where('FileName', $arguments[0]['FileName'])->first();
                 self::fireHookBatch($hooks, $map);
                 break;
@@ -129,6 +129,12 @@ class HookController
                 //int PlayerUid, string Login
                 $player = PlayerController::getPlayerByLogin($arguments['Login']);
                 self::fireHookBatch($hooks, $player);
+                break;
+
+            case 'PlayerManialinkPageAnswer':
+                //int PlayerUid, string Login, string Answer, SEntryVal Entries[]
+                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                self::fireHookBatch($hooks, $player, $arguments[2]);
                 break;
         }
     }

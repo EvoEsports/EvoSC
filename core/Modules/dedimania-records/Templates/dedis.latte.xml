@@ -5,12 +5,14 @@
     <label pos="2 -2" z-index="1" size="48 3" text="local records" textsize="1"/>
     <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="2B69"/>
 
+    {if isset($locals)}
     {foreach $locals as $local}
     <label pos="8 -{$iterator->counter * 4 + 4}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" halign="right"/>
-    <label pos="9 -{$iterator->counter * 4 + 4}" z-index="1" size="13 3" text="{$local->getScore()}" textcolor="{$local->getPlayer()->isOnline() ? 'FFFF' : '888F'}" textsize="1.2" halign="left"/>
+    <label pos="9 -{$iterator->counter * 4 + 4}" z-index="1" size="13 3" text="{$local->getScore()}" textcolor="{$local->getPlayer()->Online ? 'FFFF' : '888F'}" textsize="1.2" halign="left"/>
     <label pos="22 -{$iterator->counter * 4 + 4}" z-index="1" size="30 3" text="{$local->getPlayer()->NickName}" textsize="1.2"
            halign="left"/>
     {/foreach}
+    {/if}
 
 </frame>
 </manialink>

@@ -15,7 +15,7 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
         return $this->hasOne('\esc\models\Player', 'id', 'Player');
     }
 
-    public function getPlayer(): \esc\models\Player
+    public function getPlayer(): ?\esc\models\Player
     {
         return $this->player()->first();
     }

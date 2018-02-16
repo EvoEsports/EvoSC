@@ -89,6 +89,6 @@ class LocalRecords
     public static function displayLocalRecords()
     {
         $map = MapController::getCurrentMap();
-        Template::sendToAll('locals', ['locals' => $map->locals()->orderBy('Score')->get()]);
+        Template::showAll('locals', ['locals' => $map->locals()->orderBy('Score')->get()]);
     }
 }

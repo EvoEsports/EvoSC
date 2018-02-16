@@ -80,15 +80,6 @@ class Player extends Model
     }
 
     /**
-     * Checks if player is online (OBSOLETE WILL BE REMOVED, use $player->Online)
-     * @return bool
-     */
-    public function isOnline(): bool
-    {
-        return $this->Online;
-    }
-
-    /**
      * Sets player online
      * @return Player
      */

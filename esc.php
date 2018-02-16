@@ -18,9 +18,14 @@ include 'vendor/autoload.php';
 
 $connectionFailed = 0;
 
-while(true){
+while (true) {
     try {
         Log::info("Starting...");
+
+        function formatScore(int $score): string
+        {
+            return Timer::formatScore($score);
+        }
 
         Log::info("Loading config files.");
         Config::loadConfigFiles();
@@ -28,6 +33,7 @@ while(true){
         HookController::initialize();
 
         TemplateController::init();
+        \esc\classes\ManiaLinkEvent::init();
 
         \esc\classes\Database::initialize();
 
