@@ -81,7 +81,7 @@ class MapController
         $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
         self::$nextMap = $nextMap;
 
-        Template::showAll('map', ['map' => $map, 'next' => $nextMap]);
+        self::displayMapWidget();
     }
 
     public static function getCurrentMap(): ?Map
@@ -157,9 +157,16 @@ class MapController
         }
     }
 
-    public function getNext(): Map
+    public static function getNext(): Map
     {
-        return self::getQueue()->first();
+        $map = self::getQueue()->first()['map'];
+
+        if(!$map){
+            $mapId = ServerController::getRpc()->getNextMapInfo()->uId;
+            $map = Map::where('UId', $mapId)->first();
+        }
+
+        return $map;
     }
 
     public static function queueMap(Player $player, Map $map)
@@ -174,9 +181,11 @@ class MapController
             'map' => $map
         ]);
 
-        ChatController::messageAll('$%s%s $z$s$%squeued map %s',
-            config('color.secondary'), $player->nick(true),
+        ChatController::messageAll('%s $z$s$%squeued map %s',
+            $player->NickName,
             config('color.primary'), $map->Name);
+
+        self::displayMapWidget();
     }
 
     private static function loadMaps()
@@ -198,5 +207,13 @@ class MapController
                 Log::warning("Map $mapFile already added.");
             }
         }
+    }
+
+    private static function displayMapWidget()
+    {
+        $currentMap = self::getCurrentMap();
+        $nextMap = self::getNext();
+
+        Template::showAll('map', ['map' => $currentMap, 'next' => $nextMap]);
     }
 }

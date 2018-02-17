@@ -34,12 +34,11 @@ class Dedimania
     private function createTables()
     {
         Database::create('dedi-records', function (Blueprint $table) {
-            $table->increments('id');
             $table->integer('Map');
             $table->integer('Player');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->unique(['Map', 'Rank']);
+            $table->primary(['Map', 'Rank']);
         });
 
         Database::create('dedi-sessions', function (Blueprint $table) {
@@ -92,7 +91,8 @@ class Dedimania
             $score = (int)$record->struct->member[2]->value->int;
             $rank = (int)$record->struct->member[3]->value->int;
 
-            $player = Player::firstOrCreate(['Login' => $login, 'NickName' => $nickname]);
+            $player = Player::firstOrCreate(['Login' => $login]);
+            $player->update(['NickName' => $nickname]);
 
             if(isset($player->id)){
                 Dedi::firstOrCreate([

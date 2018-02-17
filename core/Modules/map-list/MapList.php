@@ -37,11 +37,15 @@ class MapList
     public static function queueMap(Player $player, $mapId)
     {
         $map = Map::where('id', intval($mapId))->first();
+
         if($map){
             MapController::queueMap($player, $map);
             Template::hide($player, 'maplist.show');
-            self::showMapList($player);
+        }else{
+            ChatController::message($player, 'Invalid map selected');
         }
+
+        self::closeMapList($player);
     }
 
     public static function deleteMap(Player $player, $mapId)

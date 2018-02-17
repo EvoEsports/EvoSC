@@ -21,4 +21,8 @@ class Map extends Model
     public function dedis(){
         return $this->hasMany('Dedi', 'Map');
     }
+
+    public function author(){
+        return $this->hasOne('esc\models\Player', 'Login', 'Author');
+    }
 }

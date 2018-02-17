@@ -90,7 +90,7 @@ $$: Writes a dollarsign
         $text = preg_replace('/\$[nb]/', '', $text);
 
         if ($player->isSpectator()) {
-            $nick = '$eee📷$z ' . $nick;
+            $nick = '$eee📷 ' . $nick;
         }
 
         $chatText = sprintf('$z$s%s: $%s$z$s%s', $nick, config('color.chat'), $text);

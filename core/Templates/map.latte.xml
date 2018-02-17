@@ -7,7 +7,7 @@
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
 
     <label pos="2 -8" z-index="1" size="40 3" text="$o{$map->Name}" textsize="1.7"/>
-    <label pos="2 -12.3" z-index="1" size="58 3" text="by {$map->Author}" textsize="0.7"/>
+    <label pos="2 -12.3" z-index="1" size="58 3" text="by {$map->author->NickName}" textsize="0.7"/>
     <label pos="2 -16.3" z-index="1" size="58 3" text="Next: {$next ? $next->Name : 'none'}" textsize="0.5"/>
 
 </frame>

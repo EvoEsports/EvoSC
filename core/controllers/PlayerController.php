@@ -71,7 +71,6 @@ class PlayerController
         }
 
         self::getPlayers()->add($player);
-        Log::info($player->nick(true) . " joined the server.");
 
         self::displayPlayerlist();
 
@@ -107,14 +106,8 @@ class PlayerController
             $player = self::getPlayerByLogin($info['Login']);
 
             if (!$player) {
-                if (Player::exists($info['Login'])) {
-                    $player = Player::find($info['Login']);
-                } else {
-                    $player = new \esc\models\Player();
-                    $player->Login = $info['Login'];
-                    $player->NickName = $info['NickName'];
-                    $player->save();
-                }
+                $player = Player::firstOrCreate(['Login' => $info['Login']]);
+                $player->update($info);
             }
 
             if (!$player->Online) {
@@ -122,9 +115,9 @@ class PlayerController
                 $player->increment('Visits');
                 self::$players = self::getPlayers()->add($player)->unique();
 
-                ChatController::messageAll('$%s%s $%s%s $z$s$%sjoined the server',
-                    config('color.primary'), $player->group->Name,
-                    config('color.secondary'), $player->nick(true),
+                Log::info($player->nick(true) . " joined the server.");
+                ChatController::messageAll('$%s %s $z$s$%sjoined the server',
+                    config('color.primary'), $player->group->Name, $player->nick(true),
                     config('color.primary'));
             }
 
