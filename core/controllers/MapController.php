@@ -8,15 +8,19 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
+use esc\classes\ManiaLinkEvent;
 use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\models\Map;
+use esc\models\Player;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 class MapController
 {
     private static $currentMap;
+    private static $queue;
     private static $nextMap;
 
     public static function initialize()
@@ -25,7 +29,10 @@ class MapController
 
         self::loadMaps();
 
+        self::$queue = new Collection();
+
         Template::add('map', File::get('core/Templates/map.latte.xml'));
+        ManiaLinkEvent::add('map.queue', 'esc\controllers\MapController::queueMap');
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
         Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
@@ -50,6 +57,12 @@ class MapController
 
     public static function endMap(Map $map)
     {
+        $request = self::getQueue()->shift();
+
+        if(isset($request->map)){
+            self::setNext($request->map);
+        }
+
         foreach (PlayerController::getPlayers() as $player) {
             $player->setScore(0);
         }
@@ -75,6 +88,11 @@ class MapController
     public static function getCurrentMap(): ?Map
     {
         return self::$currentMap;
+    }
+
+    private static function getQueue(): Collection
+    {
+        return self::$queue;
     }
 
     public static function addMap(string ...$arguments)
@@ -121,6 +139,7 @@ class MapController
     {
         ServerController::getRpc()->removeMap($map->FileName);
         File::delete(Config::get('server.maps') . '/' . $map->FileName);
+        ChatController::messageAll("Admin removed map \$eee$map->Name");
         $map->delete();
     }
 
@@ -128,7 +147,6 @@ class MapController
     {
         ServerController::getRpc()->chooseNextMap($map->FileName);
         self::$nextMap = $map;
-        Template::showAll('map', ['map' => self::$currentMap, 'next' => $map]);
     }
 
     public static function next()
@@ -138,6 +156,26 @@ class MapController
         } catch (FaultException $e) {
             Log::error("$e");
         }
+    }
+
+    public function getNext(): Map
+    {
+        return self::getQueue()->first();
+    }
+
+    public static function queueMap(Player $player, Map $map)
+    {
+        if (self::getQueue()->where('player', $player)->isNotEmpty()) {
+            ChatController::message($player, "You already have a map in queue.");
+            return;
+        }
+
+        self::getQueue()->push([
+            'player' => $player,
+            'map' => $map
+        ]);
+
+        ChatController::messageAll("\$z\$fff$player->NickName $19fqueued map \$z\$fff$map->Name");
     }
 
     private static function loadMaps()

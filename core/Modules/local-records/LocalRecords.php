@@ -57,14 +57,15 @@ class LocalRecords
                 'Score' => $score
             ]);
 
-            $message = sprintf('%s made a new local record (%s).', $player->NickName, Timer::formatScore($score));
+            $message = sprintf();
+            ChatController::messageAll('%s $z$s$%smade a new local record $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), Timer::formatScore($score));
         }else{
             $localRecord = $map->locals()->wherePlayer($player->id)->first();
 
             if ($localRecord && $score < $localRecord->Score) {
                 $diff = $localRecord->Score - $score;
                 $localRecord->update(['Score' => $score]);
-                $message = sprintf('%s improved his local record (-%s).', $player->NickName, Timer::formatScore($diff));
+                $message = sprintf('%s $z$s$%simproved his/hers local record $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), Timer::formatScore($diff));
             }
         }
 

@@ -7,6 +7,7 @@ use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\classes\Template;
+use esc\controllers\ChatController;
 use esc\controllers\MapController;
 use esc\controllers\ServerController;
 use esc\models\Map;
@@ -17,20 +18,16 @@ use Illuminate\Support\Collection;
 class Dedimania
 {
     private static $dedis;
-    private static $sessionId;
 
     public function __construct()
     {
         $this->createTables();
-
-        include_once __DIR__ . '/Models/Dedi.php';
-
-        $this->authenticateAndValidateAccount();
-
         self::$dedis = new Collection();
 
-        Hook::add('BeginMap', 'Dedimania::beginMap');
+        include_once __DIR__ . '/Models/Dedi.php';
+        include_once __DIR__ . '/Models/DedimaniaSession.php';
 
+        Hook::add('BeginMap', 'Dedimania::beginMap');
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
     }
 
@@ -44,10 +41,44 @@ class Dedimania
             $table->integer('Rank');
             $table->unique(['Map', 'Rank']);
         });
+
+        Database::create('dedi-sessions', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('Session');
+            $table->boolean('Expired')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    private static function getSession(): ?DedimaniaSession
+    {
+        $sessions = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at');
+
+        $session = $sessions->first();
+
+        if ($session == null) {
+            $sessionId = self::authenticateAndValidateAccount();
+
+            if ($sessionId == null) {
+                Log::warning("Connection to Dedimania failed. Using cached values.");
+                return null;
+            }
+
+            return DedimaniaSession::create(['Session' => $sessionId]);
+        }
+
+        return $session;
     }
 
     public static function beginMap(Map $map)
     {
+        $session = self::getSession();
+
+        if($session == null){
+            Log::warning("Dedimania offline. Using cached values.");
+            ChatController::messageAll('Dedimania is offline. Using cached values.');
+        }
+
         $data = self::call('dedimania.GetChallengeInfo', [
             'UId' => $map->UId
         ]);
@@ -55,19 +86,21 @@ class Dedimania
         $records = $data->params->param->value->struct->member[5]->value->array->data->value;
 
         foreach ($records as $record) {
-            $login = $record->struct->member[0]->value->string;
-            $nickname = $record->struct->member[1]->value->string;
+            $login = (string)$record->struct->member[0]->value->string;
+            $nickname = (string)$record->struct->member[1]->value->string;
             $score = (int)$record->struct->member[2]->value->int;
             $rank = (int)$record->struct->member[3]->value->int;
 
-            $player = Player::firstOrCreate(['Login' => (string)$login, 'NickName' => (string)$nickname]);
+            $player = Player::firstOrCreate(['Login' => $login, 'NickName' => $nickname]);
 
-            Dedi::updateOrCreate([
-                'Map' => $map->id,
-                'Player' => $player->id,
-                'Score' => $score,
-                'Rank' => $rank
-            ]);
+            if($player){
+                Dedi::firstOrCreate([
+                    'Map' => $map->id,
+                    'Player' => $player->id,
+                    'Score' => $score,
+                    'Rank' => $rank
+                ]);
+            }
         }
 
         self::displayDedis();
@@ -76,25 +109,38 @@ class Dedimania
     public static function displayDedis()
     {
         $map = MapController::getCurrentMap();
-        $dedis = $map->dedis->take(13);
+        $dedis = $map->dedis->sortBy('Rank')->take(15);
         Template::showAll('dedis', ['dedis' => $dedis]);
     }
 
-    private function authenticateAndValidateAccount()
+    /**
+     * Connect to dedimania and authenticate
+     */
+    private static function authenticateAndValidateAccount(): ?string
     {
         $response = Dedimania::callStruct('dedimania.OpenSession', [
             'Game' => 'TM2',
             'Login' => Config::get('dedimania.login'),
             'Code' => Config::get('dedimania.key'),
             'Tool' => 'EvoSC',
-            'Version' => '0.7.0',
+            'Version' => '0.7.8',
             'Packmask' => 'Stadium',
             'ServerVersion' => ServerController::getRpc()->getVersion()->version,
             'ServerBuild' => ServerController::getRpc()->getVersion()->build,
             'Path' => ServerController::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
-        self::$sessionId = (string)$response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
+        Log::logAddLine($response, false);
+
+        try {
+            if (trim($response) == '') {
+                throw new Exception('Connection to Dedimania failed.');
+            }
+
+            return (string)$response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

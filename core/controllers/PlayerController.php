@@ -3,6 +3,7 @@
 namespace esc\controllers;
 
 
+use esc\classes\Config;
 use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
@@ -97,7 +98,7 @@ class PlayerController
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
-        ChatController::messageAll("$player->NickName left the server.");
+        ChatController::messageAll('$%s%s $z$s$%sleft the server', config('color.secondary'), $player->NickName, config('color.primary'));
     }
 
     public static function playerInfoChanged($infoplayerInfo)
@@ -119,9 +120,13 @@ class PlayerController
 
             if (!$player->Online) {
                 $player->setOnline();
-                $player->increment('visits');
+                $player->increment('Visits');
                 self::$players = self::getPlayers()->add($player)->unique();
-                ChatController::messageAll("$18f" . $player->group->Name . " $player->NickName \$z\$s$18fjoined the server.");
+
+                ChatController::messageAll('$%s%s $%s%s $z$s$%sjoined the server',
+                    config('color.primary'), $player->group->Name,
+                    config('color.secondary'), $player->nick(true),
+                    config('color.primary'));
             }
 
             $player->update($info);
@@ -140,13 +145,13 @@ class PlayerController
     public static function displayPlayerlist()
     {
         $players = self::getPlayers()->sort(function (Player $a, Player $b) {
-            if ($a->score == 0) {
+            if ($a->LastScore == 0) {
                 return 1000;
             }
 
-            if ($a->score < $b->score) {
+            if ($a->LastScore < $b->LastScore) {
                 return -1;
-            } else if ($a->score > $b->score) {
+            } else if ($a->LastScore > $b->LastScore) {
                 return 1;
             }
 

@@ -27,6 +27,21 @@ while (true) {
             return Timer::formatScore($score);
         }
 
+        function stripColors(string $colored): string
+        {
+            return preg_replace('/\$[0-9a-f]{3}/', '', $colored);
+        }
+
+        function stripStyle(string $styled): string
+        {
+            return preg_replace('/(?:\$[0-9a-f]{3}|\$l\[.+\)?)/', '', $styled);
+        }
+
+        function config(string $id, $default = null)
+        {
+            return Config::get($id) ?: $default;
+        }
+
         Log::info("Loading config files.");
         Config::loadConfigFiles();
 

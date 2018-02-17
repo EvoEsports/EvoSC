@@ -4,12 +4,14 @@ namespace esc\controllers;
 
 
 use esc\classes\ChatCommand;
+use esc\classes\Config;
 use esc\classes\File;
 use esc\classes\Log;
 use esc\classes\Template;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
+use Maniaplanet\DedicatedServer\Xmlrpc\UnknownPlayerException;
 
 class ChatController
 {
@@ -147,19 +149,23 @@ $$: Writes a dollarsign
         Log::info("Chat command added: $trigger$command -> $callback");
     }
 
-    public static function messageAll(string $message)
+    public static function messageAll(string $formatString, ...$arguments)
     {
-        try {
-            ServerController::getRpc()->chatSendServerMessage('$18f' . $message);
-        } catch (FaultException $e) {
-            Log::error($e);
+        foreach(PlayerController::getPlayers() as $player){
+            self::message($player, $formatString, $arguments);
         }
     }
 
-    public static function message(Player $player, string $message)
+    public static function message(Player $player, string $formatString, ...$arguments)
     {
+        $primaryColor = config('color.primary');
+        array_unshift($arguments[0], $formatString);
+        $message = call_user_func_array('sprintf', $arguments[0]);
+
         try {
-            ServerController::getRpc()->chatSendServerMessage($message, $player->Login);
+            if(isset($player->Login) && $player->Online){
+                ServerController::getRpc()->chatSendServerMessage('$' . $primaryColor . $message, $player->Login);
+            }
         } catch (FaultException $e) {
             Log::error($e);
         }

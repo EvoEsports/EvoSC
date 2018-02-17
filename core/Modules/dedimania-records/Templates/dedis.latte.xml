@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="DediRecords" version="3">
     <frame pos="-160 -9" scale="0.8">
-        <quad pos="0 0" z-index="-1" size="50 60" bgcolor="0009"/>
-        <label pos="2 -2" z-index="1" size="48 3" text="dedimania records" textsize="1"/>
+        <quad pos="0 0" z-index="-1" size="50 68" bgcolor="0009"/>
+        <label pos="2 -2" z-index="1" size="48 3" text="crappymania records" textsize="1"/>
         <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="18f9"/>
         <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
 
         {if count($dedis)}
         {foreach $dedis as $dedi}
         <label pos="8 -{$iterator->counter * 4 + 4}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" halign="right"/>
-        <label pos="9 -{$iterator->counter * 4 + 4}" z-index="1" size="13 3" text="{formatScore($dedi->Score)}" textcolor="{$dedi->player->Online ? 'FFFF' : '888F'}" textsize="1.2" halign="left"/>
+        <label pos="9 -{$iterator->counter * 4 + 4}" z-index="1" size="13 3" text="{formatScore($dedi->Score)}" textcolor="{$dedi->player->Online ? 'FFFF' : 'cccF'}" textsize="1.2" halign="left"/>
         <label pos="22 -{$iterator->counter * 4 + 4}" z-index="1" size="25 3" text="{$dedi->player->NickName}" textsize="1.2"
                halign="left"/>
         {/foreach}

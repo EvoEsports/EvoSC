@@ -36,8 +36,10 @@ class MapList
     public static function queueMap(Player $player, $mapId)
     {
         $map = Map::where('id', intval($mapId))->first();
-        \esc\controllers\MapController::setNext($map);
-        ChatController::messageAll("\$fff" . $player->nick(true) . " $18fchanged the map to $map->Name");
+        if($map){
+            \esc\controllers\MapController::queueMap($player, $map);
+            Template::hide($player, 'maplist.show');
+        }
     }
 
     public static function deleteMap(Player $player, $mapId)
