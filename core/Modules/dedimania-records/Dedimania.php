@@ -77,7 +77,7 @@ class Dedimania
 
         if($session == null){
             Log::warning("Dedimania offline. Using cached values.");
-            ChatController::messageAll('Dedimania is offline. Using cached values.');
+//            ChatController::messageAll('Dedimania is offline. Using cached values.');
         }
 
         $data = self::call('dedimania.GetChallengeInfo', [

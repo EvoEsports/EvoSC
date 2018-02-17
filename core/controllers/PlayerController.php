@@ -143,11 +143,7 @@ class PlayerController
 
     public static function displayPlayerlist()
     {
-        $players = self::getPlayers()->sort(function (Player $a, Player $b) {
-            if ($a->LastScore == 0) {
-                return 1000;
-            }
-
+        $players = self::getPlayers()->where('LastScore', '>', 0)->sort(function (Player $a, Player $b) {
             if ($a->LastScore < $b->LastScore) {
                 return -1;
             } else if ($a->LastScore > $b->LastScore) {
@@ -156,6 +152,12 @@ class PlayerController
 
             return 0;
         });
+
+        $playersNotFinished = self::getPlayers()->diff($players);
+
+        foreach ($playersNotFinished as $player) {
+            $players->add($player);
+        }
 
         Template::showAll('players', ['players' => $players]);
     }
