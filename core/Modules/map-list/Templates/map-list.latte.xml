@@ -3,7 +3,7 @@
     <frame scale="0.8">
         <quad pos="-101 45" z-index="0" size="280 100" bgcolor="FFFA" style="ManiaPlanetMainMenu" substyle="MainBg"/>
         <quad pos="-94 43.5" z-index="0" size="186 91" bgcolor="000c"/>
-        <quad pos="40 34" z-index="1" size="0.25 73" bgcolor="FFF5"/>
+        <quad pos="45 34" z-index="1" size="0.25 73" bgcolor="FFF5"/>
         <quad pos="84 40" z-index="1" size="5 5" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
         <label pos="-90 40" z-index="1" size="20 5" text="Maplist"/>
 
@@ -15,20 +15,26 @@
         {if isset($maps)}
         {foreach $maps as $map}
 
-        <label pos="-90 {30 - $iterator->counter * 5}" z-index="2" size="43 5" text="{$map->Name}" textsize="2" valign="center"/>
-        <label pos="-45 {30 - $iterator->counter * 5}" z-index="2" size="23 5" text="{$map->Author}" textsize="2" valign="center"/>
-        {if $map->locals()->where('Player', $player->id)->first() != null}
-        <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->locals()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
-        {else}
-        <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
-        {/if}
-        {if $map->dedis()->where('Player', $player->id)->first() != null}
-        <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->dedis()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
-        {else}
-        <label pos="0 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
-        {/if}
+            <label pos="-90 {30 - $iterator->counter * 5}" z-index="2" size="43 5" text="{$map->Name}" textsize="2" valign="center"/>
+            <label pos="-45 {30 - $iterator->counter * 5}" z-index="2" size="23 5" text="{$map->Author}" textsize="2" valign="center"/>
 
-        <label pos="20 {30 - $iterator->counter * 5}" z-index="2" size="14 5" text="Queue" textsize="2" valign="center" action="maplist.queue,{$map->id}"/>
+            {if $map->locals()->where('Player', $player->id)->first() != null}
+                <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->locals()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
+                {else}
+                <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
+            {/if}
+
+            {if $map->dedis()->where('Player', $player->id)->first() != null}
+                <label pos="0 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->dedis()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
+                {else}
+                <label pos="0 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
+            {/if}
+
+            <label pos="18 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Queue" textsize="2" valign="center" action="maplist.queue,{$map->id}"/>
+
+        {if in_array($player->group->Name, ['Admin', 'SuperAdmin'])}
+            <label pos="30 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Delete" textcolor="f00f" textsize="2" valign="center" action="maplist.delete,{$map->id}"/>
+        {/if}
 
         {/foreach}
         {/if}

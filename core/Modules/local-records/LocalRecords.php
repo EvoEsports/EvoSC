@@ -51,7 +51,7 @@ class LocalRecords
         $map = MapController::getCurrentMap();
 
         if (!self::playerHasLocal($map, $player)) {
-            LocalRecord::create([
+            $local = LocalRecord::create([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'Score' => $score

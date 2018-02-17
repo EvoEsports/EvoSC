@@ -16,7 +16,7 @@ class MapList
 
         ManiaLinkEvent::add('maplist.close', 'MapList::closeMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
-        ManiaLinkEvent::add('map.delete', 'MapList::deleteMap');
+        ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap');
 
         ChatController::addCommand('list', 'MapList::showMapList', 'Display list of maps');
     }
@@ -52,6 +52,6 @@ class MapList
     {
         $map = Map::where('id', intval($mapId))->first();
         MapController::deleteMap($map);
-        self::showMapList($player);
+        self::closeMapList($player);
     }
 }
