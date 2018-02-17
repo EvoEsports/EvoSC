@@ -35,6 +35,7 @@ class MapController
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
         Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
+        Hook::add('PlayerConnect', '\esc\controllers\MapController::displayMapWidget');
 
         ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', ['Admin', 'SuperAdmin']);
     }
@@ -161,7 +162,7 @@ class MapController
     {
         $map = self::getQueue()->first()['map'];
 
-        if(!$map){
+        if (!$map) {
             $mapId = ServerController::getRpc()->getNextMapInfo()->uId;
             $map = Map::where('UId', $mapId)->first();
         }
@@ -209,11 +210,15 @@ class MapController
         }
     }
 
-    private static function displayMapWidget()
+    public static function displayMapWidget(Player $player = null)
     {
         $currentMap = self::getCurrentMap();
         $nextMap = self::getNext();
 
-        Template::showAll('map', ['map' => $currentMap, 'next' => $nextMap]);
+        if ($player) {
+            Template::show($player, 'map', ['map' => $currentMap, 'next' => $nextMap]);
+        } else {
+            Template::showAll('map', ['map' => $currentMap, 'next' => $nextMap]);
+        }
     }
 }

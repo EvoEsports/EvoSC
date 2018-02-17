@@ -28,7 +28,11 @@ class Dedimania
         include_once __DIR__ . '/Models/DedimaniaSession.php';
 
         Hook::add('BeginMap', 'Dedimania::beginMap');
+        Hook::add('PlayerConnect', 'Dedimania::displayDedis');
+
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
+
+        ChatController::addCommand('dediinfo', 'Dedimania::printInfo', 'Prints dedis of connected players to chat.');
     }
 
     private function createTables()
@@ -74,7 +78,7 @@ class Dedimania
     {
         $session = self::getSession();
 
-        if($session == null){
+        if ($session == null) {
             Log::warning("Dedimania offline. Using cached values.");
 //            ChatController::messageAll('Dedimania is offline. Using cached values.');
         }
@@ -94,7 +98,7 @@ class Dedimania
             $player = Player::firstOrCreate(['Login' => $login]);
             $player->update(['NickName' => $nickname]);
 
-            if(isset($player->id)){
+            if (isset($player->id)) {
                 Dedi::firstOrCreate([
                     'Map' => $map->id,
                     'Player' => $player->id,
@@ -107,11 +111,15 @@ class Dedimania
         self::displayDedis();
     }
 
-    public static function displayDedis()
+    public static function displayDedis(Player $player = null)
     {
         $map = MapController::getCurrentMap();
         $dedis = $map->dedis->sortBy('Rank')->take(15);
-        Template::showAll('dedis', ['dedis' => $dedis]);
+        if ($player) {
+            Template::show($player, 'dedis', ['dedis' => $dedis]);
+        } else {
+            Template::showAll('dedis', ['dedis' => $dedis]);
+        }
     }
 
     /**
@@ -231,5 +239,18 @@ class Dedimania
         }
 
         return new SimpleXMLElement($response->getBody());
+    }
+
+    public static function printInfo(Player $callee)
+    {
+        $map = MapController::getCurrentMap();
+        $players = \esc\controllers\PlayerController::getPlayers();
+
+        foreach ($players as $player) {
+            $dedi = $player->dedis()->whereMap($map->id)->first();
+            if ($dedi) {
+                ChatController::messageAll('%s has dedi %d. %s', $player->NickName, $dedi->Rank, $dedi->Score);
+            }
+        }
     }
 }

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="MapList" version="3">
     <frame scale="0.8">
-        <quad pos="-100 50" z-index="0" size="200 100" bgcolor="FFFA" style="BgRaceScore2" substyle="BgCardServer"/>
+        <quad pos="-101 45" z-index="0" size="280 100" bgcolor="FFFA" style="ManiaPlanetMainMenu" substyle="MainBg"/>
+        <quad pos="-94 43.5" z-index="0" size="186 91" bgcolor="000c"/>
         <quad pos="40 34" z-index="1" size="0.25 73" bgcolor="FFF5"/>
         <quad pos="84 40" z-index="1" size="5 5" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
         <label pos="-90 40" z-index="1" size="20 5" text="Maplist"/>
 
-        <label pos="-90 32" z-index="0" size="20 5" text="Name" textsize="2"/>
-        <label pos="-45 32" z-index="0" size="20 5" text="Author" textsize="2"/>
-        <label pos="-20 32" z-index="0" size="20 5" text="Local" textsize="2"/>
-        <label pos="0 32" z-index="0" size="20 5" text="Dedi" textsize="2"/>
+        <label pos="-90 32" z-index="1" size="20 5" text="Name" textsize="2"/>
+        <label pos="-45 32" z-index="1" size="20 5" text="Author" textsize="2"/>
+        <label pos="-20 32" z-index="1" size="20 5" text="Local" textsize="2"/>
+        <label pos="0 32" z-index="1" size="20 5" text="Dedi" textsize="2"/>
 
         {if isset($maps)}
         {foreach $maps as $map}

@@ -5,6 +5,7 @@ use esc\classes\Hook;
 use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\models\Map;
+use esc\models\Player;
 use Illuminate\Support\Collection;
 
 class MusicServer
@@ -19,6 +20,7 @@ class MusicServer
 
         Hook::add('EndMap', 'MusicServer::setNextSong');
         Hook::add('BeginMap', 'MusicServer::displayCurrentSong');
+        Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
     }
 
     private function readFiles()
@@ -48,9 +50,19 @@ class MusicServer
 
     public static function displayCurrentSong(Map $map = null)
     {
+        self::displaySongWidget();
+    }
+
+    public static function displaySongWidget(Player $player = null)
+    {
         $songInformation = \esc\controllers\ServerController::getRpc()->getForcedMusic();
         $songInformation = str_replace(config('music.server'), '', $songInformation->url);
         $songInformation = preg_replace('/\.ogg$/', '', $songInformation);
-        Template::showAll('music', ['song' => $songInformation]);
+
+        if ($player) {
+            Template::show($player, 'music', ['song' => $songInformation]);
+        } else {
+            Template::showAll('music', ['song' => $songInformation]);
+        }
     }
 }

@@ -126,4 +126,9 @@ class Player extends Model
     {
         return in_array($this->group->Name, $groups);
     }
+
+    public function dedis()
+    {
+        return $this->hasMAny('Dedi', 'Player', 'id');
+    }
 }

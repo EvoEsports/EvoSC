@@ -8,7 +8,7 @@ class AdminCommands
 {
     public function __construct()
     {
-        ChatController::addCommand('next', 'AdminCommands::next', 'Skip map instantly', '//', ['Admin', 'SuperAdmin']);
+        ChatController::addCommand('skip', 'AdminCommands::next', 'Skip map instantly', '//', ['Admin', 'SuperAdmin']);
     }
 
     public static function next(Player $player)

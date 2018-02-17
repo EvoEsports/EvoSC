@@ -116,8 +116,8 @@ class PlayerController
                 self::$players = self::getPlayers()->add($player)->unique();
 
                 Log::info($player->nick(true) . " joined the server.");
-                ChatController::messageAll('$%s %s $z$s$%sjoined the server',
-                    config('color.primary'), $player->group->Name, $player->nick(true),
+                ChatController::messageAll('$%s%s $%s%s $z$s$%sjoined the server',
+                    config('color.primary'), $player->group->Name, config('color.secondary'), $player->nick(),
                     config('color.primary'));
             }
 
