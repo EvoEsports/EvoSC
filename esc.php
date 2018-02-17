@@ -91,6 +91,7 @@ while (true) {
 
         LocalRecords::displayLocalRecords();
         Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
+        MusicServer::displayCurrentSong();
 
         while (true) {
             Timer::startCycle();

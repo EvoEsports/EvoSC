@@ -2,6 +2,7 @@
 
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
+use esc\models\Player;
 
 class AdminCommands
 {
@@ -10,9 +11,9 @@ class AdminCommands
         ChatController::addCommand('next', 'AdminCommands::next', 'Skip map instantly', '//', ['Admin', 'SuperAdmin']);
     }
 
-    public static function next()
+    public static function next(Player $player)
     {
-        ChatController::messageAll("Going to next map.");
+        ChatController::messageAll("$player->NickName \$z\$s$%sskips map.", config('color.primary'));
         MapController::next();
     }
 }

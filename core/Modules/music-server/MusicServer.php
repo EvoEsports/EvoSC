@@ -1,6 +1,10 @@
 <?php
 
+use esc\classes\File;
+use esc\classes\Hook;
 use esc\classes\RestClient;
+use esc\classes\Template;
+use esc\models\Map;
 use Illuminate\Support\Collection;
 
 class MusicServer
@@ -10,6 +14,11 @@ class MusicServer
     public function __construct()
     {
         $this->readFiles();
+
+        Template::add('music', File::get(__DIR__ . '/Templates/music.latte.xml'));
+
+        Hook::add('EndMap', 'MusicServer::setNextSong');
+        Hook::add('BeginMap', 'MusicServer::displayCurrentSong');
     }
 
     private function readFiles()
@@ -28,5 +37,20 @@ class MusicServer
     public static function setMusicFiles(Collection $files)
     {
         self::$music = $files;
+    }
+
+    public static function setNextSong(Map $map = null)
+    {
+        $randomMusicFile = self::$music->random();
+        $url = config('music.server') . '/' . $randomMusicFile;
+        \esc\controllers\ServerController::getRpc()->setForcedMusic(true, $url);
+    }
+
+    public static function displayCurrentSong(Map $map = null)
+    {
+        $songInformation = \esc\controllers\ServerController::getRpc()->getForcedMusic();
+        $songInformation = str_replace(config('music.server'), '', $songInformation->url);
+        $songInformation = preg_replace('/\.ogg$/', '', $songInformation);
+        Template::showAll('music', ['song' => $songInformation]);
     }
 }

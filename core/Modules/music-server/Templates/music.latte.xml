@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="SongInformation" version="3">
+<frame pos="120 23" scale="0.8">
+    <quad pos="0 0" z-index="-1" size="50 13" bgcolor="0009"/>
+    <label pos="2 -2" z-index="1" size="48 2.8" text="music" textsize="1"/>
+    <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
+    <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
+    <label pos="2 -8" z-index="1" size="40 3" text="{$song}" textsize="1.7"/>
+</frame>
+</manialink>
