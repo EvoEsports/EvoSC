@@ -113,7 +113,6 @@ class PlayerController
                     $player = new \esc\models\Player();
                     $player->Login = $info['Login'];
                     $player->NickName = $info['NickName'];
-                    $player->LadderScore = $info['LadderScore'];
                     $player->save();
                 }
             }
