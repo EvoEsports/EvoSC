@@ -24,8 +24,9 @@ class MapList
     public static function showMapList(Player $player)
     {
         $maps = Map::all();
+        $queuedMaps = MapController::getQueue();
 
-        Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player]);
+        Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
     }
 
     public static function closeMapList(Player $player)
@@ -37,8 +38,9 @@ class MapList
     {
         $map = Map::where('id', intval($mapId))->first();
         if($map){
-            \esc\controllers\MapController::queueMap($player, $map);
+            MapController::queueMap($player, $map);
             Template::hide($player, 'maplist.show');
+            self::showMapList($player);
         }
     }
 

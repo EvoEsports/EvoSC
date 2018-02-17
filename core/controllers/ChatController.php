@@ -93,7 +93,7 @@ $$: Writes a dollarsign
             $nick = '$eee📷$z ' . $nick;
         }
 
-        $chatText = sprintf('$z$s%s: $fe2$z$s%s', $nick, $text);
+        $chatText = sprintf('$z$s%s: $%s$z$s%s', $nick, config('color.chat'), $text);
 
         echo "$chatText\n";
 

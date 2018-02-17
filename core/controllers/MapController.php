@@ -32,7 +32,6 @@ class MapController
         self::$queue = new Collection();
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
-        ManiaLinkEvent::add('map.queue', 'esc\controllers\MapController::queueMap');
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
         Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
@@ -59,7 +58,7 @@ class MapController
     {
         $request = self::getQueue()->shift();
 
-        if(isset($request->map)){
+        if (isset($request->map)) {
             self::setNext($request->map);
         }
 
@@ -90,7 +89,7 @@ class MapController
         return self::$currentMap;
     }
 
-    private static function getQueue(): Collection
+    public static function getQueue(): Collection
     {
         return self::$queue;
     }
@@ -166,7 +165,7 @@ class MapController
     public static function queueMap(Player $player, Map $map)
     {
         if (self::getQueue()->where('player', $player)->isNotEmpty()) {
-            ChatController::message($player, "You already have a map in queue.");
+            ChatController::message($player, "You already have a map in queue", []);
             return;
         }
 
@@ -175,7 +174,9 @@ class MapController
             'map' => $map
         ]);
 
-        ChatController::messageAll("\$z\$fff$player->NickName $19fqueued map \$z\$fff$map->Name");
+        ChatController::messageAll('$%s%s $z$s$%squeued map %s',
+            config('color.secondary'), $player->nick(true),
+            config('color.primary'), $map->Name);
     }
 
     private static function loadMaps()

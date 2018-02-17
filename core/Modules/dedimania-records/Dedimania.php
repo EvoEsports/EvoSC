@@ -57,7 +57,8 @@ class Dedimania
         $session = $sessions->first();
 
         if ($session == null) {
-            $sessionId = self::authenticateAndValidateAccount();
+//            $sessionId = self::authenticateAndValidateAccount();
+            $sessionId = null;
 
             if ($sessionId == null) {
                 Log::warning("Connection to Dedimania failed. Using cached values.");
@@ -93,7 +94,7 @@ class Dedimania
 
             $player = Player::firstOrCreate(['Login' => $login, 'NickName' => $nickname]);
 
-            if($player){
+            if(isset($player->id)){
                 Dedi::firstOrCreate([
                     'Map' => $map->id,
                     'Player' => $player->id,
