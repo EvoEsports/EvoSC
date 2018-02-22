@@ -38,7 +38,7 @@ class File
     {
         if (!is_dir($name)) {
             Log::info("Creating directory: $name");
-            mkdir($name);
+            mkdir($name, true);
         }
     }
 
@@ -52,5 +52,10 @@ class File
     public static function delete(string $path)
     {
         unlink($path);
+    }
+
+    public static function exists(string $filename)
+    {
+        return file_exists($filename);
     }
 }

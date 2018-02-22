@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
 use esc\classes\Config;
 use esc\classes\Log;
 use esc\classes\RestClient;
@@ -40,6 +42,10 @@ while (true) {
         function config(string $id, $default = null)
         {
             return Config::get($id) ?: $default;
+        }
+
+        function cacheDir(string $filename = ''): string{
+            return __DIR__ . '\\cache\\' . $filename;
         }
 
         Log::info("Loading config files.");

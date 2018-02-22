@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="SongInformation" version="3">
 <frame pos="120 23" scale="0.8">
-    <quad pos="0 0" z-index="-1" size="50 13" bgcolor="0009"/>
+    <quad pos="0 0" z-index="-1" size="50 16" bgcolor="0009"/>
     <label pos="2 -2" z-index="1" size="48 2.8" text="music" textsize="1"/>
     <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
-    <label pos="2 -8" z-index="1" size="40 3" text="{$song}" textsize="1.7"/>
+
+    <label pos="2 -8" z-index="1" size="40 3" text="{$song->title}" textcolor="eeee" textsize="1.4"/>
+    <label pos="2 -13"  z-index="1" size="40 3" text="{$song->length} - " textcolor="dddd" valign="center" textsize="0.6"/>
+    <label pos="9 -13" z-index="1" size="40 3" text="({$song->year})" textcolor="dddd" valign="center" textsize="0.6"/>
+    <label pos="17 -13" z-index="1" size="40 3" text="{$song->artist}" textcolor="dddd" valign="center" textsize="0.6"/>
 </frame>
 </manialink>
