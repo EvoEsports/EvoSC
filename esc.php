@@ -5,6 +5,7 @@ use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\classes\Timer;
 use esc\controllers\ChatController;
+use esc\controllers\CountdownController;
 use esc\controllers\GroupController;
 use esc\controllers\HookController;
 use esc\controllers\MapController;
@@ -90,8 +91,9 @@ while (true) {
         }
 
         LocalRecords::displayLocalRecords();
-        Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
+//        Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
         MusicServer::displayCurrentSong();
+        CountdownController::init();
 
         while (true) {
             Timer::startCycle();
@@ -100,10 +102,11 @@ while (true) {
 
             usleep(Timer::getNextCyclePause());
         }
+    }catch (PDOException $pdoe) {
+        Log::error("Connection to database failed. Please make sure your MySQL server is running.");
+        exit(1);
     } catch (\Exception $e) {
         echo "FATAL ERROR RESTARTING: $e\n";
-        if ($connectionFailed > 5) {
-            echo "CONNECTION FAILED MORE THAN 5 TIMES. SHUTTING DOWN.\n";
-        }
+        continue;
     }
 }

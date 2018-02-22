@@ -3,18 +3,73 @@
 namespace esc\classes;
 
 
+use Illuminate\Support\Collection;
+
 class Timer
 {
-    private static $interval = 10; //one tick each X milliseconds
+    private static $interval = 500; //one tick each X milliseconds
     private static $uStart;
 
+    private static $timers;
+
+    /**
+     * Creates a new timer
+     * @param string $id
+     * @param string $callback
+     * @param int $delayInSeconds
+     * @param bool $override
+     */
+    public static function create(string $id, string $callback, string $delayTime, bool $override = false)
+    {
+        if (!self::$timers) self::$timers = new Collection();
+
+        $timers = self::$timers;
+
+        if ($timers->where('id', $id)->isNotEmpty() && !$override) {
+            Log::warning("Timer with id: $id already exists, not setting.");
+            return;
+        }
+
+        $runtime = time() + self::textTimeToSeconds($delayTime);
+
+        $timer = collect([
+            'id' => $id,
+            'callback' => $callback,
+            'runtime' => $runtime
+        ]);
+
+        $timers->push($timer);
+    }
+
+    /**
+     * Executes timers
+     */
+    private static function executeTimers()
+    {
+        $toRun = self::$timers->where('runtime', '<', time());
+        self::$timers = self::$timers->diff($toRun);
+
+        foreach ($toRun as $timer) {
+            call_user_func($timer['callback']);
+        }
+    }
+
+    /**
+     * Start a new cycle
+     */
     public static function startCycle()
     {
         self::$uStart = microtime(true);
     }
 
-    public static function getNextCyclePause()
+    /**
+     * Calculate the sleep time
+     * @return float|int
+     */
+    public static function getNextCyclePause(): int
     {
+        self::executeTimers();
+
         $nextCyclePause = (self::$interval / 1000) + self::$uStart - microtime(true);
 
         if ($nextCyclePause < 0) {
@@ -33,10 +88,6 @@ class Timer
      */
     public static function textTimeToMinutes(string $durationShort): int
     {
-        if (preg_match('/^\d+$/', $durationShort)) {
-            return intval($durationShort);
-        }
-
         $time = 0;
 
         if (preg_match('/(\d)m/', $durationShort, $matches)) {
@@ -56,6 +107,23 @@ class Timer
         }
 
         return $time;
+    }
+
+    /**
+     * Converts time string to seconds
+     * m = minutes, h = hours, d = days, w = weeks, mo = months
+     * @param string $durationShort
+     * @return int
+     */
+    public static function textTimeToSeconds(string $durationShort): int
+    {
+        $seconds = self::textTimeToMinutes($durationShort) * 60;
+
+        if (preg_match('/(\d)s/', $durationShort, $matches)) {
+            $seconds += intval($matches[1]);
+        }
+
+        return $seconds;
     }
 
     public static function formatScore(int $score): string

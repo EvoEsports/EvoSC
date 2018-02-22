@@ -32,7 +32,7 @@
 
             <label pos="18 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Queue" textsize="2" valign="center" action="maplist.queue,{$map->id}"/>
 
-        {if in_array($player->group->Name, ['Admin', 'SuperAdmin'])}
+        {if $player->hasGroup(['Admin', 'SuperAdmin'])}
             <label pos="30 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Delete" textcolor="f00f" textsize="2" valign="center" action="maplist.delete,{$map->id}"/>
         {/if}
 

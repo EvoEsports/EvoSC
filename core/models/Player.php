@@ -114,7 +114,7 @@ class Player extends Model
      */
     public function locals()
     {
-        return $this->hasMany('esc\models\LocalRecord', 'player');
+        return $this->hasMany('esc\models\LocalRecord', 'Player', 'id');
     }
 
     public function group()

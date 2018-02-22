@@ -249,7 +249,8 @@ class Dedimania
         foreach ($players as $player) {
             $dedi = $player->dedis()->whereMap($map->id)->first();
             if ($dedi) {
-                ChatController::messageAll('%s has dedi %d. %s', $player->NickName, $dedi->Rank, $dedi->Score);
+                $string = sprintf('%s has dedi $fff%d. %s', stripColors($player->NickName), $dedi->Rank, ((int)$dedi->Score)/1000);
+                ChatController::messageAll($string);
             }
         }
     }
