@@ -131,15 +131,15 @@ class Dedimania
             'Game' => 'TM2',
             'Login' => Config::get('dedimania.login'),
             'Code' => Config::get('dedimania.key'),
-            'Tool' => 'EvoSC',
-            'Version' => '0.7.8',
+            'Tool' => 'ESCon',
+            'Version' => '0.8.6',
             'Packmask' => 'Stadium',
             'ServerVersion' => ServerController::getRpc()->getVersion()->version,
             'ServerBuild' => ServerController::getRpc()->getVersion()->build,
             'Path' => ServerController::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
-        Log::logAddLine($response, false);
+        Log::logAddLine($response, true);
 
         try {
             if (trim($response) == '') {

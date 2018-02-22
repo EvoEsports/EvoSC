@@ -5,7 +5,6 @@ use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\classes\Timer;
 use esc\controllers\ChatController;
-use esc\controllers\CountdownController;
 use esc\controllers\GroupController;
 use esc\controllers\HookController;
 use esc\controllers\MapController;
@@ -91,9 +90,8 @@ while (true) {
         }
 
         LocalRecords::displayLocalRecords();
-//        Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
+        Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
         MusicServer::displayCurrentSong();
-        CountdownController::init();
 
         while (true) {
             Timer::startCycle();

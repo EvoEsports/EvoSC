@@ -3,8 +3,10 @@
 namespace esc\controllers;
 
 
+use esc\classes\Log;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\Structures\Map;
+use Maniaplanet\DedicatedServer\Xmlrpc\GameModeException;
 
 class ServerController
 {
@@ -33,6 +35,15 @@ class ServerController
         self::getRpc()->execute($rpc_func, $args);
     }
 
+
+    public static function forceEndRound()
+    {
+        try {
+            return self::getRpc()->forceEndRound();
+        } catch (GameModeException $e) {
+            Log::error("Not in Rounds or Laps mode.");
+        }
+    }
 
     public static function getNextMapInfo(): Map
     {

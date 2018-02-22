@@ -13,6 +13,7 @@ use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\models\Map;
 use esc\models\Player;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
@@ -52,6 +53,7 @@ class MapController
             $table->integer('Plays')->default(0);
             $table->string('Mood')->nullable();
             $table->boolean('LapRace')->nullable();
+            $table->dateTime('LastPlayed')->nullable();
         });
     }
 
@@ -71,7 +73,10 @@ class MapController
     public static function beginMap(Map $map)
     {
         $map->update(ServerController::getCurrentMapInfo()->toArray());
+
         $map->increment('Plays');
+        $map->update(['LastPlayed' => Carbon::now()]);
+
         self::$currentMap = $map;
 
         if (self::$nextMap && $map->FileName != self::$nextMap->FileName) {
