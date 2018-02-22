@@ -3,6 +3,7 @@
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 use esc\classes\Config;
+use esc\classes\Database;
 use esc\classes\Log;
 use esc\classes\RestClient;
 use esc\classes\Timer;
@@ -51,12 +52,13 @@ while (true) {
         Log::info("Loading config files.");
         Config::loadConfigFiles();
 
+        Database::initialize();
+
         HookController::initialize();
 
         TemplateController::init();
         \esc\classes\ManiaLinkEvent::init();
 
-        \esc\classes\Database::initialize();
 
         try {
             Log::info("Connecting to server...");

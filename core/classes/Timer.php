@@ -63,7 +63,7 @@ class Timer
 
         $timers->push($timer);
 
-        Log::info("Created timer $id");
+//        Log::info("Created timer $id");
     }
 
     /**

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="SongMenu" version="3">
+<frame pos="0 0" scale="0.8">
+    <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
+    <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
+    <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
+    <quad pos="-100 50" z-index="-1" size="200 110" style="Bgs1" substyle="BgDialogBlur"/>
+
+    <frame pos="-95 45">
+        <quad pos="155 -13" z-index="0" size="0.2 80" bgcolor="18f9"/>
+        <label pos="0 0" z-index="0" size="20 5" text="$oMusic" textcolor="ffff" halign="left"/>
+        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="ms.hidemenu"/>
+
+        <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
+        <label pos="80 -12" z-index="0" size="40 5" text="Artist"/>
+        <label pos="160 -12" z-index="0" size="20 5" text="Next"/>
+
+        {if count($songs)}
+        {foreach $songs as $song}
+        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="79 5" textsize="1.8" valign="center" text="{$song->title}"/>
+        <label pos="80 -{15 + $iterator->counter * 5}" z-index="0" size="45 5" textsize="1.8" valign="center" text="{$song->title}"/>
+        <label pos="142 -{15 + $iterator->counter * 5}" z-index="0" size="18 4.8" textsize="1.8" valign="center" halign="center" text="Juke" textcolor="18fa" action="ms.juke"/>
+        {/foreach}
+        {/if}
+
+        <label pos="160 -20" z-index="0" size="38 5" textsize="1.8" valign="center" text="Random"/>
+
+        {for $i = 1; $i <= $pages; $i++}
+        <label pos="{$i * 6 - 4} -98" z-index="0" size="5 5" textsize="1.8" textcolor="{$page == $i ? '19FF' : 'EEEF'}" valign="center" halign="center" text="{$i}" action="ms.menu.showpage,{$i}"/>
+        {/for}
+    </frame>
+</frame>
+</manialink>

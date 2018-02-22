@@ -7,6 +7,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "philo/laravel-blade": "3.*",
         "latte/latte": "^2.4",
-        "nass600/get-id3": "^1.0"
+        "nass600/get-id3": "^1.0",
+        "illuminate/pagination": "^5.6"
     }
 }
