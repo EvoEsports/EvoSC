@@ -28,10 +28,13 @@ class MusicServer
 
         $this->readFiles();
 
+        self::$songQueue = new Collection();
+
         Template::add('music', File::get(__DIR__ . '/Templates/music.latte.xml'));
         Template::add('music.menu', File::get(__DIR__ . '/Templates/menu.latte.xml'));
 
         ManiaLinkEvent::add('ms.hidemenu', 'MusicServer::hideMusicMenu');
+        ManiaLinkEvent::add('ms.juke', 'MusicServer::queueSong');
         ManiaLinkEvent::add('ms.menu.showpage', 'MusicServer::displayMusicMenu');
 
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
@@ -115,13 +118,35 @@ class MusicServer
         $songs = Song::orderBy('title')->get()->forPage($page, 15);
         $pages = ceil(Song::count() / 15);
 
-        $queue = self::$songQueue;
+        $queue = self::$songQueue->sortBy('time')->take(9);
         Template::show($callee, 'music.menu', ['songs' => $songs, 'queue' => $queue, 'pages' => $pages, 'page' => $page]);
     }
 
     public static function hideMusicMenu(Player $triggerer)
     {
         Template::hide($triggerer, 'music.menu');
+    }
+
+    /**
+     * Adds a song to the music-jukebox
+     * @param Player $callee
+     * @param $songHash
+     */
+    public static function queueSong(Player $callee, $songHash)
+    {
+        $song = Song::where('hash', $songHash)->first();
+
+        if($song){
+            self::$songQueue->push([
+                'song' => $song,
+                'wisher' => $callee,
+                'time' => time()
+            ]);
+
+            ChatController::messageAll('%s $z$s$%s added Song $%s%s $%sto the jukebox', $callee->NickName, config('color.primary'), config('color.secondary'), $song->title, config('color.primary'));
+        }
+
+        Template::hide($callee, 'music.menu');
     }
 
     /**
