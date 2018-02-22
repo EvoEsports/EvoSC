@@ -38,17 +38,10 @@ class MusicServer
         ManiaLinkEvent::add('ms.menu.showpage', 'MusicServer::displayMusicMenu');
 
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
-        \esc\classes\Timer::create('reload.music.template', 'MusicServer::reloadTemplates', '1s');
 
         Hook::add('EndMap', 'MusicServer::setNextSong');
         Hook::add('BeginMap', 'MusicServer::displayCurrentSong');
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
-    }
-
-    public static function reloadTemplates()
-    {
-        Template::add('music.menu', File::get(__DIR__ . '/Templates/menu.latte.xml'));
-        \esc\classes\Timer::create('reload.music.template', 'MusicServer::reloadTemplates', '1s');
     }
 
     private function createTables()
