@@ -24,7 +24,7 @@ class MapList
     public static function showMapList(Player $player)
     {
         $maps = Map::all();
-        $queuedMaps = MapController::getQueue();
+        $queuedMaps = MapController::getQueue()->take(15);
 
         Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
     }
@@ -38,10 +38,10 @@ class MapList
     {
         $map = Map::where('id', intval($mapId))->first();
 
-        if($map){
+        if ($map) {
             MapController::queueMap($player, $map);
             Template::hide($player, 'maplist.show');
-        }else{
+        } else {
             ChatController::message($player, 'Invalid map selected');
         }
 

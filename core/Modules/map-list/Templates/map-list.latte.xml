@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="MapList" version="3">
-    <frame scale="0.8">
-        <quad pos="-101 45" z-index="0" size="280 100" bgcolor="FFFA" style="ManiaPlanetMainMenu" substyle="MainBg"/>
-        <quad pos="-94 43.5" z-index="0" size="186 91" bgcolor="000c"/>
-        <quad pos="45 34" z-index="1" size="0.25 73" bgcolor="FFF5"/>
-        <quad pos="84 40" z-index="1" size="5 5" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
-        <label pos="-90 40" z-index="1" size="20 5" text="Maplist"/>
+<frame pos="0 0" scale="0.8">
+    <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
+    <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
+    <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
+    <quad pos="-100 50" z-index="-1" size="200 110" style="Bgs1" substyle="BgDialogBlur"/>
 
-        <label pos="-90 32" z-index="1" size="20 5" text="Name" textsize="2"/>
-        <label pos="-45 32" z-index="1" size="20 5" text="Author" textsize="2"/>
-        <label pos="-20 32" z-index="1" size="20 5" text="Local" textsize="2"/>
-        <label pos="0 32" z-index="1" size="20 5" text="Dedi" textsize="2"/>
+    <frame pos="-95 45">
+        <quad pos="135 -13" z-index="0" size="0.2 80" bgcolor="18f9"/>
+        <label pos="0 0" z-index="0" size="20 5" text="$oMaps" textcolor="ffff" halign="left"/>
+        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="maplist.close"/>
+
+        <label pos="0 -12" z-index="0" size="79 5" text="Name"/>
+        <label pos="65 -12" z-index="0" size="40 5" text="Author"/>
+        <label pos="140 -12" z-index="0" size="20 5" text="Next"/>
 
         {if isset($maps)}
         {foreach $maps as $map}
+        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="60 5" textsize="1.8" valign="center" text=" {$map->Name}"/>
+        <label pos="65 -{15 + $iterator->counter * 5}" z-index="0" size="20 5" textsize="1.8" valign="center" text="{$map->Author}"/>
+        <label pos="110 -{15 + $iterator->counter * 5}" z-index="0" size="111 4.8" textsize="1.8" valign="center" halign="right" text="Queue  " textcolor="18fa" action="maplist.queue,{$map->id}"/>
 
-            <label pos="-90 {30 - $iterator->counter * 5}" z-index="2" size="43 5" text="{$map->Name}" textsize="2" valign="center"/>
-            <label pos="-45 {30 - $iterator->counter * 5}" z-index="2" size="23 5" text="{$map->Author}" textsize="2" valign="center"/>
-
-            {if $map->locals()->where('Player', $player->id)->first() != null}
-                <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->locals()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
-                {else}
-                <label pos="-20 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
+            {if $player->hasGroup(['Admin', 'SuperAdmin'])}
+            <label pos="120 -{15 + $iterator->counter * 5}" z-index="0" size="20 4.8" textsize="1.8" valign="center" halign="center" text=" $o$nDELETE " textcolor="c00a" action="maplist.delete,{$map->id}"/>
+            {else}
+            <label pos="120 -{15 + $iterator->counter * 5}" z-index="0" size="20 4.8" textsize="1.8" valign="center" halign="center" text=" $o$nDELETE " textcolor="666a" action=""/>
             {/if}
-
-            {if $map->dedis()->where('Player', $player->id)->first() != null}
-                <label pos="0 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{formatScore($map->dedis()->where('Player', $player->id)->first()->Score)}" textsize="2" valign="center"/>
-                {else}
-                <label pos="0 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="-" textsize="2" valign="center"/>
-            {/if}
-
-            <label pos="18 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Queue" textsize="2" valign="center" action="maplist.queue,{$map->id}"/>
-
-        {if $player->hasGroup(['Admin', 'SuperAdmin'])}
-            <label pos="30 {30 - $iterator->counter * 5}" z-index="2" size="12 5" text="Delete" textcolor="f00f" textsize="2" valign="center" action="maplist.delete,{$map->id}"/>
-        {/if}
-
         {/foreach}
         {/if}
 
-
-        <label pos="50 32" z-index="2" size="40 5" text="Queued maps" textsize="2"/>
-        {if count($queuedMaps) > 0}
+        {if count($queuedMaps)}
         {foreach $queuedMaps as $map}
-        <label pos="50 {30 - $iterator->counter * 5}" z-index="2" size="18 5" text="{$map['map']->Name}" textsize="2" valign="center"/>
+        <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text="{$map['map']->Name}"/>
         {/foreach}
         {else}
-        <label pos="50 26" z-index="2" size="18 5" text="$iNo maps in queue" textsize="2" valign="center"/>
+        <label pos="140 -20" z-index="0" size="50 5" textsize="1.8" valign="center" text="No maps in queue"/>
         {/if}
+
+        {for $i = 1; $i <= 0; $i++}
+        <label pos="{$i * 6 - 4} -98" z-index="0" size="5 5" textsize="1.8" textcolor="{0 == $i ? '19FF' : 'EEEF'}" valign="center" halign="center" text="{$i}" action="ms.menu.showpage,{$i}"/>
+        {/for}
     </frame>
+</frame>
 </manialink>
