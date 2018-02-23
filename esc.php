@@ -27,7 +27,12 @@ while (true) {
 
         function formatScore(int $score): string
         {
-            return Timer::formatScore($score);
+            $seconds = floor($score / 1000);
+            $ms = $score - ($seconds * 1000);
+            $minutes = floor($seconds / 60);
+            $seconds -= $minutes * 60;
+
+            return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
         }
 
         function stripColors(string $colored): string

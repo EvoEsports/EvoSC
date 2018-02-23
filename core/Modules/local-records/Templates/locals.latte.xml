@@ -2,7 +2,7 @@
 <manialink id="LocalRecords" version="3">
 <frame pos="-160 89" scale="0.8">
     <quad pos="0 0" z-index="-1" size="50 60" bgcolor="0009"/>
-    <quad pos="0 -6.5" z-index="-1" size="50 13" bgcolor="000a"/>
+    <quad pos="0 -6.5" z-index="-1" size="50 13" bgcolor="0006"/>
     <label pos="2 -2" z-index="1" size="48 3" text="local records" textsize="1"/>
     <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="18f9"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>

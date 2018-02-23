@@ -136,7 +136,7 @@ class MusicServer
                 'time' => time()
             ]);
 
-            ChatController::messageAll('%s $z$s$%s added Song $%s%s $%sto the jukebox', $callee->NickName, config('color.primary'), config('color.secondary'), $song->title, config('color.primary'));
+            ChatController::messageAll('%s$z$s$%s added song $%s%s $%sto the jukebox', $callee->NickName, config('color.primary'), config('color.secondary'), $song->title, config('color.primary'));
         }
 
         Template::hide($callee, 'music.menu');

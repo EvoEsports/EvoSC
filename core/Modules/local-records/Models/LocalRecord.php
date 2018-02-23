@@ -22,6 +22,6 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
 
     public function getScore(): string
     {
-        return Timer::formatScore($this->Score);
+        return formatScore($this->Score);
     }
 }

@@ -43,7 +43,7 @@ class Player extends Model
             return $this->LastScore;
         }
 
-        return Timer::formatScore($this->LastScore ?: 0);
+        return formatScore($this->LastScore ?: 0);
     }
 
     /**
