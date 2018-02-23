@@ -6,10 +6,8 @@
     <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
 
-    <label pos="2 -8" z-index="1" size="47 3" text="$o{$map->Name}" textsize="1.5"/>
-    <label pos="2 -12.3" z-index="1" size="58 3" text="by {isset($map->author->NickName) ? $map->author->NickName : $map->Author}" textsize="0.7"/>
-
-    <label pos="2 -16.3" z-index="1" size="58 3" text="Next: {$next ? stripColors($next->Name) : 'none'}" textcolor="cccc" textsize="0.5"/>
+    <label pos="2 -9" z-index="1" size="47 3" text="$o{$map->Name}" textsize="2.8"/>
+    <label pos="2 -15" z-index="1" size="48 3" text="by {isset($map->author->NickName) ? stripStyle($map->author->NickName) : $map->Author}" textsize="1"/>
 
     <quad pos="0 0" size="50 20" action="maplist.show" />
 </frame>

@@ -37,12 +37,12 @@ while (true) {
 
         function stripColors(string $colored): string
         {
-            return preg_replace('/\$[0-9a-f]{3}/', '', $colored);
+            return preg_replace('/(\$[0-9a-f]{3})/', '', $colored);
         }
 
         function stripStyle(string $styled): string
         {
-            return preg_replace('/(?:\$[0-9a-f]{3}|\$l\[.+\)?)/', '', $styled);
+            return preg_replace('/(\$[iwngo]|\$l\[.+\)?)/', '', $styled);
         }
 
         function config(string $id, $default = null)
@@ -50,7 +50,8 @@ while (true) {
             return Config::get($id) ?: $default;
         }
 
-        function cacheDir(string $filename = ''): string{
+        function cacheDir(string $filename = ''): string
+        {
             return __DIR__ . '\\cache\\' . $filename;
         }
 
@@ -104,7 +105,7 @@ while (true) {
 
         LocalRecords::displayLocalRecords();
         Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
-        MusicServer::displayCurrentSong();
+        MusicServer::displaySongWidget();
 
         AdminCommands::showAdminControlPanel();
 
@@ -115,7 +116,7 @@ while (true) {
 
             usleep(Timer::getNextCyclePause());
         }
-    }catch (PDOException $pdoe) {
+    } catch (PDOException $pdoe) {
         Log::error("Connection to database failed. Please make sure your MySQL server is running.");
         exit(1);
     } catch (\Exception $e) {

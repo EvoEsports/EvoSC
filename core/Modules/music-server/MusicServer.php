@@ -39,7 +39,7 @@ class MusicServer
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
 
         Hook::add('EndMap', 'MusicServer::setNextSong');
-        Hook::add('BeginMap', 'MusicServer::displayCurrentSong');
+        Hook::add('BeginMap', 'MusicServer::beginMap');
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
     }
 
@@ -54,21 +54,33 @@ class MusicServer
         });
     }
 
+    /**
+     * Show music widget on map start
+     * @param array ...$args
+     */
+    public static function beginMap(...$args)
+    {
+        self::displaySongWidget();
+    }
+
+    /**
+     * Gets current song
+     * @return null|Song
+     */
     public static function getCurrentSong(): ?Song
     {
         return self::$currentSong;
     }
 
-    public static function setNextSong(Map $map = null)
+    /**
+     * Sets next song to be played
+     * @param array ...$args
+     */
+    public static function setNextSong(...$args)
     {
         $randomMusicFile = self::$music->random();
-        $url = config('music.server') . '/' . $randomMusicFile;
+        $url = $randomMusicFile->url;
         \esc\controllers\ServerController::getRpc()->setForcedMusic(true, $url);
-    }
-
-    public static function displayCurrentSong(Map $map = null)
-    {
-        self::displaySongWidget();
     }
 
     /**
@@ -91,15 +103,24 @@ class MusicServer
             $song = Song::where('hash', $hash)->first();
         }
 
-        if ($player) {
-            Template::show($player, 'music', ['song' => $song]);
-        } else {
-            Template::showAll('music', ['song' => $song]);
-        }
+        if ($song) {
+            if ($player) {
+                Template::show($player, 'music', ['song' => $song]);
+            } else {
+                Template::showAll('music', ['song' => $song]);
+            }
 
-        self::$currentSong = $song;
+            self::$currentSong = $song;
+        } else {
+            Log::error("Invalid song");
+        }
     }
 
+    /**
+     * Display the music menu
+     * @param Player $callee
+     * @param int $page
+     */
     public static function displayMusicMenu(Player $callee, $page = 1)
     {
         $page = (int)$page;
@@ -114,6 +135,10 @@ class MusicServer
         Template::show($callee, 'music.menu', ['songs' => $songs, 'queue' => $queue, 'pages' => $pages, 'page' => $page]);
     }
 
+    /**
+     * Hides the music menu
+     * @param Player $triggerer
+     */
     public static function hideMusicMenu(Player $triggerer)
     {
         Template::hide($triggerer, 'music.menu');
@@ -128,7 +153,7 @@ class MusicServer
     {
         $song = Song::where('hash', $songHash)->first();
 
-        if($song){
+        if ($song) {
             self::$songQueue->push([
                 'song' => $song,
                 'wisher' => $callee,

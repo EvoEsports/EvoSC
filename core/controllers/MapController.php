@@ -209,7 +209,7 @@ class MapController
             return;
         }
 
-        self::getQueue()->push(new MapQueueItem($player, $map, time()));
+        self::$queue->push(new MapQueueItem($player, $map, time()));
 
         ChatController::messageAllNew($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");

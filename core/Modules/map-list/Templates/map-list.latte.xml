@@ -13,19 +13,20 @@
 
         <label pos="0 -12" z-index="0" size="79 5" text="Name"/>
         <label pos="65 -12" z-index="0" size="40 5" text="Author"/>
+        <label pos="105 -12" z-index="0" size="40 5" text="Local"/>
+        <label pos="125 -12" z-index="0" size="40 5" text="Dedi"/>
+
         <label pos="140 -12" z-index="0" size="20 5" text="Next"/>
 
         {if isset($maps)}
         {foreach $maps as $map}
-        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="60 5" textsize="1.8" valign="center" text=" {$map->Name}"/>
-        <label pos="65 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{stripStyle($map->author->NickName ?: $map->Author)}"/>
-        <label pos="110 -{15 + $iterator->counter * 5}" z-index="0" size="111 4.8" textsize="1.8" valign="center" halign="right" text="Queue  " textcolor="18fa" action="maplist.queue,{$map->id}"/>
+        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="62 5" textsize="1.8" valign="center" text="{stripStyle($map->Name)}"/>
+        <label pos="65 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{stripStyle(stripColors($map->author->NickName ?: $map->Author))}"/>
+        <label pos="105 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->locals()->whereLogin($player->Login)->Score ?: '-'}"/>
+        <label pos="125 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->dedis()->whereLogin($player->Login)->Score ?: '-'}"/>
 
-            {if $player->hasGroup(['Admin', 'SuperAdmin'])}
-            <label pos="120 -{15 + $iterator->counter * 5}" z-index="0" size="20 4.8" textsize="1.8" valign="center" halign="center" text=" $o$nDELETE " textcolor="c00a" action="maplist.delete,{$map->id}"/>
-            {else}
-            <label pos="120 -{15 + $iterator->counter * 5}" z-index="0" size="20 4.8" textsize="1.8" valign="center" halign="center" text=" $o$nDELETE " textcolor="666a" action=""/>
-            {/if}
+        <label pos="-1 -{15 + $iterator->counter * 5}" z-index="0" size="64 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.queue,{$map->id}"/>
+        <label pos="64 -{15 + $iterator->counter * 5}" z-index="0" size="30 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.filter.author,{$map->Author}"/>
         {/foreach}
         {/if}
 
