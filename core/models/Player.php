@@ -124,7 +124,7 @@ class Player extends Model
 
     public function hasGroup(array $groups)
     {
-        return in_array($this->group->Name, $groups);
+        return in_array($this->Group, $groups);
     }
 
     public function dedis()
@@ -134,16 +134,21 @@ class Player extends Model
 
     public function isSuperadmin(): bool
     {
-        return $this->hasGroup(['SuperAdmin']);
+        return $this->hasGroup([Group::SUPER]);
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasGroup(['Admin', 'SuperAdmin']);
+        return $this->hasGroup([Group::ADMIN, Group::SUPER]);
     }
 
     public function isModerator(): bool
     {
-        return $this->hasGroup(['Moderator']);
+        return $this->hasGroup([Group::MOD]);
+    }
+
+    public function isPlayer(): bool
+    {
+        return $this->hasGroup([Group::PLAYER]);
     }
 }

@@ -35,11 +35,13 @@ class ManiaLinkEvent
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 
-        if ($maniaLinkEvents->where('id', $id)->isNotEmpty()) {
-            Log::error("ManiaLinkEvent with id '$id' already exists.");
+        $event = new ManiaLinkEvent($id, $callback);
+
+        $existingEvents = $maniaLinkEvents->where('id', $id);
+        if ($existingEvents->isNotEmpty()) {
+            self::$maniaLinkEvents = self::$maniaLinkEvents->diff($existingEvents);
         }
 
-        $event = new ManiaLinkEvent($id, $callback);
         $maniaLinkEvents->push($event);
     }
 

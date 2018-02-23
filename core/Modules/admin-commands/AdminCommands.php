@@ -8,6 +8,7 @@ use esc\classes\Template;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
 use esc\controllers\PlayerController;
+use esc\models\Group;
 use esc\models\Player;
 
 class AdminCommands
@@ -27,7 +28,7 @@ class AdminCommands
     public static function showAdminControlPanel(...$vars)
     {
         $admins = PlayerController::getPlayers()->filter(function (Player $ply) {
-            return $ply->hasGroup(['Admin', 'SuperAdmin']);
+            return $ply->isAdmin();
         });
 
         foreach ($admins as $player) {
@@ -38,7 +39,7 @@ class AdminCommands
     public static function hideAdminControlPanel(...$vars)
     {
         $admins = PlayerController::getPlayers()->filter(function (Player $ply) {
-            return $ply->hasGroup(['Admin', 'SuperAdmin']);
+            return $ply->isAdmin();
         });
 
         foreach ($admins as $player) {

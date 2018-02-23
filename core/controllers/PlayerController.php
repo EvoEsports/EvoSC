@@ -45,6 +45,11 @@ class PlayerController
         });
     }
 
+    public static function hasPlayers(): bool
+    {
+        return count(self::$players ?: []) > 0;
+    }
+
     public static function toggleAfk(Player $player)
     {
         if (!isset($player->afk)) {

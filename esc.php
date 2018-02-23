@@ -84,7 +84,8 @@ while (true) {
         RestClient::initialize();
         RestClient::$serverName = 'Brakers dev server LOGIN brakertest2';
 
-        ModuleController::loadModules('core/Modules');
+        ModuleController::init();
+        ModuleController::loadModules('core\\Modules');
         ModuleController::loadModules('modules');
 
         PlayerController::initialize();

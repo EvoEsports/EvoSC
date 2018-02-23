@@ -7,6 +7,7 @@ use esc\classes\ChatCommand;
 use esc\classes\Config;
 use esc\classes\File;
 use esc\classes\Log;
+use esc\classes\Module;
 use esc\classes\Template;
 use esc\models\Group;
 use esc\models\Map;
@@ -185,6 +186,12 @@ $$: Writes a dollarsign
 
             if ($part instanceof Group) {
                 $part = ucfirst($part->Name);
+            }
+
+            if ($part instanceof Module) {
+                $message .= '$z$s$' . config('color.secondary');
+                $message .= $part->name;
+                continue;
             }
 
             if (is_float($part) || is_int($part)) {

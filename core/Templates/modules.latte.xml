@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="Modules" version="3">
+    <frame pos="0 0" scale="0.8">
+        <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
+        <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
+        <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
+        <quad pos="-100 50" z-index="-1" size="200 110" style="Bgs1" substyle="BgDialogBlur"/>
+
+        <frame pos="-95 45">
+            <label pos="0 0" z-index="0" size="20 5" text="$oModules" textcolor="ffff" halign="left"/>
+            <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="modules.close"/>
+
+            <label pos="0 -12" z-index="0" size="79 5" text="Name"/>
+            {foreach $modules as $module}
+            <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="62 5" textsize="1.8" valign="center" text="{$module->name}"/>
+            <label pos="60 -{15 + $iterator->counter * 5}" z-index="0" size="20 5" textsize="1.8" valign="center" halign="center" text="Reload" action="module.reload,{$module->name}"/>
+            {/foreach}
+        </frame>
+    </frame>
+</manialink>

@@ -6,7 +6,7 @@ function esc_autoloader($className)
     $realClassName = "core";
 
     for ($i = 1; $i < count($classNameExplode); $i++) {
-        $realClassName .= "/" . $classNameExplode[$i];
+        $realClassName .= "\\" . $classNameExplode[$i];
     }
 
     $file = $realClassName . '.php';

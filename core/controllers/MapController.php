@@ -12,6 +12,7 @@ use esc\classes\ManiaLinkEvent;
 use esc\classes\MapQueueItem;
 use esc\classes\RestClient;
 use esc\classes\Template;
+use esc\models\Group;
 use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Support\Carbon;
@@ -39,8 +40,8 @@ class MapController
         Hook::add('EndMatch', '\esc\controllers\MapController::endMatch');
         Hook::add('PlayerConnect', '\esc\controllers\MapController::displayMapWidget');
 
-        ChatController::addCommand('skip', '\esc\controllers\MapController::skip', 'Skips map instantly', '//', ['Admin', 'SuperAdmin']);
-        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', ['Admin', 'SuperAdmin']);
+        ChatController::addCommand('skip', '\esc\controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
+        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', [Group::ADMIN, Group::SUPER]);
     }
 
     private static function createTables()

@@ -1,3 +1,4 @@
 {
+  "name": "Music server",
   "main": "MusicServer"
 }
