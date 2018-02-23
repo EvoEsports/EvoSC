@@ -9,6 +9,7 @@ use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaLinkEvent;
+use esc\classes\MapQueueItem;
 use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\models\Map;
@@ -58,19 +59,18 @@ class MapController
         });
     }
 
-    public static function skip(Player $player)
-    {
-        ChatController::messageAllNew($player->group, ' ', $player, ' skips map');
-        MapController::next();
-    }
-
+    /**
+     * Hook: EndMatch
+     * @param $rankings
+     * @param $winnerteam
+     */
     public static function endMatch($rankings, $winnerteam)
     {
         $request = self::getQueue()->shift();
 
-        if (isset($request['map'])) {
-            Log::info("Try set next map: " . $request['map']->Name);
-            self::setNext($request['map']);
+        if (isset($request->map)) {
+            Log::info("Try set next map: " . $request->map->Name);
+            self::setNext($request->map);
         }
 
         foreach (PlayerController::getPlayers() as $player) {
@@ -78,6 +78,9 @@ class MapController
         }
     }
 
+    /*
+     * Hook: BeginMap
+     */
     public static function beginMap(Map $map)
     {
         $map->update(ServerController::getCurrentMapInfo()->toArray());
@@ -98,16 +101,28 @@ class MapController
         self::displayMapWidget();
     }
 
+    /**
+     * Gets current map
+     * @return Map|null
+     */
     public static function getCurrentMap(): ?Map
     {
         return self::$currentMap;
     }
 
+    /**
+     * Get all queued maps
+     * @return Collection
+     */
     public static function getQueue(): Collection
     {
-        return self::$queue;
+        return self::$queue->sortBy('time');
     }
 
+    /**
+     * Delete a map
+     * @param Map $map
+     */
     public static function deleteMap(Map $map)
     {
 //        ServerController::getRpc()->removeMap($map->FileName);
@@ -116,13 +131,20 @@ class MapController
 //        $map->delete();
     }
 
+    /**
+     * Sets the next map on the server
+     * @param Map|null $map
+     */
     public static function setNext(Map $map = null)
     {
         ServerController::getRpc()->chooseNextMap($map->FileName);
         self::$nextMap = $map;
     }
 
-    public static function next()
+    /**
+     * Ends the match and goes to the next round
+     */
+    public static function goToNextMap()
     {
         try {
             ServerController::getRpc()->nextMap();
@@ -131,9 +153,13 @@ class MapController
         }
     }
 
+    /**
+     * Gets the next played map
+     * @return Map
+     */
     public static function getNext(): Map
     {
-        $map = self::getQueue()->first()['map'];
+        $map = self::getQueue()->first()->map;
 
         if (!$map) {
             $mapId = ServerController::getRpc()->getNextMapInfo()->uId;
@@ -143,17 +169,47 @@ class MapController
         return $map;
     }
 
+    /**
+     * Admins skip method
+     * @param Player $player
+     */
+    public static function skip(Player $player)
+    {
+        ChatController::messageAllNew($player->group, ' ', $player, ' skips map');
+        MapController::goToNextMap();
+    }
+
+    /**
+     * Force replay a round at end of match
+     * @param Player $player
+     */
+    public static function forceReplay(Player $player)
+    {
+        $currentMap = self::getCurrentMap();
+
+        if (self::getQueue()->contains('map.UId', $currentMap->UId)) {
+            ChatController::messageNew($player, 'Map is already being replayed');
+            return;
+        }
+
+        self::$queue->push(new MapQueueItem($player, $currentMap, 0));
+        ChatController::messageAllNew($player->group, ' ', $player, ' queued map ', $currentMap, ' for replay');
+        self::displayMapWidget();
+    }
+
+    /**
+     * Add a map to the queue
+     * @param Player $player
+     * @param Map $map
+     */
     public static function queueMap(Player $player, Map $map)
     {
-        if (self::getQueue()->where('player', $player)->isNotEmpty()) {
+        if (self::getQueue()->where('player', $player)->isNotEmpty() && !$player->isAdmin()) {
             ChatController::message($player, "You already have a map in queue", []);
             return;
         }
 
-        self::getQueue()->push([
-            'player' => $player,
-            'map' => $map
-        ]);
+        self::getQueue()->push(new MapQueueItem($player, $map, time()));
 
         ChatController::messageAllNew($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");
@@ -161,6 +217,9 @@ class MapController
         self::displayMapWidget();
     }
 
+    /**
+     * Loads maps from server directory
+     */
     private static function loadMaps()
     {
         $mapFiles = File::getDirectoryContents(Config::get('server.maps'))->filter(function ($fileName) {
@@ -182,6 +241,10 @@ class MapController
         }
     }
 
+    /**
+     * Display the map widget
+     * @param Player|null $player
+     */
     public static function displayMapWidget(Player $player = null)
     {
         $currentMap = self::getCurrentMap();
@@ -194,6 +257,10 @@ class MapController
         }
     }
 
+    /**
+     * Add map from MX
+     * @param string[] ...$arguments
+     */
     public static function addMap(string ...$arguments)
     {
         $mxId = intval($arguments[2]);

@@ -106,6 +106,8 @@ while (true) {
         Dedimania::beginMap(\esc\controllers\MapController::getCurrentMap());
         MusicServer::displayCurrentSong();
 
+        AdminCommands::showAdminControlPanel();
+
         while (true) {
             Timer::startCycle();
 

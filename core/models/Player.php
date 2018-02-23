@@ -131,4 +131,19 @@ class Player extends Model
     {
         return $this->hasMAny('Dedi', 'Player', 'id');
     }
+
+    public function isSuperadmin(): bool
+    {
+        return $this->hasGroup(['SuperAdmin']);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasGroup(['Admin', 'SuperAdmin']);
+    }
+
+    public function isModerator(): bool
+    {
+        return $this->hasGroup(['Moderator']);
+    }
 }

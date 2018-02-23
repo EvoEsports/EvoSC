@@ -11,7 +11,6 @@ use esc\controllers\ChatController;
 use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 
 class MusicServer

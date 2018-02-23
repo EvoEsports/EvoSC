@@ -2,13 +2,15 @@
 <manialink id="CurrentMap" version="3">
 <frame pos="120 89" scale="0.8">
     <quad pos="0 0" z-index="-1" size="50 20" bgcolor="0009"/>
-    <label pos="2 -2" z-index="1" size="48 2.8" text="now playing" textsize="1"/>
+    <label pos="2 -2" z-index="1" size="49 2.8" text="now playing" textsize="1"/>
     <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
 
     <label pos="2 -8" z-index="1" size="47 3" text="$o{$map->Name}" textsize="1.5"/>
-    <label pos="2 -12.3" z-index="1" size="58 3" text="by {isset($map->author->NickName) ? $map->author->NickName : 'unknown'}" textsize="0.7"/>
-    <label pos="2 -16.3" z-index="1" size="58 3" text="Next: {$next ? $next->Name : 'none'}" textsize="0.5"/>
+    <label pos="2 -12.3" z-index="1" size="58 3" text="by {isset($map->author->NickName) ? $map->author->NickName : $map->Author}" textsize="0.7"/>
 
+    <label pos="2 -16.3" z-index="1" size="58 3" text="Next: {$next ? stripColors($next->Name) : 'none'}" textcolor="cccc" textsize="0.5"/>
+
+    <quad pos="0 0" size="50 20" action="maplist.show" />
 </frame>
 </manialink>

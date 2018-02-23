@@ -14,6 +14,7 @@ class MapList
     {
         Template::add('maplist.show', File::get(__DIR__ . '/Templates/map-list.latte.xml'));
 
+        ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.close', 'MapList::closeMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap');

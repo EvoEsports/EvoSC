@@ -184,7 +184,7 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Group) {
-                $part .= $part->Name;
+                $part = ucfirst($part->Name);
             }
 
             if (is_float($part) || is_int($part)) {

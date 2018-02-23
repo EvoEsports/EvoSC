@@ -8,5 +8,7 @@
 
     <label pos="2 -8" z-index="1" size="40 3" text="{$song->title}" textcolor="eeee" textsize="1.4"/>
     <label pos="2 -13" z-index="1" size="40 3" text="{$song->artist}" textcolor="dddd" valign="center" textsize="0.6"/>
+
+    <quad pos="0 0" size="50 16" action="ms.menu.showpage" />
 </frame>
 </manialink>
