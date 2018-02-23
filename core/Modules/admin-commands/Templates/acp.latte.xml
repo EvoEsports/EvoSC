@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="AdminControlPanel" version="3">
+    <frame pos="120 9" scale="0.8">
+        <quad pos="0 0" z-index="-1" size="50 16" bgcolor="0009"/>
+        <label pos="2 -2" z-index="1" size="48 2.8" text="admin control panel" textsize="1"/>
+        <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
+        <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
+
+        <quad pos="12.5 -7.5" z-index="0" size="7 7" bgcolor="FFFA" style="Icons128x32_1" substyle="RT_Laps" action="ac.replay"/>
+        <quad pos="37.5 -15" z-index="0" size="8 8" bgcolor="FFFA" style="Icons64x64_1" substyle="ClipRewind" rot="180" action="ac.skip"/>
+    </frame>
+</manialink>

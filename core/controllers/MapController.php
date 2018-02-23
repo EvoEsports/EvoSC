@@ -35,9 +35,10 @@ class MapController
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
         Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
-        Hook::add('BeginMap', '\esc\controllers\MapController::endMap');
+        Hook::add('EndMatch', '\esc\controllers\MapController::endMatch');
         Hook::add('PlayerConnect', '\esc\controllers\MapController::displayMapWidget');
 
+        ChatController::addCommand('skip', '\esc\controllers\MapController::skip', 'Skips map instantly', '//', ['Admin', 'SuperAdmin']);
         ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', ['Admin', 'SuperAdmin']);
     }
 
@@ -57,12 +58,19 @@ class MapController
         });
     }
 
-    public static function endMap(Map $map)
+    public static function skip(Player $player)
+    {
+        ChatController::messageAllNew($player->group, ' ', $player, ' skips map');
+        MapController::next();
+    }
+
+    public static function endMatch($rankings, $winnerteam)
     {
         $request = self::getQueue()->shift();
 
-        if (isset($request->map)) {
-            self::setNext($request->map);
+        if (isset($request['map'])) {
+            Log::info("Try set next map: " . $request['map']->Name);
+            self::setNext($request['map']);
         }
 
         foreach (PlayerController::getPlayers() as $player) {
@@ -81,7 +89,7 @@ class MapController
 
         if (self::$nextMap && $map->FileName != self::$nextMap->FileName) {
             Log::warning("Skipping incompatible map " . self::$nextMap->Name);
-            ChatController::messageAll("Skipping incompatible map " . self::$nextMap->Name);
+            ChatController::messageAllNew('Skipping map ', self::$nextMap);
         }
 
         $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
@@ -100,52 +108,12 @@ class MapController
         return self::$queue;
     }
 
-    public static function addMap(string ...$arguments)
-    {
-        $mxId = intval($arguments[2]);
-
-        if ($mxId == 0) {
-            Log::warning("Requested map with invalid id: " . $arguments[2]);
-            ChatController::messageAll("Requested map with invalid id: " . $arguments[2]);
-            return;
-        }
-
-        $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
-
-        if ($response->getStatusCode() != 200) {
-            Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-            ChatController::messageAll("Can not reach mania exchange.");
-            return;
-        }
-
-        if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
-            Log::warning('Not a valid GBX.');
-            return;
-        }
-
-        $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
-        $mapFolder = Config::get('server.maps');
-        File::put("$mapFolder/$fileName", $response->getBody());
-
-        $name = str_replace('.Map.Gbx', '', $fileName);
-
-        $map = Map::updateOrCreate([
-            'MxId' => $mxId,
-            'Name' => $name,
-            'FileName' => $fileName
-        ]);
-
-        ServerController::getRpc()->insertMap($map->FileName);
-
-        ChatController::messageAll("Admin added map \$eee$name.");
-    }
-
     public static function deleteMap(Map $map)
     {
-        ServerController::getRpc()->removeMap($map->FileName);
-        File::delete(Config::get('server.maps') . '/' . $map->FileName);
-        ChatController::messageAll("Admin removed map \$eee$map->Name");
-        $map->delete();
+//        ServerController::getRpc()->removeMap($map->FileName);
+//        File::delete(Config::get('server.maps') . '/' . $map->FileName);
+//        ChatController::messageAllNew('Admin removed map ', $map);
+//        $map->delete();
     }
 
     public static function setNext(Map $map = null)
@@ -187,9 +155,8 @@ class MapController
             'map' => $map
         ]);
 
-        ChatController::messageAll('%s $z$s$%squeued map %s',
-            $player->NickName,
-            config('color.primary'), $map->Name);
+        ChatController::messageAllNew($player, ' juked map ', $map);
+        Log::info("$player->NickName juked map $map->Name");
 
         self::displayMapWidget();
     }
@@ -225,5 +192,45 @@ class MapController
         } else {
             Template::showAll('map', ['map' => $currentMap, 'next' => $nextMap]);
         }
+    }
+
+    public static function addMap(string ...$arguments)
+    {
+        $mxId = intval($arguments[2]);
+
+        if ($mxId == 0) {
+            Log::warning("Requested map with invalid id: " . $arguments[2]);
+            ChatController::messageAllNew("Requested map with invalid id: " . $arguments[2]);
+            return;
+        }
+
+        $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
+
+        if ($response->getStatusCode() != 200) {
+            Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
+            ChatController::messageAllNew("Can not reach mania exchange.");
+            return;
+        }
+
+        if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
+            Log::warning('Not a valid GBX.');
+            return;
+        }
+
+        $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
+        $mapFolder = Config::get('server.maps');
+        File::put("$mapFolder/$fileName", $response->getBody());
+
+        $name = str_replace('.Map.Gbx', '', $fileName);
+
+        $map = Map::updateOrCreate([
+            'MxId' => $mxId,
+            'Name' => $name,
+            'FileName' => $fileName
+        ]);
+
+        ServerController::getRpc()->insertMap($map->FileName);
+
+        ChatController::messageAllNew('Admin added map ', $map);
     }
 }

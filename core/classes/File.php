@@ -7,8 +7,13 @@ use Illuminate\Support\Collection;
 
 class File
 {
-    public static function get(string $fileName): ?string
+    public static function get(string $fileName = null): ?string
     {
+        if (!$fileName) {
+            Log::error("Could not load file $fileName");
+            return null;
+        }
+
         if (file_exists($fileName)) {
             return file_get_contents($fileName);
         }

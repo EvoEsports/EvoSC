@@ -91,8 +91,15 @@ class PlayerController
         }
     }
 
-    public static function playerDisconnect(Player $player, $disconnectReason)
+    public static function playerDisconnect(Player $player = null, $disconnectReason)
     {
+        if ($player == null) {
+            Log::info('SERVER SHUTTING DOWN');
+            Log::info('SERVER SHUTTING DOWN');
+            Log::info('SERVER SHUTTING DOWN');
+            exit(0);
+        }
+
         Log::info($player->nick(true) . " left the server [$disconnectReason].");
         $player->setOffline();
         $player->setScore(0);

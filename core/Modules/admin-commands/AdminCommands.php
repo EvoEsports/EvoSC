@@ -1,19 +1,30 @@
 <?php
 
-use esc\controllers\ChatController;
-use esc\controllers\MapController;
+
+use esc\classes\File;
+use esc\classes\Hook;
+use esc\classes\Template;
+use esc\controllers\PlayerController;
 use esc\models\Player;
 
 class AdminCommands
 {
     public function __construct()
     {
-        ChatController::addCommand('skip', 'AdminCommands::next', 'Skip map instantly', '//', ['Admin', 'SuperAdmin']);
+        Template::add('acp', File::get(__DIR__ . '/Templates/acp.latte.xml'));
+
+        Hook::add('BeginMap', 'AdminCommands::showAdminControlPanel');
+        Hook::add('PlayerConnect', 'AdminCommands::showAdminControlPanel');
     }
 
-    public static function next(Player $player)
+    public static function showAdminControlPanel(...$vars)
     {
-        ChatController::messageAll("$player->NickName \$z\$s$%sskips map.", config('color.primary'));
-        MapController::next();
+        $admins = PlayerController::getPlayers()->filter(function (Player $ply) {
+            return $ply->hasGroup(['Admin', 'SuperAdmin']);
+        });
+
+        foreach ($admins as $player) {
+            Template::show($player, 'acp');
+        }
     }
 }

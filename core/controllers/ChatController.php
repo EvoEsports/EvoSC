@@ -8,10 +8,13 @@ use esc\classes\Config;
 use esc\classes\File;
 use esc\classes\Log;
 use esc\classes\Template;
+use esc\models\Group;
+use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 use Maniaplanet\DedicatedServer\Xmlrpc\UnknownPlayerException;
+use Symfony\Component\Translation\Tests\StringClass;
 
 class ChatController
 {
@@ -151,9 +154,50 @@ $$: Writes a dollarsign
 
     public static function messageAll(string $formatString, ...$arguments)
     {
-        foreach(PlayerController::getPlayers() as $player){
+        foreach (PlayerController::getPlayers() as $player) {
             self::message($player, $formatString, $arguments);
         }
+    }
+
+    public static function messageAllNew(...$parts)
+    {
+        foreach (PlayerController::getPlayers() as $player) {
+            self::messageNew($player, ...$parts);
+        }
+    }
+
+    public static function messageNew(Player $recipient, ...$parts)
+    {
+        $message = '$s';
+
+        foreach ($parts as $part) {
+            if ($part instanceof Player) {
+                $message .= '$z$s$' . config('color.secondary');
+                $message .= $part->NickName;
+                continue;
+            }
+
+            if ($part instanceof Map) {
+                $message .= '$z$s$' . config('color.secondary');
+                $message .= $part->Name;
+                continue;
+            }
+
+            if ($part instanceof Group) {
+                $part .= $part->Name;
+            }
+
+            if (is_float($part) || is_int($part)) {
+                $message .= '$z$s$' . config('color.secondary');
+                $message .= $part;
+                continue;
+            }
+
+            $message .= '$z$s$' . config('color.primary');
+            $message .= $part;
+        }
+
+        ServerController::getRpc()->chatSendServerMessage($message, $recipient->Login);
     }
 
     public static function message(Player $player, string $formatString, ...$arguments)
@@ -163,7 +207,7 @@ $$: Writes a dollarsign
         $message = call_user_func_array('sprintf', $arguments[0]);
 
         try {
-            if(isset($player->Login) && $player->Online){
+            if (isset($player->Login) && $player->Online) {
                 ServerController::getRpc()->chatSendServerMessage('$' . $primaryColor . $message, $player->Login);
             }
         } catch (FaultException $e) {

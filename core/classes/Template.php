@@ -20,7 +20,7 @@ class Template
 
     public static function showAll(string $index, array $values = null)
     {
-        if(!$values){
+        if (!$values) {
             $values = [];
         }
 
@@ -36,7 +36,7 @@ class Template
 
     public static function show(Player $player, string $index, array $values = null)
     {
-        if(!$values){
+        if (!$values) {
             $values = [];
         }
 
@@ -50,8 +50,13 @@ class Template
         ServerController::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
     }
 
-    public static function add(string $index, string $template)
+    public static function add(string $index, string $template = null)
     {
+        if (!$template) {
+            Log::error("Could not load template: $index");
+            return;
+        }
+
         TemplateController::addTemplate($index, $template);
     }
 }

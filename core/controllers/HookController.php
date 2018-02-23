@@ -20,6 +20,7 @@ class HookController
         'ManiaPlanet.PlayerChat' => 'PlayerChat',
         'ManiaPlanet.BeginMap' => 'BeginMap',
         'ManiaPlanet.EndMap' => 'EndMap',
+        'ManiaPlanet.EndMatch' => 'EndMatch',
         'TrackMania.PlayerCheckpoint' => 'PlayerCheckpoint',
         'TrackMania.PlayerFinish' => 'PlayerFinish',
         'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
@@ -78,6 +79,11 @@ class HookController
                 //SMapInfo Map
                 $map = Map::where('FileName', $arguments[0]['FileName'])->first();
                 self::fireHookBatch($hooks, $map);
+                break;
+
+            case 'EndMatch':
+                //SMapInfo Map
+                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
                 break;
 
             case 'PlayerInfoChanged':
