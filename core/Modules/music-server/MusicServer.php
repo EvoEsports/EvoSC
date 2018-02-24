@@ -6,6 +6,7 @@ use esc\classes\Hook;
 use esc\classes\Log;
 use esc\classes\ManiaLinkEvent;
 use esc\classes\RestClient;
+use esc\Classes\Server;
 use esc\classes\Template;
 use esc\controllers\ChatController;
 use esc\models\Map;
@@ -38,7 +39,7 @@ class MusicServer
 
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
 
-        Hook::add('EndMap', 'MusicServer::setNextSong');
+        Hook::add('EndMatch', 'MusicServer::setNextSong');
         Hook::add('BeginMap', 'MusicServer::beginMap');
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
     }
@@ -69,7 +70,9 @@ class MusicServer
      */
     public static function getCurrentSong(): ?Song
     {
-        return self::$currentSong;
+        $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
+        $hash = md5($songInformation->url);
+        return Song::where('hash', $hash)->first();
     }
 
     /**
@@ -78,9 +81,13 @@ class MusicServer
      */
     public static function setNextSong(...$args)
     {
-        $randomMusicFile = self::$music->random();
-        $url = $randomMusicFile->url;
-        \esc\classes\Server::getRpc()->setForcedMusic(true, $url);
+        if (self::$songQueue && count(self::$songQueue) > 0) {
+            $song = self::$songQueue->shift()['song'];
+        } else {
+            $song = self::$music->random();
+        }
+
+        Server::getRpc()->setForcedMusic(true, $song->url);
     }
 
     /**
@@ -95,13 +102,8 @@ class MusicServer
         }
 
         $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
-
-        $song = self::getCurrentSong();
-
-        if (!$song) {
-            $hash = md5($songInformation->url);
-            $song = Song::where('hash', $hash)->first();
-        }
+        $hash = md5($songInformation->url);
+        $song = Song::where('hash', $hash)->first();
 
         if ($song) {
             if ($player) {
@@ -160,7 +162,7 @@ class MusicServer
                 'time' => time()
             ]);
 
-            ChatController::messageAll('%s$z$s$%s added song $%s%s $%sto the jukebox', $callee->NickName, config('color.primary'), config('color.secondary'), $song->title, config('color.primary'));
+            ChatController::messageAllNew($callee, ' added song ', $song, ' to the jukebox');
         }
 
         Template::hide($callee, 'music.menu');

@@ -36,8 +36,8 @@ class Vote
 
         ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
         ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
-        ChatController::addCommand('y', 'esc\classes\Vote::voteYes');
-        ChatController::addCommand('n', 'esc\classes\Vote::voteNo');
+        ChatController::addCommand('y', 'esc\classes\Vote::voteYes', 'Vote yes');
+        ChatController::addCommand('n', 'esc\classes\Vote::voteNo', 'Vote no');
     }
 
     public static function active(): bool

@@ -22,6 +22,8 @@ class PlayerController
 
         Hook::add('PlayerDisconnect', '\esc\Controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\Controllers\PlayerController::playerFinish');
+        Hook::add('PlayerCheckpoint', '\esc\Controllers\PlayerController::playerCheckpoint');
+        Hook::add('PlayerChat', '\esc\Controllers\PlayerController::playerChat');
 
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
@@ -45,7 +47,7 @@ class PlayerController
 
     public static function toggleAfk(Player $player)
     {
-        $player->update(['Afk' => $player->Afk]);
+        $player->update(['Afk' => !$player->Afk]);
         self::displayPlayerlist();
     }
 
@@ -80,6 +82,19 @@ class PlayerController
             Server::getRpc()->forceSpectator($player->Login, 2);
             Server::getRpc()->forceSpectator($player->Login, 0);
         }
+
+        $player->update(['Afk' => false]);
+    }
+
+    public static function playerCheckpoint(Player $player)
+    {
+        $player->update(['Afk' => false]);
+        self::displayPlayerlist();
+    }
+
+    public static function playerChat(Player $player)
+    {
+        $player->update(['Afk' => false]);
     }
 
     public static function playerDisconnect(Player $player = null, $disconnectReason)

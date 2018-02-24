@@ -14,6 +14,7 @@ use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
+use Song;
 
 class ChatController
 {
@@ -187,6 +188,12 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Module) {
+                $message .= '$z$s$' . config('color.secondary');
+                $message .= $part->name;
+                continue;
+            }
+
+            if ($part instanceof Song) {
                 $message .= '$z$s$' . config('color.secondary');
                 $message .= $part->name;
                 continue;
