@@ -116,8 +116,6 @@ while (true) {
         }catch(\Exception $e){
         }
 
-        ServerController::getRpc()->setTimeAttackLimit(120000);
-
         while (true) {
             Timer::startCycle();
 

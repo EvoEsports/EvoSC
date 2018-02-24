@@ -12,6 +12,7 @@ use esc\classes\ManiaLinkEvent;
 use esc\classes\MapQueueItem;
 use esc\classes\RestClient;
 use esc\classes\Template;
+use esc\classes\Vote;
 use esc\models\Group;
 use esc\models\Map;
 use esc\models\Player;
@@ -181,6 +182,7 @@ class MapController
     {
         ChatController::messageAllNew($player->group, ' ', $player, ' skips map');
         MapController::goToNextMap();
+        Vote::stopVote();
     }
 
     /**

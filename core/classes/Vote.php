@@ -34,7 +34,8 @@ class Vote
 
         Template::add('vote', File::get('core/Templates/vote.latte.xml'));
 
-        ChatController::addCommand('replay', 'esc\classes\Vote::replayMap');
+        ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
+        ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
         ChatController::addCommand('y', 'esc\classes\Vote::voteYes');
         ChatController::addCommand('n', 'esc\classes\Vote::voteNo');
     }
@@ -100,15 +101,41 @@ class Vote
         self::showVote();
     }
 
+    public static function skipMap(Player $player)
+    {
+        if (self::$inProgress) {
+            ChatController::messageNew($player, 'There is already a vote in progress');
+            return;
+        }
+
+        self::$votes = new Collection();
+        self::$inProgress = true;
+        self::$message = 'Skip map?';
+        self::$startTime = time();
+        self::$action = 'esc\classes\Vote::doSkip';
+        self::$starter = $player;
+
+        self::voteYes($player);
+
+        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+
+        ChatController::messageAllNew($player, ' is asking to skip the map. Type /y or /n to vote.');
+
+        self::showVote();
+    }
+
     public static function doReplay()
     {
         MapController::forceReplay(Player::console());
     }
 
+    public static function doSkip()
+    {
+        MapController::skip(Player::console());
+    }
+
     public static function finishVote()
     {
-        self::hideVote();
-
         $yesVotes = self::$votes->where('decision', true)->count();
         $noVotes = self::$votes->where('decision', false)->count();
 
@@ -122,10 +149,7 @@ class Vote
 
         ChatController::messageAllNew('Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
 
-        self::$inProgress = false;
-        self::$starter = null;
-        self::$message = null;
-        self::$action = null;
+        self::stopVote();
     }
 
     public static function showVote()
@@ -153,5 +177,15 @@ class Vote
     public static function hideVote()
     {
         Template::hideAll('vote');
+    }
+
+    public static function stopVote()
+    {
+        self::$inProgress = false;
+        self::$starter = null;
+        self::$message = null;
+        self::$action = null;
+        self::$votes = null;
+        self::hideVote();
     }
 }
