@@ -62,7 +62,7 @@ class HookController
             $hook = 'PlayerInfoChanged';
         }
 
-        Log::hook("Hook called: $hook", false);
+        Log::hook("Hook called: $hook", true);
 
         $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
             return $value->getEvent() == $hook;

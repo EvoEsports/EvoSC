@@ -38,9 +38,6 @@ function startEsc()
     esc\classes\Vote::init();
     esc\controllers\ModuleController::init();
 
-    $map = \esc\models\Map::where('FileName', esc\classes\Server::getRpc()->getCurrentMapInfo()->fileName)->first();
-    esc\controllers\HookController::fire('BeginMap', [$map]);
-
     //Handle already connected players
     foreach (esc\classes\Server::getRpc()->getPlayerList() as $player) {
         $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
@@ -59,4 +56,10 @@ function cycle()
 function loadModulesFrom(string $path)
 {
     esc\controllers\ModuleController::loadModules($path);
+}
+
+function beginMap()
+{
+    $map = \esc\models\Map::where('FileName', esc\classes\Server::getRpc()->getCurrentMapInfo()->fileName)->first();
+    esc\controllers\HookController::fire('BeginMap', [$map]);
 }

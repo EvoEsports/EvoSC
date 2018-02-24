@@ -16,6 +16,8 @@ while (true) {
         loadModulesFrom('core\\Modules');
         loadModulesFrom('modules');
 
+        beginMap();
+
         while (true) {
             cycle();
         }

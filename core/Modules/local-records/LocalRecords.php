@@ -23,7 +23,6 @@ class LocalRecords
         Template::add('locals', File::get(__DIR__ . '/Templates/locals.latte.xml'));
 
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
-        Hook::add('PlayerConnect', 'LocalRecords::playerConnect');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
     }
 
@@ -68,11 +67,6 @@ class LocalRecords
             }
         }
 
-        self::displayLocalRecords();
-    }
-
-    public static function playerConnect()
-    {
         self::displayLocalRecords();
     }
 
