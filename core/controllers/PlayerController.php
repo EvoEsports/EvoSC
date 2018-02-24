@@ -125,11 +125,20 @@ class PlayerController
             return 0;
         });
 
-//        $playersNotFinished = self::getPlayers()->diff($players);
-//
-//        foreach ($playersNotFinished as $player) {
-//            $players->add($player);
-//        }
+        $playersNotFinished = onlinePlayers()->where('Score', '=', 0)->sort(function (Player $a, Player $b) {
+            if ($a->Score < $b->Score) {
+                return -1;
+            } else if ($a->Score > $b->Score) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+
+        foreach ($playersNotFinished as $player) {
+            $players->add($player);
+        }
 
         Template::showAll('players', ['players' => $players]);
     }
