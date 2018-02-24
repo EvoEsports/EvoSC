@@ -28,6 +28,7 @@ class Dedimania
         include_once __DIR__ . '/Models/DedimaniaSession.php';
 
         Hook::add('BeginMap', 'Dedimania::beginMap');
+        Hook::add('PlayerConnect', 'Dedimania::displayDedis');
 
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
 

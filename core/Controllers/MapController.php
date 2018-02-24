@@ -38,6 +38,7 @@ class MapController
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
+        Hook::add('PlayerConnect', '\esc\Controllers\MapController::displayMapWidget');
         Hook::add('BeginMap', '\esc\Controllers\MapController::beginMap');
         Hook::add('EndMatch', '\esc\Controllers\MapController::endMatch');
 

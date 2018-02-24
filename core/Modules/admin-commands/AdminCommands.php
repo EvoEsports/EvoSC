@@ -64,6 +64,6 @@ class AdminCommands
 
         MapController::goToNextMap();
 
-        ChatController::messageAllNew($callee->group, ' ', $callee, ' skipped map');
+        ChatController::messageAllNew($callee->group, ' ', $callee, ' skips map');
     }
 }

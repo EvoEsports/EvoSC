@@ -24,6 +24,7 @@ class LocalRecords
 
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
+        Hook::add('PlayerConnect', 'LocalRecords::beginMap');
     }
 
     private function createTables()

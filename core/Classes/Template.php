@@ -43,6 +43,15 @@ class Template
         Server::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
     }
 
+    public static function toString(string $index, array $values = null): string
+    {
+        if (!$values) {
+            $values = [];
+        }
+
+        return TemplateController::getTemplate($index, $values);
+    }
+
     public static function hide(Player $player, string $index)
     {
         $xml = TemplateController::getBlankTemplate($index);
