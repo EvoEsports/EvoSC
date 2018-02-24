@@ -199,7 +199,7 @@ class MapController
         }
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::messageAllNew($player->group, ' ', $player, ' queued map ', $currentMap, ' for replay');
+        ChatController::messageAllNew($player, ' queued map ', $currentMap, ' for replay');
         self::displayMapWidget();
     }
 

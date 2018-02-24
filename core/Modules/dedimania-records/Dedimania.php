@@ -96,17 +96,18 @@ class Dedimania
             $rank = (int)$record->struct->member[3]->value->int;
 
             $player = Player::firstOrCreate(['Login' => $login]);
-            $player->update(['NickName' => $nickname]);
 
             if (isset($player->id)) {
-//                Dedi::whereMap($map->id)->wherePlayer($player->id)->delete();
-//
-//                Dedi::create([
-//                    'Map' => $map->id,
-//                    'Player' => $player->id,
-//                    'Score' => $score,
-//                    'Rank' => $rank
-//                ]);
+                $player->update(['NickName' => $nickname]);
+
+                Dedi::whereMap($map->id)->whereRank($rank)->delete();
+
+                Dedi::create([
+                    'Map' => $map->id,
+                    'Player' => $player->id,
+                    'Score' => $score,
+                    'Rank' => $rank
+                ]);
             }
         }
 

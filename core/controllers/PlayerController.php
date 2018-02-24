@@ -52,7 +52,7 @@ class PlayerController
 
     public static function getPlayers(): Collection
     {
-        return Player::whereOnline(true);
+        return Player::whereOnline(true)->get();
     }
 
     public static function playerConnect(Player $player): Player
