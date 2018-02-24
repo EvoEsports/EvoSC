@@ -99,12 +99,14 @@ class Dedimania
             $player->update(['NickName' => $nickname]);
 
             if (isset($player->id)) {
-                Dedi::firstOrCreate([
-                    'Map' => $map->id,
-                    'Player' => $player->id,
-                    'Score' => $score,
-                    'Rank' => $rank
-                ]);
+//                Dedi::whereMap($map->id)->wherePlayer($player->id)->delete();
+//
+//                Dedi::create([
+//                    'Map' => $map->id,
+//                    'Player' => $player->id,
+//                    'Score' => $score,
+//                    'Rank' => $rank
+//                ]);
             }
         }
 

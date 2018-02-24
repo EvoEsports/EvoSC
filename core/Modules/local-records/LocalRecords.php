@@ -57,14 +57,14 @@ class LocalRecords
                 'Score' => $score
             ]);
 
-            ChatController::messageAll('%s $z$s$%smade a new local record $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), Timer::formatScore($score));
+            ChatController::messageAll('%s $z$s$%smade a new local record $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), formatScore($score));
         }else{
             $localRecord = $map->locals()->wherePlayer($player->id)->first();
 
             if ($localRecord && $score < $localRecord->Score) {
                 $diff = $localRecord->Score - $score;
                 $localRecord->update(['Score' => $score]);
-                ChatController::messageAll('%s $z$s$%simproved his/hers local record by $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), Timer::formatScore($diff));
+                ChatController::messageAll('%s $z$s$%simproved his/hers local record by $%s%s', $player->NickName, config('color.primary'), config('color.secondary'), formatScore($diff));
             }
         }
 

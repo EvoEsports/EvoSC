@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
+use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 
 class MapController
 {
@@ -41,7 +42,7 @@ class MapController
         Hook::add('PlayerConnect', '\esc\controllers\MapController::displayMapWidget');
 
         ChatController::addCommand('skip', '\esc\controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
-        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add <mxid>', '//', [Group::ADMIN, Group::SUPER]);
+        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', [Group::ADMIN, Group::SUPER]);
     }
 
     private static function createTables()
@@ -147,6 +148,8 @@ class MapController
      */
     public static function goToNextMap()
     {
+        self::setNext(self::getNext());
+
         try {
             ServerController::getRpc()->nextMap();
         } catch (FaultException $e) {
@@ -236,6 +239,8 @@ class MapController
 
             try {
                 ServerController::getRpc()->addMap($mapFile);
+            } catch (FileException $e) {
+                Log::error("Map $mapFile not found.");
             } catch (AlreadyInListException $e) {
                 Log::warning("Map $mapFile already added.");
             }
@@ -297,7 +302,7 @@ class MapController
             'FileName' => $fileName
         ]);
 
-        ServerController::getRpc()->insertMap($map->FileName);
+        ServerController::getRpc()->addMap($map->FileName);
 
         ChatController::messageAllNew('Admin added map ', $map);
     }

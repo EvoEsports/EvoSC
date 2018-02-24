@@ -1,0 +1,157 @@
+<?php
+
+namespace esc\classes;
+
+
+use esc\controllers\ChatController;
+use esc\controllers\MapController;
+use esc\models\Player;
+use Illuminate\Support\Collection;
+
+class Vote
+{
+    const VOTE_TIME = 15;
+
+    private static $inProgress;
+    private static $message;
+    private static $votes;
+    private static $action;
+    private static $startTime;
+    private static $starter;
+
+    public $player;
+    public $decision;
+
+    public function __construct(Player $player, bool $decision)
+    {
+        $this->player = $player;
+        $this->decision = $decision;
+    }
+
+    public static function init()
+    {
+        self::$inProgress = false;
+
+        Template::add('vote', File::get('core/Templates/vote.latte.xml'));
+
+        ChatController::addCommand('replay', 'esc\classes\Vote::replayMap');
+        ChatController::addCommand('y', 'esc\classes\Vote::voteYes');
+        ChatController::addCommand('n', 'esc\classes\Vote::voteNo');
+    }
+
+    public static function active(): bool
+    {
+        return self::$active ?: false;
+    }
+
+    public static function voteYes(Player $player)
+    {
+        if (!self::$inProgress) {
+            ChatController::messageNew($player, 'There is no vote in progress');
+            return;
+        }
+
+        self::vote($player, true);
+    }
+
+    public static function voteNo(Player $player)
+    {
+        if (!self::$inProgress) {
+            ChatController::messageNew($player, 'There is no vote in progress');
+            return;
+        }
+
+        self::vote($player, false);
+    }
+
+    private static function vote(Player $player, bool $decision)
+    {
+        $alreadyVoted = self::$votes->where('player.Login', $player->Login);
+
+        if ($alreadyVoted->isEmpty()) {
+            self::$votes->push(new Vote($player, $decision));
+        } else {
+            $alreadyVoted->first()->decision = $decision;
+        }
+
+        self::showVote();
+    }
+
+    public static function replayMap(Player $player)
+    {
+        if (self::$inProgress) {
+            ChatController::messageNew($player, 'There is already a vote in progress');
+            return;
+        }
+
+        self::$votes = new Collection();
+        self::$inProgress = true;
+        self::$message = 'Replay map?';
+        self::$startTime = time();
+        self::$action = 'esc\classes\Vote::doReplay';
+        self::$starter = $player;
+
+        self::voteYes($player);
+
+        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+
+        ChatController::messageAllNew($player, ' is asking for a replay. Type /y or /n to vote.');
+
+        self::showVote();
+    }
+
+    public static function doReplay()
+    {
+        MapController::forceReplay(Player::console());
+    }
+
+    public static function finishVote()
+    {
+        self::hideVote();
+
+        $yesVotes = self::$votes->where('decision', true)->count();
+        $noVotes = self::$votes->where('decision', false)->count();
+
+        $successful = $yesVotes > $noVotes;
+
+        if ($successful) {
+            call_user_func(self::$action);
+        }
+
+        $voteText = '$' . config('color.secondary') . self::$message;
+
+        ChatController::messageAllNew('Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
+
+        self::$inProgress = false;
+        self::$starter = null;
+        self::$message = null;
+        self::$action = null;
+    }
+
+    public static function showVote()
+    {
+        if (self::$inProgress) {
+            $yesVotes = self::$votes->where('decision', true)->count();
+            $noVotes = self::$votes->where('decision', false)->count();
+
+            $totalVotes = $yesVotes + $noVotes;
+
+            if ($totalVotes > 0) {
+                $yesRatio = ($yesVotes * 100) / $totalVotes;
+                $noRatio = ($noVotes * 100) / $totalVotes;
+            }
+
+            $yes = ($yesRatio ?: 0) * 0.35;
+            $no = ($noRatio ?: 0) * 0.35;
+
+            $timeleft = (self::$startTime + self::VOTE_TIME) - time();
+
+            Template::showAll('vote', ['message' => self::$message, 'yes' => $yes, 'no' => $no, 'voteDuration' => self::VOTE_TIME, 'timeLeft' => $timeleft]);
+        }
+    }
+
+    public static function hideVote()
+    {
+        Template::hideAll('vote');
+    }
+}

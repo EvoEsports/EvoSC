@@ -65,7 +65,6 @@ while (true) {
         TemplateController::init();
         \esc\classes\ManiaLinkEvent::init();
 
-
         try {
             Log::info("Connecting to server...");
 
@@ -90,6 +89,8 @@ while (true) {
 
         PlayerController::initialize();
 
+        \esc\classes\Vote::init();
+
         $map = \esc\models\Map::where('FileName', ServerController::getRpc()->getCurrentMapInfo()->fileName)->first();
         if ($map) {
             MapController::beginMap($map);
@@ -110,6 +111,13 @@ while (true) {
 
         AdminCommands::showAdminControlPanel();
 
+        try{
+            ServerController::getRpc()->setGameMode(1);
+        }catch(\Exception $e){
+        }
+
+        ServerController::getRpc()->setTimeAttackLimit(120000);
+
         while (true) {
             Timer::startCycle();
 
@@ -118,8 +126,7 @@ while (true) {
             usleep(Timer::getNextCyclePause());
         }
     } catch (PDOException $pdoe) {
-        Log::error("Connection to database failed. Please make sure your MySQL server is running.");
-        exit(1);
+        Log::error("Connection to database failed. Please make sure your MySQL server is running. $pdoe");
     } catch (\Exception $e) {
         echo "FATAL ERROR RESTARTING: $e\n";
         continue;

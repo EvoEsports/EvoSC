@@ -151,4 +151,13 @@ class Player extends Model
     {
         return $this->hasGroup([Group::PLAYER]);
     }
+
+    public static function console(): Player
+    {
+        $player = new Player();
+        $player->Login = 'console';
+        $player->NickName = 'console';
+        $player->group = Group::find(1);
+        return $player;
+    }
 }

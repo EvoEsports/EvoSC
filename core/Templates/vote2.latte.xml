@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="Vote" version="3">
+<frame pos="-160 -15" scale="0.8">
+    <quad pos="0 0" z-index="-1" size="50 20" bgcolor="0009"/>
+    <label pos="2 -2" z-index="1" size="49 2.8" text="{$message}" textsize="1"/>
+    <label pos="49 -2" z-index="1" size="49 2.8" text="{$timeleft}s" halign="right" textsize="1"/>
+    <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
+    <quad pos="0 -6.5" z-index="2" size="50 0.2" bgcolor="18f9"/>
+    <gauge pos="49 -8" z-index="0" size="48 1.5" ratio="1.0" style="BgCard" color="1eff" halign="right" drawbg="0" id="tleft"/>
+
+    <label pos="5 -12" z-index="1" size="49 2.8" halign="center" text="YES" textsize="0.8"/>
+    <quad pos="10 -12.5" z-index="1" size="{$yes} 1" bgcolor="18f8"/>
+    <label pos="5 -16" z-index="1" size="49 2.8" halign="center" text="NO" textsize="0.8"/>
+    <quad pos="10 -16.5" z-index="1" size="{$no} 1" bgcolor="f118"/>
+
+    <script><!--
+    main() {
+        declare gauge <=> (Page.MainFrame.GetFirstChild("tleft") as CMlGauge);
+        declare Real timeleft = 1.0;
+
+        log("Started vote");
+
+        while(timeleft > 0){
+            sleep(100);
+            timeleft = timeleft - 0.005;
+            gauge.SetRatio(timeleft);
+        }
+    }
+    --></script>
+</frame>
+</manialink>
