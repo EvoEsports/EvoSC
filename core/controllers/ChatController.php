@@ -162,7 +162,7 @@ $$: Writes a dollarsign
 
     public static function messageAllNew(...$parts)
     {
-        foreach (PlayerController::getPlayers() as $player) {
+        foreach (onlinePlayers() as $player) {
             self::messageNew($player, ...$parts);
         }
     }

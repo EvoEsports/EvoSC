@@ -27,7 +27,7 @@ class AdminCommands
 
     public static function showAdminControlPanel(...$vars)
     {
-        $admins = PlayerController::getPlayers()->filter(function (Player $ply) {
+        $admins = onlinePlayers()->filter(function (Player $ply) {
             return $ply->isAdmin();
         });
 

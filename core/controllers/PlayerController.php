@@ -15,7 +15,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class PlayerController
 {
-    private static $players;
     private static $lastManialinkHash;
 
     public static function initialize()
@@ -28,8 +27,6 @@ class PlayerController
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
         ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
-
-        self::$players = new Collection();
     }
 
     private static function createTables()
@@ -40,42 +37,32 @@ class PlayerController
             $table->string('NickName')->default("unset");
             $table->integer('Visits')->default(0);
             $table->integer('Group')->default(4);
-            $table->integer('LastScore')->default(0);
+            $table->integer('Score')->default(0);
             $table->boolean('Online')->default(false);
+            $table->integer('Afk')->default(0);
+            $table->boolean('Spectator')->default(false);
         });
-    }
-
-    public static function hasPlayers(): bool
-    {
-        return count(self::$players ?: []) > 0;
     }
 
     public static function toggleAfk(Player $player)
     {
-        if (!isset($player->afk)) {
-            $player->afk = true;
-        }
-
-        $player->afk = !$player->afk;
-
+        $player->update(['Afk' => $player->Afk]);
         self::displayPlayerlist();
     }
 
     public static function getPlayers(): Collection
     {
-        return self::$players;
+        return Player::whereOnline(true);
     }
 
     public static function playerConnect(Player $player): Player
     {
+        $player->setOnline();
         $player->increment('Visits');
 
-        if (!$player->Online) {
-            $player->setOnline();
-            $player->setScore(0);
-        }
+        Log::info($player->NickName . " joined the server.");
 
-        self::getPlayers()->add($player);
+        ChatController::messageAllNew($player->group, ' ', $player, ' joined the server');
 
         self::displayPlayerlist();
 
@@ -86,7 +73,7 @@ class PlayerController
     {
         if ($score > 0) {
             $player->setScore($score);
-            Log::info($player->nick() . " finished with time ($score) " . $player->getTime());
+            Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
             self::displayPlayerlist();
         }
 
@@ -100,69 +87,49 @@ class PlayerController
     {
         if ($player == null) {
             Log::info('SERVER SHUTTING DOWN');
-            Log::info('SERVER SHUTTING DOWN');
-            Log::info('SERVER SHUTTING DOWN');
             exit(0);
         }
 
-        Log::info($player->nick(true) . " left the server [$disconnectReason].");
+        Log::info($player->NickName . " left the server [$disconnectReason].");
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
-        ChatController::messageAll('$%s%s $z$s$%sleft the server', config('color.secondary'), $player->NickName, config('color.primary'));
+        ChatController::messageAllNew($player, ' left the server');
     }
 
     public static function playerInfoChanged($infoplayerInfo)
     {
         foreach ($infoplayerInfo as $info) {
-            $player = self::getPlayerByLogin($info['Login']);
-
-            if (!$player) {
-                $player = Player::firstOrCreate(['Login' => $info['Login']]);
-                $player->update($info);
-            }
+            $player = Player::firstOrCreate(['Login' => $info['Login']]);
+            $player->update($info);
 
             if (!$player->Online) {
-                $player->setOnline();
-                $player->increment('Visits');
-                self::$players = self::getPlayers()->add($player)->unique();
-
-                Log::info($player->nick(true) . " joined the server.");
-                ChatController::messageAll('$%s%s $%s%s $z$s$%sjoined the server',
-                    config('color.primary'), $player->group->Name, config('color.secondary'), $player->nick(),
-                    config('color.primary'));
+                self::playerConnect($player);
             }
 
-            $player->update($info);
             $player->setIsSpectator($info['SpectatorStatus'] > 0);
         }
 
         self::displayPlayerlist();
     }
 
-    public static function getPlayerByLogin(string $login): ?Player
-    {
-        $player = self::getPlayers()->where('Login', $login)->first();
-        return $player;
-    }
-
     public static function displayPlayerlist()
     {
-        $players = self::getPlayers()->where('LastScore', '>', 0)->sort(function (Player $a, Player $b) {
-            if ($a->LastScore < $b->LastScore) {
+        $players = onlinePlayers()->where('Score', '>', 0)->sort(function (Player $a, Player $b) {
+            if ($a->Score < $b->Score) {
                 return -1;
-            } else if ($a->LastScore > $b->LastScore) {
+            } else if ($a->Score > $b->Score) {
                 return 1;
             }
 
             return 0;
         });
 
-        $playersNotFinished = self::getPlayers()->diff($players);
-
-        foreach ($playersNotFinished as $player) {
-            $players->add($player);
-        }
+//        $playersNotFinished = self::getPlayers()->diff($players);
+//
+//        foreach ($playersNotFinished as $player) {
+//            $players->add($player);
+//        }
 
         Template::showAll('players', ['players' => $players]);
     }

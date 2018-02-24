@@ -10,13 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'LastScore', 'Online'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'Spectator'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
-
-    public $spectator = false;
-    public $afk = false;
 
     /**
      * Returns nickname of player, stripped of colors if true
@@ -40,10 +37,10 @@ class Player extends Model
     public function getTime(bool $asMilliseconds = false)
     {
         if ($asMilliseconds) {
-            return $this->LastScore;
+            return $this->Score ?: 0;
         }
 
-        return formatScore($this->LastScore ?: 0);
+        return formatScore($this->Score ?: 0);
     }
 
     /**
@@ -52,9 +49,14 @@ class Player extends Model
      */
     public function setScore($score)
     {
-        $this->update(['LastScore' => $score]);
+        $this->update(['Score' => $score]);
     }
 
+    /**
+     * Checks if a player exists by login
+     * @param string $login
+     * @return bool
+     */
     public static function exists(string $login)
     {
         $player = self::whereLogin($login)->first();
@@ -64,10 +66,12 @@ class Player extends Model
     /**
      * Set spectator status
      * @param bool $isSpectator
+     * @return Player
      */
-    public function setIsSpectator(bool $isSpectator)
+    public function setIsSpectator(bool $isSpectator): Player
     {
-        $this->spectator = $isSpectator;
+        $this->update(['Spectator' => $isSpectator]);
+        return $this;
     }
 
     /**
@@ -76,7 +80,7 @@ class Player extends Model
      */
     public function isSpectator(): bool
     {
-        return $this->spectator > 0;
+        return $this->Spectator;
     }
 
     /**
@@ -105,7 +109,7 @@ class Player extends Model
      */
     public function hasFinished(): bool
     {
-        return $this->LastScore > 0;
+        return $this->Score > 0;
     }
 
     /**

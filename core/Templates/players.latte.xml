@@ -11,7 +11,7 @@
     <quad pos="0 -{$iterator->counter * 4 + 4.3}" size="8.4 3.8" z-index="0" bgcolor="05a8"/>
     {/if}
     <label pos="8 -{$iterator->counter * 4 + 6}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>
-    <label pos="9 -{$iterator->counter * 4 + 6}" z-index="1" size="13 3" text="{$player->getTime()}" textcolor="{$player->LastScore == 0 ? 'FFF9' : 'FFFF'}" textsize="1.2" valign="center" halign="left"/>
+    <label pos="9 -{$iterator->counter * 4 + 6}" z-index="1" size="13 3" text="{$player->getTime()}" textcolor="{$player->Score == 0 ? 'FFF9' : 'FFFF'}" textsize="1.2" valign="center" halign="left"/>
     <label pos="22 -{$iterator->counter * 4 + 6}" z-index="1" size="27 3" text="{$player->afk ? '$n$o$18fafk$z '.$player->NickName : $player->NickName}" textsize="1.2" valign="center" halign="left"/>
     {/foreach}
 

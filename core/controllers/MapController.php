@@ -76,7 +76,7 @@ class MapController
             self::setNext($request->map);
         }
 
-        foreach (PlayerController::getPlayers() as $player) {
+        foreach (Player::whereOnline(true) as $player) {
             $player->setScore(0);
         }
     }

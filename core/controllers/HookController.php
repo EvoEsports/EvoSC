@@ -62,7 +62,7 @@ class HookController
             $hook = 'PlayerInfoChanged';
         }
 
-        Log::hook("Hook called: $hook", true);
+        Log::hook("Hook called: $hook", false);
 
         $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
             return $value->getEvent() == $hook;
@@ -90,7 +90,7 @@ class HookController
                 //SPlayerInfo PlayerInfo
                 $players = new Collection();
                 foreach($arguments as $playerInfo){
-                    $players->add(PlayerController::getPlayerByLogin($playerInfo['Login']));
+                    $players->add(Player::find($playerInfo['Login']));
                 }
                 self::fireHookBatch($hooks, $players);
                 break;
@@ -106,25 +106,25 @@ class HookController
 
             case 'PlayerDisconnect':
                 //string Login, string DisconnectionReason
-                $player = PlayerController::getPlayerByLogin($arguments[0]);
+                $player = Player::find($arguments[0]);
                 self::fireHookBatch($hooks, $player, $arguments[1]);
                 break;
 
             case 'PlayerChat':
                 //int PlayerUid, string Login, string Text, bool IsRegistredCmd
-                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                $player = Player::find($arguments[1]);
                 self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3]);
                 break;
 
             case 'PlayerCheckpoint':
                 //int PlayerUid, string Login, int TimeOrScore, int CurLap, int CheckpointIndex
-                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                $player = Player::find($arguments[1]);
                 self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3], $arguments[4]);
                 break;
 
             case 'PlayerFinish':
                 //int PlayerUid, string Login, int TimeOrScore
-                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                $player = Player::find($arguments[1]);
                 if($player == null){
                     $player = Player::find($arguments[1]);
                 }
@@ -133,13 +133,13 @@ class HookController
 
             case 'PlayerIncoherence':
                 //int PlayerUid, string Login
-                $player = PlayerController::getPlayerByLogin($arguments['Login']);
+                $player = Player::find($arguments['Login']);
                 self::fireHookBatch($hooks, $player);
                 break;
 
             case 'PlayerManialinkPageAnswer':
                 //int PlayerUid, string Login, string Answer, SEntryVal Entries[]
-                $player = PlayerController::getPlayerByLogin($arguments[1]);
+                $player = Player::find($arguments[1]);
                 self::fireHookBatch($hooks, $player, $arguments[2]);
                 break;
         }

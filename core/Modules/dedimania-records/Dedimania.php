@@ -246,12 +246,12 @@ class Dedimania
     public static function printInfo(Player $callee)
     {
         $map = MapController::getCurrentMap();
-        $players = \esc\controllers\PlayerController::getPlayers();
+        $players = Player::whereOnline(true);
 
         foreach ($players as $player) {
             $dedi = $player->dedis()->whereMap($map->id)->first();
             if ($dedi) {
-                $string = sprintf('%s has dedi $fff%d. %s', stripColors($player->NickName), $dedi->Rank, ((int)$dedi->Score)/1000);
+                $string = sprintf('%s has dedi $fff%d. %s', stripColors($player->NickName), $dedi->Rank, ((int)$dedi->Score) / 1000);
                 ChatController::messageAll($string);
             }
         }

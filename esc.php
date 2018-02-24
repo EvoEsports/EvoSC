@@ -15,6 +15,7 @@ use esc\controllers\ModuleController;
 use esc\controllers\PlayerController;
 use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
+use esc\models\Player;
 
 include 'core/autoload.php';
 include 'vendor/autoload.php';
@@ -53,6 +54,11 @@ while (true) {
         function cacheDir(string $filename = ''): string
         {
             return __DIR__ . '\\cache\\' . $filename;
+        }
+
+        function onlinePlayers(): \Illuminate\Support\Collection
+        {
+            return Player::whereOnline(true)->get();
         }
 
         Log::info("Loading config files.");
@@ -99,10 +105,7 @@ while (true) {
         foreach (ServerController::getRpc()->getPlayerList() as $player) {
             $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
             $ply->update($player->toArray());
-
-            if ($ply) {
-                PlayerController::playerConnect($ply);
-            }
+            PlayerController::playerConnect($ply);
         }
 
         LocalRecords::displayLocalRecords();
@@ -111,9 +114,9 @@ while (true) {
 
         AdminCommands::showAdminControlPanel();
 
-        try{
+        try {
             ServerController::getRpc()->setGameMode(1);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
         }
 
         while (true) {
