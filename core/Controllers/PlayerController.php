@@ -3,7 +3,6 @@
 namespace esc\controllers;
 
 
-use esc\classes\Config;
 use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
@@ -17,16 +16,16 @@ class PlayerController
 {
     private static $lastManialinkHash;
 
-    public static function initialize()
+    public static function init()
     {
         self::createTables();
 
-        Hook::add('PlayerDisconnect', '\esc\controllers\PlayerController::playerDisconnect');
-        Hook::add('PlayerFinish', '\esc\controllers\PlayerController::playerFinish');
+        Hook::add('PlayerDisconnect', '\esc\Controllers\PlayerController::playerDisconnect');
+        Hook::add('PlayerFinish', '\esc\Controllers\PlayerController::playerFinish');
 
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
-        ChatController::addCommand('afk', '\esc\controllers\PlayerController::toggleAfk', 'Toggle AFK status');
+        ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
     }
 
     private static function createTables()
@@ -78,8 +77,8 @@ class PlayerController
         }
 
         if ($player->isSpectator()) {
-            ServerController::getRpc()->forceSpectator($player->Login, 2);
-            ServerController::getRpc()->forceSpectator($player->Login, 0);
+            Server::getRpc()->forceSpectator($player->Login, 2);
+            Server::getRpc()->forceSpectator($player->Login, 0);
         }
     }
 

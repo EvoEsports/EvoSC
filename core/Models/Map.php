@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\models;
+namespace esc\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +23,6 @@ class Map extends Model
     }
 
     public function author(){
-        return $this->hasOne('esc\models\Player', 'Login', 'Author');
+        return $this->hasOne('esc\Models\Player', 'Login', 'Author');
     }
 }

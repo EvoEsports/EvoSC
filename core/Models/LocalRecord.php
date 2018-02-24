@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\models;
+namespace esc\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -12,10 +12,10 @@ class LocalRecord extends Model
     public $timestamps = false;
 
     public function player(){
-        return $this->hasOne('esc\models\Player', 'Login', 'player');
+        return $this->hasOne('esc\Models\Player', 'Login', 'player');
     }
 
     public function map(){
-        return $this->hasOne('esc\models\Map', 'UId', 'map');
+        return $this->hasOne('esc\Models\Map', 'UId', 'map');
     }
 }

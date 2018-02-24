@@ -1,9 +1,8 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
 
-use esc\controllers\ServerController;
 use esc\controllers\TemplateController;
 use esc\models\Player;
 
@@ -25,13 +24,13 @@ class Template
         }
 
         $xml = TemplateController::getTemplate($index, $values);
-        ServerController::getRpc()->sendDisplayManialinkPage('', $xml);
+        Server::getRpc()->sendDisplayManialinkPage('', $xml);
     }
 
     public static function hideAll(string $index)
     {
         $xml = TemplateController::getBlankTemplate($index);
-        ServerController::getRpc()->sendDisplayManialinkPage('', $xml);
+        Server::getRpc()->sendDisplayManialinkPage('', $xml);
     }
 
     public static function show(Player $player, string $index, array $values = null)
@@ -41,13 +40,13 @@ class Template
         }
 
         $xml = TemplateController::getTemplate($index, $values);
-        ServerController::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
+        Server::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
     }
 
     public static function hide(Player $player, string $index)
     {
         $xml = TemplateController::getBlankTemplate($index);
-        ServerController::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
+        Server::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
     }
 
     public static function add(string $index, string $template = null)

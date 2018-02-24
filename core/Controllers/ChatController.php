@@ -4,18 +4,16 @@ namespace esc\controllers;
 
 
 use esc\classes\ChatCommand;
-use esc\classes\Config;
 use esc\classes\File;
 use esc\classes\Log;
 use esc\classes\Module;
+use esc\classes\Server;
 use esc\classes\Template;
 use esc\models\Group;
 use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
-use Maniaplanet\DedicatedServer\Xmlrpc\UnknownPlayerException;
-use Symfony\Component\Translation\Tests\StringClass;
 
 class ChatController
 {
@@ -35,17 +33,17 @@ $$: Writes a dollarsign
     private static $pattern;
     private static $chatCommands;
 
-    public static function initialize()
+    public static function init()
     {
         self::$chatCommands = new Collection();
 
-        ServerController::call('ChatEnableManualRouting', [true, false]);
+        Server::call('ChatEnableManualRouting', [true, false]);
 
-        HookController::add('PlayerChat', 'esc\controllers\ChatController::playerChat');
+        HookController::add('PlayerChat', 'esc\Controllers\ChatController::playerChat');
 
         Template::add('help', File::get('core/Templates/help.latte.xml'));
 
-        self::addCommand('help', '\esc\controllers\ChatController::showHelp', 'Show this help');
+        self::addCommand('help', '\esc\Controllers\ChatController::showHelp', 'Show this help');
     }
 
     private static function getChatCommands(): Collection
@@ -101,7 +99,7 @@ $$: Writes a dollarsign
 
         echo "$chatText\n";
 
-        ServerController::call('ChatSendServerMessage', [$chatText]);
+        Server::call('ChatSendServerMessage', [$chatText]);
     }
 
     private static function executeChatCommand(Player $player, string $text): bool
@@ -204,7 +202,7 @@ $$: Writes a dollarsign
             $message .= $part;
         }
 
-        ServerController::getRpc()->chatSendServerMessage($message, $recipient->Login);
+        Server::getRpc()->chatSendServerMessage($message, $recipient->Login);
     }
 
     public static function message(Player $player, string $formatString, ...$arguments)
@@ -215,7 +213,7 @@ $$: Writes a dollarsign
 
         try {
             if (isset($player->Login) && $player->Online) {
-                ServerController::getRpc()->chatSendServerMessage('$' . $primaryColor . $message, $player->Login);
+                Server::getRpc()->chatSendServerMessage('$' . $primaryColor . $message, $player->Login);
             }
         } catch (FaultException $e) {
             Log::error($e);

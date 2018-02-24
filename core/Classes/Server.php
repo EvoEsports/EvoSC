@@ -1,18 +1,17 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Classes;
 
 
-use esc\classes\Log;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\Structures\Map;
 use Maniaplanet\DedicatedServer\Xmlrpc\GameModeException;
 
-class ServerController
+class Server
 {
     private static $rpc;
 
-    public static function initialize($host, $port, $timeout, $login, $password)
+    public static function init($host, $port, $timeout, $login, $password)
     {
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();

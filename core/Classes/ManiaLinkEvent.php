@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
 
 use esc\models\Player;

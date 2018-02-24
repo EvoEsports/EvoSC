@@ -1,10 +1,8 @@
 <?php
 
-namespace esc\models;
+namespace esc\Models;
 
 
-use esc\classes\Timer;
-use esc\controllers\PlayerController;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
@@ -118,12 +116,12 @@ class Player extends Model
      */
     public function locals()
     {
-        return $this->hasMany('esc\models\LocalRecord', 'Player', 'id');
+        return $this->hasMany('esc\Models\LocalRecord', 'Player', 'id');
     }
 
     public function group()
     {
-        return $this->hasOne('esc\models\Group', 'id', 'Group');
+        return $this->hasOne('esc\Models\Group', 'id', 'Group');
     }
 
     public function hasGroup(array $groups)

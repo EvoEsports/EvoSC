@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -10,7 +10,7 @@ class Database
 {
     private static $capsule;
 
-    public static function initialize()
+    public static function init()
     {
         self::connect();
     }

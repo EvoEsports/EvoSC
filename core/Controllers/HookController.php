@@ -27,7 +27,7 @@ class HookController
         'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
     ];
 
-    public static function initialize()
+    public static function init()
     {
         self::$hooks = new Collection();
     }
@@ -55,7 +55,7 @@ class HookController
         }
     }
 
-    private static function fire(string $hook, $arguments = null)
+    public static function fire(string $hook, $arguments = null)
     {
         if($hook == 'ManiaPlanet.PlayerInfoChanged'){
             PlayerController::playerInfoChanged($arguments);

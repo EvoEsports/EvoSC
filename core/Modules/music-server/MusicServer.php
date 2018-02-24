@@ -80,7 +80,7 @@ class MusicServer
     {
         $randomMusicFile = self::$music->random();
         $url = $randomMusicFile->url;
-        \esc\controllers\ServerController::getRpc()->setForcedMusic(true, $url);
+        \esc\classes\Server::getRpc()->setForcedMusic(true, $url);
     }
 
     /**
@@ -94,7 +94,7 @@ class MusicServer
             return;
         }
 
-        $songInformation = \esc\controllers\ServerController::getRpc()->getForcedMusic();
+        $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
 
         $song = self::getCurrentSong();
 

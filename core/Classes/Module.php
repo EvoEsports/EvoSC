@@ -1,12 +1,7 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
-
-use esc\controllers\ChatController;
-use esc\controllers\PlayerController;
-use esc\models\Group;
-use esc\models\Player;
 
 class Module
 {

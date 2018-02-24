@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
 
 use GuzzleHttp\Client;
@@ -11,9 +11,11 @@ class RestClient
     public static $serverName;
     public static $client;
 
-    public static function initialize()
+    public static function init(string $serverName)
     {
         self::$client = new Client();
+
+        self::$serverName = stripStyle(stripColors($serverName));
     }
 
     public static function getClient(): Client

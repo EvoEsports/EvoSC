@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\classes;
+namespace esc\Classes;
 
 
 class Log
@@ -22,20 +22,20 @@ class Log
         File::fileAppendLine($logFile, $line);
     }
 
-    public static function info($message)
+    public static function info($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Info: %s", $message), true);
+        self::logAddLine(sprintf(self::$prefix . " Info: %s", $message), $echo);
     }
 
-    public static function error($message)
+    public static function error($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " [!] ERROR: %s", $message), true);
+        self::logAddLine(sprintf(self::$prefix . " [!] ERROR: %s", $message), $echo);
         self::debug($message);
     }
 
-    public static function warning($message)
+    public static function warning($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Warning: %s", $message), true);
+        self::logAddLine(sprintf(self::$prefix . " Warning: %s", $message), $echo);
     }
 
     public static function hook($message, $echo = false)
@@ -43,9 +43,9 @@ class Log
         self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message), $echo);
     }
 
-    private static function debug($message)
+    private static function debug($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Debug: %s", $message));
+        self::logAddLine(sprintf(self::$prefix . " Debug: %s", $message), $echo);
     }
 
     public static function chat($nick, $message)

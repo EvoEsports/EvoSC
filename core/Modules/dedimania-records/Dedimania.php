@@ -9,7 +9,7 @@ use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
-use esc\controllers\ServerController;
+use esc\classes\Server;
 use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -137,9 +137,9 @@ class Dedimania
             'Tool' => 'EvoSC',
             'Version' => '0.9.3',
             'Packmask' => 'Stadium',
-            'ServerVersion' => ServerController::getRpc()->getVersion()->version,
-            'ServerBuild' => ServerController::getRpc()->getVersion()->build,
-            'Path' => ServerController::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
+            'ServerVersion' => Server::getRpc()->getVersion()->version,
+            'ServerBuild' => Server::getRpc()->getVersion()->build,
+            'Path' => Server::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
         Log::logAddLine($response, true);

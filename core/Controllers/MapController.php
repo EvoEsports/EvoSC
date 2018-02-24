@@ -8,9 +8,9 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
-use esc\classes\ManiaLinkEvent;
 use esc\classes\MapQueueItem;
 use esc\classes\RestClient;
+use esc\classes\Server;
 use esc\classes\Template;
 use esc\classes\Vote;
 use esc\models\Group;
@@ -28,7 +28,7 @@ class MapController
     private static $queue;
     private static $nextMap;
 
-    public static function initialize()
+    public static function init()
     {
         self::createTables();
 
@@ -38,12 +38,12 @@ class MapController
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
-        Hook::add('BeginMap', '\esc\controllers\MapController::beginMap');
-        Hook::add('EndMatch', '\esc\controllers\MapController::endMatch');
-        Hook::add('PlayerConnect', '\esc\controllers\MapController::displayMapWidget');
+        Hook::add('BeginMap', '\esc\Controllers\MapController::beginMap');
+        Hook::add('EndMatch', '\esc\Controllers\MapController::endMatch');
+        Hook::add('PlayerConnect', '\esc\Controllers\MapController::displayMapWidget');
 
-        ChatController::addCommand('skip', '\esc\controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
-        ChatController::addCommand('add', '\esc\controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', [Group::ADMIN, Group::SUPER]);
+        ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
+        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', [Group::ADMIN, Group::SUPER]);
     }
 
     private static function createTables()
@@ -86,19 +86,14 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->update(ServerController::getCurrentMapInfo()->toArray());
+        $map->update(Server::getCurrentMapInfo()->toArray());
 
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
 
         self::$currentMap = $map;
 
-        if (self::$nextMap && $map->FileName != self::$nextMap->FileName) {
-            Log::warning("Skipping incompatible map " . self::$nextMap->Name);
-            ChatController::messageAllNew('Skipping map ', self::$nextMap);
-        }
-
-        $nextMap = Map::where('FileName', ServerController::getNextMapInfo()->fileName)->first();
+        $nextMap = Map::where('FileName', Server::getNextMapInfo()->fileName)->first();
         self::$nextMap = $nextMap;
 
         self::displayMapWidget();
@@ -140,7 +135,7 @@ class MapController
      */
     public static function setNext(Map $map = null)
     {
-        ServerController::getRpc()->chooseNextMap($map->FileName);
+        Server::getRpc()->chooseNextMap($map->FileName);
         self::$nextMap = $map;
     }
 
@@ -152,7 +147,7 @@ class MapController
         self::setNext(self::getNext());
 
         try {
-            ServerController::getRpc()->nextMap();
+            Server::getRpc()->nextMap();
         } catch (FaultException $e) {
             Log::error("$e");
         }
@@ -167,7 +162,7 @@ class MapController
         $map = self::getQueue()->first()->map;
 
         if (!$map) {
-            $mapId = ServerController::getRpc()->getNextMapInfo()->uId;
+            $mapId = Server::getRpc()->getNextMapInfo()->uId;
             $map = Map::where('UId', $mapId)->first();
         }
 
@@ -235,12 +230,12 @@ class MapController
         foreach ($mapFiles as $mapFile) {
             $map = Map::where('FileName', $mapFile)->first();
             if (!$map) {
-                $mapInfo = ServerController::getMapInfo($mapFile)->toArray();
+                $mapInfo = Server::getMapInfo($mapFile)->toArray();
                 Map::create($mapInfo);
             }
 
             try {
-                ServerController::getRpc()->addMap($mapFile);
+                Server::getRpc()->addMap($mapFile);
             } catch (FileException $e) {
                 Log::error("Map $mapFile not found.");
             } catch (AlreadyInListException $e) {
@@ -304,7 +299,7 @@ class MapController
             'FileName' => $fileName
         ]);
 
-        ServerController::getRpc()->addMap($map->FileName);
+        Server::getRpc()->addMap($map->FileName);
 
         ChatController::messageAllNew('Admin added map ', $map);
     }
