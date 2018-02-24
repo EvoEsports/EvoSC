@@ -188,6 +188,11 @@ class Timer
         return formatScore($score);
     }
 
+    public static function stop(string $id)
+    {
+        self::$timers = self::$timers->diff(self::$timers->where('id', $id));
+    }
+
     /**
      * Creates a hash from the timer
      * @return string

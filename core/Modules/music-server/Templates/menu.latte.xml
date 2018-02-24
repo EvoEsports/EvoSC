@@ -12,13 +12,15 @@
         <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="ms.hidemenu"/>
 
         <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
-        <label pos="85 -12" z-index="0" size="40 5" text="Artist"/>
+        <label pos="55 -12" z-index="0" size="40 5" text="Artist"/>
+        <label pos="85 -12" z-index="0" size="40 5" text="Album"/>
         <label pos="150 -12" z-index="0" size="20 5" text="Next"/>
 
         {if count($songs)}
         {foreach $songs as $song}
-        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="79 5" textsize="1.8" valign="center" text=" {$song->title}"/>
-        <label pos="85 -{15 + $iterator->counter * 5}" z-index="0" size="45 5" textsize="1.8" valign="center" text="{$song->artist}"/>
+        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text=" {$song->title}"/>
+        <label pos="55 -{15 + $iterator->counter * 5}" z-index="0" size="40 5" textsize="1.8" valign="center" text="{$song->artist}"/>
+        <label pos="85 -{15 + $iterator->counter * 5}" z-index="0" size="30 5" textsize="1.8" valign="center" text="{$song->album}"/>
         <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="141 4.8" textsize="1.8" valign="center" halign="right" text="Juke  " textcolor="18fa" action="ms.juke,{md5($song->url)}"/>
         {/foreach}
         {/if}

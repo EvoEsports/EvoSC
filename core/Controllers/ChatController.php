@@ -195,7 +195,7 @@ $$: Writes a dollarsign
 
             if ($part instanceof Song) {
                 $message .= '$z$s$' . config('color.secondary');
-                $message .= $part->name;
+                $message .= $part->title;
                 continue;
             }
 

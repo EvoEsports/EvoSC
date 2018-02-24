@@ -50,6 +50,9 @@ class MusicServer
             $table->string('hash')->primary();
             $table->string('title')->default('unkown');
             $table->string('artist')->default('unkown');
+            $table->string('album')->nullable();
+            $table->string('year')->nullable();
+            $table->string('length')->nullable();
             $table->string('url')->unique();
             $table->timestamps();
         });
@@ -229,28 +232,37 @@ class MusicServer
 
                 try {
                     $song = Song::firstOrCreate([
-                        'title' => $songInfo['audio']['tags']['title'][0],
-                        'artist' => $songInfo['audio']['tags']['artist'][0],
-                        'album' => $songInfo['audio']['tags']['album'][0],
-                        'year' => $songInfo['audio']['tags']['date'][0],
+                        'title' => $songInfo['tags']['vorbiscomment']['title'][0],
+                        'artist' => $songInfo['tags']['vorbiscomment']['artist'][0],
+                        'album' => $songInfo['tags']['vorbiscomment']['album'][0],
+                        'year' => $songInfo['tags']['vorbiscomment']['date'][0],
                         'length' => $songInfo['playtime_string'],
                         'url' => $remoteUrl,
                         'hash' => md5($remoteUrl)
                     ]);
                 } catch (\Exception $e) {
-                    if (preg_match('/(.+) \- (.+)\.ogg/', $file, $matches)) {
+                    try{
                         $song = Song::firstOrCreate([
-                            'title' => $matches[2],
-                            'artist' => $matches[1],
+                            'title' => $songInfo['audio']['tags']['title'][0],
+                            'artist' => $songInfo['audio']['tags']['artist'][0],
+                            'album' => $songInfo['audio']['tags']['album'][0],
+                            'year' => $songInfo['audio']['tags']['date'][0],
+                            'length' => $songInfo['playtime_string'],
                             'url' => $remoteUrl,
                             'hash' => md5($remoteUrl)
                         ]);
-                    } else {
-                        $song = Song::firstOrCreate([
-                            'title' => preg_replace('/\.ogg$/', '', $file),
+                    }catch(\Exception $e){
+                        Log::warning("Could not get id3-tags for song: $file");
+                        var_dump([
+                            'title' => $songInfo['tags']['vorbiscomment']['title'][0],
+                            'artist' => $songInfo['tags']['vorbiscomment']['artist'][0],
+                            'album' => $songInfo['tags']['vorbiscomment']['album'][0],
+                            'year' => $songInfo['tags']['vorbiscomment']['date'][0],
+                            'length' => $songInfo['playtime_string'],
                             'url' => $remoteUrl,
                             'hash' => md5($remoteUrl)
                         ]);
+                        continue;
                     }
                 }
             }

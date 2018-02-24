@@ -19,10 +19,22 @@ class AdminCommands
 
         ManiaLinkEvent::add('ac.replay', 'AdminCommands::forceReplayAtEnd');
         ManiaLinkEvent::add('ac.skip', 'AdminCommands::forceSkipMap');
+        ManiaLinkEvent::add('ac.stopvote', 'AdminCommands::stopVote');
+        ManiaLinkEvent::add('ac.approvevote', 'AdminCommands::approveVote');
 
         Hook::add('BeginMap', 'AdminCommands::showAdminControlPanel');
         Hook::add('EndMatch', 'AdminCommands::hideAdminControlPanel');
         Hook::add('PlayerConnect', 'AdminCommands::showAdminControlPanel');
+    }
+
+    public static function stopVote(Player $player)
+    {
+        \esc\Classes\Vote::stopVote($player);
+    }
+
+    public static function approveVote(Player $player)
+    {
+        \esc\Classes\Vote::approveVote($player);
     }
 
     public static function showAdminControlPanel(...$vars)
@@ -64,6 +76,6 @@ class AdminCommands
 
         MapController::goToNextMap();
 
-        ChatController::messageAllNew($callee->group, ' ', $callee, ' skips map');
+        ChatController::messageAllNew($callee, ' skips map');
     }
 }

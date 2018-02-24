@@ -20,6 +20,7 @@ class CPRecords
 
         Hook::add('EndMatch', 'CPRecords::clearCheckpoints');
         Hook::add('PlayerCheckpoint', 'CPRecords::playerCheckpoint');
+        Hook::add('PlayerConnect', 'CPRecords::playerConnect');
     }
 
     public static function clearCheckpoints(...$args)
@@ -50,11 +51,16 @@ class CPRecords
         self::showCheckpointRecords();
     }
 
+    public static function playerConnect()
+    {
+        self::showCheckpointRecords();
+    }
+
     public static function showCheckpointRecords(bool $clear = false)
     {
         $cps = new Collection();
 
-        if(!$clear){
+        if (!$clear) {
             $columns = config('cpr.columns');
 
             foreach (self::$checkpoints as $checkpoint) {

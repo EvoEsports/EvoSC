@@ -136,7 +136,7 @@ class Dedimania
             'Login' => Config::get('dedimania.login'),
             'Code' => Config::get('dedimania.key'),
             'Tool' => 'EvoSC',
-            'Version' => '0.9.3',
+            'Version' => '0.10.4',
             'Packmask' => 'Stadium',
             'ServerVersion' => Server::getRpc()->getVersion()->version,
             'ServerBuild' => Server::getRpc()->getVersion()->build,

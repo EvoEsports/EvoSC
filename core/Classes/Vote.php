@@ -179,13 +179,26 @@ class Vote
         Template::hideAll('vote');
     }
 
-    public static function stopVote()
+    public static function stopVote(Player $player = null)
     {
+        if($player){
+            ChatController::messageAllNew($player, ' stops vote');
+        }
+
+        Timer::stop('vote.finish');
+
         self::$inProgress = false;
         self::$starter = null;
         self::$message = null;
         self::$action = null;
         self::$votes = null;
         self::hideVote();
+    }
+
+    public static function approveVote(Player $player)
+    {
+        ChatController::messageAllNew($player, ' approves vote');
+        call_user_func(self::$action);
+        self::stopVote();
     }
 }
