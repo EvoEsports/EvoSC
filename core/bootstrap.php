@@ -38,6 +38,8 @@ function startEsc()
     esc\classes\Vote::init();
     esc\controllers\ModuleController::init();
 
+    \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
+
     //Handle already connected players
     foreach (esc\classes\Server::getRpc()->getPlayerList() as $player) {
         $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
