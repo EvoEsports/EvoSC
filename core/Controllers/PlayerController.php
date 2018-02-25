@@ -56,14 +56,16 @@ class PlayerController
         return Player::whereOnline(true)->get();
     }
 
-    public static function playerConnect(Player $player): Player
+    public static function playerConnect(Player $player, bool $surpressJoinMessage = false): Player
     {
         $player->setOnline();
         $player->increment('Visits');
 
         Log::info($player->NickName . " joined the server.");
 
-        ChatController::messageAllNew($player->group, ' ', $player, ' joined the server');
+        if(!$surpressJoinMessage){
+            ChatController::messageAllNew($player->group, ' ', $player, ' joined the server');
+        }
 
         self::displayPlayerlist();
 

@@ -44,7 +44,7 @@ function startEsc()
     foreach (esc\classes\Server::getRpc()->getPlayerList() as $player) {
         $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
         $ply->update($player->toArray());
-        esc\controllers\PlayerController::playerConnect($ply);
+        esc\controllers\PlayerController::playerConnect($ply, true);
     }
 }
 
