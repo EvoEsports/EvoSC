@@ -14,6 +14,7 @@ class TimeWidget
         Template::add('time-widget', File::get(__DIR__ . '/Templates/time-widget.latte.xml'));
 
         Hook::add('PlayerConnect', 'TimeWidget::show');
+        Hook::add('EndMatch', 'TimeWidget::hide');
 
         ManiaLinkEvent::add('tw.addTime', 'TimeWidget::addTime');
         ManiaLinkEvent::add('tw.requestMoreTime', 'TimeWidget::requestMoreTime');
@@ -28,6 +29,11 @@ class TimeWidget
         } else {
             Template::showAll('time-widget');
         }
+    }
+
+    public static function hide()
+    {
+        Template::hideAll('time-widget');
     }
 
     public static function addTime(Player $player)

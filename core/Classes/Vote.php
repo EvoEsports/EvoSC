@@ -171,7 +171,7 @@ class Vote
 
             $timeleft = (self::$startTime + self::VOTE_TIME) - time();
 
-            Template::showAll('vote', ['message' => self::$message, 'yes' => $yes, 'no' => $no, 'voteDuration' => self::VOTE_TIME, 'timeLeft' => $timeleft]);
+            Template::showAll('vote', ['message' => self::$message, 'yes' => $yes, 'no' => $no, 'yesN' => $yesVotes, 'noN' => $noVotes, 'voteDuration' => self::VOTE_TIME, 'timeLeft' => $timeleft]);
         }
     }
 

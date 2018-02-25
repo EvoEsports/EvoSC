@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" version="3">
 <frame pos="-160 -15" scale="0.8">
-    <quad pos="0 0" z-index="-1" size="50 20" bgcolor="0009"/>
+    <quad pos="0 0" z-index="-2" size="50 16" style="Bgs1" substyle="BgDialogBlur"/>
     <label pos="2 -2" z-index="1" size="49 2.8" text="{$message}" textsize="1"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
-    <quad pos="0 -6.5" z-index="2" size="50 0.2" bgcolor="18f9"/>
-    <gauge pos="48 -8" z-index="0" size="46 1.5" ratio="1.0" style="BgCard" color="1eff" halign="right" drawbg="0" id="tleft"/>
+    <quad pos="50 -6.5" z-index="2" size="50 .2" bgcolor="0006" halign="right"/>
+    <quad pos="50 -6.5" z-index="3" size="50 .2" bgcolor="18fc" halign="right" id="sep"/>
 
-    <label pos="5 -12" z-index="1" size="49 2.8" halign="center" text="YES" textsize="0.7"/>
-    <quad pos="10 -12.5" z-index="1" size="{$yes} 1" bgcolor="18f8"/>
-    <label pos="5 -16" z-index="1" size="49 2.8" halign="center" text="NO" textsize="0.7"/>
-    <quad pos="10 -16.5" z-index="1" size="{$no} 1" bgcolor="f118"/>
+    <label pos="2 -9" z-index="1" size="49 2.8" halign="left" text="[{$yesN}] yes" valign="center" textsize="0.6"/>
+    <quad pos="11 -8.8" z-index="1" size="{$yes} 0.5" bgcolor="18f9"/>
+    <label pos="2 -13" z-index="1" size="49 2.8" halign="left" text="[{$noN}] no" valign="center" textsize="0.6"/>
+    <quad pos="11 -12.8" z-index="1" size="{$no} 0.5" bgcolor="f119"/>
 
     <script><!--
     main() {
-        declare gauge <=> (Page.MainFrame.GetFirstChild("tleft") as CMlGauge);
+        declare qq <=> (Page.MainFrame.GetFirstChild("sep") as CMlQuad);
         declare Integer timeEnd = CurrentTime + {$timeLeft}000;
         declare Integer voteDuration = {$voteDuration}000;
-        declare Real ratio = 1.0;
+        declare Real size = 50.0;
 
         while(timeEnd > (CurrentTime + 1)){
             yield;
-            ratio = (((timeEnd - CurrentTime) * 1.0) / voteDuration);
-            gauge.SetRatio(ratio);
+            qq.Size = <((((timeEnd - CurrentTime) * 1.0) / voteDuration) * size),.2>;
         }
     }
     --></script>
