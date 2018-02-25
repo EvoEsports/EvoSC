@@ -26,7 +26,6 @@ class MapController
 {
     private static $currentMap;
     private static $queue;
-    private static $nextMap;
     private static $addedTime = 0;
 
     public static function init()
@@ -82,16 +81,16 @@ class MapController
      * @param $rankings
      * @param $winnerteam
      */
-    public static function endMatch($rankings, $winnerteam)
+    public static function endMatch($rankings = null, $winnerteam = null)
     {
-        $request = self::getQueue()->shift();
+        $request = self::$queue->shift();
 
-        if (isset($request->map)) {
+        if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
-            self::setNext($request->map);
-            ChatController::messageAllNew('Next map: ', self::getNext(), ' as requested by ', $request->issuer);
+            Server::getRpc()->chooseNextMap($request->map->FileName);
+            ChatController::messageAllNew('Next map: ', $request->map, ' as requested by ', $request->issuer);
         } else {
-            ChatController::messageAllNew('Next map: ', self::getNext());
+            ChatController::messageAllNew('Next map: ', $request->map);
         }
 
         foreach (Player::whereOnline(true) as $player) {
@@ -110,10 +109,6 @@ class MapController
         $map->update(['LastPlayed' => Carbon::now()]);
 
         self::$currentMap = $map;
-
-        $nextMap = Map::where('FileName', Server::getNextMapInfo()->fileName)->first();
-        self::$nextMap = $nextMap;
-
         self::displayMapWidget();
     }
 
@@ -132,7 +127,7 @@ class MapController
      */
     public static function getQueue(): Collection
     {
-        return self::$queue->sortBy('time');
+        return self::$queue->sortBy('timeRequested');
     }
 
     /**
@@ -148,27 +143,11 @@ class MapController
     }
 
     /**
-     * Sets the next map on the server
-     * @param Map|null $map
-     */
-    public static function setNext(Map $map = null)
-    {
-        Server::getRpc()->chooseNextMap($map->FileName);
-        self::$nextMap = $map;
-    }
-
-    /**
      * Ends the match and goes to the next round
      */
     public static function goToNextMap()
     {
-        self::setNext(self::getNext());
-
-        try {
-            Server::getRpc()->nextMap();
-        } catch (FaultException $e) {
-            Log::error("$e");
-        }
+        Server::getRpc()->nextMap();
     }
 
     /**
@@ -301,7 +280,7 @@ class MapController
 
             $map = Map::where('MxId', $mxId)->first();
             if ($map) {
-                ChatController::messageAllNew($map,' already exists');
+                ChatController::messageAllNew($map, ' already exists');
                 continue;
             }
 
