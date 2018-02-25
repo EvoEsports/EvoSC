@@ -27,6 +27,7 @@ class MapController
     private static $currentMap;
     private static $queue;
     private static $nextMap;
+    private static $addedTime = 0;
 
     public static function init()
     {
@@ -60,6 +61,20 @@ class MapController
             $table->boolean('LapRace')->nullable();
             $table->dateTime('LastPlayed')->nullable();
         });
+    }
+
+    public static function addTime(int $minutes = 5)
+    {
+        self::$addedTime = self::$addedTime + $minutes;
+        $totalNewTime = (config('server.roundTime', 7) + self::$addedTime) * 60;
+        self::updateRoundtime($totalNewTime);
+    }
+
+    private static function updateRoundtime(int $timeInSeconds)
+    {
+        $settings = \esc\Classes\Server::getRpc()->getModeScriptSettings();
+        $settings['S_TimeLimit'] = $timeInSeconds;
+        \esc\Classes\Server::getRpc()->setModeScriptSettings($settings);
     }
 
     /**

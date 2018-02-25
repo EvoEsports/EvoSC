@@ -38,6 +38,10 @@ function startEsc()
     esc\classes\Vote::init();
     esc\controllers\ModuleController::init();
 
+    $settings = \esc\Classes\Server::getRpc()->getModeScriptSettings();
+    $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
+    \esc\Classes\Server::getRpc()->setModeScriptSettings($settings);
+
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 
     //Handle already connected players

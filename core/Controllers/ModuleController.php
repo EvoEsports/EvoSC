@@ -81,7 +81,7 @@ class ModuleController
 
                 self::$loadedModules->push($module);
 
-                Log::info("Loaded module $item");
+                Log::info("## Loaded module $item");
             } catch (\Exception $e) {
                 Log::error("Could not load module $item: $e");
             }

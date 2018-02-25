@@ -35,6 +35,7 @@ class Vote
         Template::add('vote', File::get('core/Templates/vote.latte.xml'));
 
         ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
+        ChatController::addCommand('res', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
         ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
         ChatController::addCommand('y', 'esc\classes\Vote::voteYes', 'Vote yes');
         ChatController::addCommand('n', 'esc\classes\Vote::voteNo', 'Vote no');
@@ -87,7 +88,7 @@ class Vote
 
         self::$votes = new Collection();
         self::$inProgress = true;
-        self::$message = 'Replay map?';
+        self::$message = 'Play for another 5 minutes?';
         self::$startTime = time();
         self::$action = 'esc\classes\Vote::doReplay';
         self::$starter = $player;
@@ -96,7 +97,7 @@ class Vote
 
         Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
 
-        ChatController::messageAllNew($player, ' is asking for a replay. Type /y or /n to vote.');
+        ChatController::messageAllNew($player, ' is asking for more time. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -126,7 +127,7 @@ class Vote
 
     public static function doReplay()
     {
-        MapController::forceReplay(Player::console());
+        MapController::addTime();
     }
 
     public static function doSkip()
@@ -181,7 +182,7 @@ class Vote
 
     public static function stopVote(Player $player = null)
     {
-        if($player){
+        if ($player) {
             ChatController::messageAllNew($player, ' stops vote');
         }
 
