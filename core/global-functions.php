@@ -17,7 +17,7 @@ function stripColors(string $colored): string
 
 function stripStyle(string $styled, bool $keepLinks = false): string
 {
-    if($keepLinks){
+    if ($keepLinks) {
         return preg_replace('/\$[iwngo]/', '', $styled);
     }
 
@@ -37,4 +37,14 @@ function cacheDir(string $filename = ''): string
 function onlinePlayers(): \Illuminate\Support\Collection
 {
     return esc\models\Player::whereOnline(true)->get();
+}
+
+function finishPlayers(): \Illuminate\Support\Collection
+{
+    return esc\models\Player::where('Score', '>', 0)->get();
+}
+
+function cutZeroes(string $formattedScore): string
+{
+    return preg_replace('/^[0\:\.]+/', '', $formattedScore);
 }

@@ -13,7 +13,8 @@
         <quad pos="0 -{$iterator->counter * 4 + 3.3}" size="8.4 3.8" z-index="0" bgcolor="05a8"/>
         {/if}
         <label pos="8 -{$iterator->counter * 4 + 5}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>
-        <label pos="9 -{$iterator->counter * 4 + 5}" z-index="1" size="13 3" text="{formatScore($dedi->Score)}" textsize="1.2" valign="center" halign="left"/>
+        <label pos="21 -{$iterator->counter * 4 + 5}" z-index="0" size="13 3" text="{formatScore($dedi->Score)}" textcolor="cdff" opacity="0.3" textsize="1.2" valign="center" halign="right"/>
+        <label pos="21 -{$iterator->counter * 4 + 5}" z-index="1" size="13 3" text="{cutZeroes(formatScore($dedi->Score))}" textsize="1.2" valign="center" halign="right"/>
         <label pos="22 -{$iterator->counter * 4 + 5}" z-index="1" size="27 3" text="{stripStyle($dedi->player->NickName, true)}" textsize="1.1" valign="center" halign="left"/>
         {/foreach}
         {else}
