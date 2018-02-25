@@ -25,9 +25,9 @@ class MapList
     public static function showMapList(Player $player)
     {
         $maps = Map::all();
-        $queuedMaps = MapController::getQueue()->take(15);
+        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take(15);
 
-        Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => []]);
+        Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
     }
 
     public static function closeMapList(Player $player)

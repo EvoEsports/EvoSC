@@ -21,6 +21,7 @@ class HookController
         'ManiaPlanet.BeginMap' => 'BeginMap',
         'ManiaPlanet.EndMap' => 'EndMap',
         'ManiaPlanet.EndMatch' => 'EndMatch',
+        'ManiaPlanet.BeginMatch' => 'BeginMatch',
         'TrackMania.PlayerCheckpoint' => 'PlayerCheckpoint',
         'TrackMania.PlayerFinish' => 'PlayerFinish',
         'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
@@ -79,6 +80,11 @@ class HookController
                 //SMapInfo Map
                 $map = Map::where('FileName', $arguments[0]['FileName'])->first();
                 self::fireHookBatch($hooks, $map);
+                break;
+
+            case 'BeginMatch':
+                //SMapInfo Map
+                self::fireHookBatch($hooks);
                 break;
 
             case 'EndMatch':

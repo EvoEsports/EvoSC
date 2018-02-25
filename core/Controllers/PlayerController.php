@@ -63,7 +63,7 @@ class PlayerController
 
         Log::info($player->NickName . " joined the server.");
 
-        if(!$surpressJoinMessage){
+        if (!$surpressJoinMessage) {
             ChatController::messageAllNew($player->group, ' ', $player, ' joined the server');
         }
 
@@ -146,5 +146,10 @@ class PlayerController
         }
 
         Template::showAll('players', ['players' => $players]);
+    }
+
+    public static function hidePlayerlist()
+    {
+        Template::hideAll('players');
     }
 }

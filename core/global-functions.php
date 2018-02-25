@@ -15,8 +15,12 @@ function stripColors(string $colored): string
     return preg_replace('/(\$[0-9a-f]{3})/', '', $colored);
 }
 
-function stripStyle(string $styled): string
+function stripStyle(string $styled, bool $keepLinks = false): string
 {
+    if($keepLinks){
+        return preg_replace('/\$[iwngo]/', '', $styled);
+    }
+
     return preg_replace('/(\$[iwngo]|\$l\[.+\)?)/', '', $styled);
 }
 

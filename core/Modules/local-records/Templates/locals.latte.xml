@@ -14,7 +14,7 @@
     {/if}
     <label pos="8 -{$iterator->counter * 4 + 6}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>
     <label pos="9 -{$iterator->counter * 4 + 6}" z-index="1" size="13 3" text="{$local->getScore()}" textsize="1.2" valign="center" halign="left"/>
-    <label pos="22 -{$iterator->counter * 4 + 6}" z-index="1" size="27 3" text="{$local->player->NickName}" textsize="1.2" valign="center" halign="left"/>
+    <label pos="22 -{$iterator->counter * 4 + 6}" z-index="1" size="27 3" text="{stripStyle($local->player->NickName, true)}" textsize="1.2" valign="center" halign="left"/>
     {/foreach}
     {else}
     <label pos="2 -9" z-index="1" size="40 3" text="$iNo local records." textsize="0.8" halign="left"/>

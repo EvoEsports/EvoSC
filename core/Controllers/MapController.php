@@ -89,6 +89,9 @@ class MapController
         if (isset($request->map)) {
             Log::info("Try set next map: " . $request->map->Name);
             self::setNext($request->map);
+            ChatController::messageAllNew('Next map: ', self::getNext(), ' as requested by ', $request->issuer);
+        } else {
+            ChatController::messageAllNew('Next map: ', self::getNext());
         }
 
         foreach (Player::whereOnline(true) as $player) {

@@ -14,6 +14,7 @@ class TimeWidget
         Template::add('time-widget', File::get(__DIR__ . '/Templates/time-widget.latte.xml'));
 
         Hook::add('PlayerConnect', 'TimeWidget::show');
+        Hook::add('BeginMatch', 'TimeWidget::show');
         Hook::add('EndMatch', 'TimeWidget::hide');
 
         ManiaLinkEvent::add('tw.addTime', 'TimeWidget::addTime');

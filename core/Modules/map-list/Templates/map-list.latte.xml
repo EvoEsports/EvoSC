@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="MapList" version="3">
-<frame pos="0 0" scale="0.8">
+<frame pos="0 0" scale="0.85" id="main-frame">
     <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
     <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
     <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
@@ -31,8 +31,11 @@
         {/if}
 
         {if count($queuedMaps)}
-        {foreach $queuedMaps as $map}
-        <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text="{$map['map']->Name}"/>
+        {foreach $queuedMaps as $mapQueueItem}
+        <frame pos="140 -{12 + $iterator->counter * 8}">
+            <label pos="0 0" z-index="0" size="50 5" textsize="1.8" valign="center" text="{$mapQueueItem->map->Name}"/>
+            <label pos="0 -3" z-index="0" size="50 5" textsize=".7" valign="center" textcolor="cccc" text="Requested by {$mapQueueItem->issuer->NickName}"/>
+        </frame>
         {/foreach}
         {else}
         <label pos="140 -20" z-index="0" size="50 5" textsize="1.8" valign="center" text="No maps in queue"/>
@@ -42,5 +45,20 @@
         <label pos="{$i * 6 - 4} -98" z-index="0" size="5 5" textsize="1.8" textcolor="{0 == $i ? '19FF' : 'EEEF'}" valign="center" halign="center" text="{$i}" action="ms.menu.showpage,{$i}"/>
         {/for}
     </frame>
+
+    <script><!--
+    main() {
+        declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+        declare Real startScale = 0.85;
+        declare Real curScale = startScale;
+        declare Real targetScale = 0.81;
+
+        while(curScale > targetScale){
+            yield;
+            curScale = curScale - 0.007;
+            frame.Scale = curScale;
+        }
+    }
+    --></script>
 </frame>
 </manialink>
