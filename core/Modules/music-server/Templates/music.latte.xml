@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="SongInformation" version="3">
-<frame pos="120 23" scale="0.8">
+<frame pos="120 80" scale="0.8">
     <quad pos="0 0" z-index="-2" size="50 10" style="Bgs1" substyle="BgDialogBlur"/>
     <quad pos="0 0" z-index="-1" size="50 10" bgcolor="0001"/>
     <quad pos="40 0" z-index="0" size="10 10" bgcolor="18f3"/>

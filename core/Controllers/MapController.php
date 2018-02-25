@@ -284,41 +284,55 @@ class MapController
      */
     public static function addMap(string ...$arguments)
     {
-        $mxId = intval($arguments[2]);
+        $mxIds = $arguments;
 
-        if ($mxId == 0) {
-            Log::warning("Requested map with invalid id: " . $arguments[2]);
-            ChatController::messageAllNew("Requested map with invalid id: " . $arguments[2]);
-            return;
+        //shift first two entries so we get list of mx ids
+        array_shift($mxIds);
+        array_shift($mxIds);
+
+        foreach ($mxIds as $mxId) {
+            $mxId = (int)$mxId;
+
+            if ($mxId == 0) {
+                Log::warning("Requested map with invalid id: " . $mxId);
+                ChatController::messageAllNew("Requested map with invalid id: " . $mxId);
+                return;
+            }
+
+            $map = Map::where('MxId', $mxId)->first();
+            if ($map) {
+                ChatController::messageAllNew($map,' already exists');
+                continue;
+            }
+
+            $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
+
+            if ($response->getStatusCode() != 200) {
+                Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
+                ChatController::messageAllNew("Can not reach mania exchange.");
+                return;
+            }
+
+            if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
+                Log::warning('Not a valid GBX.');
+                return;
+            }
+
+            $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
+            $mapFolder = Config::get('server.maps');
+            File::put("$mapFolder/$fileName", $response->getBody());
+
+            $name = str_replace('.Map.Gbx', '', $fileName);
+
+            $map = Map::updateOrCreate([
+                'MxId' => $mxId,
+                'Name' => $name,
+                'FileName' => $fileName
+            ]);
+
+            Server::getRpc()->addMap($map->FileName);
+
+            ChatController::messageAllNew('New map added: ', $map);
         }
-
-        $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
-
-        if ($response->getStatusCode() != 200) {
-            Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-            ChatController::messageAllNew("Can not reach mania exchange.");
-            return;
-        }
-
-        if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
-            Log::warning('Not a valid GBX.');
-            return;
-        }
-
-        $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
-        $mapFolder = Config::get('server.maps');
-        File::put("$mapFolder/$fileName", $response->getBody());
-
-        $name = str_replace('.Map.Gbx', '', $fileName);
-
-        $map = Map::updateOrCreate([
-            'MxId' => $mxId,
-            'Name' => $name,
-            'FileName' => $fileName
-        ]);
-
-        Server::getRpc()->addMap($map->FileName);
-
-        ChatController::messageAllNew('Admin added map ', $map);
     }
 }

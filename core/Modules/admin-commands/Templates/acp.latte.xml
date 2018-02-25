@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="AdminControlPanel" version="3">
-<frame pos="120 14" scale="1">
+<frame pos="120 22" scale="1">
     <quad pos="0 0" z-index="-2" size="50 7" style="Bgs1" substyle="BgDialogBlur"/>
 
     <quad pos="3 -1.2" z-index="0" size="4.5 4.5" bgcolor="FFFA" style="Icons64x64_1" substyle="Refresh" action="ac.replay"/>
