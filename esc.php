@@ -18,7 +18,7 @@ while (true) {
 
         beginMap();
 
-//        \esc\controllers\ChatController::messageAllNew('ESC Started. Running version ', '$' . config('color.secondary') . '0.10.4');
+//        \esc\controllers\ChatController::messageAllNew('ESC Started. Running version ', '$' . config('color.secondary') . '0.11.0');
 
         while (true) {
             cycle();

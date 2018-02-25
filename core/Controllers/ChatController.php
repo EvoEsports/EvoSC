@@ -199,7 +199,19 @@ $$: Writes a dollarsign
                 continue;
             }
 
-            if (is_float($part) || is_int($part)) {
+            if ($part instanceof \LocalRecord) {
+                $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'local record $z$s$' . config('color.secondary') . formatScore($part->Score);
+                $message .= $part->title;
+                continue;
+            }
+
+            if ($part instanceof \Dedi) {
+                $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'dedimania record $z$s$' . config('color.secondary') . formatScore($part->Score);
+                $message .= $part->title;
+                continue;
+            }
+
+            if (is_float($part) || is_int($part) || preg_match('/\-?\d+\./', $part)) {
                 $message .= '$z$s$' . config('color.secondary');
                 $message .= $part;
                 continue;
