@@ -56,18 +56,24 @@ class LocalRecords
 
         if (self::playerHasLocal($map, $player)) {
             $local = $map->locals()->wherePlayer($player->id)->first();
+
+            if ($score == $local->Score) {
+                ChatController::messageAllNew('Player ', $player, ' equaled his/hers ', $local);
+                return;
+            }
+
             if ($score < $local->Score) {
                 $diff = $local->Score - $score;
                 $rank = self::getRank($map, $score);
 
                 if ($rank) {
                     self::pushDownRanks($map, $rank);
-                    $local = self::pushLocal($map, $player, $score, $rank);
+                    $local->update(['Score' => $score, 'Rank' => $rank]);
+                    ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score]);
+                    ChatController::messageAllNew('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
-
-                ChatController::messageAllNew($player, ' gained ', $local, ' (', formatScore(-$diff), ')');
             }
         } else {
             if ($localsCount < 100) {
@@ -78,12 +84,12 @@ class LocalRecords
                     if ($score < $worstLocal->Score) {
                         self::pushDownRanks($map, $rank);
                         $local = self::pushLocal($map, $player, $score, $rank);
-                        ChatController::messageAllNew($player, ' gained ', $local);
+                        ChatController::messageAllNew('Player ', $player, ' gained the ', $local);
                     }
                 } else {
                     $rank = 1;
                     $local = self::pushLocal($map, $player, $score, $rank);
-                    ChatController::messageAllNew($player, ' made ', $local);
+                    ChatController::messageAllNew('Player ', $player, ' made the ', $local);
                 }
             }
         }
@@ -105,18 +111,18 @@ class LocalRecords
 
     private static function pushDownRanks(Map $map, int $startRank)
     {
-        $map->locals()->where('Rank', '>=', $startRank)->increment('Rank');
+        $map->locals()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
     }
 
     private static function getRank(Map $map, int $score): ?int
     {
-        $nextBetter = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->get()->first();
+        $nextBetter = $map->locals->where('Score', '<=', $score)->sortByDesc('Score')->first();
 
         if ($nextBetter) {
             return $nextBetter->Rank;
         }
 
-        return null;
+        return 1;
     }
 
     public static function beginMap()
@@ -127,6 +133,6 @@ class LocalRecords
     public static function displayLocalRecords()
     {
         $map = MapController::getCurrentMap();
-        Template::showAll('locals', ['locals' => $map->locals()->orderBy('Score')->get()->take(13)]);
+        Template::showAll('locals', ['locals' => $map->locals()->orderBy('Rank')->get()->take(13)]);
     }
 }

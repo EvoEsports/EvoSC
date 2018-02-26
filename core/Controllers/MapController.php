@@ -85,16 +85,15 @@ class MapController
     {
         $request = self::$queue->shift();
 
+        self::$addedTime = 0;
+
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
             Server::getRpc()->chooseNextMap($request->map->FileName);
             ChatController::messageAllNew('Next map: ', $request->map, ' as requested by ', $request->issuer);
         } else {
-            ChatController::messageAllNew('Next map: ', $request->map);
-        }
-
-        foreach (Player::whereOnline(true) as $player) {
-            $player->setScore(0);
+            $nextMap = self::getNext();
+            ChatController::messageAllNew('Next map: ', $nextMap);
         }
     }
 
@@ -108,8 +107,13 @@ class MapController
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
 
+        foreach (finishPlayers() as $player) {
+            $player->setScore(0);
+        }
+
         self::$currentMap = $map;
         self::displayMapWidget();
+        PlayerController::displayPlayerlist();
     }
 
     /**
@@ -226,6 +230,7 @@ class MapController
 
         foreach ($mapFiles as $mapFile) {
             $map = Map::where('FileName', $mapFile)->first();
+
             if (!$map) {
                 $mapInfo = Server::getMapInfo($mapFile)->toArray();
                 Map::create($mapInfo);
