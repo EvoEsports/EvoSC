@@ -22,9 +22,9 @@ class MusicServer
 
     public function __construct()
     {
-        $this->createTables();
+//        $this->createTables();
 
-        include_once 'Models/Song.php';
+//        include_once 'Models/Song.php';
 
         $this->readFiles();
 
@@ -47,9 +47,9 @@ class MusicServer
     private function createTables()
     {
         Database::create('songs', function (Blueprint $table) {
-            $table->string('hash')->primary();
-            $table->string('title')->default('unkown');
-            $table->string('artist')->default('unkown');
+            $table->increments('id');
+            $table->string('title')->nullable();
+            $table->string('artist')->nullable();
             $table->string('album')->nullable();
             $table->string('year')->nullable();
             $table->string('length')->nullable();
@@ -74,8 +74,8 @@ class MusicServer
     public static function getCurrentSong(): ?Song
     {
         $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
-        $hash = md5($songInformation->url);
-        return Song::where('hash', $hash)->first();
+        $url = $songInformation->url;
+        return self::$music->where('url', $url)->first();
     }
 
     /**
@@ -105,8 +105,8 @@ class MusicServer
         }
 
         $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
-        $hash = md5($songInformation->url);
-        $song = Song::where('hash', $hash)->first();
+        $url = $songInformation->url;
+        $song = self::$music->where('url', $url)->first();
 
         if ($song) {
             if ($player) {
@@ -133,8 +133,8 @@ class MusicServer
             $page = 1;
         }
 
-        $songs = Song::orderBy('title')->get()->forPage($page, 15);
-        $pages = ceil(Song::count() / 15);
+        $songs = self::$music->sortBy('title')->forPage($page, 15);
+        $pages = ceil(count(self::$music) / 15);
 
         $queue = self::$songQueue->sortBy('time')->take(9);
         Template::show($callee, 'music.menu', ['songs' => $songs, 'queue' => $queue, 'pages' => $pages, 'page' => $page]);
@@ -152,11 +152,11 @@ class MusicServer
     /**
      * Adds a song to the music-jukebox
      * @param Player $callee
-     * @param $songHash
+     * @param $songId
      */
-    public static function queueSong(Player $callee, $songHash)
+    public static function queueSong(Player $callee, $songId)
     {
-        $song = Song::where('hash', $songHash)->first();
+        $song = self::$music->get($songId);
 
         if ($song) {
             self::$songQueue->push([
@@ -165,109 +165,22 @@ class MusicServer
                 'time' => time()
             ]);
 
-            ChatController::messageAllNew($callee, ' added song ', $song, ' to the jukebox');
+            ChatController::messageAllNew($callee, ' added song ', secondary($song->title), ' to the jukebox');
         }
 
         Template::hide($callee, 'music.menu');
     }
 
     /**
-     * Get song information from remote url
-     * @param string $url
-     * @return mixed
-     */
-    private static function getSongInformation(string $url)
-    {
-        $remoteUrl = str_replace(' ', '%20', $url);
-        if ($fp_remote = fopen($remoteUrl, 'rb')) {
-            $localtempfilename = tempnam(cacheDir(), 'getID3');
-            if ($fp_local = fopen($localtempfilename, 'wb')) {
-                while ($buffer = fread($fp_remote, 8192)) {
-                    fwrite($fp_local, $buffer);
-                }
-                fclose($fp_local);
-
-                $getID3 = new getID3;
-                $ThisFileInfo = $getID3->analyze($localtempfilename);
-
-                unlink($localtempfilename);
-            }
-            fclose($fp_remote);
-
-            if (isset($song)) {
-                return $song;
-            }
-        }
-
-        if (isset($ThisFileInfo)) {
-            return $ThisFileInfo;
-        }
-    }
-
-    /**
      * Sets the music files
-     * @param Collection $files
+     * @param Collection $songs
      */
-    private static function setMusicFiles(Collection $files)
+    private static function setMusicFiles(Collection $songs)
     {
-        $songsToDelete = Song::whereNotIn('url', $files)->get();
-
-        foreach ($songsToDelete as $song) {
-//            Log::info("Delete song: $song->name - $song->artist");
-        }
-
-        $songs = new Collection();
-
         Log::info("Loading music...");
 
-        foreach ($files as $file) {
-            $remoteUrl = config('music.server') . $file;
-
-            $song = Song::where('url', $remoteUrl)->first();
-
-            if (!$song) {
-                Log::info("Loading song $remoteUrl");
-
-                $songInfo = self::getSongInformation($remoteUrl);
-
-                try {
-                    $song = Song::firstOrCreate([
-                        'title' => $songInfo['tags']['vorbiscomment']['title'][0],
-                        'artist' => $songInfo['tags']['vorbiscomment']['artist'][0],
-                        'album' => $songInfo['tags']['vorbiscomment']['album'][0],
-                        'year' => $songInfo['tags']['vorbiscomment']['date'][0],
-                        'length' => $songInfo['playtime_string'],
-                        'url' => $remoteUrl,
-                        'hash' => md5($remoteUrl)
-                    ]);
-                } catch (\Exception $e) {
-                    try{
-                        $song = Song::firstOrCreate([
-                            'title' => $songInfo['audio']['tags']['title'][0],
-                            'artist' => $songInfo['audio']['tags']['artist'][0],
-                            'album' => $songInfo['audio']['tags']['album'][0],
-                            'year' => $songInfo['audio']['tags']['date'][0],
-                            'length' => $songInfo['playtime_string'],
-                            'url' => $remoteUrl,
-                            'hash' => md5($remoteUrl)
-                        ]);
-                    }catch(\Exception $e){
-                        Log::warning("Could not get id3-tags for song: $file");
-                        var_dump([
-                            'title' => $songInfo['tags']['vorbiscomment']['title'][0],
-                            'artist' => $songInfo['tags']['vorbiscomment']['artist'][0],
-                            'album' => $songInfo['tags']['vorbiscomment']['album'][0],
-                            'year' => $songInfo['tags']['vorbiscomment']['date'][0],
-                            'length' => $songInfo['playtime_string'],
-                            'url' => $remoteUrl,
-                            'hash' => md5($remoteUrl)
-                        ]);
-                        continue;
-                    }
-                }
-            }
-
-            $songs->push($song);
+        foreach ($songs as $song) {
+            $song->url = config('music.server') . $song->file;
         }
 
         Log::info("Finished loading music.");
@@ -284,7 +197,7 @@ class MusicServer
             'query' => [
                 'token' => config('music.token')
             ]
-        ])->getBody();
+        ])->getBody()->getContents();
 
         $musicFiles = json_decode($musicJson);
 

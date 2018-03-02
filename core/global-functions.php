@@ -18,10 +18,10 @@ function stripColors(string $colored): string
 function stripStyle(string $styled, bool $keepLinks = false): string
 {
     if ($keepLinks) {
-        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1})/i', '', $styled);
 }
 
 function stripAll(string $styled, bool $keepLinks = false): string
@@ -56,4 +56,9 @@ function finishPlayers(): \Illuminate\Support\Collection
 function cutZeroes(string $formattedScore): string
 {
     return preg_replace('/^[0\:\.]+/', '', $formattedScore);
+}
+
+function secondary(string $str): string
+{
+    return '$' . config('color.secondary') . $str;
 }
