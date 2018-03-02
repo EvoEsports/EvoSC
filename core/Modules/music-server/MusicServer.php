@@ -91,6 +91,8 @@ class MusicServer
             $song = self::$music->random();
         }
 
+        var_dump($song->url);
+
         Server::getRpc()->setForcedMusic(true, $song->url);
     }
 
@@ -166,7 +168,7 @@ class MusicServer
                 'time' => time()
             ]);
 
-            ChatController::messageAllNew($callee, ' added song ', secondary($song->title), ' to the jukebox');
+            ChatController::messageAllNew($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
         }
 
         Template::hide($callee, 'music.menu');
@@ -179,7 +181,7 @@ class MusicServer
     private static function setMusicFiles(Collection $songs)
     {
         foreach ($songs as $song) {
-            $song->url = config('music.server') . $song->file;
+            $song->url = config('music.server') . '/' . $song->file;
         }
 
         $totalTime = (time() + microtime()) - self::$startLoad;
@@ -197,11 +199,7 @@ class MusicServer
 
         self::$startLoad = (float)microtime() + time();
 
-        $musicJson = RestClient::get(config('music.server') . 'dir.php', [
-            'query' => [
-                'token' => config('music.token')
-            ]
-        ])->getBody()->getContents();
+        $musicJson = RestClient::get(config('music.server'))->getBody()->getContents();
 
         $musicFiles = json_decode($musicJson);
 

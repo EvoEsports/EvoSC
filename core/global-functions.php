@@ -58,7 +58,7 @@ function cutZeroes(string $formattedScore): string
     return preg_replace('/^[0\:\.]+/', '', $formattedScore);
 }
 
-function secondary(string $str): string
+function secondary(string $str = ""): string
 {
     return '$' . config('color.secondary') . $str;
 }

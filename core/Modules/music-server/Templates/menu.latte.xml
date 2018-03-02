@@ -18,7 +18,11 @@
 
         {if count($songs)}
         {foreach $songs as $key => $song}
+        {if $song->title}
         <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text=" {$song->title}"/>
+        {else}
+        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="160 5" textsize="1.8" valign="center" text=" {$song->file}"/>
+        {/if}
         <label pos="55 -{15 + $iterator->counter * 5}" z-index="0" size="40 5" textsize="1.8" valign="center" text="{$song->artist}"/>
         <label pos="85 -{15 + $iterator->counter * 5}" z-index="0" size="30 5" textsize="1.8" valign="center" text="{$song->album}"/>
         <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="141 4.8" textsize="1.8" valign="center" halign="right" text="Juke  " textcolor="18fa" action="ms.juke,{$key}"/>

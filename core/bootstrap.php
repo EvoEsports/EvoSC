@@ -5,6 +5,9 @@ include 'global-functions.php';
 esc\classes\Log::info("Loading config files.");
 esc\classes\Config::loadConfigFiles();
 
+\esc\Classes\Log::info("Starting music server.");
+
+
 function startEsc()
 {
     try {
