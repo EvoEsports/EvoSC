@@ -1,6 +1,7 @@
 .idea/
 vendor/
 modules/
+music/
 maps/
 logs/
 config/

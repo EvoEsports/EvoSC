@@ -8,6 +8,7 @@
         "philo/laravel-blade": "3.*",
         "latte/latte": "^2.4",
         "nass600/get-id3": "^1.0",
-        "illuminate/pagination": "^5.6"
+        "illuminate/pagination": "^5.6",
+        "symfony/process": "^4.0"
     }
 }

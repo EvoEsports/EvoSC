@@ -116,31 +116,24 @@ class Dedimania
 
     public static function displayDedis(Player $player = null)
     {
+        $rows = config('ui.dedis.rows');
         $map = MapController::getCurrentMap();
-        $dedis = $map->dedis->sortBy('Rank')->take(15);
+        $dedis = $map->dedis->sortBy('Rank')->take($rows);
+
+        $variables = [
+            'id' => 'Dedimania',
+            'title' => 'dedimania records',
+            'x' => config('ui.dedis.x'),
+            'y' => config('ui.dedis.y'),
+            'rows' => $rows,
+            'scale' => config('ui.dedis.scale'),
+            'content' => Template::toString('dedis', ['dedis' => $dedis])
+        ];
 
         if ($player) {
-            Template::show($player, 'esc.box', [
-                'id' => 'Dedimania',
-                'title' => 'dedimania records',
-                'x' => config('ui.dedis.x'),
-                'y' => config('ui.dedis.y'),
-                'width' => config('ui.dedis.width'),
-                'height' => config('ui.dedis.height'),
-                'scale' => config('ui.dedis.scale'),
-                'content' => Template::toString('dedis', ['dedis' => $dedis])
-            ]);
+            Template::show($player, 'esc.box', $variables);
         } else {
-            Template::showAll('esc.box', [
-                'id' => 'Dedimania',
-                'title' => 'dedimania records',
-                'x' => config('ui.dedis.x'),
-                'y' => config('ui.dedis.y'),
-                'width' => config('ui.dedis.width'),
-                'height' => config('ui.dedis.height'),
-                'scale' => config('ui.dedis.scale'),
-                'content' => Template::toString('dedis', ['dedis' => $dedis])
-            ]);
+            Template::showAll('esc.box', $variables);
         }
     }
 

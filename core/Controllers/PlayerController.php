@@ -150,10 +150,9 @@ class PlayerController
             'title' => 'live rankings',
             'x' => config('ui.playerlist.x'),
             'y' => config('ui.playerlist.y'),
-            'width' => config('ui.playerlist.width'),
-            'height' => config('ui.playerlist.height'),
+            'rows' => 13,
             'scale' => config('ui.playerlist.scale'),
-            'content' => Template::toString('players', ['players' => $players])
+            'content' => Template::toString('players', ['players' => $players->take(15)])
         ]);
     }
 

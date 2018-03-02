@@ -143,8 +143,7 @@ class LocalRecords
             'title' => 'local records',
             'x' => config('ui.locals.x'),
             'y' => config('ui.locals.y'),
-            'width' => config('ui.locals.width'),
-            'height' => config('ui.locals.height'),
+            'rows' => 13,
             'scale' => config('ui.locals.scale'),
             'content' => Template::toString('locals', ['locals' => $locals])
         ]);
