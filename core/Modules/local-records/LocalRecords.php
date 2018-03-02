@@ -132,7 +132,21 @@ class LocalRecords
 
     public static function displayLocalRecords()
     {
-        $map = MapController::getCurrentMap();
-        Template::showAll('locals', ['locals' => $map->locals()->orderBy('Rank')->get()->take(13)]);
+        $locals = MapController::getCurrentMap()
+            ->locals()
+            ->orderBy('Rank')
+            ->get()
+            ->take(13);
+
+        Template::showAll('esc.box', [
+            'id' => 'Locals',
+            'title' => 'local records',
+            'x' => config('ui.locals.x'),
+            'y' => config('ui.locals.y'),
+            'width' => config('ui.locals.width'),
+            'height' => config('ui.locals.height'),
+            'scale' => config('ui.locals.scale'),
+            'content' => Template::toString('locals', ['locals' => $locals])
+        ]);
     }
 }

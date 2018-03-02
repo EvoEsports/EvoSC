@@ -1,25 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="DediRecords" version="3">
-    <frame pos="-160 40" scale="0.8">
-        <quad pos="0 0" z-index="-2" size="50 68" style="Bgs1" substyle="BgDialogBlur"/>
-        <quad pos="0 0" z-index="-1" size="50 68" bgcolor="0001"/>
-        <label pos="2 -2" z-index="1" size="48 3" text="dedimania records" textsize="1"/>
-        <quad pos="0 -6.5" z-index="1" size="50 0.25" bgcolor="18f9"/>
-        <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
-
-        {if count($dedis)}
-        {foreach $dedis as $dedi}
-        {if $dedi->player->Online}
-        <quad pos="0 -{$iterator->counter * 4 + 3.3}" size="8.4 3.8" z-index="0" bgcolor="05a8"/>
-        {/if}
-        <label pos="8 -{$iterator->counter * 4 + 5}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>
-        <label pos="21 -{$iterator->counter * 4 + 5}" z-index="0" size="13 3" text="{formatScore($dedi->Score)}" textcolor="cdff" opacity="0.3" textsize="1.2" valign="center" halign="right"/>
-        <label pos="21 -{$iterator->counter * 4 + 5}" z-index="1" size="13 3" text="{cutZeroes(formatScore($dedi->Score))}" textsize="1.2" valign="center" halign="right"/>
-        <label pos="22 -{$iterator->counter * 4 + 5}" z-index="1" size="27 3" text="{stripStyle($dedi->player->NickName, true)}" textsize="1.1" valign="center" halign="left"/>
-        {/foreach}
-        {else}
-        <label pos="2 -9" z-index="1" size="40 3" text="$iNo dedimania records." textsize="0.8" halign="left"/>
-        {/if}
-
-    </frame>
-</manialink>
+{if count($dedis)}
+{foreach $dedis as $dedi}
+{if $dedi->player->Online}
+<quad pos="0 -{$iterator->counter * 4 - 1.7}" size="8.4 3.8" z-index="0" bgcolor="05a8"/>
+{/if}
+<label pos="8 -{$iterator->counter * 4 - 1}" z-index="1" size="8 3" text="{$dedi->Rank}." textsize="1.2" valign="center" halign="right"/>
+<label pos="21 -{$iterator->counter * 4 - 1}" z-index="0" size="13 3" text="{formatScore($dedi->Score)}" textcolor="cdff" opacity="0.3" textsize="1.2" valign="center" halign="right"/>
+<label pos="21 -{$iterator->counter * 4 - 1}" z-index="1" size="13 3" text="{cutZeroes(formatScore($dedi->Score))}" textsize="1.2" valign="center" halign="right"/>
+<label pos="22 -{$iterator->counter * 4 - 1}" z-index="1" size="27 3" text="{stripStyle($dedi->player->NickName, true)}" textsize="1.1" valign="center" halign="left"/>
+{/foreach}
+{else}
+<label pos="2 -9" z-index="1" size="40 -2" text="$iNo dedimania records." textsize="0.8" halign="left"/>
+{/if}

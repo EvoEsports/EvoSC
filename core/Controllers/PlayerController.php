@@ -145,7 +145,16 @@ class PlayerController
             $players->add($player);
         }
 
-        Template::showAll('players', ['players' => $players]);
+        Template::showAll('esc.box', [
+            'id' => 'PlayerList',
+            'title' => 'live rankings',
+            'x' => config('ui.playerlist.x'),
+            'y' => config('ui.playerlist.y'),
+            'width' => config('ui.playerlist.width'),
+            'height' => config('ui.playerlist.height'),
+            'scale' => config('ui.playerlist.scale'),
+            'content' => Template::toString('players', ['players' => $players])
+        ]);
     }
 
     public static function hidePlayerlist()

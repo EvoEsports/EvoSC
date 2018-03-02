@@ -118,11 +118,29 @@ class Dedimania
     {
         $map = MapController::getCurrentMap();
         $dedis = $map->dedis->sortBy('Rank')->take(15);
-        
+
         if ($player) {
-            Template::show($player, 'dedis', ['dedis' => $dedis]);
+            Template::show($player, 'esc.box', [
+                'id' => 'Dedimania',
+                'title' => 'dedimania records',
+                'x' => config('ui.dedis.x'),
+                'y' => config('ui.dedis.y'),
+                'width' => config('ui.dedis.width'),
+                'height' => config('ui.dedis.height'),
+                'scale' => config('ui.dedis.scale'),
+                'content' => Template::toString('dedis', ['dedis' => $dedis])
+            ]);
         } else {
-            Template::showAll('dedis', ['dedis' => $dedis]);
+            Template::showAll('esc.box', [
+                'id' => 'Dedimania',
+                'title' => 'dedimania records',
+                'x' => config('ui.dedis.x'),
+                'y' => config('ui.dedis.y'),
+                'width' => config('ui.dedis.width'),
+                'height' => config('ui.dedis.height'),
+                'scale' => config('ui.dedis.scale'),
+                'content' => Template::toString('dedis', ['dedis' => $dedis])
+            ]);
         }
     }
 

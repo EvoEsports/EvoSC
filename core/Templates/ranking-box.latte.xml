@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="{$id}" version="3">
+    <frame pos="{$x} {$y}" scale="{isset($scale) ? $scale : 1}">
+        <quad pos="0 0" z-index="-2" size="{$width} {$height + 6.5}" style="Bgs1" substyle="BgDialogBlur"/>
+        <quad pos="0 0" z-index="-1" size="{$width} {$height + 6.5}" bgcolor="0001"/>
+        <label pos="2 -2" z-index="1" size="48 3" text="{$title}" textsize="1"/>
+        <quad pos="0 -6.5" z-index="1" size="50 0.2" bgcolor="18f9"/>
+        <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>
+
+        <frame pos="0 -6.5">
+            {$content|noescape}
+        </frame>
+    </frame>
+</manialink>

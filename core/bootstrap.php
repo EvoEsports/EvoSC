@@ -38,6 +38,8 @@ function startEsc()
     esc\classes\Vote::init();
     esc\controllers\ModuleController::init();
 
+    \esc\Classes\Template::add('esc.box', \esc\Classes\File::get(__DIR__ . '/Templates/ranking-box.latte.xml'));
+
     $settings = \esc\Classes\Server::getRpc()->getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
     \esc\Classes\Server::getRpc()->setModeScriptSettings($settings);
