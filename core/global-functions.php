@@ -12,16 +12,25 @@ function formatScore(int $score): string
 
 function stripColors(string $colored): string
 {
-    return preg_replace('/(\$[0-9a-f]{3})/', '', $colored);
+    return preg_replace('/(?<![$])\${1}(?:[\w\d]{3})/i', '', $colored);
 }
 
 function stripStyle(string $styled, bool $keepLinks = false): string
 {
     if ($keepLinks) {
-        return preg_replace('/\$[iwngo]/', '', $styled);
+        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(\$[iwngo]|\$l\[.+\)?)/', '', $styled);
+    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+}
+
+function stripAll(string $styled, bool $keepLinks = false): string
+{
+    if ($keepLinks) {
+        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    }
+
+    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 function config(string $id, $default = null)
