@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
 
 class MusicServer
 {
+    private static $startLoad;
     private static $music;
     private static $currentSong;
     private static $songQueue;
@@ -177,13 +178,12 @@ class MusicServer
      */
     private static function setMusicFiles(Collection $songs)
     {
-        Log::info("Loading music...");
-
         foreach ($songs as $song) {
             $song->url = config('music.server') . $song->file;
         }
 
-        Log::info("Finished loading music.");
+        $totalTime = (time() + microtime()) - self::$startLoad;
+        Log::info("Finished loading music. " . sprintf("Took %.3fs.", $totalTime));
 
         self::$music = $songs;
     }
@@ -193,6 +193,10 @@ class MusicServer
      */
     private function readFiles()
     {
+        Log::info("Loading music...");
+
+        self::$startLoad = (float)microtime() + time();
+
         $musicJson = RestClient::get(config('music.server') . 'dir.php', [
             'query' => [
                 'token' => config('music.token')
