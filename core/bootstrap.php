@@ -8,11 +8,12 @@ include 'global-functions.php';
 esc\classes\Log::info("Loading config files.");
 esc\classes\Config::loadConfigFiles();
 
-\esc\Classes\Log::info("Starting music server...");
-//$process = new Process('c:/php.exe -S 0.0.0.0:6600 music-server.php');
-$musicServer = new Process('C:\php\php.exe -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
-$musicServer->start();
-\esc\Classes\Log::info("Music server started.");
+if(config('music.enable-internal-server', true)){
+    \esc\Classes\Log::info("Starting music server...");
+    $musicServer = new Process('C:\php\php.exe -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
+    $musicServer->start();
+    \esc\Classes\Log::info("Music server started.");
+}
 
 
 function startEsc()
@@ -72,9 +73,11 @@ function cycle()
     esc\controllers\HookController::handleCallbacks(esc\classes\Server::executeCallbacks());
     usleep(esc\classes\Timer::getNextCyclePause());
 
-    $msOutput = $musicServer->getOutput();
-    if($msOutput){
-        \esc\Classes\Log::music($msOutput);
+    if(config('music.enable-internal-server', true)) {
+        $msOutput = $musicServer->getOutput();
+        if ($msOutput) {
+            \esc\Classes\Log::music($msOutput);
+        }
     }
 }
 
