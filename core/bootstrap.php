@@ -1,8 +1,5 @@
 <?php
 
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
-
 include 'global-functions.php';
 
 esc\classes\Log::info("Loading config files.");
@@ -10,8 +7,13 @@ esc\classes\Config::loadConfigFiles();
 
 if(config('music.enable-internal-server', true)){
     \esc\Classes\Log::info("Starting music server...");
-    $musicServer = new Process('C:\php\php.exe -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
+
+    $phpBinaryFinder = new Symfony\Component\Process\PhpExecutableFinder();
+    $phpBinaryPath = $phpBinaryFinder->find();
+
+    $musicServer = new Symfony\Component\Process\Process($phpBinaryPath . ' -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
     $musicServer->start();
+
     \esc\Classes\Log::info("Music server started.");
 }
 
