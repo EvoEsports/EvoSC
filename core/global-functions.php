@@ -43,6 +43,16 @@ function cacheDir(string $filename = ''): string
     return __DIR__ . '\\cache\\' . $filename;
 }
 
+function musicDir(string $filename = ''): string
+{
+    return __DIR__ . '\\..\\music\\' . $filename;
+}
+
+function coreDir(string $filename = ''): string
+{
+    return __DIR__ . '\\' . $filename;
+}
+
 function onlinePlayers(): \Illuminate\Support\Collection
 {
     return esc\models\Player::whereOnline(true)->get();

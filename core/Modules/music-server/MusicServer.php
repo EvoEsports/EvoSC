@@ -91,8 +91,6 @@ class MusicServer
             $song = self::$music->random();
         }
 
-        var_dump($song->url);
-
         Server::getRpc()->setForcedMusic(true, $song->url);
     }
 

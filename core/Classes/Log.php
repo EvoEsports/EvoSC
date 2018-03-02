@@ -48,6 +48,11 @@ class Log
         self::logAddLine(sprintf(self::$prefix . " Debug: %s", $message), $echo);
     }
 
+    public static function music($message, bool $echo = true)
+    {
+        self::logAddLine(sprintf(self::$prefix . " Music-Server: %s", $message), $echo);
+    }
+
     public static function chat($nick, $message)
     {
         $line = "$nick: ";

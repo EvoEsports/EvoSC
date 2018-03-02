@@ -2,7 +2,9 @@
 
 error_reporting(E_ERROR);
 
-$musicDir = __DIR__ . '/music';
+include_once 'global-functions.php';
+
+$musicDir = musicDir();
 
 if (preg_match('/^\/(.+\.ogg)$/', $_SERVER["REQUEST_URI"], $matches)) {
     $file = $musicDir . '/' . urldecode($matches[1]);
@@ -15,7 +17,7 @@ if (!is_dir($musicDir)) {
     mkdir($musicDir);
 }
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $files = collect(scandir($musicDir))->filter(function ($item) {
     return preg_match('/\.ogg$/', $item);
