@@ -1,0 +1,3 @@
+<quad pos="2 -2" z-index="0" size="46 1" bgcolor="9999"/>
+<quad pos="2 -2" z-index="1" size="{($karma->voteaverage / 100) * 46} 1" bgcolor="{$karma->color}9"/>
+<label pos="{($karma->voteaverage / 100) * 46 + 2} -5" z-index="1" size="48 3" text="{$karma->voteaverage}%" halign="center" textsize=".6"/>

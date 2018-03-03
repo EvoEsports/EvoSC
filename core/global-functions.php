@@ -72,3 +72,9 @@ function secondary(string $str = ""): string
 {
     return '$' . config('color.secondary') . $str;
 }
+
+function getEscVersion(): string
+{
+    global $escVersion;
+    return $escVersion;
+}

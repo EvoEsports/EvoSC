@@ -1,5 +1,7 @@
 <?php
 
+$escVersion = '0.12.*';
+
 include 'global-functions.php';
 
 esc\classes\Log::info("Loading config files.");
