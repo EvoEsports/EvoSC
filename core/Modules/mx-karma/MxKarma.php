@@ -91,8 +91,6 @@ class MxKarma extends MXK
         if (self::$currentMap != $map) {
             self::$mapKarma = self::call(MXK::getMapRating);
             self::$currentMap = $map;
-
-            echo "MAP KARMA: ";
             var_dump(self::$mapKarma);
         }
 

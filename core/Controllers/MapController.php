@@ -221,7 +221,7 @@ class MapController
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
 
-        Server::getRpc()->chooseNextMap(self::getNext());
+        Server::getRpc()->chooseNextMap(self::getNext()->FileName);
 
         ChatController::messageAllNew($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");
@@ -276,6 +276,8 @@ class MapController
     {
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->MxId);
         $i = json_decode($result->getBody()->getContents())[0];
+
+        var_dump($i);
 
         $information = [
             'UId' => $i->TrackUID,
@@ -339,7 +341,6 @@ class MapController
 
             $info = self::getMapInformationFromMx($map);
             if ($info) {
-                var_dump($info);
                 $map->update($info);
             }
 
