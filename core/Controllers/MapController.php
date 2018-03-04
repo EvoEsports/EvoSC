@@ -140,9 +140,9 @@ class MapController
      */
     public static function deleteMap(Map $map)
     {
-        try{
+        try {
             Server::getRpc()->removeMap($map->FileName);
-        }catch(FileException $e){
+        } catch (FileException $e) {
             Log::error($e);
         }
 
@@ -272,10 +272,17 @@ class MapController
         }
     }
 
-    public static function getMapInformationFromMx(Map $map)
+    public static function getMapInformationFromMx(Map $map): array
     {
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->MxId);
-        return json_decode($result);
+        $i = json_decode($result->getBody()->getContents())[0];
+
+        $information = [
+            'UId' => $i->TrackUID,
+            'Name' => $i->GbxMapName
+        ];
+
+        return $information;
     }
 
     /**
@@ -332,6 +339,7 @@ class MapController
 
             $info = self::getMapInformationFromMx($map);
             if ($info) {
+                var_dump($info);
                 $map->update($info);
             }
 
