@@ -22,8 +22,8 @@
         {foreach $maps as $map}
         <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="62 5" textsize="1.8" valign="center" text="{stripStyle($map->Name ?: '')}"/>
         <label pos="65 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{stripStyle(stripColors($map->author->NickName ?: $map->Author ?: ''))}"/>
-        <label pos="105 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->locals()->whereLogin($player->Login)->Score ?: '-'}"/>
-        <label pos="125 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->dedis()->whereLogin($player->Login)->Score ?: '-'}"/>
+        <label pos="105 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->locals->where('Player', $player->id)->first()->Rank}."/>
+        <label pos="125 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{$map->dedis->where('Player', $player->id)->first()->Rank}."/>
 
         <label pos="-1 -{15 + $iterator->counter * 5}" z-index="0" size="64 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.queue,{$map->id}"/>
         <label pos="64 -{15 + $iterator->counter * 5}" z-index="0" size="30 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.filter.author,{$map->Author}"/>

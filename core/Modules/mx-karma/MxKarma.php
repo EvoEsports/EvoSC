@@ -91,6 +91,9 @@ class MxKarma extends MXK
         if (self::$currentMap != $map) {
             self::$mapKarma = self::call(MXK::getMapRating);
             self::$currentMap = $map;
+
+            echo "MAP KARMA: ";
+            var_dump(self::$mapKarma);
         }
 
         if (self::$mapKarma->voteaverage < 30) {
@@ -100,9 +103,6 @@ class MxKarma extends MXK
         } else {
             self::$mapKarma->color = config('color.primary');
         }
-
-        echo "MAP KARMA: ";
-        var_dump(self::$mapKarma);
 
         Template::showAll('esc.box', [
             'id' => 'MXKarma',

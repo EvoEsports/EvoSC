@@ -7,6 +7,7 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
+use esc\Classes\Server;
 use esc\classes\Template;
 use esc\models\Player;
 use Illuminate\Database\Eloquent\Collection;

@@ -262,6 +262,12 @@ class MapController
         }
     }
 
+    public static function getMapInformationFromMx(Map $map)
+    {
+        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->MxId);
+        return json_decode($result);
+    }
+
     /**
      * Add map from MX
      * @param string[] ...$arguments
@@ -313,6 +319,11 @@ class MapController
                 'Name' => $name,
                 'FileName' => $fileName
             ]);
+
+            $info = self::getMapInformationFromMx($map);
+            if ($info) {
+                $map->update($info);
+            }
 
             Server::getRpc()->addMap($map->FileName);
 

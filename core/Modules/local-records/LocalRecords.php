@@ -66,13 +66,13 @@ class LocalRecords
                 $diff = $local->Score - $score;
                 $rank = self::getRank($map, $score);
 
-                if ($rank) {
+                if ($rank != $local->Rank) {
                     self::pushDownRanks($map, $rank);
                     $local->update(['Score' => $score, 'Rank' => $rank]);
                     ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score]);
-                    ChatController::messageAllNew('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
         } else {
@@ -80,11 +80,13 @@ class LocalRecords
                 $worstLocal = $map->locals()->orderByDesc('Score')->first();
 
                 if ($worstLocal) {
-                    $rank = $worstLocal->Rank;
-                    if ($score < $worstLocal->Score) {
-                        self::pushDownRanks($map, $rank);
-                        $local = self::pushLocal($map, $player, $score, $rank);
+                    if ($score <= $worstLocal->Score) {
+                        self::pushDownRanks($map, $worstLocal->Rank);
+                        $local = self::pushLocal($map, $player, $score, $worstLocal->Rank);
                         ChatController::messageAllNew('Player ', $player, ' gained the ', $local);
+                    }else{
+                        $local = self::pushLocal($map, $player, $score, $worstLocal->Rank + 1);
+                        ChatController::messageAllNew('Player ', $player, ' made the ', $local);
                     }
                 } else {
                     $rank = 1;
@@ -119,9 +121,11 @@ class LocalRecords
         $nextBetter = $map->locals->where('Score', '<=', $score)->sortByDesc('Score')->first();
 
         if ($nextBetter) {
-            return $nextBetter->Rank;
+            ChatController::messageAllNew('New calculated rank: ', $nextBetter->Rank + 1);
+            return $nextBetter->Rank + 1;
         }
 
+        ChatController::messageAllNew('New calculated rank: ', 1);
         return 1;
     }
 
