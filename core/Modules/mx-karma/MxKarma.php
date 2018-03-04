@@ -110,7 +110,7 @@ class MxKarma extends MXK
             'x' => config('ui.mx-karma.x'),
             'y' => config('ui.mx-karma.y'),
             'rows' => 2,
-            'scale' => config('ui.locals.scale'),
+            'scale' => config('ui.mx-karma.scale'),
             'content' => Template::toString('mx-karma', ['karma' => self::$mapKarma])
         ]);
     }

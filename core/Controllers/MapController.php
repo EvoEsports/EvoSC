@@ -140,10 +140,18 @@ class MapController
      */
     public static function deleteMap(Map $map)
     {
-//        ServerController::getRpc()->removeMap($map->FileName);
-//        File::delete(Config::get('server.maps') . '/' . $map->FileName);
-//        ChatController::messageAllNew('Admin removed map ', $map);
-//        $map->delete();
+        try{
+            Server::getRpc()->removeMap($map->FileName);
+        }catch(FileException $e){
+            Log::error($e);
+        }
+
+        $deleted = File::delete(Config::get('server.maps') . '/' . $map->FileName);
+
+        if ($deleted) {
+            ChatController::messageAllNew('Admin removed map ', $map);
+            $map->delete();
+        }
     }
 
     /**
@@ -163,8 +171,8 @@ class MapController
         $map = self::getQueue()->first()->map;
 
         if (!$map) {
-            $mapId = Server::getRpc()->getNextMapInfo()->uId;
-            $map = Map::where('UId', $mapId)->first();
+            $mapInfo = Server::getRpc()->getNextMapInfo();
+            $map = Map::where('UId', $mapInfo->uId)->first();
         }
 
         return $map;
@@ -212,6 +220,8 @@ class MapController
         }
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
+
+        Server::getRpc()->chooseNextMap(self::getNext());
 
         ChatController::messageAllNew($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");

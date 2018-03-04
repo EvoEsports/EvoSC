@@ -54,9 +54,14 @@ class File
         return $files;
     }
 
-    public static function delete(string $path)
+    public static function delete(string $path): bool
     {
-        unlink($path);
+        if (file_exists($path) && is_file($path)) {
+            unlink($path);
+            return true;
+        }
+
+        return false;
     }
 
     public static function exists(string $filename)

@@ -121,11 +121,9 @@ class LocalRecords
         $nextBetter = $map->locals->where('Score', '<=', $score)->sortByDesc('Score')->first();
 
         if ($nextBetter) {
-            ChatController::messageAllNew('New calculated rank: ', $nextBetter->Rank + 1);
             return $nextBetter->Rank + 1;
         }
 
-        ChatController::messageAllNew('New calculated rank: ', 1);
         return 1;
     }
 
@@ -140,14 +138,14 @@ class LocalRecords
             ->locals()
             ->orderBy('Rank')
             ->get()
-            ->take(13);
+            ->take(config('ui.locals.rows'));
 
         Template::showAll('esc.box', [
             'id' => 'Locals',
             'title' => 'local records',
             'x' => config('ui.locals.x'),
             'y' => config('ui.locals.y'),
-            'rows' => 13,
+            'rows' => config('ui.locals.rows'),
             'scale' => config('ui.locals.scale'),
             'content' => Template::toString('locals', ['locals' => $locals])
         ]);

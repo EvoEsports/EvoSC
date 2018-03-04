@@ -73,7 +73,7 @@ class CPRecords
         }
 
         $manialink = sprintf(
-            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="CPRecords" version="3"><frame scale="0.35" pos="0 85.5">%s</frame></manialink>',
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="CPRecords" version="3"><frame scale="0.3" pos="0 85.5">%s</frame></manialink>',
             $cps->implode('')
         );
 
