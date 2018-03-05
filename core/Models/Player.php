@@ -102,12 +102,12 @@ class Player extends Model
      */
     public function locals()
     {
-        return $this->hasMany('esc\Models\LocalRecord', 'Player', 'id');
+        return $this->hasMany(LocalRecord::class, 'Player', 'id');
     }
 
     public function group()
     {
-        return $this->hasOne('esc\Models\Group', 'id', 'Group');
+        return $this->hasOne(Group::class, 'id', 'Group');
     }
 
     public function hasGroup(array $groups)
@@ -117,7 +117,7 @@ class Player extends Model
 
     public function dedis()
     {
-        return $this->hasMAny('Dedi', 'Player', 'id');
+        return $this->hasMAny(\Dedi::class, 'Player', 'id');
     }
 
     public function isSuperadmin(): bool
@@ -143,8 +143,8 @@ class Player extends Model
     public static function console(): Player
     {
         $player = new Player();
-        $player->Login = 'console';
-        $player->NickName = 'console';
+        $player->Login = config('server.name');
+        $player->NickName = config('server.name');
         $player->group = Group::find(1);
         return $player;
     }
