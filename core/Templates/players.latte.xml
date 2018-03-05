@@ -4,6 +4,9 @@
     {if $player->Afk}
     <label pos="1 -{$iterator->counter * 4 -1}" z-index="1" size="4 4" text="🕑" textsize=".25" textcolor="cccc"/>
     {/if}
+    {if $player->Spectator}
+    <label pos="1 -{$iterator->counter * 4 -1}" z-index="1" size="4 4" text="📷" textsize=".6" textcolor="fff5"/>
+    {/if}
 {/if}
 <label pos="8 -{$iterator->counter * 4}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>
 <label pos="21 -{$iterator->counter * 4 - 1}" z-index="0" size="13 3" text="{formatScore($player->Score)}" textcolor="cdff" opacity="0.3" textsize="1.2" halign="right"/>

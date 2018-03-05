@@ -10,12 +10,12 @@ function formatScore(int $score): string
     return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
-function stripColors(string $colored): string
+function stripColors(?string $colored): string
 {
     return preg_replace('/(?<![$])\${1}(?:[\w\d]{3})/i', '', $colored);
 }
 
-function stripStyle(string $styled, bool $keepLinks = false): string
+function stripStyle(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
         return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1})/i', '', $styled);
@@ -24,7 +24,7 @@ function stripStyle(string $styled, bool $keepLinks = false): string
     return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1})/i', '', $styled);
 }
 
-function stripAll(string $styled, bool $keepLinks = false): string
+function stripAll(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
         return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);

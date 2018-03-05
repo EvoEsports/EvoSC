@@ -14,20 +14,6 @@ class Player extends Model
     public $timestamps = false;
 
     /**
-     * Returns nickname of player, stripped of colors if true
-     * @param bool $plain
-     * @return mixed
-     */
-    public function nick($plain = false)
-    {
-        if ($plain) {
-            return preg_replace('/\$[0-9a-f]{3}/', '', $this->NickName);
-        }
-
-        return $this->NickName;
-    }
-
-    /**
      * Gets the players current time (formatted)
      * @param bool $asMilliseconds
      * @return mixed|string

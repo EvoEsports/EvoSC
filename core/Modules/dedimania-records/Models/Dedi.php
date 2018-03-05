@@ -1,5 +1,6 @@
 <?php
 
+use esc\Models\Map;
 use esc\models\Player;
 
 class Dedi extends \Illuminate\Database\Eloquent\Model
@@ -10,13 +11,13 @@ class Dedi extends \Illuminate\Database\Eloquent\Model
 
     public $timestamps = false;
 
-    public function map()
-    {
-        return $this->hasOne('esc\models\Map', 'id', 'Map');
-    }
-
     public function player()
     {
-        return $this->hasOne('esc\models\Player', 'id', 'Player');
+        return $this->hasOne(Player::class, 'id', 'Player');
+    }
+
+    public function map()
+    {
+        return $this->hasOne(Map::class, 'id', 'Map');
     }
 }

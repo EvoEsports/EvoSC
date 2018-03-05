@@ -43,7 +43,7 @@ class RestClient
             $options['headers'] = [];
         }
 
-        $options['headers']['User-Agent'] = sprintf('EvolutionServerController/0.11.0 (SERVER %s) PHP/7.2', self::$serverName ?: 'unknown');
+        $options['headers']['User-Agent'] = sprintf('EvolutionServerController/%s (SERVER %s) PHP/7.2', getEscVersion(), self::$serverName ?: 'unknown');
 
         return $options;
     }

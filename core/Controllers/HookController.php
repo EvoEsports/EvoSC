@@ -16,7 +16,7 @@ class HookController
     private static $eventMap = [
         'ManiaPlanet.PlayerConnect' => 'PlayerConnect',
         'ManiaPlanet.PlayerDisconnect' => 'PlayerDisconnect',
-        'ManiaPlanet.PlayerInfoChanged' => 'ManiaPlanet.PlayerInfoChanged',
+        'ManiaPlanet.PlayerInfoChanged' => 'PlayerInfoChanged',
         'ManiaPlanet.PlayerChat' => 'PlayerChat',
         'ManiaPlanet.BeginMap' => 'BeginMap',
         'ManiaPlanet.EndMap' => 'EndMap',
@@ -58,10 +58,10 @@ class HookController
 
     public static function fire(string $hook, $arguments = null)
     {
-        if($hook == 'ManiaPlanet.PlayerInfoChanged'){
-            PlayerController::playerInfoChanged($arguments);
-            $hook = 'PlayerInfoChanged';
-        }
+//        if($hook == 'ManiaPlanet.PlayerInfoChanged'){
+//            PlayerController::playerInfoChanged($arguments);
+//            $hook = 'PlayerInfoChanged';
+//        }
 
         Log::hook("Hook called: $hook", true);
 
@@ -94,6 +94,7 @@ class HookController
 
             case 'PlayerInfoChanged':
                 //SPlayerInfo PlayerInfo
+                PlayerController::playerInfoChanged($arguments);
                 $players = new Collection();
                 foreach($arguments as $playerInfo){
                     $players->add(Player::find($playerInfo['Login']));
@@ -103,11 +104,14 @@ class HookController
 
             case 'PlayerConnect':
                 //string Login, bool IsSpectator
-                $player = Player::find($arguments[0]);
-                if($player){
-                    $player->spectator = $arguments[1];
-                    self::fireHookBatch($hooks, $player);
+                if(Player::whereLogin($arguments[0])->get()->isEmpty()){
+                    $player = Player::create(['Login' => $arguments[0]]);
+                }else{
+                    $player = Player::find($arguments[0]);
                 }
+
+                $player->spectator = $arguments[1];
+                self::fireHookBatch($hooks, $player);
                 break;
 
             case 'PlayerDisconnect':

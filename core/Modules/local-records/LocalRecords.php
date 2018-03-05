@@ -72,7 +72,7 @@ class LocalRecords
                     ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score]);
-                    ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAllNew('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
         } else {

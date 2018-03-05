@@ -18,6 +18,8 @@ class MxKarma extends MXK
     private static $currentMap;
     private static $mapKarma;
 
+    private static $votes;
+
     public function __construct()
     {
         MxKarma::setApiKey(config('mxk.key'));

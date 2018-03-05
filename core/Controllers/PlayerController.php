@@ -75,7 +75,7 @@ class PlayerController
 
     public static function playerFinish(Player $player, $score)
     {
-        if ($score > 0) {
+        if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
             $player->setScore($score);
             Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
             self::displayPlayerlist();
@@ -106,7 +106,18 @@ class PlayerController
     public static function playerInfoChanged($infoplayerInfo)
     {
         foreach ($infoplayerInfo as $info) {
-            $player = Player::firstOrCreate(['Login' => $info['Login']]);
+            if(!isset($info['Login'])){
+                Log::error("Login not set");
+                var_dump($info);
+                die();
+            }
+
+            if(Player::where('Login', $info['Login'])->get()->isEmpty()){
+                $player = Player::create(['Login' => $info['Login']]);
+            }else{
+                $player = Player::find($info['Login']);
+            }
+
             $player->update($info);
 
             if (!$player->Online) {
