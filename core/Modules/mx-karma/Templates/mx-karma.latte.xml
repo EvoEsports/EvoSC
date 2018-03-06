@@ -1,7 +1,13 @@
 {if $karma->votecount > 0}
-<quad pos="2 -2" z-index="0" size="46 1" bgcolor="9999"/>
-<quad pos="2 -2" z-index="1" size="{($karma->voteaverage / 100) * 46} 1" bgcolor="{$karma->color}9"/>
-<label pos="{($karma->voteaverage / 100) * 46 + 2} -5" z-index="1" size="48 3" text="{$karma->voteaverage}%" halign="center" textsize=".6"/>
+<quad pos="0 0" z-index="0" size="50 0.5" bgcolor="0009"/>
+<quad pos="0 0" z-index="1" size="{($average / 100) * 50} 0.5" bgcolor="{$barColor}8"/>
 {else}
-<label pos="2 -3" z-index="1" size="48 3" text="$iMap unrated" halign="left" textsize="1"/>
+<label pos="2 -2" z-index="1" size="48 3" text="$iMap unrated" halign="left" valign="top" textsize="1"/>
 {/if}
+
+<label pos="5  -3.2" z-index="1" size="7 4" text="+++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,100"/>
+<label pos="13 -3.2" z-index="1" size="7 4" text="++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,80"/>
+<label pos="21 -3.2" z-index="1" size="7 4"  text="+"    halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,60"/>
+<label pos="29 -3.2" z-index="1" size="7 4" text="-"      halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,40"/>
+<label pos="37 -3.2" z-index="1" size="7 4" text="--"     halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,20"/>
+<label pos="45 -3.2" z-index="1" size="7 4" text="---"    halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,0"/>
