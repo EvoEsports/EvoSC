@@ -117,7 +117,7 @@ class Player extends Model
 
     public function dedis()
     {
-        return $this->hasMAny(\Dedi::class, 'Player', 'id');
+        return $this->hasMany(\Dedi::class, 'Player', 'id');
     }
 
     public function isSuperadmin(): bool
