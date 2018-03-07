@@ -1,0 +1,31 @@
+<script><!--
+main() {
+    declare fr <=> (Page.MainFrame.Controls[0] as CMlFrame);
+    declare player <=> InputPlayer;
+
+    declare startPos = fr.PosnX;
+    declare endPos = startPos * 1.3;
+
+    while(True){
+        yield;
+
+        if(player.Speed > 25){
+            if(fr.PosnX > endPos){
+                fr.PosnX = fr.PosnX - 1;
+            }
+        }else{
+            if(fr.PosnX < startPos){
+                fr.PosnX = fr.PosnX + 1;
+
+                if(player.Speed < 1){
+                    fr.PosnX = startPos;
+                }
+            }
+        }
+
+        if(fr.PosnX > startPos){
+            fr.PosnX = startPos;
+        }
+    }
+}
+--></script>
