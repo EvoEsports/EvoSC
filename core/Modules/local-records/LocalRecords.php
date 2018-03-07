@@ -149,5 +149,10 @@ class LocalRecords
             'scale' => config('ui.locals.scale'),
             'content' => Template::toString('locals', ['locals' => $locals])
         ]);
+
+        Template::showAll('esc.modal', [
+            'width' => 250,
+            'height' => 140
+        ]);
     }
 }

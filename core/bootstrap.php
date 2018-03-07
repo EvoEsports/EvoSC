@@ -54,6 +54,7 @@ function startEsc()
     esc\controllers\ModuleController::init();
 
     \esc\Classes\Template::add('esc.box', \esc\Classes\File::get(__DIR__ . '/Templates/ranking-box.latte.xml'));
+    \esc\Classes\Template::add('esc.modal', \esc\Classes\File::get(__DIR__ . '/Templates/Components/modal.latte.xml'));
 
     $settings = \esc\Classes\Server::getRpc()->getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
