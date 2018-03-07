@@ -182,6 +182,11 @@ class Vote
 
     public static function stopVote(Player $player = null)
     {
+        if(!self::$inProgress){
+            ChatController::messageNew($player, 'There is currently no vote to stop');
+            return;
+        }
+
         if ($player) {
             ChatController::messageAllNew($player, ' stops vote');
         }
@@ -198,6 +203,11 @@ class Vote
 
     public static function approveVote(Player $player)
     {
+        if(!self::$inProgress){
+            ChatController::messageNew($player, 'There is currently no vote to approve');
+            return;
+        }
+
         ChatController::messageAllNew($player, ' approves vote');
         call_user_func(self::$action);
         self::stopVote();

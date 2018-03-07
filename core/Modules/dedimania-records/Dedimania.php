@@ -112,7 +112,9 @@ class Dedimania
             }
         }
 
-        self::displayDedis();
+        foreach (onlinePlayers() as $player) {
+            self::displayDedis($player);
+        }
     }
 
     public static function showDedisModal(Player $player)
@@ -135,11 +137,50 @@ class Dedimania
         ]);
     }
 
+    /**
+     * Show the dedi widget
+     * @param Player|null $player
+     */
     public static function displayDedis(Player $player = null)
     {
         $rows = config('ui.dedis.rows');
         $map = MapController::getCurrentMap();
-        $dedis = $map->dedis->sortBy('Rank')->take($rows);
+        $dedis = new Collection();
+
+        $topDedis = $map->dedis()->orderBy('Score')->take(3)->get();
+        $topPlayers = $topDedis->pluck('Player')->toArray();
+        $fill = $rows - $topDedis->count();
+
+        if ($player && !in_array($player->id, $topPlayers)) {
+            $dedi = $map->dedis()->where('Player', $player->id)->first();
+            if ($dedi) {
+                $halfFill = ceil($fill / 2);
+
+                $above = $map->dedis()
+                    ->where('Score', '<=', $dedi->Score)
+                    ->whereNotIn('Player', $topPlayers)
+                    ->orderByDesc('Score')
+                    ->take($halfFill)
+                    ->get();
+
+                $bottomFill = $fill - $above->count();
+
+                $below = $map->dedis()
+                    ->where('Score', '>', $dedi->Score)
+                    ->whereNotIn('Player', $topPlayers)
+                    ->orderBy('Score')
+                    ->take($bottomFill)
+                    ->get();
+
+                $dedis = $dedis->concat($above)->concat($below);
+            } else {
+                $dedis = $map->dedis()->whereNotIn('Player', $topPlayers)->orderByDesc('Score')->take($fill)->get();
+            }
+        } else {
+            $dedis = $map->dedis()->whereNotIn('Player', $topPlayers)->orderByDesc('Score')->take($fill)->get();
+        }
+
+        $result = $dedis->concat($topDedis)->sortBy('Score');
 
         $variables = [
             'id' => 'Dedimania',
@@ -148,7 +189,7 @@ class Dedimania
             'y' => config('ui.dedis.y'),
             'rows' => $rows,
             'scale' => config('ui.dedis.scale'),
-            'content' => Template::toString('dedis', ['dedis' => $dedis]),
+            'content' => Template::toString('dedis', ['dedis' => $result]),
             'action' => 'dedis.show'
         ];
 
