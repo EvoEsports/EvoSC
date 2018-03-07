@@ -170,9 +170,9 @@ class MapController
     {
         $first = self::$queue->first();
 
-        if($first){
+        if ($first) {
             $map = self::$queue->first()->map;
-        }else{
+        } else {
             $mapInfo = Server::getRpc()->getNextMapInfo();
             $map = Map::where('UId', $mapInfo->uId)->first();
         }
@@ -237,15 +237,23 @@ class MapController
     private static function loadMaps()
     {
         $mapFiles = File::getDirectoryContents(Config::get('server.maps'))->filter(function ($fileName) {
-            return preg_match('/^.+.Gbx$/', $fileName);
+            return preg_match('/\.gbx$/i', $fileName);
         });
 
         foreach ($mapFiles as $mapFile) {
             $map = Map::where('FileName', $mapFile)->first();
 
             if (!$map) {
+                if (preg_match('/^_(\d+)\.Map\.gbx$/', $mapFile, $matches)) {
+                    $mxId = (int)$matches[1];
+                }
+
                 $mapInfo = Server::getMapInfo($mapFile)->toArray();
-                Map::create($mapInfo);
+                $map = Map::create($mapInfo);
+
+                if (isset($mxId)) {
+                    $map->update(['MxId' => $mxId]);
+                }
             }
 
             try {
@@ -333,20 +341,21 @@ class MapController
             $mapFolder = Config::get('server.maps');
             File::put("$mapFolder/$fileName", $response->getBody());
 
-            $name = str_replace('.Map.Gbx', '', $fileName);
-
-            $map = Map::updateOrCreate([
+            $map = Map::firstOrCreate([
                 'MxId' => $mxId,
-                'Name' => $name,
                 'FileName' => $fileName
             ]);
 
-            $info = self::getMapInformationFromMx($map);
+            $info = Server::getMapInfo($map->FileName)->toArray();
             if ($info) {
                 $map->update($info);
             }
 
-            Server::getRpc()->addMap($map->FileName);
+            try{
+                Server::getRpc()->addMap($map->FileName);
+            }catch(\Exception $e){
+                Log::warning("Map $map->FileName already added.");
+            }
 
             ChatController::messageAllNew('New map added: ', $map);
         }

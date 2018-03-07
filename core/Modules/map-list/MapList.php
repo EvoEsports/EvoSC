@@ -23,7 +23,7 @@ class MapList
 
     public static function showMapList(Player $player, ?int $page = 1)
     {
-        $perPage = 20;
+        $perPage = 23;
         $allMaps = Map::all();
         $pages = ceil($allMaps->count() / $perPage);
 

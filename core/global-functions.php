@@ -78,3 +78,14 @@ function getEscVersion(): string
     global $escVersion;
     return $escVersion;
 }
+
+function getMapInfoFromFile(string $fileName)
+{
+    $mps = config('server.mps');
+    $maps = config('server.maps') . '/';
+    if (file_exists($maps . $fileName) && file_exists($mps)) {
+        $process = new \Symfony\Component\Process\Process($mps . ' /parsegbx=' . $maps . $fileName);
+        $process->run();
+        return json_decode($process->getOutput());
+    }
+}

@@ -19,7 +19,6 @@ if(config('music.enable-internal-server', true)){
     \esc\Classes\Log::info("Music server started.");
 }
 
-
 function startEsc()
 {
     try {

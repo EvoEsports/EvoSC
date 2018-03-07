@@ -10,7 +10,7 @@
         <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
     </frame>
     {if isset($pagination)}
-    <frame pos="0 -{$height/2}">
+    <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">
         {$pagination|noescape}
     </frame>
     {/if}
