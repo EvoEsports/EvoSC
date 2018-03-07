@@ -9,4 +9,9 @@
         <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="10 3" text="close" valign="top" textsize="1.6" textcolor="fff9" halign="right" action="modal.hide,{$id}"/>
         <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
     </frame>
+    {if isset($pagination)}
+    <frame pos="0 -{$height/2}">
+        {$pagination|noescape}
+    </frame>
+    {/if}
 </manialink>

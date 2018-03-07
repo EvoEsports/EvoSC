@@ -15,24 +15,36 @@ class MapList
         Template::add('maplist.show', File::get(__DIR__ . '/Templates/map-list.latte.xml'));
 
         ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
-        ManiaLinkEvent::add('maplist.close', 'MapList::closeMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap');
 
         ChatController::addCommand('list', 'MapList::showMapList', 'Display list of maps');
     }
 
-    public static function showMapList(Player $player)
+    public static function showMapList(Player $player, ?int $page = 1)
     {
-        $maps = Map::all();
-        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take(15);
+        $perPage = 20;
+        $allMaps = Map::all();
+        $pages = ceil($allMaps->count() / $perPage);
 
-        Template::show($player, 'maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
+        $maps = $allMaps->forPage($page, $perPage);
+        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
+
+        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
+        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show']);
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'MapList',
+            'width' => 180,
+            'height' => 97,
+            'content' => $mapList,
+            'pagination' => $pagination
+        ]);
     }
 
     public static function closeMapList(Player $player)
     {
-        Template::hide($player, 'maplist.show');
+        Template::hide($player, 'MapList');
     }
 
     public static function queueMap(Player $player, $mapId)

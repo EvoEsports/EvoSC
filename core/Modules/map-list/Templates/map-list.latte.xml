@@ -1,66 +1,44 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="MapList" version="3">
-<frame pos="0 0" scale="0.85" id="main-frame">
-    <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
-    <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
-    <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
-    <quad pos="-100 50" z-index="-1" size="200 110" style="Bgs1" substyle="BgDialogBlur"/>
+<label pos="0 0" z-index="0" size="79 5" textsize="1.2" text="Name"/>
+<label pos="65 0" z-index="0" size="40 5" textsize="1.2" text="Author"/>
+<label pos="105 0" z-index="0" size="40 5" textsize="1.2" halign="center" text="Local"/>
+<label pos="120 0" z-index="0" size="40 5" textsize="1.2" halign="center" text="Dedi"/>
+<label pos="140 0" z-index="0" size="20 5" textsize="1.2" text="Next"/>
 
-    <frame pos="-95 45">
-        <quad pos="135 -13" z-index="0" size="0.2 80" bgcolor="18f9"/>
-        <label pos="0 0" z-index="0" size="20 5" text="$oMaps" textcolor="ffff" halign="left"/>
-        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="modal.hide,MapList"/>
 
-        <label pos="0 -12" z-index="0" size="79 5" text="Name"/>
-        <label pos="65 -12" z-index="0" size="40 5" text="Author"/>
-        <label pos="105 -12" z-index="0" size="40 5" halign="center" text="Local"/>
-        <label pos="120 -12" z-index="0" size="40 5" halign="center" text="Dedi"/>
+{if $player->isAdmin()}
+<label pos="-20 0" z-index="0" size="20 5" textsize="1.2" text="Admin"/>
+<quad pos="-23 3" size="20 89" z-index="-5" bgcolor="000c"/>
+{/if}
 
-        <label pos="140 -12" z-index="0" size="20 5" text="Next"/>
+{if isset($maps)}
+{foreach $maps as $map}
+<frame pos="0 -{3 + $iterator->counter * 3.2}">
+    <label pos="-1 0" z-index="-2" size="138 3" valign="center" action="maplist.queue,{$map->id}"/>
+    <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripStyle($map->Name ?: '')}"/>
+    <label pos="64 0" z-index="-1" size="30 3" textsize="1" valign="center" action="maplist.filter.author,{$map->Author}"/>
+    <label pos="65 0" z-index="0" size="28 3" textsize="1" valign="center" text="{stripStyle(stripColors($map->author ? $map->author->NickName : ($map->Author ?? '')))}"/>
 
-        {if isset($maps)}
-        {foreach $maps as $map}
-        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="62 5" textsize="1.8" valign="center" text="{stripStyle($map->Name ?: '')}"/>
-        <label pos="65 -{15 + $iterator->counter * 5}" z-index="0" size="28 5" textsize="1.8" valign="center" text="{stripStyle(stripColors($map->author->NickName ?: $map->Author ?: ''))}"/>
+    {if $map->locals->where('Player', $player->id)->isNotEmpty()}
+    <label pos="105 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{$map->locals->where('Player', $player->id)->first()->Rank}."/>
+    {/if}
+    {if $map->dedis->where('Player', $player->id)->isNotEmpty()}
+    <label pos="120 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{$map->dedis->where('Player', $player->id)->first()->Rank}."/>
+    {/if}
 
-        <label pos="-1 -{15 + $iterator->counter * 5}" z-index="0" size="64 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.queue,{$map->id}"/>
-        <label pos="64 -{15 + $iterator->counter * 5}" z-index="0" size="30 4.8" textsize="1.8" valign="center" textcolor="18fa" action="maplist.filter.author,{$map->Author}"/>
-
-            {if $player->isAdmin()}
-            <label pos="-6 -{15 + $iterator->counter * 5}" z-index="0" size="10 5" textsize="1.8" text="DELETE" valign="center" halign="right" textcolor="f11a" action="maplist.delete,{$map->id}"/>
-            {/if}
-        {/foreach}
-        {/if}
-
-        {if count($queuedMaps)}
-        {foreach $queuedMaps as $mapQueueItem}
-        <frame pos="140 -{12 + $iterator->counter * 8}">
-            <label pos="0 0" z-index="0" size="50 5" textsize="1.8" valign="center" text="{$mapQueueItem->map->Name}"/>
-            <label pos="0 -3" z-index="0" size="50 5" textsize=".7" valign="center" textcolor="cccc" text="Requested by {$mapQueueItem->issuer->NickName}"/>
-        </frame>
-        {/foreach}
-        {else}
-        <label pos="140 -20" z-index="0" size="50 5" textsize="1.8" valign="center" text="No maps in queue"/>
-        {/if}
-
-        {for $i = 1; $i <= 0; $i++}
-        <label pos="{$i * 6 - 4} -98" z-index="0" size="5 5" textsize="1.8" textcolor="{0 == $i ? '19FF' : 'EEEF'}" valign="center" halign="center" text="{$i}" action="ms.menu.showpage,{$i}"/>
-        {/for}
-    </frame>
-
-    <script><!--
-    main() {
-        declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-        declare Real startScale = 0.85;
-        declare Real curScale = startScale;
-        declare Real targetScale = 0.81;
-
-        while(curScale > targetScale){
-            yield;
-            curScale = curScale - 0.009;
-            frame.Scale = curScale;
-        }
-    }
-    --></script>
+    {if $player->isAdmin()}
+    <label pos="-20 0" z-index="-3" size="157 3" textsize="1" text="  DELETE" valign="center" halign="left" textcolor="f11a" action="maplist.delete,{$map->id}"/>
+    {/if}
 </frame>
-</manialink>
+{/foreach}
+{/if}
+
+{if count($queuedMaps)}
+{foreach $queuedMaps as $mapQueueItem}
+<frame pos="140 -{$iterator->counter * 8 - 1}">
+    <label pos="0 0" z-index="0" size="32 5" textsize="1" valign="center" text="{stripStyle($mapQueueItem->map->Name)}"/>
+    <label pos="0 -3" z-index="0" size="32 5" textsize=".5" valign="center" textcolor="cccc" text="Requested by {stripStyle($mapQueueItem->issuer->NickName, true)}"/>
+</frame>
+{/foreach}
+{else}
+<label pos="140 -5" z-index="0" size="36 5" textsize="1" valign="center" halign="top" text="No maps in queue"/>
+{/if}

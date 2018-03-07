@@ -140,7 +140,7 @@ class MxKarma extends MXK
 
         $response = self::call(MXK::saveVotes, $map, $votes);
 
-        if (!$response->updated) {
+        if ($response instanceof stdClass && !$response->updated) {
             Log::warning('Could not update MX Karma.');
         }
     }
