@@ -31,7 +31,7 @@ class MapList
         $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
 
         $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show']);
+        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show', 'page' => $page]);
 
         Template::show($player, 'esc.modal', [
             'id' => 'MapList',

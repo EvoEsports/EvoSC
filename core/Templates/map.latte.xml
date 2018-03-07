@@ -8,7 +8,8 @@
 
     <label pos="38 -2" z-index="1" size="36 3" text="{$map->Name}" halign="right" textcolor="eeee" textsize="1.4"/>
     <label pos="38 -7" z-index="1" size="36 3" text="by {isset($map->author->NickName) ? stripStyle($map->author->NickName) : $map->Author}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
-    <quad pos="42.5 -2.5" z-index="0" size="6 6" style="TitleLogos" substyle="Icon" opacity=".8"/>
+
+    <label pos="45 -5" valign="center" halign="center" textsize="2" size="6 6" text="" textcolor="ffff"/>
 
     <quad pos="0 0" size="50 10" action="maplist.show" />
 </frame>
