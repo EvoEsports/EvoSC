@@ -144,15 +144,14 @@ class LocalRecords
         $columns = [];
         foreach ($chunks as $key => $chunk) {
             $ranking = Template::toString('esc.ranking', ['ranks' => $chunk]);
-            $ranking = '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>';
-            array_push($columns, $ranking);
+            array_push($columns, '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>');
         }
 
         Template::show($player, 'esc.modal', [
             'id' => 'LocalRecordsOverview',
             'width' => 180,
             'height' => 97,
-            'content' => implode('', $columns ?? [])
+            'content' => implode('', $columns)
         ]);
     }
 

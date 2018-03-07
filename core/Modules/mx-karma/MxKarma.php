@@ -305,6 +305,10 @@ class MxKarma extends MXK
                 break;
 
             case MXK::saveVotes:
+                if (count(self::$votes) == 0) {
+                    return null;
+                }
+
                 $requestMethod = 'POST';
 
                 $query = [
