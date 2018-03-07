@@ -23,7 +23,7 @@ main() {
     while(True){
         yield;
 
-        if(player.Speed > 25){
+        if(player != Null && player.Speed > 25){
             if(fr.PosnX > endPos){
                 fr.PosnX = fr.PosnX - 1;
             }
