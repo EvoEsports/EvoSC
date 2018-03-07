@@ -76,7 +76,7 @@ class ModuleController
 
             try {
                 require_once "$loadFrom/$item/$moduleData->main.php";
-                $module = new Module($moduleData->name ?: $moduleData->main, $moduleData->main);
+                $module = new Module($moduleData->name ?? $moduleData->main, $moduleData->main);
                 $module->load();
 
                 self::$loadedModules->push($module);

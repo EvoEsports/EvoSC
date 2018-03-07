@@ -29,8 +29,9 @@ class Template
 
     public static function hideAll(string $index)
     {
-        $xml = TemplateController::getBlankTemplate($index);
-        Server::getRpc()->sendDisplayManialinkPage('', $xml);
+        self::showAll('blank', [
+            'id' => $index
+        ]);
     }
 
     public static function show(Player $player, string $index, array $values = null)
@@ -54,8 +55,9 @@ class Template
 
     public static function hide(Player $player, string $index)
     {
-        $xml = TemplateController::getBlankTemplate($index);
-        Server::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
+        self::show($player, 'blank', [
+            'id' => $index
+        ]);
     }
 
     public static function add(string $index, string $template = null)

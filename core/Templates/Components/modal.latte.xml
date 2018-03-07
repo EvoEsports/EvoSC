@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{$id}" version="3">
-    <frame pos="0 0" scale="0.8">
+    <frame pos="0 0" scale="1">
         <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="0006"/>
         <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="18f6"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="18f2"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-1" size="{$width} {$height}" style="Bgs1" substyle="BgDialogBlur"/>
-        <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="20 5" text="$sModules" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
-        <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="10 3" text="close" valign="top" textsize="1.6" textcolor="fff9" halign="right" action="modal.close,{$id}"/>
-
-        <frame pos="-{($width/2)-3} {($height/2)-11}">
-            <label pos="0 0" z-index="0" size="79 5" halign="left" valign="top" text="Name"/>
-        </frame>
+        <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="{$width-6} 5" text="$s{$id}" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
+        <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="10 3" text="close" valign="top" textsize="1.6" textcolor="fff9" halign="right" action="modal.hide,{$id}"/>
+        <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
     </frame>
 </manialink>

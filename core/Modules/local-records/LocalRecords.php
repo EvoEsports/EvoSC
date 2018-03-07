@@ -4,6 +4,7 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\classes\Template;
 use esc\classes\Timer;
 use esc\controllers\ChatController;
@@ -25,6 +26,9 @@ class LocalRecords
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
         Hook::add('PlayerConnect', 'LocalRecords::beginMap');
+
+        ManiaLinkEvent::add('locals.show', 'LocalRecords::showLocalsModal');
+        ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
     }
 
     private function createTables()
@@ -84,7 +88,7 @@ class LocalRecords
                         self::pushDownRanks($map, $worstLocal->Rank);
                         $local = self::pushLocal($map, $player, $score, $worstLocal->Rank);
                         ChatController::messageAllNew('Player ', $player, ' gained the ', $local);
-                    }else{
+                    } else {
                         $local = self::pushLocal($map, $player, $score, $worstLocal->Rank + 1);
                         ChatController::messageAllNew('Player ', $player, ' made the ', $local);
                     }
@@ -132,6 +136,31 @@ class LocalRecords
         self::displayLocalRecords();
     }
 
+    public static function showLocalsModal(Player $player)
+    {
+        $map = MapController::getCurrentMap();
+        $chunks = $map->locals->chunk(25);
+
+        $columns = [];
+        foreach ($chunks as $key => $chunk) {
+            $ranking = Template::toString('esc.ranking', ['ranks' => $chunk]);
+            $ranking = '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>';
+            array_push($columns, $ranking);
+        }
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'LocalRecordsOverview',
+            'width' => 180,
+            'height' => 97,
+            'content' => implode('', $columns ?? [])
+        ]);
+    }
+
+    public static function hideLocalsModal(Player $player, string $id)
+    {
+        Template::hide($player, $id);
+    }
+
     public static function displayLocalRecords()
     {
         $locals = MapController::getCurrentMap()
@@ -147,12 +176,8 @@ class LocalRecords
             'y' => config('ui.locals.y'),
             'rows' => config('ui.locals.rows'),
             'scale' => config('ui.locals.scale'),
-            'content' => Template::toString('locals', ['locals' => $locals])
-        ]);
-
-        Template::showAll('esc.modal', [
-            'width' => 250,
-            'height' => 140
+            'content' => Template::toString('locals', ['locals' => $locals]),
+            'action' => 'locals.show'
         ]);
     }
 }

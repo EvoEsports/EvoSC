@@ -5,6 +5,7 @@ use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\controllers\ChatController;
@@ -32,7 +33,7 @@ class Dedimania
 
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
 
-        ChatController::addCommand('dediinfo', 'Dedimania::printInfo', 'Prints dedis of connected players to chat.');
+        ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
     }
 
     private function createTables()
@@ -114,6 +115,26 @@ class Dedimania
         self::displayDedis();
     }
 
+    public static function showDedisModal(Player $player)
+    {
+        $map = MapController::getCurrentMap();
+        $chunks = $map->dedis->chunk(25);
+
+        $columns = [];
+        foreach ($chunks as $key => $chunk) {
+            $ranking = Template::toString('esc.ranking', ['ranks' => $chunk]);
+            $ranking = '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>';
+            array_push($columns, $ranking);
+        }
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'DediRecordsOverview',
+            'width' => 180,
+            'height' => 97,
+            'content' => implode('', $columns ?? [])
+        ]);
+    }
+
     public static function displayDedis(Player $player = null)
     {
         $rows = config('ui.dedis.rows');
@@ -127,7 +148,8 @@ class Dedimania
             'y' => config('ui.dedis.y'),
             'rows' => $rows,
             'scale' => config('ui.dedis.scale'),
-            'content' => Template::toString('dedis', ['dedis' => $dedis])
+            'content' => Template::toString('dedis', ['dedis' => $dedis]),
+            'action' => 'dedis.show'
         ];
 
         if ($player) {

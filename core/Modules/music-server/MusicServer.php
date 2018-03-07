@@ -182,8 +182,9 @@ class MusicServer
             $song->url = config('music.server') . '/' . $song->file;
         }
 
-        $totalTime = (time() + microtime()) - self::$startLoad;
-        Log::info("Finished loading music. " . sprintf("Took %.3fs.", $totalTime));
+//        $totalTime = (float) ((time() + microtime()) - self::$startLoad);
+//        Log::info("Finished loading music. " . sprintf("Took %.3fs.", $totalTime));
+        Log::info("Finished loading music.");
 
         self::$music = $songs;
     }

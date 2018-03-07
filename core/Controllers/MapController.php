@@ -168,9 +168,11 @@ class MapController
      */
     public static function getNext(): Map
     {
-        $map = self::getQueue()->first()->map;
+        $first = self::$queue->first();
 
-        if (!$map) {
+        if($first){
+            $map = self::$queue->first()->map;
+        }else{
             $mapInfo = Server::getRpc()->getNextMapInfo();
             $map = Map::where('UId', $mapInfo->uId)->first();
         }
