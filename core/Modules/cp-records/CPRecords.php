@@ -48,7 +48,7 @@ class CPRecords
 
         self::$checkpoints[$cpId] = new Checkpoint($player, $score, $cpId);
 
-        self::showCheckpointRecords();
+        self::showCheckpointRecords(false, $cpId);
     }
 
     public static function playerConnect()
@@ -56,7 +56,7 @@ class CPRecords
         self::showCheckpointRecords();
     }
 
-    public static function showCheckpointRecords(bool $clear = false)
+    public static function showCheckpointRecords(bool $clear = false, $cpId = null)
     {
         $cps = new Collection();
 
@@ -68,7 +68,13 @@ class CPRecords
                 $y = $row * 10.5 - 10;
                 $posInRow = $checkpoint->id % $columns;
                 $x = $posInRow * 110.5 - (110.5 * $columns / 2);
-                $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
+
+                if(isset($cpId) && $cpId == $checkpoint->id){
+                    \esc\Classes\Log::info("Show flash.");
+                    $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
+                }else{
+                    $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
+                }
             }
         }
 
