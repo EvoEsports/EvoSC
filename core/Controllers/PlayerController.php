@@ -65,7 +65,7 @@ class PlayerController
         Log::info($player->NickName . " joined the server.");
 
         if (!$surpressJoinMessage) {
-            ChatController::messageAllNew($player->group, ' ', $player, ' joined the server');
+            ChatController::messageAll($player->group, ' ', $player, ' joined the server');
         }
 
         self::displayPlayerlist();
@@ -100,7 +100,7 @@ class PlayerController
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
-        ChatController::messageAllNew($player, ' left the server');
+        ChatController::messageAll($player, ' left the server');
     }
 
     public static function playerInfoChanged($infoplayerInfo)
@@ -159,7 +159,7 @@ class PlayerController
 
         Template::showAll('esc.box', [
             'id' => 'PlayerList',
-            'title' => 'live rankings',
+            'title' => '  LIVE RANKINGS',
             'x' => config('ui.playerlist.x'),
             'y' => config('ui.playerlist.y'),
             'rows' => 13,

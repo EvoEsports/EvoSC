@@ -184,7 +184,7 @@ class Dedimania
 
         $variables = [
             'id' => 'Dedimania',
-            'title' => 'dedimania records',
+            'title' => '🏆  DEDIMANIA',
             'x' => config('ui.dedis.x'),
             'y' => config('ui.dedis.y'),
             'rows' => $rows,

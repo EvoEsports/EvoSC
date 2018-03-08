@@ -7,11 +7,13 @@ use esc\classes\ChatCommand;
 use esc\classes\File;
 use esc\classes\Log;
 use esc\classes\Module;
+use esc\Classes\RestClient;
 use esc\classes\Server;
 use esc\classes\Template;
 use esc\models\Group;
 use esc\models\Map;
 use esc\models\Player;
+use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 use Song;
@@ -71,6 +73,15 @@ $$: Writes a dollarsign
 
         Log::chat($player->NickName, $text);
         $nick = $player->NickName;
+
+        $parts = explode(" ", $text);
+        foreach ($parts as $part) {
+            if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
+                $url = $matches[0];
+                $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
+                $text = str_replace($url, $info, $text);
+            }
+        }
 
         if (preg_match('/\$l\[(http.+)\](http.+)[ ]?/', $text, $matches)) {
             if (strlen($matches[2]) > 50) {
@@ -152,21 +163,14 @@ $$: Writes a dollarsign
         Log::info("Chat command added: $trigger$command -> $callback");
     }
 
-    public static function messageAll(string $formatString, ...$arguments)
-    {
-        foreach (PlayerController::getPlayers() as $player) {
-            self::message($player, $formatString, $arguments);
-        }
-    }
-
-    public static function messageAllNew(...$parts)
+    public static function messageAll(...$parts)
     {
         foreach (onlinePlayers() as $player) {
-            self::messageNew($player, ...$parts);
+            self::message($player, ...$parts);
         }
     }
 
-    public static function messageNew(Player $recipient, ...$parts)
+    public static function message(Player $recipient, ...$parts)
     {
         $message = '$s';
 
@@ -222,20 +226,5 @@ $$: Writes a dollarsign
         }
 
         Server::getRpc()->chatSendServerMessage($message, $recipient->Login);
-    }
-
-    public static function message(Player $player, string $formatString, ...$arguments)
-    {
-        $primaryColor = config('color.primary');
-        array_unshift($arguments[0], $formatString);
-        $message = call_user_func_array('sprintf', $arguments[0]);
-
-        try {
-            if (isset($player->Login) && $player->Online) {
-                Server::getRpc()->chatSendServerMessage('$' . $primaryColor . $message, $player->Login);
-            }
-        } catch (FaultException $e) {
-            Log::error($e);
-        }
     }
 }

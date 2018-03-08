@@ -2,7 +2,7 @@
 <manialink id="{$id}" version="3">
     <frame pos="{$x} {$y}" scale="{isset($scale) ? $scale : 1}">
         <quad pos="0 0" z-index="-1" size="50 {$rows * 4.1 + 6}" bgcolor="000a" action="{$action ?? ''}" />
-        <label pos="2 -2" z-index="1" size="48 3" text="{$title}" textsize="1"/>
+        <label pos="2 -3" z-index="1" size="48 3" text="{$title}" textsize=".8" valign="center"/>
         <quad pos="0 -6" z-index="1" size="50 0.2" bgcolor="18fc"/>
         <quad pos="0 0" z-index="0" size="50 6" bgcolor="18f2"/>
         <frame z-index="2" pos="0 -6">{$content|noescape}</frame>

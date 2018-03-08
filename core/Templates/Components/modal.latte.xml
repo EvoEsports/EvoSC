@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{$id}" version="3">
-    <frame pos="0 0" scale="1">
+    <frame pos="0 0" scale="1" id="main-frame">
         <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="0006"/>
         <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="18f6"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="18f2"/>
@@ -8,10 +8,27 @@
         <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="{$width-6} 5" text="$s{$id}" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
         <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="3 3" text="✖" valign="top" textsize="1.6" textcolor="fff9" halign="right" action="modal.hide,{$id}"/>
         <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
+
+
+        <script><!--
+    main() {
+        declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+        declare Real startScale = frame.Scale;
+        declare Real curScale = 1.0;
+        declare Real targetScale = 0.95;
+
+        while(curScale > targetScale){
+            yield;
+            curScale = curScale - 0.01;
+            frame.Scale = curScale;
+        }
+    }
+    --></script>
+
+        {if isset($pagination)}
+        <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">
+            {$pagination|noescape}
+        </frame>
+        {/if}
     </frame>
-    {if isset($pagination)}
-    <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">
-        {$pagination|noescape}
-    </frame>
-    {/if}
 </manialink>

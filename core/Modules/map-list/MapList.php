@@ -64,7 +64,7 @@ class MapList
     public static function deleteMap(Player $player, $mapId)
     {
         if (!$player->isAdmin()) {
-            ChatController::messageNew($player, 'You do not have access to that command');
+            ChatController::message($player, 'You do not have access to that command');
             return;
         }
 

@@ -76,6 +76,6 @@ class AdminCommands
 
         MapController::goToNextMap();
 
-        ChatController::messageAllNew($callee, ' skips map');
+        ChatController::messageAll($callee, ' skips map');
     }
 }

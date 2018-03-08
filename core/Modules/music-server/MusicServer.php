@@ -166,7 +166,7 @@ class MusicServer
                 'time' => time()
             ]);
 
-            ChatController::messageAllNew($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
+            ChatController::messageAll($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
         }
 
         Template::hide($callee, 'music.menu');

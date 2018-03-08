@@ -38,7 +38,7 @@ class ModuleController
             $players = PlayerController::getPlayers()->where('Group', Group::SUPER);
 
             foreach ($players as $player) {
-                ChatController::messageNew($player, $callee, ' reloads module ', $module);
+                ChatController::message($player, $callee, ' reloads module ', $module);
             }
         }
     }

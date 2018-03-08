@@ -69,7 +69,7 @@ class MxKarma extends MXK
 
         $rating = [0 => 'Unplayable', 20 => 'Trash', 40 => 'Ok', 60 => 'Good', 80 => 'Awesome', 100 => 'Fantastic'][$rating];
 
-        ChatController::messageAllNew($player, ' rated this track ', secondary("$rating"));
+        ChatController::messageAll($player, ' rated this track ', secondary("$rating"));
 
         self::showWidget();
     }
@@ -244,7 +244,7 @@ class MxKarma extends MXK
 
         Template::showAll('esc.box', [
             'id' => 'MXKarma',
-            'title' => 'mx karma',
+            'title' => '  MX KARMA',
             'x' => config('ui.mx-karma.x'),
             'y' => config('ui.mx-karma.y'),
             'rows' => 1.5,

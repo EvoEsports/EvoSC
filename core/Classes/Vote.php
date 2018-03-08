@@ -49,7 +49,7 @@ class Vote
     public static function voteYes(Player $player)
     {
         if (!self::$inProgress) {
-            ChatController::messageNew($player, 'There is no vote in progress');
+            ChatController::message($player, 'There is no vote in progress');
             return;
         }
 
@@ -59,7 +59,7 @@ class Vote
     public static function voteNo(Player $player)
     {
         if (!self::$inProgress) {
-            ChatController::messageNew($player, 'There is no vote in progress');
+            ChatController::message($player, 'There is no vote in progress');
             return;
         }
 
@@ -82,7 +82,7 @@ class Vote
     public static function replayMap(Player $player)
     {
         if (self::$inProgress) {
-            ChatController::messageNew($player, 'There is already a vote in progress');
+            ChatController::message($player, 'There is already a vote in progress');
             return;
         }
 
@@ -97,7 +97,7 @@ class Vote
 
         Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
 
-        ChatController::messageAllNew($player, ' is asking for more time. Type /y or /n to vote.');
+        ChatController::messageAll($player, ' is asking for more time. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -105,7 +105,7 @@ class Vote
     public static function skipMap(Player $player)
     {
         if (self::$inProgress) {
-            ChatController::messageNew($player, 'There is already a vote in progress');
+            ChatController::message($player, 'There is already a vote in progress');
             return;
         }
 
@@ -120,7 +120,7 @@ class Vote
 
         Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
 
-        ChatController::messageAllNew($player, ' is asking to skip the map. Type /y or /n to vote.');
+        ChatController::messageAll($player, ' is asking to skip the map. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -148,7 +148,7 @@ class Vote
 
         $voteText = '$' . config('color.secondary') . self::$message;
 
-        ChatController::messageAllNew('Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
+        ChatController::messageAll('Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
 
         self::stopVote();
     }
@@ -177,18 +177,18 @@ class Vote
 
     public static function hideVote()
     {
-        Template::hideAll('vote');
+        Template::hideAll('Vote');
     }
 
     public static function stopVote(Player $player = null)
     {
         if(!self::$inProgress){
-            ChatController::messageNew($player, 'There is currently no vote to stop');
+            ChatController::message($player, 'There is currently no vote to stop');
             return;
         }
 
         if ($player) {
-            ChatController::messageAllNew($player, ' stops vote');
+            ChatController::messageAll($player, ' stops vote');
         }
 
         Timer::stop('vote.finish');
@@ -204,11 +204,11 @@ class Vote
     public static function approveVote(Player $player)
     {
         if(!self::$inProgress){
-            ChatController::messageNew($player, 'There is currently no vote to approve');
+            ChatController::message($player, 'There is currently no vote to approve');
             return;
         }
 
-        ChatController::messageAllNew($player, ' approves vote');
+        ChatController::messageAll($player, ' approves vote');
         call_user_func(self::$action);
         self::stopVote();
     }

@@ -90,10 +90,10 @@ class MapController
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
             Server::getRpc()->chooseNextMap($request->map->FileName);
-            ChatController::messageAllNew('Next map: ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::messageAll('Next map: ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::messageAllNew('Next map: ', $nextMap);
+            ChatController::messageAll('Next map: ', $nextMap);
         }
     }
 
@@ -149,7 +149,7 @@ class MapController
         $deleted = File::delete(Config::get('server.maps') . '/' . $map->FileName);
 
         if ($deleted) {
-            ChatController::messageAllNew('Admin removed map ', $map);
+            ChatController::messageAll('Admin removed map ', $map);
             $map->delete();
         }
     }
@@ -186,7 +186,7 @@ class MapController
      */
     public static function skip(Player $player)
     {
-        ChatController::messageAllNew($player->group, ' ', $player, ' skips map');
+        ChatController::messageAll($player->group, ' ', $player, ' skips map');
         MapController::goToNextMap();
         Vote::stopVote();
     }
@@ -200,12 +200,12 @@ class MapController
         $currentMap = self::getCurrentMap();
 
         if (self::getQueue()->contains('map.UId', $currentMap->UId)) {
-            ChatController::messageNew($player, 'Map is already being replayed');
+            ChatController::message($player, 'Map is already being replayed');
             return;
         }
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::messageAllNew($player, ' queued map ', $currentMap, ' for replay');
+        ChatController::messageAll($player, ' queued map ', $currentMap, ' for replay');
         self::displayMapWidget();
     }
 
@@ -225,7 +225,7 @@ class MapController
 
         Server::getRpc()->chooseNextMap(self::getNext()->FileName);
 
-        ChatController::messageAllNew($player, ' juked map ', $map);
+        ChatController::messageAll($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");
 
         self::displayMapWidget();
@@ -314,13 +314,13 @@ class MapController
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::messageAllNew("Requested map with invalid id: " . $mxId);
+                ChatController::messageAll("Requested map with invalid id: " . $mxId);
                 return;
             }
 
             $map = Map::where('MxId', $mxId)->first();
             if ($map) {
-                ChatController::messageAllNew($map, ' already exists');
+                ChatController::messageAll($map, ' already exists');
                 continue;
             }
 
@@ -328,7 +328,7 @@ class MapController
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-                ChatController::messageAllNew("Can not reach mania exchange.");
+                ChatController::messageAll("Can not reach mania exchange.");
                 return;
             }
 
@@ -357,7 +357,7 @@ class MapController
                 Log::warning("Map $map->FileName already added.");
             }
 
-            ChatController::messageAllNew('New map added: ', $map);
+            ChatController::messageAll('New map added: ', $map);
         }
     }
 }

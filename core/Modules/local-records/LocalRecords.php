@@ -62,7 +62,7 @@ class LocalRecords
             $local = $map->locals()->wherePlayer($player->id)->first();
 
             if ($score == $local->Score) {
-                ChatController::messageAllNew('Player ', $player, ' equaled his/hers ', $local);
+                ChatController::messageAll('Player ', $player, ' equaled his/hers ', $local);
                 return;
             }
 
@@ -73,10 +73,10 @@ class LocalRecords
                 if ($rank != $local->Rank) {
                     self::pushDownRanks($map, $rank);
                     $local->update(['Score' => $score, 'Rank' => $rank]);
-                    ChatController::messageAllNew('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score]);
-                    ChatController::messageAllNew('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
         } else {
@@ -87,15 +87,15 @@ class LocalRecords
                     if ($score <= $worstLocal->Score) {
                         self::pushDownRanks($map, $worstLocal->Rank);
                         $local = self::pushLocal($map, $player, $score, $worstLocal->Rank);
-                        ChatController::messageAllNew('Player ', $player, ' gained the ', $local);
+                        ChatController::messageAll('Player ', $player, ' gained the ', $local);
                     } else {
                         $local = self::pushLocal($map, $player, $score, $worstLocal->Rank + 1);
-                        ChatController::messageAllNew('Player ', $player, ' made the ', $local);
+                        ChatController::messageAll('Player ', $player, ' made the ', $local);
                     }
                 } else {
                     $rank = 1;
                     $local = self::pushLocal($map, $player, $score, $rank);
-                    ChatController::messageAllNew('Player ', $player, ' made the ', $local);
+                    ChatController::messageAll('Player ', $player, ' made the ', $local);
                 }
             }
         }
@@ -170,7 +170,7 @@ class LocalRecords
 
         Template::showAll('esc.box', [
             'id' => 'Locals',
-            'title' => 'local records',
+            'title' => '🏆  LOCAL RECORDS',
             'x' => config('ui.locals.x'),
             'y' => config('ui.locals.y'),
             'rows' => config('ui.locals.rows'),

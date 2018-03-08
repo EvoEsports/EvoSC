@@ -9,7 +9,7 @@
     <frame pos="-95 45">
         <quad pos="145 -13" z-index="0" size="0.2 80" bgcolor="18f9"/>
         <label pos="0 0" z-index="0" size="20 5" text="$oMusic" textcolor="ffff" halign="left"/>
-        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="ms.hidemenu"/>
+        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="modal.hide,SongMenu"/>
 
         <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
         <label pos="55 -12" z-index="0" size="40 5" text="Artist"/>
