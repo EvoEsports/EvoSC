@@ -34,6 +34,10 @@ class Log
                     Console::log($line, 'red');
                     break;
 
+                case 'Dedimania':
+                    Console::log($line, 'purple');
+                    break;
+
                 case '[!] ERROR':
                     Console::log($line, 'black', true, 'red');
                     break;

@@ -40,7 +40,7 @@ function config(string $id, $default = null)
 
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . '\\cache\\' . $filename;
+    return __DIR__ . '\\..\\cache\\' . $filename;
 }
 
 function musicDir(string $filename = ''): string

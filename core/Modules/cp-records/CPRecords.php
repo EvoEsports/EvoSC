@@ -70,7 +70,6 @@ class CPRecords
                 $x = $posInRow * 110.5 - (110.5 * $columns / 2);
 
                 if(isset($cpId) && $cpId == $checkpoint->id){
-                    \esc\Classes\Log::info("Show flash.");
                     $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
                 }else{
                     $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));

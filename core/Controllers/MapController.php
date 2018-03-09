@@ -55,6 +55,9 @@ class MapController
             $table->string('Name')->nullable();
             $table->string('Author')->nullable();
             $table->string('FileName')->unique();
+            $table->string('Environnement')->nullable();
+            $table->integer('NbCheckpoints')->nullable();
+            $table->integer('NbLaps')->nullable();
             $table->integer('Plays')->default(0);
             $table->string('Mood')->nullable();
             $table->boolean('LapRace')->nullable();

@@ -1,22 +1,21 @@
 <?php
 
-use esc\classes\Config;
+require_once __DIR__ . '/DedimaniaApi.php';
+
 use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\classes\RestClient;
 use esc\classes\Template;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
-use esc\classes\Server;
 use esc\models\Map;
 use esc\models\Player;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
-class Dedimania
+class Dedimania extends DedimaniaApi
 {
     private static $dedis;
 
@@ -54,50 +53,28 @@ class Dedimania
         });
     }
 
-    private static function getSession(): ?DedimaniaSession
-    {
-        $session = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at')->first();
-
-        if ($session) {
-            Log::info("Dedimania using stored session: $session->Session from $session->created_at");
-        } else {
-            $sessionId = self::authenticateAndValidateAccount();
-
-            if ($sessionId == null) {
-                Log::warning("Connection to Dedimania failed. Using cached values.");
-                return null;
-            }
-
-            Log::info("Dedimania session created: $sessionId");
-
-            return DedimaniaSession::create(['Session' => $sessionId]);
-        }
-
-        return $session;
-    }
-
     public static function beginMap(Map $map)
     {
         $session = self::getSession();
 
         if ($session == null) {
             Log::warning("Dedimania offline. Using cached values.");
-//            ChatController::messageAll('Dedimania is offline. Using cached values.');
         }
 
-        $data = self::call('dedimania.GetChallengeInfo', [
-            'UId' => $map->UId
-        ]);
-
-        $records = $data->params->param->value->struct->member[5]->value->array->data->value;
+        $data = self::getChallengeRecords($map);
+        $records = $data->params->param->value->struct->member[3]->value->array->data->value;
 
         foreach ($records as $record) {
-            $login = (string)$record->struct->member[0]->value->string;
-            $nickname = (string)$record->struct->member[1]->value->string;
-            $score = (int)$record->struct->member[2]->value->int;
-            $rank = (int)$record->struct->member[3]->value->int;
+            try{
+                $login = (string)$record->struct->member[0]->value->string;
+                $nickname = (string)$record->struct->member[1]->value->string;
+                $score = (int)$record->struct->member[2]->value->int;
+                $rank = (int)$record->struct->member[3]->value->int;
 
-            $player = Player::firstOrCreate(['Login' => $login]);
+                $player = Player::firstOrCreate(['Login' => $login]);
+            }catch(\Exception $e){
+                continue;
+            }
 
             if (isset($player->id)) {
                 $player->update(['NickName' => $nickname]);
@@ -113,20 +90,29 @@ class Dedimania
             }
         }
 
-        foreach (Dedi::whereMap($map->id)->orderBy('Score')->get() as $key => $dedi) {
-            $dedi->update(['Rank' => $key + 1]);
-        }
+        Dedi::where('Map', $map->id)->where('Score', 0)->delete();
 
         foreach (onlinePlayers() as $player) {
             self::displayDedis($player);
         }
     }
 
+    /**
+     * Checks if player has a dedi
+     * @param Map $map
+     * @param Player $player
+     * @return bool
+     */
     public static function playerHasDedi(Map $map, Player $player): bool
     {
         return $map->dedis->where('Player', $player->id)->isNotEmpty();
     }
 
+    /**
+     * called on playerFinish
+     * @param Player $player
+     * @param int $score
+     */
     public static function playerFinish(Player $player, int $score)
     {
         if ($score == 0) {
@@ -182,6 +168,14 @@ class Dedimania
         self::displayDedis();
     }
 
+    /**
+     * Inser the dedi
+     * @param Map $map
+     * @param Player $player
+     * @param int $score
+     * @param int $rank
+     * @return Dedi
+     */
     private static function pushDedi(Map $map, Player $player, int $score, int $rank): Dedi
     {
         $map->dedis()->create([
@@ -194,6 +188,12 @@ class Dedimania
         return $map->dedis()->whereRank($rank)->first();
     }
 
+    /**
+     * Get insert position
+     * @param Map $map
+     * @param int $score
+     * @return int|null
+     */
     private static function getRank(Map $map, int $score): ?int
     {
         $nextBetter = $map->dedis->where('Score', '<=', $score)->sortByDesc('Score')->first();
@@ -205,11 +205,20 @@ class Dedimania
         return 1;
     }
 
+    /**
+     * Push down worse ranks
+     * @param Map $map
+     * @param int $startRank
+     */
     private static function pushDownRanks(Map $map, int $startRank)
     {
         $map->dedis()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
     }
 
+    /**
+     * Display all dedis in window
+     * @param Player $player
+     */
     public static function showDedisModal(Player $player)
     {
         $map = MapController::getCurrentMap();
@@ -290,126 +299,6 @@ class Dedimania
             Template::show($player, 'esc.box', $variables);
         } else {
             Template::showAll('esc.box', $variables);
-        }
-    }
-
-    /**
-     * Connect to dedimania and authenticate
-     */
-    private static function authenticateAndValidateAccount(): ?string
-    {
-        $response = Dedimania::callStruct('dedimania.OpenSession', [
-            'Game' => 'TM2',
-            'Login' => Config::get('dedimania.login'),
-            'Code' => Config::get('dedimania.key'),
-            'Tool' => 'EvoSC',
-            'Version' => getEscVersion(),
-            'Packmask' => 'Stadium',
-            'ServerVersion' => Server::getRpc()->getVersion()->version,
-            'ServerBuild' => Server::getRpc()->getVersion()->build,
-            'Path' => Server::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
-        ]);
-
-        try {
-            return (string)$response->params->param->value->array->data->value->array->data->value->struct->member[0]->value->string;
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8081/Dedimania
-     * @param string $method
-     * @param array|null $parameters
-     * @return null|SimpleXMLElement
-     */
-    public static function call(string $method, array $parameters = null): ?SimpleXMLElement
-    {
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
-        $xml->addChild('methodName', $method);
-
-        $params = $xml->addChild('params');
-
-        if ($parameters) {
-            foreach ($parameters as $key => $param) {
-                $member = $params->addChild('member');
-                $member->addChild('name', $key);
-                $member->addChild('value')->addChild('string', $param);
-            }
-        }
-
-        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8'
-            ],
-            'body' => $xml->asXML()
-        ]);
-
-        if ($response->getStatusCode() != 200) {
-            Log::error($response->getReasonPhrase());
-            return null;
-        }
-
-        return new SimpleXMLElement($response->getBody());
-    }
-
-    /**
-     * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8081/Dedimania
-     * @param string $method
-     * @param array|null $parameters
-     * @return null|SimpleXMLElement
-     */
-    public static function callStruct(string $method, array $parameters = null): ?SimpleXMLElement
-    {
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
-        $xml->addChild('methodName', 'system.multicall');
-
-        $struct = $xml
-            ->addChild('params')
-            ->addChild('param')
-            ->addChild('value')
-            ->addChild('array')
-            ->addChild('data')
-            ->addChild('value')
-            ->addChild('struct');
-
-        $member = $struct->addChild('member');
-        $member->addChild('name', 'methodName');
-        $member->addChild('value')->addChild('string', $method);
-
-        if ($parameters) {
-            $structArrayMember = $struct->addChild('member');
-            $structArrayMember->addChild('name', 'params');
-            $structArray = $structArrayMember->addChild('value')->addChild('array')->addChild('data')->addChild('value')->addChild('struct');
-
-            foreach ($parameters as $key => $param) {
-                $subMember = $structArray->addChild('member');
-                $subMember->addChild('name', $key);
-                $subMember->addChild('value')->addChild('string', $param);
-            }
-        }
-
-        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8'
-            ],
-            'body' => $xml->asXML()
-        ]);
-
-        if ($response->getStatusCode() != 200) {
-            Log::error($response->getReasonPhrase());
-            return null;
-        }
-
-        $content = $response->getBody()->getContents();
-
-        try {
-            return new SimpleXMLElement($content);
-        } catch (\Exception $e) {
-            Log::error("Could not parse content to XML");
-            return null;
         }
     }
 }
