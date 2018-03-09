@@ -232,15 +232,23 @@ class MxKarma extends MXK
 
         $average = self::getUpdatedVotesAverage();
 
-        if ($average < 30) {
-            self::$mapKarma->color = 'f33';
-        } elseif ($average < 60) {
-            self::$mapKarma->color = 'fc3';
-        } else {
-            self::$mapKarma->color = config('color.primary');
+        $starString = '';
+        $stars = $average / 20;
+        $full = floor($stars);
+        $left = $stars - $full;
+
+        for ($i = 0; $i < $full; $i++) {
+            $starString .= '';
         }
 
-        $barColor = self::hsvToHexRgb($average * 1.5, 100, 100);
+        if ($left >= 0.5) {
+            $starString .= '';
+            $full++;
+        }
+
+        for ($i = $full; $i < 5; $i++) {
+            $starString .= '';
+        }
 
         Template::showAll('esc.box', [
             'id' => 'MXKarma',
@@ -249,7 +257,7 @@ class MxKarma extends MXK
             'y' => config('ui.mx-karma.y'),
             'rows' => 1.5,
             'scale' => config('ui.mx-karma.scale'),
-            'content' => Template::toString('mx-karma', ['karma' => self::$mapKarma, 'average' => $average, 'barColor' => $barColor])
+            'content' => Template::toString('mx-karma', ['karma' => self::$mapKarma, 'average' => $average, 'stars' => $starString])
         ]);
     }
 
