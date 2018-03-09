@@ -56,18 +56,19 @@ class Dedimania
 
     private static function getSession(): ?DedimaniaSession
     {
-        $sessions = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at');
+        $session = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at')->first();
 
-        $session = $sessions->first();
-
-        if ($session == null) {
-//            $sessionId = self::authenticateAndValidateAccount();
-            $sessionId = null;
+        if ($session) {
+            Log::info("Dedimania using stored session: $session->Session from $session->created_at");
+        } else {
+            $sessionId = self::authenticateAndValidateAccount();
 
             if ($sessionId == null) {
                 Log::warning("Connection to Dedimania failed. Using cached values.");
                 return null;
             }
+
+            Log::info("Dedimania session created: $sessionId");
 
             return DedimaniaSession::create(['Session' => $sessionId]);
         }
@@ -112,9 +113,101 @@ class Dedimania
             }
         }
 
+        foreach (Dedi::whereMap($map->id)->orderBy('Score')->get() as $key => $dedi) {
+            $dedi->update(['Rank' => $key + 1]);
+        }
+
         foreach (onlinePlayers() as $player) {
             self::displayDedis($player);
         }
+    }
+
+    public static function playerHasDedi(Map $map, Player $player): bool
+    {
+        return $map->dedis->where('Player', $player->id)->isNotEmpty();
+    }
+
+    public static function playerFinish(Player $player, int $score)
+    {
+        if ($score == 0) {
+            return;
+        }
+
+        $map = MapController::getCurrentMap();
+
+        $dedisCount = $map->dedis()->count();
+
+        if (self::playerHasDedi($map, $player)) {
+            $dedi = $map->dedis()->wherePlayer($player->id)->first();
+
+            if ($score == $dedi->Score) {
+                ChatController::messageAll('Player ', $player, ' equaled his/hers ', $dedi);
+                return;
+            }
+
+            if ($score < $dedi->Score) {
+                $diff = $dedi->Score - $score;
+                $rank = self::getRank($map, $score);
+
+                if ($rank != $dedi->Rank) {
+                    self::pushDownRanks($map, $rank);
+                    $dedi->update(['Score' => $score, 'Rank' => $rank]);
+                    ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')', ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                } else {
+                    $dedi->update(['Score' => $score]);
+                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $dedi, ' (-' . formatScore($diff) . ')', ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                }
+            }
+        } else {
+            if ($dedisCount < 100) {
+                $worstDedi = $map->dedis()->orderByDesc('Score')->first();
+
+                if ($worstDedi) {
+                    if ($score <= $worstDedi->Score) {
+                        self::pushDownRanks($map, $worstDedi->Rank);
+                        $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank);
+                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                    } else {
+                        $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank + 1);
+                        ChatController::messageAll('Player ', $player, ' made the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                    }
+                } else {
+                    $rank = 1;
+                    $dedi = self::pushDedi($map, $player, $score, $rank);
+                    ChatController::messageAll('Player ', $player, ' made the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                }
+            }
+        }
+
+        self::displayDedis();
+    }
+
+    private static function pushDedi(Map $map, Player $player, int $score, int $rank): Dedi
+    {
+        $map->dedis()->create([
+            'Player' => $player->id,
+            'Map' => $map->id,
+            'Score' => $score,
+            'Rank' => $rank,
+        ]);
+
+        return $map->dedis()->whereRank($rank)->first();
+    }
+
+    private static function getRank(Map $map, int $score): ?int
+    {
+        $nextBetter = $map->dedis->where('Score', '<=', $score)->sortByDesc('Score')->first();
+
+        if ($nextBetter) {
+            return $nextBetter->Rank + 1;
+        }
+
+        return 1;
+    }
+
+    private static function pushDownRanks(Map $map, int $startRank)
+    {
+        $map->dedis()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
     }
 
     public static function showDedisModal(Player $player)
@@ -217,14 +310,8 @@ class Dedimania
             'Path' => Server::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
-        Log::logAddLine($response, true);
-
         try {
-            if (trim($response) == '') {
-                throw new Exception('Connection to Dedimania failed.');
-            }
-
-            return (string)$response->params->param->value->array->data->value->array->data->value->struct->member->value->string;
+            return (string)$response->params->param->value->array->data->value->array->data->value->struct->member[0]->value->string;
         } catch (\Exception $e) {
             return null;
         }
@@ -232,7 +319,7 @@ class Dedimania
 
     /**
      * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8082/Dedimania
+     * See documentation at http://dedimania.net:8081/Dedimania
      * @param string $method
      * @param array|null $parameters
      * @return null|SimpleXMLElement
@@ -252,7 +339,7 @@ class Dedimania
             }
         }
 
-        $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
+        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=UTF8'
             ],
@@ -269,7 +356,7 @@ class Dedimania
 
     /**
      * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8082/Dedimania
+     * See documentation at http://dedimania.net:8081/Dedimania
      * @param string $method
      * @param array|null $parameters
      * @return null|SimpleXMLElement
@@ -304,7 +391,7 @@ class Dedimania
             }
         }
 
-        $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
+        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=UTF8'
             ],
@@ -316,20 +403,13 @@ class Dedimania
             return null;
         }
 
-        return new SimpleXMLElement($response->getBody());
-    }
+        $content = $response->getBody()->getContents();
 
-    public static function printInfo(Player $callee)
-    {
-        $map = MapController::getCurrentMap();
-        $players = Player::whereOnline(true);
-
-        foreach ($players as $player) {
-            $dedi = $player->dedis()->whereMap($map->id)->first();
-            if ($dedi) {
-                $string = sprintf('%s has dedi $fff%d. %s', stripColors($player->NickName), $dedi->Rank, ((int)$dedi->Score) / 1000);
-                ChatController::messageAll($string);
-            }
+        try {
+            return new SimpleXMLElement($content);
+        } catch (\Exception $e) {
+            Log::error("Could not parse content to XML");
+            return null;
         }
     }
 }

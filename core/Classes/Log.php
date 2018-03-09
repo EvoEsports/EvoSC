@@ -5,7 +5,7 @@ namespace esc\Classes;
 
 class Log
 {
-    private static $prefix = '[ESC]';
+    private static $prefix = '';
 
     public static function logAddLine($string, $echo = false)
     {
@@ -24,33 +24,33 @@ class Log
 
     public static function info($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Info: %s", $message), $echo);
+        self::logAddLine(sprintf("Info: %s", $message), $echo);
     }
 
     public static function error($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " [!] ERROR: %s", $message), $echo);
+        self::logAddLine(sprintf("[!] ERROR: %s", $message), $echo);
         self::debug($message);
     }
 
     public static function warning($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Warning: %s", $message), $echo);
+        self::logAddLine(sprintf("Warning: %s", $message), $echo);
     }
 
     public static function hook($message, $echo = false)
     {
-        self::logAddLine(sprintf(self::$prefix . " Hook: %s", $message), $echo);
+        self::logAddLine(sprintf("Hook: %s", $message), $echo);
     }
 
     private static function debug($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Debug: %s", $message), $echo);
+        self::logAddLine(sprintf("Debug: %s", $message), $echo);
     }
 
     public static function music($message, bool $echo = true)
     {
-        self::logAddLine(sprintf(self::$prefix . " Music-Server: %s", $message), $echo);
+        self::logAddLine(sprintf("Music-Server: %s", $message), $echo);
     }
 
     public static function chat($nick, $message)
