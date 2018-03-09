@@ -170,8 +170,12 @@ $$: Writes a dollarsign
         }
     }
 
-    public static function message(Player $recipient, ...$parts)
+    public static function message(?Player $recipient, ...$parts)
     {
+        if(!$recipient){
+            Log::warning('Do not send message to null player');
+        }
+
         $message = '$s';
 
         foreach ($parts as $part) {
