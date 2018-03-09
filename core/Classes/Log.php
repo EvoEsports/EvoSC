@@ -35,11 +35,11 @@ class Log
                     break;
 
                 case 'Dedimania':
-                    Console::log($line, 'purple');
+                    Console::log($line, 'white', true, 'purple');
                     break;
 
-                case '[!] ERROR':
-                    Console::log($line, 'black', true, 'red');
+                case 'ERROR':
+                    Console::log($line, 'white', true, 'red');
                     break;
 
                 case 'Debug':
@@ -61,7 +61,7 @@ class Log
 
     public static function error($message, bool $echo = true)
     {
-        self::logAddLine("[!] ERROR", $message, $echo);
+        self::logAddLine("ERROR", $message, $echo);
         self::debug($message);
     }
 

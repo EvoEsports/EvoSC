@@ -43,6 +43,12 @@ function cacheDir(string $filename = ''): string
     return __DIR__ . '\\..\\cache\\' . $filename;
 }
 
+function ghost(string $filename = ''): string
+{
+    $basePath = str_replace('/', '\\', config('server.base'));
+    return $basePath . 'UserData\\Replays\\Ghosts\\' . $filename . '.Replay.Gbx';
+}
+
 function musicDir(string $filename = ''): string
 {
     return __DIR__ . '\\..\\music\\' . $filename;

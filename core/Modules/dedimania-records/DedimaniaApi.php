@@ -9,6 +9,9 @@ use esc\Models\Player;
 
 class DedimaniaApi
 {
+    static $newTimes;
+    static $checkpoints;
+
     /**
      * Connect to dedimania and authenticate
      */
@@ -35,7 +38,7 @@ class DedimaniaApi
 
     /**
      * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8081/Dedimania
+     * See documentation at http://dedimania.net:8082/Dedimania
      * @param string $method
      * @param array|null $parameters
      * @return null|SimpleXMLElement
@@ -55,7 +58,7 @@ class DedimaniaApi
             }
         }
 
-        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
+        $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=UTF8'
             ],
@@ -126,7 +129,7 @@ class DedimaniaApi
 
     /**
      * Call a method on dedimania server
-     * See documentation at http://dedimania.net:8081/Dedimania
+     * See documentation at http://dedimania.net:8082/Dedimania
      * @param string $method
      * @param array|null $parameters
      * @return null|SimpleXMLElement
@@ -161,7 +164,7 @@ class DedimaniaApi
             }
         }
 
-        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
+        $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=UTF8'
             ],
@@ -183,6 +186,89 @@ class DedimaniaApi
         }
     }
 
+    static function setChallengeTimes(Map $map)
+    {
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
+        $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
+        $params = $xml->addChild('params');
+
+        //string SessionId
+        $params->addChild('param')->addChild('value', self::getSession()->Session);
+
+        //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
+        self::paramAddStruct($params->addChild('param'), [
+            'UId' => $map->UId,
+            'Name' => $map->Name,
+            'Environment' => Server::getRpc()->getCurrentMapInfo()->environnement,
+            'Author' => $map->Author,
+            'NbCheckpoints' => $map->NbCheckpoints,
+            'NbLaps' => $map->NbLaps,
+        ]);
+
+        //string GameMode
+        $params->addChild('param')->addChild('value', 'TA'); //TODO: make dynamic
+
+        //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
+        $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
+        foreach (self::$newTimes->sortBy('Score') as $dedi) {
+            $struct = $times->addChild('struct');
+
+            $member = $struct->addChild('member');
+            $member->addChild('name', 'Login');
+            $member->addChild('value', $dedi->player->Login);
+
+            $member = $struct->addChild('member');
+            $member->addChild('name', 'Best');
+            $member->addChild('value')->addChild('i4', $dedi->Score);
+
+            $member = $struct->addChild('member');
+            $member->addChild('name', 'Checks');
+            $array = $member->addChild('value')->addChild('array')->addChild('data');
+
+            $checkTimes = self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time');
+            foreach ($checkTimes as $time) {
+                $array->addChild('value')->addChild('i4', $time);
+            }
+//            $member->addChild('value', self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time')->implode(','));
+        }
+
+        //Replays: struct {'VReplay': base64 string, 'VReplayChecks': string (list of int, comma separated), 'Top1GReplay': base64 string}:
+        /*
+            .. VReplay: validation replay of the best time (ie first) sent, base64 encoded,
+            .. VReplayChecks: in special case of Laps mode (for which only best laps checkpoints are in Times), give here all race checkpoints (list of int, comma separated)
+            .. Top1GReplay: GhostReplay for the same time as VReplay, base64 encoded: send only if supposed new top1, else send an empty string !
+        */
+        $bestPlayer = self::$newTimes->sortBy('Score')->first();
+
+        if ($bestPlayer) {
+            $vreplay = Server::getRpc()->getValidationReplay($bestPlayer->player->Login);
+            $vreplayChecks = self::$checkpoints->where('player.Login', $bestPlayer->player->Login)->pluck('time')->sortBy('time')->implode(',');
+            $top1greplay = '';
+
+            try {
+                //Check if there is top1 dedi
+                if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
+                    $top1greplay = base64_encode(file_get_contents(ghost($dedi->ghostReplayFile)));
+                }
+
+                self::paramAddStruct($params->addChild('param'), [
+                    'VReplay' => $vreplay,
+                    'VReplayChecks' => $vreplayChecks,
+                    'Top1GReplay' => $top1greplay
+                ]);
+            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
+                Log::error('Error saving dedis: ' . $e->getMessage());
+            }
+        }
+
+        $xml->asXML(cacheDir('dedi-req.xml'));
+
+        $data = self::post($xml);
+        if ($data) {
+            var_dump($data);
+        }
+    }
+
     static function getChallengeRecords(Map $map)
     {
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
@@ -190,7 +276,7 @@ class DedimaniaApi
         $params = $xml->addChild('params');
 
         //string SessionId
-        $params->addChild('param')->addChild('value')->addChild('string', self::getSession()->Session);
+        $params->addChild('param')->addChild('value', self::getSession()->Session);
 
         //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
@@ -229,8 +315,6 @@ class DedimaniaApi
         $responseData = self::post($xml);
 
         if ($responseData) {
-            $responseData->saveXML(cacheDir('dedi.xml'));
-
             return $responseData;
         }
     }
@@ -304,12 +388,17 @@ class DedimaniaApi
 
     private static function post(SimpleXMLElement $xml): ?SimpleXMLElement
     {
-        $response = RestClient::post('http://dedimania.net:8081/Dedimania', [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8'
-            ],
-            'body' => $xml->asXML()
-        ]);
+        try {
+            $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
+                'headers' => [
+                    'Content-Type' => 'text/xml; charset=UTF8'
+                ],
+                'body' => $xml->asXML()
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            Log::error('Dedimania post failed: ' . $e->getMessage());
+            return null;
+        }
 
         if ($response->getStatusCode() != 200) {
             Log::warning("Connection to dedimania failed: " . $response->getReasonPhrase());

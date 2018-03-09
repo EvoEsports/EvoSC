@@ -34,6 +34,13 @@ function startEsc()
 
         esc\classes\Server::getRpc()->getStatus();
 
+        if(!\esc\Classes\Server::getRpc()->isAutoSaveValidationReplaysEnabled()){
+            \esc\Classes\Server::getRpc()->autoSaveValidationReplays(true);
+        }
+        if(!\esc\Classes\Server::getRpc()->isAutoSaveReplaysEnabled()){
+            \esc\Classes\Server::getRpc()->autoSaveReplays(true);
+        }
+
         esc\classes\Log::info("Connection established.");
     } catch (\Exception $e) {
         esc\classes\Log::error("Connection to server failed.");

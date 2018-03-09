@@ -7,6 +7,7 @@ use esc\classes\File;
 use esc\classes\Hook;
 use esc\classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Server;
 use esc\classes\Template;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
@@ -28,7 +29,10 @@ class Dedimania extends DedimaniaApi
         include_once __DIR__ . '/Models/DedimaniaSession.php';
 
         Hook::add('BeginMap', 'Dedimania::beginMap');
+        Hook::add('EndMatch', 'Dedimania::endMatch');
         Hook::add('PlayerConnect', 'Dedimania::displayDedis');
+        Hook::add('PlayerFinish', 'Dedimania::playerFinish');
+        Hook::add('PlayerCheckpoint', 'Dedimania::playerCheckpoint');
 
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
 
@@ -38,11 +42,12 @@ class Dedimania extends DedimaniaApi
     private function createTables()
     {
         Database::create('dedi-records', function (Blueprint $table) {
+            $table->increments('id');
             $table->integer('Map');
             $table->integer('Player');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->primary(['Map', 'Rank']);
+            $table->unique(['Map', 'Rank']);
         });
 
         Database::create('dedi-sessions', function (Blueprint $table) {
@@ -55,6 +60,8 @@ class Dedimania extends DedimaniaApi
 
     public static function beginMap(Map $map)
     {
+        self::$newTimes = new Collection();
+        self::$checkpoints = new Collection();
         $session = self::getSession();
 
         if ($session == null) {
@@ -65,14 +72,14 @@ class Dedimania extends DedimaniaApi
         $records = $data->params->param->value->struct->member[3]->value->array->data->value;
 
         foreach ($records as $record) {
-            try{
+            try {
                 $login = (string)$record->struct->member[0]->value->string;
                 $nickname = (string)$record->struct->member[1]->value->string;
                 $score = (int)$record->struct->member[2]->value->int;
                 $rank = (int)$record->struct->member[3]->value->int;
 
                 $player = Player::firstOrCreate(['Login' => $login]);
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 continue;
             }
 
@@ -97,6 +104,58 @@ class Dedimania extends DedimaniaApi
         }
     }
 
+    public static function endMatch(...$args)
+    {
+        var_dump($args);
+        $map = MapController::getCurrentMap();
+        self::setChallengeTimes($map);
+    }
+
+    public static function playerCheckpoint(Player $player, int $time, int $curLap, int $cpId)
+    {
+        $cp = collect([]);
+        $cp->player = $player;
+        $cp->time = $time;
+        $cp->id = $cpId;
+
+        $existingCpTime = self::$checkpoints->where('player.Login', $player->Login)->where('id', $cpId);
+        if ($existingCpTime->isNotEmpty()) {
+            self::$checkpoints = self::$checkpoints->diff($existingCpTime);
+        }
+
+        self::$checkpoints->push($cp);
+    }
+
+    public static function addNewTime(Dedi $dedi)
+    {
+        $existingDedi = self::$newTimes->where('Player', $dedi->Player);
+
+        if ($existingDedi->isNotEmpty()) {
+            if (isset($existingDedi->ghostReplayFile) && file_exists($existingDedi->ghostReplayFile)) {
+                unlink($existingDedi->ghostReplayFile);
+            }
+
+            self::$newTimes = self::$newTimes->diff($existingDedi);
+        }
+
+        $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($dedi->map->Name), $dedi->Score);
+
+        try {
+            $saved = Server::getRpc()->saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
+        } catch (\Exception $e) {
+            Log::error('Could not save ghost: ' . $e->getMessage());
+        }
+
+        if (isset($saved) && !$saved) {
+            Log::error('Saving top 1 dedi failed');
+            return;
+        } else {
+            $dedi->ghostReplayFile = $ghostFile;
+        }
+
+        self::$newTimes->push($dedi);
+    }
+
     /**
      * Checks if player has a dedi
      * @param Map $map
@@ -105,7 +164,7 @@ class Dedimania extends DedimaniaApi
      */
     public static function playerHasDedi(Map $map, Player $player): bool
     {
-        return $map->dedis->where('Player', $player->id)->isNotEmpty();
+        return $map->dedis()->where('Player', $player->id)->get()->isNotEmpty();
     }
 
     /**
@@ -138,10 +197,12 @@ class Dedimania extends DedimaniaApi
                 if ($rank != $dedi->Rank) {
                     self::pushDownRanks($map, $rank);
                     $dedi->update(['Score' => $score, 'Rank' => $rank]);
-                    ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')', ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                    ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
+                    self::addNewTime($dedi);
                 } else {
                     $dedi->update(['Score' => $score]);
-                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $dedi, ' (-' . formatScore($diff) . ')', ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $dedi, ' (-' . formatScore($diff) . ')');
+                    self::addNewTime($dedi);
                 }
             }
         } else {
@@ -152,15 +213,18 @@ class Dedimania extends DedimaniaApi
                     if ($score <= $worstDedi->Score) {
                         self::pushDownRanks($map, $worstDedi->Rank);
                         $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank);
-                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi);
+                        self::addNewTime($dedi);
                     } else {
                         $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank + 1);
-                        ChatController::messageAll('Player ', $player, ' made the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                        ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+                        self::addNewTime($dedi);
                     }
                 } else {
                     $rank = 1;
                     $dedi = self::pushDedi($map, $player, $score, $rank);
-                    ChatController::messageAll('Player ', $player, ' made the ', $dedi, ' [!! VALUES NOT SAVED TO DEDIMANIA !!]');
+                    ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+                    self::addNewTime($dedi);
                 }
             }
         }
