@@ -19,7 +19,7 @@
 
         while(q.Opacity > 0.0){
             yield;
-            q.Opacity = q.Opacity - 0.02;
+            q.Opacity = q.Opacity - 0.012;
         }
 
         if(q.Opacity < 0.0){
