@@ -3,7 +3,9 @@
 namespace esc\Models;
 
 
+use Dedi;
 use Illuminate\Database\Eloquent\Model;
+use Karma;
 
 class Map extends Model
 {
@@ -15,14 +17,21 @@ class Map extends Model
 
     public function locals()
     {
-        return $this->hasMany('LocalRecord', 'Map', 'id');
+        return $this->hasMany(LocalRecord::class, 'Map', 'id');
     }
 
-    public function dedis(){
-        return $this->hasMany('Dedi', 'Map');
+    public function dedis()
+    {
+        return $this->hasMany(Dedi::class, 'Map');
     }
 
-    public function author(){
-        return $this->hasOne('esc\Models\Player', 'Login', 'Author');
+    public function author()
+    {
+        return $this->hasOne(Player::class, 'Login', 'Author');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Karma::class, 'Map', 'id');
     }
 }

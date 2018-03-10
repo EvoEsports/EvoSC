@@ -15,6 +15,8 @@ use Illuminate\Database\Schema\Blueprint;
 
 class LocalRecords
 {
+    static $checkpoints;
+
     public function __construct()
     {
         $this->createTables();
@@ -26,6 +28,7 @@ class LocalRecords
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
         Hook::add('PlayerConnect', 'LocalRecords::beginMap');
+        Hook::add('PlayerCheckpoint', 'LocalRecords::playerCheckpoint');
 
         ManiaLinkEvent::add('locals.show', 'LocalRecords::showLocalsModal');
         ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
@@ -39,6 +42,7 @@ class LocalRecords
             $table->integer('Map');
             $table->integer('Score');
             $table->integer('Rank');
+            $table->string('Checkpoints');
             $table->unique(['Map', 'Rank']);
         });
     }
@@ -46,6 +50,26 @@ class LocalRecords
     private static function playerHasLocal(Map $map, Player $player): bool
     {
         return LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first() != null;
+    }
+
+    public static function playerCheckpoint(Player $player, int $time, int $curLap, int $cpId)
+    {
+        $existingCpTime = self::$checkpoints->where('player.Login', $player->Login)->where('id', $cpId);
+        if ($existingCpTime->isNotEmpty()) {
+            self::$checkpoints = self::$checkpoints->diff($existingCpTime);
+        }
+
+        $cp = collect([]);
+        $cp->player = $player;
+        $cp->time = $time;
+        $cp->id = $cpId;
+
+        self::$checkpoints->push($cp);
+    }
+
+    public static function getBestCps(Player $player): string
+    {
+        return self::$checkpoints->where('player.Login', $player->Login)->pluck('time')->sortBy('time')->implode(',');
     }
 
     public static function playerFinish(Player $player, int $score)
@@ -72,10 +96,10 @@ class LocalRecords
 
                 if ($rank != $local->Rank) {
                     self::pushDownRanks($map, $rank);
-                    $local->update(['Score' => $score, 'Rank' => $rank]);
+                    $local->update(['Score' => $score, 'Rank' => $rank, 'Checkpoints' => self::getBestCps($player)]);
                     ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
-                    $local->update(['Score' => $score]);
+                    $local->update(['Score' => $score, 'Checkpoints' => self::getBestCps($player)]);
                     ChatController::messageAll('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
@@ -110,10 +134,11 @@ class LocalRecords
             'Map' => $map->id,
             'Score' => $score,
             'Rank' => $rank,
+            'Checkpoints' => self::getBestCps($player)
         ]);
 
         //Fix locals rank order
-        foreach($map->locals as $key => $local){
+        foreach ($map->locals->sortBy('Score') as $key => $local) {
             $local->update(['Rank' => $key + 1]);
         }
 
@@ -138,6 +163,7 @@ class LocalRecords
 
     public static function beginMap()
     {
+        self::$checkpoints = new \Illuminate\Support\Collection();
         self::displayLocalRecords();
     }
 

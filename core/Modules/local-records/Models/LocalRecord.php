@@ -6,7 +6,7 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'local-records';
 
-    protected $fillable = ['Player', 'Map', 'Score', 'Rank'];
+    protected $fillable = ['Player', 'Map', 'Score', 'Rank', 'Checkpoints'];
 
     public $timestamps = false;
 

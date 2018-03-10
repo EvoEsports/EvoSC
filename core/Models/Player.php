@@ -100,10 +100,10 @@ class Player extends Model
      * Get players locals
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function locals()
-    {
-        return $this->hasMany(LocalRecord::class, 'Player', 'id');
-    }
+//    public function locals()
+//    {
+//        return $this->hasMany(LocalRecord::class, 'Player', 'id');
+//    }
 
     public function group()
     {
@@ -115,10 +115,10 @@ class Player extends Model
         return in_array($this->Group, $groups);
     }
 
-    public function dedis()
-    {
-        return $this->hasMany(\Dedi::class, 'Player', 'id');
-    }
+//    public function dedis()
+//    {
+//        return $this->hasMany(\Dedi::class, 'Player', 'id');
+//    }
 
     public function isSuperadmin(): bool
     {

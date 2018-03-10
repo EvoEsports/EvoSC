@@ -6,6 +6,7 @@ namespace esc\Classes;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
 use esc\models\Player;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
 class Vote

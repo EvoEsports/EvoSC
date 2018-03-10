@@ -21,8 +21,10 @@ class MapList
         ChatController::addCommand('list', 'MapList::showMapList', 'Display list of maps');
     }
 
-    public static function showMapList(Player $player, ?int $page = 1)
+    public static function showMapList(Player $player, $page = 1)
     {
+        $page = (int)$page;
+
         $perPage = 23;
         $allMaps = Map::all();
         $pages = ceil($allMaps->count() / $perPage);

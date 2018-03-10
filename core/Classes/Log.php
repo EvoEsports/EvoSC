@@ -77,7 +77,7 @@ class Log
 
     private static function debug($message, bool $echo = true)
     {
-        self::logAddLine('Debug', $message, $echo);
+        self::logAddLine('Debug', $message, false);
     }
 
     public static function music($message, bool $echo = true)

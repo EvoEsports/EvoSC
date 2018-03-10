@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" version="3">
-<frame pos="-160 -39" scale="0.72">
+<frame pos="-160 -42" scale="0.72">
     <quad pos="0 0" z-index="-2" size="50 16" style="Bgs1" substyle="BgDialogBlur"/>
     <label pos="2 -2" z-index="1" size="49 2.8" text="{$message}" textsize="1"/>
     <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="18f3"/>

@@ -18,17 +18,13 @@ main() {
     while(True){
         yield;
 
-        if(player != Null && player.Speed > 25){
+        if(player != Null && player.Speed > 1){
             if(fr.PosnX < endPos){
                 fr.PosnX = fr.PosnX + 1;
             }
         }else{
             if(fr.PosnX > startPos){
                 fr.PosnX = fr.PosnX - 1;
-
-                if(player.Speed < 1){
-                    fr.PosnX = startPos;
-                }
             }
         }
 

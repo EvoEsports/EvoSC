@@ -153,6 +153,10 @@ class Dedimania extends DedimaniaApi
         }
 
         self::$newTimes->push($dedi);
+
+        foreach (onlinePlayers() as $player) {
+            self::displayDedis($player);
+        }
     }
 
     /**
@@ -227,8 +231,6 @@ class Dedimania extends DedimaniaApi
                 }
             }
         }
-
-        self::displayDedis();
     }
 
     /**
