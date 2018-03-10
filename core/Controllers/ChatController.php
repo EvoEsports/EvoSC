@@ -174,6 +174,7 @@ $$: Writes a dollarsign
     {
         if(!$recipient){
             Log::warning('Do not send message to null player');
+            return;
         }
 
         $message = '$s';

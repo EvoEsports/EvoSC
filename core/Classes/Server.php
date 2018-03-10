@@ -32,7 +32,7 @@ class Server
     {
         self::getRpc()->execute($rpc_func, $args);
     }
-    
+
     public static function forceEndRound()
     {
         try {
@@ -45,7 +45,7 @@ class Server
     public static function __callStatic($name, $arguments)
     {
         if (method_exists(self::$rpc, $name)) {
-            Log::logAddLine('RPC', "Call $name");
+            Log::logAddLine('RPC', "Call $name()", true);
             return call_user_func_array([self::$rpc, $name], $arguments);
         } else {
             Log::error("Calling undefined rpc-method: $name");

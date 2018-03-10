@@ -48,12 +48,12 @@ class MxKarma extends MXK
         Hook::add('BeginMap', 'MxKarma::beginMap');
         Hook::add('EndMap', 'MxKarma::endMap');
 
-        ChatController::addCommand('+', 'MxKarma::votePlus', 'Rate the map good', '');
-        ChatController::addCommand('++', 'MxKarma::votePlusPlus', 'Rate the map excellent', '');
+        ChatController::addCommand('+', 'MxKarma::votePlus', 'Rate the map ok', '');
+        ChatController::addCommand('++', 'MxKarma::votePlusPlus', 'Rate the map good', '');
         ChatController::addCommand('+++', 'MxKarma::votePlusPlusPlus', 'Rate the map fantastic', '');
-        ChatController::addCommand('-', 'MxKarma::voteMinus', 'Rate the map bad', '');
-        ChatController::addCommand('--', 'MxKarma::voteMinusMinus', 'Rate the map trash', '');
-        ChatController::addCommand('---', 'MxKarma::voteMinusMinusMinus', 'Rate the map unplayable', '');
+        ChatController::addCommand('-', 'MxKarma::voteMinus', 'Rate the map playable', '');
+        ChatController::addCommand('--', 'MxKarma::voteMinusMinus', 'Rate the map bad', '');
+        ChatController::addCommand('---', 'MxKarma::voteMinusMinusMinus', 'Rate the map trash', '');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', 'MxKarma::vote');
 
@@ -354,7 +354,7 @@ class MxKarma extends MXK
                 break;
 
             case MXK::saveVotes:
-                if (count(self::$votes) == 0) {
+                if (count(self::$updatedVotes) == 0) {
                     return null;
                 }
 
