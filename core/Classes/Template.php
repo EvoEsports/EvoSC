@@ -24,7 +24,7 @@ class Template
         }
 
         $xml = TemplateController::getTemplate($index, $values);
-        Server::getRpc()->sendDisplayManialinkPage('', $xml);
+        Server::sendDisplayManialinkPage('', $xml);
     }
 
     public static function hideAll(string $index)
@@ -41,7 +41,7 @@ class Template
         }
 
         $xml = TemplateController::getTemplate($index, $values);
-        Server::getRpc()->sendDisplayManialinkPage($player->Login, $xml);
+        Server::sendDisplayManialinkPage($player->Login, $xml);
     }
 
     public static function toString(string $index, array $values = null): string

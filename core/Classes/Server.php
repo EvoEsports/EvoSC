@@ -4,7 +4,6 @@ namespace esc\Classes;
 
 
 use Maniaplanet\DedicatedServer\Connection;
-use Maniaplanet\DedicatedServer\Structures\Map;
 use Maniaplanet\DedicatedServer\Xmlrpc\GameModeException;
 
 class Server
@@ -19,7 +18,7 @@ class Server
         self::call('SendHideManialinkPage');
     }
 
-    public static function getRpc(): Connection
+    private static function getRpc(): Connection
     {
         return self::$rpc;
     }
@@ -33,8 +32,7 @@ class Server
     {
         self::getRpc()->execute($rpc_func, $args);
     }
-
-
+    
     public static function forceEndRound()
     {
         try {
@@ -44,18 +42,13 @@ class Server
         }
     }
 
-    public static function getNextMapInfo(): Map
+    public static function __callStatic($name, $arguments)
     {
-        return self::getRpc()->getNextMapInfo();
-    }
-
-    public static function getCurrentMapInfo(): Map
-    {
-        return self::getRpc()->getCurrentMapInfo();
-    }
-
-    public static function getMapInfo(string $fileName): Map
-    {
-        return self::getRpc()->getMapInfo($fileName);
+        if (method_exists(self::$rpc, $name)) {
+            Log::logAddLine('RPC', "Call $name");
+            return call_user_func_array([self::$rpc, $name], $arguments);
+        } else {
+            Log::error("Calling undefined rpc-method: $name");
+        }
     }
 }

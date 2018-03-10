@@ -74,9 +74,9 @@ class MapController
 
     private static function updateRoundtime(int $timeInSeconds)
     {
-        $settings = \esc\Classes\Server::getRpc()->getModeScriptSettings();
+        $settings = \esc\Classes\Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $timeInSeconds;
-        \esc\Classes\Server::getRpc()->setModeScriptSettings($settings);
+        \esc\Classes\Server::setModeScriptSettings($settings);
     }
 
     /**
@@ -92,7 +92,7 @@ class MapController
 
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
-            Server::getRpc()->chooseNextMap($request->map->FileName);
+            Server::chooseNextMap($request->map->FileName);
             ChatController::messageAll('Next map: ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
@@ -144,7 +144,7 @@ class MapController
     public static function deleteMap(Map $map)
     {
         try {
-            Server::getRpc()->removeMap($map->FileName);
+            Server::removeMap($map->FileName);
         } catch (FileException $e) {
             Log::error($e);
         }
@@ -162,7 +162,7 @@ class MapController
      */
     public static function goToNextMap()
     {
-        Server::getRpc()->nextMap();
+        Server::nextMap();
     }
 
     /**
@@ -176,7 +176,7 @@ class MapController
         if ($first) {
             $map = self::$queue->first()->map;
         } else {
-            $mapInfo = Server::getRpc()->getNextMapInfo();
+            $mapInfo = Server::getNextMapInfo();
             $map = Map::where('UId', $mapInfo->uId)->first();
         }
 
@@ -226,7 +226,7 @@ class MapController
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
 
-        Server::getRpc()->chooseNextMap(self::getNext()->FileName);
+        Server::chooseNextMap(self::getNext()->FileName);
 
         ChatController::messageAll($player, ' juked map ', $map);
         Log::info("$player->NickName juked map $map->Name");
@@ -260,7 +260,7 @@ class MapController
             }
 
             try {
-                Server::getRpc()->addMap($mapFile);
+                Server::addMap($mapFile);
             } catch (FileException $e) {
                 Log::error("Map $mapFile not found.");
             } catch (AlreadyInListException $e) {
@@ -355,7 +355,7 @@ class MapController
             }
 
             try{
-                Server::getRpc()->addMap($map->FileName);
+                Server::addMap($map->FileName);
             }catch(\Exception $e){
                 Log::warning("Map $map->FileName already added.");
             }

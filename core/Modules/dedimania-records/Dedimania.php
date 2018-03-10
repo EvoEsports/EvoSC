@@ -140,7 +140,7 @@ class Dedimania extends DedimaniaApi
         $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($dedi->map->Name), $dedi->Score);
 
         try {
-            $saved = Server::getRpc()->saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
+            $saved = Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
         } catch (\Exception $e) {
             Log::error('Could not save ghost: ' . $e->getMessage());
         }

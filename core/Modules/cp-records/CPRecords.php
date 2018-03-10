@@ -82,6 +82,6 @@ class CPRecords
             $cps->implode('')
         );
 
-        \esc\Classes\Server::getRpc()->sendDisplayManialinkPage('', $manialink);
+        \esc\Classes\Server::sendDisplayManialinkPage('', $manialink);
     }
 }

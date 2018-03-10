@@ -229,6 +229,6 @@ $$: Writes a dollarsign
             $message .= $part;
         }
 
-        Server::getRpc()->chatSendServerMessage($message, $recipient->Login);
+        Server::chatSendServerMessage($message, $recipient->Login);
     }
 }

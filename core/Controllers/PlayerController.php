@@ -82,8 +82,8 @@ class PlayerController
         }
 
         if ($player->isSpectator()) {
-            Server::getRpc()->forceSpectator($player->Login, 2);
-            Server::getRpc()->forceSpectator($player->Login, 0);
+            Server::forceSpectator($player->Login, 2);
+            Server::forceSpectator($player->Login, 0);
         }
 
         $player->update(['Afk' => false]);

@@ -74,7 +74,7 @@ class MusicServer
      */
     public static function getCurrentSong(): ?Song
     {
-        $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
+        $songInformation = \esc\classes\Server::getForcedMusic();
         $url = $songInformation->url;
         return self::$music->where('url', $url)->first();
     }
@@ -91,7 +91,7 @@ class MusicServer
             $song = self::$music->random();
         }
 
-        Server::getRpc()->setForcedMusic(true, $song->url);
+        Server::setForcedMusic(true, $song->url);
     }
 
     /**
@@ -105,7 +105,7 @@ class MusicServer
             return;
         }
 
-        $songInformation = \esc\classes\Server::getRpc()->getForcedMusic();
+        $songInformation = \esc\classes\Server::getForcedMusic();
         $url = $songInformation->url;
         $song = self::$music->where('url', $url)->first();
 

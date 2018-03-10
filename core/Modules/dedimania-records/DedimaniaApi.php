@@ -24,9 +24,9 @@ class DedimaniaApi
             'Tool' => 'EvoSC',
             'Version' => getEscVersion(),
             'Packmask' => 'Stadium',
-            'ServerVersion' => Server::getRpc()->getVersion()->version,
-            'ServerBuild' => Server::getRpc()->getVersion()->build,
-            'Path' => Server::getRpc()->getDetailedPlayerInfo(Config::get('dedimania.login'))->path
+            'ServerVersion' => Server::getVersion()->version,
+            'ServerBuild' => Server::getVersion()->build,
+            'Path' => Server::getDetailedPlayerInfo(Config::get('dedimania.login'))->path
         ]);
 
         try {
@@ -204,7 +204,7 @@ class DedimaniaApi
         self::paramAddStruct($params->addChild('param'), [
             'UId' => $map->UId,
             'Name' => $map->Name,
-            'Environment' => Server::getRpc()->getCurrentMapInfo()->environnement,
+            'Environment' => Server::getCurrentMapInfo()->environnement,
             'Author' => $map->Author,
             'NbCheckpoints' => $map->NbCheckpoints,
             'NbLaps' => $map->NbLaps,
@@ -250,7 +250,7 @@ class DedimaniaApi
             return;
         }
 
-        $vreplay = Server::getRpc()->getValidationReplay($bestPlayer->player->Login);
+        $vreplay = Server::getValidationReplay($bestPlayer->player->Login);
         $vreplayChecks = self::$checkpoints->where('player.Login', $bestPlayer->player->Login)->pluck('time')->sortBy('time')->implode(',');
         $top1greplay = '';
 
@@ -294,7 +294,7 @@ class DedimaniaApi
         self::paramAddStruct($params->addChild('param'), [
             'UId' => $map->UId,
             'Name' => $map->Name,
-            'Environment' => Server::getRpc()->getCurrentMapInfo()->environnement,
+            'Environment' => Server::getCurrentMapInfo()->environnement,
             'Author' => $map->Author,
             'NbCheckpoints' => $map->NbCheckpoints,
             'NbLaps' => $map->NbLaps,
@@ -305,9 +305,9 @@ class DedimaniaApi
 
         //struct SrvInfo
         self::paramAddStruct($params->addChild('param'), [
-            'SrvName' => Server::getRpc()->getServerName(),
-            'Comment' => Server::getRpc()->getServerComment(),
-            'Private' => Server::getRpc()->getServerPassword() ? true : false,
+            'SrvName' => Server::getServerName(),
+            'Comment' => Server::getServerComment(),
+            'Private' => Server::getServerPassword() ? true : false,
             'NumPlayers' => onlinePlayers()->count(),
             'MaxPlayers' => 16, //TODO: change form hardcode
             'NumSpecs' => 0,

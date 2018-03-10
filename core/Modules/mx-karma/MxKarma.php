@@ -74,7 +74,7 @@ class MxKarma extends MXK
             return;
         }
 
-        $ranking = Server::getRpc()->getCurrentRankingForLogin($player->Login);
+        $ranking = Server::getCurrentRankingForLogin($player->Login);
 
         if (isset($ranking) && !$ranking->bestTime || !isset($ranking)) {
             ChatController::message($player, 'You can not vote before you finished');
@@ -264,7 +264,7 @@ class MxKarma extends MXK
      */
     public static function showWidget(...$args)
     {
-        $map = Server::getRpc()->getCurrentMapInfo()->uId;
+        $map = Server::getCurrentMapInfo()->uId;
 
         if (self::$currentMap != $map) {
             self::$mapKarma = self::call(MXK::getMapRating);
@@ -344,8 +344,8 @@ class MxKarma extends MXK
 
                 $json = [
                     'gamemode' => self::getGameMode(),
-                    'titleid' => Server::getRpc()->getVersion()->titleId,
-                    'mapuid' => Server::getRpc()->getCurrentMapInfo()->uId,
+                    'titleid' => Server::getVersion()->titleId,
+                    'mapuid' => Server::getCurrentMapInfo()->uId,
                     'getvotesonly' => 'false',
                     'playerlogins' => []
                 ];
@@ -366,7 +366,7 @@ class MxKarma extends MXK
 
                 $json = [
                     'gamemode' => self::getGameMode(),
-                    'titleid' => Server::getRpc()->getVersion()->titleId,
+                    'titleid' => Server::getVersion()->titleId,
                     'mapuid' => $map->UId,
                     'mapname' => $map->Name,
                     'mapauthor' => $map->Author,
@@ -413,11 +413,11 @@ class MxKarma extends MXK
      */
     private static function getGameMode(): string
     {
-        $gameMode = Server::getRpc()->getGameMode();
+        $gameMode = Server::getGameMode();
 
         switch ($gameMode) {
             case 0:
-                return Server::getRpc()->getScriptName()['CurrentValue'];
+                return Server::getScriptName()['CurrentValue'];
             case 1:
                 return "Rounds";
             case 2:
