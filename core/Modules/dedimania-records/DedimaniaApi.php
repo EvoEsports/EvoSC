@@ -188,6 +188,11 @@ class DedimaniaApi
 
     static function setChallengeTimes(Map $map)
     {
+        if(count(self::$newTimes) == 0){
+            Log::logAddLine('Dedimania', 'No new times to push');
+            return;
+        }
+
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
         $params = $xml->addChild('params');
@@ -223,13 +228,13 @@ class DedimaniaApi
 
             $member = $struct->addChild('member');
             $member->addChild('name', 'Checks');
-            $array = $member->addChild('value')->addChild('array')->addChild('data');
-
-            $checkTimes = self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time');
-            foreach ($checkTimes as $time) {
-                $array->addChild('value')->addChild('i4', $time);
-            }
-//            $member->addChild('value', self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time')->implode(','));
+//            $array = $member->addChild('value')->addChild('array')->addChild('data');
+//
+//            $checkTimes = self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time');
+//            foreach ($checkTimes as $time) {
+//                $array->addChild('value')->addChild('i4', $time);
+//            }
+            $member->addChild('value', self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time')->implode(','));
         }
 
         //Replays: struct {'VReplay': base64 string, 'VReplayChecks': string (list of int, comma separated), 'Top1GReplay': base64 string}:
@@ -240,32 +245,42 @@ class DedimaniaApi
         */
         $bestPlayer = self::$newTimes->sortBy('Score')->first();
 
-        if ($bestPlayer) {
-            $vreplay = Server::getRpc()->getValidationReplay($bestPlayer->player->Login);
-            $vreplayChecks = self::$checkpoints->where('player.Login', $bestPlayer->player->Login)->pluck('time')->sortBy('time')->implode(',');
-            $top1greplay = '';
+        if(!$bestPlayer){
+            Log::logAddLine('Dedimania', 'No best player');
+            return;
+        }
 
-            try {
-                //Check if there is top1 dedi
-                if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
-                    $top1greplay = base64_encode(file_get_contents(ghost($dedi->ghostReplayFile)));
-                }
+        $vreplay = Server::getRpc()->getValidationReplay($bestPlayer->player->Login);
+        $vreplayChecks = self::$checkpoints->where('player.Login', $bestPlayer->player->Login)->pluck('time')->sortBy('time')->implode(',');
+        $top1greplay = '';
 
-                self::paramAddStruct($params->addChild('param'), [
-                    'VReplay' => $vreplay,
-                    'VReplayChecks' => $vreplayChecks,
-                    'Top1GReplay' => $top1greplay
-                ]);
-            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
-                Log::error('Error saving dedis: ' . $e->getMessage());
+        try {
+            //Check if there is top1 dedi
+            if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
+                $top1greplay = file_get_contents(ghost($dedi->ghostReplayFile));
             }
+
+            self::paramAddStruct($params->addChild('param'), [
+                'VReplay' => $vreplay,
+                'VReplayChecks' => $vreplayChecks,
+                'Top1GReplay' => $top1greplay
+            ]);
+        } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
+            Log::error('Error saving dedis: ' . $e->getMessage());
         }
 
         $xml->asXML(cacheDir('dedi-req.xml'));
 
         $data = self::post($xml);
         if ($data) {
+            echo "DEDI MANIA RESPONSE: ";
             var_dump($data);
+
+            if(isset($data->params->param->value->boolean)){
+                if($data->params->param->value->boolean == "0"){
+                    \esc\controllers\ChatController::messageAll('0 dedis updated');
+                }
+            }
         }
     }
 
@@ -326,6 +341,16 @@ class DedimaniaApi
         foreach ($data as $key => $value) {
             $member = $struct->addChild('member');
             $member->addChild('name', $key);
+
+            if($key == 'VReplay'){
+                $member->addChild('value')->addChild('base64', base64_encode($value));
+                continue;
+            }
+
+            if($key == 'Top1GReplay'){
+                $member->addChild('value')->addChild('base64', base64_encode($value));
+                continue;
+            }
 
             switch (gettype($value)) {
                 case 'integer':

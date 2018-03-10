@@ -112,6 +112,11 @@ class LocalRecords
             'Rank' => $rank,
         ]);
 
+        //Fix locals rank order
+        foreach($map->locals as $key => $local){
+            $local->update(['Rank' => $key + 1]);
+        }
+
         return $map->locals()->whereRank($rank)->first();
     }
 

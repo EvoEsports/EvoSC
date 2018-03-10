@@ -106,7 +106,6 @@ class Dedimania extends DedimaniaApi
 
     public static function endMatch(...$args)
     {
-        var_dump($args);
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);
     }
