@@ -200,7 +200,7 @@ class Dedimania extends DedimaniaApi
                     self::addNewTime($dedi);
                 } else {
                     $dedi->update(['Score' => $score]);
-                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $dedi, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAll('Player ', $player, ' secured his/hers ', $dedi, ' (-' . formatScore($diff) . ')');
                     self::addNewTime($dedi);
                 }
             }

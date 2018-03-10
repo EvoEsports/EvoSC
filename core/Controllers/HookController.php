@@ -157,7 +157,7 @@ class HookController
 
     public static function call($event, $arguments = null)
     {
-        echo "Event called: $event\n";
+//        echo "Event called: $event\n";
 
         if($event == 'ManiaPlanet.ModeScriptCallbackArray'){
 //            var_dump($arguments);

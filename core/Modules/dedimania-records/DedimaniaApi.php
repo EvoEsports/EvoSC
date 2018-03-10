@@ -269,16 +269,13 @@ class DedimaniaApi
             Log::error('Error saving dedis: ' . $e->getMessage());
         }
 
-        $xml->asXML(cacheDir('dedi-req.xml'));
+        $xml->asXML(cacheDir(sprintf('dedi_req_%s.xml', time())));
 
         $data = self::post($xml);
         if ($data) {
-            echo "DEDI MANIA RESPONSE: ";
-            var_dump($data);
-
             if(isset($data->params->param->value->boolean)){
-                if($data->params->param->value->boolean == "0"){
-                    \esc\controllers\ChatController::messageAll('0 dedis updated');
+                if(!$data->params->param->value->boolean){
+                    \esc\controllers\ChatController::messageAll('Updating dedis failed');
                 }
             }
         }
