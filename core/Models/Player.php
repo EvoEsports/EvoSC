@@ -3,6 +3,7 @@
 namespace esc\Models;
 
 
+use Dedi;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
@@ -100,10 +101,15 @@ class Player extends Model
      * Get players locals
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-//    public function locals()
-//    {
-//        return $this->hasMany(LocalRecord::class, 'Player', 'id');
-//    }
+    public function locals()
+    {
+        return $this->hasMany(LocalRecord::class, 'id', 'Player');
+    }
+
+    public function dedis()
+    {
+        return $this->hasMany(Dedi::class, 'id', 'Player');
+    }
 
     public function group()
     {
@@ -115,11 +121,6 @@ class Player extends Model
         return in_array($this->Group, $groups);
     }
 
-//    public function dedis()
-//    {
-//        return $this->hasMany(\Dedi::class, 'Player', 'id');
-//    }
-
     public function isSuperadmin(): bool
     {
         return $this->hasGroup([Group::SUPER]);
@@ -128,16 +129,6 @@ class Player extends Model
     public function isAdmin(): bool
     {
         return $this->hasGroup([Group::ADMIN, Group::SUPER]);
-    }
-
-    public function isModerator(): bool
-    {
-        return $this->hasGroup([Group::MOD]);
-    }
-
-    public function isPlayer(): bool
-    {
-        return $this->hasGroup([Group::PLAYER]);
     }
 
     public static function console(): Player

@@ -38,7 +38,7 @@ class PlayerController
             $table->string('Login')->unique();
             $table->string('NickName')->default("unset");
             $table->integer('Visits')->default(0);
-            $table->integer('Group')->default(4);
+            $table->integer('Group')->nullable();
             $table->integer('Score')->default(0);
             $table->boolean('Online')->default(false);
             $table->integer('Afk')->default(0);

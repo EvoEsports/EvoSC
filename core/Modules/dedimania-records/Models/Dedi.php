@@ -11,13 +11,27 @@ class Dedi extends \Illuminate\Database\Eloquent\Model
 
     public $timestamps = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function player()
     {
-        return $this->hasOne(Player::class, 'id', 'Player');
+        return $this->belongsTo(Player::class, 'Player', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function map()
     {
-        return $this->hasOne(Map::class, 'id', 'Map');
+        return $this->belongsTo(Map::class, 'Map', 'id');
+    }
+
+    /**
+     * @return string
+     */
+    public function score(): string
+    {
+        return formatScore($this->Score);
     }
 }

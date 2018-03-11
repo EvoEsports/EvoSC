@@ -76,7 +76,7 @@ class MxKarma extends MXK
 
         $ranking = Server::getCurrentRankingForLogin($player->Login);
 
-        if (isset($ranking) && !$ranking->bestTime || !isset($ranking)) {
+        if ($ranking[0] && $ranking[0]->bestTime > 0) {
             ChatController::message($player, 'You can not vote before you finished');
             return;
         }
@@ -93,7 +93,7 @@ class MxKarma extends MXK
 
             $karma->update(['rating' => $rating]);
         } else {
-            Karma::create([
+            Karma::insert([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'rating' => $rating

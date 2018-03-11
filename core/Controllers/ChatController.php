@@ -7,15 +7,13 @@ use esc\classes\ChatCommand;
 use esc\classes\File;
 use esc\classes\Log;
 use esc\classes\Module;
-use esc\Classes\RestClient;
 use esc\classes\Server;
 use esc\classes\Template;
 use esc\models\Group;
 use esc\models\Map;
 use esc\models\Player;
-use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
+use LocalRecord;
 use Song;
 
 class ChatController
@@ -208,7 +206,7 @@ $$: Writes a dollarsign
                 continue;
             }
 
-            if ($part instanceof \LocalRecord) {
+            if ($part instanceof LocalRecord) {
                 $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'local record $z$s$' . config('color.secondary') . formatScore($part->Score);
                 $message .= $part->title;
                 continue;

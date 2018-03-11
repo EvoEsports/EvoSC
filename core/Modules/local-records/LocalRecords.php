@@ -3,10 +3,8 @@
 use esc\classes\Database;
 use esc\classes\File;
 use esc\classes\Hook;
-use esc\classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\classes\Template;
-use esc\classes\Timer;
 use esc\controllers\ChatController;
 use esc\controllers\MapController;
 use esc\models\Map;
@@ -21,7 +19,7 @@ class LocalRecords
     {
         $this->createTables();
 
-        include_once 'Models/LocalRecord.php';
+        include_once __DIR__ . '/Models/LocalRecord.php';
 
         Template::add('locals', File::get(__DIR__ . '/Templates/locals.latte.xml'));
 
@@ -142,7 +140,7 @@ class LocalRecords
             $local->update(['Rank' => $key + 1]);
         }
 
-        return $map->locals()->whereRank($rank)->first();
+        return LocalRecord::whereMap($map->id)->whereRank($rank)->first();
     }
 
     private static function pushDownRanks(Map $map, int $startRank)

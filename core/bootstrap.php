@@ -54,6 +54,7 @@ function startEsc()
     esc\controllers\ChatController::init();
     esc\classes\ManiaLinkEvent::init();
     esc\controllers\GroupController::init();
+    esc\controllers\AccessController::init();
     esc\controllers\MapController::init();
     esc\controllers\PlayerController::init();
     esc\classes\Vote::init();

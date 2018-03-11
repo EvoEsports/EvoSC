@@ -1,6 +1,7 @@
 <?php
 
-use esc\classes\Timer;
+use esc\Models\Map;
+use esc\Models\Player;
 
 class LocalRecord extends \Illuminate\Database\Eloquent\Model
 {
@@ -10,17 +11,26 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
 
     public $timestamps = false;
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function player()
     {
-        return $this->hasOne('\esc\models\Player', 'id', 'Player');
+        return $this->belongsTo(Player::class, 'Player', 'id');
     }
 
-    public function getPlayer(): ?\esc\models\Player
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function map()
     {
-        return $this->player()->first();
+        return $this->belongsTo(Map::class, 'Map', 'id');
     }
 
-    public function getScore(): string
+    /**
+     * @return string
+     */
+    public function score(): string
     {
         return formatScore($this->Score);
     }
