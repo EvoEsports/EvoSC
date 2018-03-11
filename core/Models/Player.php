@@ -5,6 +5,8 @@ namespace esc\Models;
 
 use Dedi;
 use Illuminate\Database\Eloquent\Model;
+use LocalRecord;
+use MxKarma;
 
 class Player extends Model
 {
@@ -109,6 +111,11 @@ class Player extends Model
     public function dedis()
     {
         return $this->hasMany(Dedi::class, 'id', 'Player');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(MxKarma::class, 'id', 'Player');
     }
 
     public function group()

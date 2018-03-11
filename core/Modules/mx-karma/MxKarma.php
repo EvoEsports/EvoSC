@@ -168,11 +168,21 @@ class MxKarma extends MXK
             $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray());
 
             foreach ($ratings as $rating) {
+                if(!$rating->player){
+                    var_dump($rating);
+                    continue;
+                }
+
                 array_push($votes, [
                     'login' => $rating->player->Login,
                     'nickname' => $rating->player->NickName,
                     'vote' => $rating->rating,
                 ]);
+            }
+
+            if(count($votes) == 0){
+                Log::warning('Got new votes but got null player');
+                return;
             }
 
             $response = self::call(MXK::saveVotes, $map, $votes);

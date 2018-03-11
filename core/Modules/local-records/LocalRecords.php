@@ -19,6 +19,8 @@ class LocalRecords
     {
         $this->createTables();
 
+        self::$checkpoints = new \Illuminate\Support\Collection();
+
         include_once __DIR__ . '/Models/LocalRecord.php';
 
         Template::add('locals', File::get(__DIR__ . '/Templates/locals.latte.xml'));
@@ -95,10 +97,14 @@ class LocalRecords
                 if ($rank != $local->Rank) {
                     self::pushDownRanks($map, $rank);
                     $local->update(['Score' => $score, 'Rank' => $rank, 'Checkpoints' => self::getBestCps($player)]);
+
+//                    $local = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
                     ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score, 'Checkpoints' => self::getBestCps($player)]);
-                    ChatController::messageAll('Player ', $player, ' improved his/hers ', $local, ' (-' . formatScore($diff) . ')');
+
+//                    $local = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
+                    ChatController::messageAll('Player ', $player, ' secured his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
         } else {

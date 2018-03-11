@@ -3,6 +3,7 @@
 namespace esc\controllers;
 
 
+use Dedi;
 use esc\classes\ChatCommand;
 use esc\classes\File;
 use esc\classes\Log;
@@ -212,7 +213,7 @@ $$: Writes a dollarsign
                 continue;
             }
 
-            if ($part instanceof \Dedi) {
+            if ($part instanceof Dedi) {
                 $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'dedimania record $z$s$' . config('color.secondary') . formatScore($part->Score);
                 $message .= $part->title;
                 continue;
@@ -222,6 +223,12 @@ $$: Writes a dollarsign
                 $message .= '$z$s$' . config('color.secondary');
                 $message .= $part;
                 continue;
+            }
+
+            if(!is_string($part)){
+                echo "CLASS OF PART: ";
+                var_dump(get_class($part));
+                var_dump(LocalRecord::class);
             }
 
             $message .= '$z$s$' . config('color.primary');

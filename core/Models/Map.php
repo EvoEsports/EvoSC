@@ -6,6 +6,7 @@ namespace esc\Models;
 use Dedi;
 use Illuminate\Database\Eloquent\Model;
 use Karma;
+use LocalRecord;
 
 class Map extends Model
 {
