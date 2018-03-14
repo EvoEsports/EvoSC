@@ -10,6 +10,7 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\controllers\ChatController;
+use esc\controllers\HookController;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
@@ -93,11 +94,15 @@ class MxKarma extends MXK
 
             $karma->update(['rating' => $rating]);
         } else {
-            Karma::insert([
+            $karma = Karma::insert([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'rating' => $rating
             ]);
+        }
+
+        if (isset($karma)) {
+            HookController::call('PlayerRateMap', [$player, $karma]);
         }
 
         self::$updatedVotes->push($player->id);
@@ -168,7 +173,7 @@ class MxKarma extends MXK
             $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray());
 
             foreach ($ratings as $rating) {
-                if(!$rating->player){
+                if (!$rating->player) {
                     var_dump($rating);
                     continue;
                 }
@@ -180,7 +185,7 @@ class MxKarma extends MXK
                 ]);
             }
 
-            if(count($votes) == 0){
+            if (count($votes) == 0) {
                 Log::warning('Got new votes but got null player');
                 return;
             }

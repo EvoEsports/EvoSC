@@ -6,6 +6,7 @@ use esc\classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\classes\Template;
 use esc\controllers\ChatController;
+use esc\controllers\HookController;
 use esc\controllers\MapController;
 use esc\models\Map;
 use esc\models\Player;
@@ -15,6 +16,9 @@ class LocalRecords
 {
     static $checkpoints;
 
+    /**
+     * LocalRecords constructor.
+     */
     public function __construct()
     {
         $this->createTables();
@@ -34,6 +38,9 @@ class LocalRecords
         ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
     }
 
+    /**
+     * Create the database tables
+     */
     private function createTables()
     {
         Database::create('local-records', function (Blueprint $table) {
@@ -47,11 +54,24 @@ class LocalRecords
         });
     }
 
+    /**
+     * Checks if player has local
+     * @param Map $map
+     * @param Player $player
+     * @return bool
+     */
     private static function playerHasLocal(Map $map, Player $player): bool
     {
         return LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first() != null;
     }
 
+    /**
+     * Called @ PlayerCheckpoint
+     * @param Player $player
+     * @param int $time
+     * @param int $curLap
+     * @param int $cpId
+     */
     public static function playerCheckpoint(Player $player, int $time, int $curLap, int $cpId)
     {
         $existingCpTime = self::$checkpoints->where('player.Login', $player->Login)->where('id', $cpId);
@@ -67,11 +87,21 @@ class LocalRecords
         self::$checkpoints->push($cp);
     }
 
+    /**
+     * Get the best CPs of the player for this round
+     * @param Player $player
+     * @return string
+     */
     public static function getBestCps(Player $player): string
     {
         return self::$checkpoints->where('player.Login', $player->Login)->pluck('time')->sortBy('time')->implode(',');
     }
 
+    /**
+     * Called @ PlayerFinish
+     * @param Player $player
+     * @param int $score
+     */
     public static function playerFinish(Player $player, int $score)
     {
         if ($score == 0) {
@@ -131,9 +161,17 @@ class LocalRecords
         self::displayLocalRecords();
     }
 
+    /**
+     * Insert local into database
+     * @param Map $map
+     * @param Player $player
+     * @param int $score
+     * @param int $rank
+     * @return LocalRecord
+     */
     private static function pushLocal(Map $map, Player $player, int $score, int $rank): LocalRecord
     {
-        $map->locals()->create([
+        $local = $map->locals()->create([
             'Player' => $player->id,
             'Map' => $map->id,
             'Score' => $score,
@@ -146,14 +184,29 @@ class LocalRecords
             $local->update(['Rank' => $key + 1]);
         }
 
-        return LocalRecord::whereMap($map->id)->whereRank($rank)->first();
+        $local = LocalRecord::whereMap($map->id)->whereRank($rank)->first();
+
+        HookController::call('PlayerLocal', [$player, $local]);
+
+        return $local;
     }
 
+    /**
+     * Push down ranks from given position
+     * @param Map $map
+     * @param int $startRank
+     */
     private static function pushDownRanks(Map $map, int $startRank)
     {
         $map->locals()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
     }
 
+    /**
+     * Get rank for driven time
+     * @param Map $map
+     * @param int $score
+     * @return int|null
+     */
     private static function getRank(Map $map, int $score): ?int
     {
         $nextBetter = $map->locals->where('Score', '<=', $score)->sortByDesc('Score')->first();
@@ -165,12 +218,19 @@ class LocalRecords
         return 1;
     }
 
+    /**
+     * Called @ BeginMap
+     */
     public static function beginMap()
     {
         self::$checkpoints = new \Illuminate\Support\Collection();
         self::displayLocalRecords();
     }
 
+    /**
+     * Display the locals overview
+     * @param Player $player
+     */
     public static function showLocalsModal(Player $player)
     {
         $map = MapController::getCurrentMap();
@@ -190,11 +250,19 @@ class LocalRecords
         ]);
     }
 
+    /**
+     * Hide locals overview
+     * @param Player $player
+     * @param string $id
+     */
     public static function hideLocalsModal(Player $player, string $id)
     {
         Template::hide($player, $id);
     }
 
+    /**
+     * Display locals widget
+     */
     public static function displayLocalRecords()
     {
         $locals = MapController::getCurrentMap()

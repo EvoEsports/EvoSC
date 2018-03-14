@@ -7,6 +7,7 @@ use Dedi;
 use Illuminate\Database\Eloquent\Model;
 use LocalRecord;
 use MxKarma;
+use Stats;
 
 class Player extends Model
 {
@@ -116,6 +117,11 @@ class Player extends Model
     public function ratings()
     {
         return $this->hasMany(MxKarma::class, 'id', 'Player');
+    }
+
+    public function stats()
+    {
+        $this->hasOne(Stats::class, 'Player', 'id');
     }
 
     public function group()

@@ -177,7 +177,8 @@ class Dedimania extends DedimaniaApi
      */
     public static function playerFinish(Player $player, int $score)
     {
-        if ($score == 0) {
+        if($score < 3000){
+            //ignore times under 3 seconds
             return;
         }
 

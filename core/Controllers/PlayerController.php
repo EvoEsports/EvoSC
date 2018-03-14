@@ -60,7 +60,6 @@ class PlayerController
     public static function playerConnect(Player $player, bool $surpressJoinMessage = false): Player
     {
         $player->setOnline();
-        $player->increment('Visits');
 
         Log::info($player->NickName . " joined the server.");
 
@@ -106,16 +105,20 @@ class PlayerController
     public static function playerInfoChanged($infoplayerInfo)
     {
         foreach ($infoplayerInfo as $info) {
-            if(!isset($info['Login'])){
+            if (!isset($info['Login'])) {
                 Log::error("Login not set");
                 var_dump($info);
                 die();
             }
 
-            if(Player::where('Login', $info['Login'])->get()->isEmpty()){
+            if (Player::where('Login', $info['Login'])->get()->isEmpty()) {
                 $player = Player::create(['Login' => $info['Login']]);
-            }else{
+            } else {
                 $player = Player::find($info['Login']);
+            }
+
+            if (!$player->stats) {
+                $player->stats()->create(['Player' => $player->id]);
             }
 
             $player->update($info);
