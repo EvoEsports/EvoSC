@@ -9,24 +9,22 @@ include 'core/bootstrap.php';
 
 while (true) {
     try {
-        esc\classes\Log::info("Starting...");
+        esc\Classes\Log::info("Starting...");
 
         startEsc();
 
-        loadModulesFrom('core\\Modules');
+        loadModulesFrom('core/Modules');
         loadModulesFrom('modules');
 
         beginMap();
-
-//        \esc\controllers\ChatController::messageAllNew('ESC Started. Running version ', '$' . config('color.secondary') . '0.11.0');
 
         while (true) {
             cycle();
         }
     } catch (PDOException $pdoe) {
-        esc\classes\Log::error("Database exception: $pdoe");
+        esc\Classes\Log::error("Database exception: $pdoe");
     } catch (\Exception $e) {
-        \esc\classes\Log::error("Fatal error. Restarting...");
-        \esc\classes\Log::error($e, false);
+        \esc\Classes\Log::error("Fatal error. Restarting...");
+        \esc\Classes\Log::error($e, false);
     }
 }

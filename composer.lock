@@ -30,8 +30,8 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "ManiaScript\\": "src/",
-                    "ManiaScriptTests\\": "tests/"
+                    "ManiaScript/": "src/",
+                    "ManiaScriptTests/": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -81,7 +81,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Doctrine\\Common\\Inflector\\": "lib/Doctrine/Common/Inflector"
+                    "Doctrine/Common/Inflector/": "lib/Doctrine/Common/Inflector"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -158,7 +158,7 @@
                     "src/functions_include.php"
                 ],
                 "psr-4": {
-                    "GuzzleHttp\\": "src/"
+                    "GuzzleHttp/": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -213,7 +213,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp\\Promise\\": "src/"
+                    "GuzzleHttp/Promise/": "src/"
                 },
                 "files": [
                     "src/functions_include.php"
@@ -268,7 +268,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp\\Psr7\\": "src/"
+                    "GuzzleHttp/Psr7/": "src/"
                 },
                 "files": [
                     "src/functions_include.php"
@@ -328,7 +328,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Container\\": ""
+                    "Illuminate/Container/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -372,7 +372,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Contracts\\": ""
+                    "Illuminate/Contracts/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -425,7 +425,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Database\\": ""
+                    "Illuminate/Database/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -476,7 +476,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Events\\": ""
+                    "Illuminate/Events/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -527,7 +527,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Filesystem\\": ""
+                    "Illuminate/Filesystem/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -571,7 +571,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Pagination\\": ""
+                    "Illuminate/Pagination/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -625,7 +625,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\Support\\": ""
+                    "Illuminate/Support/": ""
                 },
                 "files": [
                     "helpers.php"
@@ -676,7 +676,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate\\View\\": ""
+                    "Illuminate/View/": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -790,7 +790,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Maniaplanet\\": "libraries/Maniaplanet"
+                    "Maniaplanet/": "libraries/Maniaplanet"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -890,7 +890,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Carbon\\": "src/Carbon/"
+                    "Carbon/": "src/Carbon/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -934,7 +934,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Philo\\Blade\\": "src"
+                    "Philo/Blade/": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -979,7 +979,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Container\\": "src/"
+                    "Psr/Container/": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1028,7 +1028,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Http\\Message\\": "src/"
+                    "Psr/Http/Message/": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1078,7 +1078,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
+                    "Psr/Log/": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1125,7 +1125,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\SimpleCache\\": "src/"
+                    "Psr/SimpleCache/": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1192,7 +1192,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Component\\Console\\": ""
+                    "Symfony/Component/Console/": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1248,7 +1248,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Component\\Debug\\": ""
+                    "Symfony/Component/Debug/": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1297,7 +1297,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Component\\Finder\\": ""
+                    "Symfony/Component/Finder/": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1349,7 +1349,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Polyfill\\Mbstring\\": ""
+                    "Symfony/Polyfill/Mbstring/": ""
                 },
                 "files": [
                     "bootstrap.php"
@@ -1405,7 +1405,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
+                    "Symfony/Component/Process/": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1473,7 +1473,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony\\Component\\Translation\\": ""
+                    "Symfony/Component/Translation/": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"

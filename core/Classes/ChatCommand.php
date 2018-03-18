@@ -3,8 +3,8 @@
 namespace esc\Classes;
 
 
-use esc\controllers\ChatController;
-use esc\models\Player;
+use esc\Controllers\ChatController;
+use esc\Models\Player;
 
 class ChatCommand
 {

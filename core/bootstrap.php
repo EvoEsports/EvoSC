@@ -4,8 +4,11 @@ $escVersion = '0.14.*';
 
 include 'global-functions.php';
 
-esc\classes\Log::info("Loading config files.");
-esc\classes\Config::loadConfigFiles();
+$output = new \Symfony\Component\Console\Output\ConsoleOutput();
+\esc\Classes\Log::setOutput($output);
+
+esc\Classes\Log::info("Loading config files.");
+esc\Classes\Config::loadConfigFiles();
 
 if(config('music.enable-internal-server', true)){
     \esc\Classes\Log::info("Starting music server...");
@@ -22,17 +25,17 @@ if(config('music.enable-internal-server', true)){
 function startEsc()
 {
     try {
-        esc\classes\Log::info("Connecting to server...");
+        esc\Classes\Log::info("Connecting to server...");
 
-        esc\classes\Server::init(
-            esc\classes\Config::get('server.ip'),
-            esc\classes\Config::get('server.port'),
+        esc\Classes\Server::init(
+            esc\Classes\Config::get('server.ip'),
+            esc\Classes\Config::get('server.port'),
             5,
-            esc\classes\Config::get('server.rpc.login'),
-            esc\classes\Config::get('server.rpc.password')
+            esc\Classes\Config::get('server.rpc.login'),
+            esc\Classes\Config::get('server.rpc.password')
         );
 
-        esc\classes\Server::getStatus();
+        esc\Classes\Server::getStatus();
 
         if(!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()){
             \esc\Classes\Server::autoSaveValidationReplays(true);
@@ -41,24 +44,24 @@ function startEsc()
             \esc\Classes\Server::autoSaveReplays(true);
         }
 
-        esc\classes\Log::info("Connection established.");
+        esc\Classes\Log::info("Connection established.");
     } catch (\Exception $e) {
-        esc\classes\Log::error("Connection to server failed.");
+        esc\Classes\Log::error("Connection to server failed.");
         exit(1);
     }
 
-    esc\classes\Database::init();
-    esc\classes\RestClient::init(config('server.name'));
-    esc\controllers\HookController::init();
-    esc\controllers\TemplateController::init();
-    esc\controllers\ChatController::init();
-    esc\classes\ManiaLinkEvent::init();
-    esc\controllers\GroupController::init();
-    esc\controllers\AccessController::init();
-    esc\controllers\MapController::init();
-    esc\controllers\PlayerController::init();
-    esc\classes\Vote::init();
-    esc\controllers\ModuleController::init();
+    esc\Classes\Database::init();
+    esc\Classes\RestClient::init(config('server.name'));
+    esc\Controllers\HookController::init();
+    esc\Controllers\TemplateController::init();
+    esc\Controllers\ChatController::init();
+    esc\Classes\ManiaLinkEvent::init();
+    esc\Controllers\GroupController::init();
+    esc\Controllers\AccessController::init();
+    esc\Controllers\MapController::init();
+    esc\Controllers\PlayerController::init();
+    esc\Classes\Vote::init();
+    esc\Controllers\ModuleController::init();
 
     \esc\Classes\Template::add('esc.box', \esc\Classes\File::get(__DIR__ . '/Templates/ranking-box.latte.xml'));
     \esc\Classes\Template::add('esc.ranking', \esc\Classes\File::get(__DIR__ . '/Templates/Components/ranking.latte.xml'));
@@ -73,10 +76,10 @@ function startEsc()
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 
     //Handle already connected players
-    foreach (esc\classes\Server::getPlayerList() as $player) {
-        $ply = \esc\models\Player::firstOrCreate(['Login' => $player->login]);
+    foreach (esc\Classes\Server::getPlayerList() as $player) {
+        $ply = \esc\Models\Player::firstOrCreate(['Login' => $player->login]);
         $ply->update($player->toArray());
-        esc\controllers\PlayerController::playerConnect($ply, true);
+        esc\Controllers\PlayerController::playerConnect($ply, true);
     }
 }
 
@@ -84,9 +87,9 @@ function cycle()
 {
     global $musicServer;
 
-    esc\classes\Timer::startCycle();
-    esc\controllers\HookController::handleCallbacks(esc\classes\Server::executeCallbacks());
-    usleep(esc\classes\Timer::getNextCyclePause());
+    esc\Classes\Timer::startCycle();
+    esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+    usleep(esc\Classes\Timer::getNextCyclePause());
 
     if(config('music.enable-internal-server', true)) {
         $msOutput = $musicServer->getOutput();
@@ -98,11 +101,11 @@ function cycle()
 
 function loadModulesFrom(string $path)
 {
-    esc\controllers\ModuleController::loadModules($path);
+    esc\Controllers\ModuleController::loadModules($path);
 }
 
 function beginMap()
 {
-    $map = \esc\models\Map::where('FileName', esc\classes\Server::getCurrentMapInfo()->fileName)->first();
-    esc\controllers\HookController::fire('BeginMap', [$map]);
+    $map = \esc\Models\Map::where('FileName', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
+    esc\Controllers\HookController::fire('BeginMap', [$map]);
 }

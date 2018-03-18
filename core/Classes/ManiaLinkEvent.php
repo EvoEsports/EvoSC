@@ -3,7 +3,7 @@
 namespace esc\Classes;
 
 
-use esc\models\Player;
+use esc\Models\Player;
 use Illuminate\Support\Collection;
 
 class ManiaLinkEvent
@@ -28,7 +28,7 @@ class ManiaLinkEvent
     {
         self::$maniaLinkEvents = new Collection();
 
-        Hook::add('PlayerManialinkPageAnswer', '\esc\classes\ManiaLinkEvent::call');
+        Hook::add('PlayerManialinkPageAnswer', '\esc\Classes\ManiaLinkEvent::call');
     }
 
     public static function add(string $id, string $callback)

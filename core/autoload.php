@@ -3,16 +3,13 @@ function esc_autoloader($className)
 {
     $classNameExplode = explode("\\", $className);
 
-    $realClassName = "core";
+    $file = implode('/', $classNameExplode) . '.php';
 
-    for ($i = 1; $i < count($classNameExplode); $i++) {
-        $realClassName .= "\\" . $classNameExplode[$i];
-    }
+    $file = str_replace('esc/', '', $file);
 
-    $file = $realClassName . '.php';
+    $file = coreDir($file);
 
     if (file_exists($file)) {
-//        echo "[[AUTOLOAD]] --------------------------------------> ".str_pad($className, 40, ' ',STR_PAD_RIGHT)." from $file\n";
         require_once $file;
     }
 }

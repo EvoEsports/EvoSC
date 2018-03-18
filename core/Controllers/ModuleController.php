@@ -1,15 +1,15 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
-use esc\classes\ChatCommand;
-use esc\classes\File;
-use esc\classes\Log;
-use esc\classes\ManiaLinkEvent;
-use esc\classes\Module;
-use esc\classes\Template;
-use esc\models\Group;
-use esc\models\Player;
+use esc\Classes\ChatCommand;
+use esc\Classes\File;
+use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
+use esc\Classes\Template;
+use esc\Models\Group;
+use esc\Models\Player;
 use Illuminate\Support\Collection;
 
 class ModuleController
@@ -43,29 +43,25 @@ class ModuleController
         }
     }
 
-    public
-    static function getModules(): Collection
+    public static function getModules(): Collection
     {
         return self::$loadedModules;
     }
 
-    public
-    static function showModules(Player $callee)
+    public static function showModules(Player $callee)
     {
         Template::show($callee, 'modules', ['modules' => self::getModules()]);
     }
 
-    public
-    static function hideModules(Player $callee)
+    public static function hideModules(Player $callee)
     {
         Template::hide($callee, 'modules');
     }
 
-    public
-    static function loadModules($loadFrom = 'modules')
+    public static function loadModules($loadFrom = 'modules')
     {
         foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
-            $dir = $loadFrom . '\\' . $item;
+            $dir = $loadFrom . '/' . $item;
 
             if (!file_exists($dir . '/module.json')) {
                 Log::error("Missing module.json for [$item]");
@@ -81,7 +77,7 @@ class ModuleController
 
                 self::$loadedModules->push($module);
 
-                Log::logAddLine('Module',"$item loaded");
+                Log::logAddLine('Module', "$item loaded");
             } catch (\Exception $e) {
                 Log::error("Could not load module $item: $e");
             }

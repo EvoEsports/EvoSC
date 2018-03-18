@@ -1,16 +1,16 @@
 <?php
 
-use esc\classes\Database;
-use esc\classes\File;
-use esc\classes\Hook;
-use esc\classes\Log;
-use esc\classes\ManiaLinkEvent;
-use esc\classes\RestClient;
+use esc\Classes\Database;
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\classes\Template;
-use esc\controllers\ChatController;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
@@ -74,7 +74,7 @@ class MusicServer
      */
     public static function getCurrentSong(): ?Song
     {
-        $songInformation = \esc\classes\Server::getForcedMusic();
+        $songInformation = \esc\Classes\Server::getForcedMusic();
         $url = $songInformation->url;
         return self::$music->where('url', $url)->first();
     }
@@ -105,7 +105,7 @@ class MusicServer
             return;
         }
 
-        $songInformation = \esc\classes\Server::getForcedMusic();
+        $songInformation = \esc\Classes\Server::getForcedMusic();
         $url = $songInformation->url;
         $song = self::$music->where('url', $url)->first();
 

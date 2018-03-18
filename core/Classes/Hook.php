@@ -3,7 +3,7 @@
 namespace esc\Classes;
 
 
-use esc\controllers\HookController;
+use esc\Controllers\HookController;
 
 class Hook
 {

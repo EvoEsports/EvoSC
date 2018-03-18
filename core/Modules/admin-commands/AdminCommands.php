@@ -1,15 +1,15 @@
 <?php
 
 
-use esc\classes\File;
-use esc\classes\Hook;
-use esc\classes\ManiaLinkEvent;
-use esc\classes\Template;
-use esc\controllers\ChatController;
-use esc\controllers\MapController;
-use esc\controllers\PlayerController;
-use esc\models\Group;
-use esc\models\Player;
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
+use esc\Controllers\PlayerController;
+use esc\Models\Group;
+use esc\Models\Player;
 
 class AdminCommands
 {

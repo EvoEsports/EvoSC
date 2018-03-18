@@ -106,7 +106,7 @@ class Statistics
     /**
      * Create the database table
      */
-    private static function createTables()
+    public static function createTables()
     {
         Database::create('stats', function (Blueprint $table) {
             $table->integer('Player')->primary();

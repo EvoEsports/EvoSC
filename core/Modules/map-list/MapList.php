@@ -1,12 +1,12 @@
 <?php
 
-use esc\classes\File;
-use esc\classes\ManiaLinkEvent;
-use esc\classes\Template;
-use esc\controllers\ChatController;
-use esc\controllers\MapController;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\File;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
+use esc\Models\Map;
+use esc\Models\Player;
 
 class MapList
 {

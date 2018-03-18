@@ -1,15 +1,15 @@
 <?php
 
-use esc\classes\Database;
-use esc\classes\File;
-use esc\classes\Hook;
+use esc\Classes\Database;
+use esc\Classes\File;
+use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
-use esc\classes\Template;
-use esc\controllers\ChatController;
-use esc\controllers\HookController;
-use esc\controllers\MapController;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Controllers\HookController;
+use esc\Controllers\MapController;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 
 class LocalRecords
@@ -21,7 +21,7 @@ class LocalRecords
      */
     public function __construct()
     {
-        $this->createTables();
+        LocalRecords::createTables();
 
         self::$checkpoints = new \Illuminate\Support\Collection();
 
@@ -41,7 +41,7 @@ class LocalRecords
     /**
      * Create the database tables
      */
-    private function createTables()
+    public static function createTables()
     {
         Database::create('local-records', function (Blueprint $table) {
             $table->increments('id');
@@ -49,7 +49,7 @@ class LocalRecords
             $table->integer('Map');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->string('Checkpoints');
+            $table->mediumText('Checkpoints');
             $table->unique(['Map', 'Rank']);
         });
     }

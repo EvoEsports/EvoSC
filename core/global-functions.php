@@ -35,38 +35,38 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 
 function config(string $id, $default = null)
 {
-    return esc\classes\Config::get($id) ?: $default;
+    return esc\Classes\Config::get($id) ?: $default;
 }
 
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . '\\..\\cache\\' . $filename;
+    return __DIR__ . '/../cache/' . $filename;
 }
 
 function ghost(string $filename = ''): string
 {
-    $basePath = str_replace('/', '\\', config('server.base'));
-    return $basePath . 'UserData\\Replays\\Ghosts\\' . $filename . '.Replay.Gbx';
+    $basePath = str_replace('/', '/', config('server.base'));
+    return $basePath . 'UserData/Replays/Ghosts/' . $filename . '.Replay.Gbx';
 }
 
 function musicDir(string $filename = ''): string
 {
-    return __DIR__ . '\\..\\music\\' . $filename;
+    return __DIR__ . '/../music/' . $filename;
 }
 
 function coreDir(string $filename = ''): string
 {
-    return __DIR__ . '\\' . $filename;
+    return __DIR__ . '/' . $filename;
 }
 
 function onlinePlayers(): \Illuminate\Support\Collection
 {
-    return esc\models\Player::whereOnline(true)->get();
+    return esc\Models\Player::whereOnline(true)->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
 {
-    return esc\models\Player::where('Score', '>', 0)->get();
+    return esc\Models\Player::where('Score', '>', 0)->get();
 }
 
 function cutZeroes(string $formattedScore): string

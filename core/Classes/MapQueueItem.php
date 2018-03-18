@@ -2,8 +2,8 @@
 
 namespace esc\Classes;
 
-use esc\models\Map;
-use esc\models\Player;
+use esc\Models\Map;
+use esc\Models\Player;
 
 class MapQueueItem
 {

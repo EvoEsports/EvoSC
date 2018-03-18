@@ -1,12 +1,12 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
-use esc\classes\Hook;
-use esc\classes\Log;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\Hook;
+use esc\Classes\Log;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 
 class HookController

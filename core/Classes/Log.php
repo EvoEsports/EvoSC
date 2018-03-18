@@ -2,10 +2,26 @@
 
 namespace esc\Classes;
 
+use \Symfony\Component\Console\Output\ConsoleOutput;
 
 class Log
 {
-    private static $prefix = '';
+    private static $output;
+
+    public static function setOutput(ConsoleOutput $output)
+    {
+        self::$output = $output;
+    }
+
+    public static function getOutput(): ?ConsoleOutput
+    {
+        return self::$output;
+    }
+
+    public static function writeLn(string $line)
+    {
+        self::$output->writeln(stripAll($line));
+    }
 
     public static function logAddLine(string $prefix, string $string, $echo = false)
     {
@@ -13,41 +29,45 @@ class Log
         $time = date("H:i:s", time());
         $logFile = sprintf("logs/%s.txt", $date);
 
+        if($prefix == 'Info'){
+            $prefix = 'i';
+        }
+
         $line = sprintf("[%s] [%s] %s", $time, $prefix, $string);
         $line = stripAll($line);
 
-        if($echo){
-            switch($prefix){
+        if ($echo) {
+            switch ($prefix) {
                 case 'Module':
-                    Console::log($line, 'blue');
+                    self::writeLn($line);
                     break;
 
                 case 'Info':
-                    Console::log($line, 'blue');
+                    self::writeLn($line);
                     break;
 
                 case 'Hook':
-                    Console::log($line, 'light_green');
+                    self::writeLn($line);
                     break;
 
                 case 'Warning':
-                    Console::log($line, 'red');
+                    self::writeLn($line);
                     break;
 
                 case 'Dedimania':
-                    Console::log($line, 'white', true, 'purple');
+                    self::writeLn($line);
                     break;
 
                 case 'ERROR':
-                    Console::log($line, 'white', true, 'red');
+                    self::writeLn($line);
                     break;
 
                 case 'Debug':
-                    Console::log($line, 'dark_gray', true, 'magenta');
+                    self::writeLn($line);
                     break;
 
                 default:
-                    Console::log($line, 'normal');
+                    self::writeLn($line);
             }
         }
 

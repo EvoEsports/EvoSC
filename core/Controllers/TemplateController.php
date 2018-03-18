@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
 use Illuminate\Support\Collection;

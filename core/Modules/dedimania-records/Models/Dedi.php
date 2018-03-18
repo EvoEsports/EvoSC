@@ -1,7 +1,7 @@
 <?php
 
 use esc\Models\Map;
-use esc\models\Player;
+use esc\Models\Player;
 
 class Dedi extends \Illuminate\Database\Eloquent\Model
 {

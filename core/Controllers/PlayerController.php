@@ -1,15 +1,15 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
-use esc\classes\Database;
-use esc\classes\File;
-use esc\classes\Hook;
-use esc\classes\Log;
+use esc\Classes\Database;
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\Server;
-use esc\classes\Template;
-use esc\models\Player;
+use esc\Classes\Template;
+use esc\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -31,13 +31,12 @@ class PlayerController
         ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
     }
 
-    private static function createTables()
+    public static function createTables()
     {
         Database::create('players', function (Blueprint $table) {
             $table->increments('id');
             $table->string('Login')->unique();
             $table->string('NickName')->default("unset");
-            $table->integer('Visits')->default(0);
             $table->integer('Group')->nullable();
             $table->integer('Score')->default(0);
             $table->boolean('Online')->default(false);

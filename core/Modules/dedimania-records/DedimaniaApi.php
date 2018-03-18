@@ -275,7 +275,7 @@ class DedimaniaApi
         if ($data) {
             if(isset($data->params->param->value->boolean)){
                 if(!$data->params->param->value->boolean){
-                    \esc\controllers\ChatController::messageAll('Updating dedis failed');
+                    \esc\Controllers\ChatController::messageAll('Updating dedis failed');
                 }
             }
         }

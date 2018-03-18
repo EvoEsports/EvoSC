@@ -2,17 +2,17 @@
 
 require_once __DIR__ . '/DedimaniaApi.php';
 
-use esc\classes\Database;
-use esc\classes\File;
-use esc\classes\Hook;
-use esc\classes\Log;
+use esc\Classes\Database;
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
-use esc\classes\Template;
-use esc\controllers\ChatController;
-use esc\controllers\MapController;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 
@@ -69,32 +69,37 @@ class Dedimania extends DedimaniaApi
         }
 
         $data = self::getChallengeRecords($map);
-        $records = $data->params->param->value->struct->member[3]->value->array->data->value;
 
-        foreach ($records as $record) {
-            try {
-                $login = (string)$record->struct->member[0]->value->string;
-                $nickname = (string)$record->struct->member[1]->value->string;
-                $score = (int)$record->struct->member[2]->value->int;
-                $rank = (int)$record->struct->member[3]->value->int;
+        if (isset($data->params->param->value->struct->member[3]->value->array->data->value)) {
+            $records = $data->params->param->value->struct->member[3]->value->array->data->value;
 
-                $player = Player::firstOrCreate(['Login' => $login]);
-            } catch (\Exception $e) {
-                continue;
+            foreach ($records as $record) {
+                try {
+                    $login = (string)$record->struct->member[0]->value->string;
+                    $nickname = (string)$record->struct->member[1]->value->string;
+                    $score = (int)$record->struct->member[2]->value->int;
+                    $rank = (int)$record->struct->member[3]->value->int;
+
+                    $player = Player::firstOrCreate(['Login' => $login]);
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                if (isset($player->id)) {
+                    $player->update(['NickName' => $nickname]);
+
+                    Dedi::whereMap($map->id)->whereRank($rank)->delete();
+
+                    Dedi::create([
+                        'Map' => $map->id,
+                        'Player' => $player->id,
+                        'Score' => $score,
+                        'Rank' => $rank
+                    ]);
+                }
             }
-
-            if (isset($player->id)) {
-                $player->update(['NickName' => $nickname]);
-
-                Dedi::whereMap($map->id)->whereRank($rank)->delete();
-
-                Dedi::create([
-                    'Map' => $map->id,
-                    'Player' => $player->id,
-                    'Score' => $score,
-                    'Rank' => $rank
-                ]);
-            }
+        } else {
+            Log::warning('Failed to fetch dedimania');
         }
 
         Dedi::where('Map', $map->id)->where('Score', 0)->delete();
@@ -177,7 +182,7 @@ class Dedimania extends DedimaniaApi
      */
     public static function playerFinish(Player $player, int $score)
     {
-        if($score < 3000){
+        if ($score < 3000) {
             //ignore times under 3 seconds
             return;
         }

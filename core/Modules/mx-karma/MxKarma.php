@@ -9,8 +9,8 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\controllers\ChatController;
-use esc\controllers\HookController;
+use esc\Controllers\ChatController;
+use esc\Controllers\HookController;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
@@ -58,6 +58,11 @@ class MxKarma extends MXK
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', 'MxKarma::vote');
 
+        MxKarma::createTables();
+    }
+
+    public static function createTables()
+    {
         Database::create('mx-karma', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('Player');
@@ -82,7 +87,7 @@ class MxKarma extends MXK
             return;
         }
 
-        $map = \esc\controllers\MapController::getCurrentMap();
+        $map = \esc\Controllers\MapController::getCurrentMap();
 
         Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating");
 
@@ -257,7 +262,7 @@ class MxKarma extends MXK
 
     public static function getUpdatedVotesAverage()
     {
-        $map = \esc\controllers\MapController::getCurrentMap();
+        $map = \esc\Controllers\MapController::getCurrentMap();
         $items = new Collection();
 
         for ($i = 0; $i < self::$mapKarma->votecount; $i++) {

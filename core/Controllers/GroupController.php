@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
 use esc\classes\Database;
@@ -13,7 +13,7 @@ class GroupController
         self::createTables();
     }
 
-    private static function createTables()
+    public static function createTables()
     {
         $seed = [
             ['id' => 1, 'Name' => 'Masteradmin', 'Protected' => true],

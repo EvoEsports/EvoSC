@@ -3,9 +3,9 @@
 namespace esc\Classes;
 
 
-use esc\controllers\ChatController;
-use esc\controllers\MapController;
-use esc\models\Player;
+use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
+use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 

@@ -4,6 +4,8 @@ class Stats extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'stats';
 
+    protected $fillable = ['Visits', 'LastPlayer', 'Finishes', 'Locals', 'Donations', 'Playtime', 'Wins', 'Player', 'updated_at', 'created_at'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

@@ -1,18 +1,18 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
 use Dedi;
-use esc\classes\ChatCommand;
-use esc\classes\File;
-use esc\classes\Log;
-use esc\classes\Module;
-use esc\classes\Server;
-use esc\classes\Template;
-use esc\models\Group;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\ChatCommand;
+use esc\Classes\File;
+use esc\Classes\Log;
+use esc\Classes\Module;
+use esc\Classes\Server;
+use esc\Classes\Template;
+use esc\Models\Group;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use LocalRecord;
 use Song;
@@ -154,7 +154,7 @@ $$: Writes a dollarsign
         $triggers = [];
         $chatCommandPattern = '/^(';
         foreach (self::$chatCommands as $cmd) {
-            array_push($triggers, '\\' . implode('\\', str_split($cmd->trigger)) . $cmd->command);
+            array_push($triggers, '/' . implode('/', str_split($cmd->trigger)) . $cmd->command);
         }
         $chatCommandPattern .= implode('|', $triggers) . ')/';
         self::$pattern = $chatCommandPattern;

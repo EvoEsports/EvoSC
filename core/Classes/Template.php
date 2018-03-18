@@ -3,8 +3,8 @@
 namespace esc\Classes;
 
 
-use esc\controllers\TemplateController;
-use esc\models\Player;
+use esc\Controllers\TemplateController;
+use esc\Models\Player;
 
 class Template
 {

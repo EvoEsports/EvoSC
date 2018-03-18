@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
 use esc\Classes\Database;
@@ -14,7 +14,7 @@ class AccessController
         self::createTables();
     }
 
-    private static function createTables()
+    public static function createTables()
     {
         $seed = [
             ['name' => 'skip', 'description' => 'Skip the map'],

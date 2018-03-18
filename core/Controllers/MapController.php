@@ -1,21 +1,21 @@
 <?php
 
-namespace esc\controllers;
+namespace esc\Controllers;
 
 
-use esc\classes\Config;
-use esc\classes\Database;
-use esc\classes\File;
-use esc\classes\Hook;
-use esc\classes\Log;
-use esc\classes\MapQueueItem;
-use esc\classes\RestClient;
-use esc\classes\Server;
-use esc\classes\Template;
-use esc\classes\Vote;
-use esc\models\Group;
-use esc\models\Map;
-use esc\models\Player;
+use esc\Classes\Config;
+use esc\Classes\Database;
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\Log;
+use esc\Classes\MapQueueItem;
+use esc\Classes\RestClient;
+use esc\Classes\Server;
+use esc\Classes\Template;
+use esc\Classes\Vote;
+use esc\Models\Group;
+use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
@@ -39,14 +39,14 @@ class MapController
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
         Hook::add('PlayerConnect', '\esc\Controllers\MapController::displayMapWidget');
-        Hook::add('BeginMap', '\esc\Controllers\MapController::beginMap');
-        Hook::add('EndMatch', '\esc\Controllers\MapController::endMatch');
+        Hook::add('BeginMap', 'esc\Controllers\MapController::beginMap');
+        Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
 
         ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
         ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', [Group::ADMIN, Group::SUPER]);
     }
 
-    private static function createTables()
+    public static function createTables()
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
@@ -55,7 +55,7 @@ class MapController
             $table->string('Name')->nullable();
             $table->string('Author')->nullable();
             $table->string('FileName')->unique();
-            $table->string('Environnement')->nullable();
+            $table->string('Environment')->nullable();
             $table->integer('NbCheckpoints')->nullable();
             $table->integer('NbLaps')->nullable();
             $table->integer('Plays')->default(0);
@@ -264,7 +264,7 @@ class MapController
             } catch (FileException $e) {
                 Log::error("Map $mapFile not found.");
             } catch (AlreadyInListException $e) {
-                Log::warning("Map $mapFile already added.");
+//                Log::warning("Map $mapFile already added.");
             }
         }
     }

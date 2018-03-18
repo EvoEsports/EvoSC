@@ -4,7 +4,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\controllers\MapController;
+use esc\Controllers\MapController;
 use esc\Models\Player;
 
 class TimeWidget
