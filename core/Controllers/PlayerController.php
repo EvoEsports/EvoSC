@@ -116,7 +116,7 @@ class PlayerController
                 $player = Player::find($info['Login']);
             }
 
-            if (!$player->stats) {
+            if (!$player->stats && $player) {
                 $player->stats()->create(['Player' => $player->id]);
             }
 

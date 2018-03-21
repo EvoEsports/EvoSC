@@ -9,11 +9,11 @@ use Illuminate\Database\Schema\Blueprint;
 class Statistics
 {
     /**
-     * Initialize statistics
+     * Statistics constructor.
      */
-    public static function init()
+    public function __construct()
     {
-        require_once __DIR__ . '/Models/Stats.php';
+        include_once __DIR__ . '/Models/Stats.php';
 
         self::createTables();
 
@@ -75,7 +75,7 @@ class Statistics
     public static function updatePlaytimes()
     {
         foreach (onlinePlayers() as $player) {
-            $player->increment('Playtime');
+            $player->stats()->increment('Playtime');
         }
 
         Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m', true);

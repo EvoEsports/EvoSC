@@ -24,7 +24,7 @@ while (true) {
     } catch (PDOException $pdoe) {
         esc\Classes\Log::error("Database exception: $pdoe");
     } catch (\Exception $e) {
-        \esc\Classes\Log::error("Fatal error. Restarting...");
+        \esc\Classes\Log::error("!!!!! Fatal error. Restarting... Check the logs for more detailed information !!!!!");
         \esc\Classes\Log::error($e, false);
     }
 }

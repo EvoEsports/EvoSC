@@ -99,7 +99,18 @@ class Dedimania extends DedimaniaApi
                 }
             }
         } else {
-            Log::warning('Failed to fetch dedimania');
+            if(isset($data->fault)){
+                $message = $data->fault->value->struct->member[1]->value->string;
+
+                if(preg_match('/SessionId .+ not found !!!/', $message)){
+                    Log::logAddLine('Dedimania', 'Session expired, generating new.');
+                    $session->update(['Expired' => true]);
+                    self::beginMap($map);
+                    return;
+                }else{
+                    Log::logAddLine('! Dedimania !', $message);
+                }
+            }
         }
 
         Dedi::where('Map', $map->id)->where('Score', 0)->delete();
@@ -109,7 +120,7 @@ class Dedimania extends DedimaniaApi
         }
     }
 
-    public static function endMatch(...$args)
+    public static function endMatch($sPlayerRanking, int $winnerTeam)
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);

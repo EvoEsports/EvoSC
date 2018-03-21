@@ -121,7 +121,7 @@ class Player extends Model
 
     public function stats()
     {
-        $this->hasOne(Stats::class, 'Player', 'id');
+        return $this->hasOne(Stats::class, 'Player', 'id');
     }
 
     public function group()

@@ -64,6 +64,7 @@ $$: Writes a dollarsign
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
+        echo self::$pattern . "\n";
         if (preg_match(self::$pattern, $text, $matches)) {
             if (self::executeChatCommand($player, $text)) {
                 return;
@@ -108,7 +109,7 @@ $$: Writes a dollarsign
 
         $chatText = sprintf('$z$s%s: $%s$z$s%s', $nick, config('color.chat'), $text);
 
-        echo "$chatText\n";
+        echo stripAll("$chatText\n");
 
         Server::call('ChatSendServerMessage', [$chatText]);
     }
@@ -154,12 +155,16 @@ $$: Writes a dollarsign
         $triggers = [];
         $chatCommandPattern = '/^(';
         foreach (self::$chatCommands as $cmd) {
-            array_push($triggers, '/' . implode('/', str_split($cmd->trigger)) . $cmd->command);
+            $escapedTrigger = '';
+            foreach (str_split($cmd->trigger) as $part) {
+                $escapedTrigger .= '\\' . $part;
+            }
+            array_push($triggers, $escapedTrigger . $cmd->command);
         }
         $chatCommandPattern .= implode('|', $triggers) . ')/';
         self::$pattern = $chatCommandPattern;
 
-        Log::info("Chat command added: $trigger$command -> $callback");
+        Log::info("Chat command added: $trigger$command -> $callback", false);
     }
 
     public static function messageAll(...$parts)
@@ -171,7 +176,7 @@ $$: Writes a dollarsign
 
     public static function message(?Player $recipient, ...$parts)
     {
-        if(!$recipient){
+        if (!$recipient) {
             Log::warning('Do not send message to null player');
             return;
         }
@@ -225,7 +230,7 @@ $$: Writes a dollarsign
                 continue;
             }
 
-            if(!is_string($part)){
+            if (!is_string($part)) {
                 echo "CLASS OF PART: ";
                 var_dump(get_class($part));
                 var_dump(LocalRecord::class);

@@ -23,7 +23,7 @@ class Log
         self::$output->writeln(stripAll($line));
     }
 
-    public static function logAddLine(string $prefix, string $string, $echo = false)
+    public static function logAddLine(string $prefix, string $string, $echo = true)
     {
         $date = date("Y-m-d", time());
         $time = date("H:i:s", time());

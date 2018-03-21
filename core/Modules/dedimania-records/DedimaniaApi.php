@@ -99,11 +99,11 @@ class DedimaniaApi
                         $sessionId = self::authenticateAndValidateAccount();
 
                         if ($sessionId == null) {
-                            Log::warning("Connection to Dedimania failed. Using cached values.");
+                            Log::warning("Connection to Dedimania failed.");
                             return null;
                         }
 
-                        Log::info("Dedimania session created: $sessionId");
+                        Log::logAddLine('Dedimania', "Session created: $sessionId");
 
                         return DedimaniaSession::create(['Session' => $sessionId]);
                     }
@@ -115,11 +115,11 @@ class DedimaniaApi
             $sessionId = self::authenticateAndValidateAccount();
 
             if ($sessionId == null) {
-                Log::warning("Connection to Dedimania failed. Using cached values.");
+                Log::logAddLine('Dedimania', "Connection to Dedimania failed.");
                 return null;
             }
 
-            Log::info("Dedimania session created: $sessionId");
+            Log::logAddLine('Dedimania', "Session created: $sessionId");
 
             return DedimaniaSession::create(['Session' => $sessionId]);
         }
@@ -188,7 +188,7 @@ class DedimaniaApi
 
     static function setChallengeTimes(Map $map)
     {
-        if(count(self::$newTimes) == 0){
+        if (count(self::$newTimes) == 0) {
             Log::logAddLine('Dedimania', 'No new times to push');
             return;
         }
@@ -245,7 +245,7 @@ class DedimaniaApi
         */
         $bestPlayer = self::$newTimes->sortBy('Score')->first();
 
-        if(!$bestPlayer){
+        if (!$bestPlayer) {
             Log::logAddLine('Dedimania', 'No best player');
             return;
         }
@@ -273,8 +273,8 @@ class DedimaniaApi
 
         $data = self::post($xml);
         if ($data) {
-            if(isset($data->params->param->value->boolean)){
-                if(!$data->params->param->value->boolean){
+            if (isset($data->params->param->value->boolean)) {
+                if (!$data->params->param->value->boolean) {
                     \esc\Controllers\ChatController::messageAll('Updating dedis failed');
                 }
             }
@@ -339,12 +339,12 @@ class DedimaniaApi
             $member = $struct->addChild('member');
             $member->addChild('name', $key);
 
-            if($key == 'VReplay'){
+            if ($key == 'VReplay') {
                 $member->addChild('value')->addChild('base64', base64_encode($value));
                 continue;
             }
 
-            if($key == 'Top1GReplay'){
+            if ($key == 'Top1GReplay') {
                 $member->addChild('value')->addChild('base64', base64_encode($value));
                 continue;
             }
