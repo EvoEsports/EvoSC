@@ -35,6 +35,8 @@ class Vote
 
         Template::add('vote', File::get('core/Templates/vote.latte.xml'));
 
+        Hook::add('EndMatch', 'esc\Classes\Vote::endMatch');
+
         ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
         ChatController::addCommand('res', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
         ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
@@ -65,6 +67,13 @@ class Vote
         }
 
         self::vote($player, false);
+    }
+
+    public static function endMatch()
+    {
+        if(self::$inProgress){
+            self::stopVote();
+        }
     }
 
     private static function vote(Player $player, bool $decision)
@@ -183,7 +192,7 @@ class Vote
 
     public static function stopVote(Player $player = null)
     {
-        if(!self::$inProgress){
+        if (!self::$inProgress) {
             ChatController::message($player, 'There is currently no vote to stop');
             return;
         }
@@ -204,7 +213,7 @@ class Vote
 
     public static function approveVote(Player $player)
     {
-        if(!self::$inProgress){
+        if (!self::$inProgress) {
             ChatController::message($player, 'There is currently no vote to approve');
             return;
         }
