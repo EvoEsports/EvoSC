@@ -7,8 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
-    const SUPER = 1;
-    const ADMIN = 2;
-    const MOD = 3;
-    const PLAYER = 4;
+    public function hasAccess(string $accessRightName)
+    {
+        return $this->accessRights->where('name', $accessRightName)->isNotEmpty();
+    }
+
+    public function accessRights()
+    {
+        return $this->belongsToMany(AccessRight::class);
+    }
 }

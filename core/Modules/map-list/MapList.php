@@ -16,7 +16,8 @@ class MapList
 
         ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
-        ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap');
+        ManiaLinkEvent::add('maplist.filter.author', 'MapList::filterAuthor');
+        ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
 
         ChatController::addCommand('list', 'MapList::showMapList', 'Display list of maps');
     }
@@ -34,6 +35,29 @@ class MapList
 
         $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
         $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show', 'page' => $page]);
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'MapList',
+            'width' => 180,
+            'height' => 97,
+            'content' => $mapList,
+            'pagination' => $pagination
+        ]);
+    }
+
+    public static function filterAuthor(Player $player, $authorLogin, $page = 1)
+    {
+        $page = (int)$page;
+
+        $perPage = 23;
+        $allMaps = Map::all()->where('author.Login', $authorLogin);
+        $pages = ceil($allMaps->count() / $perPage);
+
+        $maps = $allMaps->forPage($page, $perPage);
+        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
+
+        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
+        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.filter.author', 'page' => $page]);
 
         Template::show($player, 'esc.modal', [
             'id' => 'MapList',

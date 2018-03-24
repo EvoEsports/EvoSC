@@ -17,6 +17,7 @@ class GroupController
     {
         $seed = [
             ['id' => 1, 'Name' => 'Masteradmin', 'Protected' => true],
+            ['id' => 2, 'Name' => 'Admin', 'Protected' => true],
         ];
 
         Database::create('groups', function(Blueprint $table){

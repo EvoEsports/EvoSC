@@ -19,6 +19,8 @@ class AccessController
         $seed = [
             ['name' => 'skip', 'description' => 'Skip the map'],
             ['name' => 'replay', 'description' => 'Queue map for replay'],
+            ['name' => 'map.add', 'description' => 'Permanently add map from MX'],
+            ['name' => 'map.delete', 'description' => 'Delete map from server'],
             ['name' => 'vote', 'description' => 'You can approve/decline votes'],
             ['name' => 'kick', 'description' => 'Kick a player'],
             ['name' => 'ban', 'description' => 'Ban a player'],
@@ -35,13 +37,14 @@ class AccessController
 
         $groupAccessSeed = [];
         foreach ($seed as $key => $item) {
-            array_push($groupAccessSeed, ['group_id' => 1, 'access_id' => $key + 1]);
+            array_push($groupAccessSeed, ['group_id' => 1, 'access_right_id' => $key + 1]);
+            array_push($groupAccessSeed, ['group_id' => 2, 'access_right_id' => $key + 1]);
         }
 
-        Database::create('group_access', function (Blueprint $table) {
+        Database::create('access_right_group', function (Blueprint $table) {
             $table->integer('group_id');
-            $table->integer('access_id');
-            $table->unique(['group_id', 'access_id']);
+            $table->integer('access_right_id');
+            $table->unique(['group_id', 'access_right_id']);
         }, $groupAccessSeed);
     }
 }

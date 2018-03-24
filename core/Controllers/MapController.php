@@ -42,8 +42,8 @@ class MapController
         Hook::add('BeginMap', 'esc\Controllers\MapController::beginMap');
         Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
 
-        ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', [Group::ADMIN, Group::SUPER]);
-        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', [Group::ADMIN, Group::SUPER]);
+        ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
+        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
 
     public static function createTables()

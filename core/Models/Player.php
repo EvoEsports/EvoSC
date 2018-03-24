@@ -129,19 +129,18 @@ class Player extends Model
         return $this->hasOne(Group::class, 'id', 'Group');
     }
 
-    public function hasGroup(array $groups)
+    public function isMasteradmin(): bool
     {
-        return in_array($this->Group, $groups);
-    }
-
-    public function isSuperadmin(): bool
-    {
-        return $this->hasGroup([Group::SUPER]);
+        return $this->group->id == 1;
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasGroup([Group::ADMIN, Group::SUPER]);
+        if ($this->isMasteradmin()) {
+            return true;
+        }
+
+        return strtolower($this->group->name) == 'admin';
     }
 
     public static function console(): Player

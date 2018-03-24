@@ -59,10 +59,10 @@ $$: Writes a dollarsign
 
         $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
             return $command->hasAccess($player);
-        })->sortBy('trigger')->forPage($page, 23);;
+        })->sortBy('trigger')->forPage($page, 23);
 
         $commandsList = Template::toString('help', ['commands' => $commands, 'player' => $player]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $commands, 'action' => 'help.show', 'page' => $page]);
+        $pagination = Template::toString('esc.pagination', ['pages' => $commands->count()/23, 'action' => 'help.show', 'page' => $page]);
 
         Template::show($player, 'esc.modal', [
             'id' => 'Help',
@@ -157,7 +157,7 @@ $$: Writes a dollarsign
         return $isValidCommand;
     }
 
-    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/', array $access = null)
+    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
         self::$chatCommands->add($chatCommand);

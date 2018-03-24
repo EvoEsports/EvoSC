@@ -6,8 +6,8 @@
 
 
 {if $player->isAdmin()}
-<label pos="-20 0" z-index="0" size="20 5" textsize="1.2" text="Admin"/>
-<quad pos="-23 3" size="20 89" z-index="-5" bgcolor="000c"/>
+<!--<label pos="-20 0" z-index="0" size="20 5" textsize="1.2" text="Admin"/>-->
+<quad pos="-10 3" size="7 89" z-index="-5" bgcolor="0009"/>
 {/if}
 
 {if isset($maps)}
@@ -26,7 +26,7 @@
     {/if}
 
     {if $player->isAdmin()}
-    <label pos="-20 0" z-index="-3" size="157 3" textsize="1" text="  DELETE" valign="center" halign="left" textcolor="f11a" action="maplist.delete,{$map->id}"/>
+    <label pos="-8 0" z-index="-3" size="145 3" textsize="1" text="" valign="center" halign="left" textcolor="f11a" action="maplist.delete,{$map->id}"/>
     {/if}
 </frame>
 {/foreach}
