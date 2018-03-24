@@ -88,8 +88,6 @@ class MapController
     {
         $request = self::$queue->shift();
 
-        self::$addedTime = 0;
-
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->FileName);
@@ -117,6 +115,8 @@ class MapController
         self::$currentMap = $map;
         self::displayMapWidget();
         PlayerController::displayPlayerlist();
+
+        self::$addedTime = 0;
     }
 
     /**
@@ -354,9 +354,9 @@ class MapController
                 $map->update($info);
             }
 
-            try{
+            try {
                 Server::addMap($map->FileName);
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 Log::warning("Map $map->FileName already added.");
             }
 

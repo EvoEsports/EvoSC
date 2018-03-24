@@ -1,8 +1,8 @@
 <frame scale="1" pos="{$x} {$y}">
     <quad pos="0 0" z-index="-2" size="110 10" style="Bgs1" opacity="0" substyle="BgDialogBlur"/>
     <quad z-index="-1" size="110 10" bgcolor="0006"/>
-    <quad z-index="-1" size="45 10" bgcolor="18f3"/>
-    <quad z-index="-1" size="11 10" bgcolor="18f9"/>
+    <quad z-index="-1" size="45 10" bgcolor="18f2"/>
+    <quad z-index="-1" size="11 10" bgcolor="18f6"/>
     <label pos="5.25 -4.5" z-index="1" size="9 10" textsize="6" text="{$cp->id + 1}" halign="center" valign="center"/>
 
     <label pos="42 -4.5" z-index="0" size="31 10" text="{formatScore($cp->score)}" textcolor="cdff" opacity="0.3" textsize="5.5" halign="right" valign="center"/>
@@ -11,7 +11,8 @@
     <label pos="77.5 -4.5" z-index="1" size="62 10" textsize="5" text="{$cp->player->NickName}" halign="center" valign="center"/>
 
     {if isset($flash)}
-    <quad z-index="0" size="110 10" bgcolor="18ff" id="{$flash}" opacity="1.0"/>
+    <!--<quad z-index="0" size="110 10" bgcolor="18ff" id="{$flash}" opacity="1.0"/>-->
+    <quad z-index="0" size="110 10" bgcolor="1f8f" id="{$flash}" opacity="1.0"/>
 
     <script><!--
     main() {

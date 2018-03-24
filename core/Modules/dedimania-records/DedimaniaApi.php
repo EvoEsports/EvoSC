@@ -216,6 +216,10 @@ class DedimaniaApi
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
         foreach (self::$newTimes->sortBy('Score') as $dedi) {
+            if ($dedi->Rank < Dedimania::getMaxRank()) {
+                continue;
+            }
+
             $struct = $times->addChild('struct');
 
             $member = $struct->addChild('member');

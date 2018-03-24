@@ -22,6 +22,10 @@ main() {
     declare startPos = fr.PosnX;
     declare endPos = startPos * 1.5;
 
+    if(player != Null && player.Speed > 1){
+        fr.PosnX = endPos;
+    }
+
     while(True){
         yield;
 

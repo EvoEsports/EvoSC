@@ -18,6 +18,8 @@ use Illuminate\Support\Collection;
 
 class Dedimania extends DedimaniaApi
 {
+    private static $maxRank = 30;
+
     private static $dedis;
 
     public function __construct()
@@ -214,9 +216,14 @@ class Dedimania extends DedimaniaApi
                 $diff = $dedi->Score - $score;
                 $rank = self::getRank($map, $score);
 
+                if ($rank < self::$maxRank) {
+                    return;
+                }
+
                 if ($rank != $dedi->Rank) {
                     self::pushDownRanks($map, $rank);
                     $dedi->update(['Score' => $score, 'Rank' => $rank]);
+                    $dedi = self::fixDedimaniaRanks($map, $player);
                     ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
                     self::addNewTime($dedi);
                 } else {
@@ -231,18 +238,20 @@ class Dedimania extends DedimaniaApi
 
                 if ($worstDedi) {
                     if ($score <= $worstDedi->Score) {
-                        self::pushDownRanks($map, $worstDedi->Rank);
-                        $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank);
+                        self::pushDedi($map, $player, $score, $worstDedi->Rank);
+                        $dedi = self::fixDedimaniaRanks($map, $player);
                         ChatController::messageAll('Player ', $player, ' gained the ', $dedi);
                         self::addNewTime($dedi);
                     } else {
-                        $dedi = self::pushDedi($map, $player, $score, $worstDedi->Rank + 1);
+                        self::pushDedi($map, $player, $score, $worstDedi->Rank + 1);
+                        $dedi = self::fixDedimaniaRanks($map, $player);
                         ChatController::messageAll('Player ', $player, ' made the ', $dedi);
                         self::addNewTime($dedi);
                     }
                 } else {
                     $rank = 1;
-                    $dedi = self::pushDedi($map, $player, $score, $rank);
+                    self::pushDedi($map, $player, $score, $rank);
+                    $dedi = self::fixDedimaniaRanks($map, $player);
                     ChatController::messageAll('Player ', $player, ' made the ', $dedi);
                     self::addNewTime($dedi);
                 }
@@ -267,6 +276,13 @@ class Dedimania extends DedimaniaApi
             'Rank' => $rank,
         ]);
 
+        self::fixDedimaniaRanks($map, $player);
+
+        return $map->dedis()->where('Player', $player->id)->first();
+    }
+
+    private static function fixDedimaniaRanks(Map $map, Player $player = null): ?Dedi
+    {
         $dedis = $map->dedis()->orderBy('Score');
         $i = 1;
         foreach ($dedis as $dedi) {
@@ -274,7 +290,11 @@ class Dedimania extends DedimaniaApi
             $i++;
         }
 
-        return $map->dedis()->where('Player', $player->id)->first();
+        if ($player) {
+            return $map->dedis()->wherePlayer($player->id)->first();
+        }
+
+        return null;
     }
 
     /**
@@ -389,5 +409,21 @@ class Dedimania extends DedimaniaApi
         } else {
             Template::showAll('esc.box', $variables);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public static function getMaxRank(): int
+    {
+        return self::$maxRank;
+    }
+
+    /**
+     * @param int $maxRank
+     */
+    public static function setMaxRank(int $maxRank)
+    {
+        self::$maxRank = $maxRank;
     }
 }

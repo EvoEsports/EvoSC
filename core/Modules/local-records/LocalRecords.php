@@ -127,13 +127,15 @@ class LocalRecords
                 if ($rank != $local->Rank) {
                     self::pushDownRanks($map, $rank);
                     $local->update(['Score' => $score, 'Rank' => $rank, 'Checkpoints' => self::getBestCps($player)]);
+                    self::fixLocalRecordRanks($map);
+                    $local = $map->locals()->wherePlayer($player->id)->first();
 
-//                    $local = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
                     ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
                     $local->update(['Score' => $score, 'Checkpoints' => self::getBestCps($player)]);
+                    self::fixLocalRecordRanks($map);
+                    $local = $map->locals()->wherePlayer($player->id)->first();
 
-//                    $local = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
                     ChatController::messageAll('Player ', $player, ' secured his/hers ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
@@ -144,10 +146,14 @@ class LocalRecords
                 if ($worstLocal) {
                     if ($score <= $worstLocal->Score) {
                         self::pushDownRanks($map, $worstLocal->Rank);
-                        $local = self::pushLocal($map, $player, $score, $worstLocal->Rank);
+                        self::pushLocal($map, $player, $score, $worstLocal->Rank);
+                        self::fixLocalRecordRanks($map);
+                        $local = $map->locals()->wherePlayer($player->id)->first();
                         ChatController::messageAll('Player ', $player, ' gained the ', $local);
                     } else {
-                        $local = self::pushLocal($map, $player, $score, $worstLocal->Rank + 1);
+                        self::pushLocal($map, $player, $score, $worstLocal->Rank + 1);
+                        self::fixLocalRecordRanks($map);
+                        $local = $map->locals()->wherePlayer($player->id)->first();
                         ChatController::messageAll('Player ', $player, ' made the ', $local);
                     }
                 } else {
@@ -171,7 +177,7 @@ class LocalRecords
      */
     private static function pushLocal(Map $map, Player $player, int $score, int $rank): LocalRecord
     {
-        $local = $map->locals()->create([
+        $map->locals()->create([
             'Player' => $player->id,
             'Map' => $map->id,
             'Score' => $score,
@@ -179,16 +185,21 @@ class LocalRecords
             'Checkpoints' => self::getBestCps($player)
         ]);
 
-        //Fix locals rank order
-        foreach ($map->locals->sortBy('Score') as $key => $local) {
-            $local->update(['Rank' => $key + 1]);
-        }
+        self::fixLocalRecordRanks($map);
 
-        $local = LocalRecord::whereMap($map->id)->whereRank($rank)->first();
+        $local = $map->locals()->wherePlayer($player->id)->first();
 
         HookController::call('PlayerLocal', [$player, $local]);
 
         return $local;
+    }
+
+    private static function fixLocalRecordRanks(Map $map)
+    {
+        //Fix locals rank order
+        foreach ($map->locals->sortBy('Score') as $key => $local) {
+            $local->update(['Rank' => $key + 1]);
+        }
     }
 
     /**
