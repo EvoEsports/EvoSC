@@ -1,4 +1,4 @@
-![version:0.17.1](https://img.shields.io/badge/Version-0.17.1-blue.svg)
+![version:0.17.2](https://img.shields.io/badge/Version-0.17.2-blue.svg)
 
 # Evolution Server Controller
 
@@ -11,7 +11,7 @@ A server controller for Trackmania² based on PHP 7.2 and Maniaplanet 4 support.
 ### Installation
 1. Clone project
 2. Run `composer install`
-3. Copy contents from `config/default` to `config` and fill out the erquired fields
+3. Copy contents from `config/default` to `config` and fill out the required fields
 
 ### Run ESC
 1. In terminal type `php esc.php`
