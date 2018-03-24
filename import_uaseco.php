@@ -1,10 +1,10 @@
 <?php
 
-$uaseco_host = '127.0.0.1';
-$uaseco_db = 'uaseco';
-$uaseco_user = 'root';
-$uaseco_password = '';
-$uaseco_table_prefix = 'drtk03_';
+$uaseco_host = config('uaseco.host');
+$uaseco_db = config('uaseco.db');
+$uaseco_user = config('uaseco.user');
+$uaseco_password = config('uaseco.password');
+$uaseco_table_prefix = config('uaseco.prefix');
 
 include 'core/autoload.php';
 include 'vendor/autoload.php';
