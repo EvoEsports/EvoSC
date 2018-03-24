@@ -19,15 +19,29 @@ class MapList
         ManiaLinkEvent::add('maplist.filter.author', 'MapList::filterAuthor');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
 
-        ChatController::addCommand('list', 'MapList::showMapList', 'Display list of maps');
+        ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
     }
 
-    public static function showMapList(Player $player, $page = 1)
+    public static function list(Player $player, $cmd, $filter = null)
+    {
+        self::showMapList($player, 1, $filter);
+    }
+
+    public static function showMapList(Player $player, $page = 1, $filter = null)
     {
         $page = (int)$page;
 
         $perPage = 23;
+
         $allMaps = Map::all();
+
+        if ($filter) {
+            $allMaps = $allMaps->filter(function (Map $map) use ($filter) {
+                $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
+                return (is_int($nameMatch) || $map->Author == $filter);
+            });
+        }
+
         $pages = ceil($allMaps->count() / $perPage);
 
         $maps = $allMaps->forPage($page, $perPage);
@@ -47,25 +61,7 @@ class MapList
 
     public static function filterAuthor(Player $player, $authorLogin, $page = 1)
     {
-        $page = (int)$page;
-
-        $perPage = 23;
-        $allMaps = Map::all()->where('author.Login', $authorLogin);
-        $pages = ceil($allMaps->count() / $perPage);
-
-        $maps = $allMaps->forPage($page, $perPage);
-        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
-
-        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.filter.author', 'page' => $page]);
-
-        Template::show($player, 'esc.modal', [
-            'id' => 'MapList',
-            'width' => 180,
-            'height' => 97,
-            'content' => $mapList,
-            'pagination' => $pagination
-        ]);
+        self::showMapList($player, $page, $authorLogin);
     }
 
     public static function closeMapList(Player $player)
