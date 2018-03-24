@@ -99,15 +99,15 @@ class Dedimania extends DedimaniaApi
                 }
             }
         } else {
-            if(isset($data->fault)){
+            if (isset($data->fault)) {
                 $message = $data->fault->value->struct->member[1]->value->string;
 
-                if(preg_match('/SessionId .+ not found !!!/', $message)){
+                if (preg_match('/SessionId .+ not found !!!/', $message)) {
                     Log::logAddLine('Dedimania', 'Session expired, generating new.');
                     $session->update(['Expired' => true]);
                     self::beginMap($map);
                     return;
-                }else{
+                } else {
                     Log::logAddLine('! Dedimania !', $message);
                 }
             }
@@ -267,7 +267,14 @@ class Dedimania extends DedimaniaApi
             'Rank' => $rank,
         ]);
 
-        return $map->dedis()->whereRank($rank)->first();
+        $dedis = $map->dedis()->orderBy('Score');
+        $i = 1;
+        foreach ($dedis as $dedi) {
+            $dedi->update(['Rank' => $i]);
+            $i++;
+        }
+
+        return $map->dedis()->where('Player', $player->id)->first();
     }
 
     /**

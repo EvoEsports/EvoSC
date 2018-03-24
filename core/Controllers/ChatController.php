@@ -53,25 +53,35 @@ $$: Writes a dollarsign
         return self::$chatCommands;
     }
 
-    public static function showHelp(Player $player)
+    public static function showHelp(Player $player, $cmd, $page = 1)
     {
+        $page = (int)$page;
+
         $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
             return $command->hasAccess($player);
-        })->sortBy('trigger');
+        })->sortBy('trigger')->forPage($page, 23);;
 
-        Template::show($player, 'help', ['commands' => $commands]);
+        $commandsList = Template::toString('help', ['commands' => $commands, 'player' => $player]);
+        $pagination = Template::toString('esc.pagination', ['pages' => $commands, 'action' => 'help.show', 'page' => $page]);
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'Help',
+            'width' => 180,
+            'height' => 97,
+            'content' => $commandsList,
+            'pagination' => $pagination
+        ]);
     }
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
-        echo self::$pattern . "\n";
         if (preg_match(self::$pattern, $text, $matches)) {
             if (self::executeChatCommand($player, $text)) {
                 return;
             }
         }
 
-        Log::chat($player->NickName, $text);
+        Log::logAddLine($player->NickName, $text);
         $nick = $player->NickName;
 
         $parts = explode(" ", $text);
@@ -109,7 +119,7 @@ $$: Writes a dollarsign
 
         $chatText = sprintf('$z$s%s: $%s$z$s%s', $nick, config('color.chat'), $text);
 
-        echo stripAll("$chatText\n");
+//        echo stripAll("$chatText\n");
 
         Server::call('ChatSendServerMessage', [$chatText]);
     }

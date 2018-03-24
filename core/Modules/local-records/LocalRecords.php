@@ -49,7 +49,7 @@ class LocalRecords
             $table->integer('Map');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->mediumText('Checkpoints');
+            $table->text('Checkpoints');
             $table->unique(['Map', 'Rank']);
         });
     }
