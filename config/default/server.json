@@ -1,0 +1,15 @@
+{
+  "module": "server",
+  "name": "",
+  "login": "",
+  "ip": "127.0.0.1",
+  "port": 5000,
+  "rpc": {
+    "login": "SuperAdmin",
+    "password": ""
+  },
+  "maps": ".../server/UserData/Maps",
+  "mps": ".../server/ManiaPlanetServer",
+  "base": ".../server/",
+  "roundTime": 10
+}

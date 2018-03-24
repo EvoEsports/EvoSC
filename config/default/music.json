@@ -1,0 +1,5 @@
+{
+  "module": "music",
+  "server": "",
+  "enable-internal-server": false
+}

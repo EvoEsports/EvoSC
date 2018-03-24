@@ -4,5 +4,8 @@ modules/
 music/
 maps/
 logs/
-config/
 cache/
+
+!config/
+config/*
+!config/default

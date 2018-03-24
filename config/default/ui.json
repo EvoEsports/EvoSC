@@ -1,0 +1,33 @@
+{
+  "module": "ui",
+
+  "playerlist": {
+    "x": 120,
+    "y": 71,
+    "width": 50,
+    "height": 53,
+    "scale": 0.8
+  },
+
+  "locals": {
+    "x": -160,
+    "y": 89,
+    "rows": 20,
+    "scale": 0.75
+  },
+
+  "dedis": {
+    "x": -160,
+    "y": 22,
+    "rows": 20,
+    "scale": 0.75
+  },
+
+  "mx-karma": {
+    "x": 120,
+    "y": 22.5,
+    "width": 50,
+    "height": 30,
+    "scale": 0.8
+  }
+}
