@@ -232,8 +232,7 @@ class Dedimania extends DedimaniaApi
                 }
 
                 if ($rank != $dedi->Rank) {
-                    self::pushDownRanks($map, $rank);
-                    $dedi->update(['Score' => $score, 'Rank' => $rank]);
+                    $dedi->update(['Score' => $score]);
                     $dedi = self::fixDedimaniaRanks($map, $player);
                     ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
                     self::addNewTime($dedi);
@@ -245,27 +244,10 @@ class Dedimania extends DedimaniaApi
             }
         } else {
             if ($dedisCount < 100) {
-                $worstDedi = $map->dedis()->orderByDesc('Score')->first();
-
-                if ($worstDedi) {
-                    if ($score <= $worstDedi->Score) {
-                        self::pushDedi($map, $player, $score, $worstDedi->Rank);
-                        $dedi = self::fixDedimaniaRanks($map, $player);
-                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi);
-                        self::addNewTime($dedi);
-                    } else {
-                        self::pushDedi($map, $player, $score, $worstDedi->Rank + 1);
-                        $dedi = self::fixDedimaniaRanks($map, $player);
-                        ChatController::messageAll('Player ', $player, ' made the ', $dedi);
-                        self::addNewTime($dedi);
-                    }
-                } else {
-                    $rank = 1;
-                    self::pushDedi($map, $player, $score, $rank);
-                    $dedi = self::fixDedimaniaRanks($map, $player);
-                    ChatController::messageAll('Player ', $player, ' made the ', $dedi);
-                    self::addNewTime($dedi);
-                }
+                self::pushDedi($map, $player, $score, 999);
+                $dedi = self::fixDedimaniaRanks($map, $player);
+                ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+                self::addNewTime($dedi);
             }
         }
     }

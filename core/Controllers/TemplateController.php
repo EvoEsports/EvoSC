@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\Timer;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
@@ -21,6 +22,8 @@ class TemplateController
     {
         self::$templates = new Collection();
         self::$latte = new Engine();
+
+        Timer::create('template.reload', 'esc\Controllers\TemplateController::checkTemplateChanges', '2s');
     }
 
     public static function addTemplate(string $index, string $templateString)
@@ -37,5 +40,12 @@ class TemplateController
     public static function getBlankTemplate(string $index): string
     {
         return substr(self::$templates[$index], 0, strpos(self::$templates[$index], '<frame')) . '</manialink>';
+    }
+
+    public static function checkTemplateChanges()
+    {
+        //TODO: Automaticly reload templates
+
+        //Timer::create('template.reload', 'esc\Controllers\TemplateController::checkTemplateChanges', '2s');
     }
 }

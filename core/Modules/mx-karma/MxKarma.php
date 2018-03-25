@@ -191,7 +191,6 @@ class MxKarma extends MXK
             }
 
             if (count($votes) == 0) {
-                Log::warning('Got new votes but got null player');
                 return;
             }
 

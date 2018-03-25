@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="PbRecords" version="3">
+<frame scale="0.7" pos="0 -72">
+
+
+    {if count($times)}
+    {foreach $times as $key => $time}
+    <frame pos="{($key+1) * 5 - (((count($times)+1)*5)/2)}">
+        {if isset($current[$key])}
+            {if $current[$key] < $time}
+            <label text="$s-{formatScore($time - $current[$key])}" pos="-2 4.5" textcolor="6f6a" textsize="1.6" rot="-40" />
+            <quad z-index="1" size="4 4" pos="0 0" bgcolor="0f04" valign="center" halign="center" class="quad"/>
+            {/if}
+            {if $current[$key] > $time}
+            <label text="$s+{formatScore($current[$key] - $time)}" pos="-2 4.5" textcolor="f66a" textsize="1.6" rot="-40"/>
+            <quad z-index="1" size="4 4" pos="0 0" bgcolor="f004" valign="center" halign="center" class="quad"/>
+            {/if}
+            {if $current[$key] == $time}
+            <label text="$s{formatScore($current[$key] - $time)}" pos="-2 4.5" textcolor="6afa" textsize="1.6" rot="-40" />
+            <quad z-index="1" size="4 4" pos="0 0" bgcolor="18f4" valign="center" halign="center" class="quad"/>
+            {/if}
+        {else}
+        <quad z-index="1" size="4 4" pos="0 0" bgcolor="0005" valign="center" halign="center" class="quad"/>
+        {/if}
+
+        <label z-index="1" size="4 4" pos="0 .2" text="{$key + 1}" valign="center" textsize="1.2" halign="center" class="label" />
+    </frame>
+    {/foreach}
+    {/if}
+
+</frame>
+</manialink>

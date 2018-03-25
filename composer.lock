@@ -30,8 +30,8 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "ManiaScript/": "src/",
-                    "ManiaScriptTests/": "tests/"
+                    "ManiaScript\\": "src/",
+                    "ManiaScriptTests\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -81,7 +81,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Doctrine/Common/Inflector/": "lib/Doctrine/Common/Inflector"
+                    "Doctrine\\Common\\Inflector\\": "lib/Doctrine/Common/Inflector"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -158,7 +158,7 @@
                     "src/functions_include.php"
                 ],
                 "psr-4": {
-                    "GuzzleHttp/": "src/"
+                    "GuzzleHttp\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -213,7 +213,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp/Promise/": "src/"
+                    "GuzzleHttp\\Promise\\": "src/"
                 },
                 "files": [
                     "src/functions_include.php"
@@ -268,7 +268,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "GuzzleHttp/Psr7/": "src/"
+                    "GuzzleHttp\\Psr7\\": "src/"
                 },
                 "files": [
                     "src/functions_include.php"
@@ -303,7 +303,7 @@
         },
         {
             "name": "illuminate/container",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/container.git",
@@ -328,7 +328,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Container/": ""
+                    "Illuminate\\Container\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -347,7 +347,7 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
@@ -372,7 +372,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Contracts/": ""
+                    "Illuminate\\Contracts\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -391,16 +391,16 @@
         },
         {
             "name": "illuminate/database",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/database.git",
-                "reference": "4d2fc3c816ed402fcac290e6ca7bc855d5313000"
+                "reference": "104cd99c17d46e6f96eafd4f1469ea921a289279"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/database/zipball/4d2fc3c816ed402fcac290e6ca7bc855d5313000",
-                "reference": "4d2fc3c816ed402fcac290e6ca7bc855d5313000",
+                "url": "https://api.github.com/repos/illuminate/database/zipball/104cd99c17d46e6f96eafd4f1469ea921a289279",
+                "reference": "104cd99c17d46e6f96eafd4f1469ea921a289279",
                 "shasum": ""
             },
             "require": {
@@ -425,7 +425,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Database/": ""
+                    "Illuminate\\Database\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -446,11 +446,11 @@
                 "orm",
                 "sql"
             ],
-            "time": "2018-03-09 13:55:05"
+            "time": "2018-03-14 12:21:13"
         },
         {
             "name": "illuminate/events",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/events.git",
@@ -476,7 +476,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Events/": ""
+                    "Illuminate\\Events\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -495,7 +495,7 @@
         },
         {
             "name": "illuminate/filesystem",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/filesystem.git",
@@ -527,7 +527,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Filesystem/": ""
+                    "Illuminate\\Filesystem\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -546,7 +546,7 @@
         },
         {
             "name": "illuminate/pagination",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/pagination.git",
@@ -571,7 +571,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Pagination/": ""
+                    "Illuminate\\Pagination\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -590,30 +590,30 @@
         },
         {
             "name": "illuminate/support",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/support.git",
-                "reference": "259f6f17a11b0379340ec5311fcba27bc2a04070"
+                "reference": "f0776f5bbfeeb9d4c4cac8f64d96f8f0cbe4f3f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/support/zipball/259f6f17a11b0379340ec5311fcba27bc2a04070",
-                "reference": "259f6f17a11b0379340ec5311fcba27bc2a04070",
+                "url": "https://api.github.com/repos/illuminate/support/zipball/f0776f5bbfeeb9d4c4cac8f64d96f8f0cbe4f3f7",
+                "reference": "f0776f5bbfeeb9d4c4cac8f64d96f8f0cbe4f3f7",
                 "shasum": ""
             },
             "require": {
                 "doctrine/inflector": "~1.1",
                 "ext-mbstring": "*",
                 "illuminate/contracts": "5.6.*",
-                "nesbot/carbon": "^1.20",
+                "nesbot/carbon": "^1.24.1",
                 "php": "^7.1.3"
             },
             "conflict": {
                 "tightenco/collect": "<5.5.33"
             },
             "suggest": {
-                "illuminate/filesystem": "Required to use the composer class (5.2.*).",
+                "illuminate/filesystem": "Required to use the composer class (5.6.*).",
                 "symfony/process": "Required to use the composer class (~4.0).",
                 "symfony/var-dumper": "Required to use the dd function (~4.0)."
             },
@@ -625,7 +625,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/Support/": ""
+                    "Illuminate\\Support\\": ""
                 },
                 "files": [
                     "helpers.php"
@@ -643,11 +643,11 @@
             ],
             "description": "The Illuminate Support package.",
             "homepage": "https://laravel.com",
-            "time": "2018-03-09 16:52:54"
+            "time": "2018-03-14 12:56:14"
         },
         {
             "name": "illuminate/view",
-            "version": "v5.6.11",
+            "version": "v5.6.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/view.git",
@@ -676,7 +676,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Illuminate/View/": ""
+                    "Illuminate\\View\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -790,7 +790,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Maniaplanet/": "libraries/Maniaplanet"
+                    "Maniaplanet\\": "libraries/Maniaplanet"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -862,16 +862,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "1.24.1",
+            "version": "1.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "ef12cbd8ba5ce624f0a6a95e0850c4cc13e71e41"
+                "reference": "cbcf13da0b531767e39eb86e9687f5deba9857b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/ef12cbd8ba5ce624f0a6a95e0850c4cc13e71e41",
-                "reference": "ef12cbd8ba5ce624f0a6a95e0850c4cc13e71e41",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/cbcf13da0b531767e39eb86e9687f5deba9857b4",
+                "reference": "cbcf13da0b531767e39eb86e9687f5deba9857b4",
                 "shasum": ""
             },
             "require": {
@@ -890,7 +890,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Carbon/": "src/Carbon/"
+                    "Carbon\\": "src/Carbon/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -911,7 +911,7 @@
                 "datetime",
                 "time"
             ],
-            "time": "2018-03-09 15:49:34"
+            "time": "2018-03-19 15:50:49"
         },
         {
             "name": "philo/laravel-blade",
@@ -934,7 +934,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Philo/Blade/": "src"
+                    "Philo\\Blade\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -979,7 +979,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr/Container/": "src/"
+                    "Psr\\Container\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1028,7 +1028,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr/Http/Message/": "src/"
+                    "Psr\\Http\\Message\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1078,7 +1078,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr/Log/": "Psr/Log/"
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1125,7 +1125,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Psr/SimpleCache/": "src/"
+                    "Psr\\SimpleCache\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1192,7 +1192,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Component/Console/": ""
+                    "Symfony\\Component\\Console\\": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1248,7 +1248,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Component/Debug/": ""
+                    "Symfony\\Component\\Debug\\": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1297,7 +1297,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Component/Finder/": ""
+                    "Symfony\\Component\\Finder\\": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1349,7 +1349,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Polyfill/Mbstring/": ""
+                    "Symfony\\Polyfill\\Mbstring\\": ""
                 },
                 "files": [
                     "bootstrap.php"
@@ -1405,7 +1405,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Component/Process/": ""
+                    "Symfony\\Component\\Process\\": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
@@ -1473,7 +1473,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Symfony/Component/Translation/": ""
+                    "Symfony\\Component\\Translation\\": ""
                 },
                 "exclude-from-classmap": [
                     "/Tests/"
