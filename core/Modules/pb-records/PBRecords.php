@@ -40,12 +40,10 @@ class PBRecords
         $checkpoints = self::$checkpoints->get($player->id)->toArray();
         $pbRecords = self::getPbRecordTimes($player);
 
-        if ($cpId && count($checkpoints) > 0) {
-            $diff = $checkpoints[$cpId] - $pbRecords[$cpId];
-        }
-
         if ($pbRecords) {
             Template::show($player, 'pbrecords', ['times' => $pbRecords, 'current' => $checkpoints]);
+        }else{
+            Template::hide($player, 'pbrecords');
         }
     }
 
