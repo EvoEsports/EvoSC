@@ -115,7 +115,18 @@ class Dedimania extends DedimaniaApi
             }
         }
 
+        //Remove faulty dedis
         Dedi::where('Map', $map->id)->where('Score', 0)->delete();
+        while (true) {
+            $last = $map->dedis()->orderByDesc('Score')->get()->first();
+            $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
+
+            if($foreLast->Player == $last->Player){
+                $last->delete();
+            }else{
+                break;
+            }
+        }
 
         foreach (onlinePlayers() as $player) {
             self::displayDedis($player);
