@@ -1,15 +1,19 @@
 <?php
 
-function formatScore(int $score, bool $noMinutes = false): string
+function formatScore(int $score): string
 {
     $seconds = floor($score / 1000);
     $ms = $score - ($seconds * 1000);
     $minutes = floor($seconds / 60);
     $seconds -= $minutes * 60;
 
-    if($noMinutes){
-        return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
-    }
+    return sprintf('%d.%02d.%03d', $minutes, $seconds, $ms);
+}
+
+function formatScoreNoMinutes(int $score): string
+{
+    $seconds = floor($score / 1000);
+    $ms = $score - ($seconds * 1000);
 
     return sprintf('%d.%03d', $seconds, $ms);
 }

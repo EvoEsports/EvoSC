@@ -21,6 +21,10 @@ class PBRecords
         Hook::add('EndMatch', 'PBRecords::endMatch');
 
         PBRecords::$checkpoints = collect([]);
+
+        foreach(onlinePlayers() as $player){
+            PBRecords::$checkpoints->put($player->id, collect([]));
+        }
     }
 
     public static function beginMatch(...$args)
@@ -37,11 +41,11 @@ class PBRecords
 
     public static function showWidget(Player $player, $cpId = null)
     {
-        $checkpoints = self::$checkpoints->get($player->id)->toArray();
+        $checkpoints = self::$checkpoints->get($player->id);
         $pbRecords = self::getPbRecordTimes($player);
 
-        if ($pbRecords) {
-            Template::show($player, 'pbrecords', ['times' => $pbRecords, 'current' => $checkpoints]);
+        if ($pbRecords && $checkpoints) {
+            Template::show($player, 'pbrecords', ['times' => $pbRecords, 'current' => $checkpoints->toArray()]);
         }else{
             Template::hide($player, 'pbrecords');
         }

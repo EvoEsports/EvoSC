@@ -49,7 +49,6 @@ class Dedimania extends DedimaniaApi
             $table->integer('Player');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->unique(['Map', 'Rank']);
         });
 
         Database::create('dedi-sessions', function (Blueprint $table) {
@@ -225,58 +224,29 @@ class Dedimania extends DedimaniaApi
 
             if ($score < $dedi->Score) {
                 $diff = $dedi->Score - $score;
-                $rank = self::getRank($map, $score);
-
-                if ($rank < self::$maxRank) {
-                    return;
-                }
-
-                if ($rank != $dedi->Rank) {
-                    $dedi->update(['Score' => $score]);
-                    $dedi = self::fixDedimaniaRanks($map, $player);
-                    ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
-                    self::addNewTime($dedi);
-                } else {
-                    $dedi->update(['Score' => $score]);
-                    ChatController::messageAll('Player ', $player, ' secured his/hers ', $dedi, ' (-' . formatScore($diff) . ')');
-                    self::addNewTime($dedi);
-                }
+                $dedi->update(['Score' => $score]);
+                $dedi = self::fixDedimaniaRanks($map, $player);
+                ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
+                self::addNewTime($dedi);
             }
         } else {
             if ($dedisCount < 100) {
-                self::pushDedi($map, $player, $score, 999);
+                $map->dedis()->create([
+                    'Player' => $player->id,
+                    'Map' => $map->id,
+                    'Score' => $score,
+                    'Rank' => 999,
+                ]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
-                ChatController::messageAll('Player ', $player, ' made the ', $dedi);
                 self::addNewTime($dedi);
+                ChatController::messageAll('Player ', $player, ' made the ', $dedi);
             }
         }
     }
 
-    /**
-     * Inser the dedi
-     * @param Map $map
-     * @param Player $player
-     * @param int $score
-     * @param int $rank
-     * @return Dedi
-     */
-    private static function pushDedi(Map $map, Player $player, int $score, int $rank): Dedi
-    {
-        $map->dedis()->create([
-            'Player' => $player->id,
-            'Map' => $map->id,
-            'Score' => $score,
-            'Rank' => $rank,
-        ]);
-
-        self::fixDedimaniaRanks($map, $player);
-
-        return $map->dedis()->where('Player', $player->id)->first();
-    }
-
     private static function fixDedimaniaRanks(Map $map, Player $player = null): ?Dedi
     {
-        $dedis = $map->dedis()->orderBy('Score');
+        $dedis = $map->dedis()->orderBy('Score')->get();
         $i = 1;
         foreach ($dedis as $dedi) {
             $dedi->update(['Rank' => $i]);
