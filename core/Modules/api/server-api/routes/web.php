@@ -32,6 +32,10 @@ $router->group(['prefix' => 'groups'], function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('online', function () {
         $onlinePlayers = app('db')->table('players')->whereOnline(true)->get();
+        $onlinePlayers->each(function(&$player){
+            $player->NickName = preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $player->NickName);
+            $player->Group = app('db')->table('groups')->whereId($player->Group)->get()->first() ?? '';
+        });
         return json_encode($onlinePlayers);
     });
 });
