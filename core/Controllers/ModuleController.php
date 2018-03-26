@@ -58,7 +58,7 @@ class ModuleController
         Template::hide($callee, 'modules');
     }
 
-    public static function loadModules($loadFrom = 'modules')
+    public static function loadModules($loadFrom = __DIR__.'/../Modules')
     {
         foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
             $dir = $loadFrom . '/' . $item;

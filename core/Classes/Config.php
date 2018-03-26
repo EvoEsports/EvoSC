@@ -35,7 +35,7 @@ class Config
      */
     public static function loadConfigFiles()
     {
-        foreach (array_diff(scandir('config'), array('..', '.', '.gitignore')) as $configFile) {
+        foreach (array_diff(scandir('config'), array('..', '.', '.gitignore', 'default')) as $configFile) {
             try {
                 if (preg_match('/[a-z\-\_]+\.json/i', $configFile)) {
                     $content = file_get_contents('config/' . $configFile);

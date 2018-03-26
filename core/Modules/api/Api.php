@@ -4,7 +4,9 @@ class Api
 {
     public function __construct()
     {
-        Api::start();
+        if(config('server.cp', false) == true){
+            Api::start();
+        }
     }
 
     public static function start()

@@ -13,8 +13,8 @@ while (true) {
 
         startEsc();
 
-        loadModulesFrom('core/Modules');
-        loadModulesFrom('modules');
+        loadModulesFrom(__DIR__ . '/core/Modules');
+        loadModulesFrom(__DIR__ . '/modules');
 
         beginMap();
 
