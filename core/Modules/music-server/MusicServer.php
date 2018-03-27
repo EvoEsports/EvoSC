@@ -182,8 +182,6 @@ class MusicServer
             $song->url = preg_replace('/\?token=.+\//', '', config('music.server')) . '/' . $song->file;
         }
 
-//        $totalTime = (float) ((time() + microtime()) - self::$startLoad);
-//        Log::info("Finished loading music. " . sprintf("Took %.3fs.", $totalTime));
         Log::info("Finished loading music.");
 
         self::$music = $songs;
@@ -195,8 +193,6 @@ class MusicServer
     private function readFiles()
     {
         Log::info("Loading music...");
-
-        self::$startLoad = (float)microtime() + time();
 
         try{
             $musicJson = $response = RestClient::get(config('music.server'))->getBody()->getContents();
