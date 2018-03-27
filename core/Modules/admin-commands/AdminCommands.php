@@ -43,7 +43,7 @@ class AdminCommands
             $pw = config('server.pw');
             if ($pw) {
                 ChatController::messageAll($player, ' locked the server with a password.');
-                Server::setServerPassword();
+                Server::setServerPassword($pw);
                 self::$pwEnabled = true;
             }
         } else {
