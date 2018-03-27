@@ -64,6 +64,10 @@ class PBRecords
 
     public static function playerCheckpoint(Player $player, int $score, int $curLap, int $cpId)
     {
+        if(!self::$checkpoints->get($player->id)){
+            self::$checkpoints->put($player->id, collect([]));
+        }
+
         self::$checkpoints->get($player->id)->put($cpId, $score);
         self::showWidget($player, $cpId);
     }
