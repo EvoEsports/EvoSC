@@ -73,17 +73,15 @@ class MxKarma extends MXK
     }
 
     /* +++ 100, ++ 80, + 60, - 40, -- 20, - 0*/
-    public static function vote(Player $player = null, int $rating)
+    public static function vote(Player $player, int $rating)
     {
         if (!$player) {
             Log::warning("Null player tries to vote");
             return;
         }
 
-        $ranking = Server::getCurrentRankingForLogin($player->Login);
-
-        if ($ranking[0] && $ranking[0]->bestTime > 0) {
-            ChatController::message($player, 'You can not vote before you finished');
+        if (!self::playerFinished($player)) {
+            //Prevent players from voting when they didnt finish
             return;
         }
 
@@ -91,7 +89,8 @@ class MxKarma extends MXK
 
         Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating");
 
-        $karma = Karma::where('Map', $map->id)->where('Player', $player->Login)->first();
+        $karma = $map->ratings()->wherePlayer($player->Login)->first();
+
         if ($karma) {
             if ($karma->rating == $rating) {
                 return;
@@ -115,7 +114,7 @@ class MxKarma extends MXK
 
         ChatController::messageAll($player, ' rated this track ', secondary(self::$ratings[$rating]));
 
-        self::showWidget();
+        self::showWidget($player);
     }
 
     /**
@@ -256,7 +255,10 @@ class MxKarma extends MXK
     public static function beginMap()
     {
         self::$updatedVotes = new Collection();
-        self::showWidget();
+
+        foreach (onlinePlayers() as $player) {
+            self::showWidget($player);
+        }
     }
 
     public static function getUpdatedVotesAverage()
@@ -279,15 +281,14 @@ class MxKarma extends MXK
 
     /**
      * Display the widget
-     * @param array ...$args
      */
-    public static function showWidget(...$args)
+    public static function showWidget(Player $player)
     {
-        $map = Server::getCurrentMapInfo()->uId;
+        $mapUid = Server::getCurrentMapInfo()->uId;
 
-        if (self::$currentMap != $map) {
+        if (self::$currentMap != $mapUid) {
             self::$mapKarma = self::call(MXK::getMapRating);
-            self::$currentMap = $map;
+            self::$currentMap = $mapUid;
         }
 
         $average = self::getUpdatedVotesAverage();
@@ -310,15 +311,38 @@ class MxKarma extends MXK
             $starString .= '';
         }
 
-        Template::showAll('esc.box', [
+        Template::show($player, 'esc.box', [
             'id' => 'MXKarma',
             'title' => '  MX KARMA',
             'x' => config('ui.mx-karma.x'),
             'y' => config('ui.mx-karma.y'),
             'rows' => 1.5,
             'scale' => config('ui.mx-karma.scale'),
-            'content' => Template::toString('mx-karma', ['karma' => self::$mapKarma, 'average' => $average, 'stars' => $starString])
+            'content' => Template::toString('mx-karma', ['karma' => self::$mapKarma, 'average' => $average, 'stars' => $starString, 'finished' => self::playerFinished($player)])
         ]);
+    }
+
+    public static function playerFinished(Player $player): bool
+    {
+        $map = \esc\Controllers\MapController::getCurrentMap();
+
+        if ($player->Score > 0) {
+            return true;
+        }
+
+        if ($map->ratings()->wherePlayer($player->id)->first() != null) {
+            return true;
+        }
+
+        if ($map->locals()->wherePlayer($player->id)->first() != null) {
+            return true;
+        }
+
+        if ($map->dedis()->wherePlayer($player->id)->first() != null) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -476,86 +500,5 @@ class MxKarma extends MXK
         }
 
         Log::info("MX Karma session created.");
-    }
-
-    /*
-    **  Converts HSV to RGB values
-    ** –––––––––––––––––––––––––––––––––––––––––––––––––––––
-    **  Reference: http://en.wikipedia.org/wiki/HSL_and_HSV
-    **  Purpose:   Useful for generating colours with
-    **             same hue-value for web designs.
-    **  Input:     Hue        (H) Integer 0-360
-    **             Saturation (S) Integer 0-100
-    **             Lightness  (V) Integer 0-100
-    **  Output:    String "R,G,B"
-    **             Suitable for CSS function RGB().
-     *
-     *  From: https://gist.github.com/vkbo/2323023
-    */
-    private static function hsvToHexRgb($iH, $iS, $iV)
-    {
-        if ($iH < 0) $iH = 0;   // Hue:
-        if ($iH > 360) $iH = 360; //   0-360
-        if ($iS < 0) $iS = 0;   // Saturation:
-        if ($iS > 100) $iS = 100; //   0-100
-        if ($iV < 0) $iV = 0;   // Lightness:
-        if ($iV > 100) $iV = 100; //   0-100
-        $dS = $iS / 100.0; // Saturation: 0.0-1.0
-        $dV = $iV / 100.0; // Lightness:  0.0-1.0
-        $dC = $dV * $dS;   // Chroma:     0.0-1.0
-        $dH = $iH / 60.0;  // H-Prime:    0.0-6.0
-        $dT = $dH;       // Temp variable
-        while ($dT >= 2.0) $dT -= 2.0; // php modulus does not work with float
-        $dX = $dC * (1 - abs($dT - 1));     // as used in the Wikipedia link
-        switch (floor($dH)) {
-            case 0:
-                $dR = $dC;
-                $dG = $dX;
-                $dB = 0.0;
-                break;
-            case 1:
-                $dR = $dX;
-                $dG = $dC;
-                $dB = 0.0;
-                break;
-            case 2:
-                $dR = 0.0;
-                $dG = $dC;
-                $dB = $dX;
-                break;
-            case 3:
-                $dR = 0.0;
-                $dG = $dX;
-                $dB = $dC;
-                break;
-            case 4:
-                $dR = $dX;
-                $dG = 0.0;
-                $dB = $dC;
-                break;
-            case 5:
-                $dR = $dC;
-                $dG = 0.0;
-                $dB = $dX;
-                break;
-            default:
-                $dR = 0.0;
-                $dG = 0.0;
-                $dB = 0.0;
-                break;
-        }
-        $dM = $dV - $dC;
-        $dR += $dM;
-        $dG += $dM;
-        $dB += $dM;
-        $dR *= 255;
-        $dG *= 255;
-        $dB *= 255;
-
-        $dR = str_pad(dechex(round($dR)), 2, "0", STR_PAD_LEFT);
-        $dG = str_pad(dechex(round($dG)), 2, "0", STR_PAD_LEFT);
-        $dB = str_pad(dechex(round($dB)), 2, "0", STR_PAD_LEFT);
-
-        return $dR . $dG . $dB;
     }
 }
