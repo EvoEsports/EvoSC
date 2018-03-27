@@ -14,7 +14,7 @@ while (true) {
         startEsc();
 
         loadModulesFrom(__DIR__ . '/core/Modules');
-        loadModulesFrom(__DIR__ . '/modules');
+//        loadModulesFrom(__DIR__ . '/modules'); do not load custom modules for now
 
         beginMap();
 
@@ -25,11 +25,6 @@ while (true) {
         esc\Classes\Log::error("Database exception: $pdoe");
     } catch (\Exception $e) {
         \esc\Classes\Log::error("!!!!! Fatal error. Restarting... Check the logs for more detailed information !!!!!");
-        \esc\Classes\Log::error($e, false);
-
-        try{
-            mail('brakerb@vination.eu', '[ESC] Fatal error', $e->getTraceAsString());
-        }catch(\Exception $e){
-        }
+        \esc\Classes\Log::error($e, true);
     }
 }

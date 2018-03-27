@@ -131,6 +131,10 @@ class Player extends Model
 
     public function isMasteradmin(): bool
     {
+        if (!$this->group) {
+            return false;
+        }
+
         return $this->group->id == 1;
     }
 
@@ -140,7 +144,11 @@ class Player extends Model
             return true;
         }
 
-        return strtolower($this->group->name) == 'admin';
+        if (!$this->group) {
+            return false;
+        }
+
+        return strtolower($this->group->Name) == 'admin';
     }
 
     public static function console(): Player

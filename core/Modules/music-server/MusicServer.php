@@ -198,7 +198,12 @@ class MusicServer
 
         self::$startLoad = (float)microtime() + time();
 
-        $musicJson = RestClient::get(config('music.server'))->getBody()->getContents();
+        try{
+            $musicJson = $response = RestClient::get(config('music.server'))->getBody()->getContents();
+        }catch(\GuzzleHttp\Exception\RequestException $e){
+            Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
+            return;
+        }
 
         $musicFiles = json_decode($musicJson);
 

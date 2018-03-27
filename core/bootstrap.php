@@ -91,7 +91,7 @@ function cycle()
     esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
     usleep(esc\Classes\Timer::getNextCyclePause());
 
-    if(config('music.enable-internal-server', true)) {
+    if(config('music.enable-internal-server', false) == true) {
         $msOutput = $musicServer->getOutput();
         if ($msOutput) {
             \esc\Classes\Log::music($msOutput);
