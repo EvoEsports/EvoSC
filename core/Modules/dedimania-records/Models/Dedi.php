@@ -7,7 +7,7 @@ class Dedi extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'dedi-records';
 
-    protected $fillable = ['Map', 'Player', 'Score', 'Rank'];
+    protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints'];
 
     public $timestamps = false;
 
