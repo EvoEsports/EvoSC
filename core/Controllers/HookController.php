@@ -167,6 +167,8 @@ class HookController
         if (array_key_exists($event, self::$eventMap)) {
             $hook = self::$eventMap[$event];
             self::fire($hook, $arguments);
+        } else {
+            Log::logAddLine('RPC-Event', 'Calling unhandled ' . $event, true);
         }
     }
 
