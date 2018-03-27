@@ -179,7 +179,7 @@ class MusicServer
     private static function setMusicFiles(Collection $songs)
     {
         foreach ($songs as $song) {
-            $song->url = config('music.server') . '/' . $song->file;
+            $song->url = preg_replace('/\?token=.+\//', '', config('music.server')) . '/' . $song->file;
         }
 
 //        $totalTime = (float) ((time() + microtime()) - self::$startLoad);
