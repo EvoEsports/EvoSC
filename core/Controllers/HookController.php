@@ -45,7 +45,7 @@ class HookController
 
         if ($hooks) {
             self::getHooks()->add($hook);
-            Log::logAddLine('Hook', "Added $event -> $staticFunction", true);
+            Log::logAddLine('Hook', "Added $event -> $staticFunction", false);
         }
     }
 
@@ -63,7 +63,7 @@ class HookController
 //            $hook = 'PlayerInfoChanged';
 //        }
 
-        Log::logAddLine('Hook', "Called: $hook", true);
+        Log::logAddLine('Hook', "Called: $hook", false);
 
         $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
             return $value->getEvent() == $hook;
@@ -157,7 +157,7 @@ class HookController
 
     public static function call($event, $arguments = null)
     {
-        Log::logAddLine('RPC-Event', "$event called", true);
+        Log::logAddLine('RPC-Event', "$event called", false);
 
         if ($event == 'ManiaPlanet.ModeScriptCallbackArray') {
 //            var_dump($arguments);
