@@ -50,7 +50,6 @@ class LocalRecords
             $table->integer('Score');
             $table->integer('Rank');
             $table->text('Checkpoints');
-            $table->unique(['Map', 'Rank']);
         });
     }
 
