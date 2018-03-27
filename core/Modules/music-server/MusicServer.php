@@ -178,10 +178,10 @@ class MusicServer
      */
     private static function setMusicFiles(Collection $songs)
     {
-        foreach ($songs as $song) {
+        $songs->each(function(&$song){
             $song->url = preg_replace('/\?token=.+\//', '', config('music.server')) . '/' . $song->file;
             echo "$song->url \n";
-        }
+        });
 
         Log::info("Finished loading music.");
 
