@@ -45,7 +45,7 @@ class HookController
 
         if ($hooks) {
             self::getHooks()->add($hook);
-            Log::hook("Added $event -> $staticFunction");
+            Log::logAddLine('Hook', "Added $event -> $staticFunction", true);
         }
     }
 
@@ -63,7 +63,7 @@ class HookController
 //            $hook = 'PlayerInfoChanged';
 //        }
 
-        Log::hook("Called: $hook", false);
+        Log::logAddLine('Hook', "Called: $hook", true);
 
         $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
             return $value->getEvent() == $hook;
@@ -96,7 +96,7 @@ class HookController
                 //SPlayerInfo PlayerInfo
                 PlayerController::playerInfoChanged($arguments);
                 $players = new Collection();
-                foreach($arguments as $playerInfo){
+                foreach ($arguments as $playerInfo) {
                     $players->add(Player::find($playerInfo['Login']));
                 }
                 self::fireHookBatch($hooks, $players);
@@ -104,9 +104,9 @@ class HookController
 
             case 'PlayerConnect':
                 //string Login, bool IsSpectator
-                if(Player::whereLogin($arguments[0])->get()->isEmpty()){
+                if (Player::whereLogin($arguments[0])->get()->isEmpty()) {
                     $player = Player::create(['Login' => $arguments[0]]);
-                }else{
+                } else {
                     $player = Player::find($arguments[0]);
                 }
 
@@ -135,7 +135,7 @@ class HookController
             case 'PlayerFinish':
                 //int PlayerUid, string Login, int TimeOrScore
                 $player = Player::find($arguments[1]);
-                if($player == null){
+                if ($player == null) {
                     $player = Player::find($arguments[1]);
                 }
                 self::fireHookBatch($hooks, $player, $arguments[2]);
@@ -157,9 +157,9 @@ class HookController
 
     public static function call($event, $arguments = null)
     {
-//        echo "Event called: $event\n";
+        Log::logAddLine('RPC-Event', "$event called", true);
 
-        if($event == 'ManiaPlanet.ModeScriptCallbackArray'){
+        if ($event == 'ManiaPlanet.ModeScriptCallbackArray') {
 //            var_dump($arguments);
             return;
         }
