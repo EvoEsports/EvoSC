@@ -121,13 +121,13 @@ class Dedimania extends DedimaniaApi
             $last = $map->dedis()->orderByDesc('Score')->get()->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
 
-            if(!$foreLast || !$last){
+            if (!$foreLast || !$last) {
                 break;
             }
 
-            if($foreLast->Player == $last->Player){
+            if ($foreLast->Player == $last->Player) {
                 $last->delete();
-            }else{
+            } else {
                 break;
             }
         }
@@ -193,17 +193,6 @@ class Dedimania extends DedimaniaApi
     }
 
     /**
-     * Checks if player has a dedi
-     * @param Map $map
-     * @param Player $player
-     * @return bool
-     */
-    public static function playerHasDedi(Map $map, Player $player): bool
-    {
-        return $map->dedis()->where('Player', $player->id)->get()->isNotEmpty();
-    }
-
-    /**
      * called on playerFinish
      * @param Player $player
      * @param int $score
@@ -219,20 +208,28 @@ class Dedimania extends DedimaniaApi
 
         $dedisCount = $map->dedis()->count();
 
-        if (self::playerHasDedi($map, $player)) {
-            $dedi = $map->dedis()->wherePlayer($player->id)->first();
-
+        $dedi = $map->dedis()->wherePlayer($player->id)->first();
+        if ($dedi != null) {
             if ($score == $dedi->Score) {
                 ChatController::messageAll('Player ', $player, ' equaled his/hers ', $dedi);
                 return;
             }
 
+            $oldRank = $dedi->Rank;
+
             if ($score < $dedi->Score) {
                 $diff = $dedi->Score - $score;
                 $dedi->update(['Score' => $score]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
-                ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
-                self::addNewTime($dedi);
+
+                if ($dedi->Rank <= self::$maxRank) {
+                    if ($oldRank == $dedi->Rank) {
+                        ChatController::messageAll('Player ', $player, ' secured his/hers ', $dedi, ' (-' . formatScore($diff) . ')');
+                    }else{
+                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
+                    }
+                    self::addNewTime($dedi);
+                }
             }
         } else {
             if ($dedisCount < 100) {
@@ -243,8 +240,11 @@ class Dedimania extends DedimaniaApi
                     'Rank' => 999,
                 ]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
-                self::addNewTime($dedi);
-                ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+
+                if ($dedi->Rank <= self::$maxRank) {
+                    self::addNewTime($dedi);
+                    ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+                }
             }
         }
     }
