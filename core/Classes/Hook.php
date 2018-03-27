@@ -29,8 +29,12 @@ class Hook
      */
     public function execute(...$arguments)
     {
-        call_user_func_array($this->function, $arguments);
-        Log::hook("Execute: $this->function");
+        try{
+            call_user_func_array($this->function, $arguments); //TODO: deprecated switch to call_user_func()
+            Log::logAddLine('Hook', "Execute: $this->function", true);
+        }catch(\Exception $e){
+            Log::logAddLine('Hook ERROR', "Execution of $this->function failed", true);
+        }
     }
 
     /**
