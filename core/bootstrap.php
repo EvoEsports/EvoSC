@@ -85,18 +85,9 @@ function startEsc()
 
 function cycle()
 {
-    global $musicServer;
-
     esc\Classes\Timer::startCycle();
     esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
     usleep(esc\Classes\Timer::getNextCyclePause());
-
-    if(config('music.enable-internal-server', false) == true) {
-        $msOutput = $musicServer->getOutput();
-        if ($msOutput) {
-            \esc\Classes\Log::music($msOutput);
-        }
-    }
 }
 
 function loadModulesFrom(string $path)
