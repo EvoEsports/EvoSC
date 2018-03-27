@@ -120,6 +120,10 @@ class Dedimania extends DedimaniaApi
             $last = $map->dedis()->orderByDesc('Score')->get()->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
 
+            if(!$foreLast || !$last){
+                break;
+            }
+
             if($foreLast->Player == $last->Player){
                 $last->delete();
             }else{
