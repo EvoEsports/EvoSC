@@ -63,7 +63,7 @@ class PlayerController
         Log::info($player->NickName . " joined the server.");
 
         if (!$surpressJoinMessage) {
-            ChatController::messageAll($player->group, ' ', $player, ' joined the server');
+            ChatController::messageAll($player->group ? $player->group->Name : 'Player', ' ', $player, ' joined the server');
         }
 
         self::displayPlayerlist();
