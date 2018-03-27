@@ -49,7 +49,7 @@ class Dedimania extends DedimaniaApi
             $table->integer('Player');
             $table->integer('Score');
             $table->integer('Rank');
-            $table->text('Checkpoints');
+            $table->text('Checkpoints')->default(null);
         });
 
         Database::create('dedi-sessions', function (Blueprint $table) {
