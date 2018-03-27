@@ -117,7 +117,7 @@ $$: Writes a dollarsign
             $nick = '$eee📷 ' . $nick;
         }
 
-        $chatText = sprintf('$z$s%s: $%s$z$s%s', $nick, config('color.chat'), $text);
+        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('color.chat'), $text);
 
 //        echo stripAll("$chatText\n");
 

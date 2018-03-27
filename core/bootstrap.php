@@ -10,7 +10,7 @@ $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
 
-if(config('music.enable-internal-server', true) == 'true'){
+if(config('music.enable-internal-server', false) == true){
     \esc\Classes\Log::info("Starting music server...");
 
     $phpBinaryFinder = new Symfony\Component\Process\PhpExecutableFinder();
