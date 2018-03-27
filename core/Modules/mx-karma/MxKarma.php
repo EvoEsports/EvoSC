@@ -46,6 +46,7 @@ class MxKarma extends MXK
         self::$ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
         Hook::add('PlayerConnect', 'MxKarma::showWidget');
+        Hook::add('PlayerFinish', 'MxKarma::playerFinish');
         Hook::add('BeginMap', 'MxKarma::beginMap');
         Hook::add('EndMap', 'MxKarma::endMap');
 
@@ -277,6 +278,18 @@ class MxKarma extends MXK
         }
 
         return $items->average();
+    }
+
+    /**
+     * Unlock voting if player finished
+     * @param Player $player
+     * @param int $score
+     */
+    public static function playerFinish(Player $player, int $score)
+    {
+        if ($score > 0) {
+            self::showWidget($player);
+        }
     }
 
     /**
