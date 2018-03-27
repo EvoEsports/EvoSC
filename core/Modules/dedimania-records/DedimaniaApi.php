@@ -216,7 +216,15 @@ class DedimaniaApi
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
         foreach (self::$newTimes->sortBy('Score') as $dedi) {
-            if ($dedi->Rank < Dedimania::getMaxRank()) {
+            if ($dedi->Rank > Dedimania::getMaxRank()) {
+                //Do not push dedis that wont get saved anyway (pay to unlock more)
+                continue;
+            }
+
+            $checkpoints = self::$checkpoints->where('player.Login', $dedi->player->Login) ?? [];
+
+            if($map->NbCheckpoints != count($checkpoints)){
+                //Only push dedis with valid checkpoints
                 continue;
             }
 
@@ -238,7 +246,7 @@ class DedimaniaApi
 //            foreach ($checkTimes as $time) {
 //                $array->addChild('value')->addChild('i4', $time);
 //            }
-            $member->addChild('value', self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time')->implode(','));
+            $member->addChild('value', $checkpoints->pluck('time')->sortBy('time')->implode(','));
         }
 
         //Replays: struct {'VReplay': base64 string, 'VReplayChecks': string (list of int, comma separated), 'Top1GReplay': base64 string}:
