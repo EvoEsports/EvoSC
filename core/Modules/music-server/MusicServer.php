@@ -180,6 +180,7 @@ class MusicServer
     {
         foreach ($songs as $song) {
             $song->url = preg_replace('/\?token=.+\//', '', config('music.server')) . '/' . $song->file;
+            echo "$song->url \n";
         }
 
         Log::info("Finished loading music.");

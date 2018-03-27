@@ -51,6 +51,8 @@ class AdminCommands
             Server::setServerPassword('');
             self::$pwEnabled = false;
         }
+
+        self::showAdminControlPanel();
     }
 
     public static function stopVote(Player $player)
