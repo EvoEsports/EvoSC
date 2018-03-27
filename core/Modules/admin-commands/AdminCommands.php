@@ -1,6 +1,7 @@
 <?php
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
@@ -9,7 +10,6 @@ use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Controllers\PlayerController;
-use esc\Models\Group;
 use esc\Models\Player;
 
 class AdminCommands
@@ -26,12 +26,38 @@ class AdminCommands
         ManiaLinkEvent::add('ac.approvevote', 'AdminCommands::approveVote');
         ManiaLinkEvent::add('ac.lockserver', 'AdminCommands::toggleLockServer');
 
+        ChatCommand::add('setpw', 'AdminCommands::setPw', 'Set server and spec password', '//', 'ban');
+
         Hook::add('BeginMap', 'AdminCommands::showAdminControlPanel');
         Hook::add('EndMatch', 'AdminCommands::hideAdminControlPanel');
         Hook::add('PlayerConnect', 'AdminCommands::showAdminControlPanel');
     }
 
-    public static function toggleLockServer(Player $player)
+    public static function setPw(Player $player, $cmd, $pw)
+    {
+        if (!$player->isMasteradmin()) {
+            return;
+        }
+
+        self::toggleLockServer($player, $pw);
+    }
+
+    private static function announcePasswordChange(Player $player, string $pw = null)
+    {
+        if (!$pw) {
+            ChatController::messageAll($player, ' removed the server password');
+        } else {
+            foreach (onlinePlayers() as $ply) {
+                if ($ply->isAdmin()) {
+                    ChatController::message($ply, $player, ' set a new server password: ', $pw);
+                }else{
+                    ChatController::message($ply, $player, ' locked the server with a password');
+                }
+            }
+        }
+    }
+
+    public static function toggleLockServer(Player $player, string $pw = null)
     {
         if (!$player->isMasteradmin()) {
             return;
@@ -39,18 +65,26 @@ class AdminCommands
 
         $currentPw = Server::getServerPassword();
 
-        if ($currentPw == '') {
-            $pw = config('server.pw');
-            if ($pw) {
-                ChatController::messageAll($player, ' locked the server with a password.');
-                Server::setServerPassword($pw);
-                self::$pwEnabled = true;
-            }
+        if ($pw) {
+            Server::setServerPassword($pw);
+            self::announcePasswordChange($player, $pw);
+            self::$pwEnabled = true;
         } else {
-            ChatController::messageAll($player, ' removed the server password.');
-            Server::setServerPassword('');
-            self::$pwEnabled = false;
+            if ($currentPw == '') {
+                $pw = config('server.pw');
+                if ($pw) {
+                    //only set password if one is defined in config
+                    Server::setServerPassword($pw);
+                    self::announcePasswordChange($player, $pw);
+                    self::$pwEnabled = true;
+                }
+            } else {
+                Server::setServerPassword('');
+                self::announcePasswordChange($player);
+                self::$pwEnabled = false;
+            }
         }
+
 
         self::showAdminControlPanel();
     }
