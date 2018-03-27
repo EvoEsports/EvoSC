@@ -58,7 +58,6 @@ class PBRecords
         }
 
         self::$checkpoints->put($player->id, collect([]));
-        Template::add('pbrecords', File::get(__DIR__ . '/Templates/pb-records.latte.xml'));
         self::showWidget($player);
     }
 
