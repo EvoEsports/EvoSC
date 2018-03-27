@@ -178,8 +178,10 @@ class MusicServer
      */
     private static function setMusicFiles(Collection $songs)
     {
-        $songs->each(function(&$song){
-            $song->url = preg_replace('/\?token=.+\//', '', config('music.server')) . '/' . $song->file;
+        $url = preg_replace('/\/\?token=[\w]+/', '', config('music.server'));
+
+        $songs->each(function (&$song) use ($url) {
+            $song->url = $url . '/' . $song->file;
             echo "$song->url \n";
         });
 
@@ -195,9 +197,9 @@ class MusicServer
     {
         Log::info("Loading music...");
 
-        try{
+        try {
             $musicJson = $response = RestClient::get(config('music.server'))->getBody()->getContents();
-        }catch(\GuzzleHttp\Exception\RequestException $e){
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
             return;
         }
