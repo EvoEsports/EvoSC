@@ -182,7 +182,6 @@ class MusicServer
 
         $songs->each(function (&$song) use ($url) {
             $song->url = $url . '/' . $song->file;
-            echo "$song->url \n";
         });
 
         Log::info("Finished loading music.");
