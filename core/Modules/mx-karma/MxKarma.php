@@ -266,7 +266,7 @@ class MxKarma extends MXK
         $map = \esc\Controllers\MapController::getCurrentMap();
         $items = new Collection();
 
-        for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
+        for ($i = 0; $i < self::$mapKarma->votecount ?? 0; $i++) {
             $items->push(self::$mapKarma->voteaverage);
         }
 
@@ -443,7 +443,7 @@ class MxKarma extends MXK
 
         //Check if method was executed properly
         if (!$mxResponse->success) {
-            Log::error('MX Karma method execution failed ' . $requestMethod . '(' . $function . ') [' . implode(', ', $json ?? []) . ']: ' . $mxResponse->data->message);
+            Log::error('MX Karma method execution failed ' . $requestMethod . '(' . $function . '): ' . $mxResponse->data->message);
             return null;
         }
 
@@ -490,7 +490,7 @@ class MxKarma extends MXK
 
             $mxResponse = self::call(MXK::activateSession);
 
-            if (!$mxResponse->activated) {
+            if (!$mxResponse->activated || !isset($mxResponse->activated)) {
                 Log::warning('Could not activate session @ MX Karma.');
                 return;
             }
