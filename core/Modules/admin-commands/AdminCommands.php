@@ -4,6 +4,7 @@
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
@@ -13,6 +14,8 @@ use esc\Models\Player;
 
 class AdminCommands
 {
+    public static $pwEnabled;
+
     public function __construct()
     {
         Template::add('acp', File::get(__DIR__ . '/Templates/acp.latte.xml'));
@@ -21,10 +24,33 @@ class AdminCommands
         ManiaLinkEvent::add('ac.skip', 'AdminCommands::forceSkipMap');
         ManiaLinkEvent::add('ac.stopvote', 'AdminCommands::stopVote');
         ManiaLinkEvent::add('ac.approvevote', 'AdminCommands::approveVote');
+        ManiaLinkEvent::add('ac.lockserver', 'AdminCommands::toggleLockServer');
 
         Hook::add('BeginMap', 'AdminCommands::showAdminControlPanel');
         Hook::add('EndMatch', 'AdminCommands::hideAdminControlPanel');
         Hook::add('PlayerConnect', 'AdminCommands::showAdminControlPanel');
+    }
+
+    public static function toggleLockServer(Player $player)
+    {
+        if (!$player->isMasteradmin()) {
+            return;
+        }
+
+        $currentPw = Server::getServerPassword();
+
+        if ($currentPw == '') {
+            $pw = config('server.pw');
+            if ($pw) {
+                ChatController::messageAll($player, ' locked the server with a password.');
+                Server::setServerPassword();
+                self::$pwEnabled = true;
+            }
+        } else {
+            ChatController::messageAll($player, ' removed the server password.');
+            Server::setServerPassword('');
+            self::$pwEnabled = false;
+        }
     }
 
     public static function stopVote(Player $player)
