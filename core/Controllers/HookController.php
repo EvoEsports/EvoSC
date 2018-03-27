@@ -172,10 +172,19 @@ class HookController
         }
     }
 
+    /**
+     * Handle the fetched callbacks
+     * @param $callbacks
+     */
     public static function handleCallbacks($callbacks)
     {
         foreach ($callbacks as $callback) {
-            self::call($callback[0], $callback[1]);
+            if(count($callback) == 2){
+                self::call($callback[0], $callback[1]);
+            }else{
+                echo "Got faulty rpc-callback: ";
+                var_dump($callback);
+            }
         }
     }
 }
