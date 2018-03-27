@@ -67,6 +67,7 @@ class AdminCommands
 
         if ($pw) {
             Server::setServerPassword($pw);
+            Server::setServerPasswordForSpectator($pw);
             self::announcePasswordChange($player, $pw);
             self::$pwEnabled = true;
         } else {
@@ -75,11 +76,13 @@ class AdminCommands
                 if ($pw) {
                     //only set password if one is defined in config
                     Server::setServerPassword($pw);
+                    Server::setServerPasswordForSpectator($pw);
                     self::announcePasswordChange($player, $pw);
                     self::$pwEnabled = true;
                 }
             } else {
                 Server::setServerPassword('');
+                Server::setServerPasswordForSpectator('');
                 self::announcePasswordChange($player);
                 self::$pwEnabled = false;
             }
