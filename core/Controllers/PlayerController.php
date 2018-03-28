@@ -12,6 +12,7 @@ use esc\Classes\Template;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
+use Stats;
 
 class PlayerController
 {
@@ -117,7 +118,7 @@ class PlayerController
             }
 
             if (!$player->stats && $player) {
-                $player->stats()->create(['Player' => $player->id]);
+                Stats::create(['Player' => $player->id]);
             }
 
             $player->update($info);
