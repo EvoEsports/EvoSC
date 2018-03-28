@@ -114,7 +114,7 @@ class LocalRecords
 
         $checkpoints = self::getBestCps($player);
 
-        $local = $map->dedis()->wherePlayer($player->id)->first();
+        $local = $map->locals()->wherePlayer($player->id)->first();
         if ($local != null) {
             if ($score == $local->Score) {
                 ChatController::messageAll('Player ', $player, ' equaled his/her ', $local);
