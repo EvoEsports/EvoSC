@@ -65,6 +65,19 @@ class MapController
         });
     }
 
+    /**
+     * Reset time on round end for example
+     */
+    public static function resetTime()
+    {
+        self::$addedTime = 0;
+        self::updateRoundtime(config('server.roundTime', 7) * 60);
+    }
+
+    /**
+     * Add time to the counter
+     * @param int $minutes
+     */
     public static function addTime(int $minutes = 5)
     {
         self::$addedTime = self::$addedTime + $minutes;
@@ -116,7 +129,7 @@ class MapController
         self::displayMapWidget();
         PlayerController::displayPlayerlist();
 
-        self::$addedTime = 0;
+        self::resetTime();
     }
 
     /**
