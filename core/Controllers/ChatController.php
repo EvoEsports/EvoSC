@@ -58,7 +58,7 @@ $$: Writes a dollarsign
         $page = (int)$page;
 
         $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
-            if (!$player) {
+            if (!$player || !$command) {
                 return false;
             }
 
