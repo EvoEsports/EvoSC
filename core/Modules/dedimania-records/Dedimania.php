@@ -83,6 +83,8 @@ class Dedimania extends DedimaniaApi
             $records = $data->params->param->value->struct->member[3]->value->array->data->value;
             self::setMaxRank((int)$data->params->param->value->struct->member[1]->value->int);
 
+            $map->dedis()->delete();
+
             foreach ($records as $record) {
                 try {
 
@@ -99,8 +101,6 @@ class Dedimania extends DedimaniaApi
 
                 if (isset($player->id)) {
                     $player->update(['NickName' => $nickname]);
-
-                    $map->dedis()->delete();
 
                     Dedi::create([
                         'Map' => $map->id,
@@ -122,12 +122,15 @@ class Dedimania extends DedimaniaApi
                     return;
                 } else {
                     Log::logAddLine('! Dedimania !', $message);
+                    return;
                 }
             }
         }
 
+        self::fixDedimaniaRanks($map);
+
         //Remove faulty dedis
-        Dedi::where('Map', $map->id)->where('Score', 0)->delete();
+        $map->dedis()->where('Score', 0)->delete();
         while (true) {
             $last = $map->dedis()->orderByDesc('Score')->get()->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
