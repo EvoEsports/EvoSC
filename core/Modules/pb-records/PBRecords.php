@@ -22,7 +22,7 @@ class PBRecords
 
         PBRecords::$checkpoints = collect([]);
 
-        foreach(onlinePlayers() as $player){
+        foreach (onlinePlayers() as $player) {
             PBRecords::$checkpoints->put($player->id, collect([]));
         }
     }
@@ -46,7 +46,7 @@ class PBRecords
 
         if ($pbRecords && $checkpoints) {
             Template::show($player, 'pbrecords', ['times' => $pbRecords, 'current' => $checkpoints->toArray()]);
-        }else{
+        } else {
             Template::hide($player, 'pbrecords');
         }
     }
@@ -63,7 +63,7 @@ class PBRecords
 
     public static function playerCheckpoint(Player $player, int $score, int $curLap, int $cpId)
     {
-        if(!self::$checkpoints->get($player->id)){
+        if (!self::$checkpoints->get($player->id)) {
             self::$checkpoints->put($player->id, collect([]));
         }
 
@@ -79,8 +79,14 @@ class PBRecords
 
         $dedi = $map->dedis()->wherePlayer($player->id)->get()->first();
 
-        if($dedi && $dedi->Score < $pb->Score && $dedi->Checkpoints){
-            $pb = $dedi;
+        if ($pb) {
+            if ($dedi && $dedi->Score < $pb->Score && $dedi->Checkpoints) {
+                $pb = $dedi;
+            }
+        } else {
+            if ($dedi) {
+                $pb = $dedi;
+            }
         }
 
         if ($pb) {
