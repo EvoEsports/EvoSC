@@ -32,6 +32,10 @@ class Statistics
      */
     public static function playerConnect(Player $player)
     {
+        if (!$player->stats) {
+            $player->stats()->create(['Player' => $player->id]);
+        }
+
         $player->stats()->increment('Visits');
     }
 
