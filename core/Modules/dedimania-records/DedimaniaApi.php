@@ -281,8 +281,6 @@ class DedimaniaApi
             Log::error('Error saving dedis: ' . $e->getMessage());
         }
 
-        $xml->asXML(cacheDir(sprintf('dedi_req_%s.xml', time())));
-
         $data = self::post($xml);
         if ($data) {
             if (isset($data->params->param->value->boolean)) {
