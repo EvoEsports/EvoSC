@@ -115,7 +115,7 @@ class LocalRecords
             $local = $map->locals()->wherePlayer($player->id)->first();
 
             if ($score == $local->Score) {
-                ChatController::messageAll('Player ', $player, ' equaled his/hers ', $local);
+                ChatController::messageAll('Player ', $player, ' equaled his/her ', $local);
                 return;
             }
 
@@ -135,7 +135,7 @@ class LocalRecords
                     self::fixLocalRecordRanks($map);
                     $local = $map->locals()->wherePlayer($player->id)->first();
 
-                    ChatController::messageAll('Player ', $player, ' secured his/hers ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::messageAll('Player ', $player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
                 }
             }
         } else {
