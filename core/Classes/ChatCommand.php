@@ -29,6 +29,10 @@ class ChatCommand
             return true;
         }
 
+        if (!$player->group) {
+            return false;
+        }
+
         return $player->group->hasAccess($this->access);
     }
 
