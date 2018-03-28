@@ -89,8 +89,7 @@ class MxKarma extends MXK
 
         $map = \esc\Controllers\MapController::getCurrentMap();
 
-        var_dump($map->ratings);
-        $karma = $map->ratings()->wherePlayer($player->Login)->first();
+        $karma = $map->ratings()->wherePlayer($player->Login)->get()->first();
 
         if ($karma != null) {
             if ($karma->rating == $rating) {
