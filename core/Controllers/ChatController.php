@@ -58,11 +58,15 @@ $$: Writes a dollarsign
         $page = (int)$page;
 
         $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
+            if (!$player) {
+                return false;
+            }
+
             return $command->hasAccess($player);
         })->sortBy('trigger')->forPage($page, 23);
 
         $commandsList = Template::toString('help', ['commands' => $commands, 'player' => $player]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $commands->count()/23, 'action' => 'help.show', 'page' => $page]);
+        $pagination = Template::toString('esc.pagination', ['pages' => $commands->count() / 23, 'action' => 'help.show', 'page' => $page]);
 
         Template::show($player, 'esc.modal', [
             'id' => 'Help',
