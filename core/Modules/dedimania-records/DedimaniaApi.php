@@ -60,8 +60,10 @@ class DedimaniaApi
 
         $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
             'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8'
+                'Content-Type' => 'text/xml; charset=UTF8',
+                'Accept-Encoding' => 'gzip'
             ],
+            'decode_content' => 'gzip',
             'body' => $xml->asXML()
         ]);
 
@@ -166,8 +168,10 @@ class DedimaniaApi
 
         $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
             'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8'
+                'Content-Type' => 'text/xml; charset=UTF8',
+                'Accept-Encoding' => 'gzip'
             ],
+            'decode_content' => 'gzip',
             'body' => $xml->asXML()
         ]);
 
@@ -423,8 +427,10 @@ class DedimaniaApi
         try {
             $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
                 'headers' => [
-                    'Content-Type' => 'text/xml; charset=UTF8'
+                    'Content-Type' => 'text/xml; charset=UTF8',
+                    'Accept-Encoding' => 'gzip'
                 ],
+                'decode_content' => 'gzip',
                 'body' => $xml->asXML()
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
