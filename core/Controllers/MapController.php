@@ -246,6 +246,14 @@ class MapController
         foreach ($mapFiles as $mapFile) {
             $map = Map::where('FileName', $mapFile)->first();
 
+            try {
+                Server::addMap($mapFile);
+            } catch (FileException $e) {
+                Log::error("Map $mapFile not found.");
+            } catch (AlreadyInListException $e) {
+//                Log::warning("Map $mapFile already added.");
+            }
+
             if (!$map) {
                 if (preg_match('/^_(\d+)\.Map\.gbx$/', $mapFile, $matches)) {
                     $mxId = (int)$matches[1];
@@ -257,14 +265,6 @@ class MapController
                 if (isset($mxId)) {
                     $map->update(['MxId' => $mxId]);
                 }
-            }
-
-            try {
-                Server::addMap($mapFile);
-            } catch (FileException $e) {
-                Log::error("Map $mapFile not found.");
-            } catch (AlreadyInListException $e) {
-//                Log::warning("Map $mapFile already added.");
             }
         }
     }
