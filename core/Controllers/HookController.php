@@ -157,7 +157,7 @@ class HookController
 
     public static function call($event, $arguments = null)
     {
-        Log::logAddLine('RPC-Event', "$event called", false);
+//        Log::logAddLine('RPC-Event', "$event called", false);
 
         if ($event == 'ManiaPlanet.ModeScriptCallbackArray') {
 //            var_dump($arguments);

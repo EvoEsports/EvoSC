@@ -83,37 +83,34 @@ class MxKarma extends MXK
 
         if (!self::playerFinished($player)) {
             //Prevent players from voting when they didnt finish
+            ChatController::message($player, 'You need to finish the track before youc an vote.');
             return;
         }
 
         $map = \esc\Controllers\MapController::getCurrentMap();
 
-        Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating");
-
+        var_dump($map->ratings);
         $karma = $map->ratings()->wherePlayer($player->Login)->first();
 
-        if ($karma) {
+        if ($karma != null) {
             if ($karma->rating == $rating) {
                 return;
             }
 
             $karma->update(['rating' => $rating]);
         } else {
-            $karma = Karma::insert([
+            Karma::insert([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'rating' => $rating
             ]);
         }
 
-        if (isset($karma)) {
-            HookController::call('PlayerRateMap', [$player, $karma]);
-        }
-
         self::$updatedVotes->push($player->id);
         self::$updatedVotes = self::$updatedVotes->unique();
 
         ChatController::messageAll($player, ' rated this track ', secondary(self::$ratings[$rating]));
+        Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating");
 
         self::showWidget($player);
     }
