@@ -93,7 +93,7 @@ class LocalRecords
      */
     public static function getBestCps(Player $player): string
     {
-        return self::$checkpoints->where('player.Login', $player->Login)->pluck('time')->sortBy('time')->implode(',');
+        return self::$checkpoints->where('player.Login', $player->Login)->pluck('time')->sortBy('time')->implode(',') ?? '';
     }
 
     /**
@@ -112,6 +112,8 @@ class LocalRecords
 
         $localCount = $map->locals()->count();
 
+        $checkpoints = self::getBestCps($player);
+
         $local = $map->dedis()->wherePlayer($player->id)->first();
         if ($local != null) {
             if ($score == $local->Score) {
@@ -123,7 +125,7 @@ class LocalRecords
 
             if ($score < $local->Score) {
                 $diff = $local->Score - $score;
-                $local->update(['Score' => $score]);
+                $local->update(['Score' => $score, 'Checkpoints' => $checkpoints]);
                 $local = self::fixLocalRecordRanks($map, $player);
 
                 if ($oldRank == $local->Rank) {
@@ -140,6 +142,7 @@ class LocalRecords
                     'Player' => $player->id,
                     'Map' => $map->id,
                     'Score' => $score,
+                    'Checkpoints' => $checkpoints,
                     'Rank' => 999,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
@@ -170,33 +173,6 @@ class LocalRecords
         }
 
         return null;
-    }
-
-    /**
-     * Push down ranks from given position
-     * @param Map $map
-     * @param int $startRank
-     */
-    private static function pushDownRanks(Map $map, int $startRank)
-    {
-        $map->locals()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
-    }
-
-    /**
-     * Get rank for driven time
-     * @param Map $map
-     * @param int $score
-     * @return int|null
-     */
-    private static function getRank(Map $map, int $score): ?int
-    {
-        $nextBetter = $map->locals->where('Score', '<=', $score)->sortByDesc('Score')->first();
-
-        if ($nextBetter) {
-            return $nextBetter->Rank + 1;
-        }
-
-        return 1;
     }
 
     /**

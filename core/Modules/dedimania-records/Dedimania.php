@@ -39,6 +39,8 @@ class Dedimania extends DedimaniaApi
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
 
         ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
+
+        ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
     }
 
     private function createTables()
@@ -60,6 +62,11 @@ class Dedimania extends DedimaniaApi
         });
     }
 
+    public static function printMaxRank(Player $player, ...$args)
+    {
+        ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank());
+    }
+
     public static function beginMap(Map $map)
     {
         self::$newTimes = new Collection();
@@ -74,13 +81,16 @@ class Dedimania extends DedimaniaApi
 
         if (isset($data->params->param->value->struct->member[3]->value->array->data->value)) {
             $records = $data->params->param->value->struct->member[3]->value->array->data->value;
+            self::setMaxRank((int)$data->params->param->value->struct->member[1]->value->int);
 
             foreach ($records as $record) {
                 try {
+
                     $login = (string)$record->struct->member[0]->value->string;
                     $nickname = (string)$record->struct->member[1]->value->string;
                     $score = (int)$record->struct->member[2]->value->int;
                     $rank = (int)$record->struct->member[3]->value->int;
+                    $checkpoints = (string)$record->struct->member[5]->value->string;
 
                     $player = Player::firstOrCreate(['Login' => $login]);
                 } catch (\Exception $e) {
@@ -90,13 +100,14 @@ class Dedimania extends DedimaniaApi
                 if (isset($player->id)) {
                     $player->update(['NickName' => $nickname]);
 
-                    Dedi::whereMap($map->id)->whereRank($rank)->delete();
+                    $map->dedis()->delete();
 
                     Dedi::create([
                         'Map' => $map->id,
                         'Player' => $player->id,
                         'Score' => $score,
-                        'Rank' => $rank
+                        'Rank' => $rank,
+                        'Checkpoints' => $checkpoints
                     ]);
                 }
             }
@@ -225,7 +236,7 @@ class Dedimania extends DedimaniaApi
                 if ($dedi->Rank <= self::$maxRank) {
                     if ($oldRank == $dedi->Rank) {
                         ChatController::messageAll('Player ', $player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')');
-                    }else{
+                    } else {
                         ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
                     }
                     self::addNewTime($dedi);
