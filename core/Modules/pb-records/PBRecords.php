@@ -77,12 +77,11 @@ class PBRecords
 
         $pb = $map->locals()->wherePlayer($player->id)->get()->first();
 
-        //TODO: Add dedi checkpoints
-//        $dedi = $map->dedis()->wherePlayer($player->id)->get()->first();
-//
-//        if($dedi && $dedi->Score < $pb->Score){
-//            $pb = $dedi;
-//        }
+        $dedi = $map->dedis()->wherePlayer($player->id)->get()->first();
+
+        if($dedi && $dedi->Score < $pb->Score && $dedi->Checkpoints){
+            $pb = $dedi;
+        }
 
         if ($pb) {
             return explode(',', $pb->Checkpoints);

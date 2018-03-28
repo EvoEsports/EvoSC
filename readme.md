@@ -1,4 +1,4 @@
-![version:0.19.0](https://img.shields.io/badge/Version-0.19.0-blue.svg)
+![version:0.20.0](https://img.shields.io/badge/Version-0.20.0-blue.svg)
 
 # Evolution Server Controller
 
