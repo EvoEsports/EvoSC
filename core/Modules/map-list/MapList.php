@@ -36,10 +36,28 @@ class MapList
         $allMaps = Map::all();
 
         if ($filter) {
-            $allMaps = $allMaps->filter(function (Map $map) use ($filter) {
-                $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
-                return (is_int($nameMatch) || $map->Author == $filter);
-            });
+            if ($filter == 'worst') {
+                $worstLocals = $player->locals()->orderByDesc('Rank')->get();
+                $allMaps = collect([]);
+                foreach ($worstLocals as $local) {
+                    $allMaps->push($local->map);
+                }
+            } elseif ($filter == 'best') {
+                $worstLocals = $player->locals()->orderBy('Rank')->get();
+                $allMaps = collect([]);
+                foreach ($worstLocals as $local) {
+                    $allMaps->push($local->map);
+                }
+            } elseif ($filter == 'nofinish') {
+                $allMaps = $allMaps->filder(function (Map $map) use ($player) {
+                    return (!$map->locals()->wherePlayer($player->id)->get()->first() && !$map->dedis()->wherePlayer($player->id)->get()->first());
+                });
+            } else {
+                $allMaps = $allMaps->filter(function (Map $map) use ($filter) {
+                    $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
+                    return (is_int($nameMatch) || $map->Author == $filter);
+                });
+            }
         }
 
         $pages = ceil($allMaps->count() / $perPage);
