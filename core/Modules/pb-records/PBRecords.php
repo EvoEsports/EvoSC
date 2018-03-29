@@ -95,6 +95,11 @@ class PBRecords
         }
 
         $pb = $map->locals()->orderByDesc('Score')->get()->first();
-        return explode(',', $pb->Checkpoints);
+
+        if($pb && isset($pb->Checkpoints)){
+            return explode(',', $pb->Checkpoints);
+        }
+
+        return null;
     }
 }
