@@ -63,8 +63,12 @@ class Dedimania extends DedimaniaApi
         });
     }
 
-    public static function printDediCps(Player $player, $cmd, $dediId)
+    public static function printDediCps(Player $player, $cmd = null, $dediId = null)
     {
+        if (!$dediId) {
+            return;
+        }
+
         $map = MapController::getCurrentMap();
         $dedi = $map->dedis()->where('Rank', $dediId)->get()->first();
 
