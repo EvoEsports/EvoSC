@@ -31,6 +31,7 @@ class PBRecords
     {
         foreach (onlinePlayers() as $player) {
             self::showWidget($player);
+            self::playerFinish($player, 0);
         }
     }
 
@@ -93,6 +94,7 @@ class PBRecords
             return explode(',', $pb->Checkpoints);
         }
 
-        return null;
+        $pb = $map->locals()->orderByDesc('Score')->get()->first();
+        return explode(',', $pb->Checkpoints);
     }
 }
