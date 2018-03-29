@@ -1,10 +1,5 @@
-<label pos="0 0" z-index="0" size="79 5" textsize="1.2" text="Available chat commands"/>
-<label pos="65 0" z-index="0" size="40 5" textsize="1.2" text="Description"/>
-
-{if isset($modules)}
 {foreach $modules as $module}
 <label pos="0 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$module->name}"/>
 <label pos="60 0" z-index="0" size="20 5" textsize="1" valign="center" halign="center" text="Reload" action="module.reload,{$module->name}"/>
 </frame>
 {/foreach}
-{/if}
