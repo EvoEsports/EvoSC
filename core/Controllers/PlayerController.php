@@ -29,7 +29,7 @@ class PlayerController
 
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
-//        ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
+        ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
     }
 
     public static function createTables()
