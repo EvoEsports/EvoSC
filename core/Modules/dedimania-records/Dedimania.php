@@ -70,7 +70,7 @@ class Dedimania extends DedimaniaApi
 
         if ($dedi && $dedi->Checkpoints) {
             $output = "";
-            foreach ($dedi->Checkpoints as $id => $time) {
+            foreach (explode(",", $dedi->Checkpoints) as $id => $time) {
                 $output .= "$id: " . formatScore(intval($time)) . ", ";
             }
             ChatController::message($player, $output);
