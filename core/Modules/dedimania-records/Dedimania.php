@@ -41,6 +41,7 @@ class Dedimania extends DedimaniaApi
         ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
 
         ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
+        ChatController::addCommand('dedicps', 'Dedimania::printDediCps', 'SPrints cps for given dedi to chat');
     }
 
     private function createTables()
@@ -60,6 +61,22 @@ class Dedimania extends DedimaniaApi
             $table->boolean('Expired')->default(false);
             $table->timestamps();
         });
+    }
+
+    public static function printDediCps(Player $player, $cmd, $dediId)
+    {
+        $map = MapController::getCurrentMap();
+        $dedi = $map->dedis()->where('Rank', $dediId)->get()->first();
+
+        if ($dedi && $dedi->Checkpoints) {
+            $output = "";
+            foreach ($dedi->Checkpoints as $id => $time) {
+                $output .= "$id: " . formatScore(intval($time)) . ", ";
+            }
+            ChatController::message($player, $output);
+        } else {
+            ChatController::message($player, 'No checkpoints for this dedi');
+        }
     }
 
     public static function printMaxRank(Player $player, ...$args)
