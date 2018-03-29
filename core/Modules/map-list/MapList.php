@@ -49,7 +49,7 @@ class MapList
                     $allMaps->push($local->map);
                 }
             } elseif ($filter == 'nofinish') {
-                $allMaps = $allMaps->filder(function (Map $map) use ($player) {
+                $allMaps = $allMaps->filter(function (Map $map) use ($player) {
                     return (!$map->locals()->wherePlayer($player->id)->get()->first() && !$map->dedis()->wherePlayer($player->id)->get()->first());
                 });
             } else {
