@@ -69,7 +69,6 @@ class MxKarma extends MXK
             $table->integer('Player');
             $table->integer('Map');
             $table->integer('rating');
-            $table->unique(['Player', 'Map']);
         });
     }
 
@@ -89,21 +88,13 @@ class MxKarma extends MXK
 
         $map = \esc\Controllers\MapController::getCurrentMap();
 
-        $karma = $map->ratings()->wherePlayer($player->Login)->get()->first();
+        $map->ratings()->wherePlayer($player->Login)->delete();
 
-        if ($karma != null) {
-            if ($karma->rating == $rating) {
-                return;
-            }
-
-            $karma->update(['rating' => $rating]);
-        } else {
-            Karma::insert([
-                'Player' => $player->id,
-                'Map' => $map->id,
-                'rating' => $rating
-            ]);
-        }
+        Karma::insert([
+            'Player' => $player->id,
+            'Map' => $map->id,
+            'rating' => $rating
+        ]);
 
         self::$updatedVotes->push($player->id);
         self::$updatedVotes = self::$updatedVotes->unique();
@@ -267,7 +258,7 @@ class MxKarma extends MXK
             $items->push(self::$mapKarma->voteaverage);
         }
 
-        $ratings = $map->whereIn('Player', self::$updatedVotes->toArray());
+        $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray());
 
         foreach ($ratings as $rating) {
             $items->push($rating->rating);
