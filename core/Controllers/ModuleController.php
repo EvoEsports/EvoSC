@@ -48,7 +48,14 @@ class ModuleController
 
     public static function showModules(Player $callee)
     {
-        Template::show($callee, 'modules', ['modules' => self::getModules()]);
+        $modules = Template::toString('modules', ['modules' => self::getModules()]);
+
+        Template::show($callee, 'esc.modal', [
+            'id' => 'ModulesReloader',
+            'width' => 180,
+            'height' => 97,
+            'content' => $modules
+        ]);
     }
 
     public static function hideModules(Player $callee)
