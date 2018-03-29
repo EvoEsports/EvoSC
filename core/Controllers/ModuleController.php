@@ -35,9 +35,7 @@ class ModuleController
         if ($module) {
             $module->load($callee);
 
-            $players = PlayerController::getPlayers()->where('Group', Group::SUPER);
-
-            foreach ($players as $player) {
+            foreach (onlinePlayers() as $player) {
                 ChatController::message($player, $callee, ' reloads module ', $module);
             }
         }
