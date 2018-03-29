@@ -126,11 +126,9 @@ class Player extends Model
 
     public function group()
     {
-        if (!$this->Group) {
-            $group = new Group();
-            $group->Name = 'Player';
-
-            return $group;
+        if($this->Group == null){
+            $this->Group = 3;
+            $this->save();
         }
 
         return $this->hasOne(Group::class, 'id', 'Group');
