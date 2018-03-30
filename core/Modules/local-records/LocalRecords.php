@@ -14,16 +14,12 @@ use Illuminate\Database\Schema\Blueprint;
 
 class LocalRecords
 {
-    static $checkpoints;
-
     /**
      * LocalRecords constructor.
      */
     public function __construct()
     {
         LocalRecords::createTables();
-
-        self::$checkpoints = new \Illuminate\Support\Collection();
 
         include_once __DIR__ . '/Models/LocalRecord.php';
 
@@ -32,7 +28,6 @@ class LocalRecords
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
         Hook::add('PlayerConnect', 'LocalRecords::beginMap');
-        Hook::add('PlayerCheckpoint', 'LocalRecords::playerCheckpoint');
 
         ManiaLinkEvent::add('locals.show', 'LocalRecords::showLocalsModal');
         ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
@@ -61,39 +56,7 @@ class LocalRecords
      */
     private static function playerHasLocal(Map $map, Player $player): bool
     {
-        return LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first() != null;
-    }
-
-    /**
-     * Called @ PlayerCheckpoint
-     * @param Player $player
-     * @param int $time
-     * @param int $curLap
-     * @param int $cpId
-     */
-    public static function playerCheckpoint(Player $player, int $time, int $curLap, int $cpId)
-    {
-        $existingCpTime = self::$checkpoints->where('player.Login', $player->Login)->where('id', $cpId);
-        if ($existingCpTime->isNotEmpty()) {
-            self::$checkpoints = self::$checkpoints->diff($existingCpTime);
-        }
-
-        $cp = collect([]);
-        $cp->player = $player;
-        $cp->time = $time;
-        $cp->id = $cpId;
-
-        self::$checkpoints->push($cp);
-    }
-
-    /**
-     * Get the best CPs of the player for this round
-     * @param Player $player
-     * @return string
-     */
-    public static function getBestCps(Player $player): string
-    {
-        return self::$checkpoints->where('player.Login', $player->Login)->pluck('time')->sortBy('time')->implode(',') ?? '';
+        return $map->locals()->wherePlayer($player->id)->get()->first() != null;
     }
 
     /**
@@ -101,7 +64,7 @@ class LocalRecords
      * @param Player $player
      * @param int $score
      */
-    public static function playerFinish(Player $player, int $score)
+    public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 3000) {
             //ignore times under 3 seconds
@@ -111,8 +74,6 @@ class LocalRecords
         $map = MapController::getCurrentMap();
 
         $localCount = $map->locals()->count();
-
-        $checkpoints = self::getBestCps($player);
 
         $local = $map->locals()->wherePlayer($player->id)->first();
         if ($local != null) {
@@ -180,7 +141,6 @@ class LocalRecords
      */
     public static function beginMap()
     {
-        self::$checkpoints = new \Illuminate\Support\Collection();
         self::displayLocalRecords();
     }
 

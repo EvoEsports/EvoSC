@@ -62,6 +62,7 @@ class MapController
             $table->string('Mood')->nullable();
             $table->boolean('LapRace')->nullable();
             $table->dateTime('LastPlayed')->nullable();
+            $table->boolean('Available')->default(false);
         });
     }
 

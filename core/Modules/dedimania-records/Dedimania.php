@@ -34,7 +34,6 @@ class Dedimania extends DedimaniaApi
         Hook::add('EndMatch', 'Dedimania::endMatch');
         Hook::add('PlayerConnect', 'Dedimania::displayDedis');
         Hook::add('PlayerFinish', 'Dedimania::playerFinish');
-        Hook::add('PlayerCheckpoint', 'Dedimania::playerCheckpoint');
 
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
 
@@ -91,7 +90,6 @@ class Dedimania extends DedimaniaApi
     public static function beginMap(Map $map)
     {
         self::$newTimes = new Collection();
-        self::$checkpoints = new Collection();
         $session = self::getSession();
 
         if ($session == null) {
@@ -178,21 +176,6 @@ class Dedimania extends DedimaniaApi
         self::setChallengeTimes($map);
     }
 
-    public static function playerCheckpoint(Player $player, int $time, int $curLap, int $cpId)
-    {
-        $cp = collect([]);
-        $cp->player = $player;
-        $cp->time = $time;
-        $cp->id = $cpId;
-
-        $existingCpTime = self::$checkpoints->where('player.Login', $player->Login)->where('id', $cpId);
-        if ($existingCpTime->isNotEmpty()) {
-            self::$checkpoints = self::$checkpoints->diff($existingCpTime);
-        }
-
-        self::$checkpoints->push($cp);
-    }
-
     public static function addNewTime(Dedi $dedi)
     {
         $existingDedi = self::$newTimes->where('Player', $dedi->Player);
@@ -232,7 +215,7 @@ class Dedimania extends DedimaniaApi
      * @param Player $player
      * @param int $score
      */
-    public static function playerFinish(Player $player, int $score)
+    public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 3000) {
             //ignore times under 3 seconds
@@ -240,7 +223,6 @@ class Dedimania extends DedimaniaApi
         }
 
         $map = MapController::getCurrentMap();
-
         $dedisCount = $map->dedis()->count();
 
         $dedi = $map->dedis()->wherePlayer($player->id)->first();
@@ -254,7 +236,7 @@ class Dedimania extends DedimaniaApi
 
             if ($score < $dedi->Score) {
                 $diff = $dedi->Score - $score;
-                $dedi->update(['Score' => $score]);
+                $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
 
                 if ($dedi->Rank <= self::$maxRank) {
@@ -273,12 +255,14 @@ class Dedimania extends DedimaniaApi
                     'Map' => $map->id,
                     'Score' => $score,
                     'Rank' => 999,
+                    'Checkpoints' => $checkpoints
                 ]);
+
                 $dedi = self::fixDedimaniaRanks($map, $player);
 
                 if ($dedi->Rank <= self::$maxRank) {
                     self::addNewTime($dedi);
-                    ChatController::messageAll('Player ', $player, ' made the ', $dedi);
+                    ChatController::messageAll('Player ', $player, ' gained the ', $dedi);
                 }
             }
         }

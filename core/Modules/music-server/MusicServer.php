@@ -11,8 +11,10 @@ use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Models\Map;
 use esc\Models\Player;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
+use Psr\Http\Message\ResponseInterface;
 
 class MusicServer
 {
@@ -197,14 +199,14 @@ class MusicServer
         Log::info("Loading music...");
 
         try {
-            $musicJson = $response = RestClient::get(config('music.server'))->getBody()->getContents();
+            $res = RestClient::get(config('music.server'));
+            $musicJson = $res->getBody()->getContents();
+            $musicFiles = json_decode($musicJson);
+            MusicServer::setMusicFiles(collect($musicFiles));
+            return;
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
             return;
         }
-
-        $musicFiles = json_decode($musicJson);
-
-        MusicServer::setMusicFiles(collect($musicFiles));
     }
 }

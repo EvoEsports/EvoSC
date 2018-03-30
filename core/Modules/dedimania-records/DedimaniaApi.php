@@ -10,7 +10,6 @@ use esc\Models\Player;
 class DedimaniaApi
 {
     static $newTimes;
-    static $checkpoints;
 
     /**
      * Connect to dedimania and authenticate
@@ -225,12 +224,7 @@ class DedimaniaApi
                 continue;
             }
 
-            $checkpoints = self::$checkpoints->where('player.Login', $dedi->player->Login) ?? [];
-
-            if($map->NbCheckpoints != count($checkpoints)){
-                //Only push dedis with valid checkpoints
-                continue;
-            }
+            $checkpoints = $dedi->Checkpoints;
 
             $struct = $times->addChild('struct');
 
@@ -244,13 +238,7 @@ class DedimaniaApi
 
             $member = $struct->addChild('member');
             $member->addChild('name', 'Checks');
-//            $array = $member->addChild('value')->addChild('array')->addChild('data');
-//
-//            $checkTimes = self::$checkpoints->where('player.Login', $dedi->player->Login)->pluck('time')->sortBy('time');
-//            foreach ($checkTimes as $time) {
-//                $array->addChild('value')->addChild('i4', $time);
-//            }
-            $member->addChild('value', $checkpoints->pluck('time')->sortBy('time')->implode(','));
+            $member->addChild('value', $checkpoints);
         }
 
         //Replays: struct {'VReplay': base64 string, 'VReplayChecks': string (list of int, comma separated), 'Top1GReplay': base64 string}:
@@ -267,7 +255,7 @@ class DedimaniaApi
         }
 
         $vreplay = Server::getValidationReplay($bestPlayer->player->Login);
-        $vreplayChecks = self::$checkpoints->where('player.Login', $bestPlayer->player->Login)->pluck('time')->sortBy('time')->implode(',');
+        $vreplayChecks = $map->dedis()->wherePlayer($bestPlayer->id)->get()->first()->Checkpoints;
         $top1greplay = '';
 
         try {

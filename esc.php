@@ -14,9 +14,12 @@ while (true) {
         startEsc();
 
         loadModulesFrom(__DIR__ . '/core/Modules');
-//        loadModulesFrom(__DIR__ . '/modules'); do not load custom modules for now
 
         beginMap();
+
+        //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
+        //only if you would enable legacy callbacks and we don't want that
+        \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
         while (true) {
             cycle();

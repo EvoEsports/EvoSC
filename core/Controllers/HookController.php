@@ -5,11 +5,12 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\ModescriptCallbacks;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Collection;
 
-class HookController
+class HookController extends ModescriptCallbacks
 {
     private static $hooks;
 
@@ -26,6 +27,7 @@ class HookController
         'TrackMania.PlayerFinish' => 'PlayerFinish',
         'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
         'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
+        'ManiaPlanet.ModeScriptCallbackArray' => 'ManiaPlanet.ModeScriptCallbackArray',
     ];
 
     public static function init()
@@ -33,8 +35,14 @@ class HookController
         self::$hooks = new Collection();
     }
 
-    private static function getHooks(): ?Collection
+    static function getHooks(string $hook = null): ?Collection
     {
+        if ($hook) {
+            return self::$hooks->filter(function ($value, $key) use ($hook) {
+                return $value->getEvent() == $hook;
+            });
+        }
+
         return self::$hooks;
     }
 
@@ -49,26 +57,49 @@ class HookController
         }
     }
 
-    private static function fireHookBatch($hooks, ...$arguments)
+    static function fireHookBatch($hooks, ...$arguments)
     {
         foreach ($hooks as $hook) {
             $hook->execute(...$arguments);
         }
     }
 
+    private static function handleModeScriptCallbackArray(array $modescriptCallbackArray)
+    {
+        $callback = $modescriptCallbackArray[0];
+        $arguments = $modescriptCallbackArray[1];
+
+        switch ($callback) {
+            case 'Trackmania.Scores':
+                self::tmScores($arguments);
+                break;
+
+            case 'Trackmania.Event.GiveUp':
+                self::tmGiveUp($arguments);
+                break;
+
+            case 'Trackmania.Event.WayPoint':
+                self::tmWayPoint($arguments);
+                break;
+
+            default:
+                Log::logAddLine('ScriptCallback', "Calling unhandled $callback");
+                break;
+        }
+    }
+
     public static function fire(string $hook, $arguments = null)
     {
-//        if($hook == 'ManiaPlanet.PlayerInfoChanged'){
-//            PlayerController::playerInfoChanged($arguments);
-//            $hook = 'PlayerInfoChanged';
-//        }
-
         Log::logAddLine('Hook', "Called: $hook", false);
 
-        $hooks = self::getHooks()->filter(function ($value, $key) use ($hook) {
-            return $value->getEvent() == $hook;
-        });
+        if($hook == 'ManiaPlanet.ModeScriptCallbackArray'){
+            //handle modescript callbacks
+            self::handleModeScriptCallbackArray($arguments);
+            return;
+        }
 
+        //handle maniaplanet callbacks
+        $hooks = self::getHooks($hook);
         switch ($hook) {
             case 'BeginMap':
                 //SMapInfo Map
@@ -126,20 +157,20 @@ class HookController
                 self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3]);
                 break;
 
-            case 'PlayerCheckpoint':
-                //int PlayerUid, string Login, int TimeOrScore, int CurLap, int CheckpointIndex
-                $player = Player::find($arguments[1]);
-                self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3], $arguments[4]);
-                break;
+//            case 'PlayerCheckpoint':
+//                //int PlayerUid, string Login, int TimeOrScore, int CurLap, int CheckpointIndex
+//                $player = Player::find($arguments[1]);
+//                self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3], $arguments[4]);
+//                break;
 
-            case 'PlayerFinish':
-                //int PlayerUid, string Login, int TimeOrScore
-                $player = Player::find($arguments[1]);
-                if ($player == null) {
-                    $player = Player::find($arguments[1]);
-                }
-                self::fireHookBatch($hooks, $player, $arguments[2]);
-                break;
+//            case 'PlayerFinish':
+//                //int PlayerUid, string Login, int TimeOrScore
+//                $player = Player::find($arguments[1]);
+//                if ($player == null) {
+//                    $player = Player::find($arguments[1]);
+//                }
+//                self::fireHookBatch($hooks, $player, $arguments[2]);
+//                break;
 
             case 'PlayerIncoherence':
                 //int PlayerUid, string Login
@@ -157,14 +188,16 @@ class HookController
 
     public static function call($event, $arguments = null)
     {
-//        Log::logAddLine('RPC-Event', "$event called", false);
-
-        if ($event == 'ManiaPlanet.ModeScriptCallbackArray') {
-//            var_dump($arguments);
-            return;
-        }
+//        Log::logAddLine('RPC-Event', $event, true);
 
         if (array_key_exists($event, self::$eventMap)) {
+            foreach ($arguments as $key => $argument) {
+                if (is_null($argument)) {
+                    Log::logAddLine('RPC-Event', 'Calling event ' . $event . ' with null argument: ' . $key, true);
+                    return;
+                }
+            }
+
             $hook = self::$eventMap[$event];
             self::fire($hook, $arguments);
         } else {
@@ -179,9 +212,9 @@ class HookController
     public static function handleCallbacks($callbacks)
     {
         foreach ($callbacks as $callback) {
-            if(count($callback) == 2){
+            if (count($callback) == 2) {
                 self::call($callback[0], $callback[1]);
-            }else{
+            } else {
                 echo "Got faulty rpc-callback: ";
                 var_dump($callback);
             }
