@@ -64,6 +64,19 @@ class ModescriptCallbacks
         HookController::fireHookBatch($playerStartCountdown, $player);
     }
 
+    static function tmStartLine($arguments)
+    {
+        $playerStartCountdown = HookController::getHooks('PlayerStartLine');
+        $playerLogin = json_decode($arguments[0])->login;
+        $player = Player::find($playerLogin);
+        HookController::fireHookBatch($playerStartCountdown, $player);
+    }
+
+    static function tmStunt($arguments)
+    {
+        //ignore stunts for now
+    }
+
     /**
      * Convert cp array to comma separated string
      * @param array $cps
