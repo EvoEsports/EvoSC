@@ -68,7 +68,8 @@ class MxKarma extends MXK
             $table->increments('id');
             $table->integer('Player');
             $table->integer('Map');
-            $table->integer('rating');
+            $table->integer('Rating');
+            $table->unique(['Map', 'Player']);
         });
     }
 
@@ -82,25 +83,35 @@ class MxKarma extends MXK
 
         if (!self::playerFinished($player)) {
             //Prevent players from voting when they didnt finish
-            ChatController::message($player, 'You need to finish the track before youc an vote.');
+            ChatController::message($player, 'You need to finish the track before you can vote.');
             return;
         }
 
         $map = \esc\Controllers\MapController::getCurrentMap();
 
-        $map->ratings()->wherePlayer($player->Login)->delete();
+        $karma = $map->ratings()->wherePlayer($player->id)->get()->first();
 
-        Karma::insert([
-            'Player' => $player->id,
-            'Map' => $map->id,
-            'rating' => $rating
-        ]);
+        if ($karma != null) {
+            if ($karma->Rating == $rating) {
+                //Prevent spam
+                return;
+            }
+
+            $karma->update(['Rating' => $rating]);
+        } else {
+            $karma = Karma::create([
+                'Player' => $player->id,
+                'Map' => $map->id,
+                'Rating' => $rating
+            ]);
+        }
+
 
         self::$updatedVotes->push($player->id);
         self::$updatedVotes = self::$updatedVotes->unique();
 
-        ChatController::messageAll($player, ' rated this track ', secondary(self::$ratings[$rating]));
-        Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating");
+        ChatController::messageAll($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])));
+        Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating|" . self::$ratings[$rating]);
 
         self::showWidget($player);
     }
