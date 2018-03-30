@@ -1,62 +1,29 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="SongMenu" version="3">
-<frame pos="0 0" scale="0.85" id="main-frame">
-    <quad pos="-100 50" z-index="-3" size="200 110" bgcolor="0006"/>
-    <quad pos="-100 37" z-index="0" size="200 0.2" bgcolor="18f9"/>
-    <quad pos="-100 50" z-index="-2" size="200 13.5" bgcolor="18f3"/>
-    <quad pos="-100 50" z-index="-1" size="200 110" style="Bgs1" substyle="BgDialogBlur"/>
+<frame pos="0 11" scale="0.8">
+    <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
+    <label pos="55 -12" z-index="0" size="40 5" text="Artist"/>
+    <label pos="85 -12" z-index="0" size="40 5" text="Album"/>
+    <label pos="150 -12" z-index="0" size="20 5" text="Next"/>
 
-    <frame pos="-95 45">
-        <quad pos="145 -13" z-index="0" size="0.2 80" bgcolor="18f9"/>
-        <label pos="0 0" z-index="0" size="20 5" text="$oMusic" textcolor="ffff" halign="left"/>
-        <quad pos="185 1" z-index="0" size="6 6" bgcolor="FFFA" style="Icons128x32_1" substyle="Close" action="modal.hide,SongMenu"/>
+    {if count($songs)}
+    {foreach $songs as $key => $song}
+    {if $song->title}
+    <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text=" {$song->title}"/>
+    {else}
+    <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="160 5" textsize="1.8" valign="center" text=" {$song->file}"/>
+    {/if}
+    <label pos="55 -{15 + $iterator->counter * 5}" z-index="0" size="40 5" textsize="1.8" valign="center" text="{$song->artist}"/>
+    <label pos="85 -{15 + $iterator->counter * 5}" z-index="0" size="30 5" textsize="1.8" valign="center" text="{$song->album}"/>
+    <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="141 4.8" textsize="1.8" valign="center" halign="right" text="Juke  " textcolor="18fa" action="ms.juke,{$key}"/>
+    {/foreach}
+    {/if}
 
-        <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
-        <label pos="55 -12" z-index="0" size="40 5" text="Artist"/>
-        <label pos="85 -12" z-index="0" size="40 5" text="Album"/>
-        <label pos="150 -12" z-index="0" size="20 5" text="Next"/>
-
-        {if count($songs)}
-        {foreach $songs as $key => $song}
-        {if $song->title}
-        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="50 5" textsize="1.8" valign="center" text=" {$song->title}"/>
-        {else}
-        <label pos="0 -{15 + $iterator->counter * 5}" z-index="0" size="160 5" textsize="1.8" valign="center" text=" {$song->file}"/>
-        {/if}
-        <label pos="55 -{15 + $iterator->counter * 5}" z-index="0" size="40 5" textsize="1.8" valign="center" text="{$song->artist}"/>
-        <label pos="85 -{15 + $iterator->counter * 5}" z-index="0" size="30 5" textsize="1.8" valign="center" text="{$song->album}"/>
-        <label pos="140 -{15 + $iterator->counter * 5}" z-index="0" size="141 4.8" textsize="1.8" valign="center" halign="right" text="Juke  " textcolor="18fa" action="ms.juke,{$key}"/>
-        {/foreach}
-        {/if}
-
-        {if count($queue)}
-        {foreach $queue as $item}
-        <label pos="149 -{13 + $iterator->counter * 8}" z-index="0" size="5 5" textsize="3" valign="center" text="{$iterator->counter}."/>
-        <label pos="154 -{12 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="1.4" valign="center" text="{$item['song']->title}"/>
-        <label pos="154 -{15 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="0.8" valign="center" text="{$item['song']->artist}"/>
-        {/foreach}
-        {else}
-        <label pos="150 -20" z-index="0" size="34 5" textsize="1.8" valign="center" text="Random"/>
-        {/if}
-
-        {for $i = 1; $i <= $pages; $i++}
-        <label pos="{$i * 6 - 4} -98" z-index="0" size="5 5" textsize="1.8" textcolor="{$page == $i ? '19FF' : 'EEEF'}" valign="center" halign="center" text="{$i}" action="ms.menu.showpage,{$i}"/>
-        {/for}
-    </frame>
-
-    <script><!--
-    main() {
-        declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-        declare Real startScale = 0.85;
-        declare Real curScale = startScale;
-        declare Real targetScale = 0.81;
-
-        while(curScale > targetScale){
-            yield;
-            curScale = curScale - 0.007;
-            frame.Scale = curScale;
-        }
-    }
-    --></script>
+    {if count($queue)}
+    {foreach $queue as $item}
+    <label pos="149 -{13 + $iterator->counter * 8}" z-index="0" size="5 5" textsize="3" valign="center" text="{$iterator->counter}."/>
+    <label pos="154 -{12 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="1.4" valign="center" text="{$item['song']->title}"/>
+    <label pos="154 -{15 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="0.8" valign="center" text="{$item['song']->artist}"/>
+    {/foreach}
+    {else}
+    <label pos="150 -20" z-index="0" size="34 5" textsize="1.8" valign="center" text="Random"/>
+    {/if}
 </frame>
-</manialink>

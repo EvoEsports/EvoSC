@@ -82,6 +82,10 @@ class HookController extends ModescriptCallbacks
                 self::tmWayPoint($arguments);
                 break;
 
+            case 'Trackmania.Event.StartCountdown':
+                self::tmStartCountdown($arguments);
+                break;
+
             default:
                 Log::logAddLine('ScriptCallback', "Calling unhandled $callback");
                 break;

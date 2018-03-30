@@ -16,9 +16,8 @@ class PBRecords
     {
         Template::add('pbrecords', File::get(__DIR__ . '/Templates/pb-records.latte.xml'));
 
-        Hook::add('PlayerFinish', 'PBRecords::playerFinish');
         Hook::add('PlayerCheckpoint', 'PBRecords::playerCheckpoint');
-        Hook::add('BeginMatch', 'PBRecords::beginMatch');
+        Hook::add('PlayerStartCountdown', 'PBRecords::playerStartCountdown');
         Hook::add('EndMatch', 'PBRecords::endMatch');
 
         ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
@@ -31,12 +30,10 @@ class PBRecords
         }
     }
 
-    public static function beginMatch(...$args)
+    public static function playerStartCountdown(Player $player)
     {
-        self::$targets = collect([]);
-        foreach (onlinePlayers() as $player) {
-            self::playerFinish($player, 0);
-        }
+        self::$checkpoints->put($player->id, collect([]));
+        self::showWidget($player);
     }
 
     public static function endMatch(...$args)
@@ -66,16 +63,6 @@ class PBRecords
         }
     }
 
-    public static function playerFinish(Player $player, int $score)
-    {
-        if ($score > 0) {
-            return;
-        }
-
-        self::$checkpoints->put($player->id, collect([]));
-        self::showWidget($player);
-    }
-
     public static function playerCheckpoint(Player $player, int $score, int $curLap, int $cpId)
     {
         if (!self::$checkpoints->get($player->id)) {
@@ -89,7 +76,7 @@ class PBRecords
     public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
     {
         if (!$dediOrLocal) {
-            ChatController::message($player, info('You must specify ') . secondary('local') . info(' or ') . secondary('dedi')  . info(' or ') . secondary('wr') . info(' as first and the id of the record as second'));
+            ChatController::message($player, info('You must specify ') . secondary('local') . info(' or ') . secondary('dedi') . info(' or ') . secondary('wr') . info(' as first and the id of the record as second'));
             return;
         }
 

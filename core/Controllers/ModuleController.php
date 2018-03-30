@@ -46,12 +46,18 @@ class ModuleController
         return self::$loadedModules;
     }
 
-    public static function showModules(Player $callee)
+    public static function showModules(Player $player)
     {
+        if(!$player->isMasteradmin()){
+            ChatController::message($player, warning('Access denied'));
+            return;
+        }
+
         $modules = Template::toString('modules', ['modules' => self::getModules()]);
 
-        Template::show($callee, 'esc.modal', [
+        Template::show($player, 'esc.modal', [
             'id' => 'ModulesReloader',
+            'title' => 'ModulesReloader $f00(by the love of god, do not touch!)',
             'width' => 180,
             'height' => 97,
             'content' => $modules
@@ -63,7 +69,7 @@ class ModuleController
         Template::hide($callee, 'modules');
     }
 
-    public static function loadModules($loadFrom = __DIR__.'/../Modules')
+    public static function loadModules($loadFrom = __DIR__ . '/../Modules')
     {
         foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
             $dir = $loadFrom . '/' . $item;

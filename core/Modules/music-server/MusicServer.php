@@ -126,21 +126,32 @@ class MusicServer
 
     /**
      * Display the music menu
-     * @param Player $callee
+     * @param Player $player
      * @param int $page
      */
-    public static function displayMusicMenu(Player $callee, $page = 1)
+    public static function displayMusicMenu(Player $player, $page = 1)
     {
         $page = (int)$page;
         if ($page == 0) {
             $page = 1;
         }
 
-        $songs = self::$music->sortBy('title')->forPage($page, 15);
-        $pages = ceil(count(self::$music) / 15);
+        $perPage = 19;
+        $songsCount = self::$music->count();
+        $songs = self::$music->sortBy('title')->forPage($page, $perPage);
 
         $queue = self::$songQueue->sortBy('time')->take(9);
-        Template::show($callee, 'music.menu', ['songs' => $songs, 'queue' => $queue, 'pages' => $pages, 'page' => $page]);
+
+        $music = Template::toString('music.menu', ['songs' => $songs, 'queue' => $queue]);
+        $pagination = Template::toString('esc.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
+
+        Template::show($player, 'esc.modal', [
+            'id' => '♫ Music',
+            'width' => 180,
+            'height' => 97,
+            'content' => $music,
+            'pagination' => $pagination
+        ]);
     }
 
     /**

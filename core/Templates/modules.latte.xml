@@ -1,5 +1,8 @@
-{foreach $modules as $module}
-<label pos="0 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$module->name}"/>
-<label pos="60 0" z-index="0" size="20 5" textsize="1" valign="center" halign="center" text="Reload" action="module.reload,{$module->name}"/>
+{if isset($modules)}
+{foreach $modules as $key => $module}
+<frame pos="0 {$key * -5}">
+    <label pos="0 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$module->name}"/>
+    <label pos="60 0" z-index="0" size="20 5" textsize="1" valign="center" halign="center" text="Reload" action="module.reload,{$module->name}"/>
 </frame>
 {/foreach}
+{/if}

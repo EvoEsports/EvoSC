@@ -56,6 +56,14 @@ class ModescriptCallbacks
         }
     }
 
+    static function tmStartCountdown($arguments)
+    {
+        $playerStartCountdown = HookController::getHooks('PlayerStartCountdown');
+        $playerLogin = json_decode($arguments[0])->login;
+        $player = Player::find($playerLogin);
+        HookController::fireHookBatch($playerStartCountdown, $player);
+    }
+
     /**
      * Convert cp array to comma separated string
      * @param array $cps

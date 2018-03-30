@@ -27,6 +27,7 @@ while (true) {
     } catch (PDOException $pdoe) {
         esc\Classes\Log::error("Database exception: $pdoe");
     } catch (\Exception $e) {
+        \esc\Classes\Server::call('ChatEnableManualRouting', [false, false]);
         \esc\Classes\Log::error("!!!!! Fatal error. Restarting... Check the logs for more detailed information !!!!!");
         \esc\Classes\Log::error($e, true);
     }
