@@ -91,7 +91,7 @@ class LocalRecords
 
                 if ($oldRank == $local->Rank) {
                     ChatController::messageAll('Player ', $player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
-                }else{
+                } else {
                     ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
                 HookController::call('PlayerLocal', [$player, $local]);
@@ -151,7 +151,7 @@ class LocalRecords
     public static function showLocalsModal(Player $player)
     {
         $map = MapController::getCurrentMap();
-        $chunks = $map->locals->chunk(25);
+        $chunks = $map->locals()->orderBy('Score')->get()->chunk(25);
 
         $columns = [];
         foreach ($chunks as $key => $chunk) {

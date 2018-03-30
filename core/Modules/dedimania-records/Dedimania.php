@@ -318,7 +318,7 @@ class Dedimania extends DedimaniaApi
     public static function showDedisModal(Player $player)
     {
         $map = MapController::getCurrentMap();
-        $chunks = $map->dedis->chunk(25);
+        $chunks = $map->dedis()->orderBy('Score')->get()->chunk(25);
 
         $columns = [];
         foreach ($chunks as $key => $chunk) {
