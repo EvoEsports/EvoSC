@@ -86,7 +86,7 @@ class HookController extends ModescriptCallbacks
                 self::tmStartCountdown($arguments);
                 break;
 
-            case 'Trackmania.Event.PlayerStartLine':
+            case 'Trackmania.Event.StartLine':
                 self::tmStartLine($arguments);
                 break;
 
