@@ -54,7 +54,7 @@ class PBRecords
             $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
         }
 
-        $recordCpTimes = explode(',', $target->Checkpoints);
+        $recordCpTimes = explode(',', $target->Checkpoints ?? []);
 
         if ($target && $checkpoints) {
             Template::show($player, 'pbrecords', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
