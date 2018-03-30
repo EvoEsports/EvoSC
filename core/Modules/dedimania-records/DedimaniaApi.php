@@ -255,7 +255,7 @@ class DedimaniaApi
         }
 
         $vreplay = Server::getValidationReplay($bestPlayer->player->Login);
-        $vreplayChecks = $map->dedis()->wherePlayer($bestPlayer->id)->get()->first()->Checkpoints;
+        $vreplayChecks = $map->dedis()->wherePlayer($bestPlayer->id)->get()->first()->Checkpoints ?? "";
         $top1greplay = '';
 
         try {
