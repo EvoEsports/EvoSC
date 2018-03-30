@@ -87,6 +87,21 @@ function secondary(string $str = ""): string
     return '$' . config('color.secondary') . $str;
 }
 
+function primary(string $str = ""): string
+{
+    return '$' . config('color.primary') . $str;
+}
+
+function warning(string $str = ""): string
+{
+    return '$' . config('color.warning') . $str;
+}
+
+function info(string $str = ""): string
+{
+    return '$' . config('color.warning') . $str;
+}
+
 function getEscVersion(): string
 {
     global $escVersion;

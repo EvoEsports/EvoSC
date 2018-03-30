@@ -3,13 +3,14 @@
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Models\Player;
-use Illuminate\Support\Collection;
 
 class PBRecords
 {
     private static $checkpoints;
+    private static $targets;
 
     public function __construct()
     {
@@ -20,6 +21,9 @@ class PBRecords
         Hook::add('BeginMatch', 'PBRecords::beginMatch');
         Hook::add('EndMatch', 'PBRecords::endMatch');
 
+        ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
+
+        self::$targets = collect([]);
         PBRecords::$checkpoints = collect([]);
 
         foreach (onlinePlayers() as $player) {
@@ -29,8 +33,8 @@ class PBRecords
 
     public static function beginMatch(...$args)
     {
+        self::$targets = collect([]);
         foreach (onlinePlayers() as $player) {
-            self::showWidget($player);
             self::playerFinish($player, 0);
         }
     }
@@ -43,10 +47,20 @@ class PBRecords
     public static function showWidget(Player $player, $cpId = null)
     {
         $checkpoints = self::$checkpoints->get($player->id);
-        $pbRecords = self::getPbRecordTimes($player);
+        $target = self::getTarget($player);
 
-        if ($pbRecords && $checkpoints) {
-            Template::show($player, 'pbrecords', ['times' => $pbRecords, 'current' => $checkpoints->toArray()]);
+        $targetString = 'unknown';
+
+        if ($target instanceof LocalRecord) {
+            $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+        } elseif ($target instanceof Dedi) {
+            $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+        }
+
+        $recordCpTimes = explode(',', $target->Checkpoints);
+
+        if ($target && $checkpoints) {
+            Template::show($player, 'pbrecords', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
         } else {
             Template::hide($player, 'pbrecords');
         }
@@ -72,34 +86,84 @@ class PBRecords
         self::showWidget($player, $cpId);
     }
 
-    private static function getPbRecordTimes(Player $player)
+    public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
     {
+        if (!$dediOrLocal) {
+            ChatController::message($player, info('You must specify ') . secondary('local') . info(' or ') . secondary('dedi')  . info(' or ') . secondary('wr') . info(' as first and the id of the record as second'));
+            return;
+        }
+
+        $currentTarget = self::$targets->where('player', $player)->first();
+
+        $map = \esc\Controllers\MapController::getCurrentMap();
+
+        switch ($dediOrLocal) {
+            case 'wr':
+                $record = $map->dedis()->whereRank(1)->get()->first();
+                break;
+
+            case 'dedi':
+                $record = $map->dedis()->whereRank($recordId ?? 1)->get()->first();
+                break;
+
+            case 'local':
+                $record = $map->locals()->whereRank($recordId ?? 1)->get()->first();
+                break;
+
+            default:
+                ChatController::message($player, 'You must specify "local" or "dedi" as first parameter');
+                $record = null;
+                break;
+        }
+
+        if (!$record) {
+            ChatController::message($player, 'Unknown record selected');
+            return;
+        }
+
+        if (!isset($record->Checkpoints)) {
+            ChatController::message($player, 'Record has no saved checkpoints');
+            return;
+        }
+
+        if ($currentTarget != null) {
+            $currentTarget->record = $record;
+        } else {
+            $currentTarget = collect([]);
+            $currentTarget->player = $player;
+            $currentTarget->record = $record;
+            self::$targets->push($currentTarget);
+        }
+
+        ChatController::message($player, 'New checkpoints target: ', $record);
+
+        self::showWidget($player);
+    }
+
+    private static function getTarget(Player $player)
+    {
+        $target = self::$targets->where('player', $player);
+        if ($target->isNotEmpty()) {
+            return $target->first()->record;
+        }
+
         $map = MapController::getCurrentMap();
 
-        $pb = $map->locals()->wherePlayer($player->id)->get()->first();
-
+        $local = $map->locals()->wherePlayer($player->id)->get()->first();
         $dedi = $map->dedis()->wherePlayer($player->id)->get()->first();
 
-        if ($pb) {
-            if ($dedi && $dedi->Score < $pb->Score && $dedi->Checkpoints) {
-                $pb = $dedi;
+        if ($local && $dedi) {
+            if ($dedi->Score <= $local->Score) {
+                return $dedi;
             }
-        } else {
-            if ($dedi) {
-                $pb = $dedi;
-            }
+
+            return $local;
         }
 
-        if ($pb) {
-            return explode(',', $pb->Checkpoints);
+        if ($dedi) {
+            return $dedi;
         }
 
-        $pb = $map->dedis()->orderByDesc('Score')->get()->first();
-
-        if($pb && isset($pb->Checkpoints)){
-            return explode(',', $pb->Checkpoints);
-        }
-
-        return null;
+        return $local;
     }
 }

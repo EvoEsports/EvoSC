@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="pbrecords" version="3">
-<frame scale="0.7" pos="0 -72">
+<frame scale="0.7" pos="0 -70">
 
 
     {if count($times)}
@@ -27,6 +27,7 @@
     </frame>
     {/foreach}
     {/if}
+    <label z-index="1" pos="0 -3" size="40 4" halign="center" textsize=".9" text="{$target}" opacity="0.6" />
 
 </frame>
 </manialink>

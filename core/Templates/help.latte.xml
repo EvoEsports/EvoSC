@@ -9,7 +9,7 @@
     {/if}
 
     <label pos="0 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$command->trigger}{$command->command}"/>
-    <label pos="65 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$command->description}"/>
+    <label pos="65 0" z-index="0" size="100 5" textsize="1" valign="center" text="{$command->description}"/>
 </frame>
 {/foreach}
 {/if}
