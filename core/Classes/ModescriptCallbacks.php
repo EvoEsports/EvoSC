@@ -11,10 +11,9 @@ class ModescriptCallbacks
 {
     static function tmScores($arguments)
     {
-        foreach ($arguments as $playerJson) {
-            $player = json_decode($playerJson);
-            var_dump($player);
-        }
+//        foreach ($arguments as $playerJson) {
+//            $player = json_decode($playerJson);
+//        }
     }
 
     static function tmGiveUp($arguments)
@@ -39,20 +38,20 @@ class ModescriptCallbacks
 
         $totalCps = $map->NbCheckpoints;
 
+        //checkpoint passed
+        HookController::fireHookBatch($playerCheckpointHooks,
+            $player,
+            $wayPoint->laptime,
+            ceil($wayPoint->checkpointinrace / $totalCps),
+            count($wayPoint->curlapcheckpoints) - 1
+        );
+
+        //player finished
         if ($wayPoint->isendlap) {
-            //finish
             HookController::fireHookBatch($playerFinishHooks,
                 $player,
                 $wayPoint->laptime,
                 self::cpArrayToString($wayPoint->curlapcheckpoints)
-            );
-        } else {
-            //checkpoint passed
-            HookController::fireHookBatch($playerCheckpointHooks,
-                $player,
-                $wayPoint->laptime,
-                ceil($wayPoint->checkpointinrace / $totalCps),
-                count($wayPoint->curlapcheckpoints) - 1
             );
         }
     }
