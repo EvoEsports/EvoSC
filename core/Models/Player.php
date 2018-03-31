@@ -126,11 +126,6 @@ class Player extends Model
 
     public function group()
     {
-        if($this->Group == null){
-            $this->Group = 3;
-            $this->save();
-        }
-
         return $this->hasOne(Group::class, 'id', 'Group');
     }
 
@@ -161,7 +156,7 @@ class Player extends Model
         $player = new Player();
         $player->Login = config('server.name');
         $player->NickName = config('server.name');
-        $player->group = Group::find(1);
+        $player->Group = Group::find(1);
         return $player;
     }
 }

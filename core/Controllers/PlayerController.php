@@ -112,7 +112,7 @@ class PlayerController
             }
 
             if (Player::where('Login', $info['Login'])->get()->isEmpty()) {
-                $player = Player::create(['Login' => $info['Login']]);
+                $player = Player::create(['Login' => $info['Login'], 'Group' => 3]);
             } else {
                 $player = Player::find($info['Login']);
             }
