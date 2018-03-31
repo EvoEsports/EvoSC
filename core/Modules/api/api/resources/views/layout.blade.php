@@ -2,6 +2,7 @@
 <head>
     <title>ESC Control panel</title>
     <link rel="stylesheet" href="{{mix('css/app.css')}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="{{asset('js/app.js')}}"></script>
 </head>
 <body>
