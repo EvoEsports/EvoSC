@@ -32,7 +32,7 @@
         }
 
         function fetchOnlinePlayers() {
-            $.get("http://127.0.0.1:5200/api/online", function (data) {
+            $.get("http://{{$_SERVER['SERVER_ADDR']}}:5200/api/online", function (data) {
                 app.players = JSON.parse(data);
             }).fail(function (data) {
                 console.log(data);
