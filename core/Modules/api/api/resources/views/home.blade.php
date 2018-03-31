@@ -32,7 +32,7 @@
         }
 
         function fetchOnlinePlayers() {
-            $.get("http://{{gethostbyname(gethostname())}}:5200/api/online", function (data) {
+            $.get("http://{{env('SERVER_ADDR')}}:5200/api/online", function (data) {
                 app.players = JSON.parse(data);
             }).fail(function (data) {
                 console.log(data);
