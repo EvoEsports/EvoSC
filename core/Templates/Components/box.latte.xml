@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="{$id}" version="3">
+    <frame pos="{$x} {$y}" scale="{$scale ?? 1}">
+        <quad pos="0 0" z-index="-1" size="{$width ?? 50} {$height ?? 60}" bgcolor="000a" action="{$action ?? ''}" />
+        <label pos="2 -3" z-index="1" size="48 3" text="{$title ?? '#'.$id}" textsize=".8" valign="center"/>
+        <quad pos="0 -6" z-index="1" size="50 0.2" bgcolor="18fc"/>
+        <quad pos="0 0" z-index="0" size="50 6" bgcolor="18f2"/>
+        <frame z-index="2" pos="0 -9">{$content|noescape}</frame>
+    </frame>
+</manialink>

@@ -3,6 +3,8 @@
 namespace esc\Classes;
 
 
+use esc\Controllers\ChatController;
+
 class Config
 {
     private static $configs = [];
@@ -12,17 +14,17 @@ class Config
         $variableExplode = explode('.', $variable);
         $config = array_shift($variableExplode);
 
-        if(!array_key_exists($config, self::$configs)){
+        if (!array_key_exists($config, self::$configs)) {
             Log::error("Trying to access unloaded config: $variable");
             return null;
         }
 
         $out = self::$configs[$config];
-        foreach($variableExplode as $variable){
-            if(isset($out->{$variable})){
+        foreach ($variableExplode as $variable) {
+            if (isset($out->{$variable})) {
                 $out = $out->{$variable};
-            }else{
-                Log::error("Trying to access undefined: " . implode('.', $variableExplode));
+            } else {
+//                Log::error("Trying to access undefined: " . implode('.', $variableExplode));
                 return null;
             }
         }
@@ -33,7 +35,7 @@ class Config
     /**
      * Loads all configuration files in config dir
      */
-    public static function loadConfigFiles()
+    public static function loadConfigFiles(...$args)
     {
         foreach (array_diff(scandir('config'), array('..', '.', '.gitignore', 'default')) as $configFile) {
             try {
@@ -63,6 +65,10 @@ class Config
             self::$configs[$json->module] = $json;
 
             Log::info("Config ($json->module) loaded.");
+        }
+
+        if(count($args)){
+            ChatController::messageAll(warning('Config files reloaded'));
         }
     }
 }

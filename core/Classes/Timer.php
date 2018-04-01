@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 class Timer
 {
-    private static $interval = 10; //one tick each X milliseconds
+    private static $interval = 20; //one tick each X milliseconds
     private static $uStart;
     private static $timers;
 

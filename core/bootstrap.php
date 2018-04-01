@@ -10,7 +10,7 @@ $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
 
-if(config('music.enable-internal-server', false) == true){
+if (config('music.enable-internal-server', false) == true) {
     \esc\Classes\Log::info("Starting music server...");
 
     $phpBinaryFinder = new Symfony\Component\Process\PhpExecutableFinder();
@@ -37,10 +37,10 @@ function startEsc()
 
         esc\Classes\Server::getStatus();
 
-        if(!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()){
+        if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
             \esc\Classes\Server::autoSaveValidationReplays(true);
         }
-        if(!\esc\Classes\Server::isAutoSaveReplaysEnabled()){
+        if (!\esc\Classes\Server::isAutoSaveReplaysEnabled()) {
             \esc\Classes\Server::autoSaveReplays(true);
         }
 
@@ -67,7 +67,11 @@ function startEsc()
     \esc\Classes\Template::add('esc.ranking', \esc\Classes\File::get(__DIR__ . '/Templates/Components/ranking.latte.xml'));
     \esc\Classes\Template::add('esc.modal', \esc\Classes\File::get(__DIR__ . '/Templates/Components/modal.latte.xml'));
     \esc\Classes\Template::add('esc.pagination', \esc\Classes\File::get(__DIR__ . '/Templates/Components/pagination.latte.xml'));
+    \esc\Classes\Template::add('esc.box2', \esc\Classes\File::get(__DIR__ . '/Templates/Components/box.latte.xml'));
+    \esc\Classes\Template::add('esc.stat-list', \esc\Classes\File::get(__DIR__ . '/Templates/Components/stat-list.latte.xml'));
     \esc\Classes\Template::add('blank', \esc\Classes\File::get(__DIR__ . '/Templates/blank.latte.xml'));
+
+    \esc\Controllers\ChatController::addCommand('config', 'esc\Classes\Config::loadConfigFiles', 'Reload config', '//', 'ban');
 
     $settings = \esc\Classes\Server::getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
@@ -87,6 +91,8 @@ function cycle()
 {
     esc\Classes\Timer::startCycle();
     esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+    \esc\Classes\Template::add('esc.box2', \esc\Classes\File::get(__DIR__ . '/Templates/Components/box.latte.xml'));
+    \esc\Classes\Template::add('esc.stat-list', \esc\Classes\File::get(__DIR__ . '/Templates/Components/stat-list.latte.xml'));
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
 

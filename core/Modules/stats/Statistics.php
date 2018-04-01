@@ -2,6 +2,7 @@
 
 use esc\Classes\Database;
 use esc\Classes\Hook;
+use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -23,8 +24,66 @@ class Statistics
         Hook::add('PlayerLocal', 'Statistics::playerLocal');
         Hook::add('PlayerDonate', 'Statistics::playerDonate');
         Hook::add('EndMatch', 'Statistics::endMatch');
+        Hook::add('PlayerStartCountdown', 'Statistics::playerStartCountdown');
 
         Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m');
+    }
+
+    public static function displayStats(Player $player)
+    {
+        $statsConfig = config('ui.stats');
+
+        $visitsConfig = $statsConfig->visits;
+        $showMostVisits = $visitsConfig->show;
+        $mostVisitsValues = Stats::orderByDesc('Visits')->take($showMostVisits)->get();
+        $mostVisits = Template::toString('esc.stat-list', [
+            'width' => $visitsConfig->width,
+            'values' => $mostVisitsValues,
+            'value_func' => function (Stats $stats) {
+                return $stats->Visits;
+            }
+        ]);
+        $mostVisitsHeight = $showMostVisits * 4.2 + 8;
+
+        Template::show($player, 'esc.box2', [
+            'id' => 'stats_visits',
+            'title' => 'Top visitors',
+            'x' => $visitsConfig->pos->x,
+            'y' => $visitsConfig->pos->y,
+            'scale' => $visitsConfig->scale,
+            'width' => $visitsConfig->width,
+            'height' => $mostVisitsHeight,
+            'content' => $mostVisits
+        ]);
+
+        $playtimeConfig = $statsConfig->playtime;
+        $showMostPlayed = $playtimeConfig->show;
+        $mostPlayedValues = Stats::orderByDesc('Playtime')->take($showMostPlayed)->get();
+        $mostPlayed = Template::toString('esc.stat-list', [
+            'width' => $playtimeConfig->width,
+            'values' => $mostPlayedValues,
+            'value_func' => function (Stats $stats) {
+                $hours = $stats->Playtime / 60;
+                return ($hours >= 1 ? round($hours, 1) . 'h' : $stats->Playtime . 'min');
+            }
+        ]);
+        $mostPlayedHeight = $showMostPlayed * 4.2 + 8;
+
+        Template::show($player, 'esc.box2', [
+            'id' => 'stats_playtime',
+            'title' => 'Most played',
+            'x' => $playtimeConfig->pos->x,
+            'y' => $playtimeConfig->pos->y,
+            'scale' => $playtimeConfig->scale,
+            'width' => $playtimeConfig->width,
+            'height' => $mostPlayedHeight,
+            'content' => $mostPlayed
+        ]);
+    }
+
+    public static function playerStartCountdown(Player $player)
+    {
+        self::displayStats($player);
     }
 
     /**
