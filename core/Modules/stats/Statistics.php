@@ -4,6 +4,7 @@ use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Controllers\ChatController;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -24,7 +25,9 @@ class Statistics
         Hook::add('PlayerLocal', 'Statistics::playerLocal');
         Hook::add('PlayerDonate', 'Statistics::playerDonate');
         Hook::add('EndMatch', 'Statistics::endMatch');
-        Hook::add('PlayerStartCountdown', 'Statistics::playerStartCountdown');
+
+        Hook::add('ShowScores', 'Statistics::showScores');
+        Hook::add('BeginMap', 'Statistics::endMap');
 
         Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m');
     }
@@ -40,7 +43,7 @@ class Statistics
         $height = $config->show * 4.2 + 8;
 
         Template::show($player, 'esc.box2', [
-            'id' => $title,
+            'id' => str_slug($title),
             'title' => $title,
             'x' => $config->pos->x,
             'y' => $config->pos->y,
@@ -51,7 +54,7 @@ class Statistics
         ]);
     }
 
-    public static function displayStats(Player $player)
+    public static function showStats(Player $player)
     {
         $statsConfig = config('ui.stats');
 
@@ -85,11 +88,53 @@ class Statistics
                 return $stats->Finishes;
             }
         );
+
+        $mostRecords = Stats::orderByDesc('Locals')->take($statsConfig->records->show)->get();
+        self::displayStatsWidget($player,
+            $mostRecords,
+            'Most records',
+            $statsConfig->records,
+            function (Stats $stats) {
+                return $stats->Locals;
+            }
+        );
+
+        $topWinners = Stats::orderByDesc('Wins')->take($statsConfig->winner->show)->get();
+        self::displayStatsWidget($player,
+            $topWinners,
+            'Top winners',
+            $statsConfig->winner,
+            function (Stats $stats) {
+                return $stats->Wins;
+            }
+        );
+
+        $topVoters = Stats::orderByDesc('Ratings')->take($statsConfig->voter->show)->get();
+        self::displayStatsWidget($player,
+            $topVoters,
+            'Top voters',
+            $statsConfig->voter,
+            function (Stats $stats) {
+                return $stats->Ratings;
+            }
+        );
     }
 
-    public static function playerStartCountdown(Player $player)
+    public static function showScores(...$args)
     {
-        self::displayStats($player);
+        foreach (onlinePlayers() as $player) {
+            self::showStats($player);
+        }
+    }
+
+    public static function endMap(...$args)
+    {
+        Template::hideAll('top-visitors');
+        Template::hideAll('most-played');
+        Template::hideAll('most-finishes');
+        Template::hideAll('most-records');
+        Template::hideAll('top-winners');
+        Template::hideAll('top-voters');
     }
 
     /**
@@ -134,7 +179,7 @@ class Statistics
      */
     public static function playerLocal(Player $player, LocalRecord $local)
     {
-        $player->Locals = $player->locals()->count();
+        $player->Locals = $player->locals->count();
         $player->save();
     }
 
@@ -159,6 +204,7 @@ class Statistics
 
         if ($bestPlayer) {
             $bestPlayer->stats()->increment('Wins');
+            ChatController::messageAll($bestPlayer, ' won this round');
         }
     }
 

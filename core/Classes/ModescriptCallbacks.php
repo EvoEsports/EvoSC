@@ -11,9 +11,8 @@ class ModescriptCallbacks
 {
     static function tmScores($arguments)
     {
-//        foreach ($arguments as $playerJson) {
-//            $player = json_decode($playerJson);
-//        }
+        $showScoresHooks = HookController::getHooks('ShowScores');
+        HookController::fireHookBatch($showScoresHooks, $arguments);
     }
 
     static function tmGiveUp($arguments)

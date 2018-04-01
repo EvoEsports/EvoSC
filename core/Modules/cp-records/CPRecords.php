@@ -18,7 +18,7 @@ class CPRecords
 
         Template::add('cpr.record', File::get(__DIR__ . '/Templates/cp-record.latte.xml'));
 
-        Hook::add('EndMatch', 'CPRecords::clearCheckpoints');
+        Hook::add('ShowScores', 'CPRecords::clearCheckpoints');
         Hook::add('PlayerCheckpoint', 'CPRecords::playerCheckpoint');
         Hook::add('PlayerConnect', 'CPRecords::playerConnect');
     }
