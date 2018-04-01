@@ -331,7 +331,8 @@ class Dedimania extends DedimaniaApi
             'id' => 'DediRecordsOverview',
             'width' => 180,
             'height' => 97,
-            'content' => implode('', $columns ?? [])
+            'content' => implode('', $columns ?? []),
+            'showAnimation' => true
         ]);
     }
 

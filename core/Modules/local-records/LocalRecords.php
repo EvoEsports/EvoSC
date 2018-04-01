@@ -163,7 +163,8 @@ class LocalRecords
             'id' => 'LocalRecordsOverview',
             'width' => 180,
             'height' => 97,
-            'content' => implode('', $columns)
+            'content' => implode('', $columns),
+            'showAnimation' => true
         ]);
     }
 

@@ -129,16 +129,11 @@ class MusicServer
      * @param Player $player
      * @param int $page
      */
-    public static function displayMusicMenu(Player $player, $page = 1)
+    public static function displayMusicMenu(Player $player, $page = null)
     {
-        $page = (int)$page;
-        if ($page == 0) {
-            $page = 1;
-        }
-
         $perPage = 19;
         $songsCount = self::$music->count();
-        $songs = self::$music->sortBy('title')->forPage($page, $perPage);
+        $songs = self::$music->sortBy('title')->forPage($page ?? 0, $perPage);
 
         $queue = self::$songQueue->sortBy('time')->take(9);
 
@@ -150,7 +145,8 @@ class MusicServer
             'width' => 180,
             'height' => 97,
             'content' => $music,
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'showAnimation' => isset($page) ? false : true
         ]);
     }
 

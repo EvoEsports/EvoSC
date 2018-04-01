@@ -106,17 +106,17 @@ class Player extends Model
      */
     public function locals()
     {
-        return $this->hasMany(LocalRecord::class, 'id', 'Player');
+        return $this->hasMany(LocalRecord::class, 'Player', 'id');
     }
 
     public function dedis()
     {
-        return $this->hasMany(Dedi::class, 'id', 'Player');
+        return $this->hasMany(Dedi::class, 'Player', 'id');
     }
 
     public function ratings()
     {
-        return $this->hasMany(MxKarma::class, 'id', 'Player');
+        return $this->hasMany(MxKarma::class, 'Player', 'id');
     }
 
     public function stats()

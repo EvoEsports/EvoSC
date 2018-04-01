@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{$id}" version="3">
-    <frame pos="0 0" scale="1" id="main-frame">
+    <frame pos="0 0" scale="{$showAnimation ? 1 : 0.95}" id="main-frame">
         <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="0006"/>
         <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="18f6"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="18f2"/>
@@ -10,20 +10,22 @@
         <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
 
 
+        {if $showAnimation}
         <script><!--
-    main() {
-        declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-        declare Real startScale = frame.Scale;
-        declare Real curScale = 1.0;
-        declare Real targetScale = 0.95;
+            main() {
+            declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+            declare Real startScale = frame.Scale;
+            declare Real curScale = 1.0;
+            declare Real targetScale = 0.95;
 
-        while(curScale > targetScale){
+            while(curScale > targetScale){
             yield;
             curScale = curScale - 0.01;
             frame.Scale = curScale;
-        }
-    }
-    --></script>
+            }
+            }
+        --></script>
+        {/if}
 
         {if isset($pagination)}
         <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">

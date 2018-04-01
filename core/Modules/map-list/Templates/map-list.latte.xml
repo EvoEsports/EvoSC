@@ -11,22 +11,18 @@
 {/if}
 
 {if isset($maps)}
-{foreach $maps as $map}
+{foreach $maps as $mapId => $map}
 <frame pos="0 -{3 + $iterator->counter * 3.2}">
-    <label pos="-1 0" z-index="-2" size="138 3" valign="center" action="maplist.queue,{$map->id}"/>
+    <label pos="-1 0" z-index="-2" size="138 3" valign="center" action="maplist.queue,{$mapId}"/>
     <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripStyle($map->Name ?: '')}"/>
     <label pos="64 0" z-index="-1" size="30 3" textsize="1" valign="center" action="maplist.filter.author,{$map->Author}"/>
     <label pos="65 0" z-index="0" size="28 3" textsize="1" valign="center" text="{stripStyle(stripColors($map->author ? $map->author->NickName : ($map->Author ?? '')))}"/>
 
-    {if $map->locals->where('Player', $player->id)->isNotEmpty()}
-    <label pos="105 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{$map->locals->where('Player', $player->id)->first()->Rank}."/>
-    {/if}
-    {if $map->dedis->where('Player', $player->id)->isNotEmpty()}
-    <label pos="120 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{$map->dedis->where('Player', $player->id)->first()->Rank}."/>
-    {/if}
+    <label pos="105 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{isset($locals[$mapId]) ? $locals[$mapId]->Rank.'.' : '-'}"/>
+    <label pos="120 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{isset($dedis[$mapId]) ? $dedis[$mapId]->Rank.'.' : '-'}"/>
 
     {if $player->isAdmin()}
-    <label pos="-8 0" z-index="-3" size="145 3" textsize="1" text="" valign="center" halign="left" textcolor="f11a" action="maplist.delete,{$map->id}"/>
+    <label pos="-8 0" z-index="-3" size="145 3" textsize="1" text="" valign="center" halign="left" textcolor="f11a" action="maplist.delete,{$mapId}"/>
     {/if}
 </frame>
 {/foreach}

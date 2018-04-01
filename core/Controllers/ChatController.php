@@ -175,7 +175,7 @@ $$: Writes a dollarsign
             }
             array_push($triggers, $escapedTrigger . $cmd->command);
         }
-        $chatCommandPattern .= implode('|', $triggers) . ')/';
+        $chatCommandPattern .= implode('|', $triggers) . ')/i';
         self::$pattern = $chatCommandPattern;
 
         Log::info("Chat command added: $trigger$command -> $callback", false);

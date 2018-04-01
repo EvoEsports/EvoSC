@@ -108,6 +108,11 @@ function getEscVersion(): string
     return $escVersion;
 }
 
+function maps()
+{
+    return \esc\Models\Map::all();
+}
+
 function getMapInfoFromFile(string $fileName)
 {
     $mps = config('server.mps');

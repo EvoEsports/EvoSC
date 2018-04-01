@@ -7,6 +7,7 @@ use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Models\Map;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class MapList
 {
@@ -27,45 +28,92 @@ class MapList
         self::showMapList($player, 1, $filter);
     }
 
-    public static function showMapList(Player $player, $page = 1, $filter = null)
+    private static function getRecordsForPlayer(Player $player): Collection
     {
-        $page = (int)$page;
+        $records = collect([])
+            ->concat($player->locals)
+            ->concat($player->dedis);
 
-        $perPage = 23;
+        return $records;
+    }
 
-        $allMaps = Map::all();
+    private static function getRecordsForMapsAndPlayer($maps, Player $player): ?array
+    {
+        $mapIds = array_keys($maps);
 
-        if ($filter) {
-            if ($filter == 'worst') {
-                $worstLocals = $player->locals()->orderByDesc('Rank')->get();
-                $allMaps = collect([]);
-                foreach ($worstLocals as $local) {
-                    $allMaps->push($local->map);
-                }
-            } elseif ($filter == 'best') {
-                $worstLocals = $player->locals()->orderBy('Rank')->get();
-                $allMaps = collect([]);
-                foreach ($worstLocals as $local) {
-                    $allMaps->push($local->map);
-                }
-            } elseif ($filter == 'nofinish') {
-                $allMaps = $allMaps->filter(function (Map $map) use ($player) {
-                    return (!$map->locals()->wherePlayer($player->id)->get()->first() && !$map->dedis()->wherePlayer($player->id)->get()->first());
-                });
-            } else {
-                $allMaps = $allMaps->filter(function (Map $map) use ($filter) {
-                    $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
-                    return (is_int($nameMatch) || $map->Author == $filter);
-                });
-            }
+        try{
+            $records = [
+                'locals' => LocalRecord::whereIn('Map', $mapIds)->wherePlayer($player->id)->get()->keyBy('Map')->all(),
+                'dedis' => Dedi::whereIn('Map', $mapIds)->wherePlayer($player->id)->get()->keyBy('Map')->all()
+            ];
+        }catch(\Exception $e){
+            \esc\Classes\Log::error('Failed to load records for player ' . $player->Login . "\n" . $e->getTrace());
+            return null;
         }
 
-        $pages = ceil($allMaps->count() / $perPage);
+        return $records;
+    }
 
-        $maps = $allMaps->forPage($page, $perPage);
+    public static function showMapList(Player $player, $page = null, $filter = null)
+    {
+        $perPage = 23;
+
+        if ($filter) {
+
+            if ($filter == 'worst') {
+
+                $mapIds = self::getRecordsForPlayer($player)
+                    ->sortByDesc('Rank')
+                    ->pluck('map.id')
+                    ->toArray();
+
+            } elseif ($filter == 'best') {
+
+                $mapIds = self::getRecordsForPlayer($player)
+                    ->sortBy('Rank')
+                    ->pluck('map.id')
+                    ->toArray();
+
+            } elseif ($filter == 'nofinish') {
+
+                $records = self::getRecordsForPlayer($player)
+                    ->pluck('map.id')
+                    ->toArray();
+
+                $mapIds = Map::whereNotIn('id', $records)
+                    ->pluck('id')
+                    ->toArray();
+
+            } else {
+
+                $mapIds = maps()
+                    ->filter(function (Map $map) use ($filter) {
+                        $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
+                        return (is_int($nameMatch) || $map->Author == $filter);
+                    })
+                    ->pluck('map.id')
+                    ->toArray();
+
+            }
+
+        } else {
+
+            $mapIds = maps()
+                ->pluck('id')
+                ->toArray();
+
+        }
+
+        $pages = ceil(Map::count() / $perPage);
+
+        $maps = Map::whereIn('id', $mapIds)->get();
+        $maps = $maps->forPage($page ?? 0, $perPage)->keyBy('id')->all();
+
+        $records = self::getRecordsForMapsAndPlayer($maps, $player);
+
         $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
 
-        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps]);
+        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps, 'locals' => $records['locals'], 'dedis' => $records['dedis']]);
         $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show', 'page' => $page]);
 
         Template::show($player, 'esc.modal', [
@@ -73,7 +121,8 @@ class MapList
             'width' => 180,
             'height' => 97,
             'content' => $mapList,
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'showAnimation' => isset($page) ? false : true
         ]);
     }
 
