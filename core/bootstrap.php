@@ -91,8 +91,6 @@ function cycle()
 {
     esc\Classes\Timer::startCycle();
     esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-    \esc\Classes\Template::add('esc.box2', \esc\Classes\File::get(__DIR__ . '/Templates/Components/box.latte.xml'));
-    \esc\Classes\Template::add('esc.stat-list', \esc\Classes\File::get(__DIR__ . '/Templates/Components/stat-list.latte.xml'));
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
 
