@@ -29,56 +29,62 @@ class Statistics
         Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m');
     }
 
+    private static function displayStatsWidget(Player $player, $values, $title, $config, $value_function)
+    {
+        $content = Template::toString('esc.stat-list', [
+            'width' => $config->width,
+            'values' => $values,
+            'value_func' => $value_function
+        ]);
+
+        $height = $config->show * 4.2 + 8;
+
+        Template::show($player, 'esc.box2', [
+            'id' => $title,
+            'title' => $title,
+            'x' => $config->pos->x,
+            'y' => $config->pos->y,
+            'scale' => $config->scale,
+            'width' => $config->width,
+            'height' => $height,
+            'content' => $content
+        ]);
+    }
+
     public static function displayStats(Player $player)
     {
         $statsConfig = config('ui.stats');
 
-        $visitsConfig = $statsConfig->visits;
-        $showMostVisits = $visitsConfig->show;
-        $mostVisitsValues = Stats::orderByDesc('Visits')->take($showMostVisits)->get();
-        $mostVisits = Template::toString('esc.stat-list', [
-            'width' => $visitsConfig->width,
-            'values' => $mostVisitsValues,
-            'value_func' => function (Stats $stats) {
+        $mostVisits = Stats::orderByDesc('Visits')->take($statsConfig->visits->show)->get();
+        self::displayStatsWidget($player,
+            $mostVisits,
+            'Top visitors',
+            $statsConfig->visits,
+            function (Stats $stats) {
                 return $stats->Visits;
             }
-        ]);
-        $mostVisitsHeight = $showMostVisits * 4.2 + 8;
+        );
 
-        Template::show($player, 'esc.box2', [
-            'id' => 'stats_visits',
-            'title' => 'Top visitors',
-            'x' => $visitsConfig->pos->x,
-            'y' => $visitsConfig->pos->y,
-            'scale' => $visitsConfig->scale,
-            'width' => $visitsConfig->width,
-            'height' => $mostVisitsHeight,
-            'content' => $mostVisits
-        ]);
-
-        $playtimeConfig = $statsConfig->playtime;
-        $showMostPlayed = $playtimeConfig->show;
-        $mostPlayedValues = Stats::orderByDesc('Playtime')->take($showMostPlayed)->get();
-        $mostPlayed = Template::toString('esc.stat-list', [
-            'width' => $playtimeConfig->width,
-            'values' => $mostPlayedValues,
-            'value_func' => function (Stats $stats) {
+        $mostPlayed = Stats::orderByDesc('Playtime')->take($statsConfig->playtime->show)->get();
+        self::displayStatsWidget($player,
+            $mostPlayed,
+            'Most played',
+            $statsConfig->playtime,
+            function (Stats $stats) {
                 $hours = $stats->Playtime / 60;
                 return ($hours >= 1 ? round($hours, 1) . 'h' : $stats->Playtime . 'min');
             }
-        ]);
-        $mostPlayedHeight = $showMostPlayed * 4.2 + 8;
+        );
 
-        Template::show($player, 'esc.box2', [
-            'id' => 'stats_playtime',
-            'title' => 'Most played',
-            'x' => $playtimeConfig->pos->x,
-            'y' => $playtimeConfig->pos->y,
-            'scale' => $playtimeConfig->scale,
-            'width' => $playtimeConfig->width,
-            'height' => $mostPlayedHeight,
-            'content' => $mostPlayed
-        ]);
+        $mostFinished = Stats::orderByDesc('Finishes')->take($statsConfig->finish->show)->get();
+        self::displayStatsWidget($player,
+            $mostFinished,
+            'Most finishes',
+            $statsConfig->finish,
+            function (Stats $stats) {
+                return $stats->Finishes;
+            }
+        );
     }
 
     public static function playerStartCountdown(Player $player)
