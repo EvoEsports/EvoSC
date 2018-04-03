@@ -14,6 +14,7 @@ while (true) {
         startEsc();
 
         loadModulesFrom(__DIR__ . '/core/Modules');
+        loadModulesFrom(__DIR__ . '/Modules');
 
         beginMap();
 
