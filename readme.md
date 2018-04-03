@@ -59,7 +59,7 @@ class MyModule
         
         //Add a template
         \esc\Classes\Template::add('cpr.record', \esc\Classes\File::get(__DIR__ . '/Templates/my-template.latte.xml'));
-        //please name your files .latte.xml, latte template engine was used, it is a convention to name the files that way
+        //please name your files .latte.xml, latte template engine is used, it is a convention to name the files that way
     }
     
     public static function callbackFunc()
