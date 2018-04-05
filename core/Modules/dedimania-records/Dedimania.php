@@ -102,11 +102,7 @@ class Dedimania extends DedimaniaApi
 
     public static function printMaxRank(Player $player, ...$args)
     {
-        if ($player->MaxRank) {
-            ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank(), ' as you are dedimania premium you can go up to ', $player->MaxRank);
-        } else {
-            ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank());
-        }
+        ChatController::message($player, 'Dedimania is unlocked up to rank ', $player->MaxRank ?? self::getMaxRank());
     }
 
     public static function beginMap(Map $map)
