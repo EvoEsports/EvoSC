@@ -52,6 +52,7 @@ class Dedimania extends DedimaniaApi
             $table->integer('Score');
             $table->integer('Rank');
             $table->text('Checkpoints')->nullable();
+            $table->boolean('New')->default(false);
         });
 
         Database::create('dedi-sessions', function (Blueprint $table) {
@@ -122,11 +123,11 @@ class Dedimania extends DedimaniaApi
                     $player->update(['NickName' => $nickname]);
 
                     Dedi::create([
-                        'Map' => $map->id,
-                        'Player' => $player->id,
-                        'Score' => $score,
-                        'Rank' => $rank,
-                        'Checkpoints' => $checkpoints
+                        'Map'         => $map->id,
+                        'Player'      => $player->id,
+                        'Score'       => $score,
+                        'Rank'        => $rank,
+                        'Checkpoints' => $checkpoints,
                     ]);
                 }
             }
@@ -138,9 +139,11 @@ class Dedimania extends DedimaniaApi
                     Log::logAddLine('Dedimania', 'Session expired, generating new.');
                     $session->update(['Expired' => true]);
                     self::beginMap($map);
+
                     return;
                 } else {
                     Log::logAddLine('! Dedimania !', $message);
+
                     return;
                 }
             }
@@ -198,6 +201,7 @@ class Dedimania extends DedimaniaApi
 
         if (isset($saved) && !$saved) {
             Log::error('Saving top 1 dedi failed');
+
             return;
         } else {
             $dedi->ghostReplayFile = $ghostFile;
@@ -212,8 +216,9 @@ class Dedimania extends DedimaniaApi
 
     /**
      * called on playerFinish
+     *
      * @param Player $player
-     * @param int $score
+     * @param int    $score
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -229,6 +234,7 @@ class Dedimania extends DedimaniaApi
         if ($dedi != null) {
             if ($score == $dedi->Score) {
                 ChatController::messageAll('Player ', $player, ' equaled his/her ', $dedi);
+
                 return;
             }
 
@@ -241,9 +247,11 @@ class Dedimania extends DedimaniaApi
 
                 if ($dedi->Rank <= self::$maxRank) {
                     if ($oldRank == $dedi->Rank) {
-                        ChatController::messageAll('Player ', $player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')');
+                        ChatController::messageAll('Player ', $player, ' secured his/her ', $dedi,
+                            ' (-' . formatScore($diff) . ')');
                     } else {
-                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
+                        ChatController::messageAll('Player ', $player, ' gained the ', $dedi,
+                            ' (-' . formatScore($diff) . ')');
                     }
                     self::addNewTime($dedi);
                 }
@@ -251,11 +259,11 @@ class Dedimania extends DedimaniaApi
         } else {
             if ($dedisCount < 100) {
                 $map->dedis()->create([
-                    'Player' => $player->id,
-                    'Map' => $map->id,
-                    'Score' => $score,
-                    'Rank' => 999,
-                    'Checkpoints' => $checkpoints
+                    'Player'      => $player->id,
+                    'Map'         => $map->id,
+                    'Score'       => $score,
+                    'Rank'        => 999,
+                    'Checkpoints' => $checkpoints,
                 ]);
 
                 $dedi = self::fixDedimaniaRanks($map, $player);
@@ -286,8 +294,10 @@ class Dedimania extends DedimaniaApi
 
     /**
      * Get insert position
+     *
      * @param Map $map
      * @param int $score
+     *
      * @return int|null
      */
     private static function getRank(Map $map, int $score): ?int
@@ -303,6 +313,7 @@ class Dedimania extends DedimaniaApi
 
     /**
      * Push down worse ranks
+     *
      * @param Map $map
      * @param int $startRank
      */
@@ -313,6 +324,7 @@ class Dedimania extends DedimaniaApi
 
     /**
      * Display all dedis in window
+     *
      * @param Player $player
      */
     public static function showDedisModal(Player $player)
@@ -328,16 +340,17 @@ class Dedimania extends DedimaniaApi
         }
 
         Template::show($player, 'esc.modal', [
-            'id' => 'DediRecordsOverview',
-            'width' => 180,
-            'height' => 97,
-            'content' => implode('', $columns ?? []),
-            'showAnimation' => true
+            'id'            => 'DediRecordsOverview',
+            'width'         => 180,
+            'height'        => 97,
+            'content'       => implode('', $columns ?? []),
+            'showAnimation' => true,
         ]);
     }
 
     /**
      * Show the dedi widget
+     *
      * @param Player|null $player
      */
     public static function displayDedis(Player $player = null)
@@ -382,14 +395,14 @@ class Dedimania extends DedimaniaApi
         $result = $dedis->concat($topDedis)->sortBy('Score');
 
         $variables = [
-            'id' => 'Dedimania',
-            'title' => '🏆  DEDIMANIA',
-            'x' => config('ui.dedis.x'),
-            'y' => config('ui.dedis.y'),
-            'rows' => $rows,
-            'scale' => config('ui.dedis.scale'),
+            'id'      => 'Dedimania',
+            'title'   => '🏆  DEDIMANIA',
+            'x'       => config('ui.dedis.x'),
+            'y'       => config('ui.dedis.y'),
+            'rows'    => $rows,
+            'scale'   => config('ui.dedis.scale'),
             'content' => Template::toString('dedis', ['dedis' => $result]),
-            'action' => 'dedis.show'
+            'action'  => 'dedis.show',
         ];
 
         if ($player) {

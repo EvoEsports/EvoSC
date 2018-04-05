@@ -43,6 +43,7 @@ class PlayerController
             $table->boolean('Online')->default(false);
             $table->integer('Afk')->default(0);
             $table->boolean('Spectator')->default(false);
+            $table->boolean('Premium')->default(false);
         });
     }
 
@@ -64,7 +65,8 @@ class PlayerController
         Log::info($player->NickName . " joined the server.");
 
         if (!$surpressJoinMessage) {
-            ChatController::messageAll($player->group ? $player->group->Name : 'Player', ' ', $player, ' joined the server');
+            ChatController::messageAll($player->group ? $player->group->Name : 'Player', ' ', $player,
+                ' joined the server');
         }
 
         self::displayPlayerlist();
@@ -138,8 +140,10 @@ class PlayerController
         $players = onlinePlayers()->where('Score', '>', 0)->sort(function (Player $a, Player $b) {
             if ($a->Score < $b->Score) {
                 return -1;
-            } else if ($a->Score > $b->Score) {
-                return 1;
+            } else {
+                if ($a->Score > $b->Score) {
+                    return 1;
+                }
             }
 
             return 0;
@@ -148,8 +152,10 @@ class PlayerController
         $playersNotFinished = onlinePlayers()->where('Score', '=', 0)->sort(function (Player $a, Player $b) {
             if ($a->Score < $b->Score) {
                 return -1;
-            } else if ($a->Score > $b->Score) {
-                return 1;
+            } else {
+                if ($a->Score > $b->Score) {
+                    return 1;
+                }
             }
 
             return 0;
@@ -161,13 +167,13 @@ class PlayerController
         }
 
         Template::showAll('esc.box', [
-            'id' => 'PlayerList',
-            'title' => '  LIVE RANKINGS',
-            'x' => config('ui.playerlist.x'),
-            'y' => config('ui.playerlist.y'),
-            'rows' => 13,
-            'scale' => config('ui.playerlist.scale'),
-            'content' => Template::toString('players', ['players' => $players->take(15)])
+            'id'      => 'PlayerList',
+            'title'   => '  LIVE RANKINGS',
+            'x'       => config('ui.playerlist.x'),
+            'y'       => config('ui.playerlist.y'),
+            'rows'    => 13,
+            'scale'   => config('ui.playerlist.scale'),
+            'content' => Template::toString('players', ['players' => $players->take(15)]),
         ]);
     }
 

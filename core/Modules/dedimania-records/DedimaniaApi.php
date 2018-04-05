@@ -229,9 +229,11 @@ class DedimaniaApi
 
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
-        foreach (self::$newTimes->sortBy('Score') as $dedi) {
+        $newDedis = Dedi::whereMap($map->id)->whereNew(true)->get();
+        foreach ($newDedis as $dedi) {
             if ($dedi->Rank > Dedimania::getMaxRank()) {
                 //Do not push dedis that wont get saved anyway (pay to unlock more)
+                //TODO: Check for premium users
                 continue;
             }
 
