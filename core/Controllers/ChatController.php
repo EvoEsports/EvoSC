@@ -198,6 +198,10 @@ $$: Writes a dollarsign
         $message = '$s';
 
         foreach ($parts as $part) {
+            if ($part == null) {
+                continue;
+            }
+
             if ($part instanceof Player) {
                 $message .= '$z$s$' . config('color.secondary');
                 $message .= $part->NickName;
