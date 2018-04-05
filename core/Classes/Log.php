@@ -36,7 +36,7 @@ class Log
         $line = sprintf("[%s] [%s] %s", $time, $prefix, $string);
         $line = stripAll($line);
 
-        if ($echo) {
+        if ($echo == true) {
             switch ($prefix) {
                 case 'Module':
                     self::writeLn($line);

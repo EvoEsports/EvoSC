@@ -9,6 +9,7 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Classes\Timer;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Models\Map;
@@ -33,6 +34,7 @@ class Dedimania extends DedimaniaApi
         Hook::add('BeginMap', 'Dedimania::beginMap');
         Hook::add('EndMatch', 'Dedimania::endMatch');
         Hook::add('PlayerConnect', 'Dedimania::displayDedis');
+        Hook::add('PlayerConnect', 'DedimaniaApi::playerConnect');
         Hook::add('PlayerFinish', 'Dedimania::playerFinish');
 
         Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
@@ -41,6 +43,21 @@ class Dedimania extends DedimaniaApi
 
         ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
         ChatController::addCommand('dedicps', 'Dedimania::printDediCps', 'SPrints cps for given dedi to chat');
+
+        Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
+    }
+
+    public static function reportConnectedPlayersToDedimania()
+    {
+        $map = MapController::getCurrentMap();
+        $data = self::updateServerPlayers($map);
+
+        if ($data && !isset($data->params->param->value->boolean)) {
+            Log::logAddLine('[!] Dedimania', 'Failed to report connected players.');
+            var_dump($data);
+        }
+
+        Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
     }
 
     private function createTables()
@@ -85,7 +102,11 @@ class Dedimania extends DedimaniaApi
 
     public static function printMaxRank(Player $player, ...$args)
     {
-        ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank());
+        if ($player->MaxRank) {
+            ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank(), ' as you are dedimania premium you can go up to ', $player->MaxRank);
+        } else {
+            ChatController::message($player, 'Dedimania is unlocked up to rank ', self::getMaxRank());
+        }
     }
 
     public static function beginMap(Map $map)
@@ -123,11 +144,11 @@ class Dedimania extends DedimaniaApi
                     $player->update(['NickName' => $nickname]);
 
                     Dedi::create([
-                        'Map'         => $map->id,
-                        'Player'      => $player->id,
-                        'Score'       => $score,
-                        'Rank'        => $rank,
-                        'Checkpoints' => $checkpoints,
+                        'Map' => $map->id,
+                        'Player' => $player->id,
+                        'Score' => $score,
+                        'Rank' => $rank,
+                        'Checkpoints' => $checkpoints
                     ]);
                 }
             }
@@ -218,7 +239,7 @@ class Dedimania extends DedimaniaApi
      * called on playerFinish
      *
      * @param Player $player
-     * @param int    $score
+     * @param int $score
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -242,10 +263,10 @@ class Dedimania extends DedimaniaApi
 
             if ($score < $dedi->Score) {
                 $diff = $dedi->Score - $score;
-                $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints]);
+                $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
 
-                if ($dedi->Rank <= self::$maxRank) {
+                if ($dedi->Rank <= ($player->MaxRank ?? self::$maxRank)) {
                     if ($oldRank == $dedi->Rank) {
                         ChatController::messageAll('Player ', $player, ' secured his/her ', $dedi,
                             ' (-' . formatScore($diff) . ')');
@@ -259,16 +280,16 @@ class Dedimania extends DedimaniaApi
         } else {
             if ($dedisCount < 100) {
                 $map->dedis()->create([
-                    'Player'      => $player->id,
-                    'Map'         => $map->id,
-                    'Score'       => $score,
-                    'Rank'        => 999,
+                    'Player' => $player->id,
+                    'Map' => $map->id,
+                    'Score' => $score,
+                    'Rank' => 999,
                     'Checkpoints' => $checkpoints,
                 ]);
 
                 $dedi = self::fixDedimaniaRanks($map, $player);
 
-                if ($dedi->Rank <= self::$maxRank) {
+                if ($dedi->Rank <= ($player->MaxRank ?? self::$maxRank)) {
                     self::addNewTime($dedi);
                     ChatController::messageAll('Player ', $player, ' gained the ', $dedi);
                 }
@@ -340,10 +361,10 @@ class Dedimania extends DedimaniaApi
         }
 
         Template::show($player, 'esc.modal', [
-            'id'            => 'DediRecordsOverview',
-            'width'         => 180,
-            'height'        => 97,
-            'content'       => implode('', $columns ?? []),
+            'id' => 'DediRecordsOverview',
+            'width' => 180,
+            'height' => 97,
+            'content' => implode('', $columns ?? []),
             'showAnimation' => true,
         ]);
     }
@@ -395,14 +416,14 @@ class Dedimania extends DedimaniaApi
         $result = $dedis->concat($topDedis)->sortBy('Score');
 
         $variables = [
-            'id'      => 'Dedimania',
-            'title'   => '🏆  DEDIMANIA',
-            'x'       => config('ui.dedis.x'),
-            'y'       => config('ui.dedis.y'),
-            'rows'    => $rows,
-            'scale'   => config('ui.dedis.scale'),
+            'id' => 'Dedimania',
+            'title' => '🏆  DEDIMANIA',
+            'x' => config('ui.dedis.x'),
+            'y' => config('ui.dedis.y'),
+            'rows' => $rows,
+            'scale' => config('ui.dedis.scale'),
             'content' => Template::toString('dedis', ['dedis' => $result]),
-            'action'  => 'dedis.show',
+            'action' => 'dedis.show',
         ];
 
         if ($player) {

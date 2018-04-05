@@ -94,6 +94,14 @@ class HookController extends ModescriptCallbacks
                 self::tmStunt($arguments);
                 break;
 
+            case 'Trackmania.Event.OnPlayerAdded':
+                self::tmPlayerConnect($arguments);
+                break;
+
+            case 'Trackmania.Event.OnPlayerRemoved':
+                self::tmPlayerLeave($arguments);
+                break;
+
             default:
                 Log::logAddLine('ScriptCallback', "Calling unhandled $callback");
                 break;
@@ -147,14 +155,14 @@ class HookController extends ModescriptCallbacks
 
             case 'PlayerConnect':
                 //string Login, bool IsSpectator
-                if (Player::whereLogin($arguments[0])->get()->isEmpty()) {
-                    $player = Player::create(['Login' => $arguments[0]]);
-                } else {
-                    $player = Player::find($arguments[0]);
-                }
-
-                $player->spectator = $arguments[1];
-                self::fireHookBatch($hooks, $player);
+//                if (Player::whereLogin($arguments[0])->get()->isEmpty()) {
+//                    $player = Player::create(['Login' => $arguments[0]]);
+//                } else {
+//                    $player = Player::find($arguments[0]);
+//                }
+//
+//                $player->spectator = $arguments[1];
+//                self::fireHookBatch($hooks, $player);
                 break;
 
             case 'PlayerDisconnect':

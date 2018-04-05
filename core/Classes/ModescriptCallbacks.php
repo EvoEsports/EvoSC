@@ -76,6 +76,31 @@ class ModescriptCallbacks
         //ignore stunts for now
     }
 
+    static function tmPlayerConnect($arguments)
+    {
+        $playerData = json_decode($arguments[0]);
+        $playerConnectHooks = HookController::getHooks('PlayerConnect');
+
+        //string Login, bool IsSpectator
+        if (Player::whereLogin($playerData->login)->get()->isEmpty()) {
+            $player = Player::create(['Login' => $playerData->login]);
+        } else {
+            $player = Player::find($playerData->login);
+        }
+
+        HookController::fireHookBatch($playerConnectHooks, $player);
+    }
+
+    static function tmPlayerLeave($arguments)
+    {
+        $playerData = json_decode($arguments[0]);
+        $playerLeaveHooks = HookController::getHooks('PlayerLeave');
+
+        $player = Player::find($playerData->login);
+
+        HookController::fireHookBatch($playerLeaveHooks, $player);
+    }
+
     /**
      * Convert cp array to comma separated string
      * @param array $cps

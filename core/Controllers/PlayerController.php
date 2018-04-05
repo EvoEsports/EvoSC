@@ -43,7 +43,8 @@ class PlayerController
             $table->boolean('Online')->default(false);
             $table->integer('Afk')->default(0);
             $table->boolean('Spectator')->default(false);
-            $table->boolean('Premium')->default(false);
+            $table->integer('MaxRank')->default(15);
+            $table->boolean('Banned')->default(false);
         });
     }
 

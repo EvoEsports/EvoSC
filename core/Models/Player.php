@@ -12,7 +12,7 @@ use Stats;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'Spectator'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'Spectator', 'MaxRank', 'Banned'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
