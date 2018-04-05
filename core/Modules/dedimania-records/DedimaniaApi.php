@@ -17,15 +17,15 @@ class DedimaniaApi
     static function authenticateAndValidateAccount(): ?string
     {
         $response = Dedimania::callStruct('dedimania.OpenSession', [
-            'Game' => 'TM2',
-            'Login' => Config::get('dedimania.login'),
-            'Code' => Config::get('dedimania.key'),
-            'Tool' => 'EvoSC',
-            'Version' => getEscVersion(),
-            'Packmask' => 'Stadium',
+            'Game'          => 'TM2',
+            'Login'         => Config::get('dedimania.login'),
+            'Code'          => Config::get('dedimania.key'),
+            'Tool'          => 'EvoSC',
+            'Version'       => getEscVersion(),
+            'Packmask'      => 'Stadium',
             'ServerVersion' => Server::getVersion()->version,
-            'ServerBuild' => Server::getVersion()->build,
-            'Path' => Server::getDetailedPlayerInfo(Config::get('dedimania.login'))->path
+            'ServerBuild'   => Server::getVersion()->build,
+            'Path'          => Server::getDetailedPlayerInfo(Config::get('dedimania.login'))->path,
         ]);
 
         try {
@@ -38,8 +38,10 @@ class DedimaniaApi
     /**
      * Call a method on dedimania server
      * See documentation at http://dedimania.net:8082/Dedimania
-     * @param string $method
+     *
+     * @param string     $method
      * @param array|null $parameters
+     *
      * @return null|SimpleXMLElement
      */
     static function call(string $method, array $parameters = null): ?SimpleXMLElement
@@ -58,16 +60,17 @@ class DedimaniaApi
         }
 
         $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8',
-                'Accept-Encoding' => 'gzip'
+            'headers'        => [
+                'Content-Type'    => 'text/xml; charset=UTF8',
+                'Accept-Encoding' => 'gzip',
             ],
             'decode_content' => 'gzip',
-            'body' => $xml->asXML()
+            'body'           => $xml->asXML(),
         ]);
 
         if ($response->getStatusCode() != 200) {
             Log::error($response->getReasonPhrase());
+
             return null;
         }
 
@@ -76,6 +79,7 @@ class DedimaniaApi
 
     /**
      * Get dedimania session
+     *
      * @return DedimaniaSession|null
      */
     static function getSession(): ?DedimaniaSession
@@ -101,6 +105,7 @@ class DedimaniaApi
 
                         if ($sessionId == null) {
                             Log::warning("Connection to Dedimania failed.");
+
                             return null;
                         }
 
@@ -117,6 +122,7 @@ class DedimaniaApi
 
             if ($sessionId == null) {
                 Log::logAddLine('Dedimania', "Connection to Dedimania failed.");
+
                 return null;
             }
 
@@ -131,8 +137,10 @@ class DedimaniaApi
     /**
      * Call a method on dedimania server
      * See documentation at http://dedimania.net:8082/Dedimania
-     * @param string $method
+     *
+     * @param string     $method
      * @param array|null $parameters
+     *
      * @return null|SimpleXMLElement
      */
     static function callStruct(string $method, array $parameters = null): ?SimpleXMLElement
@@ -166,16 +174,17 @@ class DedimaniaApi
         }
 
         $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=UTF8',
-                'Accept-Encoding' => 'gzip'
+            'headers'        => [
+                'Content-Type'    => 'text/xml; charset=UTF8',
+                'Accept-Encoding' => 'gzip',
             ],
             'decode_content' => 'gzip',
-            'body' => $xml->asXML()
+            'body'           => $xml->asXML(),
         ]);
 
         if ($response->getStatusCode() != 200) {
             Log::error($response->getReasonPhrase());
+
             return null;
         }
 
@@ -185,6 +194,7 @@ class DedimaniaApi
             return new SimpleXMLElement($content);
         } catch (\Exception $e) {
             Log::error("Could not parse content to XML");
+
             return null;
         }
     }
@@ -193,6 +203,7 @@ class DedimaniaApi
     {
         if (count(self::$newTimes) == 0) {
             Log::logAddLine('Dedimania', 'No new times to push');
+
             return;
         }
 
@@ -205,12 +216,12 @@ class DedimaniaApi
 
         //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->UId,
-            'Name' => $map->Name,
-            'Environment' => Server::getCurrentMapInfo()->environnement,
-            'Author' => $map->Author,
+            'UId'           => $map->UId,
+            'Name'          => $map->Name,
+            'Environment'   => Server::getCurrentMapInfo()->environnement,
+            'Author'        => $map->Author,
             'NbCheckpoints' => $map->NbCheckpoints,
-            'NbLaps' => $map->NbLaps,
+            'NbLaps'        => $map->NbLaps,
         ]);
 
         //string GameMode
@@ -251,6 +262,7 @@ class DedimaniaApi
 
         if (!$bestPlayer) {
             Log::logAddLine('Dedimania', 'No best player');
+
             return;
         }
 
@@ -265,9 +277,9 @@ class DedimaniaApi
             }
 
             self::paramAddStruct($params->addChild('param'), [
-                'VReplay' => $vreplay,
+                'VReplay'       => $vreplay,
                 'VReplayChecks' => $vreplayChecks,
-                'Top1GReplay' => $top1greplay
+                'Top1GReplay'   => $top1greplay,
             ]);
         } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
             Log::error('Error saving dedis: ' . $e->getMessage());
@@ -294,12 +306,12 @@ class DedimaniaApi
 
         //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->UId,
-            'Name' => $map->Name,
-            'Environment' => Server::getCurrentMapInfo()->environnement,
-            'Author' => $map->Author,
+            'UId'           => $map->UId,
+            'Name'          => $map->Name,
+            'Environment'   => Server::getCurrentMapInfo()->environnement,
+            'Author'        => $map->Author,
             'NbCheckpoints' => $map->NbCheckpoints,
-            'NbLaps' => $map->NbLaps,
+            'NbLaps'        => $map->NbLaps,
         ]);
 
         //string GameMode
@@ -307,20 +319,64 @@ class DedimaniaApi
 
         //struct SrvInfo
         self::paramAddStruct($params->addChild('param'), [
-            'SrvName' => Server::getServerName(),
-            'Comment' => Server::getServerComment(),
-            'Private' => Server::getServerPassword() ? true : false,
+            'SrvName'    => Server::getServerName(),
+            'Comment'    => Server::getServerComment(),
+            'Private'    => Server::getServerPassword() ? true : false,
             'NumPlayers' => onlinePlayers()->count(),
             'MaxPlayers' => 16, //TODO: change form hardcode
-            'NumSpecs' => 0,
-            'MaxSpecs' => 16 //TODO: change form hardcode
+            'NumSpecs'   => 0,
+            'MaxSpecs'   => 16 //TODO: change form hardcode
         ]);
 
         //array Players
         $players = onlinePlayers()->map(function (Player $player) {
             return [
-                'Login' => $player->Login,
-                'IsSpec' => $player->isSpectator()
+                'Login'  => $player->Login,
+                'IsSpec' => $player->isSpectator(),
+            ];
+        });
+
+        self::paramAddArray($params->addChild('param'), $players->toArray());
+
+        $responseData = self::post($xml);
+
+        if ($responseData) {
+            return $responseData;
+        }
+    }
+
+    static function updateServerPlayers(Map $map)
+    {
+        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
+        $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
+        $params = $xml->addChild('params');
+
+        //string SessionId
+        $params->addChild('param')->addChild('value', self::getSession()->Session);
+
+        //struct SrvInfo
+        self::paramAddStruct($params->addChild('param'), [
+            'SrvName'    => Server::getServerName(),
+            'Comment'    => Server::getServerComment(),
+            'Private'    => Server::getServerPassword() ? true : false,
+            'NumPlayers' => onlinePlayers()->count(),
+            'MaxPlayers' => 16, //TODO: change form hardcode
+            'NumSpecs'   => 0,
+            'MaxSpecs'   => 16 //TODO: change form hardcode
+        ]);
+
+        //struct votesInfo
+        self::paramAddStruct($params->addChild('param'), [
+            'UId'      => $map->Uid,
+            'GameMode' => 'TA' //Change from hardcode
+        ]);
+
+        //array Players (array of struct: {'Login': string, 'IsSpec': boolean, 'Vote': int (-1 = unchanged)})
+        $players = onlinePlayers()->map(function (Player $player) {
+            return [
+                'Login'  => $player->Login,
+                'IsSpec' => $player->isSpectator(),
+                'Vote'   => -1,
             ];
         });
 
@@ -414,20 +470,22 @@ class DedimaniaApi
     {
         try {
             $response = RestClient::post('http://dedimania.net:8082/Dedimania', [
-                'headers' => [
-                    'Content-Type' => 'text/xml; charset=UTF8',
-                    'Accept-Encoding' => 'gzip'
+                'headers'        => [
+                    'Content-Type'    => 'text/xml; charset=UTF8',
+                    'Accept-Encoding' => 'gzip',
                 ],
                 'decode_content' => 'gzip',
-                'body' => $xml->asXML()
+                'body'           => $xml->asXML(),
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             Log::error('Dedimania post failed: ' . $e->getMessage());
+
             return null;
         }
 
         if ($response->getStatusCode() != 200) {
             Log::warning("Connection to dedimania failed: " . $response->getReasonPhrase());
+
             return null;
         }
 
