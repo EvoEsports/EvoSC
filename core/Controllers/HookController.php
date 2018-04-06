@@ -28,6 +28,9 @@ class HookController extends ModescriptCallbacks
         'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
         'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
         'ManiaPlanet.ModeScriptCallbackArray' => 'ManiaPlanet.ModeScriptCallbackArray',
+        'PlayerLocal' => 'PlayerLocal',
+        'PlayerRateMap' => 'PlayerRateMap',
+        'PlayerDonate' => 'PlayerDonate',
     ];
 
     public static function init()
@@ -121,6 +124,16 @@ class HookController extends ModescriptCallbacks
         //handle maniaplanet callbacks
         $hooks = self::getHooks($hook);
         switch ($hook) {
+            case 'PlayerLocal':
+                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
+                break;
+            case 'PlayerRateMap':
+                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
+                break;
+            case 'PlayerDonate':
+//                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
+                break;
+
             case 'BeginMap':
                 //SMapInfo Map
                 $map = Map::where('FileName', $arguments[0]['FileName'])->first();
