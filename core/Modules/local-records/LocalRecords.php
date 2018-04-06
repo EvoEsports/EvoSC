@@ -94,7 +94,7 @@ class LocalRecords
                 } else {
                     ChatController::messageAll('Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
-                HookController::call('PlayerLocal', $player, $local);
+                HookController::call('PlayerLocal', [$player, $local]);
                 self::displayLocalRecords();
             }
         } else {
@@ -108,7 +108,7 @@ class LocalRecords
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
                 ChatController::messageAll('Player ', $player, ' made the ', $local);
-                HookController::call('PlayerLocal', $player, $local);
+                HookController::call('PlayerLocal', [$player, $local]);
                 self::displayLocalRecords();
             }
         }

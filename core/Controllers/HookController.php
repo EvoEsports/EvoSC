@@ -29,8 +29,8 @@ class HookController extends ModescriptCallbacks
         'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
         'ManiaPlanet.ModeScriptCallbackArray' => 'ManiaPlanet.ModeScriptCallbackArray',
         'PlayerLocal' => 'PlayerLocal',
-        'PlayerRateMap' => 'PlayerRateMap',
-        'PlayerDonate' => 'PlayerDonate',
+//        'PlayerRateMap' => 'PlayerRateMap',
+//        'PlayerDonate' => 'PlayerDonate',
     ];
 
     public static function init()
@@ -127,12 +127,12 @@ class HookController extends ModescriptCallbacks
             case 'PlayerLocal':
                 self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
                 break;
-            case 'PlayerRateMap':
-                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
-                break;
-            case 'PlayerDonate':
+//            case 'PlayerRateMap':
 //                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
-                break;
+//                break;
+//            case 'PlayerDonate':
+////                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
+//                break;
 
             case 'BeginMap':
                 //SMapInfo Map
