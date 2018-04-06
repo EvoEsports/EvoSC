@@ -248,7 +248,7 @@ class Statistics
                 'Rank' => $counter++
             ]);
 
-            if ($stats->player->isOnline()) {
+            if ($stats->player->Online) {
                 if ($stats->Rank && $stats->Rank > 0) {
                     ChatController::message($stats->player, 'Your server rank is ', $stats->Rank . '/' . $total, ' (Score: ', $stats->Score, ')');
                 } else {
