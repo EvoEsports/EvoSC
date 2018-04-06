@@ -126,7 +126,7 @@ class Player extends Model
 
     public function group()
     {
-        return $this->hasOne(Group::class, 'Group');
+        return $this->hasOne(Group::class, 'id', 'Group');
     }
 
     public function isMasteradmin(): bool

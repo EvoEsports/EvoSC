@@ -16,4 +16,9 @@ class Group extends Model
     {
         return $this->belongsToMany(AccessRight::class);
     }
+
+//    public function player()
+//    {
+//        return $this->belongsTo(Player::class);
+//    }
 }
