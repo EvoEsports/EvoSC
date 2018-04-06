@@ -119,13 +119,13 @@ class Statistics
 //            }
 //        );
 
-        $topRanks = Stats::orderByDesc('Rank')->take($statsConfig->topranks->show)->get();
+        $topRanks = Stats::orderBy('Rank')->take($statsConfig->topranks->show)->get();
         self::displayStatsWidget($player,
             $topRanks,
             'Top ranks',
             $statsConfig->topranks,
             function (Stats $stats) {
-                return $stats->Rank;
+                return $stats->Score;
             }
         );
     }
@@ -145,6 +145,7 @@ class Statistics
         Template::hideAll('most-records');
         Template::hideAll('top-winners');
         Template::hideAll('top-voters');
+        Template::hideAll('top-ranks');
     }
 
     /**
