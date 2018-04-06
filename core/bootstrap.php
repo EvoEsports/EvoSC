@@ -50,6 +50,8 @@ function startEsc()
         exit(1);
     }
 
+    include_once __DIR__ . '/Modules/stats/Models/Stats.php';
+
     esc\Classes\Database::init();
     esc\Classes\RestClient::init(config('server.name'));
     esc\Controllers\HookController::init();

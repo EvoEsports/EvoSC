@@ -15,7 +15,7 @@ class Statistics
      */
     public function __construct()
     {
-        include_once __DIR__ . '/Models/Stats.php';
+//        include_once __DIR__ . '/Models/Stats.php';
 
         self::createTables();
 
