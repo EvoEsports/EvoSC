@@ -106,27 +106,27 @@ class Player extends Model
      */
     public function locals()
     {
-        return $this->hasMany(LocalRecord::class, 'Player', 'id');
+        return $this->hasMany(LocalRecord::class, 'Player');
     }
 
     public function dedis()
     {
-        return $this->hasMany(Dedi::class, 'Player', 'id');
+        return $this->hasMany(Dedi::class, 'Player');
     }
 
     public function ratings()
     {
-        return $this->hasMany(MxKarma::class, 'Player', 'id');
+        return $this->hasMany(MxKarma::class, 'Player');
     }
 
     public function stats()
     {
-        return $this->hasOne('Stats', 'Player', 'id');
+        return $this->hasOne(Stats::class, 'Player');
     }
 
     public function group()
     {
-        return $this->hasOne(Group::class, 'id', 'Group');
+        return $this->hasOne(Group::class, 'Group');
     }
 
     public function isMasteradmin(): bool
