@@ -109,13 +109,23 @@ class Statistics
             }
         );
 
-        $topVoters = Stats::orderByDesc('Ratings')->take($statsConfig->voter->show)->get();
+//        $topVoters = Stats::orderByDesc('Ratings')->take($statsConfig->voter->show)->get();
+//        self::displayStatsWidget($player,
+//            $topVoters,
+//            'Top voters',
+//            $statsConfig->voter,
+//            function (Stats $stats) {
+//                return $stats->Ratings;
+//            }
+//        );
+
+        $topRanks = Stats::orderByDesc('Rank')->take($statsConfig->topranks->show)->get();
         self::displayStatsWidget($player,
-            $topVoters,
-            'Top voters',
-            $statsConfig->voter,
+            $topRanks,
+            'Top ranks',
+            $statsConfig->topranks,
             function (Stats $stats) {
-                return $stats->Ratings;
+                return $stats->Rank;
             }
         );
     }
