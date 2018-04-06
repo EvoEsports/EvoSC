@@ -248,10 +248,12 @@ class Statistics
                 'Rank' => $counter++
             ]);
 
-            if ($stats->Rank && $stats->Rank > 0) {
-                ChatController::message($stats->player, 'Your server rank is ', $stats->Rank . '/' . $total, ' (Score: ', $stats->Score, ')');
-            } else {
-                ChatController::message($stats->player, 'You need at least one local record before receiving a rank.');
+            if ($stats->player->isOnline()) {
+                if ($stats->Rank && $stats->Rank > 0) {
+                    ChatController::message($stats->player, 'Your server rank is ', $stats->Rank . '/' . $total, ' (Score: ', $stats->Score, ')');
+                } else {
+                    ChatController::message($stats->player, 'You need at least one local record before receiving a rank.');
+                }
             }
         });
     }
