@@ -62,18 +62,20 @@ class PlayerController
     public static function playerConnect(Player $player, bool $surpressJoinMessage = false): Player
     {
         $player->setOnline();
+        $stats = $player->stats;
 
         Log::info($player->NickName . " joined the server.");
 
-        if (!$surpressJoinMessage) {
-            ChatController::messageAll($player->group ? $player->group->Name : 'Player', ' ', $player,
-                ' joined the server');
+        if ($stats) {
+            if (!$surpressJoinMessage) {
+
+                ChatController::messageAll($player->group->Name, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', $stats->updated_at->diffForHumans());
+            }
         }
 
         self::displayPlayerlist();
 
-        $stats = $player->stats;
-        if($stats->Rank && $stats->Rank > 0){
+        if ($stats->Rank && $stats->Rank > 0) {
             $total = Stats::where('Rank', '>', 0)->count();
             ChatController::message($stats->player, 'Your server rank is ', $stats->Rank . '/' . $total, ' (Score: ', $stats->Score, ')');
         }
@@ -104,7 +106,7 @@ class PlayerController
             exit(0);
         }
 
-        Log::info($player->NickName . " left the server [".($disconnectReason ?: 'disconnected')."].");
+        Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
@@ -174,12 +176,12 @@ class PlayerController
         }
 
         Template::showAll('esc.box', [
-            'id'      => 'PlayerList',
-            'title'   => '  LIVE RANKINGS',
-            'x'       => config('ui.playerlist.x'),
-            'y'       => config('ui.playerlist.y'),
-            'rows'    => 13,
-            'scale'   => config('ui.playerlist.scale'),
+            'id' => 'PlayerList',
+            'title' => '  LIVE RANKINGS',
+            'x' => config('ui.playerlist.x'),
+            'y' => config('ui.playerlist.y'),
+            'rows' => 13,
+            'scale' => config('ui.playerlist.scale'),
             'content' => Template::toString('players', ['players' => $players->take(15)]),
         ]);
     }
