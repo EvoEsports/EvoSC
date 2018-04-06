@@ -200,12 +200,52 @@ class Statistics
      */
     public static function endMatch(...$args)
     {
-        $bestPlayer = finishPlayers()->sortBy('Score')->first();
+        $finishedPlayers = finishPlayers();
+        $bestPlayer = $finishedPlayers->sortBy('Score')->first();
+
+        foreach ($finishedPlayers as $player) {
+            self::calculatePlayerServerScore($player);
+        }
+
+        self::updatePlayerRanks();
 
         if ($bestPlayer) {
             $bestPlayer->stats()->increment('Wins');
             ChatController::messageAll('Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
         }
+    }
+
+    /**
+     * @param Player $player
+     */
+    private static function calculatePlayerServerScore(Player $player)
+    {
+        $locals = $player->locals;
+        $score = 0;
+
+        $locals->each(function (LocalRecord $local) use (&$score) {
+            $score += (100 - $local->Rank);
+        });
+
+        $player->stats()->update([
+            'Score' => $score
+        ]);
+    }
+
+    /**
+     * Set ranks for players
+     */
+    private static function updatePlayerRanks()
+    {
+        $stats = Stats::where('Locals', '>', 0)->orderByDesc('Score')->get();
+
+        $counter = 1;
+
+        $stats->each(function (Stats $stats) use (&$counter) {
+            $stats->update([
+                'Rank' => $counter++
+            ]);
+        });
     }
 
     /**
@@ -232,6 +272,7 @@ class Statistics
             $table->integer('Ratings')->default(0);
             $table->integer('Wins')->default(0);
             $table->integer('Donations')->default(0);
+            $table->integer('Score')->default(0);
             $table->timestamps();
         });
     }
