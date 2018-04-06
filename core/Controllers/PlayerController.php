@@ -72,6 +72,9 @@ class PlayerController
 
         self::displayPlayerlist();
 
+        $stats = $player->stats;
+        ChatController::message($stats->player, 'Your server rank is ', $stats->Rank, ' (Score: ', $stats->Score, ')');
+
         return $player;
     }
 

@@ -239,13 +239,16 @@ class Statistics
     private static function updatePlayerRanks()
     {
         $stats = Stats::where('Locals', '>', 0)->orderByDesc('Score')->get();
+        $total = $stats->count();
 
         $counter = 1;
 
-        $stats->each(function (Stats $stats) use (&$counter) {
+        $stats->each(function (Stats $stats) use (&$counter, $total) {
             $stats->update([
                 'Rank' => $counter++
             ]);
+
+            ChatController::message($stats->player, 'Your server rank is ', $stats->Rank, '/', $total, ' (Score: ', $stats->Score, ')');
         });
     }
 
