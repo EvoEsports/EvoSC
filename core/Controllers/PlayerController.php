@@ -74,7 +74,8 @@ class PlayerController
 
         $stats = $player->stats;
         if($stats->Rank && $stats->Rank > 0){
-            ChatController::message($stats->player, 'Your server rank is ', $stats->Rank, ' (Score: ', $stats->Score, ')');
+            $total = Stats::where('Rank', '>', 0)->count();
+            ChatController::message($stats->player, 'Your server rank is ', $stats->Rank . '/' . $total, ' (Score: ', $stats->Score, ')');
         }
 
         return $player;
