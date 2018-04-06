@@ -119,7 +119,7 @@ class Statistics
 //            }
 //        );
 
-        $topRanks = Stats::orderBy('Rank')->take($statsConfig->topranks->show)->get();
+        $topRanks = Stats::where('Rank', '>', 0)->orderBy('Rank')->take($statsConfig->topranks->show)->get();
         self::displayStatsWidget($player,
             $topRanks,
             'Top ranks',
