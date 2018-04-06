@@ -179,8 +179,9 @@ class Statistics
      */
     public static function playerLocal(Player $player, LocalRecord $local)
     {
-        $player->Locals = $player->locals->count();
-        $player->save();
+        $player->update([
+            'Locals' => $player->locals->count()
+        ]);
     }
 
     /**
