@@ -87,7 +87,7 @@ class DedimaniaApi
         $session = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at')->first();
 
         if ($session) {
-            Log::info("Dedimania using stored session: $session->Session from $session->created_at");
+            Log::info("Dedimania using stored session from $session->created_at");
 
             $lastCheck = $session->updated_at->diffInMinutes(\Carbon\Carbon::now());
 
