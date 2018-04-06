@@ -73,7 +73,9 @@ class PlayerController
         self::displayPlayerlist();
 
         $stats = $player->stats;
-        ChatController::message($stats->player, 'Your server rank is ', $stats->Rank, ' (Score: ', $stats->Score, ')');
+        if($stats->Rank && $stats->Rank > 0){
+            ChatController::message($stats->player, 'Your server rank is ', $stats->Rank, ' (Score: ', $stats->Score, ')');
+        }
 
         return $player;
     }
@@ -101,7 +103,7 @@ class PlayerController
             exit(0);
         }
 
-        Log::info($player->NickName . " left the server [$disconnectReason].");
+        Log::info($player->NickName . " left the server [".($disconnectReason ?: 'disconnected')."].");
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
