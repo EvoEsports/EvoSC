@@ -91,7 +91,7 @@ class MapList
                         $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
                         return (is_int($nameMatch) || $map->Author == $filter);
                     })
-                    ->pluck('map.id')
+                    ->pluck('id')
                     ->toArray();
 
             }
