@@ -17,6 +17,7 @@ use Stats;
 class PlayerController
 {
     private static $lastManialinkHash;
+    private static $fakePlayers;
 
     public static function init()
     {
@@ -30,6 +31,10 @@ class PlayerController
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
         ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
+
+        self::$fakePlayers = collect([]);
+        ChatController::addCommand('fake', '\esc\Controllers\PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
+        ChatController::addCommand('disfake', '\esc\Controllers\PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
     }
 
     public static function createTables()
@@ -45,6 +50,28 @@ class PlayerController
             $table->boolean('Spectator')->default(false);
             $table->integer('MaxRank')->default(15);
             $table->boolean('Banned')->default(false);
+        });
+    }
+
+    public static function connectFakePlayers(Player $player, $cmd = null, $n = null)
+    {
+        if (!$cmd || !$n) {
+            return;
+        }
+
+        ChatController::messageAll('Adding ', intval($n), ' fake players');
+
+        for ($i = 0; $i < intval($n); $i++) {
+            $login = Server::connectFakePlayer();
+            self::$fakePlayers->push($login);
+            usleep(10);
+        }
+    }
+
+    public static function disconnectFakePlayers(Player $player)
+    {
+        self::$fakePlayers->each(function ($login) {
+            Server::disconnectFakePlayer($login);
         });
     }
 
