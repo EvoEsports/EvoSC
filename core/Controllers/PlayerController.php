@@ -102,7 +102,7 @@ class PlayerController
 
         self::displayPlayerlist();
 
-        if ($stats->Rank && $stats->Rank > 0) {
+        if (isset($stats->Rank) && $stats->Rank > 0) {
             $total = Stats::where('Rank', '>', 0)->count();
             ChatController::message($stats->player, 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
         }
