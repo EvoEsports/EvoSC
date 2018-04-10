@@ -15,6 +15,8 @@ class Map extends Model
 
     protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints'];
 
+    protected $dates = ['LastPlayed'];
+
     public $timestamps = false;
 
     public function locals()
@@ -39,6 +41,6 @@ class Map extends Model
 
     public function canBeJuked()
     {
-        return Carbon::parse($this->LastPlayed)->diffInSeconds() > 1800;
+        return $this->LastPlayed->diffInSeconds() > 1800;
     }
 }
