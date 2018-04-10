@@ -3,6 +3,7 @@
 namespace esc\Models;
 
 
+use Carbon\Carbon;
 use Dedi;
 use Illuminate\Database\Eloquent\Model;
 use Karma;
@@ -38,6 +39,6 @@ class Map extends Model
 
     public function canBeJuked()
     {
-        return $this->LastPlayed->diffInSeconds() > 1800;
+        return Carbon::parse($this->LastPlayed)->diffInSeconds() > 1800;
     }
 }
