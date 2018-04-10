@@ -39,7 +39,7 @@ class Map extends Model
         return $this->hasMany(Karma::class, 'Map', 'id');
     }
 
-    public function canBeJuked()
+    public function canBeJuked(): bool
     {
         return $this->LastPlayed->diffInSeconds() > 1800;
     }
