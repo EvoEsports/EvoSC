@@ -64,7 +64,6 @@ class PlayerController
         for ($i = 0; $i < intval($n); $i++) {
             $login = Server::connectFakePlayer();
             self::$fakePlayers->push($login);
-            usleep(10);
         }
     }
 
@@ -73,6 +72,8 @@ class PlayerController
         self::$fakePlayers->each(function ($login) {
             Server::disconnectFakePlayer($login);
         });
+
+        self::$fakePlayers = collect([]);
     }
 
     public static function toggleAfk(Player $player)
