@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{$id}" version="3">
-    <frame pos="0 0" scale="{$showAnimation ? 1 : 0.95}" id="main-frame">
+    <frame pos="0 0" scale="{isset($showAnimation) && $showAnimation ? 1 : 0.95}" id="main-frame">
         <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="0006"/>
         <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="18f6"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="18f2"/>
@@ -10,7 +10,7 @@
         <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
 
 
-        {if $showAnimation}
+        {if isset($showAnimation) && $showAnimation}
         <script><!--
             main() {
             declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
