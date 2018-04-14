@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use Carbon\Carbon;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Models\Player;
@@ -19,6 +20,7 @@ class Vote
     private static $action;
     private static $startTime;
     private static $starter;
+    private static $lastVote;
 
     public $player;
     public $decision;
@@ -38,7 +40,8 @@ class Vote
         Hook::add('EndMatch', 'esc\Classes\Vote::endMatch');
 
         ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
-        ChatController::addCommand('res', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
+        ChatController::addCommand('res', 'esc\classes\Vote::replayMap',
+            'Cast a vote to replay map (Alias for /replay)');
         ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
         ChatController::addCommand('y', 'esc\classes\Vote::voteYes', 'Vote yes');
         ChatController::addCommand('n', 'esc\classes\Vote::voteNo', 'Vote no');
@@ -53,6 +56,7 @@ class Vote
     {
         if (!self::$inProgress) {
             ChatController::message($player, 'There is no vote in progress');
+
             return;
         }
 
@@ -63,6 +67,7 @@ class Vote
     {
         if (!self::$inProgress) {
             ChatController::message($player, 'There is no vote in progress');
+
             return;
         }
 
@@ -71,7 +76,7 @@ class Vote
 
     public static function endMatch()
     {
-        if(self::$inProgress){
+        if (self::$inProgress) {
             self::stopVote();
         }
     }
@@ -93,9 +98,19 @@ class Vote
     {
         if (self::$inProgress) {
             ChatController::message($player, 'There is already a vote in progress');
+
             return;
         }
 
+        if (self::$lastVote->diffInSeconds() < 180) {
+            $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
+
+            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
+
+            return;
+        }
+
+        self::$lastVote = Carbon::now();
         self::$votes = new Collection();
         self::$inProgress = true;
         self::$message = 'Play for another 5 minutes?';
@@ -116,9 +131,19 @@ class Vote
     {
         if (self::$inProgress) {
             ChatController::message($player, 'There is already a vote in progress');
+
             return;
         }
 
+        if (self::$lastVote->diffInSeconds() < 180) {
+            $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
+
+            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
+
+            return;
+        }
+
+        self::$lastVote = Carbon::now();
         self::$votes = new Collection();
         self::$inProgress = true;
         self::$message = 'Skip map?';
@@ -147,8 +172,10 @@ class Vote
 
     public static function finishVote()
     {
-        $yesVotes = self::$votes->where('decision', true)->count();
-        $noVotes = self::$votes->where('decision', false)->count();
+        $yesVotes = self::$votes->where('decision', true)
+            ->count();
+        $noVotes = self::$votes->where('decision', false)
+            ->count();
 
         $successful = $yesVotes > $noVotes;
 
@@ -166,8 +193,10 @@ class Vote
     public static function showVote()
     {
         if (self::$inProgress) {
-            $yesVotes = self::$votes->where('decision', true)->count();
-            $noVotes = self::$votes->where('decision', false)->count();
+            $yesVotes = self::$votes->where('decision', true)
+                ->count();
+            $noVotes = self::$votes->where('decision', false)
+                ->count();
 
             $totalVotes = $yesVotes + $noVotes;
 
@@ -181,7 +210,15 @@ class Vote
 
             $timeleft = (self::$startTime + self::VOTE_TIME) - time();
 
-            Template::showAll('vote', ['message' => self::$message, 'yes' => $yes, 'no' => $no, 'yesN' => $yesVotes, 'noN' => $noVotes, 'voteDuration' => self::VOTE_TIME, 'timeLeft' => $timeleft]);
+            Template::showAll('vote', [
+                'message'      => self::$message,
+                'yes'          => $yes,
+                'no'           => $no,
+                'yesN'         => $yesVotes,
+                'noN'          => $noVotes,
+                'voteDuration' => self::VOTE_TIME,
+                'timeLeft'     => $timeleft,
+            ]);
         }
     }
 
@@ -194,6 +231,7 @@ class Vote
     {
         if (!self::$inProgress) {
             ChatController::message($player, 'There is currently no vote to stop');
+
             return;
         }
 
@@ -215,6 +253,7 @@ class Vote
     {
         if (!self::$inProgress) {
             ChatController::message($player, 'There is currently no vote to approve');
+
             return;
         }
 
