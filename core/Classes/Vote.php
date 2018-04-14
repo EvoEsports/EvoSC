@@ -184,6 +184,7 @@ class Vote
     {
         $yesVotes = self::$votes->where('decision', true)
             ->count();
+
         $noVotes = self::$votes->where('decision', false)
             ->count();
 
@@ -255,7 +256,7 @@ class Vote
         self::$starter = null;
         self::$message = null;
         self::$action = null;
-        self::$votes = null;
+        self::$votes = collect([]);
         self::hideVote();
     }
 
