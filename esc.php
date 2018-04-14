@@ -22,8 +22,6 @@ while (true) {
         //only if you would enable legacy callbacks and we don't want that
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
-        \esc\Classes\Server::getRpc()->saveMa
-
         while (true) {
             cycle();
         }
