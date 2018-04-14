@@ -25,6 +25,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 class MapController
 {
     private static $mapsPath;
+    private static $matchSettings;
     private static $currentMap;
     private static $queue;
     private static $addedTime = 0;
@@ -424,6 +425,7 @@ class MapController
 
             try {
                 Server::addMap($map->FileName);
+                Server::saveMatchSettings(self::$matchSettings ?? config('server.default-matchsettings'));
             } catch (\Exception $e) {
                 Log::warning("Map $map->FileName already added.");
             }
