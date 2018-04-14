@@ -102,7 +102,7 @@ class Vote
             return;
         }
 
-        if (self::$lastVote->diffInSeconds() < 180) {
+        if (self::$lastVote && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
             ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
@@ -135,7 +135,7 @@ class Vote
             return;
         }
 
-        if (self::$lastVote->diffInSeconds() < 180) {
+        if (self::$lastVote && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
             ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
