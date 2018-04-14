@@ -46,6 +46,8 @@ class MapController
         Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
 
         ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
+        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//',
+            'ban');
         ChatController::addCommand('add', '\esc\Controllers\MapController::addMap',
             'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
@@ -431,6 +433,15 @@ class MapController
             }
 
             ChatController::messageAll('New map added: ', $map);
+        }
+    }
+
+    public static function settings(Player $player, $cmd, $filename)
+    {
+        try {
+            Server::loadMatchSettings(matchSettings($filename));
+        } catch (\Exception $e) {
+            Log::logAddLine('MatchSettings', 'Failed to load matchsettings: ' . $filename);
         }
     }
 }
