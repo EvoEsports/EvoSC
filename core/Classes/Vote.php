@@ -91,6 +91,14 @@ class Vote
             $alreadyVoted->first()->decision = $decision;
         }
 
+        $nonSpectators = Player::whereOnline(true)
+            ->whereSpectator(false)
+            ->get();
+
+        if (count(self::$votes) == $nonSpectators->count()) {
+            self::finishVote();
+        }
+
         self::showVote();
     }
 
@@ -105,7 +113,8 @@ class Vote
         if (self::$lastVote != null && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
-            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
+            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'),
+                ' before voting again.');
 
             return;
         }
@@ -138,7 +147,8 @@ class Vote
         if (self::$lastVote != null && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
-            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
+            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'),
+                ' before voting again.');
 
             return;
         }
