@@ -104,7 +104,7 @@ class Vote
         self::showVote();
     }
 
-    public static function custom(Player $player, $cmd, $question)
+    public static function custom(Player $player, $cmd, ...$question)
     {
         if (self::$inProgress) {
             ChatController::message($player, 'There is already a vote in progress');
@@ -114,7 +114,7 @@ class Vote
 
         self::$votes = collect([]);
         self::$inProgress = true;
-        self::$message = $question;
+        self::$message = implode(" ", $question);
         self::$startTime = time();
         self::$starter = $player;
 
