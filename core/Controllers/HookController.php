@@ -106,7 +106,7 @@ class HookController extends ModescriptCallbacks
                 break;
 
             default:
-                Log::logAddLine('ScriptCallback', "Calling unhandled $callback");
+                Log::logAddLine('ScriptCallback', "Calling unhandled $callback", false);
                 break;
         }
     }
