@@ -24,6 +24,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 
 class MapController
 {
+    private static $mapsPath;
     private static $currentMap;
     private static $queue;
     private static $addedTime = 0;
@@ -35,6 +36,7 @@ class MapController
         self::loadMaps();
 
         self::$queue = new Collection();
+        self::$mapsPath = Server::getMapsDirectory();
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
@@ -62,7 +64,8 @@ class MapController
             $table->string('Mood')->nullable();
             $table->boolean('LapRace')->nullable();
             $table->dateTime('LastPlayed')->nullable();
-            $table->boolean('Available')->default(false);
+            $table->boolean('Enabled')->default(false);
+            $table->integer('AuthorTime')->nullable();
         });
     }
 
@@ -253,34 +256,30 @@ class MapController
      */
     private static function loadMaps()
     {
-        $mapFiles = File::getDirectoryContents(Config::get('server.maps'))->filter(function ($fileName) {
-            return preg_match('/\.gbx$/i', $fileName);
-        });
+        $maps = collect(Server::getRpc()->getMapList());
+        $enabledMapsUids = $maps->pluck('uId');
 
-        foreach ($mapFiles as $mapFile) {
-            $map = Map::where('FileName', $mapFile)->first();
-
-            try {
-                Server::addMap($mapFile);
-            } catch (FileException $e) {
-                Log::error("Map $mapFile not found.");
-            } catch (AlreadyInListException $e) {
-//                Log::warning("Map $mapFile already added.");
-            }
+        foreach ($maps as $mapInfo) {
+            $map = Map::where('UId', $mapInfo->uId)->get()->first();
 
             if (!$map) {
-                if (preg_match('/^_(\d+)\.Map\.gbx$/', $mapFile, $matches)) {
-                    $mxId = (int)$matches[1];
-                }
-
-                $mapInfo = Server::getMapInfo($mapFile)->toArray();
-                $map = Map::create($mapInfo);
-
-                if (isset($mxId)) {
-                    $map->update(['MxId' => $mxId]);
-                }
+                $map = Map::create([
+                    'UId' => $mapInfo->uId,
+                    'Name' => $mapInfo->name,
+                    'FileName' => $mapInfo->fileName,
+                    'Author' => $mapInfo->author,
+                    'AuthorTime' => $mapInfo->authorTime,
+                    'Mood' => $mapInfo->mood,
+                    'NbLaps' => $mapInfo->nbLaps,
+                    'NbCheckpoints' => $mapInfo->nbCheckpoints,
+                    'Environnement' => $mapInfo->environnement,
+                    'Enabled' => true
+                ]);
             }
         }
+
+        Map::whereNotIn('UId', $enabledMapsUids)->update(['Enabled' => false]);
+        Map::whereIn('UId', $enabledMapsUids)->update(['Enabled' => true]);
     }
 
     /**

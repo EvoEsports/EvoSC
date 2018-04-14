@@ -1,4 +1,4 @@
-![version:0.21.0](https://img.shields.io/badge/Version-0.21.0-blue.svg)
+![version:0.24.0](https://img.shields.io/badge/Version-0.24.0-blue.svg)
 
 # EvoSC
 

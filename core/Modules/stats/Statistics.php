@@ -295,7 +295,6 @@ class Statistics
             $table->integer('Donations')->default(0);
             $table->integer('Score')->default(0);
             $table->integer('Rank')->default(0);
-            $table->integer('Score')->default(0);
             $table->timestamps();
         });
     }

@@ -13,14 +13,14 @@
 {if isset($maps)}
 {foreach $maps as $mapId => $map}
 <frame pos="0 -{3 + $iterator->counter * 3.2}">
-    {if $map->canBeJuked()}
+    {if isset($map) && $map->canBeJuked()}
     <label pos="-1 0" z-index="-2" size="138 3" valign="center" action="maplist.queue,{$mapId}"/>
     <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripStyle($map->Name ?: '')}"/>
     {else}
     <label pos="-1 0" z-index="-2" size="138 3" valign="center" action="{$player->isAdmin() ? 'maplist.queue,'.$mapId : ''}"/>
     <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripColors(stripStyle($map->Name ?: ''))}" textcolor="999f"/>
     {/if}
-    <label pos="64 0" z-index="-1" size="30 3" textsize="1" valign="center" action="maplist.filter.author,{$map->Author}"/>
+    <label pos="64 0" z-index="-1" size="30 3" textsize="1" valign="center" action="maplist.filter,{$map->Author}"/>
     <label pos="65 0" z-index="0" size="28 3" textsize="1" valign="center" text="{stripStyle(stripColors($map->author ? $map->author->NickName : ($map->Author ?? '')))}"/>
 
     <label pos="105 0" z-index="0" size="40 3" textsize="1" valign="center" halign="center" text="{isset($locals[$mapId]) ? $locals[$mapId]->Rank.'.' : '-'}"/>

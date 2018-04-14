@@ -90,23 +90,29 @@ class PlayerController
     public static function playerConnect(Player $player, bool $surpressJoinMessage = false): Player
     {
         $player->setOnline();
-        $stats = $player->stats;
 
-        Log::info($player->NickName . " joined the server.");
+        if (Database::hasTable('stats')) {
+            $stats = $player->stats;
 
-        if ($stats) {
+            if ($stats) {
+                if (!$surpressJoinMessage) {
+                    ChatController::messageAll($player->group->Name, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', secondary($stats->updated_at->diffForHumans()));
+                }
+            }
+
+            if (isset($stats->Rank) && $stats->Rank > 0) {
+                $total = Stats::where('Rank', '>', 0)->count();
+                ChatController::message($stats->player, 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
+            }
+        } else {
             if (!$surpressJoinMessage) {
-
-                ChatController::messageAll($player->group->Name, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', secondary($stats->updated_at->diffForHumans()));
+                ChatController::messageAll($player->group->Name, ' ', $player, ' joined the server.');
             }
         }
 
-        self::displayPlayerlist();
+        Log::info($player->NickName . " joined the server.");
 
-        if (isset($stats->Rank) && $stats->Rank > 0) {
-            $total = Stats::where('Rank', '>', 0)->count();
-            ChatController::message($stats->player, 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
-        }
+        self::displayPlayerlist();
 
         return $player;
     }

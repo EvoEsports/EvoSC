@@ -20,7 +20,7 @@ function formatScoreNoMinutes(int $score): string
 
 function stripColors(?string $colored): string
 {
-    return preg_replace('/(?<![$])\${1}(?:[\w\d]{3})/i', '', $colored);
+    return preg_replace('/(?<![$])\${1}(?:[\w\d]{1,3})/i', '', $colored);
 }
 
 function stripStyle(?string $styled = '', bool $keepLinks = false): string
@@ -110,7 +110,7 @@ function getEscVersion(): string
 
 function maps()
 {
-    return \esc\Models\Map::all();
+    return \esc\Models\Map::whereEnabled(true)->get();
 }
 
 function getMapInfoFromFile(string $fileName)
