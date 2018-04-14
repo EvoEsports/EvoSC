@@ -86,7 +86,9 @@ class PlayerController
         $playerToBeKicked = $toKick->first();
 
         try{
-            Server::kick($playerToBeKicked->Login, implode(" ", $message));
+            $reason = implode(" ", $message);
+            Server::kick($playerToBeKicked->Login, $reason);
+            ChatController::messageAll($player->group->Name, ' ', $player, ' kicked ', $playerToBeKicked, '. Reason: ', secondary($reason));
         }catch(InvalidArgumentException $e){
             Log::logAddLine('PlayerController', 'Failed to kick player: ' . $e->getMessage(), true);
             Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
