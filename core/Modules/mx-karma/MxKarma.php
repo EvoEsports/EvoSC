@@ -272,9 +272,6 @@ class MxKarma extends MXK
         $map = \esc\Controllers\MapController::getCurrentMap();
         $items = collect([]);
 
-        echo "mapKarma: ";
-        var_dump(self::$mapKarma);
-
         for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
             $items->push(self::$mapKarma->voteaverage);
         }
@@ -282,9 +279,6 @@ class MxKarma extends MXK
         $newRatings = $map->ratings()
             ->whereIn('Player', self::$updatedVotes->toArray())
             ->get();
-
-        echo "New ratings; ";
-        var_dump($newRatings->pluck('Rating'));
 
         foreach ($newRatings as $rating) {
             $items->push($rating->Rating);
