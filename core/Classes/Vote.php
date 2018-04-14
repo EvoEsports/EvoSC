@@ -102,6 +102,25 @@ class Vote
         self::showVote();
     }
 
+    public static function custom(Player $player, $cmd, $question)
+    {
+        if (self::$inProgress) {
+            ChatController::message($player, 'There is already a vote in progress');
+
+            return;
+        }
+
+        self::$votes = collect([]);
+        self::$inProgress = true;
+        self::$message = $question;
+        self::$startTime = time();
+        self::$starter = $player;
+
+        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+
+        self::showVote();
+    }
+
     public static function replayMap(Player $player)
     {
         if (self::$inProgress) {
@@ -190,7 +209,7 @@ class Vote
 
         $successful = $yesVotes > $noVotes;
 
-        if ($successful) {
+        if ($successful && self::$action) {
             call_user_func(self::$action);
         }
 
