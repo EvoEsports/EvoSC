@@ -7,7 +7,7 @@ function formatScore(int $score): string
     $minutes = floor($seconds / 60);
     $seconds -= $minutes * 60;
 
-    return sprintf('%d.%02d.%03d', $minutes, $seconds, $ms);
+    return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
 function formatScoreNoMinutes(int $score): string
