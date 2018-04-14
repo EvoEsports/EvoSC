@@ -24,6 +24,8 @@ use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 
 class MapController
 {
+    private static $mapsPath;
+    private static $matchSettings;
     private static $currentMap;
     private static $queue;
     private static $addedTime = 0;
@@ -35,6 +37,7 @@ class MapController
         self::loadMaps();
 
         self::$queue = new Collection();
+        self::$mapsPath = Server::getMapsDirectory();
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
@@ -43,26 +46,44 @@ class MapController
         Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
 
         ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//',
+            'ban');
+        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap',
+            'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
 
     public static function createTables()
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
-            $table->string('UId')->nullable();
-            $table->integer('MxId')->nullable();
-            $table->string('Name')->nullable();
-            $table->string('Author')->nullable();
-            $table->string('FileName')->unique();
-            $table->string('Environment')->nullable();
-            $table->integer('NbCheckpoints')->nullable();
-            $table->integer('NbLaps')->nullable();
-            $table->integer('Plays')->default(0);
-            $table->string('Mood')->nullable();
-            $table->boolean('LapRace')->nullable();
-            $table->dateTime('LastPlayed')->nullable();
-            $table->boolean('Available')->default(false);
+            $table->string('UId')
+                ->nullable();
+            $table->integer('MxId')
+                ->nullable();
+            $table->string('Name')
+                ->nullable();
+            $table->string('Author')
+                ->nullable();
+            $table->string('FileName')
+                ->unique();
+            $table->string('Environment')
+                ->nullable();
+            $table->integer('NbCheckpoints')
+                ->nullable();
+            $table->integer('NbLaps')
+                ->nullable();
+            $table->integer('Plays')
+                ->default(0);
+            $table->string('Mood')
+                ->nullable();
+            $table->boolean('LapRace')
+                ->nullable();
+            $table->dateTime('LastPlayed')
+                ->nullable();
+            $table->boolean('Enabled')
+                ->default(false);
+            $table->integer('AuthorTime')
+                ->nullable();
         });
     }
 
@@ -77,6 +98,7 @@ class MapController
 
     /**
      * Add time to the counter
+     *
      * @param int $minutes
      */
     public static function addTime(int $minutes = 5)
@@ -95,6 +117,7 @@ class MapController
 
     /**
      * Hook: EndMatch
+     *
      * @param $rankings
      * @param $winnerteam
      */
@@ -117,7 +140,8 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->update(Server::getCurrentMapInfo()->toArray());
+        $map->update(Server::getCurrentMapInfo()
+            ->toArray());
 
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
@@ -135,6 +159,7 @@ class MapController
 
     /**
      * Gets current map
+     *
      * @return Map|null
      */
     public static function getCurrentMap(): ?Map
@@ -144,6 +169,7 @@ class MapController
 
     /**
      * Get all queued maps
+     *
      * @return Collection
      */
     public static function getQueue(): Collection
@@ -153,6 +179,7 @@ class MapController
 
     /**
      * Delete a map
+     *
      * @param Map $map
      */
     public static function deleteMap(Map $map)
@@ -181,6 +208,7 @@ class MapController
 
     /**
      * Gets the next played map
+     *
      * @return Map
      */
     public static function getNext(): Map
@@ -191,7 +219,8 @@ class MapController
             $map = self::$queue->first()->map;
         } else {
             $mapInfo = Server::getNextMapInfo();
-            $map = Map::where('UId', $mapInfo->uId)->first();
+            $map = Map::where('UId', $mapInfo->uId)
+                ->first();
         }
 
         return $map;
@@ -199,6 +228,7 @@ class MapController
 
     /**
      * Admins skip method
+     *
      * @param Player $player
      */
     public static function skip(Player $player)
@@ -210,14 +240,17 @@ class MapController
 
     /**
      * Force replay a round at end of match
+     *
      * @param Player $player
      */
     public static function forceReplay(Player $player)
     {
         $currentMap = self::getCurrentMap();
 
-        if (self::getQueue()->contains('map.UId', $currentMap->UId)) {
+        if (self::getQueue()
+            ->contains('map.UId', $currentMap->UId)) {
             ChatController::message($player, 'Map is already being replayed');
+
             return;
         }
 
@@ -228,13 +261,17 @@ class MapController
 
     /**
      * Add a map to the queue
+     *
      * @param Player $player
-     * @param Map $map
+     * @param Map    $map
      */
     public static function queueMap(Player $player, Map $map)
     {
-        if (self::getQueue()->where('player', $player)->isNotEmpty() && !$player->isAdmin()) {
+        if (self::getQueue()
+                ->where('player', $player)
+                ->isNotEmpty() && !$player->isAdmin()) {
             ChatController::message($player, "You already have a map in queue", []);
+
             return;
         }
 
@@ -253,38 +290,52 @@ class MapController
      */
     private static function loadMaps()
     {
-        $mapFiles = File::getDirectoryContents(Config::get('server.maps'))->filter(function ($fileName) {
-            return preg_match('/\.gbx$/i', $fileName);
-        });
+        //Get loaded maps
+        $maps = collect(Server::getMapList());
 
-        foreach ($mapFiles as $mapFile) {
-            $map = Map::where('FileName', $mapFile)->first();
+        //get array with the UIDs
+        $enabledMapsUids = $maps->pluck('uId');
 
-            try {
-                Server::addMap($mapFile);
-            } catch (FileException $e) {
-                Log::error("Map $mapFile not found.");
-            } catch (AlreadyInListException $e) {
-//                Log::warning("Map $mapFile already added.");
-            }
+        foreach ($maps as $mapInfo) {
+            $map = Map::where('UId', $mapInfo->uId)
+                ->get()
+                ->first();
 
             if (!$map) {
-                if (preg_match('/^_(\d+)\.Map\.gbx$/', $mapFile, $matches)) {
-                    $mxId = (int)$matches[1];
-                }
+                //Map does not exist, create it
+                $map = Map::create([
+                    'UId'           => $mapInfo->uId,
+                    'Name'          => $mapInfo->name,
+                    'FileName'      => $mapInfo->fileName,
+                    'Author'        => $mapInfo->author,
+                    'AuthorTime'    => $mapInfo->authorTime,
+                    'Mood'          => $mapInfo->mood,
+                    'NbLaps'        => $mapInfo->nbLaps,
+                    'NbCheckpoints' => $mapInfo->nbCheckpoints,
+                    'Environnement' => $mapInfo->environnement,
+                    'Enabled'       => true,
+                ]);
+            }
 
-                $mapInfo = Server::getMapInfo($mapFile)->toArray();
-                $map = Map::create($mapInfo);
-
-                if (isset($mxId)) {
-                    $map->update(['MxId' => $mxId]);
-                }
+            //If file location has changed, update
+            if ($map->FileName != $mapInfo->fileName) {
+                $map->update(['FileName' => $mapInfo->fileName]);
+                Log::logAddLine('MapController', 'Map moved ' . $map->FileName . ' .. ' . $mapInfo->fileName);
             }
         }
+
+        //Disable maps
+        Map::whereNotIn('UId', $enabledMapsUids)
+            ->update(['Enabled' => false]);
+
+        //Enable loaded maps
+        Map::whereIn('UId', $enabledMapsUids)
+            ->update(['Enabled' => true]);
     }
 
     /**
      * Display the map widget
+     *
      * @param Player|null $player
      */
     public static function displayMapWidget(Player $player = null)
@@ -302,13 +353,14 @@ class MapController
     public static function getMapInformationFromMx(Map $map): array
     {
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->MxId);
-        $i = json_decode($result->getBody()->getContents())[0];
+        $i = json_decode($result->getBody()
+            ->getContents())[0];
 
         var_dump($i);
 
         $information = [
-            'UId' => $i->TrackUID,
-            'Name' => $i->GbxMapName
+            'UId'  => $i->TrackUID,
+            'Name' => $i->GbxMapName,
         ];
 
         return $information;
@@ -316,26 +368,25 @@ class MapController
 
     /**
      * Add map from MX
+     *
      * @param string[] ...$arguments
      */
-    public static function addMap(string ...$arguments)
+    public static function addMap(Player $player, $cmd, string ...$arguments)
     {
-        $mxIds = $arguments;
-
-        //shift first two entries so we get list of mx ids
-        array_shift($mxIds);
-        array_shift($mxIds);
-
-        foreach ($mxIds as $mxId) {
+        foreach ($arguments as $mxId) {
             $mxId = (int)$mxId;
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
                 ChatController::messageAll("Requested map with invalid id: " . $mxId);
+
                 return;
             }
 
-            $map = Map::where('MxId', $mxId)->first();
+            $map = Map::where('MxId', $mxId)
+                ->get()
+                ->first();
+
             if ($map) {
                 ChatController::messageAll($map, ' already exists');
                 continue;
@@ -346,35 +397,51 @@ class MapController
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
                 ChatController::messageAll("Can not reach mania exchange.");
+
                 return;
             }
 
             if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
                 Log::warning('Not a valid GBX.');
+
                 return;
             }
 
-            $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
-            $mapFolder = Config::get('server.maps');
+            $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1',
+                $response->getHeader('content-disposition')[0]);
+
+            $mapFolder = self::$mapsPath;
             File::put("$mapFolder/$fileName", $response->getBody());
 
             $map = Map::firstOrCreate([
-                'MxId' => $mxId,
-                'FileName' => $fileName
+                'MxId'     => $mxId,
+                'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
             ]);
 
-            $info = Server::getMapInfo($map->FileName)->toArray();
+            $info = Server::getMapInfo($map->FileName)
+                ->toArray();
+
             if ($info) {
                 $map->update($info);
             }
 
             try {
                 Server::addMap($map->FileName);
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
             } catch (\Exception $e) {
                 Log::warning("Map $map->FileName already added.");
             }
 
             ChatController::messageAll('New map added: ', $map);
+        }
+    }
+
+    public static function settings(Player $player, $cmd, $filename)
+    {
+        try {
+            Server::loadMatchSettings(matchSettings($filename));
+        } catch (\Exception $e) {
+            Log::logAddLine('MatchSettings', 'Failed to load matchsettings: ' . $filename);
         }
     }
 }

@@ -13,7 +13,7 @@ class Map extends Model
 {
     protected $table = 'maps';
 
-    protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints'];
+    protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints', 'AuthorTime', 'Enabled'];
 
     protected $dates = ['LastPlayed'];
 
@@ -41,6 +41,12 @@ class Map extends Model
 
     public function canBeJuked(): bool
     {
-        return $this->LastPlayed->diffInSeconds() > 1800;
+        $lastPlayedDate = $this->LastPlayed;
+
+        if ($lastPlayedDate) {
+            return $this->LastPlayed->diffInSeconds() > 1800;
+        }
+
+        return true;
     }
 }

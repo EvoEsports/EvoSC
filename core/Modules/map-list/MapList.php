@@ -17,7 +17,7 @@ class MapList
 
         ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
-        ManiaLinkEvent::add('maplist.filter.author', 'MapList::filterAuthor');
+        ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
@@ -41,13 +41,22 @@ class MapList
     {
         $mapIds = array_keys($maps);
 
-        try{
+        try {
             $records = [
-                'locals' => LocalRecord::whereIn('Map', $mapIds)->wherePlayer($player->id)->get()->keyBy('Map')->all(),
-                'dedis' => Dedi::whereIn('Map', $mapIds)->wherePlayer($player->id)->get()->keyBy('Map')->all()
+                'locals' => LocalRecord::whereIn('Map', $mapIds)
+                    ->wherePlayer($player->id)
+                    ->get()
+                    ->keyBy('Map')
+                    ->all(),
+                'dedis'  => Dedi::whereIn('Map', $mapIds)
+                    ->wherePlayer($player->id)
+                    ->get()
+                    ->keyBy('Map')
+                    ->all(),
             ];
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             \esc\Classes\Log::error('Failed to load records for player ' . $player->Login . "\n" . $e->getTrace());
+
             return null;
         }
 
@@ -59,20 +68,17 @@ class MapList
         $perPage = 23;
 
         if ($filter) {
-
             if ($filter == 'worst') {
 
-                $mapIds = self::getRecordsForPlayer($player)
+                $maps = self::getRecordsForPlayer($player)
                     ->sortByDesc('Rank')
-                    ->pluck('map.id')
-                    ->toArray();
+                    ->pluck('map');
 
             } elseif ($filter == 'best') {
 
-                $mapIds = self::getRecordsForPlayer($player)
+                $maps = self::getRecordsForPlayer($player)
                     ->sortBy('Rank')
-                    ->pluck('map.id')
-                    ->toArray();
+                    ->pluck('map');
 
             } elseif ($filter == 'nofinish') {
 
@@ -80,55 +86,61 @@ class MapList
                     ->pluck('map.id')
                     ->toArray();
 
-                $mapIds = Map::whereNotIn('id', $records)
-                    ->pluck('id')
-                    ->toArray();
+                $maps = maps()->whereNotIn('id', $records);
 
             } else {
 
-                $mapIds = maps()
+                $maps = maps()
                     ->filter(function (Map $map) use ($filter) {
                         $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
+
                         return (is_int($nameMatch) || $map->Author == $filter);
-                    })
-                    ->pluck('id')
-                    ->toArray();
+                    });
 
             }
-
         } else {
-
-            $mapIds = maps()
-                ->pluck('id')
-                ->toArray();
-
+            $maps = maps();
         }
 
-        $pages = ceil(Map::count() / $perPage);
+        $pages = ceil(count($maps) / $perPage);
 
-        $maps = Map::whereIn('id', $mapIds)->get();
-        $maps = $maps->forPage($page ?? 0, $perPage)->keyBy('id')->all();
+        $maps = $maps->forPage($page ?? 0, $perPage)
+            ->keyBy('id')
+            ->all();
 
         $records = self::getRecordsForMapsAndPlayer($maps, $player);
 
-        $queuedMaps = MapController::getQueue()->sortBy('timeRequested')->take($perPage);
+        $queuedMaps = MapController::getQueue()
+            ->sortBy('timeRequested')
+            ->take($perPage);
 
-        $mapList = Template::toString('maplist.show', ['maps' => $maps, 'player' => $player, 'queuedMaps' => $queuedMaps, 'locals' => $records['locals'], 'dedis' => $records['dedis']]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $pages, 'action' => 'maplist.show', 'page' => $page]);
+        $mapList = Template::toString('maplist.show', [
+            'maps'       => $maps,
+            'player'     => $player,
+            'queuedMaps' => $queuedMaps,
+            'locals'     => $records['locals'],
+            'dedis'      => $records['dedis'],
+        ]);
+
+        $pagination = Template::toString('esc.pagination', [
+            'pages'  => $pages,
+            'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
+            'page'   => $page,
+        ]);
 
         Template::show($player, 'esc.modal', [
-            'id' => 'MapList',
-            'width' => 180,
-            'height' => 97,
-            'content' => $mapList,
-            'pagination' => $pagination,
-            'showAnimation' => isset($page) ? false : true
+            'id'            => 'MapList',
+            'width'         => 180,
+            'height'        => 97,
+            'content'       => $mapList,
+            'pagination'    => $pagination,
+            'showAnimation' => isset($page) ? false : true,
         ]);
     }
 
-    public static function filterAuthor(Player $player, $authorLogin, $page = 1)
+    public static function filter(Player $player, $filter, $page = 1)
     {
-        self::showMapList($player, $page, $authorLogin);
+        self::showMapList($player, $page, $filter);
     }
 
     public static function closeMapList(Player $player)
@@ -138,7 +150,8 @@ class MapList
 
     public static function queueMap(Player $player, $mapId)
     {
-        $map = Map::where('id', intval($mapId))->first();
+        $map = Map::where('id', intval($mapId))
+            ->first();
 
         if ($map) {
             MapController::queueMap($player, $map);
@@ -154,10 +167,12 @@ class MapList
     {
         if (!$player->isAdmin()) {
             ChatController::message($player, 'You do not have access to that command');
+
             return;
         }
 
-        $map = Map::where('id', intval($mapId))->first();
+        $map = Map::where('id', intval($mapId))
+            ->first();
 
         if ($map) {
             MapController::deleteMap($map);
