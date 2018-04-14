@@ -85,6 +85,11 @@ $$: Writes a dollarsign
             }
         }
 
+        if(preg_match('/^(\/|\/\/|##)/', $text)){
+            ChatController::message($player, warning('Invalid chat command entered'));
+            return;
+        }
+
         Log::logAddLine($player->NickName, $text);
         $nick = $player->NickName;
 
