@@ -368,15 +368,9 @@ class MapController
      *
      * @param string[] ...$arguments
      */
-    public static function addMap(string ...$arguments)
+    public static function addMap(Player $player, $cmd, string ...$arguments)
     {
-        $mxIds = $arguments;
-
-        //shift first two entries so we get list of mx ids
-        array_shift($mxIds);
-        array_shift($mxIds);
-
-        foreach ($mxIds as $mxId) {
+        foreach ($arguments as $mxId) {
             $mxId = (int)$mxId;
 
             if ($mxId == 0) {
@@ -387,7 +381,9 @@ class MapController
             }
 
             $map = Map::where('MxId', $mxId)
+                ->get()
                 ->first();
+
             if ($map) {
                 ChatController::messageAll($map, ' already exists');
                 continue;
@@ -410,7 +406,8 @@ class MapController
 
             $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1',
                 $response->getHeader('content-disposition')[0]);
-            $mapFolder = Config::get('server.maps');
+
+            $mapFolder = self::$mapsPath;
             File::put("$mapFolder/$fileName", $response->getBody());
 
             $map = Map::firstOrCreate([
@@ -420,6 +417,7 @@ class MapController
 
             $info = Server::getMapInfo($map->FileName)
                 ->toArray();
+
             if ($info) {
                 $map->update($info);
             }
