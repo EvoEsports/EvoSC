@@ -276,6 +276,11 @@ class MapController
                     'Enabled' => true
                 ]);
             }
+
+            if($map->FileName != $mapInfo->fileName){
+                $map->update(['FileName' => $mapInfo->fileName]);
+                Log::logAddLine('MapController', stripAll() . ' moved ' . $map->FileName . ' .. ' . $mapInfo->fileName);
+            }
         }
 
         Map::whereNotIn('UId', $enabledMapsUids)->update(['Enabled' => false]);
