@@ -413,7 +413,7 @@ class MapController
 
             $map = Map::firstOrCreate([
                 'MxId'     => $mxId,
-                'FileName' => $fileName,
+                'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
             ]);
 
             $info = Server::getMapInfo($map->FileName)
@@ -425,7 +425,7 @@ class MapController
 
             try {
                 Server::addMap($map->FileName);
-                Server::saveMatchSettings(matchSettings(self::$matchSettings) ?? matchSettings(config('server.default-matchsettings')));
+                Server::saveMatchSettings(matchSettings(self::$matchSettings) ?: matchSettings(config('server.default-matchsettings')));
             } catch (\Exception $e) {
                 Log::warning("Map $map->FileName already added.");
             }
