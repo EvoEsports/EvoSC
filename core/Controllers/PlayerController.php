@@ -70,7 +70,7 @@ class PlayerController
     public static function kickPlayer(Player $player, $cmd, $nick, ...$message)
     {
         $toKick = onlinePlayers()->filter(function (Player $player) use ($nick) {
-            return str_contains(stripAll($player->NickName), $nick);
+            return str_contains(stripStyle(stripColors($player->NickName)), $nick);
         });
 
         if($toKick->count() == 0){
