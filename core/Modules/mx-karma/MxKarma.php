@@ -284,10 +284,10 @@ class MxKarma extends MXK
             ->get();
 
         echo "New ratings; ";
-        var_dump($newRatings);
+        var_dump($newRatings->pluck('Rating'));
 
         foreach ($newRatings as $rating) {
-            $items->push($rating->rating);
+            $items->push($rating->Rating);
         }
 
         return $items->average();
