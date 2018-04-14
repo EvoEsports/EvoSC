@@ -39,6 +39,8 @@ class Vote
 
         Hook::add('EndMatch', 'esc\Classes\Vote::endMatch');
 
+        ChatController::addCommand('vote', 'esc\classes\Vote::custom', 'Cast a vote, parameter is question', '//',
+            'ban');
         ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
         ChatController::addCommand('res', 'esc\classes\Vote::replayMap',
             'Cast a vote to replay map (Alias for /replay)');
