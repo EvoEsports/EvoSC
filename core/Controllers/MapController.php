@@ -425,7 +425,7 @@ class MapController
 
             try {
                 Server::addMap($map->FileName);
-                Server::saveMatchSettings(self::$matchSettings ?? config('server.default-matchsettings'));
+                Server::saveMatchSettings(matchSettings(self::$matchSettings) ?? matchSettings(config('server.default-matchsettings')));
             } catch (\Exception $e) {
                 Log::warning("Map $map->FileName already added.");
             }

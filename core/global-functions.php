@@ -54,6 +54,7 @@ function cacheDir(string $filename = ''): string
 function ghost(string $filename = ''): string
 {
     $basePath = str_replace('/', '/', config('server.base'));
+
     return $basePath . 'UserData/Replays/Ghosts/' . $filename . '.Replay.Gbx';
 }
 
@@ -69,12 +70,14 @@ function coreDir(string $filename = ''): string
 
 function onlinePlayers(): \Illuminate\Support\Collection
 {
-    return esc\Models\Player::whereOnline(true)->get();
+    return esc\Models\Player::whereOnline(true)
+        ->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
 {
-    return esc\Models\Player::where('Score', '>', 0)->get();
+    return esc\Models\Player::where('Score', '>', 0)
+        ->get();
 }
 
 function cutZeroes(string $formattedScore): string
@@ -105,21 +108,29 @@ function info(string $str = ""): string
 function getEscVersion(): string
 {
     global $escVersion;
+
     return $escVersion;
 }
 
 function maps()
 {
-    return \esc\Models\Map::whereEnabled(true)->get();
+    return \esc\Models\Map::whereEnabled(true)
+        ->get();
 }
 
-function getMapInfoFromFile(string $fileName)
+function matchSettings(string $filename = null)
+{
+    return config('server.base') . '/UserData/Maps/MatchSettings/' . ($filename);
+}
+
+function getMapInfoFromFile(string $filename)
 {
     $mps = config('server.mps');
     $maps = config('server.maps') . '/';
-    if (file_exists($maps . $fileName) && file_exists($mps)) {
-        $process = new \Symfony\Component\Process\Process($mps . ' /parsegbx=' . $maps . $fileName);
+    if (file_exists($maps . $filename) && file_exists($mps)) {
+        $process = new \Symfony\Component\Process\Process($mps . ' /parsegbx=' . $maps . $filename);
         $process->run();
+
         return json_decode($process->getOutput());
     }
 }
