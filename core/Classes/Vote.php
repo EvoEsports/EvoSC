@@ -134,8 +134,7 @@ class Vote
         if (self::$lastVote != null && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
-            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'),
-                ' before voting again.');
+            ChatController::message($player, '_warning', 'Please wait ', secondary($waitTimeInSeconds . ' seconds'), ' before voting again.');
 
             return;
         }
@@ -152,7 +151,7 @@ class Vote
 
         Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
 
-        ChatController::messageAll($player, ' is asking for more time. Type /y or /n to vote.');
+        ChatController::messageAll("\$fff ", $player, ' is asking for more time. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -168,7 +167,7 @@ class Vote
         if (self::$lastVote != null && self::$lastVote->diffInSeconds() < 180) {
             $waitTimeInSeconds = 180 - self::$lastVote->diffInSeconds();
 
-            ChatController::message($player, 'Please wait ', secondary($waitTimeInSeconds . ' seconds'),
+            ChatController::message($player, '_warning', 'Please wait ', secondary($waitTimeInSeconds . ' seconds'),
                 ' before voting again.');
 
             return;
@@ -186,7 +185,7 @@ class Vote
 
         Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
 
-        ChatController::messageAll($player, ' is asking to skip the map. Type /y or /n to vote.');
+        ChatController::messageAll("\$fff ", $player, ' is asking to skip the map. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -203,11 +202,13 @@ class Vote
 
     public static function finishVote()
     {
-        $yesVotes = self::$votes->where('decision', true)
-            ->count();
+        if (strlen(self::$message) == 0) {
+            return;
+        }
 
-        $noVotes = self::$votes->where('decision', false)
-            ->count();
+        $yesVotes = self::$votes->where('decision', true)->count();
+
+        $noVotes = self::$votes->where('decision', false)->count();
 
         $successful = $yesVotes > $noVotes;
 
@@ -217,7 +218,7 @@ class Vote
 
         $voteText = '$' . config('color.secondary') . self::$message;
 
-        ChatController::messageAll('Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
+        ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
 
         self::stopVote();
     }
@@ -243,13 +244,13 @@ class Vote
             $timeleft = (self::$startTime + self::VOTE_TIME) - time();
 
             Template::showAll('vote', [
-                'message'      => self::$message,
-                'yes'          => $yes,
-                'no'           => $no,
-                'yesN'         => $yesVotes,
-                'noN'          => $noVotes,
+                'message' => self::$message,
+                'yes' => $yes,
+                'no' => $no,
+                'yesN' => $yesVotes,
+                'noN' => $noVotes,
                 'voteDuration' => self::VOTE_TIME,
-                'timeLeft'     => $timeleft,
+                'timeLeft' => $timeleft,
             ]);
         }
     }

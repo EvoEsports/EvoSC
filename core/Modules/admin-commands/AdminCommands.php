@@ -50,7 +50,7 @@ class AdminCommands
             foreach (onlinePlayers() as $ply) {
                 if ($ply->isAdmin()) {
                     ChatController::message($ply, $player, ' set a new server password: ', $pw);
-                }else{
+                } else {
                     ChatController::message($ply, $player, ' locked the server with a password');
                 }
             }
@@ -141,6 +141,6 @@ class AdminCommands
 
         MapController::goToNextMap();
 
-        ChatController::messageAll($callee, ' skips map');
+        ChatController::messageAll($callee->group, ' ', $callee, ' skips map');
     }
 }

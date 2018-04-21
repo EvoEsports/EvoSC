@@ -1,8 +1,10 @@
 {
   "module": "color",
-  "primary": "7ad",
-  "secondary": "ffc",
-  "chat": "fe9",
-  "info": "afb",
-  "warning": "fc9"
+  "primary": "0F2",
+  "secondary": "FFC",
+  "chat": "FE9",
+  "info": "AF0",
+  "warning": "EA2",
+  "local": "6AF",
+  "dedi": "02F"
 }

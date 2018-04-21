@@ -85,7 +85,7 @@ $$: Writes a dollarsign
             }
         }
 
-        if(preg_match('/^(\/|\/\/|##)/', $text)){
+        if (preg_match('/^(\/|\/\/|##)/', $text)) {
             ChatController::message($player, warning('Invalid chat command entered'));
             return;
         }
@@ -200,22 +200,63 @@ $$: Writes a dollarsign
             return;
         }
 
+        $icon = "";
+        $color = config('color.primary');
+
+        if (preg_match('/_(\w+)/', $parts[0], $matches)) {
+            //set primary color of message
+            switch ($matches[1]) {
+                case 'secondary':
+                    $icon = "";
+                    $color = config('color.secondary');
+                    break;
+
+                case 'info':
+                    $icon = "";
+                    $color = config('color.info');
+                    break;
+
+                case 'warning':
+                    $icon = "";
+                    $color = config('color.warning');
+                    break;
+
+                case 'local':
+                    $icon = "";
+                    $color = config('color.local');
+                    break;
+
+                case 'dedi':
+                    $icon = "";
+                    $color = config('color.dedi');
+                    break;
+
+                default:
+                    if (preg_match('/[0-9a-f]{3}/', $matches[1])) {
+                        $color = $matches[1];
+                    } else {
+                        $color = config('color.primary');
+                    }
+            }
+
+            //Remove color code from parts
+            array_shift($parts);
+        }
+
         $message = '$s';
 
         foreach ($parts as $part) {
-            if ($part == null) {
+            if ($part === null) {
                 continue;
             }
 
             if ($part instanceof Player) {
-                $message .= '$z$s$' . config('color.secondary');
-                $message .= $part->NickName;
+                $message .= secondary(stripAll($part->NickName));
                 continue;
             }
 
             if ($part instanceof Map) {
-                $message .= '$z$s$' . config('color.secondary');
-                $message .= $part->Name;
+                $message .= secondary(stripAll($part->Name));
                 continue;
             }
 
@@ -224,32 +265,27 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Module) {
-                $message .= '$z$s$' . config('color.secondary');
-                $message .= $part->name;
+                $message .= secondary(stripAll($part->name));
                 continue;
             }
 
             if ($part instanceof Song) {
-                $message .= '$z$s$' . config('color.secondary');
-                $message .= $part->title;
+                $message .= secondary($part->title);
                 continue;
             }
 
             if ($part instanceof LocalRecord) {
-                $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'local record $z$s$' . config('color.secondary') . formatScore($part->Score);
-                $message .= $part->title;
+                $message .= secondary($part->Rank) . '. $z$s$' . $color . 'local record $z$s' . secondary(formatScore($part->Score));
                 continue;
             }
 
             if ($part instanceof Dedi) {
-                $message .= '$z$s$' . config('color.secondary') . $part->Rank . '. $z$s$' . config('color.primary') . 'dedimania record $z$s$' . config('color.secondary') . formatScore($part->Score);
-                $message .= $part->title;
+                $message .= secondary($part->Rank) . '. $z$s$' . $color . 'dedimania record $z$s' . secondary(formatScore($part->Score));
                 continue;
             }
 
             if (is_float($part) || is_int($part) || preg_match('/\-?\d+\./', $part)) {
-                $message .= '$z$s$' . config('color.secondary');
-                $message .= $part;
+                $message .= secondary($part ?? "0");
                 continue;
             }
 
@@ -259,8 +295,12 @@ $$: Writes a dollarsign
                 var_dump(LocalRecord::class);
             }
 
-            $message .= '$z$s$' . config('color.primary');
-            $message .= $part;
+            $message .= '$z$s$' . $color . $part;
+
+        }
+
+        if (strlen($icon) > 0) {
+            $message = '$fff' . $icon . ' ' . $message;
         }
 
         Server::chatSendServerMessage($message, $recipient->Login);
