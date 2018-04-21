@@ -115,7 +115,7 @@ class AdminCommands
 
     public static function hideAdminControlPanel(...$vars)
     {
-        $admins = PlayerController::getPlayers()->filter(function (Player $ply) {
+        $admins = onlinePlayers()->filter(function (Player $ply) {
             return $ply->isAdmin();
         });
 
