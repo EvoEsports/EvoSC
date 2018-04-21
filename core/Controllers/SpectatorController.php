@@ -46,12 +46,12 @@ class SpectatorController
 
     private static function displaySpectatorsWidget(Player $target)
     {
-        $speccedBy = self::$specTargets->filter(function ($targetLogin) use ($target) {
-            return $targetLogin == $target->Login;
-        });
-
-        $speccingPlayers = onlinePlayers()->whereIn('Login', $speccedBy);
-
-        ChatController::message($target, '_info', 'You are being specced by: ', $speccingPlayers->pluck('NickName')->implode(', '));
+//        $speccedBy = self::$specTargets->filter(function ($targetLogin) use ($target) {
+//            return $targetLogin == $target->Login;
+//        });
+//
+//        $speccingPlayers = onlinePlayers()->whereIn('Login', $speccedBy);
+//
+//        ChatController::message($target, '_info', 'You are being specced by: ', $speccingPlayers->pluck('NickName')->implode(', '));
     }
 }
