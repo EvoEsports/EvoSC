@@ -307,6 +307,11 @@ $$: Writes a dollarsign
             $message = '$fff' . $icon . ' ' . $message;
         }
 
-        Server::chatSendServerMessage($message, $recipient->Login);
+        try{
+            Server::chatSendServerMessage($message, $recipient->Login);
+        }catch(\Exception $e){
+            Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
+            Log::logAddLine('', $e->getTraceAsString());
+        }
     }
 }
