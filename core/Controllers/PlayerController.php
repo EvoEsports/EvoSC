@@ -206,6 +206,7 @@ class PlayerController
         }
 
         Log::info($player->NickName . " joined the server.");
+        Log::info($player->NickName . " joined the server.");
 
         self::displayPlayerlist();
 

@@ -255,7 +255,7 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Player) {
-                $message .= secondary(stripAll($part->NickName));
+                $message .= $part->NickName;
                 continue;
             }
 
