@@ -249,10 +249,10 @@ class PlayerController
         }
 
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
+        ChatController::messageAll($player, ' left the server');
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
-        ChatController::messageAll($player, ' left the server');
     }
 
     /**
