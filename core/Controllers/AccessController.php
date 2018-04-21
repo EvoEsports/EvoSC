@@ -29,6 +29,7 @@ class AccessController
             ['name' => 'player.ban', 'description' => 'Ban a player'],
             ['name' => 'player.mute', 'description' => 'Mute a player'],
             ['name' => 'time', 'description' => 'Can change the countdown time'],
+            ['name' => 'group', 'description' => 'Add/delete/update groups'],
         ];
 
         Database::create('access-rights', function (Blueprint $table) {
