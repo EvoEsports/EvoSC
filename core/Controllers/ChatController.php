@@ -207,7 +207,7 @@ $$: Writes a dollarsign
         $icon = "";
         $color = config('color.primary');
 
-        if (preg_match('/_(\w+)/', $parts[0], $matches)) {
+        if (preg_match('/\_(\w+)/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
@@ -314,6 +314,7 @@ $$: Writes a dollarsign
         }catch(\Exception $e){
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
             Log::logAddLine('', $e->getTraceAsString());
+            return;
         }
     }
 }
