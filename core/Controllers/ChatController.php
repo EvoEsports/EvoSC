@@ -159,9 +159,9 @@ $$: Writes a dollarsign
         array_unshift($arguments, $player);
 
         if ($command) {
-            try{
+            try {
                 call_user_func_array($command->callback, $arguments);
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getTraceAsString(), true);
             }
             $isValidCommand = true;
@@ -199,7 +199,7 @@ $$: Writes a dollarsign
 
     public static function message(?Player $recipient, ...$parts)
     {
-        if (!$recipient) {
+        if (!$recipient || !isset($recipient->Login) || $recipient->Login == null) {
             Log::warning('Do not send message to null player');
             return;
         }
