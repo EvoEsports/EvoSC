@@ -191,7 +191,7 @@ class PlayerController
 
             if ($stats) {
                 if (!$surpressJoinMessage) {
-                    ChatController::messageAll('_info', $player->group, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', secondary($stats->updated_at->diffForHumans()));
+                    ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', secondary($stats->updated_at->diffForHumans()));
                 }
             }
 
@@ -201,7 +201,7 @@ class PlayerController
             }
         } else {
             if (!$surpressJoinMessage) {
-                ChatController::messageAll('_info', $player->group, ' ', $player, ' joined the server.');
+                ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server.');
             }
         }
 
@@ -249,7 +249,7 @@ class PlayerController
         }
 
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
-        ChatController::messageAll($player, ' left the server');
+        ChatController::messageAll('_info', $player->NickName, ' left the server');
         $player->setOffline();
         $player->setScore(0);
         self::displayPlayerlist();
@@ -296,7 +296,7 @@ class PlayerController
 
         $playerInfo = $players->where('playerId', $id)->first();
 
-        if($playerInfo){
+        if ($playerInfo) {
             return Player::whereLogin($playerInfo->login)->get()->first();
         }
 
