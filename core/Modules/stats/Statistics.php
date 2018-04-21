@@ -261,9 +261,9 @@ class Statistics
 
             if ($stats->player->Online) {
                 if ($stats->Rank && $stats->Rank > 0) {
-                    ChatController::message($stats->player, 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
+                    ChatController::message($stats->player, '_info', 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
                 } else {
-                    ChatController::message($stats->player, 'You need at least one local record before receiving a rank.');
+                    ChatController::message($stats->player, '_info', 'You need at least one local record before receiving a rank.');
                 }
             }
         });

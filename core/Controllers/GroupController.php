@@ -5,8 +5,11 @@ namespace esc\Controllers;
 
 use esc\Classes\ChatCommand;
 use esc\classes\Database;
+use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Models\AccessRight;
 use esc\Models\Group;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -17,8 +20,16 @@ class GroupController
     {
         self::createTables();
 
+        Template::add('groups', File::get('core/Templates/groups.latte.xml'));
+        Template::add('group.edit', File::get('core/Templates/group-edit.latte.xml'));
+
         ChatCommand::add('group', 'esc\Controllers\GroupController::group', 'Group commands', '//', 'group');
         ChatCommand::add('groups', 'esc\Controllers\GroupController::displayGroups', 'Show groups overview', '//', 'group');
+
+        ManiaLinkEvent::add('group.delete', 'esc\Controllers\GroupController::groupDelete', 'group');
+        ManiaLinkEvent::add('group.edit', 'esc\Controllers\GroupController::groupEdit', 'group');
+        ManiaLinkEvent::add('group.toggle.access', 'esc\Controllers\GroupController::groupToggleAccessRight', 'group');
+        ManiaLinkEvent::add('groups.show', 'esc\Controllers\GroupController::groupsShow', 'group');
     }
 
     public static function createTables()
@@ -74,8 +85,62 @@ class GroupController
         }
 
         ChatController::messageAll('_info', $player->group, ' ', $player, ' created group ', $group);
+    }
 
-        return;
+    public static function groupDelete(Player $player, $id)
+    {
+        $group = Group::find($id);
+
+        if ($group) {
+            ChatController::messageAll('_info', $player->group, ' ', $player, ' deleted group ', $group);
+            Group::whereId($id)->delete();
+            self::displayGroups($player);
+            return;
+        } else {
+            Log::logAddLine('GroupController', 'Group with id ' . $id . ' not found');
+        }
+    }
+
+    public static function groupEdit(Player $player, $id)
+    {
+        $group = Group::find($id);
+
+        if (!$group) {
+            ChatController::message($player, '_warning', 'Invalid group selected');
+            Log::logAddLine('GroupController', 'Invalid group selected: ' . $id);
+            return;
+        }
+
+        $accessRights = AccessRight::all();
+        $groupEdit = Template::toString('group.edit', compact('accessRights', 'group'));
+
+        Template::hide($player, 'Groups');
+        Template::show($player, 'esc.modal', [
+            'id' => 'Group - Edit',
+            'width' => 90,
+            'height' => count($accessRights) * 4.6 + 16,
+            'content' => $groupEdit,
+            'onClose' => 'groups.show'
+        ]);
+    }
+
+    public static function groupToggleAccessRight(Player $player, $groupId, $accessRightId, bool $hasAccess)
+    {
+        $group = Group::find($groupId);
+
+        if ($hasAccess) {
+            $group->accessRights()->detach($accessRightId);
+        } else {
+            $group->accessRights()->attach($accessRightId);
+        }
+
+        self::groupEdit($player, $groupId);
+    }
+
+    public static function groupsShow(Player $player)
+    {
+        Template::hide($player, 'Group - Edit');
+        self::displayGroups($player);
     }
 
     public static function displayGroups(Player $player)
@@ -86,8 +151,8 @@ class GroupController
 
         Template::show($player, 'esc.modal', [
             'id' => 'Groups',
-            'width' => 180,
-            'height' => 97,
+            'width' => 90,
+            'height' => count($groups) * 4.5 + 15,
             'content' => $groupList
         ]);
     }

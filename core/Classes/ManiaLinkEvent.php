@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use esc\Controllers\ChatController;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -63,7 +64,9 @@ class ManiaLinkEvent
             return;
         }
 
-        if($event->access && !$ply->group->hasAccess($event->access)){
+        if ($event->access && !$ply->group->hasAccess($event->access)) {
+            ChatController::message($ply, '_warning', 'Access denied');
+            Log::logAddLine('Access', 'Player ' . stripAll($ply->NickName) . ' tried to access forbidden: ' . $event->callback);
             return;
         }
 

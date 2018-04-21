@@ -1,0 +1,17 @@
+<label pos="0 0" z-index="0" size="79 5" textsize="1.2" text="#"/>
+<label pos="5 0" z-index="0" size="40 5" textsize="1.2" text="Name"/>
+
+{if isset($groups)}
+{foreach $groups as $key => $group}
+<frame pos="0 {($key+1) * -4.5}">
+    <label pos="0 0" z-index="0" size="79 4" textsize="1" text="{$group->id}"/>
+    <label pos="5 0" z-index="0" size="40 4" textsize="1" text="{$group->Name}"/>
+    {if $group->id != 1}
+    <label pos="40 0" z-index="0" size="16 3" textsize="1" text="Edit access" action="group.edit,{$group->id}"/>
+    {/if}
+    {if !$group->Protected}
+    <label pos="56 0" z-index="0" size="14 3" textsize="1" text="Delete" textcolor="f00c" action="group.delete,{$group->id}"/>
+    {/if}
+</frame>
+{/foreach}
+{/if}
