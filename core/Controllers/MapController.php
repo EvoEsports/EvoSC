@@ -128,10 +128,10 @@ class MapController
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->FileName);
-            ChatController::messageAll('Next map: ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::messageAll("\$fff", 'Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::messageAll('Next map: ', $nextMap);
+            ChatController::messageAll("\$fff", 'Next map is ', $nextMap);
         }
     }
 

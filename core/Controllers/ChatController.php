@@ -216,7 +216,7 @@ $$: Writes a dollarsign
                     break;
 
                 case 'info':
-                    $icon = "";
+                    $icon = "";
                     $color = config('color.info');
                     break;
 
@@ -260,7 +260,7 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Map) {
-                $message .= secondary(stripAll($part->Name));
+                $message .= $part->Name;
                 continue;
             }
 

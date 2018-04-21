@@ -223,7 +223,7 @@ class Statistics
 
         if ($bestPlayer) {
             $bestPlayer->stats()->increment('Wins');
-            ChatController::messageAll('Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
+            ChatController::messageAll("\$fff🏆", 'Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
         }
     }
 
