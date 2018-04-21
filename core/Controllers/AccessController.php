@@ -17,16 +17,18 @@ class AccessController
     public static function createTables()
     {
         $seed = [
-            ['name' => 'skip', 'description' => 'Skip the map'],
-            ['name' => 'replay', 'description' => 'Queue map for replay'],
+            ['name' => 'map.skip', 'description' => 'Skip the map instantly'],
+            ['name' => 'map.replay', 'description' => 'Queue map for replay'],
             ['name' => 'map.add', 'description' => 'Permanently add map from MX'],
             ['name' => 'map.delete', 'description' => 'Delete map from server'],
-            ['name' => 'vote', 'description' => 'You can approve/decline votes'],
-            ['name' => 'kick', 'description' => 'Kick a player'],
-            ['name' => 'ban', 'description' => 'Ban a player'],
-            ['name' => 'mute', 'description' => 'Mute a player'],
+            ['name' => 'queue.recent', 'description' => 'Can queue recently played maps'],
+            ['name' => 'queue.drop', 'description' => 'Drop maps from queue'],
+            ['name' => 'vote.decide', 'description' => 'You can approve/decline votes'],
+            ['name' => 'vote.cast', 'description' => 'Create a custom vote'],
+            ['name' => 'player.kick', 'description' => 'Kick a player'],
+            ['name' => 'player.ban', 'description' => 'Ban a player'],
+            ['name' => 'player.mute', 'description' => 'Mute a player'],
             ['name' => 'time', 'description' => 'Can change the countdown time'],
-            ['name' => 'recent', 'description' => 'Can queue recently played maps']
         ];
 
         Database::create('access-rights', function (Blueprint $table) {
