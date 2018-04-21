@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
+    protected $table = 'groups';
+
+    protected $fillable = ['Name'];
+
+    public $timestamps = false;
+
     public function hasAccess(string $accessRightName)
     {
         return $this->accessRights->where('name', $accessRightName)->isNotEmpty();

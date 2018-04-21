@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\ChatCommand;
 use esc\classes\Database;
 use esc\Classes\Log;
+use esc\Classes\Template;
 use esc\Models\Group;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,7 +17,8 @@ class GroupController
     {
         self::createTables();
 
-        ChatCommand::add('group', 'Group commands', 'Group commands', '//', 'group');
+        ChatCommand::add('group', 'esc\Controllers\GroupController::group', 'Group commands', '//', 'group');
+        ChatCommand::add('groups', 'esc\Controllers\GroupController::displayGroups', 'Show groups overview', '//', 'group');
     }
 
     public static function createTables()
@@ -46,14 +48,14 @@ class GroupController
         }
     }
 
-    private static function groupAdd(Player $player, ...$arguments)
+    public static function groupAdd(Player $player, ...$arguments)
     {
         if (count($arguments[0]) != 1) {
             ChatController::message($player, '_warning', 'Invalid amount of arguments supplied. Required: name');
             return;
         }
 
-        $groupName = $arguments[0];
+        $groupName = $arguments[0][0];
         $groupNameExists = Group::whereName($groupName)->get()->isNotEmpty();
 
         if ($groupNameExists) {
@@ -63,16 +65,30 @@ class GroupController
 
         try {
             $group = Group::create([
-                'Name' => $arguments
+                'Name' => $groupName
             ]);
         } catch (\Exception $e) {
             Log::logAddLine('GroupController', 'Failed to create group with name ' . $groupName);
-            Log::logAddLine('', $e->getTraceAsString());
+            Log::logAddLine($e->getMessage(), $e->getTraceAsString());
             return;
         }
 
         ChatController::messageAll('_info', $player->group, ' ', $player, ' created group ', $group);
 
         return;
+    }
+
+    public static function displayGroups(Player $player)
+    {
+        $groups = Group::all();
+
+        $groupList = Template::toString('groups', compact('groups'));
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'Groups',
+            'width' => 180,
+            'height' => 97,
+            'content' => $groupList
+        ]);
     }
 }

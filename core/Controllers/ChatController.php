@@ -159,7 +159,11 @@ $$: Writes a dollarsign
         array_unshift($arguments, $player);
 
         if ($command) {
-            call_user_func_array($command->callback, $arguments);
+            try{
+                call_user_func_array($command->callback, $arguments);
+            }catch(\Exception $e){
+                Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getTraceAsString(), true);
+            }
             $isValidCommand = true;
         }
 
