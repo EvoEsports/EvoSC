@@ -307,6 +307,8 @@ $$: Writes a dollarsign
             $message = '$fff' . $icon . ' ' . $message;
         }
 
+        var_dump($recipient->Login);
+
         try{
             Server::chatSendServerMessage($message, $recipient->Login);
         }catch(\Exception $e){
