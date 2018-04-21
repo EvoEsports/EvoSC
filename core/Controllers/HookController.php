@@ -159,23 +159,9 @@ class HookController extends ModescriptCallbacks
             case 'PlayerInfoChanged':
                 //SPlayerInfo PlayerInfo
                 PlayerController::playerInfoChanged($arguments);
-                $players = new Collection();
-                foreach ($arguments as $playerInfo) {
-                    $players->add(Player::find($playerInfo['Login']));
-                }
+                $playerLogins = collect($arguments)->pluck('Login');
+                $players = Player::whereIn('Login', $playerLogins)->get();
                 self::fireHookBatch($hooks, $players);
-                break;
-
-            case 'PlayerConnect':
-                //string Login, bool IsSpectator
-//                if (Player::whereLogin($arguments[0])->get()->isEmpty()) {
-//                    $player = Player::create(['Login' => $arguments[0]]);
-//                } else {
-//                    $player = Player::find($arguments[0]);
-//                }
-//
-//                $player->spectator = $arguments[1];
-//                self::fireHookBatch($hooks, $player);
                 break;
 
             case 'PlayerDisconnect':

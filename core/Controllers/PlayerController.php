@@ -34,6 +34,9 @@ class PlayerController
         self::$fakePlayers = collect([]);
         ChatController::addCommand('kick', '\esc\Controllers\PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
         ChatController::addCommand('ban', '\esc\Controllers\PlayerController::banPlayer', 'Ban player by nickname', '//', 'ban');
+
+        ChatController::addCommand('fake', '\esc\Controllers\PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
+        ChatController::addCommand('disfake', '\esc\Controllers\PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
     }
 
     public static function createTables()
@@ -46,7 +49,7 @@ class PlayerController
             $table->integer('Score')->default(0);
             $table->boolean('Online')->default(false);
             $table->integer('Afk')->default(0);
-            $table->boolean('Spectator')->default(false);
+            $table->integer('spectator_status')->default(0);
             $table->integer('MaxRank')->default(15);
             $table->boolean('Banned')->default(false);
         });
@@ -259,15 +262,7 @@ class PlayerController
     public static function playerInfoChanged($infoplayerInfo)
     {
         foreach ($infoplayerInfo as $info) {
-            if (!isset($info['Login'])) {
-                Log::error("Login not set");
-                var_dump($info);
-                die();
-            }
-
-            if (Player::where('Login', $info['Login'])
-                ->get()
-                ->isEmpty()) {
+            if (Player::where('Login', $info['Login'])->get()->isEmpty()) {
                 $player = Player::create(['Login' => $info['Login'], 'Group' => 3]);
             } else {
                 $player = Player::find($info['Login']);
@@ -277,16 +272,34 @@ class PlayerController
                 Stats::create(['Player' => $player->id]);
             }
 
+            $info['spectator_status'] = $info['SpectatorStatus'];
             $player->update($info);
 
             if (!$player->Online) {
                 self::playerConnect($player);
             }
-
-            $player->setIsSpectator($info['SpectatorStatus'] > 0);
         }
 
         self::displayPlayerlist();
+    }
+
+    public static function getPlayerByServerId(int $id): ?Player
+    {
+        try {
+            $players = collect(Server::getRpc()->getPlayerList());
+        } catch (\Exception $e) {
+            Log::logAddLine('PlayerController', 'Failed to get player list', true);
+            Log::logAddLine('PlayerController', $e->getTraceAsString());
+            return null;
+        }
+
+        $playerInfo = $players->where('playerId', $id)->first();
+
+        if($playerInfo){
+            return Player::whereLogin($playerInfo->login)->get()->first();
+        }
+
+        return null;
     }
 
     /**

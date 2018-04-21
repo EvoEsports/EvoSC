@@ -12,7 +12,7 @@ use Stats;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'Spectator', 'MaxRank', 'Banned'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
@@ -49,26 +49,6 @@ class Player extends Model
     {
         $player = self::whereLogin($login)->first();
         return $player != null;
-    }
-
-    /**
-     * Set spectator status
-     * @param bool $isSpectator
-     * @return Player
-     */
-    public function setIsSpectator(bool $isSpectator): Player
-    {
-        $this->update(['Spectator' => $isSpectator]);
-        return $this;
-    }
-
-    /**
-     * Get spectator status
-     * @return bool
-     */
-    public function isSpectator(): bool
-    {
-        return $this->Spectator;
     }
 
     /**
@@ -127,6 +107,23 @@ class Player extends Model
     public function group()
     {
         return $this->hasOne(Group::class, 'id', 'Group');
+    }
+
+    public function getSpectatorStatusAttribute($value)
+    {
+        $object = collect([]);
+        $object->spectator = (bool)($value % 10);
+        $object->temporarySpectator = (bool)(intval($value / 10) % 10);
+        $object->pureSpectator = (bool)(intval($value / 100) % 10);
+        $object->autoTarget = (bool)(intval($value / 1000) % 10);
+        $object->currentTargetId = intval($value / 10000);
+
+        return $object;
+    }
+
+    public function isSpectator(): bool
+    {
+        return $this->spectator_status->spectator ?? false;
     }
 
     public function isMasteradmin(): bool
