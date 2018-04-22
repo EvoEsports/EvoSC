@@ -5,6 +5,7 @@ namespace esc\Classes;
 
 use Carbon\Carbon;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,7 +13,7 @@ use Illuminate\Support\Collection;
 
 class Vote
 {
-    const VOTE_TIME = 15;
+    const VOTE_TIME = 30;
 
     private static $inProgress;
     private static $message;
@@ -39,14 +40,15 @@ class Vote
 
         Hook::add('EndMatch', 'esc\Classes\Vote::endMatch');
 
-        ChatController::addCommand('vote', 'esc\classes\Vote::custom', 'Cast a vote, parameter is question', '//',
-            'ban');
-        ChatController::addCommand('replay', 'esc\classes\Vote::replayMap', 'Cast a vote to replay map');
-        ChatController::addCommand('res', 'esc\classes\Vote::replayMap',
-            'Cast a vote to replay map (Alias for /replay)');
-        ChatController::addCommand('skip', 'esc\classes\Vote::skipMap', 'Cast a vote to skip map');
-        ChatController::addCommand('y', 'esc\classes\Vote::voteYes', 'Vote yes');
-        ChatController::addCommand('n', 'esc\classes\Vote::voteNo', 'Vote no');
+        ChatController::addCommand('vote', 'esc\Classes\Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');
+        ChatController::addCommand('replay', 'esc\Classes\Vote::replayMap', 'Cast a vote to replay map');
+        ChatController::addCommand('res', 'esc\Classes\Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
+        ChatController::addCommand('skip', 'esc\Classes\Vote::skipMap', 'Cast a vote to skip map');
+        ChatController::addCommand('y', 'esc\Classes\Vote::voteYes', 'Vote yes');
+        ChatController::addCommand('n', 'esc\Classes\Vote::voteNo', 'Vote no');
+
+        KeyController::createBind('F5', 'esc\Classes\Vote::voteYes');
+        KeyController::createBind('F6', 'esc\Classes\Vote::voteNo');
     }
 
     public static function active(): bool
@@ -142,7 +144,7 @@ class Vote
         self::$lastVote = Carbon::now();
         self::$votes = new Collection();
         self::$inProgress = true;
-        self::$message = 'Play for another 5 minutes?';
+        self::$message = 'Add 10 minutes playtime?';
         self::$startTime = time();
         self::$action = 'esc\classes\Vote::doReplay';
         self::$starter = $player;
@@ -226,27 +228,23 @@ class Vote
     public static function showVote()
     {
         if (self::$inProgress) {
-            $yesVotes = self::$votes->where('decision', true)
-                ->count();
-            $noVotes = self::$votes->where('decision', false)
-                ->count();
+            $yesVotes = self::$votes->where('decision', true)->count();
+            $noVotes = self::$votes->where('decision', false)->count();
 
             $totalVotes = $yesVotes + $noVotes;
 
             if ($totalVotes > 0) {
-                $yesRatio = ($yesVotes * 100) / $totalVotes;
-                $noRatio = ($noVotes * 100) / $totalVotes;
+                $yesRatio = ($yesVotes) / $totalVotes;
+                $yes = $yesRatio * 46;
+                $no = 46 - $yes;
             }
-
-            $yes = ($yesRatio ?: 0) * 0.35;
-            $no = ($noRatio ?: 0) * 0.35;
 
             $timeleft = (self::$startTime + self::VOTE_TIME) - time();
 
             Template::showAll('vote', [
                 'message' => self::$message,
-                'yes' => $yes,
-                'no' => $no,
+                'yes' => $yes ?? 0,
+                'no' => $no ?? 0,
                 'yesN' => $yesVotes,
                 'noN' => $noVotes,
                 'voteDuration' => self::VOTE_TIME,

@@ -24,7 +24,6 @@ class PlayerController
     {
         self::createTables();
 
-        Hook::add('PlayerConnect', '\esc\Controllers\PlayerController::playerConnect');
         Hook::add('PlayerDisconnect', '\esc\Controllers\PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', '\esc\Controllers\PlayerController::playerFinish');
 

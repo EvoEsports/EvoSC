@@ -101,7 +101,7 @@ class MapController
      *
      * @param int $minutes
      */
-    public static function addTime(int $minutes = 5)
+    public static function addTime(int $minutes = 10)
     {
         self::$addedTime = self::$addedTime + $minutes;
         $totalNewTime = (config('server.roundTime', 7) + self::$addedTime) * 60;
@@ -128,10 +128,10 @@ class MapController
         if ($request) {
             Log::info("Try set next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->FileName);
-            ChatController::messageAll("\$fff", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::messageAll("\$n\$fff", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::messageAll("\$fff", ' Next map is ', $nextMap);
+            ChatController::messageAll("\$n\$fff", ' Next map is ', $nextMap);
         }
     }
 

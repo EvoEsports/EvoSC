@@ -3,6 +3,12 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
+use esc\Models\Player;
+
 class KeyController
 {
     private static $binds;
@@ -10,22 +16,48 @@ class KeyController
     public static function init()
     {
         self::$binds = collect([]);
+
+        Hook::add('PlayerConnect', 'esc\Controllers\KeyController::playerConnect');
+
+        ManiaLinkEvent::add('keybind', 'esc\Controllers\KeyController::executeBinds');
+
+        Template::add('keybinds', File::get('core/Templates/keybinds.latte.xml'));
+
+        foreach (onlinePlayers() as $player) {
+            self::sendKeybindsScript($player);
+        }
     }
 
     public static function createBind(string $key, string $function)
     {
-        $bind = collect([
-            'key' => $key,
-            'function' => $function
-        ]);
+        $bind = collect([]);
+
+        $bind->key = $key;
+        $bind->function = $function;
 
         self::$binds->push($bind);
     }
 
-    public static function executeBinds(string $key)
+    public static function executeBinds(Player $player, string $key)
     {
         $binds = self::$binds->where('key', $key);
 
-        var_dump($binds);
+        if ($binds->count() == 0) {
+            return;
+        }
+
+        foreach ($binds as $bind) {
+            call_user_func_array($bind->function, [$player]);
+        }
+    }
+
+    public static function sendKeybindsScript(Player $player)
+    {
+        Template::show($player, 'keybinds', []);
+    }
+
+    public static function playerConnect(Player $player)
+    {
+        self::sendKeybindsScript($player);
     }
 }
