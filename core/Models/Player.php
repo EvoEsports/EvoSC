@@ -12,7 +12,7 @@ use Stats;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned', 'user_settings'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
@@ -119,6 +119,16 @@ class Player extends Model
         $object->currentTargetId = intval($value / 10000);
 
         return $object;
+    }
+
+    public function getUserSettingsAttribute($value)
+    {
+        return json_decode($value);
+    }
+
+    public function setSetting($setting, $value)
+    {
+        Player::whereLogin($this->Login)->update(["user_settings->$setting" => $value]);
     }
 
     public function isSpectator(): bool

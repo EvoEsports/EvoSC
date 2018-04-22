@@ -30,6 +30,7 @@ class PlayerController
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
         ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
+        ChatController::addCommand('hidespeed', '\esc\Controllers\PlayerController::setHideSpeed', 'Set speed at which UI hides, 0 = disable hiding');
 
         self::$fakePlayers = collect([]);
         ChatController::addCommand('kick', '\esc\Controllers\PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
@@ -52,6 +53,7 @@ class PlayerController
             $table->integer('spectator_status')->default(0);
             $table->integer('MaxRank')->default(15);
             $table->boolean('Banned')->default(false);
+            $table->text('user_settings')->nullable();
         });
     }
 
@@ -79,6 +81,21 @@ class PlayerController
         }
 
         return $players->first();
+    }
+
+    public static function setHideSpeed(Player $player, $cmd = null, $hideSpeed = 0)
+    {
+        if (!$cmd || $hideSpeed === null) {
+            return;
+        }
+
+        $player->setSetting('ui->hideSpeed', $hideSpeed);
+
+        if($hideSpeed == 0){
+            ChatController::message($player, '_info', 'UI hiding disabled');
+        }else{
+            ChatController::message($player, '_info', 'UI hides now at ', $hideSpeed);
+        }
     }
 
     /**
