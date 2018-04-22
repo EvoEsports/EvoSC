@@ -75,7 +75,7 @@ function startEsc()
     \esc\Classes\Template::add('esc.stat-list', \esc\Classes\File::get(__DIR__ . '/Templates/Components/stat-list.latte.xml'));
     \esc\Classes\Template::add('blank', \esc\Classes\File::get(__DIR__ . '/Templates/blank.latte.xml'));
 
-    \esc\Controllers\ChatController::addCommand('config', 'esc\Classes\Config::loadConfigFiles', 'Reload config', '//', 'ban');
+    \esc\Controllers\ChatController::addCommand('config', 'esc\Classes\Config::configReload', 'Reload config', '//', 'config');
 
     $settings = \esc\Classes\Server::getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;

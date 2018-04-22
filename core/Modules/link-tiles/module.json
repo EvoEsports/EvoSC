@@ -1,0 +1,6 @@
+{
+  "name": "Link tiles",
+  "description": "Small icon widgets with text that open link on click",
+  "author": "brakerb",
+  "main": "LinkTiles"
+}

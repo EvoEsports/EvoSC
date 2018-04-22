@@ -1,0 +1,17 @@
+{
+  "module": "tiles",
+  "tiles": [
+    {
+      "icon": "",
+      "title": "Example",
+      "url": "http://example.com/",
+      "pos": "152 12"
+    },
+    {
+      "icon": "",
+      "title": "Example",
+      "url": "http://example.com/",
+      "pos": "143 12"
+    },
+  ]
+}

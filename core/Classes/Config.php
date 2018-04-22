@@ -4,6 +4,7 @@ namespace esc\Classes;
 
 
 use esc\Controllers\ChatController;
+use esc\Controllers\ModuleController;
 
 class Config
 {
@@ -67,8 +68,21 @@ class Config
             Log::info("Config ($json->module) loaded.");
         }
 
-        if(count($args)){
+        if (count($args)) {
             ChatController::messageAll(warning('Config files reloaded'));
         }
+    }
+
+    public static function configReload()
+    {
+        self::loadConfigFiles();
+
+        $loadedModules = ModuleController::getModules();
+
+        $loadedModules->each(function (Module $module) {
+            if (method_exists($module->class, 'onConfigReload')) {
+                call_user_func("$module->class::onConfigReload");
+            }
+        });
     }
 }
