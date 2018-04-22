@@ -209,7 +209,6 @@ class Vote
         }
 
         $yesVotes = self::$votes->where('decision', true)->count();
-
         $noVotes = self::$votes->where('decision', false)->count();
 
         $successful = $yesVotes > $noVotes;
@@ -220,7 +219,7 @@ class Vote
 
         $voteText = '$' . config('color.secondary') . self::$message;
 
-        ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' was ', $successful ? 'successful' : 'not successful');
+        ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
 
         self::stopVote();
     }
