@@ -34,10 +34,7 @@ class ModuleController
 
         if ($module) {
             $module->load($callee);
-
-            foreach (onlinePlayers() as $player) {
-                ChatController::message($player, $callee, ' reloads module ', $module);
-            }
+            ChatController::messageAll('_info', $callee, ' reloads module ', $module);
         }
     }
 
@@ -48,7 +45,7 @@ class ModuleController
 
     public static function showModules(Player $player)
     {
-        if(!$player->isMasteradmin()){
+        if (!$player->isMasteradmin()) {
             ChatController::message($player, warning('Access denied'));
             return;
         }
