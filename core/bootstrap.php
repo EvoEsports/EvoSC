@@ -63,6 +63,7 @@ function startEsc()
     esc\Controllers\MapController::init();
     esc\Controllers\PlayerController::init();
     \esc\Controllers\SpectatorController::init();
+    \esc\Controllers\KeyController::init();
     esc\Classes\Vote::init();
     esc\Controllers\ModuleController::init();
 

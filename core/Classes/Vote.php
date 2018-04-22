@@ -94,7 +94,7 @@ class Vote
         }
 
         $nonSpectators = Player::whereOnline(true)
-            ->whereSpectator(false)
+            ->where('spectator_status', 0)
             ->get();
 
         if (count(self::$votes) == $nonSpectators->count()) {
