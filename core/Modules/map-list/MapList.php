@@ -20,6 +20,7 @@ class MapList
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
+        ManiaLinkEvent::add('maplist.disable', 'MapList::disableMap', 'map.delete');
         ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
@@ -167,19 +168,22 @@ class MapList
         self::closeMapList($player);
     }
 
-    public static function deleteMap(Player $player, $mapId)
+    public static function disableMap(Player $player, $mapId)
     {
-        if (!$player->isAdmin()) {
-            ChatController::message($player, 'You do not have access to that command');
-
-            return;
-        }
-
-        $map = Map::where('id', intval($mapId))
-            ->first();
+        $map = Map::where('id', intval($mapId))->first();
 
         if ($map) {
-            MapController::deleteMap($map);
+            MapController::disableMap($player, $map);
+            self::closeMapList($player);
+        }
+    }
+
+    public static function deleteMap(Player $player, $mapId)
+    {
+        $map = Map::where('id', intval($mapId))->first();
+
+        if ($map) {
+            MapController::deleteMap($player, $map);
             self::closeMapList($player);
         }
     }

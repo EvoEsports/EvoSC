@@ -160,12 +160,7 @@ class MapController
         return self::$queue->sortBy('timeRequested');
     }
 
-    /**
-     * Delete a map
-     *
-     * @param Map $map
-     */
-    public static function deleteMap(Map $map)
+    public static function deleteMap(Player $player, Map $map)
     {
         try {
             Server::removeMap($map->FileName);
@@ -177,8 +172,27 @@ class MapController
 
         if ($deleted) {
             ChatController::messageAll('Admin removed map ', $map);
-            $map->delete();
+            try{
+                $map->delete();
+                ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map, ' permanently');
+            }catch(\Exception $e){
+                Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
+            }
         }
+    }
+
+    public static function disableMap(Player $player, Map $map)
+    {
+        try {
+            Server::removeMap($map->FileName);
+        } catch (FileException $e) {
+            Log::error($e);
+        }
+
+        $map->update(['Enabled' => false]);
+        Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+
+        ChatController::messageAll('_info', $player->group, ' ', $player, ' disabled map ', $map);
     }
 
     /**
