@@ -13,15 +13,18 @@ class Clock
 
         Hook::add('PlayerConnect', 'Clock::displayClock');
 
-        foreach (onlinePlayers() as $player) {
-            self::displayClock($player);
-        }
+        Clock::onConfigReload();
+    }
+
+    public static function onConfigReload()
+    {
+        $clock = config('ui.clock');
+        Template::showAll('clock', compact('clock'));
     }
 
     public static function displayClock(Player $player)
     {
         $clock = config('ui.clock');
-
         Template::show($player, 'clock', compact('clock'));
     }
 }
