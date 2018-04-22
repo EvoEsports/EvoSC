@@ -120,6 +120,8 @@ class MapList
             'maps' => $maps,
             'player' => $player,
             'queuedMaps' => $queuedMaps,
+            'filter' => $filter,
+            'page' => $page,
             'locals' => $records['locals'],
             'dedis' => $records['dedis'],
         ]);
@@ -182,7 +184,7 @@ class MapList
         }
     }
 
-    public static function showMapDetails(Player $player, $mapId)
+    public static function showMapDetails(Player $player, $mapId, $page = 1, $filter = '', $returnToMaplist = false)
     {
         $map = Map::find($mapId);
 
@@ -200,6 +202,7 @@ class MapList
             'width' => 120,
             'height' => 50,
             'content' => $detailPage,
+            'onClose' => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
             'showAnimation' => true,
         ]);
     }
