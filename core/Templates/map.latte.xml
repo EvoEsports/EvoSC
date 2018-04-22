@@ -11,6 +11,7 @@
 
     <label pos="45 -5" valign="center" halign="center" textsize="2" size="6 6" text="" textcolor="ffff"/>
 
-    <quad pos="0 0" size="50 10" action="maplist.show" />
+    <quad pos="0 0" size="40 10" action="maplist.details,{$map->id}" />
+    <quad pos="40 0" size="10 10" action="maplist.show" />
 </frame>
 </manialink>

@@ -46,44 +46,28 @@ class MapController
         Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
 
         ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//',
-            'ban');
-        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap',
-            'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//', 'ban');
+        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
 
     public static function createTables()
     {
         Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
-            $table->string('UId')
-                ->nullable();
-            $table->integer('MxId')
-                ->nullable();
-            $table->string('Name')
-                ->nullable();
-            $table->string('Author')
-                ->nullable();
-            $table->string('FileName')
-                ->unique();
-            $table->string('Environment')
-                ->nullable();
-            $table->integer('NbCheckpoints')
-                ->nullable();
-            $table->integer('NbLaps')
-                ->nullable();
-            $table->integer('Plays')
-                ->default(0);
-            $table->string('Mood')
-                ->nullable();
-            $table->boolean('LapRace')
-                ->nullable();
-            $table->dateTime('LastPlayed')
-                ->nullable();
-            $table->boolean('Enabled')
-                ->default(false);
-            $table->integer('AuthorTime')
-                ->nullable();
+            $table->string('UId')->nullable();
+            $table->integer('MxId')->nullable();
+            $table->string('Name')->nullable();
+            $table->string('Author')->nullable();
+            $table->string('FileName')->unique();
+            $table->string('Environment')->nullable();
+            $table->integer('NbCheckpoints')->nullable();
+            $table->integer('NbLaps')->nullable();
+            $table->integer('Plays')->default(0);
+            $table->string('Mood')->nullable();
+            $table->boolean('LapRace')->nullable();
+            $table->dateTime('LastPlayed')->nullable();
+            $table->boolean('Enabled')->default(false);
+            $table->integer('AuthorTime')->nullable();
         });
     }
 
@@ -140,8 +124,7 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->update(Server::getCurrentMapInfo()
-            ->toArray());
+        $map->update(Server::getCurrentMapInfo()->toArray());
 
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
@@ -263,7 +246,7 @@ class MapController
      * Add a map to the queue
      *
      * @param Player $player
-     * @param Map    $map
+     * @param Map $map
      */
     public static function queueMap(Player $player, Map $map)
     {
@@ -304,16 +287,16 @@ class MapController
             if (!$map) {
                 //Map does not exist, create it
                 $map = Map::create([
-                    'UId'           => $mapInfo->uId,
-                    'Name'          => $mapInfo->name,
-                    'FileName'      => $mapInfo->fileName,
-                    'Author'        => $mapInfo->author,
-                    'AuthorTime'    => $mapInfo->authorTime,
-                    'Mood'          => $mapInfo->mood,
-                    'NbLaps'        => $mapInfo->nbLaps,
+                    'UId' => $mapInfo->uId,
+                    'Name' => $mapInfo->name,
+                    'FileName' => $mapInfo->fileName,
+                    'Author' => $mapInfo->author,
+                    'AuthorTime' => $mapInfo->authorTime,
+                    'Mood' => $mapInfo->mood,
+                    'NbLaps' => $mapInfo->nbLaps,
                     'NbCheckpoints' => $mapInfo->nbCheckpoints,
                     'Environnement' => $mapInfo->environnement,
-                    'Enabled'       => true,
+                    'Enabled' => true,
                 ]);
             }
 
@@ -359,7 +342,7 @@ class MapController
         var_dump($i);
 
         $information = [
-            'UId'  => $i->TrackUID,
+            'UId' => $i->TrackUID,
             'Name' => $i->GbxMapName,
         ];
 
@@ -414,7 +397,7 @@ class MapController
             File::put("$mapFolder/$fileName", $response->getBody());
 
             $map = Map::firstOrCreate([
-                'MxId'     => $mxId,
+                'MxId' => $mxId,
                 'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
             ]);
 

@@ -14,11 +14,13 @@ class MapList
     public function __construct()
     {
         Template::add('maplist.show', File::get(__DIR__ . '/Templates/map-list.latte.xml'));
+        Template::add('maplist.details', File::get(__DIR__ . '/Templates/map-details.latte.xml'));
 
         ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
+        ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
     }
@@ -48,7 +50,7 @@ class MapList
                     ->get()
                     ->keyBy('Map')
                     ->all(),
-                'dedis'  => Dedi::whereIn('Map', $mapIds)
+                'dedis' => Dedi::whereIn('Map', $mapIds)
                     ->wherePlayer($player->id)
                     ->get()
                     ->keyBy('Map')
@@ -115,25 +117,25 @@ class MapList
             ->take($perPage);
 
         $mapList = Template::toString('maplist.show', [
-            'maps'       => $maps,
-            'player'     => $player,
+            'maps' => $maps,
+            'player' => $player,
             'queuedMaps' => $queuedMaps,
-            'locals'     => $records['locals'],
-            'dedis'      => $records['dedis'],
+            'locals' => $records['locals'],
+            'dedis' => $records['dedis'],
         ]);
 
         $pagination = Template::toString('esc.pagination', [
-            'pages'  => $pages,
+            'pages' => $pages,
             'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
-            'page'   => $page,
+            'page' => $page,
         ]);
 
         Template::show($player, 'esc.modal', [
-            'id'            => 'MapList',
-            'width'         => 180,
-            'height'        => 97,
-            'content'       => $mapList,
-            'pagination'    => $pagination,
+            'id' => 'MapList',
+            'width' => 180,
+            'height' => 97,
+            'content' => $mapList,
+            'pagination' => $pagination,
             'showAnimation' => isset($page) ? false : true,
         ]);
     }
@@ -178,5 +180,27 @@ class MapList
             MapController::deleteMap($map);
             self::closeMapList($player);
         }
+    }
+
+    public static function showMapDetails(Player $player, $mapId)
+    {
+        $map = Map::find($mapId);
+
+        $locals = $map->locals()->orderBy('Score')->get()->take(5);
+        $dedis = $map->dedis()->orderBy('Score')->get()->take(5);
+
+        $localsRanking = Template::toString('esc.ranking', ['ranks' => $locals]);
+        $dedisRanking = Template::toString('esc.ranking', ['ranks' => $dedis]);
+
+        $detailPage = Template::toString('maplist.details', compact('map', 'localsRanking', 'dedisRanking'));
+
+        Template::show($player, 'esc.modal', [
+            'id' => 'MapList',
+            'title' => 'Map details: ' . $map->Name,
+            'width' => 120,
+            'height' => 50,
+            'content' => $detailPage,
+            'showAnimation' => true,
+        ]);
     }
 }

@@ -11,7 +11,7 @@
     {else}
     <label pos="38 -2" z-index="1" size="36 3" text="{$song->file}" halign="right" textcolor="eeee" textsize="1.4"/>
     {/if}
-    <label pos="38 -7" z-index="1" size="36 3" text="{$song->artist}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
+    <label pos="38 -7" z-index="1" size="31 3" text="{$song->artist}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
     <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
 
     <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
