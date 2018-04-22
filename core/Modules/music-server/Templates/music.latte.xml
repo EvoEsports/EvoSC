@@ -22,7 +22,7 @@
         <label id="play" pos="0 0" text="" ScriptEvents="1" />
     </frame>
 
-    <audio id="audio" pos="2000 2000" data="{$song->url}" play="1" looping="0" ScriptEvents="1" />
+    <audio id="audio" pos="2000 2000" data="{$song->url}" play="1" looping="1" ScriptEvents="1" />
 
 
     <script><!--

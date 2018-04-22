@@ -122,6 +122,7 @@ class PlayerController
         try {
             $reason = implode(" ", $message);
             Server::ban($playerToBeBanned->Login, $reason);
+            Server::blackList($playerToBeBanned->Login);
             ChatController::messageAll($player->group->Name, ' ', $player, ' banned ', $playerToBeBanned, '. Reason: ', secondary($reason));
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to ban player: ' . $e->getMessage(), true);
