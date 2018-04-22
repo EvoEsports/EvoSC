@@ -311,7 +311,7 @@ $$: Writes a dollarsign
             Server::chatSendServerMessage($message, $recipient->Login);
         }catch(\Exception $e){
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
-            Log::logAddLine('', $e->getTraceAsString());
+            Log::logAddLine('', $e->getTraceAsString(), false);
             return;
         }
     }
