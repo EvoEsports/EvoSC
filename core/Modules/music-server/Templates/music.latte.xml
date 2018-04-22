@@ -77,6 +77,10 @@
 
                 if(timePassed > 0){
                     bar.Size = <(timePassed / (lengthInSeconds * 1.0))*36.0,0.4>;
+
+                    if(timePassed > lengthInSeconds){
+                        TriggerPageAction("music.next");
+                    }
                 }
 
                 sleep(100);
