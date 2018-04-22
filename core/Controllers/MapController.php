@@ -174,6 +174,7 @@ class MapController
             ChatController::messageAll('Admin removed map ', $map);
             try{
                 $map->delete();
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
                 ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map, ' permanently');
             }catch(\Exception $e){
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
