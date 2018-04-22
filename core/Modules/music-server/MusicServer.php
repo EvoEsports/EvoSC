@@ -49,6 +49,13 @@ class MusicServer
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
     }
 
+    public static function onConfigReload()
+    {
+        Template::add('music', File::get(__DIR__ . '/Templates/music.latte.xml'));
+        Template::add('music.menu', File::get(__DIR__ . '/Templates/menu.latte.xml'));
+        self::displaySongWidget();
+    }
+
     /**
      * Show music widget on map start
      * @param array ...$args
@@ -99,10 +106,12 @@ class MusicServer
         $song = self::$currentSong;
 
         if ($song) {
+            $lengthInSeconds = self::getTrackLengthInSeconds($song);
+
             if ($player) {
-                Template::show($player, 'music', ['song' => $song]);
+                Template::show($player, 'music', ['song' => $song, 'lengthInSeconds' => $lengthInSeconds]);
             } else {
-                Template::showAll('music', ['song' => $song]);
+                Template::showAll('music', ['song' => $song, 'lengthInSeconds' => $lengthInSeconds]);
             }
 
             self::$currentSong = $song;
@@ -233,5 +242,14 @@ class MusicServer
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
             return;
         }
+    }
+
+    private static function getTrackLengthInSeconds($song)
+    {
+        if (preg_match('/(\d+):(\d+)/', $song->length ?? '', $matches)) {
+            return intval($matches[1]) * 60 + intval($matches[2]);
+        }
+
+        return 0;
     }
 }
