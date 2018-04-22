@@ -219,7 +219,7 @@ class Vote
 
         $voteText = '$' . config('color.secondary') . self::$message;
 
-        ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
+        ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
 
         self::stopVote();
     }
