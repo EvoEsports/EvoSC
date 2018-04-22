@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="SongInformation" version="3">
+
+    <script><!--
+            main() {
+            while (True) {
+                yield;
+
+                foreach (Event in PendingEvents) {
+                    log(Event.Type);
+                    if(Event.Type == CMlEvent::Type::KeyPress){
+                        log("Key pressed:");
+                        log(Event.KeyName);
+                    }
+                }
+            }
+        }
+        --></script>
+
+</manialink>

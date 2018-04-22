@@ -14,6 +14,45 @@
     <label pos="38 -7" z-index="1" size="36 3" text="{$song->artist}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
     <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
 
-    <quad pos="0 0" size="50 10" action="ms.menu.showpage" />
+    <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
+
+    <frame pos="2.2 -6.5" scale="0.4">
+        <label pos="10 0" text="" action="music.next" />
+        <label id="pause" pos="0 0" text="" ScriptEvents="1" />
+        <label id="play" pos="0 0" text="" ScriptEvents="1" />
+    </frame>
+
+    <audio id="audio" pos="2000 2000" data="{$song->url}" play="1" looping="0" ScriptEvents="1" />
+
+
+    <script><!--
+            main() {
+            declare audio <=> (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
+            declare pauseButton <=> (Page.MainFrame.GetFirstChild("pause") as CMlLabel);
+            declare playButton <=> (Page.MainFrame.GetFirstChild("play") as CMlLabel);
+
+            playButton.Visible = False;
+
+            while (True) {
+                yield;
+
+                foreach (Event in PendingEvents) {
+                    if(Event.Type == CMlEvent::Type::MouseClick){
+                        if(Event.ControlId == "pause"){
+                            audio.Stop();
+                            pauseButton.Visible = False;
+                            playButton.Visible = True;
+                        }
+                        if(Event.ControlId == "play"){
+                            audio.Play();
+                            pauseButton.Visible = True;
+                            playButton.Visible = False;
+                        }
+                    }
+                }
+            }
+        }
+        --></script>
 </frame>
+
 </manialink>

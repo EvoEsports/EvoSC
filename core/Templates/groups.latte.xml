@@ -15,3 +15,8 @@
 </frame>
 {/foreach}
 {/if}
+
+<frame pos="0 -30">
+    <entry pos="20 0" size="50 5" style="TextValueSmall" name="inputValue" default="Hallo Welt!" />
+    <label pos="20 -5" style="CardButtonMedium" text="Wert senden" url="manialink://?value=inputValue" />
+</frame>

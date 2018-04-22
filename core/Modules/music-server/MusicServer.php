@@ -38,6 +38,8 @@ class MusicServer
 
         ManiaLinkEvent::add('ms.hidemenu', 'MusicServer::hideMusicMenu');
         ManiaLinkEvent::add('ms.juke', 'MusicServer::queueSong');
+        ManiaLinkEvent::add('ms.play', 'MusicServer::playSong');
+        ManiaLinkEvent::add('music.next', 'MusicServer::nextSong');
         ManiaLinkEvent::add('ms.menu.showpage', 'MusicServer::displayMusicMenu');
 
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
@@ -47,26 +49,13 @@ class MusicServer
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
     }
 
-    private function createTables()
-    {
-        Database::create('songs', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('title')->nullable();
-            $table->string('artist')->nullable();
-            $table->string('album')->nullable();
-            $table->string('year')->nullable();
-            $table->string('length')->nullable();
-            $table->string('url')->unique();
-            $table->timestamps();
-        });
-    }
-
     /**
      * Show music widget on map start
      * @param array ...$args
      */
     public static function beginMap(...$args)
     {
+        self::$currentSong = self::$music->random();
         self::displaySongWidget();
     }
 
@@ -76,8 +65,7 @@ class MusicServer
      */
     public static function getCurrentSong(): ?Song
     {
-        $songInformation = \esc\Classes\Server::getForcedMusic();
-        $url = $songInformation->url;
+        $url = self::$currentSong->url;
         return self::$music->where('url', $url)->first();
     }
 
@@ -93,7 +81,8 @@ class MusicServer
             $song = self::$music->random();
         }
 
-        Server::setForcedMusic(true, $song->url);
+//        Server::setForcedMusic(true, $song->url);
+        Server::setForcedMusic(true, 'https://ozonic.co.uk/empty.ogg');
     }
 
     /**
@@ -107,9 +96,7 @@ class MusicServer
             return;
         }
 
-        $songInformation = \esc\Classes\Server::getForcedMusic();
-        $url = $songInformation->url;
-        $song = self::$music->where('url', $url)->first();
+        $song = self::$currentSong;
 
         if ($song) {
             if ($player) {
@@ -182,6 +169,36 @@ class MusicServer
     }
 
     /**
+     * Plays a song
+     * @param Player $callee
+     * @param $songId
+     */
+    public static function playSong(Player $callee, $songId)
+    {
+        $song = self::$music->get($songId);
+
+        if ($song) {
+            self::$currentSong = $song;
+            self::displaySongWidget($callee);
+        }
+    }
+
+    /**
+     * Goes to next song
+     * @param Player $callee
+     * @param $songId
+     */
+    public static function nextSong(Player $callee)
+    {
+        $song = self::$music->random();
+
+        if ($song) {
+            self::$currentSong = $song;
+            self::displaySongWidget($callee);
+        }
+    }
+
+    /**
      * Sets the music files
      * @param Collection $songs
      */
@@ -196,6 +213,7 @@ class MusicServer
         Log::info("Finished loading music.");
 
         self::$music = $songs;
+        self::$currentSong = $songs->random();
     }
 
     /**

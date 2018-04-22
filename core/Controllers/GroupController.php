@@ -118,7 +118,7 @@ class GroupController
         Template::show($player, 'esc.modal', [
             'id' => 'Group - Edit',
             'width' => 90,
-            'height' => count($accessRights) * 4.6 + 16,
+            'height' => count($accessRights) * 4.6 + 26,
             'content' => $groupEdit,
             'onClose' => 'groups.show'
         ]);
