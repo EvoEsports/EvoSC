@@ -4,12 +4,6 @@
 <label pos="120 0" z-index="0" size="40 5" textsize="1.2" halign="center" text="Dedi"/>
 <label pos="140 0" z-index="0" size="20 5" textsize="1.2" text="Next"/>
 
-
-{if $player->isAdmin()}
-<!--<label pos="-20 0" z-index="0" size="20 5" textsize="1.2" text="Admin"/>-->
-<quad pos="-10 3" size="7 89" z-index="-5" bgcolor="0009"/>
-{/if}
-
 {if isset($maps)}
 {foreach $maps as $mapId => $map}
 <frame pos="0 -{3 + $iterator->counter * 3.2}">
