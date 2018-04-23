@@ -2,11 +2,14 @@
 <manialink id="Clock" version="3">
     <frame pos="{$clock->pos}">
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
+        <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" />
 
-        <quad pos="4.1 -3.5" valign="center" halign="center" z-index="-1" size="6 6" bgcolor="FFFA" style="BgsPlayerCard" substyle="ProgressBar" opacity="0.5"/>
-        <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="1.5 0.3" bgcolor="FFFF"/></frame>
-        <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.5 0.3" bgcolor="FFFF"/></frame>
+        <frame pos="-0.1 -0.05">
+            <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
+            <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
+            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="08FF"/></frame>
+        </frame>
     </frame>
 
     <script><!--
@@ -16,12 +19,15 @@
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare pointerHours <=> (Page.MainFrame.GetFirstChild("pointerHours") as CMlQuad);
             declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
+            declare pointerSeconds <=> (Page.MainFrame.GetFirstChild("pointerSeconds") as CMlQuad);
 
             declare Text timeString = "";
             declare Integer hours = 0;
             declare Integer minutes = 0;
+            declare Integer seconds = 0;
             declare Real rotHours = 0.0;
             declare Real rotMinutes = 0.0;
+            declare Real rotSeconds = 0.0;
 
             while(True){
                 timeString = TextLib::SubString(CurrentLocalDateText, 11, 5);
@@ -29,14 +35,17 @@
 
                 hours = TextLib::ToInteger(TextLib::SubString(timeString, 0, 2));
                 minutes = TextLib::ToInteger(TextLib::SubString(timeString, 3, 2));
+                seconds = TextLib::ToInteger(TextLib::SubString(CurrentLocalDateText, 17, 2));
 
                 rotHours = (hours/12.0) * 360 - 90;
                 rotMinutes = (minutes/60.0) * 360 - 90;
+                rotSeconds = (seconds/60.0) * 360 - 90;
 
                 pointerHours.RelativeRotation = rotHours;
                 pointerMinutes.RelativeRotation = rotMinutes;
+                pointerSeconds.RelativeRotation = rotSeconds;
 
-                sleep(5000);
+                sleep(500);
             }
         }
     --></script>
