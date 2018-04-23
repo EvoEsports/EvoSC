@@ -16,9 +16,7 @@
     <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
 
     <frame pos="20 -7" scale="0.4">
-        <label pos="-7 0" text="" action="music.next" />
-        <label id="pause" pos="-14 0" text="" ScriptEvents="1" />
-        <label id="play" pos="-14 0" text="" ScriptEvents="1" />
+        <label pos="-20 0" text="" action="music.next" />
 
         <label id="passed" pos="-45 0" z-index="1" size="20 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
     </frame>
