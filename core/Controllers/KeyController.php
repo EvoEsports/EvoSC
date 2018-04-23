@@ -53,7 +53,13 @@ class KeyController
 
     public static function sendKeybindsScript(Player $player)
     {
-        Template::show($player, 'keybinds', []);
+        $keys = self::$binds->pluck('key');
+
+        if(count($keys) == 0){
+            return;
+        }
+
+        Template::show($player, 'keybinds', compact('keys'));
     }
 
     public static function playerConnect(Player $player)

@@ -216,7 +216,7 @@ $$: Writes a dollarsign
                     break;
 
                 case 'info':
-                    $icon = "";
+                    $icon = "\$oi\$z";
                     $color = config('color.info');
                     break;
 

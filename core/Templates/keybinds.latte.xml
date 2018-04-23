@@ -8,7 +8,7 @@
 
                     foreach (Event in PendingEvents) {
                         if(Event.Type == CMlEvent::Type::KeyPress){
-                            if(Event.KeyName == "F5" || Event.KeyName == "F6"){
+                            if({foreach $keys as $key} Event.KeyName == {$key} ||{/foreach} False){
                                 TriggerPageAction("keybind," ^ Event.KeyName);
                             }
                         }
