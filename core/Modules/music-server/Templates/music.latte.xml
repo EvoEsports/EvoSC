@@ -29,8 +29,6 @@
             main() {
             declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
             declare audio <=> (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
-            declare pauseButton <=> (Page.MainFrame.GetFirstChild("pause") as CMlLabel);
-            declare playButton <=> (Page.MainFrame.GetFirstChild("play") as CMlLabel);
             declare timePassedLabel <=> (Page.MainFrame.GetFirstChild("passed") as CMlLabel);
 
             declare Integer timeLeft = 0;
@@ -41,25 +39,8 @@
             declare Integer lengthInSeconds = {$lengthInSeconds};
             declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
 
-            playButton.Visible = False;
-
             while (True) {
                 yield;
-
-                foreach (Event in PendingEvents) {
-                    if(Event.Type == CMlEvent::Type::MouseClick){
-                        if(Event.ControlId == "pause"){
-                            audio.Stop();
-                            pauseButton.Visible = False;
-                            playButton.Visible = True;
-                        }
-                        if(Event.ControlId == "play"){
-                            audio.Play();
-                            pauseButton.Visible = True;
-                            playButton.Visible = False;
-                        }
-                    }
-                }
 
                 timeLeft = (timeEnd/1000) - (CurrentTime/1000);
                 timePassed =  lengthInSeconds - timeLeft;
@@ -81,7 +62,7 @@
                     }
                 }
 
-                sleep(100);
+                sleep(200);
             }
         }
         --></script>
