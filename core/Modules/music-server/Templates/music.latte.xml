@@ -20,7 +20,7 @@
         <label id="pause" pos="-14 0" text="" ScriptEvents="1" />
         <label id="play" pos="-14 0" text="" ScriptEvents="1" />
 
-        <label id="passed" pos="-45 0" z-index="1" size="31 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
+        <label id="passed" pos="-45 0" z-index="1" size="5 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
     </frame>
 
     <audio id="audio" pos="2000 2000" data="{$song->url}" play="1" looping="1" ScriptEvents="1" />
