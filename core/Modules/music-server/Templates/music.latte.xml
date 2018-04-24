@@ -17,18 +17,18 @@
 
     <frame pos="20 -7" scale="0.4">
         <label pos="-20 0" text="" action="music.next" />
-
-        <label id="passed" pos="-45 0" z-index="1" size="20 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
+        <label id="passed" pos="-45 0" z-index="1" size="22 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
     </frame>
 
-    <audio id="audio" pos="2000 2000" data="{$song->url}" play="1" looping="1" ScriptEvents="1" />
 
 
     <script><!--
             #Include "MathLib" as MathLib
+
             main() {
+            declare music <=> Audio.CreateSound("{$song->url|noescape}", 1.0, True, False, False);
             declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
-            declare audio <=> (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
+            declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
             declare timePassedLabel <=> (Page.MainFrame.GetFirstChild("passed") as CMlLabel);
 
             declare Integer timeLeft = 0;
@@ -39,9 +39,9 @@
             declare Integer lengthInSeconds = {$lengthInSeconds};
             declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
 
-            while (True) {
-                yield;
+            music.Play();
 
+            while (True) {
                 timeLeft = (timeEnd/1000) - (CurrentTime/1000);
                 timePassed =  lengthInSeconds - timeLeft;
 
@@ -62,7 +62,7 @@
                     }
                 }
 
-                sleep(200);
+                sleep(500);
             }
         }
         --></script>
