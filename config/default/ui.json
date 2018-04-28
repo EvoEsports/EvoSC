@@ -1,33 +1,123 @@
 {
   "module": "ui",
-
+  "clock": {
+    "pos": "143 12"
+  },
   "playerlist": {
-    "x": 120,
-    "y": 71,
+    "pos": {
+      "visible": "120 71",
+      "hidden": "170 71"
+    },
     "width": 50,
     "height": 53,
     "scale": 0.8
   },
-
   "locals": {
-    "x": -160,
-    "y": 89,
+    "pos": {
+      "visible": "-160 89",
+      "hidden": "-210 89"
+    },
     "rows": 20,
     "scale": 0.75
   },
-
   "dedis": {
-    "x": -160,
-    "y": 22,
+    "pos": {
+      "visible": "-160 22",
+      "hidden": "-210 22"
+    },
     "rows": 20,
     "scale": 0.75
   },
-
   "mx-karma": {
-    "x": 120,
-    "y": 22.5,
+    "pos": {
+      "visible": "120 22.5",
+      "hidden": "170 22.5"
+    },
     "width": 50,
     "height": 30,
     "scale": 0.8
+  },
+  "map": {
+    "pos": {
+      "visible": "120 89",
+      "hidden": "128 89"
+    },
+    "scale": 0.8
+  },
+  "music": {
+    "pos": {
+      "visible": "120 80",
+      "hidden": "128 80"
+    },
+    "scale": 0.8
+  },
+  "stats": {
+    "visits": {
+      "pos": {
+        "x": -115,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "playtime": {
+      "pos": {
+        "x": -77,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "finish": {
+      "pos": {
+        "x": -39,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "records": {
+      "pos": {
+        "x": -1,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "winner": {
+      "pos": {
+        "x": 37,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "voter": {
+      "pos": {
+        "x": 75,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    },
+    "topranks": {
+      "pos": {
+        "x": 75,
+        "y": 89
+      },
+      "width": 50,
+      "show": 6,
+      "scale": 0.75
+    }
+  },
+  "ui_properties": {
+    "countdown": {
+    }
   }
 }
