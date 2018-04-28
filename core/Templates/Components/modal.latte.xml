@@ -16,7 +16,7 @@
                 sleep(100);
                 frame.Hide();
                 {if isset($onClose)}
-                TriggerPageAction($onClose);
+                TriggerPageAction({$onClose});
                 {/if}
             }
 
