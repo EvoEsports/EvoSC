@@ -1,17 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="CurrentMap" version="3">
-<frame pos="120 89" scale="0.8">
-    <quad pos="0 0" z-index="-2" size="50 10" style="Bgs1" substyle="BgDialogBlur"/>
-    <quad pos="0 0" z-index="-1" size="50 10" bgcolor="0001"/>
-    <quad pos="40 0" z-index="0" size="10 10" bgcolor="18f3"/>
-    <quad pos="40 0" z-index="1" size=".2 10" bgcolor="18f9"/>
+<label pos="38 -2" z-index="1" size="36 3" text="{$map->Name}" halign="right" textcolor="eeee" textsize="1.4"/>
+<label pos="38 -7" z-index="1" size="36 3" text="by {isset($map->author->NickName) ? stripStyle($map->author->NickName) : $map->Author}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
 
-    <label pos="38 -2" z-index="1" size="36 3" text="{$map->Name}" halign="right" textcolor="eeee" textsize="1.4"/>
-    <label pos="38 -7" z-index="1" size="36 3" text="by {isset($map->author->NickName) ? stripStyle($map->author->NickName) : $map->Author}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
+<label pos="45 -5" valign="center" halign="center" textsize="2" size="6 6" text="" textcolor="ffff"/>
 
-    <label pos="45 -5" valign="center" halign="center" textsize="2" size="6 6" text="" textcolor="ffff"/>
-
-    <quad pos="0 0" size="40 10" action="maplist.details,{$map->id}" />
-    <quad pos="40 0" size="10 10" action="maplist.show" />
-</frame>
-</manialink>
+<quad pos="0 0" size="40 10" action="maplist.details,{$map->id}" />
+<quad pos="40 0" size="10 10" action="maplist.show" />

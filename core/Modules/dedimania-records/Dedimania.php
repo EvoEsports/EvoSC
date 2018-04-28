@@ -411,22 +411,28 @@ class Dedimania extends DedimaniaApi
 
         $result = $dedis->concat($topDedis)->sortBy('Score');
 
-        $variables = [
+        if ($player) {
+            self::showDedis($player, $rows, $result);
+        } else {
+            foreach (onlinePlayers() as $player) {
+                self::showDedis($player, $rows, $result);
+            }
+        }
+    }
+
+    private static function showDedis(Player $player, $rows, $result)
+    {
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.dedis')]);
+
+        Template::show($player, 'esc.box', $variables = [
             'id' => 'Dedimania',
             'title' => '🏆  DEDIMANIA',
-            'x' => config('ui.dedis.x'),
-            'y' => config('ui.dedis.y'),
+            'config' => config('ui.dedis'),
+            'hideScript' => $hideScript,
             'rows' => $rows,
-            'scale' => config('ui.dedis.scale'),
             'content' => Template::toString('dedis', ['dedis' => $result]),
             'action' => 'dedis.show',
-        ];
-
-        if ($player) {
-            Template::show($player, 'esc.box', $variables);
-        } else {
-            Template::showAll('esc.box', $variables);
-        }
+        ]);
     }
 
     /**
