@@ -129,7 +129,7 @@ class MusicServer
             'lengthInSeconds' => $lengthInSeconds
         ]);
 
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.music')]);
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.music')]);
 
         Template::show($player, 'esc.icon-box', [
             'id' => 'music-widget',

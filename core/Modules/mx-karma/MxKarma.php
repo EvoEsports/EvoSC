@@ -332,7 +332,7 @@ class MxKarma extends MXK
             $starString .= '';
         }
 
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.mx-karma')]);
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.mx-karma')]);
 
         Template::show($player, 'esc.box', [
             'id' => 'MXKarma',

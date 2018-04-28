@@ -360,7 +360,7 @@ class PlayerController
         }
 
         onlinePlayers()->each(function (Player $player) use ($players) {
-            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.playerlist')]);
+            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
 
             Template::show($player, 'esc.box', [
                 'id' => 'PlayerList',

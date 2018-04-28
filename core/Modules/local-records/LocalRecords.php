@@ -190,7 +190,7 @@ class LocalRecords
             ->take(config('ui.locals.rows'));
 
         onlinePlayers()->each(function (Player $player) use ($locals) {
-            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.locals')]);
+            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.locals')]);
 
             Template::show($player, 'esc.box', [
                 'id' => 'local-records',

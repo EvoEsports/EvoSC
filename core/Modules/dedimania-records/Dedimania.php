@@ -422,7 +422,7 @@ class Dedimania extends DedimaniaApi
 
     private static function showDedis(Player $player, $rows, $result)
     {
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.dedis')]);
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.dedis')]);
 
         Template::show($player, 'esc.box', $variables = [
             'id' => 'Dedimania',

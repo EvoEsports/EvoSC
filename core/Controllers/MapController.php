@@ -355,7 +355,7 @@ class MapController
             'map' => $currentMap
         ]);
 
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.map')]);
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.map')]);
 
         Template::show($player, 'esc.icon-box', [
             'id' => 'map-widget',
