@@ -172,11 +172,11 @@ class MapController
 
         if ($deleted) {
             ChatController::messageAll('Admin removed map ', $map);
-            try{
+            try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
                 ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map, ' permanently');
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
             }
         }
@@ -339,13 +339,30 @@ class MapController
     public static function displayMapWidget(Player $player = null)
     {
         $currentMap = self::getCurrentMap();
-        $nextMap = self::getNext();
 
         if ($player) {
-            Template::show($player, 'map', ['map' => $currentMap, 'next' => $nextMap]);
+            self::showWidget($player, $currentMap);
         } else {
-            Template::showAll('map', ['map' => $currentMap, 'next' => $nextMap]);
+            onlinePlayers()->each(function (Player $player) use ($currentMap) {
+                self::showWidget($player, $currentMap);
+            });
         }
+    }
+
+    private static function showWidget(Player $player, Map $currentMap)
+    {
+        $content = Template::toString('map', [
+            'map' => $currentMap
+        ]);
+
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.map')]);
+
+        Template::show($player, 'esc.icon-box', [
+            'id' => 'map-widget',
+            'content' => $content,
+            'config' => config('ui.map'),
+            'hideScript' => $hideScript
+        ]);
     }
 
     public static function getMapInformationFromMx(Map $map): array

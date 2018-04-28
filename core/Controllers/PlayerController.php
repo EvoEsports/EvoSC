@@ -91,9 +91,9 @@ class PlayerController
 
         $player->setSetting('ui->hideSpeed', $hideSpeed);
 
-        if($hideSpeed == 0){
+        if ($hideSpeed == 0) {
             ChatController::message($player, '_info', 'UI hiding disabled');
-        }else{
+        } else {
             ChatController::message($player, '_info', 'UI hides now at ', $hideSpeed);
         }
     }
@@ -359,15 +359,18 @@ class PlayerController
             $players->add($player);
         }
 
-        Template::showAll('esc.box', [
-            'id' => 'PlayerList',
-            'title' => '  LIVE RANKINGS',
-            'x' => config('ui.playerlist.x'),
-            'y' => config('ui.playerlist.y'),
-            'rows' => 13,
-            'scale' => config('ui.playerlist.scale'),
-            'content' => Template::toString('players', ['players' => $players->take(15)]),
-        ]);
+        onlinePlayers()->each(function (Player $player) use ($players) {
+            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.playerlist')]);
+
+            Template::show($player, 'esc.box', [
+                'id' => 'PlayerList',
+                'title' => '  LIVE RANKINGS',
+                'config' => config('ui.playerlist'),
+                'hideScript' => $hideScript,
+                'rows' => 13,
+                'content' => Template::toString('players', ['players' => $players->take(15)]),
+            ]);
+        });
     }
 
     /**

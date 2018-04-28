@@ -109,15 +109,34 @@ class MusicServer
             $lengthInSeconds = self::getTrackLengthInSeconds($song);
 
             if ($player) {
-                Template::show($player, 'music', ['song' => $song, 'lengthInSeconds' => $lengthInSeconds]);
+                self::showWidget($player, $song, $lengthInSeconds);
             } else {
-                Template::showAll('music', ['song' => $song, 'lengthInSeconds' => $lengthInSeconds]);
+                onlinePlayers()->each(function (Player $player) use ($song, $lengthInSeconds) {
+                    self::showWidget($player, $song, $lengthInSeconds);
+                });
             }
 
             self::$currentSong = $song;
         } else {
             Log::error("Invalid song");
         }
+    }
+
+    private static function showWidget(Player $player, $song, $lengthInSeconds)
+    {
+        $content = Template::toString('music', [
+            'song' => $song,
+            'lengthInSeconds' => $lengthInSeconds
+        ]);
+
+        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.music')]);
+
+        Template::show($player, 'esc.icon-box', [
+            'id' => 'music-widget',
+            'content' => $content,
+            'config' => config('ui.music'),
+            'hideScript' => $hideScript
+        ]);
     }
 
     /**

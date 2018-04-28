@@ -189,15 +189,19 @@ class LocalRecords
             ->get()
             ->take(config('ui.locals.rows'));
 
-        Template::showAll('esc.box', [
-            'id' => 'Locals',
-            'title' => '🏆  LOCAL RECORDS',
-            'x' => config('ui.locals.x'),
-            'y' => config('ui.locals.y'),
-            'rows' => config('ui.locals.rows'),
-            'scale' => config('ui.locals.scale'),
-            'content' => Template::toString('locals', ['locals' => $locals]),
-            'action' => 'locals.show'
-        ]);
+        onlinePlayers()->each(function (Player $player) use ($locals) {
+            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed, 'config' => config('ui.locals')]);
+
+            Template::show($player, 'esc.box', [
+                'id' => 'local-records',
+                'title' => '🏆  LOCAL RECORDS',
+                'config' => config('ui.locals'),
+                'hideScript' => $hideScript,
+                'rows' => config('ui.locals.rows'),
+                'scale' => config('ui.locals.scale'),
+                'content' => Template::toString('locals', compact('locals')),
+                'action' => 'locals.show'
+            ]);
+        });
     }
 }
