@@ -13,16 +13,8 @@
         {if isset($showAnimation) && $showAnimation}
         <script><!--
             main() {
-            declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-            declare Real startScale = frame.Scale;
-            declare Real curScale = 1.0;
-            declare Real targetScale = 0.95;
-
-            while(curScale > targetScale){
-            yield;
-            curScale = curScale - 0.01;
-            frame.Scale = curScale;
-            }
+                declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+                AnimMgr.Add(frame, "<frame scale='0.95' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
             }
         --></script>
         {/if}
