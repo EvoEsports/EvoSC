@@ -138,13 +138,13 @@ function getMapInfoFromFile(string $filename)
 //color functions
 function background_color()
 {
-    return config('colors.ui.background');
+    return config('color.ui.background');
 }
 function header_color()
 {
-    return config('colors.ui.header');
+    return config('color.ui.header');
 }
 function primary_color()
 {
-    return config('colors.ui.primary');
+    return config('color.ui.primary');
 }
