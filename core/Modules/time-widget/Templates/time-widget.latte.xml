@@ -2,7 +2,7 @@
 <manialink id="TimeWidget" version="3">
 <frame pos="160 -12.5" scale="0.8">
     <quad pos="0 0" z-index="0" size="25 7" halign="right" action="tw.addTime"/>
-    <quad pos="0 -9.2" z-index="-1" size="30 4" style="Bgs1" halign="right" substyle="BgDialogBlur" opacity="0.3" action="tw.requestMoreTime"/>
+    <quad pos="0 -9.2" z-index="-1" size="30 4" bgcolor="{background_color()|noescape}6" halign="right" action="tw.requestMoreTime"/>
     <label pos="-15 -11" z-index="1" text="🕑 Request more time" textsize="0.7" textcolor="eeef" halign="center" valign="center"/>
 </frame>
 </manialink>
