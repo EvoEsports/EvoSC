@@ -9,8 +9,7 @@ main() {
     declare Boolean hidden = False;
     declare Boolean isLapRace = Map.TMObjective_IsLapRace;
     declare Integer duration = 800;
-    {$speed = intval($hideSpeed);}
-    declare Real hideSpeed = ({$speed > 0 ? $speed : 1} * 1.0);
+    declare Real hideSpeed = ({intval($hideSpeed) > 0 ? intval($hideSpeed) : 1} * 1.0);
     declare Real speed = 0.0;
     declare Text visiblePos = "<frame pos='{$config->pos->visible|noescape}' />";
     declare Text hiddenPos = "<frame pos='{$config->pos->hidden|noescape}' />";
