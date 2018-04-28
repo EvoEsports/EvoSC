@@ -1,10 +1,15 @@
 {
   "module": "color",
-  "primary": "0F2",
+  "primary": "AF0",
   "secondary": "FFC",
   "chat": "FE9",
   "info": "AF0",
   "warning": "EA2",
   "local": "6AF",
-  "dedi": "02F"
+  "dedi": "02F",
+  "ui": {
+    "background": "000",
+    "header": "18f",
+    "primary": "18f"
+  }
 }

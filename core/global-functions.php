@@ -134,3 +134,17 @@ function getMapInfoFromFile(string $filename)
         return json_decode($process->getOutput());
     }
 }
+
+//color functions
+function background_color()
+{
+    return config('colors.ui.background');
+}
+function header_color()
+{
+    return config('colors.ui.header');
+}
+function primary_color()
+{
+    return config('colors.ui.primary');
+}

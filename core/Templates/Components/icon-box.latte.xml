@@ -3,8 +3,8 @@
 <frame pos="{$config->pos->visible}" scale="{$config->scale ?? 0.8}" id="widget">
     <quad pos="0 0" z-index="-2" size="50 10" style="Bgs1" substyle="BgDialogBlur"/>
     <quad pos="0 0" z-index="-1" size="50 10" bgcolor="0001"/>
-    <quad pos="40 0" z-index="0" size="10 10" bgcolor="18f3"/>
-    <quad pos="40 0" z-index="1" size=".2 10" bgcolor="18f9"/>
+    <quad pos="40 0" z-index="0" size="10 10" bgcolor="{header_color()|noescape}3"/>
+    <quad pos="40 0" z-index="1" size=".2 10" bgcolor="{primary_color()|noescape}9"/>
     <frame pos="0 0">{$content|noescape}</frame>
 
     {$hideScript|noescape}
