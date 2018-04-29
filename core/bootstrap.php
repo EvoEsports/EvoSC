@@ -1,6 +1,6 @@
 <?php
 
-$escVersion = '0.26.*';
+$escVersion = '0.27.*';
 
 include 'global-functions.php';
 
@@ -9,18 +9,6 @@ $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 
 esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
-
-if (config('music.enable-internal-server', false) == true) {
-    \esc\Classes\Log::info("Starting music server...");
-
-    $phpBinaryFinder = new Symfony\Component\Process\PhpExecutableFinder();
-    $phpBinaryPath = $phpBinaryFinder->find();
-
-    $musicServer = new Symfony\Component\Process\Process($phpBinaryPath . ' -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
-    $musicServer->start();
-
-    \esc\Classes\Log::info("Music server started.");
-}
 
 function startEsc()
 {
@@ -77,7 +65,7 @@ function startEsc()
     \esc\Classes\Template::add('esc.hide-script', \esc\Classes\File::get(__DIR__ . '/Templates/Scripts/hide.script.txt'));
     \esc\Classes\Template::add('blank', \esc\Classes\File::get(__DIR__ . '/Templates/blank.latte.xml'));
 
-    \esc\Controllers\ChatController::addCommand('config', 'esc\Classes\Config::configReload', 'Reload config', '//', 'config');
+    \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
 
     $settings = \esc\Classes\Server::getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
@@ -100,9 +88,9 @@ function cycle()
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
 
-function loadModulesFrom(string $path)
+function bootModules()
 {
-    esc\Controllers\ModuleController::loadModules($path);
+    esc\Controllers\ModuleController::bootModules();
 }
 
 function beginMap()

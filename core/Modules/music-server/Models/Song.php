@@ -1,6 +1,10 @@
 <?php
 
-class Song extends \Illuminate\Database\Eloquent\Model
+namespace esc\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Song extends Model
 {
     protected $table = 'songs';
 

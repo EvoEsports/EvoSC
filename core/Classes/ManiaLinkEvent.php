@@ -77,6 +77,6 @@ class ManiaLinkEvent
             return;
         }
 
-        call_user_func($event->callback, $ply);
+        call_func($event->callback, $ply);
     }
 }

@@ -107,7 +107,7 @@ class Timer
         self::$timers = self::$timers->diff($toRun);
 
         foreach ($toRun as $timer) {
-            call_user_func($timer->callback);
+            call_func($timer->callback);
         }
     }
 

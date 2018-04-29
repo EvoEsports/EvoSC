@@ -10,10 +10,10 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Models\Player;
+use esc\Models\Stats;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
-use Stats;
 
 class PlayerController
 {
@@ -24,20 +24,20 @@ class PlayerController
     {
         self::createTables();
 
-        Hook::add('PlayerDisconnect', '\esc\Controllers\PlayerController::playerDisconnect');
-        Hook::add('PlayerFinish', '\esc\Controllers\PlayerController::playerFinish');
+        Hook::add('PlayerDisconnect', 'PlayerController::playerDisconnect');
+        Hook::add('PlayerFinish', 'PlayerController::playerFinish');
 
         Template::add('players', File::get('core/Templates/players.latte.xml'));
 
-        ChatController::addCommand('afk', '\esc\Controllers\PlayerController::toggleAfk', 'Toggle AFK status');
-        ChatController::addCommand('hidespeed', '\esc\Controllers\PlayerController::setHideSpeed', 'Set speed at which UI hides, 0 = disable hiding');
+        ChatController::addCommand('afk', 'PlayerController::toggleAfk', 'Toggle AFK status');
+        ChatController::addCommand('hidespeed', 'PlayerController::setHideSpeed', 'Set speed at which UI hides, 0 = disable hiding');
 
         self::$fakePlayers = collect([]);
-        ChatController::addCommand('kick', '\esc\Controllers\PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
-        ChatController::addCommand('ban', '\esc\Controllers\PlayerController::banPlayer', 'Ban player by nickname', '//', 'ban');
+        ChatController::addCommand('kick', 'PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
+        ChatController::addCommand('ban', 'PlayerController::banPlayer', 'Ban player by nickname', '//', 'ban');
 
-        ChatController::addCommand('fake', '\esc\Controllers\PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
-        ChatController::addCommand('disfake', '\esc\Controllers\PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
+        ChatController::addCommand('fake', 'PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
+        ChatController::addCommand('disfake', 'PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
     }
 
     public static function createTables()

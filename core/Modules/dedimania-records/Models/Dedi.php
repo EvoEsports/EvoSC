@@ -1,7 +1,6 @@
 <?php
 
-use esc\Models\Map;
-use esc\Models\Player;
+namespace esc\Models;
 
 class Dedi extends \Illuminate\Database\Eloquent\Model
 {

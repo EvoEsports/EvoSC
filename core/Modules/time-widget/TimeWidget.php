@@ -1,9 +1,12 @@
 <?php
 
+namespace esc\Modules\TimeWidget;
+
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Classes\Vote;
 use esc\Controllers\MapController;
 use esc\Models\Player;
 
@@ -46,6 +49,6 @@ class TimeWidget
 
     public static function requestMoreTime(Player $player)
     {
-        \esc\Classes\Vote::replayMap($player);
+        Vote::replayMap($player);
     }
 }

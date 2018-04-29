@@ -17,9 +17,9 @@ class KeyController
     {
         self::$binds = collect([]);
 
-        Hook::add('PlayerConnect', 'esc\Controllers\KeyController::playerConnect');
+        Hook::add('PlayerConnect', 'KeyController::playerConnect');
 
-        ManiaLinkEvent::add('keybind', 'esc\Controllers\KeyController::executeBinds');
+        ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
 
         Template::add('keybinds', File::get('core/Templates/keybinds.latte.xml'));
 

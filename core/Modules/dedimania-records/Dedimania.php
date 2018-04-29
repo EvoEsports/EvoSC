@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\Dedimania;
+
 require_once __DIR__ . '/DedimaniaApi.php';
 
 use esc\Classes\Database;
@@ -12,6 +14,7 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
+use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;

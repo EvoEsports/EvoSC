@@ -1,6 +1,7 @@
 <?php
 
-use esc\Classes\Database;
+namespace esc\Modules\MusicServer;
+
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -9,12 +10,8 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Models\Map;
 use esc\Models\Player;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
-use Psr\Http\Message\ResponseInterface;
 
 class MusicServer
 {
@@ -25,10 +22,6 @@ class MusicServer
 
     public function __construct()
     {
-//        $this->createTables();
-
-//        include_once 'Models/Song.php';
-
         $this->readFiles();
 
         self::$songQueue = new Collection();
@@ -82,13 +75,6 @@ class MusicServer
      */
     public static function setNextSong(...$args)
     {
-        if (self::$songQueue && count(self::$songQueue) > 0) {
-            $song = self::$songQueue->shift()['song'];
-        } else {
-            $song = self::$music->random();
-        }
-
-//        Server::setForcedMusic(true, $song->url);
         Server::setForcedMusic(true, 'https://ozonic.co.uk/empty.ogg');
     }
 
@@ -251,15 +237,19 @@ class MusicServer
     {
         Log::info("Loading music...");
 
-        try {
+        if (File::exists(cacheDir('music.json'))) {
+            $musicJson = file_get_contents(cacheDir('music.json'));
+        }else{
             $res = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
+            File::put(cacheDir('music.json'), $musicJson);
+        }
+
+        try {
             $musicFiles = json_decode($musicJson);
             MusicServer::setMusicFiles(collect($musicFiles));
-            return;
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
-            return;
         }
     }
 

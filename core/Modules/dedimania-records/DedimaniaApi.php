@@ -1,11 +1,15 @@
 <?php
 
+namespace esc\Modules\Dedimania;
+
 use esc\Classes\Config;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
+use esc\Models\DedimaniaSession;
 use esc\Models\Map;
 use esc\Models\Player;
+use SimpleXMLElement;
 
 class DedimaniaApi
 {
@@ -87,7 +91,7 @@ class DedimaniaApi
         $session = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at')->first();
 
         if ($session) {
-            Log::info("Dedimania using stored session from $session->created_at");
+            Log::info("Dedimania using stored session from $session->created_at", false);
 
             $lastCheck = $session->updated_at->diffInMinutes(\Carbon\Carbon::now());
 

@@ -6,11 +6,10 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Module;
 use esc\Classes\Template;
-use esc\Models\Group;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use ReflectionMethod;
 
 class ModuleController
 {
@@ -22,10 +21,10 @@ class ModuleController
 
         Template::add('modules', File::get('core/Templates/modules.latte.xml'));
 
-        ManiaLinkEvent::add('modules.close', 'esc\Controllers\ModuleController::hideModules');
-        ManiaLinkEvent::add('module.reload', 'esc\Controllers\ModuleController::reloadModule');
+        ManiaLinkEvent::add('modules.close', 'ModuleController::hideModules');
+        ManiaLinkEvent::add('module.reload', 'ModuleController::reloadModule');
 
-        ChatCommand::add('modules', 'esc\Controllers\ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
+        ChatCommand::add('modules', 'ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
     }
 
     public static function reloadModule(Player $callee, string $moduleName)
@@ -66,29 +65,69 @@ class ModuleController
         Template::hide($callee, 'modules');
     }
 
-    public static function loadModules($loadFrom = __DIR__ . '/../Modules')
+    private static function outputModuleInformation($module)
     {
-        foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
-            $dir = $loadFrom . '/' . $item;
+        $name = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $author = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $version = str_pad($module->version ?? 'n/a', 12, ' ', STR_PAD_RIGHT);
 
-            if (!file_exists($dir . '/module.json')) {
-                Log::error("Missing module.json for [$item]");
-                return;
+        Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
+    }
+
+    private static function loadModulesInformation(Collection $moduleDirectories)
+    {
+        $moduleDirectories->each(function ($moduleDirectory) {
+            $moduleJson = __DIR__ . '/../Modules/' . $moduleDirectory . '/module.json';
+            if (file_exists($moduleJson)) {
+                $json = file_get_contents($moduleJson);
+                $moduleInformation = json_decode($json);
+                self::$loadedModules->push($moduleInformation);
+            }
+        });
+    }
+
+    /**
+     * Start the modules
+     */
+    public static function bootModules()
+    {
+        $classes = classes();
+
+        //Get modules from classes
+        $moduleClasses = $classes->filter(function ($class) {
+            if (preg_match('/^esc.Modules./', $class->namespace)) {
+                return true;
             }
 
-            $moduleData = json_decode(file_get_contents($dir . '/module.json'));
+            return false;
+        });
 
-            try {
-                require_once "$loadFrom/$item/$moduleData->main.php";
-                $module = new Module($moduleData->name ?? $moduleData->main, $moduleData->main);
-                $module->load();
+        //Get module directories
+        $modules = $moduleClasses->pluck(['dir'])->unique();
 
-                self::$loadedModules->push($module);
+        //Load module information
+        Log::logAddLine('Modules', 'Loading module information');
+        self::loadModulesInformation($modules);
 
-                Log::logAddLine('Module', "$item loaded");
-            } catch (\Exception $e) {
-                Log::error("Could not load module $item: $e");
+        //Output loaded modules
+        self::outputModuleInformation(json_decode('{"name":"Name","version":"Version","author":"Author"}'));
+        self::outputModuleInformation(json_decode('{"name":"------------------------------","version":"------------","author":"------------------------------"}'));
+        self::$loadedModules->each(function ($module) {
+            self::outputModuleInformation($module);
+        });
+
+        //Boot modules
+        Log::logAddLine('Modules', 'Booting modules');
+
+        $moduleClasses->each(function ($module) {
+            if (method_exists($module->namespace, '__construct')) {
+                $reflectionMethod = new ReflectionMethod($module->namespace, '__construct');
+
+                if ($reflectionMethod->getNumberOfRequiredParameters() == 0) {
+                    //Boot the module
+                    $class = new $module->namespace;
+                }
             }
-        }
+        });
     }
 }

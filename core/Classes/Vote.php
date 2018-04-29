@@ -38,17 +38,17 @@ class Vote
 
         Template::add('vote', File::get('core/Templates/vote.latte.xml'));
 
-        Hook::add('EndMatch', 'esc\Classes\Vote::endMatch');
+        Hook::add('EndMatch', 'Vote::endMatch');
 
-        ChatController::addCommand('vote', 'esc\Classes\Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');
-        ChatController::addCommand('replay', 'esc\Classes\Vote::replayMap', 'Cast a vote to replay map');
-        ChatController::addCommand('res', 'esc\Classes\Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
-        ChatController::addCommand('skip', 'esc\Classes\Vote::skipMap', 'Cast a vote to skip map');
-        ChatController::addCommand('y', 'esc\Classes\Vote::voteYes', 'Vote yes');
-        ChatController::addCommand('n', 'esc\Classes\Vote::voteNo', 'Vote no');
+        ChatController::addCommand('vote', 'Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');
+        ChatController::addCommand('replay', 'Vote::replayMap', 'Cast a vote to replay map');
+        ChatController::addCommand('res', 'Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
+        ChatController::addCommand('skip', 'Vote::skipMap', 'Cast a vote to skip map');
+        ChatController::addCommand('y', 'Vote::voteYes', 'Vote yes');
+        ChatController::addCommand('n', 'Vote::voteNo', 'Vote no');
 
-        KeyController::createBind('F5', 'esc\Classes\Vote::voteYes');
-        KeyController::createBind('F6', 'esc\Classes\Vote::voteNo');
+        KeyController::createBind('F5', 'Vote::voteYes');
+        KeyController::createBind('F6', 'Vote::voteNo');
     }
 
     public static function active(): bool
@@ -120,7 +120,7 @@ class Vote
         self::$startTime = time();
         self::$starter = $player;
 
-        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
 
         self::showVote();
     }
@@ -146,12 +146,12 @@ class Vote
         self::$inProgress = true;
         self::$message = 'Add 10 minutes playtime?';
         self::$startTime = time();
-        self::$action = 'esc\classes\Vote::doReplay';
+        self::$action = 'Vote::doReplay';
         self::$starter = $player;
 
         self::voteYes($player);
 
-        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
 
         ChatController::messageAll("\$fff ", $player, ' is asking for more time. Type /y or /n to vote.');
 
@@ -180,12 +180,12 @@ class Vote
         self::$inProgress = true;
         self::$message = 'Skip map?';
         self::$startTime = time();
-        self::$action = 'esc\classes\Vote::doSkip';
+        self::$action = 'Vote::doSkip';
         self::$starter = $player;
 
         self::voteYes($player);
 
-        Timer::create('vote.finish', 'esc\classes\Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
 
         ChatController::messageAll("\$fff ", $player, ' is asking to skip the map. Type /y or /n to vote.');
 

@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\Hook;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -15,7 +14,7 @@ class SpectatorController
     {
         self::$specTargets = collect([]);
 
-//        Hook::add('PlayerInfoChanged', 'esc\Controllers\SpectatorController::playerInfoChanged');
+//        Hook::add('PlayerInfoChanged', 'SpectatorController::playerInfoChanged');
     }
 
     public static function playerInfoChanged(Collection $players)

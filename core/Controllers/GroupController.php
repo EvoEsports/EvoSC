@@ -23,13 +23,13 @@ class GroupController
         Template::add('groups', File::get('core/Templates/groups.latte.xml'));
         Template::add('group.edit', File::get('core/Templates/group-edit.latte.xml'));
 
-        ChatCommand::add('group', 'esc\Controllers\GroupController::group', 'Group commands', '//', 'group');
-        ChatCommand::add('groups', 'esc\Controllers\GroupController::displayGroups', 'Show groups overview', '//', 'group');
+        ChatCommand::add('group', 'GroupController::group', 'Group commands', '//', 'group');
+        ChatCommand::add('groups', 'GroupController::displayGroups', 'Show groups overview', '//', 'group');
 
-        ManiaLinkEvent::add('group.delete', 'esc\Controllers\GroupController::groupDelete', 'group');
-        ManiaLinkEvent::add('group.edit', 'esc\Controllers\GroupController::groupEdit', 'group');
-        ManiaLinkEvent::add('group.toggle.access', 'esc\Controllers\GroupController::groupToggleAccessRight', 'group');
-        ManiaLinkEvent::add('groups.show', 'esc\Controllers\GroupController::groupsShow', 'group');
+        ManiaLinkEvent::add('group.delete', 'GroupController::groupDelete', 'group');
+        ManiaLinkEvent::add('group.edit', 'GroupController::groupEdit', 'group');
+        ManiaLinkEvent::add('group.toggle.access', 'GroupController::groupToggleAccessRight', 'group');
+        ManiaLinkEvent::add('groups.show', 'GroupController::groupsShow', 'group');
     }
 
     public static function createTables()

@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules;
+
 use esc\Models\Player;
 
 class Checkpoint

@@ -1,11 +1,16 @@
 <?php
 
+namespace esc\Modules\Statistics;
+
 use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
+use esc\Models\Karma;
+use esc\Models\LocalRecord;
 use esc\Models\Player;
+use esc\Models\Stats;
 use Illuminate\Database\Schema\Blueprint;
 
 class Statistics
@@ -15,8 +20,6 @@ class Statistics
      */
     public function __construct()
     {
-//        include_once __DIR__ . '/Models/Stats.php';
-
         self::createTables();
 
         Hook::add('PlayerConnect', 'Statistics::playerConnect');

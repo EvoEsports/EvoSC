@@ -1,4 +1,5 @@
 {
   "name": "Music server",
-  "main": "MusicServer"
+  "author": "brakerb",
+  "version": 1.0
 }

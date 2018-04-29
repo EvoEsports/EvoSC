@@ -2,8 +2,8 @@
 
 //error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
-include 'core/autoload.php';
 include 'vendor/autoload.php';
+include 'core/autoload.php';
 
 include 'core/bootstrap.php';
 
@@ -13,8 +13,7 @@ while (true) {
 
         startEsc();
 
-        loadModulesFrom(__DIR__ . '/core/Modules');
-        loadModulesFrom(__DIR__ . '/modules');
+        bootModules();
 
         beginMap();
 

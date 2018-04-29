@@ -13,13 +13,10 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Vote;
-use esc\Models\Group;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
-use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 
 class MapController
@@ -41,13 +38,13 @@ class MapController
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
-        Hook::add('PlayerConnect', '\esc\Controllers\MapController::displayMapWidget');
-        Hook::add('BeginMap', 'esc\Controllers\MapController::beginMap');
-        Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
+        Hook::add('PlayerConnect', 'MapController::displayMapWidget');
+        Hook::add('BeginMap', 'MapController::beginMap');
+        Hook::add('EndMatch', 'MapController::endMatch');
 
-        ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
+        ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
+        ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
 
     public static function createTables()
