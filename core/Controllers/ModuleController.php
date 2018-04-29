@@ -119,7 +119,7 @@ class ModuleController
         //Boot modules
         Log::logAddLine('Modules', 'Booting modules');
 
-        $modules->each(function ($module) {
+        $moduleClasses->each(function ($module) {
             if (method_exists($module->namespace, '__construct')) {
                 $reflectionMethod = new ReflectionMethod($module->namespace, '__construct');
 

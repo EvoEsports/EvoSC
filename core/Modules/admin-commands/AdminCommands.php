@@ -108,8 +108,10 @@ class AdminCommands
             return $ply->isAdmin();
         });
 
+        $pwEnabled = self::$pwEnabled;
+
         foreach ($admins as $player) {
-            Template::show($player, 'acp');
+            Template::show($player, 'acp', compact('pwEnabled'));
         }
     }
 

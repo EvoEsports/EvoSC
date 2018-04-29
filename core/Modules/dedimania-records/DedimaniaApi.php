@@ -6,8 +6,10 @@ use esc\Classes\Config;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
+use esc\Models\DedimaniaSession;
 use esc\Models\Map;
 use esc\Models\Player;
+use SimpleXMLElement;
 
 class DedimaniaApi
 {

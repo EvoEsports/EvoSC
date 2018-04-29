@@ -30,7 +30,17 @@ class Hook
     public function execute(...$arguments)
     {
         try {
-            call_user_func_array($this->function, $arguments); //TODO: deprecated switch to call_user_func()
+            $className = explode('::', $this->function)[0];
+            $function = explode('::', $this->function)[1];
+
+            $class = classes()->where('class', $className)->first();
+
+            if ($class) {
+                call_user_func_array("$class->namespace::$function", $arguments);
+            }else{
+                call_user_func_array($this->function, $arguments);
+            }
+
             Log::logAddLine('Hook', "Execute: $this->function", false);
         } catch (\Exception $e) {
             Log::logAddLine('Hook ERROR', "Execution of $this->function() failed: " . $e->getMessage(), true);
