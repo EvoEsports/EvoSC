@@ -15,7 +15,7 @@ class KeyController
 
     public static function init()
     {
-        self::$binds = collect([]);
+        self::$binds = collect();
 
         Hook::add('PlayerConnect', 'KeyController::playerConnect');
 
@@ -47,7 +47,7 @@ class KeyController
         }
 
         foreach ($binds as $bind) {
-            call_user_func_array($bind->function, [$player]);
+            call_func($bind->function, $player);
         }
     }
 

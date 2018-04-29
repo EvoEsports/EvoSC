@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="Clock" version="3">
+<manialink name="clock-widget" id="clock-widget" version="3">
     <frame pos="{$clock->pos}">
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>

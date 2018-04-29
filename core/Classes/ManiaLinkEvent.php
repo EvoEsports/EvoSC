@@ -73,7 +73,7 @@ class ManiaLinkEvent
         if (strlen($event->id) < strlen($action)) {
             $arguments = explode(',', $action);
             $arguments[0] = $ply;
-            call_user_func_array($event->callback, $arguments);
+            call_func($event->callback, ...$arguments);
             return;
         }
 
