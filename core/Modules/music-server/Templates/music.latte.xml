@@ -12,3 +12,82 @@
     <label pos="-20 0" text="" action="music.next" />
     <label id="passed" pos="-45 0" z-index="1" size="22 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
 </frame>
+
+<script><!--
+#Include "MathLib" as MathLib
+
+Void anim(CMlFrame frame, Text targetPos, Integer duration){
+    AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+}
+
+    main() {
+    declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare player <=> InputPlayer;
+    declare Boolean hidden = False;
+    declare Boolean isLapRace = Map.TMObjective_IsLapRace;
+    declare Integer duration = 800;
+    declare Real hideSpeed = ({intval($hideSpeed) > 0 ? intval($hideSpeed) : 1} * 1.0);
+    declare Real speed = 0.0;
+    declare Text visiblePos = "<frame pos='{$config->pos->visible|noescape}' />";
+    declare Text hiddenPos = "<frame pos='{$config->pos->hidden|noescape}' />";
+
+    declare music <=> Audio.CreateSound("{$song->url|noescape}", 1.0, True, False, False);
+    declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
+    declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    declare timePassedLabel <=> (Page.MainFrame.GetFirstChild("passed") as CMlLabel);
+    declare Integer timeLeft = 0;
+    declare Integer timePassed = 0;
+    declare Integer playtimeMinutes = 0;
+    declare Integer playtimeSeconds = 0;
+    declare Text length = {$song->length};
+    declare Integer lengthInSeconds = {$lengthInSeconds};
+    declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
+    music.Play();
+    while (True) {
+        timeLeft = (timeEnd/1000) - (CurrentTime/1000);
+        timePassed =  lengthInSeconds - timeLeft;
+        playtimeMinutes = MathLib::FloorInteger(timePassed/60.0);
+        playtimeSeconds = timePassed - (playtimeMinutes*60);
+        if(playtimeSeconds < 10){
+            timePassedLabel.SetText(playtimeMinutes ^ ":0" ^ playtimeSeconds ^ " / " ^ length);
+        }else{
+            timePassedLabel.SetText(playtimeMinutes ^ ":" ^ playtimeSeconds ^ " / " ^ length);
+        }
+        if(timePassed > 0){
+            bar.Size = <(timePassed / (lengthInSeconds * 1.0))*36.0,0.4>;
+            if(timePassed >= lengthInSeconds){
+                TriggerPageAction("music.next");
+            }
+        }
+
+        if(hideSpeed > 0.0){
+            if(player != Null && hideSpeed > 0.0){
+                speed = player.Speed;
+
+                if(speed < 0){
+                    speed = speed  * -1;
+                }
+
+                if(!isLapRace && player.CurrentNbLaps >= 1){
+                    if(player != Null && speed < hideSpeed && hidden){
+                        anim(widget, visiblePos, duration);
+                        hidden = False;
+                    }
+                }else{
+                    if(player != Null && speed >= hideSpeed && !hidden){
+                        anim(widget, hiddenPos, duration);
+                        hidden = True;
+                    }
+
+                    if(player != Null && speed < hideSpeed && hidden){
+                        anim(widget, visiblePos, duration);
+                        hidden = False;
+                    }
+                }
+            }
+        }
+
+        yield;
+    }
+}
+--></script>

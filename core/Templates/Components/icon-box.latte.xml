@@ -7,6 +7,6 @@
     <quad pos="40 0" z-index="1" size=".2 10" bgcolor="{primary_color()|noescape}9"/>
     <frame pos="0 0">{$content|noescape}</frame>
 
-    {$hideScript|noescape}
+    {$hideScript ?? ''|noescape}
 </frame>
 </manialink>
