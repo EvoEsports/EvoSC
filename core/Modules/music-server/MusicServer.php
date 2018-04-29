@@ -2,6 +2,7 @@
 
 namespace esc\Modules\MusicServer;
 
+use Carbon\Carbon;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -112,16 +113,15 @@ class MusicServer
     {
         $content = Template::toString('music', [
             'song' => $song,
-            'lengthInSeconds' => $lengthInSeconds
+            'lengthInSeconds' => $lengthInSeconds,
+            'config' => config('ui.music'),
+            'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
         ]);
-
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.music')]);
 
         Template::show($player, 'esc.icon-box', [
             'id' => 'music-widget',
             'content' => $content,
-            'config' => config('ui.music'),
-            'hideScript' => $hideScript
+            'config' => config('ui.music')
         ]);
     }
 
@@ -242,7 +242,13 @@ class MusicServer
         }else{
             $res = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
-            File::put(cacheDir('music.json'), $musicJson);
+
+            $musicData = collect([
+                'date' => Carbon::now(),
+                'data' => $musicJson
+            ]);
+
+            File::put(cacheDir('music.json'), $musicData->toJson());
         }
 
         try {
