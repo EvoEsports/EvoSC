@@ -91,12 +91,6 @@ function bootModules()
 
 function migrate()
 {
-    $migrations = classes()
-        ->where('dir', 'Migrations')
-        ->sortBy('class')
-        ->pluck('file','class');
-
-    dd($migrations);
 }
 
 function beginMap()
