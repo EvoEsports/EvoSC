@@ -2,9 +2,9 @@
 
 namespace esc\Migrations;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
 class CreateDediSessionsTable extends Migration
 {
@@ -13,9 +13,9 @@ class CreateDediSessionsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(Builder $schemaBuilder)
     {
-        Schema::create('dedi-sessions', function (Blueprint $table) {
+        $schemaBuilder->create('dedi-sessions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('Session');
             $table->boolean('Expired')->default(false);
@@ -28,7 +28,7 @@ class CreateDediSessionsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(Builder $schemaBuilder)
     {
         Schema::drop('dedi-sessions');
     }

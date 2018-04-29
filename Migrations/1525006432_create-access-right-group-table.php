@@ -2,9 +2,9 @@
 
 namespace esc\Migrations;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
 class CreateAccessRightGroupTable extends Migration
 {
@@ -13,9 +13,9 @@ class CreateAccessRightGroupTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(Builder $schemaBuilder)
     {
-        Schema::create('access_right_group', function (Blueprint $table) {
+        $schemaBuilder->create('access_right_group', function (Blueprint $table) {
             $table->integer('group_id');
             $table->integer('access_right_id');
             $table->unique(['group_id', 'access_right_id']);
@@ -27,7 +27,7 @@ class CreateAccessRightGroupTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(Builder $schemaBuilder)
     {
         Schema::drop('access_right_group');
     }

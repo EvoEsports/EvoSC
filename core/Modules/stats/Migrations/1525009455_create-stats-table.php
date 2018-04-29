@@ -2,9 +2,9 @@
 
 namespace esc\Migrations;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 
 class CreateStatsTable extends Migration
 {
@@ -13,9 +13,9 @@ class CreateStatsTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(Builder $schemaBuilder)
     {
-        Schema::create('stats', function (Blueprint $table) {
+        $schemaBuilder->create('stats', function (Blueprint $table) {
             $table->integer('Player')->primary();
             $table->integer('Visits')->default(0);
             $table->integer('Playtime')->default(0);
@@ -35,7 +35,7 @@ class CreateStatsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(Builder $schemaBuilder)
     {
         Schema::drop('stats');
     }

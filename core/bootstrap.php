@@ -38,8 +38,6 @@ function startEsc()
         exit(1);
     }
 
-    include_once __DIR__ . '/Modules/stats/Models/Stats.php';
-
     esc\Classes\Database::init();
     esc\Classes\RestClient::init(config('server.name'));
     esc\Controllers\HookController::init();
@@ -89,6 +87,16 @@ function cycle()
 function bootModules()
 {
     esc\Controllers\ModuleController::bootModules();
+}
+
+function migrate()
+{
+    $migrations = classes()
+        ->where('dir', 'Migrations')
+        ->sortBy('class')
+        ->pluck('file','class');
+
+    dd($migrations);
 }
 
 function beginMap()
