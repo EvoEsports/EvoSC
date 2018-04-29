@@ -1,4 +1,5 @@
 {
   "name": "Admin control panel",
-  "main": "AdminCommands"
+  "author": "brakerb",
+  "version": 1.0
 }

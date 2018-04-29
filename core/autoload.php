@@ -19,7 +19,7 @@ function getClassesInDirectory(&$classes, $path)
             $class = collect();
             $class->file = $file;
             $type = explode(DIRECTORY_SEPARATOR, $path);
-            $class->type = array_pop($type);
+            $class->dir = array_pop($type);
             $class->class = str_replace('.php', '', $classFile);
             $classes->push($class);
         }
@@ -70,9 +70,13 @@ function esc_class_loader($className)
         } else {
             die("Trying to load non-existant file: " . $class->file);
         }
-    } else {
-//        die("Trying to load unknown class: $className \n");
     }
+}
+
+function classes(): \Illuminate\Support\Collection
+{
+    global $classes;
+    return $classes;
 }
 
 buildClassMap();
