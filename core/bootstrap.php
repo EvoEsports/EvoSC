@@ -10,18 +10,6 @@ $output = new \Symfony\Component\Console\Output\ConsoleOutput();
 esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
 
-if (config('music.enable-internal-server', false) == true) {
-    \esc\Classes\Log::info("Starting music server...");
-
-    $phpBinaryFinder = new Symfony\Component\Process\PhpExecutableFinder();
-    $phpBinaryPath = $phpBinaryFinder->find();
-
-    $musicServer = new Symfony\Component\Process\Process($phpBinaryPath . ' -S 0.0.0.0:6600 ' . coreDir('music-server.php'));
-    $musicServer->start();
-
-    \esc\Classes\Log::info("Music server started.");
-}
-
 function startEsc()
 {
     try {
