@@ -13,13 +13,10 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Vote;
-use esc\Models\Group;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\AlreadyInListException;
-use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 
 class MapController

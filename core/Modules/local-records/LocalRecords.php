@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\LocalRecords;
+
 use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;

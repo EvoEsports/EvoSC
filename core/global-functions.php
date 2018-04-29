@@ -140,10 +140,12 @@ function background_color()
 {
     return config('color.ui.background');
 }
+
 function header_color()
 {
     return config('color.ui.header');
 }
+
 function primary_color()
 {
     return config('color.ui.primary');

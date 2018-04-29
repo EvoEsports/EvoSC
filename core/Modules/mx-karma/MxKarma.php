@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\MxKarma;
+
 include_once __DIR__ . '/MXK.php';
 include_once __DIR__ . '/Models/Karma.php';
 
@@ -10,7 +12,6 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\HookController;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;

@@ -1,6 +1,7 @@
 <?php
 
-use esc\Classes\Database;
+namespace esc\Modules\MusicServer;
+
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -9,12 +10,8 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Models\Map;
 use esc\Models\Player;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
-use Psr\Http\Message\ResponseInterface;
 
 class MusicServer
 {

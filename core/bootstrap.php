@@ -1,6 +1,6 @@
 <?php
 
-$escVersion = '0.26.*';
+$escVersion = '0.27.*';
 
 include 'global-functions.php';
 
@@ -88,9 +88,9 @@ function cycle()
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
 
-function loadModulesFrom(string $path)
+function bootModules()
 {
-    esc\Controllers\ModuleController::loadModules($path);
+    esc\Controllers\ModuleController::bootModules();
 }
 
 function beginMap()

@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\Hook;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 

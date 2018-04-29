@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\MapList;
+
 use esc\Classes\File;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;

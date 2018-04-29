@@ -1,6 +1,6 @@
 <?php
 
-use esc\Models\Player;
+namespace esc\Models;
 
 class Karma extends \Illuminate\Database\Eloquent\Model
 {

@@ -3,11 +3,8 @@
 namespace esc\Models;
 
 
-use Dedi;
+use esc\Modules\MxKarma\MxKarma;
 use Illuminate\Database\Eloquent\Model;
-use LocalRecord;
-use MxKarma;
-use Stats;
 
 class Player extends Model
 {

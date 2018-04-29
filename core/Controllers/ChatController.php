@@ -3,19 +3,19 @@
 namespace esc\Controllers;
 
 
-use Dedi;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Models\Dedi;
 use esc\Models\Group;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Models\Song;
 use Illuminate\Database\Eloquent\Collection;
-use LocalRecord;
-use Song;
 
 class ChatController
 {

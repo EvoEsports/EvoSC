@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Models;
+
 class Stats extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'stats';

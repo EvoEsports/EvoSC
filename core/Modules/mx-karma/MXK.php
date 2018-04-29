@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\MxKarma;
+
 class MXK
 {
     const startSession = 1;

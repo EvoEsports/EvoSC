@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\Dedimania;
+
 require_once __DIR__ . '/DedimaniaApi.php';
 
 use esc\Classes\Database;

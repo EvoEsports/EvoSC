@@ -6,9 +6,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Module;
 use esc\Classes\Template;
-use esc\Models\Group;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -66,29 +64,22 @@ class ModuleController
         Template::hide($callee, 'modules');
     }
 
-    public static function loadModules($loadFrom = __DIR__ . '/../Modules')
+    public static function bootModules()
     {
-        foreach (array_diff(scandir($loadFrom), array('..', '.', '.gitignore')) as $item) {
-            $dir = $loadFrom . '/' . $item;
+        global $classes;
 
-            if (!file_exists($dir . '/module.json')) {
-                Log::error("Missing module.json for [$item]");
-                return;
+        $modules = $classes->filter(function ($class) {
+            if (preg_match('/^esc\\Modules\\.+/', $class->namespace)) {
+                return true;
             }
 
-            $moduleData = json_decode(file_get_contents($dir . '/module.json'));
+            return false;
+        });
 
-            try {
-                require_once "$loadFrom/$item/$moduleData->main.php";
-                $module = new Module($moduleData->name ?? $moduleData->main, $moduleData->main);
-                $module->load();
+        Log::logAddLine('Modules', 'Booting modules');
 
-                self::$loadedModules->push($module);
-
-                Log::logAddLine('Module', "$item loaded");
-            } catch (\Exception $e) {
-                Log::error("Could not load module $item: $e");
-            }
-        }
+        $modules->each(function($module){
+            $class = new $module->class;
+        });
     }
 }

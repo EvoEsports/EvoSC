@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\Database;
-use esc\Models\AccessRight;
 use Illuminate\Database\Schema\Blueprint;
 
 class AccessController

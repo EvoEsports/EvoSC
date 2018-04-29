@@ -3,11 +3,7 @@
 namespace esc\Models;
 
 
-use Carbon\Carbon;
-use Dedi;
 use Illuminate\Database\Eloquent\Model;
-use Karma;
-use LocalRecord;
 
 class Map extends Model
 {

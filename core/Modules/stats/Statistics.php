@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\Statistics;
+
 use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Template;

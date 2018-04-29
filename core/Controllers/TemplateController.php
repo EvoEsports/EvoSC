@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\Timer;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;

@@ -1,5 +1,6 @@
 <?php
 
+namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
@@ -9,7 +10,6 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
-use esc\Controllers\PlayerController;
 use esc\Models\Player;
 
 class AdminCommands

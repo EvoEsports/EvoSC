@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules;
+
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Template;

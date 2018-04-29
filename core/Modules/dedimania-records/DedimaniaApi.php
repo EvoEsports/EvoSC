@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Modules\Dedimania;
+
 use esc\Classes\Config;
 use esc\Classes\Log;
 use esc\Classes\RestClient;

@@ -10,10 +10,10 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Models\Player;
+use esc\Models\Stats;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
-use Stats;
 
 class PlayerController
 {
