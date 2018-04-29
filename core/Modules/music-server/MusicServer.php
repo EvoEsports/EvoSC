@@ -12,6 +12,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Models\Player;
+use esc\Models\Song;
 use Illuminate\Support\Collection;
 
 class MusicServer

@@ -2,7 +2,9 @@
 
 namespace esc\Models;
 
-class DedimaniaSession extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class DedimaniaSession extends Model
 {
     protected $table = 'dedi-sessions';
 

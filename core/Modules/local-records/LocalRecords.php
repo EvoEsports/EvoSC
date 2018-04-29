@@ -21,10 +21,6 @@ class LocalRecords
      */
     public function __construct()
     {
-        LocalRecords::createTables();
-
-        include_once __DIR__ . '/Models/LocalRecord.php';
-
         Template::add('locals', File::get(__DIR__ . '/Templates/locals.latte.xml'));
 
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
@@ -33,21 +29,6 @@ class LocalRecords
 
         ManiaLinkEvent::add('locals.show', 'LocalRecords::showLocalsModal');
         ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
-    }
-
-    /**
-     * Create the database tables
-     */
-    public static function createTables()
-    {
-        Database::create('local-records', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('Player');
-            $table->integer('Map');
-            $table->integer('Score');
-            $table->integer('Rank');
-            $table->text('Checkpoints')->nullable();
-        });
     }
 
     /**

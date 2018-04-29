@@ -9,6 +9,7 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;

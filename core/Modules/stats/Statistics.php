@@ -20,8 +20,6 @@ class Statistics
      */
     public function __construct()
     {
-        self::createTables();
-
         Hook::add('PlayerConnect', 'Statistics::playerConnect');
         Hook::add('PlayerFinish', 'Statistics::playerFinish');
         Hook::add('PlayerRateMap', 'Statistics::playerRateMap');
@@ -280,25 +278,5 @@ class Statistics
     {
         $player->Donations += $amount;
         $player->save();
-    }
-
-    /**
-     * Create the database table
-     */
-    public static function createTables()
-    {
-        Database::create('stats', function (Blueprint $table) {
-            $table->integer('Player')->primary();
-            $table->integer('Visits')->default(0);
-            $table->integer('Playtime')->default(0);
-            $table->integer('Finishes')->default(0);
-            $table->integer('Locals')->default(0);
-            $table->integer('Ratings')->default(0);
-            $table->integer('Wins')->default(0);
-            $table->integer('Donations')->default(0);
-            $table->integer('Score')->default(0);
-            $table->integer('Rank')->default(0);
-            $table->timestamps();
-        });
     }
 }
