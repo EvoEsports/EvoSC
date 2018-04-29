@@ -237,15 +237,19 @@ class MusicServer
     {
         Log::info("Loading music...");
 
-        try {
+        if (File::exists(cacheDir('music.json'))) {
+            $musicJson = file_get_contents(cacheDir('music.json'));
+        }else{
             $res = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
+            File::put(cacheDir('music.json'), $musicJson);
+        }
+
+        try {
             $musicFiles = json_decode($musicJson);
             MusicServer::setMusicFiles(collect($musicFiles));
-            return;
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
-            return;
         }
     }
 
