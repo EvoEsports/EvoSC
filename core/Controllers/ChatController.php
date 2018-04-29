@@ -160,7 +160,7 @@ $$: Writes a dollarsign
 
         if ($command) {
             try {
-                call_user_func_array($command->callback, $arguments);
+                call_func($command->callback, ...$arguments);
             } catch (\Exception $e) {
                 Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getTraceAsString(), true);
             }
