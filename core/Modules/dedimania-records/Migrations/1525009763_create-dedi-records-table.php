@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 
-class CreateGroupsTable extends Migration
+class CreateDediRecordsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,17 +15,15 @@ class CreateGroupsTable extends Migration
      */
     public function up(Builder $schemaBuilder)
     {
-        $schemaBuilder->create('groups', function (Blueprint $table) {
+        $schemaBuilder->create('dedi-records', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('Name')->unique();
-            $table->boolean('Protected')->default(false);
+            $table->integer('Map');
+            $table->integer('Player');
+            $table->integer('Score');
+            $table->integer('Rank');
+            $table->text('Checkpoints')->nullable();
+            $table->boolean('New')->default(false);
         });
-
-        $seed = [
-            ['id' => 1, 'Name' => 'Masteradmin', 'Protected' => true],
-            ['id' => 2, 'Name' => 'Admin', 'Protected' => true],
-            ['id' => 3, 'Name' => 'Player', 'Protected' => true],
-        ];
     }
 
     /**
@@ -35,6 +33,6 @@ class CreateGroupsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('groups');
+        Schema::drop('dedi-records');
     }
 }

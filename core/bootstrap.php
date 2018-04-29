@@ -38,8 +38,6 @@ function startEsc()
         exit(1);
     }
 
-    include_once __DIR__ . '/Modules/stats/Models/Stats.php';
-
     esc\Classes\Database::init();
     esc\Classes\RestClient::init(config('server.name'));
     esc\Controllers\HookController::init();
@@ -74,10 +72,8 @@ function startEsc()
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 
     //Handle already connected players
-    foreach (esc\Classes\Server::getPlayerList() as $player) {
-        $ply = \esc\Models\Player::firstOrCreate(['Login' => $player->login]);
-        $ply->update($player->toArray());
-        esc\Controllers\PlayerController::playerConnect($ply, true);
+    foreach (onlinePlayers() as $player) {
+        esc\Controllers\PlayerController::playerConnect($player, true);
     }
 }
 
@@ -91,6 +87,16 @@ function cycle()
 function bootModules()
 {
     esc\Controllers\ModuleController::bootModules();
+}
+
+function migrate()
+{
+    $migrations = classes()
+        ->where('dir', 'Migrations')
+        ->sortBy('class')
+        ->pluck('file','class');
+
+    dd($migrations);
 }
 
 function beginMap()

@@ -2,7 +2,9 @@
 
 namespace esc\Models;
 
-class Dedi extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Dedi extends Model
 {
     protected $table = 'dedi-records';
 

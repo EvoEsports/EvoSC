@@ -22,8 +22,6 @@ class PlayerController
 
     public static function init()
     {
-        self::createTables();
-
         Hook::add('PlayerDisconnect', 'PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', 'PlayerController::playerFinish');
 
@@ -38,23 +36,6 @@ class PlayerController
 
         ChatController::addCommand('fake', 'PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
         ChatController::addCommand('disfake', 'PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
-    }
-
-    public static function createTables()
-    {
-        Database::create('players', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('Login')->unique();
-            $table->string('NickName')->default("unset");
-            $table->integer('Group')->default(3);
-            $table->integer('Score')->default(0);
-            $table->boolean('Online')->default(false);
-            $table->integer('Afk')->default(0);
-            $table->integer('spectator_status')->default(0);
-            $table->integer('MaxRank')->default(15);
-            $table->boolean('Banned')->default(false);
-            $table->text('user_settings')->nullable();
-        });
     }
 
     /**
@@ -204,6 +185,8 @@ class PlayerController
     {
         $player->setOnline();
 
+        HookController::fire('PlayerConnect', $player);
+
         if (Database::hasTable('stats')) {
             $stats = $player->stats;
 
@@ -223,7 +206,6 @@ class PlayerController
             }
         }
 
-        Log::info($player->NickName . " joined the server.");
         Log::info($player->NickName . " joined the server.");
 
         self::displayPlayerlist();

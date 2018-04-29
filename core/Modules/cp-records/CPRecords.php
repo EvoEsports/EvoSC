@@ -14,8 +14,6 @@ class CPRecords
 
     public function __construct()
     {
-        include_once 'Checkpoint.php';
-
         self::clearCheckpoints();
 
         Template::add('cpr.record', File::get(__DIR__ . '/Templates/cp-record.latte.xml'));

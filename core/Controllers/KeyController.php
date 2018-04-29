@@ -15,17 +15,13 @@ class KeyController
 
     public static function init()
     {
-        self::$binds = collect([]);
+        self::$binds = collect();
 
         Hook::add('PlayerConnect', 'KeyController::playerConnect');
 
         ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
 
         Template::add('keybinds', File::get('core/Templates/keybinds.latte.xml'));
-
-        foreach (onlinePlayers() as $player) {
-            self::sendKeybindsScript($player);
-        }
     }
 
     public static function createBind(string $key, string $function)
@@ -47,7 +43,7 @@ class KeyController
         }
 
         foreach ($binds as $bind) {
-            call_user_func_array($bind->function, [$player]);
+            call_func($bind->function, $player);
         }
     }
 

@@ -29,8 +29,6 @@ class MapController
 
     public static function init()
     {
-        self::createTables();
-
         self::loadMaps();
 
         self::$queue = new Collection();
@@ -45,27 +43,6 @@ class MapController
         ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
         ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
         ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
-    }
-
-    public static function createTables()
-    {
-        Database::create('maps', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->increments('id');
-            $table->string('UId')->nullable();
-            $table->integer('MxId')->nullable();
-            $table->string('Name')->nullable();
-            $table->string('Author')->nullable();
-            $table->string('FileName')->unique();
-            $table->string('Environment')->nullable();
-            $table->integer('NbCheckpoints')->nullable();
-            $table->integer('NbLaps')->nullable();
-            $table->integer('Plays')->default(0);
-            $table->string('Mood')->nullable();
-            $table->boolean('LapRace')->nullable();
-            $table->dateTime('LastPlayed')->nullable();
-            $table->boolean('Enabled')->default(false);
-            $table->integer('AuthorTime')->nullable();
-        });
     }
 
     /**
@@ -346,8 +323,12 @@ class MapController
         }
     }
 
-    private static function showWidget(Player $player, Map $currentMap)
+    private static function showWidget(Player $player, Map $currentMap = null)
     {
+        if (!$currentMap) {
+            return;
+        }
+
         $content = Template::toString('map', [
             'map' => $currentMap
         ]);

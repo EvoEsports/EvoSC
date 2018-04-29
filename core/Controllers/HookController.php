@@ -15,7 +15,7 @@ class HookController extends ModescriptCallbacks
     private static $hooks;
 
     private static $eventMap = [
-        'ManiaPlanet.PlayerConnect' => 'PlayerConnect',
+        'PlayerConnect' => 'PlayerConnect',
         'ManiaPlanet.PlayerDisconnect' => 'PlayerDisconnect',
         'ManiaPlanet.PlayerInfoChanged' => 'PlayerInfoChanged',
         'ManiaPlanet.PlayerChat' => 'PlayerChat',
@@ -115,7 +115,7 @@ class HookController extends ModescriptCallbacks
     {
         Log::logAddLine('Hook', "Called: $hook", false);
 
-        if($hook == 'ManiaPlanet.ModeScriptCallbackArray'){
+        if ($hook == 'ManiaPlanet.ModeScriptCallbackArray') {
             //handle modescript callbacks
             self::handleModeScriptCallbackArray($arguments);
             return;
@@ -133,6 +133,10 @@ class HookController extends ModescriptCallbacks
 //            case 'PlayerDonate':
 ////                self::fireHookBatch($hooks, $arguments[0], $arguments[1]);
 //                break;
+
+            case 'PlayerConnect':
+                self::fireHookBatch($hooks, $arguments);
+                break;
 
             case 'BeginMap':
                 //SMapInfo Map
@@ -176,21 +180,6 @@ class HookController extends ModescriptCallbacks
                 self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3]);
                 break;
 
-//            case 'PlayerCheckpoint':
-//                //int PlayerUid, string Login, int TimeOrScore, int CurLap, int CheckpointIndex
-//                $player = Player::find($arguments[1]);
-//                self::fireHookBatch($hooks, $player, $arguments[2], $arguments[3], $arguments[4]);
-//                break;
-
-//            case 'PlayerFinish':
-//                //int PlayerUid, string Login, int TimeOrScore
-//                $player = Player::find($arguments[1]);
-//                if ($player == null) {
-//                    $player = Player::find($arguments[1]);
-//                }
-//                self::fireHookBatch($hooks, $player, $arguments[2]);
-//                break;
-
             case 'PlayerIncoherence':
                 //int PlayerUid, string Login
                 $player = Player::find($arguments['Login']);
@@ -207,8 +196,6 @@ class HookController extends ModescriptCallbacks
 
     public static function call($event, $arguments = null)
     {
-//        Log::logAddLine('RPC-Event', $event, true);
-
         if (array_key_exists($event, self::$eventMap)) {
             foreach ($arguments as $key => $argument) {
                 if (is_null($argument)) {

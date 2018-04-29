@@ -28,11 +28,7 @@ class Dedimania extends DedimaniaApi
 
     public function __construct()
     {
-        $this->createTables();
-        self::$dedis = new Collection();
-
-        include_once __DIR__ . '/Models/Dedi.php';
-        include_once __DIR__ . '/Models/DedimaniaSession.php';
+        self::$dedis = collect();
 
         Hook::add('BeginMap', 'Dedimania::beginMap');
         Hook::add('EndMatch', 'Dedimania::endMatch');
@@ -61,26 +57,6 @@ class Dedimania extends DedimaniaApi
         }
 
         Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
-    }
-
-    private function createTables()
-    {
-        Database::create('dedi-records', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('Map');
-            $table->integer('Player');
-            $table->integer('Score');
-            $table->integer('Rank');
-            $table->text('Checkpoints')->nullable();
-            $table->boolean('New')->default(false);
-        });
-
-        Database::create('dedi-sessions', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('Session');
-            $table->boolean('Expired')->default(false);
-            $table->timestamps();
-        });
     }
 
     public static function printDediCps(Player $player, $cmd = null, $dediId = null)

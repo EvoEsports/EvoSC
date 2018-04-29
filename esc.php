@@ -11,6 +11,8 @@ while (true) {
     try {
         esc\Classes\Log::info("Starting...");
 
+        migrate();
+
         startEsc();
 
         bootModules();

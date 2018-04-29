@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 
-class CreateAccessRightGroupTable extends Migration
+class CreateMxKarmaTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,10 +15,12 @@ class CreateAccessRightGroupTable extends Migration
      */
     public function up(Builder $schemaBuilder)
     {
-        $schemaBuilder->create('access_right_group', function (Blueprint $table) {
-            $table->integer('group_id');
-            $table->integer('access_right_id');
-            $table->unique(['group_id', 'access_right_id']);
+        $schemaBuilder->create('mx-karma', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('Player');
+            $table->integer('Map');
+            $table->integer('Rating');
+            $table->unique(['Map', 'Player']);
         });
     }
 
@@ -29,6 +31,6 @@ class CreateAccessRightGroupTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('access_right_group');
+        Schema::drop('mx-karma');
     }
 }

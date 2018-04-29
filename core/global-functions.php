@@ -70,8 +70,10 @@ function coreDir(string $filename = ''): string
 
 function onlinePlayers(): \Illuminate\Support\Collection
 {
-    return esc\Models\Player::whereOnline(true)
-        ->get();
+    $playerlist = \esc\Classes\Server::getPlayerList();
+    $logins = collect($playerlist)->pluck(['login']);
+
+    return esc\Models\Player::whereIn('Login', $logins)->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
