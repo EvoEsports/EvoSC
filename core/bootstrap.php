@@ -65,7 +65,7 @@ function startEsc()
     \esc\Classes\Template::add('esc.hide-script', \esc\Classes\File::get(__DIR__ . '/Templates/Scripts/hide.script.txt'));
     \esc\Classes\Template::add('blank', \esc\Classes\File::get(__DIR__ . '/Templates/blank.latte.xml'));
 
-    \esc\Controllers\ChatController::addCommand('config', 'esc\Classes\Config::configReload', 'Reload config', '//', 'config');
+    \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
 
     $settings = \esc\Classes\Server::getModeScriptSettings();
     $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;

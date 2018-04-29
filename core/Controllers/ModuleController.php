@@ -21,10 +21,10 @@ class ModuleController
 
         Template::add('modules', File::get('core/Templates/modules.latte.xml'));
 
-        ManiaLinkEvent::add('modules.close', 'esc\Controllers\ModuleController::hideModules');
-        ManiaLinkEvent::add('module.reload', 'esc\Controllers\ModuleController::reloadModule');
+        ManiaLinkEvent::add('modules.close', 'ModuleController::hideModules');
+        ManiaLinkEvent::add('module.reload', 'ModuleController::reloadModule');
 
-        ChatCommand::add('modules', 'esc\Controllers\ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
+        ChatCommand::add('modules', 'ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
     }
 
     public static function reloadModule(Player $callee, string $moduleName)

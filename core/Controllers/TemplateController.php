@@ -22,7 +22,7 @@ class TemplateController
         self::$templates = new Collection();
         self::$latte = new Engine();
 
-//        Timer::create('template.reload', 'esc\Controllers\TemplateController::checkTemplateChanges', '2s');
+//        Timer::create('template.reload', 'TemplateController::checkTemplateChanges', '2s');
     }
 
     public static function addTemplate(string $index, string $templateString)
@@ -45,6 +45,6 @@ class TemplateController
     {
         //TODO: Automaticly reload templates
 
-        //Timer::create('template.reload', 'esc\Controllers\TemplateController::checkTemplateChanges', '2s');
+        //Timer::create('template.reload', 'TemplateController::checkTemplateChanges', '2s');
     }
 }

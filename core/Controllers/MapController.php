@@ -38,13 +38,13 @@ class MapController
 
         Template::add('map', File::get('core/Templates/map.latte.xml'));
 
-        Hook::add('PlayerConnect', '\esc\Controllers\MapController::displayMapWidget');
-        Hook::add('BeginMap', 'esc\Controllers\MapController::beginMap');
-        Hook::add('EndMatch', 'esc\Controllers\MapController::endMatch');
+        Hook::add('PlayerConnect', 'MapController::displayMapWidget');
+        Hook::add('BeginMap', 'MapController::beginMap');
+        Hook::add('EndMatch', 'MapController::endMatch');
 
-        ChatController::addCommand('skip', '\esc\Controllers\MapController::skip', 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('settings', '\esc\Controllers\MapController::settings', 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', '\esc\Controllers\MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
+        ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
+        ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
     }
 
     public static function createTables()

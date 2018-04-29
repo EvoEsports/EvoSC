@@ -28,9 +28,9 @@ class AdminCommands
 
         ChatCommand::add('setpw', 'AdminCommands::setPw', 'Set server and spec password', '//', 'ban');
 
-        Hook::add('BeginMap', 'esc\Modules\AdminCommands::showAdminControlPanel');
-        Hook::add('EndMatch', 'esc\Modules\AdminCommands::hideAdminControlPanel');
-        Hook::add('PlayerConnect', 'esc\Modules\AdminCommands::showAdminControlPanel');
+        Hook::add('BeginMap', 'AdminCommands::showAdminControlPanel');
+        Hook::add('EndMatch', 'AdminCommands::hideAdminControlPanel');
+        Hook::add('PlayerConnect', 'AdminCommands::showAdminControlPanel');
     }
 
     public static function setPw(Player $player, $cmd, $pw)

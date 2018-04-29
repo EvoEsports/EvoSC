@@ -14,7 +14,7 @@ class SpectatorController
     {
         self::$specTargets = collect([]);
 
-//        Hook::add('PlayerInfoChanged', 'esc\Controllers\SpectatorController::playerInfoChanged');
+//        Hook::add('PlayerInfoChanged', 'SpectatorController::playerInfoChanged');
     }
 
     public static function playerInfoChanged(Collection $players)

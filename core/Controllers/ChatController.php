@@ -41,11 +41,11 @@ $$: Writes a dollarsign
 
         Server::call('ChatEnableManualRouting', [true, false]);
 
-        HookController::add('PlayerChat', 'esc\Controllers\ChatController::playerChat');
+        HookController::add('PlayerChat', 'ChatController::playerChat');
 
         Template::add('help', File::get('core/Templates/help.latte.xml'));
 
-        self::addCommand('help', '\esc\Controllers\ChatController::showHelp', 'Show this help');
+        self::addCommand('help', 'ChatController::showHelp', 'Show this help');
     }
 
     private static function getChatCommands(): Collection
