@@ -15,6 +15,6 @@ class Stats extends \Illuminate\Database\Eloquent\Model
      */
     public function player()
     {
-        return $this->belongsTo(\esc\Models\Player::class, 'Player', 'id');
+        return $this->belongsTo(Player::class, 'Player', 'id');
     }
 }

@@ -2,7 +2,9 @@
 
 namespace esc\Models;
 
-class Song extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Song extends Model
 {
     protected $table = 'songs';
 

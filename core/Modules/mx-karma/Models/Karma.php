@@ -2,7 +2,9 @@
 
 namespace esc\Models;
 
-class Karma extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+
+class Karma extends Model
 {
     protected $table = 'mx-karma';
 

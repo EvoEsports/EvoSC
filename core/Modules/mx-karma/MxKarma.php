@@ -2,9 +2,6 @@
 
 namespace esc\Modules\MxKarma;
 
-include_once __DIR__ . '/MXK.php';
-include_once __DIR__ . '/Models/Karma.php';
-
 use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -17,6 +14,7 @@ use esc\Models\Player;
 use GuzzleHttp\Client;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
+use stdClass;
 
 class MxKarma extends MXK
 {
@@ -180,8 +178,7 @@ class MxKarma extends MXK
         if ($map) {
             $votes = [];
 
-            $ratings = $map->ratings()
-                ->whereIn('Player', self::$updatedVotes->toArray());
+            $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray());
 
             foreach ($ratings as $rating) {
                 if (!$rating->player) {
@@ -385,8 +382,8 @@ class MxKarma extends MXK
      * @param int $method
      * @param Map|null $map
      * @param array|null $votes
-     *
      * @return null|stdClass
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function call(int $method, Map $map = null, array $votes = null): ?stdClass
     {

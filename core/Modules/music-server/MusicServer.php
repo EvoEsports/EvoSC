@@ -22,10 +22,6 @@ class MusicServer
 
     public function __construct()
     {
-//        $this->createTables();
-
-//        include_once 'Models/Song.php';
-
         $this->readFiles();
 
         self::$songQueue = new Collection();
@@ -79,13 +75,6 @@ class MusicServer
      */
     public static function setNextSong(...$args)
     {
-        if (self::$songQueue && count(self::$songQueue) > 0) {
-            $song = self::$songQueue->shift()['song'];
-        } else {
-            $song = self::$music->random();
-        }
-
-//        Server::setForcedMusic(true, $song->url);
         Server::setForcedMusic(true, 'https://ozonic.co.uk/empty.ogg');
     }
 
