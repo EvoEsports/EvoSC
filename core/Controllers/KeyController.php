@@ -22,10 +22,6 @@ class KeyController
         ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
 
         Template::add('keybinds', File::get('core/Templates/keybinds.latte.xml'));
-
-        foreach (onlinePlayers() as $player) {
-            self::sendKeybindsScript($player);
-        }
     }
 
     public static function createBind(string $key, string $function)

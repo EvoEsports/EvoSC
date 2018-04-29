@@ -74,10 +74,8 @@ function startEsc()
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 
     //Handle already connected players
-    foreach (esc\Classes\Server::getPlayerList() as $player) {
-        $ply = \esc\Models\Player::firstOrCreate(['Login' => $player->login]);
-        $ply->update($player->toArray());
-        esc\Controllers\PlayerController::playerConnect($ply, true);
+    foreach (onlinePlayers() as $player) {
+        esc\Controllers\PlayerController::playerConnect($player, true);
     }
 }
 
