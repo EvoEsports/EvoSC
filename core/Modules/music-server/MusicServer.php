@@ -31,6 +31,7 @@ class MusicServer
         ManiaLinkEvent::add('ms.hidemenu', 'MusicServer::hideMusicMenu');
         ManiaLinkEvent::add('ms.juke', 'MusicServer::queueSong');
         ManiaLinkEvent::add('ms.play', 'MusicServer::playSong');
+        ManiaLinkEvent::add('ms.recommend', 'MusicServer::recommend');
         ManiaLinkEvent::add('music.next', 'MusicServer::nextSong');
         ManiaLinkEvent::add('ms.menu.showpage', 'MusicServer::displayMusicMenu');
 
@@ -73,6 +74,13 @@ class MusicServer
     public static function setNextSong(...$args)
     {
         Server::setForcedMusic(true, 'https://ozonic.co.uk/empty.ogg');
+    }
+
+    public static function recommend(Player $player, $songId)
+    {
+        $song = self::$music->get($songId);
+
+        ChatController::messageAll('_info', $player, ' recommends song ', secondary($song->title), ' by ', secondary($song->artist));
     }
 
     /**
@@ -235,7 +243,7 @@ class MusicServer
 
         if (File::exists(cacheDir('music.json'))) {
             $musicJson = file_get_contents(cacheDir('music.json'));
-        }else{
+        } else {
             $res = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
 

@@ -22,7 +22,7 @@ class MapList
         ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
         ManiaLinkEvent::add('maplist.disable', 'MapList::disableMap', 'map.delete');
-        ManiaLinkEvent::add('map-list.map-details', 'MapList::showMapDetails');
+        ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
     }
@@ -130,7 +130,7 @@ class MapList
 
         $pagination = Template::toString('components.pagination', [
             'pages' => $pages,
-            'action' => $filter ? "maplist.filter,$filter" : 'map-list.map-list',
+            'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
             'page' => $page,
         ]);
 

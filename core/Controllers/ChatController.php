@@ -5,6 +5,7 @@ namespace esc\Controllers;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -51,12 +52,14 @@ $$: Writes a dollarsign
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
         if (preg_match(self::$pattern, $text, $matches)) {
+            //chat command detected
             if (self::executeChatCommand($player, $text)) {
                 return;
             }
         }
 
         if (preg_match('/^(\/|\/\/|##)/', $text)) {
+            //Catch invalid chat commands
             ChatController::message($player, warning('Invalid chat command entered'));
             return;
         }
@@ -65,6 +68,7 @@ $$: Writes a dollarsign
         $nick = $player->NickName;
 
         $parts = explode(" ", $text);
+
         foreach ($parts as $part) {
             if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
                 $url = $matches[0];
@@ -73,33 +77,16 @@ $$: Writes a dollarsign
             }
         }
 
-        if (preg_match('/\$l\[(http.+)\](http.+)[ ]?/', $text, $matches)) {
-            if (strlen($matches[2]) > 50) {
-                $restOfString = explode(' ', $matches[2]);
-                $urlName = array_shift($restOfString);
-                $short = substr($urlName, 0, 28) . '..' . substr($urlName, -10);
-                $short = preg_replace('/^https?:\/\//', '', $short);
-                if (preg_match('/^https/', $matches[1])) {
-                    $short = "🔒" . $short;
-                }
-                $newUrl = $short . '$z $s' . implode(' ', $restOfString);
-                $text = str_replace("\$l[$matches[1]]$matches[2]", "\$l[$matches[1]]$newUrl", $text);
-            }
-        }
-
         if (preg_match('/([$]+)$/', $text, $matches)) {
+            //Escape dollar signs
             $text .= $matches[0];
         }
-
-        $text = preg_replace('/\$[nb]/', '', $text);
 
         if ($player->isSpectator()) {
             $nick = '$eee📷 ' . $nick;
         }
 
         $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('color.chat'), $text);
-
-//        echo stripAll("$chatText\n");
 
         Server::call('ChatSendServerMessage', [$chatText]);
     }
