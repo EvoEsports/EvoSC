@@ -29,8 +29,9 @@ class ChatCommand
             return true;
         }
 
-        if (!$player->group) {
-            return false;
+        if ($player->group->id == 1) {
+            //Masteradmin has access to all
+            return true;
         }
 
         return $player->group->hasAccess($this->access);

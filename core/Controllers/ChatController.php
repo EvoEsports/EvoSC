@@ -41,37 +41,11 @@ $$: Writes a dollarsign
         Server::call('ChatEnableManualRouting', [true, false]);
 
         HookController::add('PlayerChat', 'ChatController::playerChat');
-
-        self::addCommand('help', 'ChatController::showHelp', 'Show this help');
     }
 
-    private static function getChatCommands(): Collection
+    public static function getChatCommands(): Collection
     {
         return self::$chatCommands;
-    }
-
-    public static function showHelp(Player $player, $cmd, $page = 1)
-    {
-        $page = (int)$page;
-
-        $commands = self::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
-            if (!$player || !$command) {
-                return false;
-            }
-
-            return $command->hasAccess($player);
-        })->sortBy('trigger')->forPage($page, 23);
-
-        $commandsList = Template::toString('help', ['commands' => $commands, 'player' => $player]);
-        $pagination = Template::toString('components.pagination', ['pages' => $commands->count() / 23, 'action' => 'help.show', 'page' => $page]);
-
-        Template::show($player, 'components.modal', [
-            'id' => 'Help',
-            'width' => 180,
-            'height' => 97,
-            'content' => $commandsList,
-            'pagination' => $pagination
-        ]);
     }
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
