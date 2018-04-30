@@ -19,6 +19,11 @@ while (true) {
 
         beginMap();
 
+        //Set connected players online
+        foreach (onlinePlayers() as $player) {
+            esc\Controllers\PlayerController::playerConnect($player, true);
+        }
+
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         //only if you would enable legacy callbacks and we don't want that
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);

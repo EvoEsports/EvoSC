@@ -17,7 +17,7 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('map-list.map-list', 'MapList::showMapList');
+        ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');

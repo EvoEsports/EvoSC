@@ -183,7 +183,8 @@ class PlayerController
     {
         $player->setOnline();
 
-        HookController::fire('PlayerConnect', $player);
+        $hooks = HookController::getHooks('PlayerConnect');
+        HookController::fireHookBatch($hooks, $player);
 
         if (Database::hasTable('stats')) {
             $stats = $player->stats;
@@ -206,8 +207,6 @@ class PlayerController
 
         Log::info($player->NickName . " joined the server.");
 
-        self::displayPlayerlist();
-
         return $player;
     }
 
@@ -222,7 +221,6 @@ class PlayerController
         if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
             $player->setScore($score);
             Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
-            self::displayPlayerlist();
         }
 
         if ($player->isSpectator()) {
@@ -250,7 +248,6 @@ class PlayerController
         ChatController::messageAll('_info', $player, ' left the server');
         $player->setOffline();
         $player->setScore(0);
-        self::displayPlayerlist();
     }
 
     /**
@@ -278,8 +275,6 @@ class PlayerController
                 self::playerConnect($player);
             }
         }
-
-        self::displayPlayerlist();
     }
 
     public static function getPlayerByServerId(int $id): ?Player
@@ -299,58 +294,6 @@ class PlayerController
         }
 
         return null;
-    }
-
-    /**
-     * Show the live rnakings
-     */
-    public static function displayPlayerlist()
-    {
-        $players = onlinePlayers()
-            ->where('Score', '>', 0)
-            ->sort(function (Player $a, Player $b) {
-                if ($a->Score < $b->Score) {
-                    return -1;
-                } else {
-                    if ($a->Score > $b->Score) {
-                        return 1;
-                    }
-                }
-
-                return 0;
-            });
-
-        $playersNotFinished = onlinePlayers()
-            ->where('Score', '=', 0)
-            ->sort(function (Player $a, Player $b) {
-                if ($a->Score < $b->Score) {
-                    return -1;
-                } else {
-                    if ($a->Score > $b->Score) {
-                        return 1;
-                    }
-                }
-
-                return 0;
-            });
-
-
-        foreach ($playersNotFinished as $player) {
-            $players->add($player);
-        }
-
-        onlinePlayers()->each(function (Player $player) use ($players) {
-            $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
-
-            Template::show($player, 'ranking-box', [
-                'id' => 'PlayerList',
-                'title' => '  LIVE RANKINGS',
-                'config' => config('ui.playerlist'),
-                'hideScript' => $hideScript,
-                'rows' => 13,
-                'content' => Template::toString('players', ['players' => $players->take(15)]),
-            ]);
-        });
     }
 
     /**

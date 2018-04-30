@@ -107,7 +107,6 @@ class MapController
 
         self::$currentMap = $map;
         self::displayMapWidget();
-        PlayerController::displayPlayerlist();
 
         self::resetTime();
     }

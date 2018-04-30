@@ -60,11 +60,6 @@ function startEsc()
     \esc\Classes\Server::setModeScriptSettings($settings);
 
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
-
-    //Handle already connected players
-    foreach (onlinePlayers() as $player) {
-        esc\Controllers\PlayerController::playerConnect($player, true);
-    }
 }
 
 function cycle()
