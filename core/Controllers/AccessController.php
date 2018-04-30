@@ -10,7 +10,6 @@ class AccessController
 {
     public static function init()
     {
-        self::createTables();
     }
 
     public static function createTables()
@@ -29,24 +28,8 @@ class AccessController
             ['name' => 'player.mute', 'description' => 'Mute a player'],
             ['name' => 'time', 'description' => 'Can change the countdown time'],
             ['name' => 'group', 'description' => 'Add/delete/update groups'],
+            ['name' => 'modules', 'description' => 'Reload modules/templates'],
+            ['name' => 'config', 'description' => 'View/edit config'],
         ];
-
-        Database::create('access-rights', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('description')->nullable();
-        }, $seed);
-
-        $groupAccessSeed = [];
-        foreach ($seed as $key => $item) {
-            array_push($groupAccessSeed, ['group_id' => 1, 'access_right_id' => $key + 1]);
-            array_push($groupAccessSeed, ['group_id' => 2, 'access_right_id' => $key + 1]);
-        }
-
-        Database::create('access_right_group', function (Blueprint $table) {
-            $table->integer('group_id');
-            $table->integer('access_right_id');
-            $table->unique(['group_id', 'access_right_id']);
-        }, $groupAccessSeed);
     }
 }

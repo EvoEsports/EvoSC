@@ -81,7 +81,7 @@ class Config
 
         $loadedModules->each(function (Module $module) {
             if (method_exists($module->class, 'onConfigReload')) {
-                call_user_func("$module->class::onConfigReload");
+                call_func("$module->class::onConfigReload");
             }
         });
     }

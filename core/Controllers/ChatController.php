@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
-use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\Module;
 use esc\Classes\Server;
@@ -15,7 +14,7 @@ use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Song;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class ChatController
 {
@@ -37,7 +36,7 @@ $$: Writes a dollarsign
 
     public static function init()
     {
-        self::$chatCommands = new Collection();
+        self::$chatCommands = collect();
 
         Server::call('ChatEnableManualRouting', [true, false]);
 
@@ -135,29 +134,37 @@ $$: Writes a dollarsign
     {
         $isValidCommand = false;
 
+        //(treat "this is a string" as single argument)
         if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
             foreach ($matches[1] as $match) {
+                //Replace all spaces in quotes to ;:;
                 $new = str_replace(' ', ';:;', $match);
                 $text = str_replace("\"$match\"", $new, $text);
             }
         }
 
+        //Split input string in arguments
         $arguments = explode(' ', $text);
 
         foreach ($arguments as $key => $argument) {
+            //Change ;:; back to spaces
             $arguments[$key] = str_replace(';:;', ' ', $argument);
         }
 
+        //Find command
         $command = self::$chatCommands
             ->filter(function (ChatCommand $cmd) use ($arguments) {
-                return "$cmd->trigger$cmd->command" == $arguments[0];
+                return "$cmd->trigger$cmd->command" == strtolower($arguments[0]);
             })
             ->first();
 
+        //Add calling player to beginning of arguments list
         array_unshift($arguments, $player);
 
         if ($command) {
+            //Command exists
             try {
+                //Run command callback
                 call_func($command->callback, ...$arguments);
             } catch (\Exception $e) {
                 Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getTraceAsString(), true);
@@ -170,8 +177,12 @@ $$: Writes a dollarsign
 
     public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
+        if (!self::$chatCommands) {
+            self::$chatCommands = collect();
+        }
+
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
-        self::$chatCommands->add($chatCommand);
+        self::$chatCommands->push($chatCommand);
 
         $triggers = [];
         $chatCommandPattern = '/^(';
@@ -305,9 +316,9 @@ $$: Writes a dollarsign
             $message = '$fff' . $icon . ' ' . $message;
         }
 
-        try{
+        try {
             Server::chatSendServerMessage($message, $recipient->Login);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
             Log::logAddLine('', $e->getTraceAsString(), false);
             return;

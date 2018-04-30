@@ -212,7 +212,7 @@ class Vote
         $successful = $yesVotes > $noVotes;
 
         if ($successful && self::$action) {
-            call_user_func(self::$action);
+            call_func(self::$action);
         }
 
         $voteText = '$' . config('color.secondary') . self::$message;
@@ -286,7 +286,7 @@ class Vote
         }
 
         ChatController::messageAll($player, ' approves vote');
-        call_user_func(self::$action);
+        call_func(self::$action);
         self::stopVote();
     }
 }
