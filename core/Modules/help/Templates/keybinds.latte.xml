@@ -1,0 +1,11 @@
+<label pos="0 0" z-index="0" size="79 5" textsize="1.2" text="Available keybinds"/>
+<label pos="65 0" z-index="0" size="40 5" textsize="1.2" text="Function"/>
+
+{if isset($commands)}
+{foreach $commands as $command}
+<frame pos="3 -{3 + $iterator->counter * 3.5}" z-index="1">
+    <label pos="0 0" z-index="0" size="62 5" textsize="1" valign="center" text="{$command->key}"/>
+    <label pos="65 0" z-index="0" size="100 5" textsize="1" valign="center" text="{$command->function}"/>
+</frame>
+{/foreach}
+{/if}

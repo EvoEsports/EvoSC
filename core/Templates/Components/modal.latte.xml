@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="{$id}" version="3">
+<manialink name="{$id}" id="{$id}" version="3">
     <frame pos="0 0" scale="{isset($showAnimation) && $showAnimation ? 1 : 0.95}" id="main-frame">
         <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="{background_color()|noescape}6"/>
         <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="{primary_color()|noescape}6"/>
@@ -7,8 +7,8 @@
         <quad pos="-{$width/2} {$height/2}" z-index="-1" size="{$width} {$height}" style="Bgs1" substyle="BgDialogBlur"/>
         <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="{$width-6} 5" text="$s{$title ?? $id}" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
         <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="3 3" text="✖" valign="top" textsize="1.6" textcolor="fff9" halign="right" ScriptEvents="1"/>
-        <frame pos="-{($width/2)-3} {($height/2)-11}">{$content|noescape}</frame>
 
+        <frame pos="-{($width/2)-3} {($height/2)-(isset($navigation) ? 15 : 11)}">{$content|noescape}</frame>
 
         <script><!--
             Void close(CMlFrame frame){
@@ -37,6 +37,14 @@
                 }
             }
         --></script>
+
+
+        {if isset($navigation)}
+        <quad pos="-{$width/2} {$height/2 - 8}" z-index="-3" size="{$width} 5" bgcolor="{background_color()|noescape}9"/>
+        <frame pos="-{$width/2 - 1} {($height/2) - 10.5}" z-index="1" scale="0.75">
+            {$navigation|noescape}
+        </frame>
+        {/if}
 
         {if isset($pagination)}
         <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">

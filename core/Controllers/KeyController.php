@@ -8,6 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class KeyController
 {
@@ -49,7 +50,7 @@ class KeyController
     {
         $keys = self::$binds->pluck('key');
 
-        if(count($keys) == 0){
+        if (count($keys) == 0) {
             return;
         }
 
@@ -59,5 +60,10 @@ class KeyController
     public static function playerConnect(Player $player)
     {
         self::sendKeybindsScript($player);
+    }
+
+    public static function getKeybinds(): Collection
+    {
+        return self::$binds;
     }
 }
