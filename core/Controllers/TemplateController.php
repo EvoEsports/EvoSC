@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use Illuminate\Support\Collection;
@@ -17,6 +18,8 @@ class TemplateController
     public static function init()
     {
         Log::logAddLine('TemplateController', 'Starting...');
+
+        ChatCommand::add('reload-templates', 'TemplateController::loadTemplates', 'Reload templates', '//', 'user.ban');
 
         self::$templates = collect();
         self::$latte = new Engine();
@@ -38,7 +41,7 @@ class TemplateController
         return substr(self::$templates[$index], 0, strpos(self::$templates[$index], '<frame')) . '</manialink>';
     }
 
-    public static function loadTemplates()
+    public static function loadTemplates($args = null)
     {
         Log::logAddLine('TemplateController', 'Loading templates...');
 
