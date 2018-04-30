@@ -1,6 +1,6 @@
 <?php
 
-$escVersion = '0.29.*';
+$escVersion = '0.30.*';
 
 include 'global-functions.php';
 
