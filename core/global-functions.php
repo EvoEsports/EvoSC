@@ -68,6 +68,11 @@ function coreDir(string $filename = ''): string
     return __DIR__ . '/' . $filename;
 }
 
+function baseDir(string $filename = ''): string
+{
+    return __DIR__ . '/../' . $filename;
+}
+
 function onlinePlayers(): \Illuminate\Support\Collection
 {
     $playerlist = \esc\Classes\Server::getPlayerList();
@@ -145,15 +150,15 @@ function call_func($function, ...$arguments)
     $class = classes()->where('class', $className)->first();
 
     if ($class) {
-        if($arguments){
+        if ($arguments) {
             call_user_func_array("$class->namespace::$functionName", $arguments);
-        }else{
+        } else {
             call_user_func("$class->namespace::$functionName");
         }
     } else {
-        if($arguments){
+        if ($arguments) {
             call_user_func_array($functionName, $arguments);
-        }else{
+        } else {
             call_user_func($functionName);
         }
     }

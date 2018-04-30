@@ -49,8 +49,28 @@ class File
 
     public static function getDirectoryContents(string $path): Collection
     {
+        return collect(scandir($path));
+    }
 
-        $files = collect(scandir($path));
+    public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
+    {
+        $files = collect();
+
+        File::getDirectoryContents($baseDirectory)->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
+            $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
+
+            if (is_dir($path) && !in_array($file, ['.', '..'])) {
+                //Check directory contents
+                $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
+            } else {
+                //File is not directory
+                if (preg_match($filterPattern, $file)) {
+                    //Add template
+                    $files->push($path);
+                }
+            }
+        });
+
         return $files;
     }
 
