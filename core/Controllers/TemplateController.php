@@ -47,7 +47,7 @@ class TemplateController
         Log::logAddLine('TemplateController', 'Loading templates...');
 
         //Get all template files in core directory
-        $templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')
+        $templates = File::getFilesRecursively(coreDir(), '/(\.latte\.xml|\.script\.txt)$/')
             ->map(function (&$template) {
                 $templateObject = collect();
 
@@ -95,7 +95,7 @@ class TemplateController
             $id .= implode('.', $pathParts) . '.';
         }
 
-        $id .= str_replace('.latte.xml', '', $filename);
+        $id .= str_replace('.latte.xml', '', str_replace('.script.txt', '', $filename));
 
         return strtolower($id);
     }
