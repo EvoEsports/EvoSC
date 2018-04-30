@@ -28,10 +28,6 @@ class TemplateController
         return self::getTemplates();
     }
 
-    public static function addTemplate(string $index, string $templateString)
-    {
-    }
-
     public static function getTemplate(string $index, $values): string
     {
         return self::$latte->renderToString($index, $values);
@@ -47,7 +43,7 @@ class TemplateController
         Log::logAddLine('TemplateController', 'Loading templates...');
 
         //Get all template files in core directory
-        $templates = File::getFilesRecursively(coreDir(), '/(\.latte\.xml|\.script\.txt)$/')
+        self::$templates = File::getFilesRecursively(coreDir(), '/(\.latte\.xml|\.script\.txt)$/')
             ->map(function (&$template) {
                 $templateObject = collect();
 
@@ -55,7 +51,7 @@ class TemplateController
                 $relativePath = str_replace(coreDir('/'), '', $template);
 
                 //Generate template id from filename & path
-                $templateObject->id = self::getTemplateId($relativePath, $templateObject);
+                $templateObject->id = self::getTemplateId($relativePath);
 
                 //Load template contents
                 $templateObject->template = file_get_contents($template);
@@ -64,16 +60,13 @@ class TemplateController
                 return $templateObject;
             });
 
-        self::$templates = $templates;
-
-        File::put(cacheDir('templates.json'), $templates->pluck('template', 'id')->toJson());
-
         //Set id <=> template map as loader for latte
-        $templateMap = $templates->pluck('template', 'id')->toArray();
-        self::$latte->setLoader(new StringLoader($templateMap));
+        $templateMap = self::$templates->pluck('template', 'id')->toArray();
+        $stringLoader = new StringLoader($templateMap);
+        self::$latte->setLoader($stringLoader);
     }
 
-    private static function getTemplateId($relativePath, $templateObject)
+    private static function getTemplateId($relativePath)
     {
         $id = '';
 
