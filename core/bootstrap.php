@@ -53,16 +53,6 @@ function startEsc()
     esc\Classes\Vote::init();
     esc\Controllers\ModuleController::init();
 
-    \esc\Classes\Template::add('esc.box', \esc\Classes\File::get(__DIR__ . '/Templates/ranking-box.latte.xml'));
-    \esc\Classes\Template::add('esc.ranking', \esc\Classes\File::get(__DIR__ . '/Templates/Components/ranking.latte.xml'));
-    \esc\Classes\Template::add('esc.modal', \esc\Classes\File::get(__DIR__ . '/Templates/Components/modal.latte.xml'));
-    \esc\Classes\Template::add('esc.pagination', \esc\Classes\File::get(__DIR__ . '/Templates/Components/pagination.latte.xml'));
-    \esc\Classes\Template::add('esc.box2', \esc\Classes\File::get(__DIR__ . '/Templates/Components/box.latte.xml'));
-    \esc\Classes\Template::add('esc.stat-list', \esc\Classes\File::get(__DIR__ . '/Templates/Components/stat-list.latte.xml'));
-    \esc\Classes\Template::add('esc.icon-box', \esc\Classes\File::get(__DIR__ . '/Templates/Components/icon-box.latte.xml'));
-    \esc\Classes\Template::add('esc.hide-script', \esc\Classes\File::get(__DIR__ . '/Templates/Scripts/hide.script.txt'));
-    \esc\Classes\Template::add('blank', \esc\Classes\File::get(__DIR__ . '/Templates/blank.latte.xml'));
-
     \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
 
     $settings = \esc\Classes\Server::getModeScriptSettings();

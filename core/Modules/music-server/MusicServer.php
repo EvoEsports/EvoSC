@@ -28,9 +28,6 @@ class MusicServer
 
         self::$songQueue = new Collection();
 
-        Template::add('music', File::get(__DIR__ . '/Templates/music.latte.xml'));
-        Template::add('music.menu', File::get(__DIR__ . '/Templates/menu.latte.xml'));
-
         ManiaLinkEvent::add('ms.hidemenu', 'MusicServer::hideMusicMenu');
         ManiaLinkEvent::add('ms.juke', 'MusicServer::queueSong');
         ManiaLinkEvent::add('ms.play', 'MusicServer::playSong');
@@ -46,8 +43,6 @@ class MusicServer
 
     public static function onConfigReload()
     {
-        Template::add('music', File::get(__DIR__ . '/Templates/music.latte.xml'));
-        Template::add('music.menu', File::get(__DIR__ . '/Templates/menu.latte.xml'));
         self::displaySongWidget();
     }
 
@@ -112,14 +107,14 @@ class MusicServer
 
     private static function showWidget(Player $player, $song, $lengthInSeconds)
     {
-        $content = Template::toString('music', [
+        $content = Template::toString('music-server.music', [
             'song' => $song,
             'lengthInSeconds' => $lengthInSeconds,
             'config' => config('ui.music'),
             'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
         ]);
 
-        Template::show($player, 'esc.icon-box', [
+        Template::show($player, 'components.icon-box', [
             'id' => 'music-widget',
             'content' => $content,
             'config' => config('ui.music')
@@ -139,10 +134,10 @@ class MusicServer
 
         $queue = self::$songQueue->sortBy('time')->take(9);
 
-        $music = Template::toString('music.menu', ['songs' => $songs, 'queue' => $queue]);
-        $pagination = Template::toString('esc.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
+        $music = Template::toString('music-server.menu', ['songs' => $songs, 'queue' => $queue]);
+        $pagination = Template::toString('components.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => '♫ Music',
             'width' => 180,
             'height' => 97,
@@ -158,7 +153,7 @@ class MusicServer
      */
     public static function hideMusicMenu(Player $triggerer)
     {
-        Template::hide($triggerer, 'music.menu');
+        Template::hide($triggerer, 'music-server.menu');
     }
 
     /**
@@ -180,7 +175,7 @@ class MusicServer
             ChatController::messageAll($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
         }
 
-        Template::hide($callee, 'music.menu');
+        Template::hide($callee, 'music-server.menu');
     }
 
     /**

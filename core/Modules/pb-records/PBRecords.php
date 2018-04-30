@@ -18,8 +18,6 @@ class PBRecords
 
     public function __construct()
     {
-        Template::add('pbrecords', File::get(__DIR__ . '/Templates/pb-records.latte.xml'));
-
         Hook::add('PlayerCheckpoint', 'PBRecords::playerCheckpoint');
         Hook::add('PlayerStartCountdown', 'PBRecords::playerStartCountdown');
         Hook::add('EndMatch', 'PBRecords::endMatch');
@@ -42,7 +40,7 @@ class PBRecords
 
     public static function endMatch(...$args)
     {
-        Template::hideAll('pbrecords');
+        Template::hideAll('pb-records.pb-records');
     }
 
     public static function showWidget(Player $player, $cpId = null)
@@ -61,9 +59,9 @@ class PBRecords
         $recordCpTimes = explode(',', $target->Checkpoints ?? '');
 
         if ($target && $checkpoints) {
-            Template::show($player, 'pbrecords', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
+            Template::show($player, 'pb-records.pb-records', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
         } else {
-            Template::hide($player, 'pbrecords');
+            Template::hide($player, 'pb-records.pb-records');
         }
     }
 

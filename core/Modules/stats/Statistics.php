@@ -35,7 +35,7 @@ class Statistics
 
     private static function displayStatsWidget(Player $player, $values, $title, $config, $value_function)
     {
-        $content = Template::toString('esc.stat-list', [
+        $content = Template::toString('components.stat-list', [
             'width' => $config->width,
             'values' => $values,
             'value_func' => $value_function
@@ -43,7 +43,7 @@ class Statistics
 
         $height = $config->show * 4.2 + 8;
 
-        Template::show($player, 'esc.box2', [
+        Template::show($player, 'components.box', [
             'id' => str_slug($title),
             'title' => $title,
             'x' => $config->pos->x,

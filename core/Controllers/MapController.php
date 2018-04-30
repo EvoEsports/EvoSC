@@ -34,8 +34,6 @@ class MapController
         self::$queue = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
 
-        Template::add('map', File::get('core/Templates/map.latte.xml'));
-
         Hook::add('PlayerConnect', 'MapController::displayMapWidget');
         Hook::add('BeginMap', 'MapController::beginMap');
         Hook::add('EndMatch', 'MapController::endMatch');
@@ -333,9 +331,9 @@ class MapController
             'map' => $currentMap
         ]);
 
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.map')]);
+        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.map')]);
 
-        Template::show($player, 'esc.icon-box', [
+        Template::show($player, 'components.icon-box', [
             'id' => 'map-widget',
             'content' => $content,
             'config' => config('ui.map'),

@@ -36,8 +36,6 @@ class Vote
     {
         self::$inProgress = false;
 
-        Template::add('vote', File::get('core/Templates/vote.latte.xml'));
-
         Hook::add('EndMatch', 'Vote::endMatch');
 
         ChatController::addCommand('vote', 'Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');

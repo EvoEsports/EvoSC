@@ -21,8 +21,6 @@ class LocalRecords
      */
     public function __construct()
     {
-        Template::add('locals', File::get(__DIR__ . '/Templates/locals.latte.xml'));
-
         Hook::add('PlayerFinish', 'LocalRecords::playerFinish');
         Hook::add('BeginMap', 'LocalRecords::beginMap');
         Hook::add('PlayerConnect', 'LocalRecords::beginMap');
@@ -138,11 +136,11 @@ class LocalRecords
 
         $columns = [];
         foreach ($chunks as $key => $chunk) {
-            $ranking = Template::toString('esc.ranking', ['ranks' => $chunk]);
+            $ranking = Template::toString('components.ranking', ['ranks' => $chunk]);
             array_push($columns, '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>');
         }
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'LocalRecordsOverview',
             'width' => 180,
             'height' => 97,
@@ -173,16 +171,16 @@ class LocalRecords
             ->take(config('ui.locals.rows'));
 
         onlinePlayers()->each(function (Player $player) use ($locals) {
-            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.locals')]);
+            $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.locals')]);
 
-            Template::show($player, 'esc.box', [
+            Template::show($player, 'ranking-box', [
                 'id' => 'local-records',
                 'title' => '🏆  LOCAL RECORDS',
                 'config' => config('ui.locals'),
                 'hideScript' => $hideScript,
                 'rows' => config('ui.locals.rows'),
                 'scale' => config('ui.locals.scale'),
-                'content' => Template::toString('locals', compact('locals')),
+                'content' => Template::toString('local-records.locals', compact('locals')),
                 'action' => 'locals.show'
             ]);
         });

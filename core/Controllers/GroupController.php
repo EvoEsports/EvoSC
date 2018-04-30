@@ -20,9 +20,6 @@ class GroupController
     {
         self::createTables();
 
-        Template::add('groups', File::get('core/Templates/groups.latte.xml'));
-        Template::add('group.edit', File::get('core/Templates/group-edit.latte.xml'));
-
         ChatCommand::add('group', 'GroupController::group', 'Group commands', '//', 'group');
         ChatCommand::add('groups', 'GroupController::displayGroups', 'Show groups overview', '//', 'group');
 
@@ -112,10 +109,10 @@ class GroupController
         }
 
         $accessRights = AccessRight::all();
-        $groupEdit = Template::toString('group.edit', compact('accessRights', 'group'));
+        $groupEdit = Template::toString('group-edit', compact('accessRights', 'group'));
 
         Template::hide($player, 'Groups');
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'Group - Edit',
             'width' => 90,
             'height' => count($accessRights) * 4.6 + 26,
@@ -149,7 +146,7 @@ class GroupController
 
         $groupList = Template::toString('groups', compact('groups'));
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'Groups',
             'width' => 90,
             'height' => count($groups) * 4.5 + 15,

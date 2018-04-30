@@ -43,8 +43,6 @@ $$: Writes a dollarsign
 
         HookController::add('PlayerChat', 'ChatController::playerChat');
 
-        Template::add('help', File::get('core/Templates/help.latte.xml'));
-
         self::addCommand('help', 'ChatController::showHelp', 'Show this help');
     }
 
@@ -66,9 +64,9 @@ $$: Writes a dollarsign
         })->sortBy('trigger')->forPage($page, 23);
 
         $commandsList = Template::toString('help', ['commands' => $commands, 'player' => $player]);
-        $pagination = Template::toString('esc.pagination', ['pages' => $commands->count() / 23, 'action' => 'help.show', 'page' => $page]);
+        $pagination = Template::toString('components.pagination', ['pages' => $commands->count() / 23, 'action' => 'help.show', 'page' => $page]);
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'Help',
             'width' => 180,
             'height' => 97,

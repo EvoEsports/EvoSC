@@ -36,8 +36,6 @@ class Dedimania extends DedimaniaApi
         Hook::add('PlayerConnect', 'DedimaniaApi::playerConnect');
         Hook::add('PlayerFinish', 'Dedimania::playerFinish');
 
-        Template::add('dedis', File::get(__DIR__ . '/Templates/dedis.latte.xml'));
-
         ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
 
         ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
@@ -330,12 +328,12 @@ class Dedimania extends DedimaniaApi
 
         $columns = [];
         foreach ($chunks as $key => $chunk) {
-            $ranking = Template::toString('esc.ranking', ['ranks' => $chunk]);
+            $ranking = Template::toString('components.ranking', ['ranks' => $chunk]);
             $ranking = '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>';
             array_push($columns, $ranking);
         }
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'DediRecordsOverview',
             'width' => 180,
             'height' => 97,
@@ -401,15 +399,15 @@ class Dedimania extends DedimaniaApi
 
     private static function showDedis(Player $player, $rows, $result)
     {
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.dedis')]);
+        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.dedis')]);
 
-        Template::show($player, 'esc.box', $variables = [
+        Template::show($player, 'ranking-box', $variables = [
             'id' => 'Dedimania',
             'title' => '🏆  DEDIMANIA',
             'config' => config('ui.dedis'),
             'hideScript' => $hideScript,
             'rows' => $rows,
-            'content' => Template::toString('dedis', ['dedis' => $result]),
+            'content' => Template::toString('dedimania-records.dedis', ['dedis' => $result]),
             'action' => 'dedis.show',
         ]);
     }

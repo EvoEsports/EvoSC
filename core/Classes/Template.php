@@ -59,14 +59,4 @@ class Template
             'id' => $index
         ]);
     }
-
-    public static function add(string $index, string $template = null)
-    {
-        if (!$template) {
-            Log::error("Could not load template: $index");
-            return;
-        }
-
-        TemplateController::addTemplate($index, $template);
-    }
 }

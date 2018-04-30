@@ -25,8 +25,6 @@ class PlayerController
         Hook::add('PlayerDisconnect', 'PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', 'PlayerController::playerFinish');
 
-        Template::add('players', File::get('core/Templates/players.latte.xml'));
-
         ChatController::addCommand('afk', 'PlayerController::toggleAfk', 'Toggle AFK status');
         ChatController::addCommand('hidespeed', 'PlayerController::setHideSpeed', 'Set speed at which UI hides, 0 = disable hiding');
 
@@ -342,9 +340,9 @@ class PlayerController
         }
 
         onlinePlayers()->each(function (Player $player) use ($players) {
-            $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
+            $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
 
-            Template::show($player, 'esc.box', [
+            Template::show($player, 'ranking-box', [
                 'id' => 'PlayerList',
                 'title' => '  LIVE RANKINGS',
                 'config' => config('ui.playerlist'),

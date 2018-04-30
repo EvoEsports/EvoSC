@@ -32,8 +32,6 @@ class MxKarma extends MXK
     {
         MxKarma::setApiKey(config('mxk.key'));
 
-        Template::add('mx-karma', File::get(__DIR__ . '/Templates/mx-karma.latte.xml'));
-
         $client = new Client([
             'base_uri' => 'https://karma.mania-exchange.com/api2/',
         ]);
@@ -331,15 +329,15 @@ class MxKarma extends MXK
             $starString .= '';
         }
 
-        $hideScript = Template::toString('esc.hide-script', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.mx-karma')]);
+        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.mx-karma')]);
 
-        Template::show($player, 'esc.box', [
+        Template::show($player, 'ranking-box', [
             'id' => 'MXKarma',
             'title' => '  MX KARMA',
             'config' => config('ui.mx-karma'),
             'hideScript' => $hideScript,
             'rows' => 1.5,
-            'content' => Template::toString('mx-karma', [
+            'content' => Template::toString('mx-karma.mx-karma', [
                 'karma' => self::$mapKarma,
                 'average' => $average,
                 'stars' => $starString,

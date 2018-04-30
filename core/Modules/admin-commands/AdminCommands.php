@@ -18,8 +18,6 @@ class AdminCommands
 
     public function __construct()
     {
-        Template::add('acp', File::get(__DIR__ . '/Templates/acp.latte.xml'));
-
         ManiaLinkEvent::add('ac.replay', 'AdminCommands::forceReplayAtEnd');
         ManiaLinkEvent::add('ac.skip', 'AdminCommands::forceSkipMap');
         ManiaLinkEvent::add('ac.stopvote', 'AdminCommands::stopVote');
@@ -111,7 +109,7 @@ class AdminCommands
         $pwEnabled = self::$pwEnabled;
 
         foreach ($admins as $player) {
-            Template::show($player, 'acp', compact('pwEnabled'));
+            Template::show($player, 'admin-commands.acp', compact('pwEnabled'));
         }
     }
 
@@ -122,7 +120,7 @@ class AdminCommands
         });
 
         foreach ($admins as $player) {
-            Template::hide($player, 'acp');
+            Template::hide($player, 'admin-commands.acp');
         }
     }
 

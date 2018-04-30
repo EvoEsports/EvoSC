@@ -14,8 +14,6 @@ class LinkTiles
 {
     public function __construct()
     {
-        Template::add('linktiles', File::get(__DIR__ . '/Templates/linktiles.latte.xml'));
-
         Hook::add('PlayerConnect', 'LinkTiles::playerConnect');
 
         \esc\Classes\ManiaLinkEvent::add('openlink', 'LinkTiles::openLink');
@@ -50,7 +48,7 @@ class LinkTiles
     {
         $tiles = config('tiles.tiles');
 
-        Template::show($player, 'linktiles', [
+        Template::show($player, 'link-tiles.linktiles', [
             'tiles' => $tiles
         ]);
     }

@@ -46,23 +46,16 @@ class TemplateController
     {
         Log::logAddLine('TemplateController', 'Loading templates...');
 
+        //Get all template files in core directory
         $templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')
             ->map(function (&$template) {
                 $templateObject = collect();
 
-                //Get sub-directories
-                $relativePath = str_replace(coreDir(), '', $template);
-                $relativePathParts = explode(DIRECTORY_SEPARATOR, $relativePath);
-                $templateLocation = array_shift($relativePathParts);
-                $templateObject->filename = array_pop($relativePathParts);
-
-                if ($templateLocation == 'Modules') {
-                    //Remove 'Templates'
-                    array_splice($relativePathParts, 1, 1);
-                }
+                //Get path relative to core directory
+                $relativePath = str_replace(coreDir('/'), '', $template);
 
                 //Generate template id from filename & path
-                self::setTemplateId($relativePathParts, $templateObject);
+                $templateObject->id = self::getTemplateId($relativePath, $templateObject);
 
                 //Load template contents
                 $templateObject->template = file_get_contents($template);
@@ -73,23 +66,37 @@ class TemplateController
 
         self::$templates = $templates;
 
+        File::put(cacheDir('templates.json'), $templates->pluck('template', 'id')->toJson());
+
         //Set id <=> template map as loader for latte
         $templateMap = $templates->pluck('template', 'id')->toArray();
         self::$latte->setLoader(new StringLoader($templateMap));
     }
 
-    private static function setTemplateId($relativePathParts, &$templateObject)
+    private static function getTemplateId($relativePath, $templateObject)
     {
         $id = '';
 
-        if (count($relativePathParts) > 0) {
-            //Template is in sub-dir, add relative path separated by dots
-            $id .= implode('.', $relativePathParts) . '.';
+        //Split directory structure
+        $pathParts = explode(DIRECTORY_SEPARATOR, $relativePath);
+
+        //Remove first entry
+        $location = array_shift($pathParts);
+
+        if ($location == 'Modules') {
+            array_splice($pathParts, 1, 1);
         }
 
-        //Remove file info in name and add it to the id
-        $id .= str_replace('.latte.xml', '', $templateObject->filename);
+        //Remove last entry
+        $filename = array_pop($pathParts);
 
-        $templateObject->id = strtolower($id);
+        if (count($pathParts) > 0) {
+            //Template is in sub-directory
+            $id .= implode('.', $pathParts) . '.';
+        }
+
+        $id .= str_replace('.latte.xml', '', $filename);
+
+        return strtolower($id);
     }
 }

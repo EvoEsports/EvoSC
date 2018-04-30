@@ -17,15 +17,12 @@ class MapList
 {
     public function __construct()
     {
-        Template::add('maplist.show', File::get(__DIR__ . '/Templates/map-list.latte.xml'));
-        Template::add('maplist.details', File::get(__DIR__ . '/Templates/map-details.latte.xml'));
-
-        ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
+        ManiaLinkEvent::add('map-list.map-list', 'MapList::showMapList');
         ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
         ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
         ManiaLinkEvent::add('maplist.disable', 'MapList::disableMap', 'map.delete');
-        ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
+        ManiaLinkEvent::add('map-list.map-details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
     }
@@ -121,7 +118,7 @@ class MapList
             ->sortBy('timeRequested')
             ->take($perPage);
 
-        $mapList = Template::toString('maplist.show', [
+        $mapList = Template::toString('map-list.map-list', [
             'maps' => $maps,
             'player' => $player,
             'queuedMaps' => $queuedMaps,
@@ -131,13 +128,13 @@ class MapList
             'dedis' => $records['dedis'],
         ]);
 
-        $pagination = Template::toString('esc.pagination', [
+        $pagination = Template::toString('components.pagination', [
             'pages' => $pages,
-            'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
+            'action' => $filter ? "maplist.filter,$filter" : 'map-list.map-list',
             'page' => $page,
         ]);
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'MapList',
             'width' => 180,
             'height' => 97,
@@ -164,7 +161,7 @@ class MapList
 
         if ($map) {
             MapController::queueMap($player, $map);
-            Template::hide($player, 'maplist.show');
+            Template::hide($player, 'map-list.map-list');
         } else {
             ChatController::message($player, 'Invalid map selected');
         }
@@ -199,12 +196,12 @@ class MapList
         $locals = $map->locals()->orderBy('Score')->get()->take(5);
         $dedis = $map->dedis()->orderBy('Score')->get()->take(5);
 
-        $localsRanking = Template::toString('esc.ranking', ['ranks' => $locals]);
-        $dedisRanking = Template::toString('esc.ranking', ['ranks' => $dedis]);
+        $localsRanking = Template::toString('components.ranking', ['ranks' => $locals]);
+        $dedisRanking = Template::toString('components.ranking', ['ranks' => $dedis]);
 
-        $detailPage = Template::toString('maplist.details', compact('map', 'localsRanking', 'dedisRanking'));
+        $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking'));
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'MapList',
             'title' => 'Map details: ' . $map->Name,
             'width' => 120,

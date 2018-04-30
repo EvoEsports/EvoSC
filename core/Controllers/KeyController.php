@@ -20,8 +20,6 @@ class KeyController
         Hook::add('PlayerConnect', 'KeyController::playerConnect');
 
         ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
-
-        Template::add('keybinds', File::get('core/Templates/keybinds.latte.xml'));
     }
 
     public static function createBind(string $key, string $function)

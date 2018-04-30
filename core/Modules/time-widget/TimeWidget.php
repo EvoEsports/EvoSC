@@ -14,8 +14,6 @@ class TimeWidget
 {
     public function __construct()
     {
-        Template::add('time-widget', File::get(__DIR__ . '/Templates/time-widget.latte.xml'));
-
         Hook::add('PlayerConnect', 'TimeWidget::show');
         Hook::add('BeginMatch', 'TimeWidget::show');
         Hook::add('EndMatch', 'TimeWidget::hide');
@@ -29,15 +27,15 @@ class TimeWidget
     public static function show(Player $player = null)
     {
         if ($player) {
-            Template::show($player, 'time-widget');
+            Template::show($player, 'time-widget.time-widget');
         } else {
-            Template::showAll('time-widget');
+            Template::showAll('time-widget.time-widget');
         }
     }
 
     public static function hide()
     {
-        Template::hideAll('time-widget');
+        Template::hideAll('time-widget.time-widget');
     }
 
     public static function addTime(Player $player)

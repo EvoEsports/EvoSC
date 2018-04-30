@@ -19,8 +19,6 @@ class ModuleController
     {
         self::$loadedModules = new Collection();
 
-        Template::add('modules', File::get('core/Templates/modules.latte.xml'));
-
         ManiaLinkEvent::add('modules.close', 'ModuleController::hideModules');
         ManiaLinkEvent::add('module.reload', 'ModuleController::reloadModule');
 
@@ -51,7 +49,7 @@ class ModuleController
 
         $modules = Template::toString('modules', ['modules' => self::getModules()]);
 
-        Template::show($player, 'esc.modal', [
+        Template::show($player, 'components.modal', [
             'id' => 'ModulesReloader',
             'title' => 'ModulesReloader $f00(by the love of god, do not touch!)',
             'width' => 180,

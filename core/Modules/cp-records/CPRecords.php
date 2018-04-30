@@ -16,8 +16,6 @@ class CPRecords
     {
         self::clearCheckpoints();
 
-        Template::add('cpr.record', File::get(__DIR__ . '/Templates/cp-record.latte.xml'));
-
         Hook::add('ShowScores', 'CPRecords::clearCheckpoints');
         Hook::add('PlayerCheckpoint', 'CPRecords::playerCheckpoint');
         Hook::add('PlayerConnect', 'CPRecords::playerConnect');
@@ -70,9 +68,9 @@ class CPRecords
                 $x = $posInRow * 110.5 - (110.5 * $columns / 2);
 
                 if(isset($cpId) && $cpId == $checkpoint->id){
-                    $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
+                    $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
                 }else{
-                    $cps->push(Template::toString('cpr.record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
+                    $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
                 }
             }
         }
