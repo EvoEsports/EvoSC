@@ -4,7 +4,7 @@
 <label pos="38 -6.8" z-index="1" size="16 3" text="{$song->artist}" halign="right" textcolor="fff9" textsize="0.45"/>
 
 <quad pos="2 -5.2" size="36 0.4" bgcolor="0003" />
-<quad id="bar" pos="2 -5.2" size="0 0.4" bgcolor="fffa" />
+<quad id="bar" pos="2 -5.2" size="0 0.4" bgcolor="{primary_color()|noescape}a" />
 
 <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
 
