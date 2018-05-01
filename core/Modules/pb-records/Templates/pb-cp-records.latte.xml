@@ -93,15 +93,16 @@
             (frame.GetFirstChild("time") as CMlLabel).SetText(formatScore(time));
 
             //Set difference and color
+            declare diff = diff(cps[cpId], time);
             declare diffQuad = (frame.GetFirstChild("diffQuad") as CMlQuad);
-            if(time > 0){
-                (frame.GetFirstChild("diff") as CMlLabel).SetText("+" ^ formatScore(diff(cps[cpId], time)));
+            if(diff > 0){
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("+" ^ formatScore(diff));
                 diffQuad.BgColor = <0.5, 0.0, 0.0>;
-            }else if(time < 0){
-                (frame.GetFirstChild("diff") as CMlLabel).SetText("-" ^ formatScore(diff(cps[cpId], time)));
+            }else if(diff < 0){
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("-" ^ formatScore(diff));
                 diffQuad.BgColor = <0.0, 0.5, 0.0>;
             }else{
-                (frame.GetFirstChild("diff") as CMlLabel).SetText("" ^ formatScore(diff(cps[cpId], time)));
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("" ^ formatScore(diff));
                 diffQuad.BgColor = <0.0, 0.25, 0.5>;
             }
 
