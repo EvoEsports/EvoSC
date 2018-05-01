@@ -16,7 +16,7 @@
     <script><!--
     main() {
         declare q <=> (Page.MainFrame.GetFirstChild({$flash}) as CMlQuad);
-        AnimMgr.Add(q, "<frame opacity='0.0' />", 1000, CAnimManager::EAnimManagerEasing::CubicOut);
+        AnimMgr.Add(q, """<frame opacity="0" />""", 1000, CAnimManager::EAnimManagerEasing::CubicOut);
     }
     --></script>
     {/if}

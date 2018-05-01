@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
+    <framemodel id="cp_diff">
+        <quad id="timeQuad" z-index="-2" pos="-4 0" size="15 5" bgcolor="0006" halign="right" valign="center"/>
+        <label id="time" z-index="1" pos="-5 0" size="13 4" text="" textsize="1.5" halign="right" textcolor="ffff" valign="center"/>
+
+        <quad id="cpidQuad" z-index="-1" size="8 5" bgcolor="0009" halign="center"  valign="center"/>
+        <label id="cpid" pos="0 0" text="" textsize="1.5" halign="center" textcolor="ffff" valign="center"/>
+
+        <quad id="diffQuad" z-index="-2" pos="4 0" size="15 5" bgcolor="f006" halign="left" valign="center"/>
+        <label id="diff" z-index="1" pos="5 0" size="13 4" text="" textsize="1.5" halign="left" textcolor="ffff"  valign="center"/>
+    </framemodel>
+
+    <frame pos="0 -60" scale="0.8">
+        <label id="targetLabel" pos="0 -10" text="Target: {$targetString}" textcolor="ffff" halign="center" textsize="0.5" />
+
+        <frame id="boxes">
+            <frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />
+            <frameinstance modelid="cp_diff" pos="0 0" scale="0.8" />
+            <frameinstance modelid="cp_diff" pos="0 -4" scale="0.6" />
+            <frameinstance modelid="cp_diff" pos="0 -7.5" scale="0.6" />
+            <frameinstance modelid="cp_diff" pos="0 -11" scale="0.6" />
+            <frameinstance modelid="cp_diff" pos="0 -14.5" scale="0.6" />
+        </frame>
+    </frame>
+
+    <script>
+        <!--
+        declare CMlFrame boxes;
+        declare Integer[] cps;
+        declare Text[] states;
+
+        Text zeroFill(Integer n){
+            if(n < 10){
+                return "0" ^ n;
+            }
+
+            return "" ^ n;
+        }
+
+        Text formatScore(Integer time){
+            declare score = time;
+
+            if(score < 0){
+                score = -score;
+            }
+
+            declare Integer seconds = score / 1000;
+            declare Integer ms = score - (seconds * 1000);
+            declare Integer minutes = seconds/60;
+            seconds = seconds - (minutes * 60);
+            declare Text milliseconds = "";
+
+            milliseconds = "" ^ ms;
+            if(ms < 10){
+                milliseconds = "00" ^ ms;
+            }
+            if(ms < 100){
+                milliseconds = "0" ^ ms;
+            }
+
+            if(minutes == 0){
+                return seconds ^ "." ^ milliseconds;
+            }
+
+            return minutes ^ ":" ^ zeroFill(seconds) ^ "." ^ milliseconds;
+        }
+
+        Integer diff(Integer record, Integer current){
+            return current - record;
+        }
+
+        Void anim(Integer boxId, Text targetXml, Integer duration){
+            declare box <=> (boxes.Controls[boxId] as CMlFrame);
+            AnimMgr.Add(box, targetXml, duration, CAnimManager::EAnimManagerEasing::QuintOut);
+        }
+
+        Void setBoxVisible(Integer boxId, Integer visibility){
+            declare box <=> (boxes.Controls[boxId] as CMlFrame);
+
+            (box.GetFirstChild("timeQuad") as CMlQuad).Opacity = (0.7 * visibility);
+            (box.GetFirstChild("diffQuad") as CMlQuad).Opacity = (0.7 * visibility);
+            (box.GetFirstChild("cpidQuad") as CMlQuad).Opacity = (0.9 * visibility);
+        }
+
+        Void updateBox(Integer boxId, Integer cpId, Integer time){
+            declare frame <=> (boxes.Controls[boxId] as CMlFrame);
+
+            //Set cp id
+            (frame.GetFirstChild("cpid") as CMlLabel).SetText("$s" ^ (cpId + 1));
+
+            //Set cp time
+            (frame.GetFirstChild("time") as CMlLabel).SetText(formatScore(time));
+
+            //Set difference and color
+            declare diffQuad = (frame.GetFirstChild("diffQuad") as CMlQuad);
+            if(time > 0){
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("+" ^ formatScore(diff(cps[cpId], time)));
+                diffQuad.BgColor = <0.5, 0.0, 0.0>;
+            }else if(time < 0){
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("-" ^ formatScore(diff(cps[cpId], time)));
+                diffQuad.BgColor = <0.0, 0.5, 0.0>;
+            }else{
+                (frame.GetFirstChild("diff") as CMlLabel).SetText("" ^ formatScore(diff(cps[cpId], time)));
+                diffQuad.BgColor = <0.0, 0.25, 0.5>;
+            }
+
+            setBoxVisible(boxId, 1);
+        }
+
+        Void transferBoxContents(Integer sourceBox, Integer targetBox){
+            declare source <=> (boxes.Controls[sourceBox] as CMlFrame);
+            declare target <=> (boxes.Controls[targetBox] as CMlFrame);
+
+            declare Text cpid = (source.GetFirstChild("cpid") as CMlLabel).Value;
+
+            if(cpid == ""){
+                return;
+            }
+
+            (target.GetFirstChild("cpid") as CMlLabel).SetText(cpid);
+            (target.GetFirstChild("time") as CMlLabel).SetText((source.GetFirstChild("time") as CMlLabel).Value);
+            (target.GetFirstChild("diff") as CMlLabel).SetText((source.GetFirstChild("diff") as CMlLabel).Value);
+            (target.GetFirstChild("diffQuad") as CMlQuad).BgColor = (source.GetFirstChild("diffQuad") as CMlQuad).BgColor;
+            (target.GetFirstChild("diffQuad") as CMlQuad).Opacity = (source.GetFirstChild("diffQuad") as CMlQuad).Opacity;
+
+            setBoxVisible(targetBox, 1);
+        }
+
+        Void eraseBoxContent(Integer boxId){
+            declare box <=> (boxes.Controls[boxId] as CMlFrame);
+
+            setBoxVisible(boxId, 0);
+
+            (box.GetFirstChild("cpid") as CMlLabel).SetText("");
+            (box.GetFirstChild("time") as CMlLabel).SetText("");
+            (box.GetFirstChild("diff") as CMlLabel).SetText("");
+        }
+
+        Void wayPoint(CTmRaceClientEvent event){
+            declare id = event.CheckpointInRace;
+            declare time = event.LapTime;
+
+            updateBox(0, id, time);
+
+            for(i, 0, 5){
+                anim(i, states[i+1], 500);
+            }
+
+            sleep(500);
+
+            for(i, 0, 5){
+                anim(i, states[i], 1);
+            }
+
+            for(i, 0, 4){
+                declare x = 5 - i;
+                transferBoxContents(x-1, x);
+            }
+        }
+
+        Void respawn(){
+            if(InputPlayer.CurLap.NbRespawns == 0){
+                for(i, 0, 5){
+                    eraseBoxContent(i);
+                }
+            }
+        }
+
+        main(){
+            boxes = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            cps = [{$checkpoints|noescape}];
+
+            states = [
+                """<frameinstance modelid="cp_diff" pos="0 5" scale="0.9" opacity="0" bgcolor="0f0" />""",
+                """<frameinstance modelid="cp_diff" pos="0 0" scale="0.8" />""",
+                """<frameinstance modelid="cp_diff" pos="0 -4" scale="0.6" />""",
+                """<frameinstance modelid="cp_diff" pos="0 -7.5" scale="0.6" />""",
+                """<frameinstance modelid="cp_diff" pos="0 -11" scale="0.6" />""",
+                """<frameinstance modelid="cp_diff" pos="0 -14.5" scale="0.6" />""",
+                """<frameinstance modelid="cp_diff" pos="0 -18" scale="0.6" />"""
+            ];
+
+            declare targetLabel <=> (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);
+            declare Boolean targetHidden = False;
+
+            boxes.ClipWindowActive = True;
+            boxes.ClipWindowRelativePosition = <0.0,-5.0>;
+            boxes.ClipWindowSize = <50.0,15.0>;
+
+            respawn();
+
+            while(True){
+                yield;
+
+                foreach(Event in RaceEvents){
+                log(Event.Type);
+                    switch(Event.Type){
+                        case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
+                        case CTmRaceClientEvent::EType::Respawn: respawn();
+                    }
+                }
+
+                if(InputPlayer != Null){
+                    declare speed = InputPlayer.Speed;
+
+                    if(speed < 0){
+                        speed = -speed;
+                    }
+
+                    if(speed > 1.0 && !targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
+                        targetHidden = True;
+                    }
+                    if(speed < 1.0 && targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                        targetHidden = False;
+                    }
+                }
+            }
+        }
+        -->
+    </script>
+</manialink>

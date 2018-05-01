@@ -6,46 +6,46 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
+use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
 
 class PBRecords
 {
-    private static $checkpoints;
     private static $targets;
 
     public function __construct()
     {
-        Hook::add('PlayerCheckpoint', 'PBRecords::playerCheckpoint');
-        Hook::add('PlayerStartCountdown', 'PBRecords::playerStartCountdown');
+        Hook::add('PlayerConnect', 'PBRecords::playerConnect');
         Hook::add('EndMatch', 'PBRecords::endMatch');
+        Hook::add('BeginMatch', 'PBRecords::beginMatch');
 
         ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
-        self::$targets = collect([]);
-        PBRecords::$checkpoints = collect([]);
-
-        foreach (onlinePlayers() as $player) {
-            PBRecords::$checkpoints->put($player->id, collect([]));
-        }
+        self::$targets = collect();
     }
 
-    public static function playerStartCountdown(Player $player)
+    public static function playerConnect(Player $player)
     {
-        self::$checkpoints->put($player->id, collect([]));
         self::showWidget($player);
     }
 
     public static function endMatch(...$args)
     {
+        self::$targets = collect();
         Template::hideAll('pb-records.pb-records');
     }
 
-    public static function showWidget(Player $player, $cpId = null)
+    public static function beginMatch(...$args)
     {
-        $checkpoints = self::$checkpoints->get($player->id);
+        onlinePlayers()->each([self::class, 'showWidget']);
+    }
+
+    public static function showWidget(Player $player)
+    {
         $target = self::getTarget($player);
 
         $targetString = 'unknown';
@@ -56,24 +56,12 @@ class PBRecords
             $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
         }
 
-        $recordCpTimes = explode(',', $target->Checkpoints ?? '');
-
-        if ($target && $checkpoints) {
-            Template::show($player, 'pb-records.pb-records', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
+        if ($target) {
+            $checkpoints = $target->Checkpoints;
+            Template::show($player, 'pb-records.pb-cp-records', compact('checkpoints', 'targetString'));
         } else {
-            Template::hide($player, 'pb-records.pb-records');
+            Template::hide($player, 'pb-records.pb-cp-records');
         }
-    }
-
-    public static function playerCheckpoint(Player $player, int $score, int $curLap, int $cpId)
-    {
-        if (!self::$checkpoints->get($player->id)) {
-            self::$checkpoints->put($player->id, collect([]));
-        }
-
-        self::$checkpoints->get($player->id)->put($cpId, $score);
-
-        self::showWidget($player, $cpId);
     }
 
     public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
