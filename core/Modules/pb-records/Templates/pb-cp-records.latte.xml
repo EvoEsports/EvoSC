@@ -160,9 +160,11 @@
         }
 
         Void respawn(){
-            if(InputPlayer.CurLap.NbRespawns == 0){
-                for(i, 0, 5){
-                    eraseBoxContent(i);
+            if(InputPlayer){
+                if(InputPlayer.CurLap.NbRespawns == 0){
+                    for(i, 0, 5){
+                        eraseBoxContent(i);
+                    }
                 }
             }
         }
