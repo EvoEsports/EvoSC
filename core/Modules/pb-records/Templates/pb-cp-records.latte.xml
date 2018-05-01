@@ -192,31 +192,32 @@
 
             respawn();
 
-            while(True){
-                yield;
+            if(cps.count > 0){
+                while(True){
+                    yield;
 
-                foreach(Event in RaceEvents){
-                log(Event.Type);
-                    switch(Event.Type){
-                        case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
-                        case CTmRaceClientEvent::EType::Respawn: respawn();
-                    }
-                }
-
-                if(InputPlayer != Null){
-                    declare speed = InputPlayer.Speed;
-
-                    if(speed < 0){
-                        speed = -speed;
+                    foreach(Event in RaceEvents){
+                        switch(Event.Type){
+                            case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
+                            case CTmRaceClientEvent::EType::Respawn: respawn();
+                        }
                     }
 
-                    if(speed > 1.0 && !targetHidden){
-                        AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
-                        targetHidden = True;
-                    }
-                    if(speed < 1.0 && targetHidden){
-                        AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
-                        targetHidden = False;
+                    if(InputPlayer != Null){
+                        declare speed = InputPlayer.Speed;
+
+                        if(speed < 0){
+                            speed = -speed;
+                        }
+
+                        if(speed > 1.0 && !targetHidden){
+                            AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
+                            targetHidden = True;
+                        }
+                        if(speed < 1.0 && targetHidden){
+                            AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                            targetHidden = False;
+                        }
                     }
                 }
             }

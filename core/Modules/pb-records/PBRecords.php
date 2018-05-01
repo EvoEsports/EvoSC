@@ -36,31 +36,34 @@ class PBRecords
     public static function endMatch(...$args)
     {
         self::$targets = collect();
-        Template::hideAll('pb-records.pb-records');
+        Template::showAll('pb-records.blank');
     }
 
     public static function beginMatch(...$args)
     {
-        onlinePlayers()->each([self::class, 'showWidget']);
+        foreach (onlinePlayers() as $player) {
+            self::showWidget($player);
+        }
     }
 
     public static function showWidget(Player $player)
     {
         $target = self::getTarget($player);
 
-        $targetString = 'unknown';
-
-        if ($target instanceof LocalRecord) {
-            $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
-        } elseif ($target instanceof Dedi) {
-            $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
-        }
-
         if ($target) {
             $checkpoints = $target->Checkpoints;
+
+            $targetString = 'unknown';
+
+            if ($target instanceof LocalRecord) {
+                $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+            } elseif ($target instanceof Dedi) {
+                $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+            }
+
             Template::show($player, 'pb-records.pb-cp-records', compact('checkpoints', 'targetString'));
         } else {
-            Template::hide($player, 'pb-records.pb-cp-records');
+            Template::show($player, 'pb-records.blank');
         }
     }
 
