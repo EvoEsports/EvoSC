@@ -171,7 +171,7 @@
 
         main(){
             boxes = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
-            cps = [{$checkpoints|noescape}];
+            cps = [{$checkpoints&&strlen($checkpoints)>0?$checkpoints:'0'|noescape}];
 
             states = [
                 """<frameinstance modelid="cp_diff" pos="0 5" scale="0.9" opacity="0" bgcolor="0f0" />""",
@@ -192,7 +192,7 @@
 
             respawn();
 
-            if(cps.count > 0){
+            if(cps.count > 1){
                 while(True){
                     yield;
 

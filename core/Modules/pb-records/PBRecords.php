@@ -25,7 +25,7 @@ class PBRecords
 
         ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
-        self::$targets = collect();
+        self::$targets = collect([]);
     }
 
     public static function playerConnect(Player $player)
@@ -35,15 +35,13 @@ class PBRecords
 
     public static function endMatch(...$args)
     {
-        self::$targets = collect();
+        self::$targets = collect([]);
         Template::showAll('pb-records.blank');
     }
 
     public static function beginMatch(...$args)
     {
-        foreach (onlinePlayers() as $player) {
-            self::showWidget($player);
-        }
+        onlinePlayers()->each([self::class, 'showWidget']);
     }
 
     public static function showWidget(Player $player)
