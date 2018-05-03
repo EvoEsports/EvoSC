@@ -36,7 +36,6 @@ class PBRecords
     public static function endMatch(...$args)
     {
         self::$targets = collect([]);
-        Template::showAll('pb-records.blank');
     }
 
     public static function beginMatch(...$args)
@@ -60,8 +59,6 @@ class PBRecords
             }
 
             Template::show($player, 'pb-records.pb-cp-records', compact('checkpoints', 'targetString'));
-        } else {
-            Template::show($player, 'pb-records.blank');
         }
     }
 
