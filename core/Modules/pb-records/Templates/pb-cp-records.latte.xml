@@ -148,6 +148,11 @@
             }
 
             sleep(500);
+            
+            if(boxes == Null){
+                //Abort
+                return;
+            }
 
             for(i, 0, 5){
                 anim(i, states[i], 1);
@@ -216,7 +221,7 @@
                     }
 
                     foreach(Event in RaceEvents){
-                        if(Event.Player.User.Login == InputPlayer.User.Login && InputPlayer != Null){
+                        if(Event.Player.User.Login == InputPlayer.User.Login){
                             switch(Event.Type){
                                 case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
                                 case CTmRaceClientEvent::EType::Respawn: respawn();

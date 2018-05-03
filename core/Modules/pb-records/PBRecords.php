@@ -41,7 +41,7 @@ class PBRecords
 
     public static function beginMatch(...$args)
     {
-        onlinePlayers()->each([self::class, 'updateTarget']);
+        onlinePlayers()->each([self::class, 'playerConnect']);
     }
 
     public static function updateTarget(Player $player)
