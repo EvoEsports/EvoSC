@@ -170,6 +170,13 @@
         }
 
         main(){
+            sleep(100);
+
+            if(InputPlayer == Null){
+                log("Could not set up pn-cp-records");
+                return;
+            }
+
             declare Integer[] Checkpoints for InputPlayer;
             declare Text TargetString for InputPlayer = "-1";
             declare Text TimesHash for InputPlayer = "-1";
