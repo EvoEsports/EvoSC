@@ -12,7 +12,7 @@
     </framemodel>
 
     <frame pos="0 -60" scale="0.8">
-        <label id="targetLabel" pos="0 -10" text="Target: {$targetString}" textcolor="ffff" halign="center" textsize="0.5" />
+        <label id="targetLabel" pos="0 -15" text="Target: -1" textcolor="ffff" halign="center" textsize="0.5" />
 
         <frame id="boxes">
             <frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />
@@ -26,7 +26,7 @@
 
     <script>
         <!--
-        declare CMlFrame boxes;
+        declare CMlFrame[] boxes;
         declare Integer[] cps;
         declare Text[] states;
 
@@ -71,12 +71,11 @@
         }
 
         Void anim(Integer boxId, Text targetXml, Integer duration){
-            declare box <=> (boxes.Controls[boxId] as CMlFrame);
-            AnimMgr.Add(box, targetXml, duration, CAnimManager::EAnimManagerEasing::QuintOut);
+            AnimMgr.Add(boxes[boxId], targetXml, duration, CAnimManager::EAnimManagerEasing::QuintOut);
         }
 
         Void setBoxVisible(Integer boxId, Integer visibility){
-            declare box <=> (boxes.Controls[boxId] as CMlFrame);
+            declare box = boxes[boxId];
 
             (box.GetFirstChild("timeQuad") as CMlQuad).Opacity = (0.7 * visibility);
             (box.GetFirstChild("diffQuad") as CMlQuad).Opacity = (0.7 * visibility);
@@ -84,7 +83,7 @@
         }
 
         Void updateBox(Integer boxId, Integer cpId, Integer time){
-            declare frame <=> (boxes.Controls[boxId] as CMlFrame);
+            declare frame = boxes[boxId];
 
             //Set cp id
             (frame.GetFirstChild("cpid") as CMlLabel).SetText("$s" ^ (cpId + 1));
@@ -109,9 +108,9 @@
             setBoxVisible(boxId, 1);
         }
 
-        Void transferBoxContents(Integer sourceBox, Integer targetBox){
-            declare source <=> (boxes.Controls[sourceBox] as CMlFrame);
-            declare target <=> (boxes.Controls[targetBox] as CMlFrame);
+        Void transferBoxContents(Integer sourceBoxId, Integer targetBoxId){
+            declare source <=> boxes[sourceBoxId];
+            declare target <=> boxes[targetBoxId];
 
             declare Text cpid = (source.GetFirstChild("cpid") as CMlLabel).Value;
 
@@ -125,11 +124,11 @@
             (target.GetFirstChild("diffQuad") as CMlQuad).BgColor = (source.GetFirstChild("diffQuad") as CMlQuad).BgColor;
             (target.GetFirstChild("diffQuad") as CMlQuad).Opacity = (source.GetFirstChild("diffQuad") as CMlQuad).Opacity;
 
-            setBoxVisible(targetBox, 1);
+            setBoxVisible(targetBoxId, 1);
         }
 
         Void eraseBoxContent(Integer boxId){
-            declare box <=> (boxes.Controls[boxId] as CMlFrame);
+            declare box = boxes[boxId];
 
             setBoxVisible(boxId, 0);
 
@@ -171,11 +170,16 @@
         }
 
         main(){
-            boxes = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
-            cps = [{$checkpoints&&strlen($checkpoints)>0?$checkpoints:'0'|noescape}];
+            declare Integer[] Checkpoints for InputPlayer;
+            declare Text TargetString for InputPlayer = "-1";
+            declare Text TimesHash for InputPlayer = "-1";
+            declare Text lastHash = "";
+
+            declare CMlFrame boxesFrame = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            declare targetLabel = (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);
 
             states = [
-                """<frameinstance modelid="cp_diff" pos="0 5" scale="0.9" opacity="0" bgcolor="0f0" />""",
+                """<frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />""",
                 """<frameinstance modelid="cp_diff" pos="0 0" scale="0.8" />""",
                 """<frameinstance modelid="cp_diff" pos="0 -4" scale="0.6" />""",
                 """<frameinstance modelid="cp_diff" pos="0 -7.5" scale="0.6" />""",
@@ -184,43 +188,52 @@
                 """<frameinstance modelid="cp_diff" pos="0 -18" scale="0.6" />"""
             ];
 
-            declare targetLabel <=> (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);
+            foreach(control in boxesFrame.Controls){
+                boxes.add((control as CMlFrame));
+            }
+
             declare Boolean targetHidden = False;
 
-            boxes.ClipWindowActive = True;
-            boxes.ClipWindowRelativePosition = <0.0,-5.0>;
-            boxes.ClipWindowSize = <50.0,15.0>;
+            boxesFrame.ClipWindowActive = True;
+            boxesFrame.ClipWindowRelativePosition = <0.0,-5.0>;
+            boxesFrame.ClipWindowSize = <50.0,15.0>;
 
             respawn();
 
-            if(cps.count > 1){
-                while(True){
-                    yield;
+            while(True){
+                yield;
 
-                    foreach(Event in RaceEvents){
-                        if(Event.Player.User.Login == InputPlayer.User.Login && InputPlayer != Null){
-                            switch(Event.Type){
-                                case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
-                                case CTmRaceClientEvent::EType::Respawn: respawn();
-                            }
+                if(lastHash != TimesHash){
+                    lastHash = TimesHash;
+                    log("CPs changed, reset");
+                    cps = Checkpoints;
+                    targetLabel.SetText(TargetString);
+                    respawn();
+                }
+
+                foreach(Event in RaceEvents){
+                    if(Event.Player.User.Login == InputPlayer.User.Login && InputPlayer != Null){
+                        switch(Event.Type){
+                            case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
+                            case CTmRaceClientEvent::EType::Respawn: respawn();
                         }
                     }
+                }
 
-                    if(InputPlayer != Null){
-                        declare speed = InputPlayer.Speed;
+                if(InputPlayer != Null){
+                    declare speed = InputPlayer.Speed;
 
-                        if(speed < 0){
-                            speed = -speed;
-                        }
+                    if(speed < 0){
+                        speed = -speed;
+                    }
 
-                        if(speed > 1.0 && !targetHidden){
-                            AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
-                            targetHidden = True;
-                        }
-                        if(speed < 1.0 && targetHidden){
-                            AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
-                            targetHidden = False;
-                        }
+                    if(speed > 1.0 && !targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
+                        targetHidden = True;
+                    }
+                    if(speed < 1.0 && targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                        targetHidden = False;
                     }
                 }
             }
