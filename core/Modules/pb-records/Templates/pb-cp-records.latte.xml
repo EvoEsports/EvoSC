@@ -86,7 +86,11 @@
             declare frame = boxes[boxId];
 
             //Set cp id
-            (frame.GetFirstChild("cpid") as CMlLabel).SetText("$s" ^ (cpId + 1));
+            if((cpId+1) == cps.count){
+                (frame.GetFirstChild("cpid") as CMlLabel).SetText(""));
+            }else{
+                (frame.GetFirstChild("cpid") as CMlLabel).SetText("$s" ^ (cpId + 1));
+            }
 
             //Set cp time
             (frame.GetFirstChild("time") as CMlLabel).SetText(formatScore(time));
