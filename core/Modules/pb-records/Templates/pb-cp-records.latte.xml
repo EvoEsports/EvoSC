@@ -87,7 +87,7 @@
 
             //Set cp id
             if((cpId+1) == cps.count){
-                (frame.GetFirstChild("cpid") as CMlLabel).SetText(""));
+                (frame.GetFirstChild("cpid") as CMlLabel).SetText("");
             }else{
                 (frame.GetFirstChild("cpid") as CMlLabel).SetText("$s" ^ (cpId + 1));
             }
