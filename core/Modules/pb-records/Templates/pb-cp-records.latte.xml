@@ -148,11 +148,6 @@
             }
 
             sleep(500);
-            
-            if(boxes == Null){
-                //Abort
-                return;
-            }
 
             for(i, 0, 5){
                 anim(i, states[i], 1);
