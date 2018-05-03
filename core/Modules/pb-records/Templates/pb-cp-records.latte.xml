@@ -178,7 +178,7 @@
             }
 
             declare Integer[] Checkpoints for InputPlayer;
-            declare Text TargetString for InputPlayer = "-1";
+            declare Text TargetString for InputPlayer = "No PB. Choose someones CPs with /target";
             declare Text TimesHash for InputPlayer = "-1";
             declare Text lastHash = "";
 
