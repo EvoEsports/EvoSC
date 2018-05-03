@@ -210,18 +210,20 @@
             while(True){
                 yield;
 
-                if(lastHash != TimesHash){
-                    lastHash = TimesHash;
-                    cps = Checkpoints;
-                    targetLabel.SetText(TargetString);
-                    respawn();
-                }
+                if(TimesHash != Null){
+                    if(lastHash != TimesHash){
+                        lastHash = TimesHash;
+                        cps = Checkpoints;
+                        targetLabel.SetText(TargetString);
+                        respawn();
+                    }
 
-                foreach(Event in RaceEvents){
-                    if(Event.Player.User.Login == InputPlayer.User.Login && InputPlayer != Null){
-                        switch(Event.Type){
-                            case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
-                            case CTmRaceClientEvent::EType::Respawn: respawn();
+                    foreach(Event in RaceEvents){
+                        if(Event.Player.User.Login == InputPlayer.User.Login && InputPlayer != Null){
+                            switch(Event.Type){
+                                case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
+                                case CTmRaceClientEvent::EType::Respawn: respawn();
+                            }
                         }
                     }
                 }
