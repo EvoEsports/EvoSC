@@ -170,17 +170,12 @@
         }
 
         main(){
-            sleep(100);
-
-            if(InputPlayer == Null){
-                log("Could not set up pn-cp-records");
-                return;
-            }
-
             declare Integer[] Checkpoints for InputPlayer;
             declare Text TargetString for InputPlayer = "No PB. Choose someones CPs with /target";
-            declare Text TimesHash for InputPlayer = "-1";
+            declare Text TimesHash for InputPlayer;
             declare Text lastHash = "";
+
+            TimesHash = "-1";
 
             declare CMlFrame boxesFrame = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
             declare targetLabel = (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);

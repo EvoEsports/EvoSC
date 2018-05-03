@@ -3,9 +3,7 @@
     <script>
         <!--
         main(){
-            sleep(100);
-
-            if(InputPlayer != Null){
+d            if(InputPlayer != Null){
                 declare Integer[] Checkpoints for InputPlayer;
                 declare Text TargetString for InputPlayer;
                 declare Text TimesHash for InputPlayer;
