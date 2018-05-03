@@ -12,7 +12,7 @@
     </framemodel>
 
     <frame pos="0 -60" scale="0.8">
-        <label id="targetLabel" pos="0 -15" text="Target: -1" textcolor="ffff" halign="center" textsize="0.5" />
+        <label id="targetLabel" pos="0 -15" text="Loading..." textcolor="ffff" halign="center" textsize="0.5" />
 
         <frame id="boxes">
             <frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />
@@ -170,10 +170,6 @@
         }
 
         main(){
-            while(InputPlayer == Null){
-                yield;
-            }
-
             declare CMlFrame boxesFrame = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
             declare targetLabel = (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);
 
@@ -192,6 +188,7 @@
             }
 
             declare Boolean targetHidden = False;
+            declare Text lastHash = "";
 
             boxesFrame.ClipWindowActive = True;
             boxesFrame.ClipWindowRelativePosition = <0.0,-5.0>;
@@ -202,16 +199,11 @@
             while(True){
                 yield;
 
-                if(InputPlayer == Null){
-                    continue;
-                }
+                if(InputPlayer != Null){
+                    declare Integer[] Checkpoints for InputPlayer;
+                    declare Text TargetString for InputPlayer = "";
+                    declare Text TimesHash for InputPlayer = "-1";
 
-                declare Integer[] Checkpoints for InputPlayer;
-                declare Text TargetString for InputPlayer = "No PB. Choose someones CPs with /target";
-                declare Text TimesHash for InputPlayer = "-1";
-                declare Text lastHash = "";
-
-                if(TimesHash != "-1"){
                     if(lastHash != TimesHash){
                         lastHash = TimesHash;
                         cps = Checkpoints;
@@ -227,21 +219,23 @@
                             }
                         }
                     }
-                }
 
-                declare speed = InputPlayer.Speed;
+                    declare speed = InputPlayer.Speed;
 
-                if(speed < 0){
-                    speed = -speed;
-                }
+                    if(speed < 0){
+                        speed = -speed;
+                    }
 
-                if(speed > 1.0 && !targetHidden){
-                    AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
-                    targetHidden = True;
-                }
-                if(speed < 1.0 && targetHidden){
-                    AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
-                    targetHidden = False;
+                    if(speed > 1.0 && !targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
+                        targetHidden = True;
+                    }
+                    if(speed < 1.0 && targetHidden){
+                        AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                        targetHidden = False;
+                    }
+                }else{
+                    sleep(10);
                 }
             }
         }
