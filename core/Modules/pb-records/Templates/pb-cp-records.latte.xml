@@ -210,7 +210,7 @@
             while(True){
                 yield;
 
-                if(TimesHash != Null){
+                if(TimesHash != "-1"){
                     if(lastHash != TimesHash){
                         lastHash = TimesHash;
                         cps = Checkpoints;
