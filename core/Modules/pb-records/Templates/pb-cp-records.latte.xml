@@ -55,7 +55,7 @@
             if(ms < 10){
                 milliseconds = "00" ^ ms;
             }
-            if(ms < 100){
+            if(ms >= 10 && ms < 100){
                 milliseconds = "0" ^ ms;
             }
 
