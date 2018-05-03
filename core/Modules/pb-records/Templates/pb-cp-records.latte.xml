@@ -205,7 +205,6 @@
 
                 if(lastHash != TimesHash){
                     lastHash = TimesHash;
-                    log("CPs changed, reset");
                     cps = Checkpoints;
                     targetLabel.SetText(TargetString);
                     respawn();

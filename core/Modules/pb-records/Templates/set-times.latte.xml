@@ -3,13 +3,17 @@
     <script>
         <!--
         main(){
-            declare Integer[] Checkpoints for InputPlayer;
-            declare Text TargetString for InputPlayer;
-            declare Text TimesHash for InputPlayer;
+            sleep(100);
 
-            Checkpoints = [{$checkpoints->count() > 0 ? $checkpoints->implode(',') : "-1"|noescape}];
-            TargetString = "{$targetString|noescape}";
-            TimesHash = "{$timesHash|noescape}";
+            if(InputPlayer != Null){
+                declare Integer[] Checkpoints for InputPlayer;
+                declare Text TargetString for InputPlayer;
+                declare Text TimesHash for InputPlayer;
+
+                Checkpoints = [{$checkpoints->count() > 0 ? $checkpoints->implode(',') : "-1"|noescape}];
+                TargetString = "{$targetString|noescape}";
+                TimesHash = "{$timesHash|noescape}";
+            }
         }
         -->
     </script>
