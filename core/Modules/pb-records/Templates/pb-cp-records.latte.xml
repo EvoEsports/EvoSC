@@ -171,13 +171,8 @@
 
         main(){
             while(InputPlayer == Null){
-                sleep(10);
+                yield;
             }
-
-            declare Integer[] Checkpoints for InputPlayer;
-            declare Text TargetString for InputPlayer = "No PB. Choose someones CPs with /target";
-            declare Text TimesHash for InputPlayer;
-            declare Text lastHash = "";
 
             declare CMlFrame boxesFrame = (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
             declare targetLabel = (Page.MainFrame.GetFirstChild("targetLabel") as CMlLabel);
@@ -207,6 +202,15 @@
             while(True){
                 yield;
 
+                if(InputPlayer == Null){
+                    continue;
+                }
+
+                declare Integer[] Checkpoints for InputPlayer;
+                declare Text TargetString for InputPlayer = "No PB. Choose someones CPs with /target";
+                declare Text TimesHash for InputPlayer = "-1";
+                declare Text lastHash = "";
+
                 if(TimesHash != "-1"){
                     if(lastHash != TimesHash){
                         lastHash = TimesHash;
@@ -225,21 +229,19 @@
                     }
                 }
 
-                if(InputPlayer != Null){
-                    declare speed = InputPlayer.Speed;
+                declare speed = InputPlayer.Speed;
 
-                    if(speed < 0){
-                        speed = -speed;
-                    }
+                if(speed < 0){
+                    speed = -speed;
+                }
 
-                    if(speed > 1.0 && !targetHidden){
-                        AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
-                        targetHidden = True;
-                    }
-                    if(speed < 1.0 && targetHidden){
-                        AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
-                        targetHidden = False;
-                    }
+                if(speed > 1.0 && !targetHidden){
+                    AnimMgr.Add(targetLabel, """<label textcolor="fff0" />""", 800, CAnimManager::EAnimManagerEasing::QuadOut);
+                    targetHidden = True;
+                }
+                if(speed < 1.0 && targetHidden){
+                    AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                    targetHidden = False;
                 }
             }
         }

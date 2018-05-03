@@ -153,6 +153,10 @@ class PBRecords
             return $dedi;
         }
 
-        return $local;
+        if ($local) {
+            return $local;
+        }
+
+        return $map->dedis()->orderByDesc('Score')->first();
     }
 }

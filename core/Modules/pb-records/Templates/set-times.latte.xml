@@ -4,7 +4,7 @@
         <!--
         main(){
             while(InputPlayer == Null){
-                sleep(10);
+                sleep(100);
             }
 
             declare Integer[] Checkpoints for InputPlayer;
