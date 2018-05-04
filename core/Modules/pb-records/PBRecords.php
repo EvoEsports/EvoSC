@@ -78,15 +78,15 @@ class PBRecords
 
         switch ($dediOrLocal) {
             case 'wr':
-                $record = $map->dedis()->whereRank(1)->get()->first();
+                $record = $map->dedis()->whereRank(1)->first();
                 break;
 
             case 'dedi':
-                $record = $map->dedis()->whereRank($recordId ?? 1)->get()->first();
+                $record = $map->dedis()->whereRank($recordId ?? 1)->first();
                 break;
 
             case 'local':
-                $record = $map->locals()->whereRank($recordId ?? 1)->get()->first();
+                $record = $map->locals()->whereRank($recordId ?? 1)->first();
                 break;
 
             default:

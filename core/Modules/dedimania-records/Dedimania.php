@@ -64,7 +64,7 @@ class Dedimania extends DedimaniaApi
         }
 
         $map = MapController::getCurrentMap();
-        $dedi = $map->dedis()->where('Rank', $dediId)->get()->first();
+        $dedi = $map->dedis()->where('Rank', $dediId)->first();
 
         if ($dedi && $dedi->Checkpoints) {
             $output = "";
@@ -148,7 +148,7 @@ class Dedimania extends DedimaniaApi
         //Remove faulty dedis
         $map->dedis()->where('Score', 0)->delete();
         while (true) {
-            $last = $map->dedis()->orderByDesc('Score')->get()->first();
+            $last = $map->dedis()->orderByDesc('Score')->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
 
             if (!$foreLast || !$last) {
@@ -221,11 +221,15 @@ class Dedimania extends DedimaniaApi
             return;
         }
 
+        Log::logAddLine('Dedimania', 'Player ' . $player->Login . ' finished with time ' . formatScore($score), false);
+
         $map = MapController::getCurrentMap();
-        $dedisCount = $map->dedis()->count();
 
         $dedi = $map->dedis()->wherePlayer($player->id)->first();
-        if ($dedi != null) {
+
+        if ($dedi) {
+            //Player has dedi on map
+
             if ($score == $dedi->Score) {
                 ChatController::messageAll('_dedi', 'Player ', $player, ' equaled his/her ', $dedi);
 
@@ -239,7 +243,7 @@ class Dedimania extends DedimaniaApi
                 $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1]);
                 $dedi = self::fixDedimaniaRanks($map, $player);
 
-                if ($dedi->Rank <= ($player->MaxRank ?? self::$maxRank)) {
+                if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                     if ($oldRank == $dedi->Rank) {
                         ChatController::messageAll('_dedi', 'Player ', $player, ' secured his/her ', $dedi,
                             ' (-' . formatScore($diff) . ')');
@@ -251,21 +255,21 @@ class Dedimania extends DedimaniaApi
                 }
             }
         } else {
-            if ($dedisCount < 100) {
-                $map->dedis()->create([
-                    'Player' => $player->id,
-                    'Map' => $map->id,
-                    'Score' => $score,
-                    'Rank' => 999,
-                    'Checkpoints' => $checkpoints,
-                ]);
+            //Player does not have a dedi on map
 
-                $dedi = self::fixDedimaniaRanks($map, $player);
+            $map->dedis()->create([
+                'Player' => $player->id,
+                'Map' => $map->id,
+                'Score' => $score,
+                'Rank' => 999,
+                'Checkpoints' => $checkpoints,
+            ]);
 
-                if ($dedi->Rank <= ($player->MaxRank ?? self::$maxRank)) {
-                    self::addNewTime($dedi);
-                    ChatController::messageAll('_dedi', 'Player ', $player, ' gained the ', $dedi);
-                }
+            $dedi = self::fixDedimaniaRanks($map, $player);
+
+            if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
+                self::addNewTime($dedi);
+                ChatController::messageAll('_dedi', 'Player ', $player, ' gained the ', $dedi);
             }
         }
     }

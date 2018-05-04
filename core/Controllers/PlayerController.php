@@ -290,7 +290,7 @@ class PlayerController
         $playerInfo = $players->where('playerId', $id)->first();
 
         if ($playerInfo) {
-            return Player::whereLogin($playerInfo->login)->get()->first();
+            return Player::whereLogin($playerInfo->login)->first();
         }
 
         return null;
