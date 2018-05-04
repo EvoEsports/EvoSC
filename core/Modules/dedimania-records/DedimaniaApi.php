@@ -206,7 +206,9 @@ class DedimaniaApi
     static function setChallengeTimes(Map $map)
     {
         if (count(self::$newTimes) == 0) {
-            Log::logAddLine('Dedimania', 'No new times to push', false);
+            //No new records
+
+            Log::logAddLine('Dedimania', 'No records made', false);
             return;
         }
 
@@ -233,6 +235,10 @@ class DedimaniaApi
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
         foreach (self::$newTimes->sortBy('Score') as $dedi) {
+            if($dedi->Rank > 100) {
+                continue;
+            }
+
             $checkpoints = $dedi->Checkpoints;
 
             $struct = $times->addChild('struct');
@@ -256,40 +262,51 @@ class DedimaniaApi
             .. VReplayChecks: in special case of Laps mode (for which only best laps checkpoints are in Times), give here all race checkpoints (list of int, comma separated)
             .. Top1GReplay: GhostReplay for the same time as VReplay, base64 encoded: send only if supposed new top1, else send an empty string !
         */
-        $bestPlayer = self::$newTimes->sortBy('Score')->first();
 
-        if (!$bestPlayer) {
-            Log::logAddLine('Dedimania', 'No best player');
+        $bestRecord = self::$newTimes->sortBy('Score')->first();
 
-            return;
+        try {
+            $VReplay = Server::getValidationReplay($bestRecord->player->Login);
+        } catch (\Exception $e) {
+            $VReplay = $e->getMessage();
+            Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage());
+            Log::logAddLine('DedimaniaApi', $e->getTraceAsString(), false);
         }
 
-        $vreplay = Server::getValidationReplay($bestPlayer->player->Login);
-        $vreplayChecks = $map->dedis()->wherePlayer($bestPlayer->id)->get()->first()->Checkpoints ?? "";
-        $top1greplay = '';
+        $VReplayChecks = $map->dedis()->wherePlayer($bestRecord->id)->first()->Checkpoints ?? "";
+        $Top1GReplay = '';
 
         try {
             //Check if there is top1 dedi
             if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
-                $top1greplay = file_get_contents(ghost($dedi->ghostReplayFile));
+                $Top1GReplay = file_get_contents(ghost($dedi->ghostReplayFile));
             }
 
+            //Add replays
             self::paramAddStruct($params->addChild('param'), [
-                'VReplay' => $vreplay,
-                'VReplayChecks' => $vreplayChecks,
-                'Top1GReplay' => $top1greplay,
+                'VReplay' => $VReplay,
+                'VReplayChecks' => $VReplayChecks,
+                'Top1GReplay' => $Top1GReplay,
             ]);
-        } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
-            Log::error('Error saving dedis: ' . $e->getMessage());
-        }
 
-        $data = self::post($xml);
-        if ($data) {
-            if (isset($data->params->param->value->boolean)) {
-                if (!$data->params->param->value->boolean) {
-                    \esc\Controllers\ChatController::messageAll('Updating dedis failed');
+            //Send the request
+            $data = self::post($xml);
+
+            if ($data) {
+                //Got response
+
+                if (isset($data->params->param->value->boolean)) {
+                    //Success parameter is set
+
+                    if (!$data->params->param->value->boolean) {
+                        //Request failed
+
+                        \esc\Controllers\ChatController::messageAll('Updating dedis failed');
+                    }
                 }
             }
+        } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
+            Log::error('Error saving dedis: ' . $e->getMessage());
         }
     }
 

@@ -37,7 +37,7 @@ class LocalRecords
      */
     private static function playerHasLocal(Map $map, Player $player): bool
     {
-        return $map->locals()->wherePlayer($player->id)->get()->first() != null;
+        return $map->locals()->wherePlayer($player->id)->first() != null;
     }
 
     /**

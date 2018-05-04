@@ -6,74 +6,62 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
+use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
 
 class PBRecords
 {
-    private static $checkpoints;
     private static $targets;
 
     public function __construct()
     {
-        Hook::add('PlayerCheckpoint', 'PBRecords::playerCheckpoint');
-        Hook::add('PlayerStartCountdown', 'PBRecords::playerStartCountdown');
+        Hook::add('PlayerConnect', 'PBRecords::playerConnect');
         Hook::add('EndMatch', 'PBRecords::endMatch');
+        Hook::add('BeginMatch', 'PBRecords::beginMatch');
 
         ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
         self::$targets = collect([]);
-        PBRecords::$checkpoints = collect([]);
-
-        foreach (onlinePlayers() as $player) {
-            PBRecords::$checkpoints->put($player->id, collect([]));
-        }
     }
 
-    public static function playerStartCountdown(Player $player)
+    public static function playerConnect(Player $player)
     {
-        self::$checkpoints->put($player->id, collect([]));
-        self::showWidget($player);
+        self::updateTarget($player);
+        Template::show($player, 'pb-records.pb-cp-records');
     }
 
     public static function endMatch(...$args)
     {
-        Template::hideAll('pb-records.pb-records');
+        self::$targets = collect([]);
     }
 
-    public static function showWidget(Player $player, $cpId = null)
+    public static function beginMatch(...$args)
     {
-        $checkpoints = self::$checkpoints->get($player->id);
+        onlinePlayers()->each([self::class, 'playerConnect']);
+    }
+
+    public static function updateTarget(Player $player)
+    {
         $target = self::getTarget($player);
 
-        $targetString = 'unknown';
+        if ($target) {
+            $targetString = 'unknown';
 
-        if ($target instanceof LocalRecord) {
-            $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
-        } elseif ($target instanceof Dedi) {
-            $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+            if ($target instanceof LocalRecord) {
+                $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+            } elseif ($target instanceof Dedi) {
+                $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
+            }
+
+            $checkpoints = collect(explode(',', $target->Checkpoints));
+            $timesHash = md5($checkpoints->toJson());
+
+            Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString', 'timesHash'));
         }
-
-        $recordCpTimes = explode(',', $target->Checkpoints ?? '');
-
-        if ($target && $checkpoints) {
-            Template::show($player, 'pb-records.pb-records', ['times' => $recordCpTimes, 'current' => $checkpoints->toArray(), 'target' => $targetString]);
-        } else {
-            Template::hide($player, 'pb-records.pb-records');
-        }
-    }
-
-    public static function playerCheckpoint(Player $player, int $score, int $curLap, int $cpId)
-    {
-        if (!self::$checkpoints->get($player->id)) {
-            self::$checkpoints->put($player->id, collect([]));
-        }
-
-        self::$checkpoints->get($player->id)->put($cpId, $score);
-
-        self::showWidget($player, $cpId);
     }
 
     public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
@@ -84,22 +72,21 @@ class PBRecords
             return;
         }
 
-        $currentTarget = self::$targets->where('player', $player)
-            ->first();
+        $currentTarget = self::$targets->where('player', $player)->first();
 
         $map = MapController::getCurrentMap();
 
         switch ($dediOrLocal) {
             case 'wr':
-                $record = $map->dedis()->whereRank(1)->get()->first();
+                $record = $map->dedis()->whereRank(1)->first();
                 break;
 
             case 'dedi':
-                $record = $map->dedis()->whereRank($recordId ?? 1)->get()->first();
+                $record = $map->dedis()->whereRank($recordId ?? 1)->first();
                 break;
 
             case 'local':
-                $record = $map->locals()->whereRank($recordId ?? 1)->get()->first();
+                $record = $map->locals()->whereRank($recordId ?? 1)->first();
                 break;
 
             default:
@@ -131,7 +118,7 @@ class PBRecords
 
         ChatController::message($player, 'New checkpoints target: ', $record);
 
-        self::showWidget($player);
+        self::updateTarget($player);
     }
 
     private static function getTarget(Player $player)
@@ -166,6 +153,10 @@ class PBRecords
             return $dedi;
         }
 
-        return $local;
+        if ($local) {
+            return $local;
+        }
+
+        return $map->dedis()->orderByDesc('Score')->first();
     }
 }
