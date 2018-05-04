@@ -207,7 +207,7 @@ class HookController extends ModescriptCallbacks
             $hook = self::$eventMap[$event];
             self::fire($hook, $arguments);
         } else {
-            Log::logAddLine('RPC-Event', 'Calling unhandled ' . $event, true);
+            Log::logAddLine('RPC-Event', 'Calling unhandled ' . $event, false);
         }
     }
 
