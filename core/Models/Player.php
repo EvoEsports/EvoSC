@@ -157,7 +157,13 @@ class Player extends Model
 
     public function setting($settingName)
     {
-        return $this->settings()->whereName($settingName)->first()->value;
+        $setting = $this->settings()->whereName($settingName)->first();
+
+        if ($setting) {
+            return $setting->value;
+        }
+
+        return null;
     }
 
     public function isMasteradmin(): bool
