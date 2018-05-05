@@ -18,14 +18,6 @@ class HideScriptController
         ManiaLinkEvent::add('hsc.set', 'HideScriptController::set');
 
         Hook::add('PlayerConnect', 'HideScriptController::sendHideScriptSettings');
-
-        KeyController::createBind('X', 'HideScriptController::update');
-    }
-
-    public static function update(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showConfig($player);
     }
 
     public static function toggle(Player $player, $toggle)
