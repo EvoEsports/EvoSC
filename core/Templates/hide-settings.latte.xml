@@ -2,6 +2,10 @@
 <manialink name="ESC:hide-script-settings" id="hide-script-settings" version="3">
     <script><!--
 main() {
+    while(InputPlayer == Null){
+        sleep(10);
+    }
+
     declare Boolean UI_Hide_Enabled for InputPlayer = True;
     declare Real UI_Hide_Speed for InputPlayer = 1.0;
 

@@ -66,6 +66,7 @@
                             }
 
                             bar.Size = <speed * 20, 1.0>;
+
                             speedLabel.SetText(MathLib::NearestInteger(speed * 1100) ^ "");
                             TriggerPageAction("hsc.set,set," ^ MathLib::NearestInteger(speed * 1100));
                             checkbox.SetText("");
