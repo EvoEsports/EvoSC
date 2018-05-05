@@ -37,6 +37,6 @@ class CreateStatsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('stats');
+        $schemaBuilder->drop('stats');
     }
 }

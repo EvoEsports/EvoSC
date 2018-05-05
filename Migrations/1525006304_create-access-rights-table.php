@@ -45,6 +45,6 @@ class CreateAccessRightsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('access-rights');
+        $schemaBuilder->drop('access-rights');
     }
 }

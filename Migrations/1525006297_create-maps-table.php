@@ -41,6 +41,6 @@ class CreateMapsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('maps');
+        $schemaBuilder->drop('maps');
     }
 }

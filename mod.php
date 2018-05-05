@@ -71,7 +71,7 @@ class {className} extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop(\'table-name\');
+        $schemaBuilder->drop(\'table-name\');
     }
 }');
 

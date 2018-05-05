@@ -29,6 +29,6 @@ class CreateAccessRightGroupTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('access_right_group');
+        $schemaBuilder->drop('access_right_group');
     }
 }

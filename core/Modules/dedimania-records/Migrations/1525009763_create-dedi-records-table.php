@@ -33,6 +33,6 @@ class CreateDediRecordsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('dedi-records');
+        $schemaBuilder->drop('dedi-records');
     }
 }

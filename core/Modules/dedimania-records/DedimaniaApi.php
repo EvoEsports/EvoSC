@@ -279,7 +279,7 @@ class DedimaniaApi
         try {
             //Check if there is top1 dedi
             if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = file_get_contents(ghost($dedi->ghostReplayFile));
+                $Top1GReplay = file_get_contents(ghost($dedi->ghostReplayFile)) ?? "";
             }
 
             //Add replays

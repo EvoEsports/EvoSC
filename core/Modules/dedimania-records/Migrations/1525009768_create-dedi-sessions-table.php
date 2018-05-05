@@ -30,6 +30,6 @@ class CreateDediSessionsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('dedi-sessions');
+        $schemaBuilder->drop('dedi-sessions');
     }
 }

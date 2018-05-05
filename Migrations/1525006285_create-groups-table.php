@@ -35,6 +35,6 @@ class CreateGroupsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('groups');
+        $schemaBuilder->drop('groups');
     }
 }

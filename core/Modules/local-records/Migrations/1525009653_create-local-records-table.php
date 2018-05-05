@@ -32,6 +32,6 @@ class CreateLocalRecordsTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('local-records');
+        $schemaBuilder->drop('local-records');
     }
 }

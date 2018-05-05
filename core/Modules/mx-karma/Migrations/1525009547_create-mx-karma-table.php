@@ -31,6 +31,6 @@ class CreateMxKarmaTable extends Migration
      */
     public function down(Builder $schemaBuilder)
     {
-        Schema::drop('mx-karma');
+        $schemaBuilder->drop('mx-karma');
     }
 }
