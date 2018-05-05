@@ -149,8 +149,7 @@ class Player extends Model
             return;
         }
 
-        UserSetting::create([
-            'player_Login' => $this->Login,
+        $this->settings()->create([
             'name' => $settingName,
             'value' => $value
         ]);
