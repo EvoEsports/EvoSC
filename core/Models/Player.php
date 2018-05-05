@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned', 'user_settings'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
@@ -106,6 +106,11 @@ class Player extends Model
         return $this->hasOne(Group::class, 'id', 'Group');
     }
 
+    public function settings()
+    {
+        return $this->hasMany(UserSetting::class);
+    }
+
     public function getSpectatorStatusAttribute($value)
     {
         $object = collect([]);
@@ -118,19 +123,31 @@ class Player extends Model
         return $object;
     }
 
-    public function getUserSettingsAttribute($value)
-    {
-        return json_decode($value);
-    }
-
-    public function setSetting($setting, $value)
-    {
-        Player::whereLogin($this->Login)->update(["user_settings->$setting" => $value]);
-    }
-
     public function isSpectator(): bool
     {
         return $this->spectator_status->spectator ?? false;
+    }
+
+    public function setSetting($settingName, $value): UserSetting
+    {
+        Player::whereLogin($this->Login)->update(["user_settings->$settingName" => $value]);
+
+        $setting = $this->settings()->whereName($settingName)->first();
+
+        if ($setting) {
+            return $setting->update(['value' => $value]);
+        }
+
+        return UserSetting::create([
+            'player_id' => $this->id,
+            'name' => $settingName,
+            'value' => $value
+        ]);
+    }
+
+    public function setting($settingName): ?UserSetting
+    {
+        return $this->settings()->whereName($settingName)->first();
     }
 
     public function isMasteradmin(): bool
