@@ -25,9 +25,6 @@ class PlayerController
         Hook::add('PlayerDisconnect', 'PlayerController::playerDisconnect');
         Hook::add('PlayerFinish', 'PlayerController::playerFinish');
 
-        ChatController::addCommand('afk', 'PlayerController::toggleAfk', 'Toggle AFK status');
-        ChatController::addCommand('hidespeed', 'PlayerController::setHideSpeed', 'Set speed at which UI hides, 0 = disable hiding');
-
         self::$fakePlayers = collect([]);
         ChatController::addCommand('kick', 'PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
         ChatController::addCommand('ban', 'PlayerController::banPlayer', 'Ban player by nickname', '//', 'ban');
@@ -60,21 +57,6 @@ class PlayerController
         }
 
         return $players->first();
-    }
-
-    public static function setHideSpeed(Player $player, $cmd = null, $hideSpeed = 0)
-    {
-        if (!$cmd || $hideSpeed === null) {
-            return;
-        }
-
-        $player->setSetting('ui->hideSpeed', $hideSpeed);
-
-        if ($hideSpeed == 0) {
-            ChatController::message($player, '_info', 'UI hiding disabled');
-        } else {
-            ChatController::message($player, '_info', 'UI hides now at ', $hideSpeed);
-        }
     }
 
     /**
@@ -162,17 +144,6 @@ class PlayerController
     }
 
     /**
-     * Toggle AFK status (Deprecated)
-     *
-     * @param Player $player
-     */
-    public static function toggleAfk(Player $player)
-    {
-        $player->update(['Afk' => !$player->Afk]);
-        self::displayPlayerlist();
-    }
-
-    /**
      * Called on players connect
      *
      * @param Player $player
@@ -227,8 +198,6 @@ class PlayerController
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
         }
-
-        $player->update(['Afk' => false]);
     }
 
     /**
@@ -247,7 +216,6 @@ class PlayerController
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
         ChatController::messageAll('_info', $player, ' left the server');
         $player->setOffline();
-        $player->setScore(0);
     }
 
     /**

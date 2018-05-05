@@ -18,8 +18,6 @@ class GroupController
 {
     public static function init()
     {
-        self::createTables();
-
         ChatCommand::add('group', 'GroupController::group', 'Group commands', '//', 'group');
         ChatCommand::add('groups', 'GroupController::displayGroups', 'Show groups overview', '//', 'group');
 
