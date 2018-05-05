@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="{$id}" id="{$id}" version="3">
+<frame pos="0 0" scale="{isset($showAnimation) && $showAnimation ? 1 : 0.95}" id="main-frame">
+    <quad pos="-{$width/2} {$height/2}" z-index="-3" size="{$width} {$height}" bgcolor="{background_color()|noescape}6"/>
+    <quad pos="-{$width/2} {($height/2)-8}" z-index="0" size="{$width} 0.2" bgcolor="{primary_color()|noescape}6"/>
+    <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="{header_color()|noescape}2"/>
+    <quad pos="-{$width/2} {$height/2}" z-index="-1" size="{$width} {$height}" style="Bgs1" substyle="BgDialogBlur"/>
+    <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="{$width-6} 5" text="$s{$title ?? $id}" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
+    <label id="close-button" pos="{($width/2)-3} {$height/2-3}" z-index="1" size="3 3" text="✖" valign="top" textsize="1.6" textcolor="fff9" halign="right" ScriptEvents="1"/>
+
+    <frame pos="-{($width/2)-3} {($height/2)-(isset($navigation) ? 15 : 11)}">
+        <frame z-index="1" pos="0 -1">
+            <label valign="center" pos="0 0" textsize="1" textcolor="ffff" text="Enabled" />
+            <label id="checkbox" valign="center" pos="20 0" textsize="1" textcolor="ffff" text="{$speed > 0.0 ? '' : ''}" action="hsc.toggle,toggle"/>
+
+            <label valign="center" pos="0 -5" textsize="1" textcolor="ffff" text="Hide Speed" />
+            <quad valign="center" id="bar-bg" pos="20 -5" z-index="2" size="20 1" bgcolor="000f" ScriptEvents="1"/>
+            <quad valign="center" id="bar" pos="20 -5" z-index="3" size="{($speed * 3.8) / 1100 * 20} 1" bgcolor="{primary_color()|noescape}f" />
+            <label valign="center" id="speed-label" pos="49 -5" halign="right" textsize="1" textcolor="ffff" text="{round($speed * 3.8)}"/>
+
+            <frame pos="51 -5" scale="0.7">
+                <label valign="center" pos="0 1.5" size="3 0.1" textsize="0.1" halign="center" textcolor="ffff" text="km" />
+                <label valign="center" pos="0 -1.5" size="3 0.1" textsize="0.1" halign="center" textcolor="ffff" text="h" />
+                <label valign="center" pos="0 0.2" textsize="0.6" halign="center" textcolor="ffff" text="—" />
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+            #Include "MathLib" as MathLib
+
+            Void close(CMlFrame frame){
+                AnimMgr.Add(frame, "<frame scale='1.0' opacity='0.0' />", 100, CAnimManager::EAnimManagerEasing::QuintIn);
+                sleep(100);
+                frame.Hide();
+                {if isset($onClose)}
+                TriggerPageAction({$onClose});
+                {/if}
+            }
+
+            main() {
+                declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+                declare closeButton <=> (Page.MainFrame.GetFirstChild("close-button") as CMlLabel);
+                declare barBg <=> (Page.MainFrame.GetFirstChild("bar-bg") as CMlQuad);
+                declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
+                declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed-label") as CMlLabel);
+                declare checkbox <=> (Page.MainFrame.GetFirstChild("checkbox") as CMlLabel);
+
+                {if isset($showAnimation) && $showAnimation}
+                AnimMgr.Add(frame, "<frame scale='0.95' />", 600, CAnimManager::EAnimManagerEasing::QuintOut);
+                {/if}
+
+                while(True){
+                    yield;
+
+                    foreach(Event in PendingEvents) {
+                        if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == closeButton){
+                            close(frame);
+                            return;
+                        }
+                        if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == barBg){
+                            declare Real speed = (MouseX + 6.625) / 18.875;
+
+                            if(speed < 0.005){
+                                speed = 0.001;
+                            }
+
+                            bar.Size = <speed * 20, 1.0>;
+                            speedLabel.SetText(MathLib::NearestInteger(speed * 1100) ^ "");
+                            TriggerPageAction("hsc.set,set," ^ MathLib::NearestInteger(speed * 1100));
+                            checkbox.SetText("");
+                        }
+                    }
+                }
+            }
+        --></script>
+
+
+    {if isset($navigation)}
+    <quad pos="-{$width/2} {$height/2 - 8}" z-index="-3" size="{$width} 5" bgcolor="{background_color()|noescape}9"/>
+    <frame pos="-{$width/2 - 1} {($height/2) - 10.5}" z-index="1" scale="0.75">
+        {$navigation|noescape}
+    </frame>
+    {/if}
+
+    {if isset($pagination)}
+    <frame pos="-{$width/2 - 3} -{($height/2) - 4}" z-index="1" scale="0.75">
+        {$pagination|noescape}
+    </frame>
+    {/if}
+</frame>
+</manialink>

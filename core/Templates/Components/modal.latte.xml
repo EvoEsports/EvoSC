@@ -6,7 +6,7 @@
         <quad pos="-{$width/2} {$height/2}" z-index="-2" size="{$width} 8" bgcolor="{header_color()|noescape}2"/>
         <quad pos="-{$width/2} {$height/2}" z-index="-1" size="{$width} {$height}" style="Bgs1" substyle="BgDialogBlur"/>
         <label pos="-{($width/2)-3} {$height/2-3}" z-index="1" size="{$width-6} 5" text="$s{$title ?? $id}" valign="top" textsize="1.6" textcolor="ffff" halign="left"/>
-        <label pos="{($width/2)-3} {$height/2-3}" z-index="1" size="3 3" text="✖" valign="top" textsize="1.6" textcolor="fff9" halign="right" ScriptEvents="1"/>
+        <label id="close-button" pos="{($width/2)-3} {$height/2-3}" z-index="1" size="3 3" text="✖" valign="top" textsize="1.6" textcolor="fff9" halign="right" ScriptEvents="1"/>
 
         <frame pos="-{($width/2)-3} {($height/2)-(isset($navigation) ? 15 : 11)}">{$content|noescape}</frame>
 
@@ -22,15 +22,16 @@
 
             main() {
                 declare frame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+                declare closeButton <=> (Page.MainFrame.GetFirstChild("close-button") as CMlLabel);
 
                 {if isset($showAnimation) && $showAnimation}
-                AnimMgr.Add(frame, "<frame scale='0.95' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+                AnimMgr.Add(frame, "<frame scale='0.95' />", 600, CAnimManager::EAnimManagerEasing::QuintOut);
                 {/if}
 
                 while(True){
                     yield;
                     foreach(Event in PendingEvents) {
-                        if(Event.Type == CMlScriptEvent::Type::MouseClick){
+                        if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == closeButton){
                             close(frame);
                         }
                     }
