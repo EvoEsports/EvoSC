@@ -27,7 +27,7 @@ class HideScriptController
         if ($speed > 0.0) {
             self::setHideSpeed($player, 0.0);
         } else {
-            self::setHideSpeed($player, 500.0);
+            self::setHideSpeed($player, 1.0);
         }
 
         self::showConfig($player);
