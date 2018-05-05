@@ -5,43 +5,42 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
 
 main() {
     declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-    declare player <=> InputPlayer;
     declare Boolean hidden = False;
     declare Boolean isLapRace = Map.TMObjective_IsLapRace;
     declare Integer duration = 800;
-    declare Real hideSpeed = ({intval($hideSpeed) > 0 ? intval($hideSpeed) : 1} * 1.0);
     declare Real speed = 0.0;
     declare Text visiblePos = "<frame pos='{$config->pos->visible|noescape}' />";
     declare Text hiddenPos = "<frame pos='{$config->pos->hidden|noescape}' />";
 
-    if(hideSpeed > 0.0){
-        while(True){
-            yield;
+    while(True){
+        yield;
 
-            if(player != Null && hideSpeed > 0.0){
-                speed = player.Speed;
+        if(InputPlayer != Null){
+            declare Real UI_Hide_Speed for InputPlayer = 1.0;
 
-                if(speed < 0){
-                    speed = speed  * -1;
+            speed = InputPlayer.Speed;
+
+            if(speed < 0){
+                speed = speed  * -1;
+            }
+
+            if(!isLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                if(speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
+                }
+            }else{
+                if(speed >= UI_Hide_Speed && !hidden){
+                    anim(widget, hiddenPos, duration);
+                    hidden = True;
                 }
 
-                if(!isLapRace && player.CurrentNbLaps >= 1){
-                    if(player != Null && speed < hideSpeed && hidden){
-                        anim(widget, visiblePos, duration);
-                        hidden = False;
-                    }
-                }else{
-                    if(player != Null && speed >= hideSpeed && !hidden){
-                        anim(widget, hiddenPos, duration);
-                        hidden = True;
-                    }
-
-                    if(player != Null && speed < hideSpeed && hidden){
-                        anim(widget, visiblePos, duration);
-                        hidden = False;
-                    }
+                if(speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
                 }
             }
+        }else{
         }
     }
 }

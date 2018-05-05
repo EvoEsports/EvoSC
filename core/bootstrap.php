@@ -52,6 +52,7 @@ function startEsc()
     \esc\Controllers\KeyController::init();
     esc\Classes\Vote::init();
     esc\Controllers\ModuleController::init();
+    \esc\Controllers\HideScriptController::init();
 
     \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
 

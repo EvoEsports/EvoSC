@@ -44,6 +44,8 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
     declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
     music.Play();
     while (True) {
+        yield;
+
         timeLeft = (timeEnd/1000) - (CurrentTime/1000);
         timePassed =  lengthInSeconds - timeLeft;
         playtimeMinutes = MathLib::FloorInteger(timePassed/60.0);
@@ -60,34 +62,32 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
             }
         }
 
-        if(hideSpeed > 0.0){
-            if(player != Null && hideSpeed > 0.0){
-                speed = player.Speed;
+        if(player != Null){
+            declare Real UI_Hide_Speed for InputPlayer = 1.0;
 
-                if(speed < 0){
-                    speed = speed  * -1;
+            speed = player.Speed;
+
+            if(speed < 0){
+                speed = speed  * -1;
+            }
+
+            if(!isLapRace && player.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                if(player != Null && speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
+                }
+            }else{
+                if(player != Null && speed >= UI_Hide_Speed && !hidden){
+                    anim(widget, hiddenPos, duration);
+                    hidden = True;
                 }
 
-                if(!isLapRace && player.CurrentNbLaps >= 1){
-                    if(player != Null && speed < hideSpeed && hidden){
-                        anim(widget, visiblePos, duration);
-                        hidden = False;
-                    }
-                }else{
-                    if(player != Null && speed >= hideSpeed && !hidden){
-                        anim(widget, hiddenPos, duration);
-                        hidden = True;
-                    }
-
-                    if(player != Null && speed < hideSpeed && hidden){
-                        anim(widget, visiblePos, duration);
-                        hidden = False;
-                    }
+                if(player != Null && speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
                 }
             }
         }
-
-        yield;
     }
 }
 --></script>

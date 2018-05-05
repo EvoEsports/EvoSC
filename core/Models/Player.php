@@ -128,26 +128,37 @@ class Player extends Model
         return $this->spectator_status->spectator ?? false;
     }
 
-    public function setSetting($settingName, $value): UserSetting
+    public function setSetting($settingName, $value)
     {
         Player::whereLogin($this->Login)->update(["user_settings->$settingName" => $value]);
 
         $setting = $this->settings()->whereName($settingName)->first();
 
-        if ($setting) {
-            return $setting->update(['value' => $value]);
+        if (is_bool($value)) {
+            $value = $value ? 'True' : 'False';
+        }
+        if (is_float($value)) {
+            $value = sprintf('%.1f', $value);
+        }
+        if (is_integer($value)) {
+            $value = sprintf('%d', $value);
         }
 
-        return UserSetting::create([
-            'player_id' => $this->id,
+        if ($setting) {
+            $setting->update(['value' => $value]);
+            return;
+        }
+
+        UserSetting::create([
+            'player_Login' => $this->Login,
             'name' => $settingName,
             'value' => $value
         ]);
     }
 
-    public function setting($settingName): ?UserSetting
+    public function setting($settingName)
     {
-        return $this->settings()->whereName($settingName)->first();
+        return $this->settings()->whereName($settingName)->first()->value;
     }
 
     public function isMasteradmin(): bool

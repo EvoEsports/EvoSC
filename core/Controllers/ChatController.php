@@ -128,7 +128,8 @@ $$: Writes a dollarsign
                 //Run command callback
                 call_func($command->callback, ...$arguments);
             } catch (\Exception $e) {
-                Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getTraceAsString(), true);
+                Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getMessage(), true);
+                Log::logAddLine('ChatController', $e->getTraceAsString(), false);
             }
             $isValidCommand = true;
         }
