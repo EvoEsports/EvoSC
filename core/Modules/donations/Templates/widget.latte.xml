@@ -31,7 +31,7 @@
 
             mainFrame.ClipWindowActive = True;
             mainFrame.ClipWindowRelativePosition = <25.0,-2.5>;
-            mainFrame.ClipWindowSize = <50.0,5.0>;
+            mainFrame.ClipWindowSize = <52.0,4.9>;
 
             while(True){
                 yield;
