@@ -269,14 +269,4 @@ class Statistics
             }
         });
     }
-
-    /**
-     * @param Player $player
-     * @param int $amount
-     */
-    public static function playerDonate(Player $player, int $amount)
-    {
-        $player->Donations += $amount;
-        $player->save();
-    }
 }
