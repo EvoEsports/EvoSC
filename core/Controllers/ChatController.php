@@ -72,7 +72,7 @@ $$: Writes a dollarsign
         foreach ($parts as $part) {
             if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
                 $url = $matches[0];
-                $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
+                $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
                 $text = str_replace($url, $info, $text);
             }
         }

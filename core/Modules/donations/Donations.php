@@ -4,9 +4,12 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\HookController;
+use esc\Controllers\KeyController;
 use esc\Controllers\PlanetsController;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class Donations
@@ -14,11 +17,26 @@ class Donations
     public function __construct()
     {
         Hook::add('PlayerConnect', 'Donations::show');
+
+        ManiaLinkEvent::add('donate', 'Donations::donate');
+
+        KeyController::createBind('X', 'Donations::reload');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::show($player);
     }
 
     public static function show(Player $player)
     {
-        PlanetsController::createBill($player, 100, 'test payment', 'Donations::paySuccess');
+        Template::show($player, 'donations.widget');
+    }
+
+    public static function donate(Player $player, $amount)
+    {
+        PlanetsController::createBill($player, $amount, "Donate $amount Planets?", 'Donations::paySuccess');
     }
 
     public static function paySuccess(Player $player, $amount)
