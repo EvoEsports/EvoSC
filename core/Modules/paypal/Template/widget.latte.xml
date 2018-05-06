@@ -3,6 +3,9 @@
     <frame pos="{config('paypal.pos.visible')}">
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
+
+        <quad size="10 10" image="https://www.paypalobjects.com/digitalassets/c/website/marketing/emea/de/de/logo-center/M2_Logo_03.jpg" imagefocus="" />
+
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Donate" />
     </frame>
 </manialink>
