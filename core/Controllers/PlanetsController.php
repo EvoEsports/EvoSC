@@ -34,7 +34,9 @@ class PlanetsController
                 break;
 
             case 5:
-                call_func($bill->failFunction, $bill->player, $bill->amount);
+                if($bill->failFunction){
+                    call_func($bill->failFunction, $bill->player);
+                }
                 $bill->expired = true;
                 break;
 
