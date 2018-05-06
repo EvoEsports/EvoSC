@@ -17,18 +17,18 @@ class LiveRankings
     public static function show(Player $player)
     {
         //Get online players or players that finished (also display disconnected and finished players)
-        $players = Player::whereOnline(true)->orWhere('Score', '>', 0)->get();
+        $players = Player::whereOnline(true)->orWhere('Score', '>', 0)->get()->sortBy('Score');
 
         $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
 
         Template::show($player, 'ranking-box', [
-            'id' => 'live-rankings',
-            'title' => '🏆 LIVE RANKINGS',
-            'config' => config('ui.playerlist'),
+            'id'         => 'live-rankings',
+            'title'      => '🏆 LIVE RANKINGS',
+            'config'     => config('ui.playerlist'),
             'hideScript' => $hideScript,
-            'rows' => config('ui.playerlist.rows'),
-            'scale' => config('ui.playerlist.scale'),
-            'content' => Template::toString('live-rankings.playerlist', compact('players'))
+            'rows'       => config('ui.playerlist.rows'),
+            'scale'      => config('ui.playerlist.scale'),
+            'content'    => Template::toString('live-rankings.playerlist', compact('players'))
         ]);
     }
 
