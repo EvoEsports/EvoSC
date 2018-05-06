@@ -59,8 +59,11 @@
                         barQuad.Size = <posCoef * 50, 5.0>;
                         amount = MathLib::NearestInteger((posCoef * 100)*(posCoef * 100));
 
-                        if(amount <= 1){
+                        if(amount < 1){
                             amount = 1;
+                        }
+
+                        if(amount > 1){
                             amountLabel.SetText(amount ^ " Planets");
                         }else{
                             amountLabel.SetText(amount ^ " Planet");
