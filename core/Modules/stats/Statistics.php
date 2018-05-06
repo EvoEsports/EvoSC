@@ -24,7 +24,6 @@ class Statistics
         Hook::add('PlayerFinish', 'Statistics::playerFinish');
         Hook::add('PlayerRateMap', 'Statistics::playerRateMap');
         Hook::add('PlayerLocal', 'Statistics::playerLocal');
-        Hook::add('PlayerDonate', 'Statistics::playerDonate');
         Hook::add('EndMatch', 'Statistics::endMatch');
 
         Hook::add('ShowScores', 'Statistics::showScores');
