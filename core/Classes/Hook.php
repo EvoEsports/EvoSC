@@ -19,9 +19,9 @@ class Hook
      */
     public function __construct(string $event, string $function, string $name = null)
     {
-        $this->event = $event;
+        $this->event    = $event;
         $this->function = $function;
-        $this->name = $name;
+        $this->name     = $name;
     }
 
     /**
@@ -31,13 +31,13 @@ class Hook
     {
         try {
             $className = explode('::', $this->function)[0];
-            $function = explode('::', $this->function)[1];
+            $function  = explode('::', $this->function)[1];
 
             $class = classes()->where('class', $className)->first();
 
             if ($class) {
                 call_user_func_array("$class->namespace::$function", $arguments);
-            }else{
+            } else {
                 call_user_func_array($this->function, $arguments);
             }
 
@@ -63,5 +63,16 @@ class Hook
     public static function add(string $event, string $function)
     {
         HookController::add($event, $function);
+    }
+
+    public static function fire(string $hookName, ...$arguments)
+    {
+        $hooks = HookController::getHooks($hookName);
+
+        if($hooks->isEmpty()){
+            return;
+        }
+
+        HookController::fireHookBatch($hooks, ...$arguments);
     }
 }

@@ -178,44 +178,45 @@ $$: Writes a dollarsign
         $icon = "";
         $color = config('color.primary');
 
-        if (preg_match('/\_(\w+)/', $parts[0], $matches)) {
+        if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
                     $icon = "";
                     $color = config('color.secondary');
+                    array_shift($parts);
                     break;
 
                 case 'info':
                     $icon = "\$oi\$z";
                     $color = config('color.info');
+                    array_shift($parts);
                     break;
 
                 case 'warning':
                     $icon = "";
                     $color = config('color.warning');
+                    array_shift($parts);
                     break;
 
                 case 'local':
                     $icon = "";
                     $color = config('color.local');
+                    array_shift($parts);
                     break;
 
                 case 'dedi':
                     $icon = "";
                     $color = config('color.dedi');
+                    array_shift($parts);
                     break;
 
                 default:
                     if (preg_match('/[0-9a-f]{3}/', $matches[1])) {
                         $color = $matches[1];
-                    } else {
-                        $color = config('color.primary');
+                        array_shift($parts);
                     }
             }
-
-            //Remove color code from parts
-            array_shift($parts);
         }
 
         $message = '$s';
