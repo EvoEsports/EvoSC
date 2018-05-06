@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="clock-widget" id="clock-widget" version="3">
-    <frame pos="{$clock->pos}">
+    <frame pos="{config('ui.clock.pos.visible')|noescape}" id="widget">
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" />
@@ -15,11 +15,22 @@
     <script><!--
         #Include "TextLib" as TextLib
 
+        Void anim(CMlFrame frame, Text targetPos, Integer duration){
+            AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+
         main() {
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare pointerHours <=> (Page.MainFrame.GetFirstChild("pointerHours") as CMlQuad);
             declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
             declare pointerSeconds <=> (Page.MainFrame.GetFirstChild("pointerSeconds") as CMlQuad);
+            declare Text visiblePos = "<frame pos='{config('ui.clock.pos.visible')|noescape}' />";
+            declare Text hiddenPos = "<frame pos='{config('ui.clock.pos.hidden')|noescape}' />";
+            declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+            declare Boolean hidden = False;
+            declare Boolean isLapRace = Map.TMObjective_IsLapRace;
+            declare Integer duration = 800;
+            declare Real speed = 0.0;
 
             declare Text timeString = "";
             declare Integer hours = 0;
@@ -30,6 +41,8 @@
             declare Real rotSeconds = 0.0;
 
             while(True){
+                yield;
+
                 timeString = TextLib::SubString(CurrentLocalDateText, 11, 5);
                 timeLabel.SetText(timeString);
 
@@ -45,7 +58,32 @@
                 pointerMinutes.RelativeRotation = rotMinutes;
                 pointerSeconds.RelativeRotation = rotSeconds;
 
-                sleep(500);
+                if(InputPlayer != Null){
+                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
+
+                    speed = InputPlayer.Speed;
+
+                    if(speed < 0){
+                        speed = speed  * -1;
+                    }
+
+                    if(!isLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                        if(speed < UI_Hide_Speed && hidden){
+                            anim(widget, visiblePos, duration);
+                            hidden = False;
+                        }
+                    }else{
+                        if(speed >= UI_Hide_Speed && !hidden){
+                            anim(widget, hiddenPos, duration);
+                            hidden = True;
+                        }
+
+                        if(speed < UI_Hide_Speed && hidden){
+                            anim(widget, visiblePos, duration);
+                            hidden = False;
+                        }
+                    }
+                }
             }
         }
     --></script>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:paypal-widget" id="paypal-widget" version="3">
-    <frame pos="{config('paypal.pos.visible')|noescape}" id="widget">
+    <frame pos="{config('discord.pos.visible')|noescape}" id="widget">
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
 
         <frame z-index="2">
             <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvolutionTM/EvoSC/master/core/Modules/paypal/paypal.png" imagefocus="" />
 
-            <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Donate" />
+            <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Discord" />
         </frame>
     </frame>
 
@@ -18,8 +18,8 @@
         }
 
         main() {
-            declare Text visiblePos = "<frame pos='{config('paypal.pos.visible')|noescape}' />";
-            declare Text hiddenPos = "<frame pos='{config('paypal.pos.hidden')|noescape}' />";
+            declare Text visiblePos = "<frame pos='{config('discord.pos.visible')|noescape}' />";
+            declare Text hiddenPos = "<frame pos='{config('discord.pos.hidden')|noescape}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
             declare Boolean hidden = False;
             declare Boolean isLapRace = Map.TMObjective_IsLapRace;

@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\KeyController;
@@ -20,6 +21,7 @@ class PayPal
 
     public static function reload(Player $player)
     {
+        Config::loadConfigFiles();
         TemplateController::loadTemplates();
         self::show($player);
     }
