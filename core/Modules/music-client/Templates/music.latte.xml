@@ -68,6 +68,33 @@ main() {
     while (True) {
         yield;
 
+        if(player != Null){
+            declare Real UI_Hide_Speed for InputPlayer = 1.0;
+
+            speed = player.Speed;
+
+            if(speed < 0){
+                speed = speed  * -1;
+            }
+
+            if(!isLapRace && player.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                if(player != Null && speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
+                }
+            }else{
+                if(player != Null && speed >= UI_Hide_Speed && !hidden){
+                    anim(widget, hiddenPos, duration);
+                    hidden = True;
+                }
+
+                if(player != Null && speed < UI_Hide_Speed && hidden){
+                    anim(widget, visiblePos, duration);
+                    hidden = False;
+                }
+            }
+        }
+
         while(InputPlayer == Null){
             sleep(100);
         }
@@ -130,33 +157,6 @@ main() {
             //skip button
             if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == skip){
                 TriggerPageAction("music.next");
-            }
-        }
-
-        if(player != Null){
-            declare Real UI_Hide_Speed for InputPlayer = 1.0;
-
-            speed = player.Speed;
-
-            if(speed < 0){
-                speed = speed  * -1;
-            }
-
-            if(!isLapRace && player.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                if(player != Null && speed < UI_Hide_Speed && hidden){
-                    anim(widget, visiblePos, duration);
-                    hidden = False;
-                }
-            }else{
-                if(player != Null && speed >= UI_Hide_Speed && !hidden){
-                    anim(widget, hiddenPos, duration);
-                    hidden = True;
-                }
-
-                if(player != Null && speed < UI_Hide_Speed && hidden){
-                    anim(widget, visiblePos, duration);
-                    hidden = False;
-                }
             }
         }
     }
