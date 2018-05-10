@@ -2,7 +2,6 @@
 
 namespace esc\Modules\TimeWidget;
 
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
@@ -40,7 +39,7 @@ class TimeWidget
 
     public static function addTime(Player $player)
     {
-        if ($player->isAdmin()) {
+        if ($player->group->hasAccess('time')) {
             MapController::addTime(1);
         }
     }
