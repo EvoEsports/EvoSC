@@ -32,6 +32,7 @@ class CreateMapsTable extends Migration
             $table->boolean('Enabled')->default(false);
             $table->integer('AuthorTime')->nullable();
             $table->text('mx_details')->nullable();
+            $table->text('mx_world_record')->nullable();
         });
     }
 

@@ -10,7 +10,7 @@ class Map extends Model
 {
     protected $table = 'maps';
 
-    protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints', 'AuthorTime', 'Enabled', 'mx_details'];
+    protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints', 'AuthorTime', 'Enabled', 'mx_details', 'mx_world_record'];
 
     protected $dates = ['LastPlayed'];
 
