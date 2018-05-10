@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\MusicServer;
+namespace esc\Modules\MusicClient;
 
 use Carbon\Carbon;
 use esc\Classes\File;
@@ -17,7 +17,7 @@ use esc\Models\Player;
 use esc\Models\Song;
 use Illuminate\Support\Collection;
 
-class MusicServer
+class MusicClient
 {
     private static $startLoad;
     private static $music;
@@ -30,19 +30,19 @@ class MusicServer
 
         self::$songQueue = new Collection();
 
-        ManiaLinkEvent::add('ms.hidemenu', 'MusicServer::hideMusicMenu');
-        ManiaLinkEvent::add('ms.juke', 'MusicServer::queueSong');
-        ManiaLinkEvent::add('ms.play', 'MusicServer::playSong');
-        ManiaLinkEvent::add('ms.recommend', 'MusicServer::recommend');
-        ManiaLinkEvent::add('music.next', 'MusicServer::nextSong');
-        ManiaLinkEvent::add('ms.menu.showpage', 'MusicServer::displayMusicMenu');
+        ManiaLinkEvent::add('ms.hidemenu', 'MusicClient::hideMusicMenu');
+        ManiaLinkEvent::add('ms.juke', 'MusicClient::queueSong');
+        ManiaLinkEvent::add('ms.play', 'MusicClient::playSong');
+        ManiaLinkEvent::add('ms.recommend', 'MusicClient::recommend');
+        ManiaLinkEvent::add('music.next', 'MusicClient::nextSong');
+        ManiaLinkEvent::add('ms.menu.showpage', 'MusicClient::displayMusicMenu');
 
-        ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
+        ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Opens the music menu where you can queue music.');
 
-        Hook::add('EndMatch', 'MusicServer::setNextSong');
-        Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
+        Hook::add('EndMatch', 'MusicClient::setNextSong');
+        Hook::add('PlayerConnect', 'MusicClient::displaySongWidget');
 
-        KeyController::createBind('X', 'MusicServer::reload');
+        KeyController::createBind('X', 'MusicClient::reload');
     }
 
     public static function reload(Player $player)
@@ -116,7 +116,7 @@ class MusicServer
 
     private static function showWidget(Player $player, $song, $lengthInSeconds)
     {
-        $content = Template::toString('music-server.music', [
+        $content = Template::toString('music-client.music', [
             'song'            => $song,
             'lengthInSeconds' => $lengthInSeconds,
             'config'          => config('ui.music'),
@@ -143,7 +143,7 @@ class MusicServer
 
         $queue = self::$songQueue->sortBy('time')->take(9);
 
-        $music      = Template::toString('music-server.menu', ['songs' => $songs, 'queue' => $queue]);
+        $music      = Template::toString('music-client.menu', ['songs' => $songs, 'queue' => $queue]);
         $pagination = Template::toString('components.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
 
         Template::show($player, 'components.modal', [
@@ -162,7 +162,7 @@ class MusicServer
      */
     public static function hideMusicMenu(Player $triggerer)
     {
-        Template::hide($triggerer, 'music-server.menu');
+        Template::hide($triggerer, 'music-client.menu');
     }
 
     /**
@@ -184,7 +184,7 @@ class MusicServer
             ChatController::messageAll($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
         }
 
-        Template::hide($callee, 'music-server.menu');
+        Template::hide($callee, 'music-client.menu');
     }
 
     /**
@@ -254,7 +254,7 @@ class MusicServer
 
         try {
             $musicFiles = json_decode($musicJson);
-            MusicServer::setMusicFiles(collect($musicFiles));
+            MusicClient::setMusicFiles(collect($musicFiles));
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
         }
