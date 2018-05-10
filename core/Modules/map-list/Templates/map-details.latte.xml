@@ -52,7 +52,11 @@
 
     <frame pos="0 -28">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="BEST MX RECORD" />
+        {if $map->mx_world_record->ReplayTime}
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$map->mx_world_record->ReplayTime|score}" />
+        {else}
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="-" />
+        {/if}
     </frame>
 </frame>
 
