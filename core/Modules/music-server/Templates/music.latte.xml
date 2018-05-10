@@ -68,7 +68,7 @@ main() {
         playPos = Audio.Sounds[0].PlayCursor / Audio.Sounds[0].PlayLength;
         bar.Size = <(playPos * 35), 1.0>;
 
-        if(playPos > 99.5){
+        if(playPos > 0.99){
             TriggerPageAction("music.next");
             return;
         }

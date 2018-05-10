@@ -40,7 +40,6 @@ class MusicServer
         ChatController::addCommand('music', 'MusicServer::displayMusicMenu', 'Opens the music menu where you can queue music.');
 
         Hook::add('EndMatch', 'MusicServer::setNextSong');
-        Hook::add('BeginMap', 'MusicServer::beginMap');
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
 
         KeyController::createBind('X', 'MusicServer::reload');
