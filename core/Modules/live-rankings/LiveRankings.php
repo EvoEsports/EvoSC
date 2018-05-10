@@ -18,7 +18,7 @@ class LiveRankings
     public static function show(Player $player)
     {
         //Get online players or players that finished (also display disconnected and finished players)
-        $players = Player::whereOnline(true)->orWhere('Score', '>', 0)->get()->sortBy('Score');
+        $players = finishPlayers()->sortBy('Score')->merge(onlinePlayers()->diff(finishPlayers()));
 
         $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
 
