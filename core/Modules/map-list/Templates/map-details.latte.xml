@@ -4,18 +4,23 @@
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$map->Author}" />
     </frame>
 
-    <frame pos="0 -6">
+    <frame pos="0 -7">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="#MX ID" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="$l[https://tm.mania-exchange.com/tracks/{$mxDetails->TrackID}]{$mxDetails->TrackID} "/>
     </frame>
 
-    <frame pos="0 -12">
+    <frame pos="0 -14">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="AWARDED" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->AwardCount} times"/>
+    </frame>
+
+    <frame pos="0 -21">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="FIRST UPLOAD" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->UploadedAt|date}" />
     </frame>
 
     {if $mxDetails->UpdatedAt != ''}
-    <frame pos="0 -18">
+    <frame pos="0 -28">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="UPDATED" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->UpdatedAt|date}" />
     </frame>
@@ -28,34 +33,39 @@
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->StyleName}" />
     </frame>
 
-    <frame pos="0 -6">
+    <frame pos="0 -7">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="MOOD" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->Mood}"/>
     </frame>
 
-    <frame pos="0 -12">
+    <frame pos="0 -14">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="LAPS" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->Laps}" />
     </frame>
 
-    <frame pos="0 -18">
+    <frame pos="0 -21">
         <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="DIFFICULTY" />
         <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->DifficultyName}" />
     </frame>
+
+    <frame pos="0 -28">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="BEST MX RECORD" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$map->mx_world_record->ReplayTime|score}" />
+    </frame>
 </frame>
 
-<label pos="0 -26" size="79 5" textsize="0.5" text="Last played: {isset($map->LastPlayed) ? $map->LastPlayed->diffForHumans() : 'never'}" textcolor="fffc"/>
+<label pos="0 -35" size="79 5" textsize="0.5" text="Last played: {isset($map->LastPlayed) ? $map->LastPlayed->diffForHumans() : 'never'}" textcolor="fffc"/>
 
 {if $mxDetails->Unreleased}
-<label pos="0 -28" size="50 4" textsize="0.5" textcolor="F00F" text="This track is not released" />
+<label pos="0 -30" size="50 4" textsize="0.5" textcolor="F00F" text="This track is not released" />
 {/if}
 
-<frame pos="41 -2" scale="0.7">
-    <label pos="3 3" text="DEDIMANIA RECORDS" textsize="1" />
+<frame pos="41 -1" scale="0.8">
+    <label pos="3 2" text="DEDIMANIA RECORDS" textsize="1" textcolor="bbbf" />
     {$dedisRanking|noescape}
 </frame>
 
-<frame pos="81 -2" scale="0.7">
-    <label pos="3 3" text="LOCAL RECORDS" textsize="1" />
+<frame pos="81 -1" scale="0.8">
+    <label pos="3 2" text="LOCAL RECORDS" textsize="1" textcolor="bbbf" />
     {$localsRanking|noescape}
 </frame>

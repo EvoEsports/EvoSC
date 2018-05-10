@@ -194,8 +194,8 @@ class MapList
     {
         $map = Map::find($mapId);
 
-        $locals = $map->locals()->orderBy('Score')->get()->take(9);
-        $dedis = $map->dedis()->orderBy('Score')->get()->take(9);
+        $locals = $map->locals()->orderBy('Score')->get()->take(10);
+        $dedis = $map->dedis()->orderBy('Score')->get()->take(10);
 
         $localsRanking = Template::toString('components.ranking', ['ranks' => $locals]);
         $dedisRanking = Template::toString('components.ranking', ['ranks' => $dedis]);
@@ -210,7 +210,7 @@ class MapList
             'id' => 'MapList',
             'title' => 'Map details: ' . $map->Name,
             'width' => 130,
-            'height' => 42,
+            'height' => 50,
             'content' => $detailPage,
             'onClose' => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
             'showAnimation' => true,

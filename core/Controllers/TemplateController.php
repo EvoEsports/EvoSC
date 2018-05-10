@@ -33,6 +33,8 @@ class TemplateController
         self::$latte->addFilter('date', function ($str) {
             $date = new Carbon($str);
             return $date->format('Y-m-d');
+        })->addFilter('score', function ($str) {
+            return formatScore($str);
         });
     }
 
