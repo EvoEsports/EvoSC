@@ -4,19 +4,19 @@
     <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
 
     <frame id="content" pos="0 0">
-        <label pos="37 -2" z-index="1" size="35 3" text="{$song->title ?? $song->file}" halign="right" textcolor="fffe" textsize="1"/>
-        <label pos="37 -5.5" z-index="1" size="35 3" text="$t{$song->artist}" halign="right" textcolor="fffc" textsize="0.2"/>
+        <label id="title" pos="37 -2" z-index="1" size="35 3" text="" halign="right" textcolor="fffe" textsize="1"/>
+        <label id="artist" pos="37 -5.5" z-index="1" size="35 3" text="" halign="right" textcolor="fffc" textsize="0.2"/>
 
         <frame pos="0 -8.5">
             <quad pos="2 0" size="35 1" bgcolor="0003" />
             <quad id="bar" pos="2 0" size="0 1" bgcolor="{primary_color()|noescape}a" />
 
             <frame pos="2 -4" z-index="10">
-                <label valign="center" pos="0 0" size="5 5" text="{$song->length}" textsize="1"/>
+                <label id="length" valign="center" pos="0 0" size="5 5" text="" textsize="1"/>
                 <label valign="center" id="play-stop" pos="7 0" text="" textsize="1" ScriptEvents="1" />
                 <label valign="center" id="skip" pos="11 0" text="" textsize="1" ScriptEvents="1" />
 
-                <label valign="center" pos="15 0" z-index="1" size="21 4" text="{substr($song->title ?? $song->file, 0, 25)}" halign="left" textcolor="fffe" textsize="0.8"/>
+                <label id="title2" valign="center" pos="15 0" z-index="1" size="21 4" text="" halign="left" textcolor="fffe" textsize="0.8"/>
             </frame>
         </frame>
     </frame>
@@ -37,26 +37,29 @@ main() {
     declare Integer duration = 800;
     declare Real hideSpeed = ({intval($hideSpeed) > 0 ? intval($hideSpeed) : 1} * 1.0);
     declare Real speed = 0.0;
-    declare Text visiblePos = "<frame pos='{$config->pos->visible|noescape}' />";
-    declare Text hiddenPos = "<frame pos='{$config->pos->hidden|noescape}' />";
+    declare Text visiblePos = "<frame pos='{('ui.music.pos.visible')|noescape}' />";
+    declare Text hiddenPos = "<frame pos='{('ui.music.pos.hidden')|noescape}' />";
 
-    declare music <=> Audio.CreateSound("{$song->url|noescape}", 1.0, True, False, False);
+    declare title <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
+    declare title2 <=> (Page.MainFrame.GetFirstChild("title2") as CMlLabel);
+    declare artist <=> (Page.MainFrame.GetFirstChild("artist") as CMlLabel);
+    declare length <=> (Page.MainFrame.GetFirstChild("length") as CMlLabel);
+
+    declare music = Audio.CreateSound("https://ozonic.co.uk/empty.ogg", 1.0, True, False, False);
     declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
     declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlQuad);
     declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
     declare mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-    declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     declare playStop <=> (Page.MainFrame.GetFirstChild("play-stop") as CMlLabel);
     declare skip <=> (Page.MainFrame.GetFirstChild("skip") as CMlLabel);
-    declare Text length = {$song->length};
     declare Boolean playing = True;
     declare Real playPos = 0.0;
+    declare Text currentSongUrl = "";
+    declare Integer songCounter = 0;
 
     declare Text contentNormal = """<frame pos="0 0" />""";
     declare Text contentHover = """<frame pos="0 6" />""";
     declare Boolean hover = False;
-
-    music.Play();
 
     mainFrame.ClipWindowActive = True;
     mainFrame.ClipWindowRelativePosition = <25.0,-5.3>;
@@ -65,7 +68,34 @@ main() {
     while (True) {
         yield;
 
-        playPos = Audio.Sounds[0].PlayCursor / Audio.Sounds[0].PlayLength;
+        while(InputPlayer == Null){
+            sleep(100);
+        }
+
+        declare Text Song_Url for InputPlayer = "-";
+        declare Text Song_Title for InputPlayer = "-";
+        declare Text Song_Artist for InputPlayer = "-";
+        declare Text Song_Length for InputPlayer = "-";
+
+        if(Song_Url == "-"){
+            continue;
+        }
+
+        if(Song_Url != currentSongUrl){
+            currentSongUrl = Song_Url;
+
+            title.SetText(Song_Title);
+            title2.SetText(Song_Title);
+            artist.SetText(Song_Artist);
+            length.SetText(Song_Length);
+
+            music.Stop();
+            music = Audio.CreateSound(Song_Url, 1.0, True, False, False);
+            songCounter = songCounter + 1;
+            music.Play();
+        }
+
+        playPos = Audio.Sounds[songCounter].PlayCursor / Audio.Sounds[songCounter].PlayLength;
         bar.Size = <(playPos * 35), 1.0>;
 
         if(playPos > 0.99){

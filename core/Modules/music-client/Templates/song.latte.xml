@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:song.set" id="song.set" version="3">
+    <script>
+        <!--
+        main(){
+            while(InputPlayer == Null){
+                sleep(10);
+            }
+
+            declare Text Song_Url for InputPlayer;
+            declare Text Song_Title for InputPlayer;
+            declare Text Song_Artist for InputPlayer;
+            declare Text Song_Length for InputPlayer;
+
+            Song_Url = "{$song->url|noescape}";
+            Song_Title = {$song->title};
+            Song_Artist = {$song->artist};
+            Song_Length = {$song->length};
+        }
+        -->
+    </script>
+</manialink>

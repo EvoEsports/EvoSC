@@ -30,8 +30,6 @@ class MusicClient
 
         self::$songQueue = new Collection();
 
-        ManiaLinkEvent::add('ms.hidemenu', 'MusicClient::hideMusicMenu');
-        ManiaLinkEvent::add('ms.juke', 'MusicClient::queueSong');
         ManiaLinkEvent::add('ms.play', 'MusicClient::playSong');
         ManiaLinkEvent::add('ms.recommend', 'MusicClient::recommend');
         ManiaLinkEvent::add('music.next', 'MusicClient::nextSong');
@@ -40,87 +38,19 @@ class MusicClient
         ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Opens the music menu where you can queue music.');
 
         Hook::add('EndMatch', 'MusicClient::setNextSong');
-        Hook::add('PlayerConnect', 'MusicClient::displaySongWidget');
-
-        KeyController::createBind('X', 'MusicClient::reload');
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::displaySongWidget($player);
-    }
-
-    public static function onConfigReload()
-    {
-        self::displaySongWidget();
-    }
-
-    /**
-     * Gets current song
-     * @return null|Song
-     */
-    public static function getCurrentSong(): ?Song
-    {
-        $url = self::$currentSong->url;
-        return self::$music->where('url', $url)->first();
-    }
-
-    /**
-     * Sets next song to be played
-     * @param array ...$args
-     */
-    public static function setNextSong(...$args)
-    {
-        Server::setForcedMusic(true, 'https://ozonic.co.uk/empty.ogg');
+        Hook::add('PlayerConnect', 'MusicClient::playerConnect');
     }
 
     public static function recommend(Player $player, $songId)
     {
         $song = self::$music->get($songId);
-
         ChatController::messageAll('_info', $player, ' recommends song ', secondary($song->title), ' by ', secondary($song->artist));
     }
 
-    /**
-     * Display the onscreen widget
-     * @param Player|null $player
-     */
-    public static function displaySongWidget(Player $player = null, $song = null)
-    {
-        if (!$song) {
-            if (!self::$music) {
-                Log::warning("Music not loaded, can not display widget.");
-                return;
-            }
-
-            $song = self::$music->random();
-        }
-
-        if ($song) {
-            $lengthInSeconds = self::getTrackLengthInSeconds($song);
-
-            if ($player) {
-                self::showWidget($player, $song, $lengthInSeconds);
-            } else {
-                onlinePlayers()->each(function (Player $player) use ($song, $lengthInSeconds) {
-                    self::showWidget($player, $song, $lengthInSeconds);
-                });
-            }
-
-            self::$currentSong = $song;
-        } else {
-            Log::error("Invalid song");
-        }
-    }
-
-    private static function showWidget(Player $player, $song, $lengthInSeconds)
+    public static function playerConnect(Player $player)
     {
         $content = Template::toString('music-client.music', [
-            'song'            => $song,
-            'lengthInSeconds' => $lengthInSeconds,
-            'config'          => config('ui.music'),
-            'hideSpeed'       => $player->user_settings->ui->hideSpeed ?? null
+            'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
         ]);
 
         Template::show($player, 'components.icon-box', [
@@ -128,6 +58,8 @@ class MusicClient
             'content' => $content,
             'config'  => config('ui.music')
         ]);
+
+        self::playSong($player);
     }
 
     /**
@@ -157,45 +89,21 @@ class MusicClient
     }
 
     /**
-     * Hides the music menu
-     * @param Player $triggerer
-     */
-    public static function hideMusicMenu(Player $triggerer)
-    {
-        Template::hide($triggerer, 'music-client.menu');
-    }
-
-    /**
-     * Adds a song to the music-jukebox
-     * @param Player $callee
-     * @param $songId
-     */
-    public static function queueSong(Player $callee, $songId)
-    {
-        $song = self::$music->get($songId);
-
-        if ($song) {
-            self::$songQueue->push([
-                'song'   => $song,
-                'wisher' => $callee,
-                'time'   => time()
-            ]);
-
-            ChatController::messageAll($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
-        }
-
-        Template::hide($callee, 'music-client.menu');
-    }
-
-    /**
      * Plays a song
      * @param Player $callee
      * @param $songId
      */
-    public static function playSong(Player $callee, $songId)
+    public static function playSong(Player $callee, $songId = null)
     {
-        $song = self::$music->get($songId);
-        self::displaySongWidget($callee, $song);
+        if ($songId) {
+            $song = self::$music->get($songId);
+        }
+
+        if (!$song) {
+            $song = self::$music->random();
+        }
+
+        Template::show($callee, 'music-client.song', compact('song'));
     }
 
     /**
@@ -205,12 +113,7 @@ class MusicClient
      */
     public static function nextSong(Player $callee)
     {
-        $song = self::$music->random();
-
-        if ($song) {
-            self::$currentSong = $song;
-            self::displaySongWidget($callee);
-        }
+        self::playSong($callee);
     }
 
     /**
@@ -258,14 +161,5 @@ class MusicClient
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
         }
-    }
-
-    private static function getTrackLengthInSeconds($song)
-    {
-        if (preg_match('/(\d+):(\d+)/', $song->length ?? '', $matches)) {
-            return intval($matches[1]) * 60 + intval($matches[2]);
-        }
-
-        return 0;
     }
 }
