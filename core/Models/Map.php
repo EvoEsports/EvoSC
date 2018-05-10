@@ -41,6 +41,11 @@ class Map extends Model
         return json_decode($jsonMxDetails)[0];
     }
 
+    public function getMxWorldRecordAttribute($jsonMxWorldRecordDetails)
+    {
+        return json_decode($jsonMxWorldRecordDetails);
+    }
+
     public function canBeJuked(): bool
     {
         $lastPlayedDate = $this->LastPlayed;

@@ -15,6 +15,7 @@ use esc\Classes\Timer;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Models\Dedi;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -46,7 +47,7 @@ class Dedimania extends DedimaniaApi
 
     public static function reportConnectedPlayersToDedimania()
     {
-        $map = MapController::getCurrentMap();
+        $map  = MapController::getCurrentMap();
         $data = self::updateServerPlayers($map);
 
         if ($data && !isset($data->params->param->value->boolean)) {
@@ -63,7 +64,7 @@ class Dedimania extends DedimaniaApi
             return;
         }
 
-        $map = MapController::getCurrentMap();
+        $map  = MapController::getCurrentMap();
         $dedi = $map->dedis()->where('Rank', $dediId)->first();
 
         if ($dedi && $dedi->Checkpoints) {
@@ -85,7 +86,7 @@ class Dedimania extends DedimaniaApi
     public static function beginMap(Map $map)
     {
         self::$newTimes = new Collection();
-        $session = self::getSession();
+        $session        = self::getSession();
 
         if ($session == null) {
             Log::warning("Dedimania offline. Using cached values.");
@@ -102,10 +103,10 @@ class Dedimania extends DedimaniaApi
             foreach ($records as $record) {
                 try {
 
-                    $login = (string)$record->struct->member[0]->value->string;
-                    $nickname = (string)$record->struct->member[1]->value->string;
-                    $score = (int)$record->struct->member[2]->value->int;
-                    $rank = (int)$record->struct->member[3]->value->int;
+                    $login       = (string)$record->struct->member[0]->value->string;
+                    $nickname    = (string)$record->struct->member[1]->value->string;
+                    $score       = (int)$record->struct->member[2]->value->int;
+                    $rank        = (int)$record->struct->member[3]->value->int;
                     $checkpoints = (string)$record->struct->member[5]->value->string;
 
                     $player = Player::firstOrCreate(['Login' => $login]);
@@ -117,10 +118,10 @@ class Dedimania extends DedimaniaApi
                     $player->update(['NickName' => $nickname]);
 
                     Dedi::create([
-                        'Map' => $map->id,
-                        'Player' => $player->id,
-                        'Score' => $score,
-                        'Rank' => $rank,
+                        'Map'         => $map->id,
+                        'Player'      => $player->id,
+                        'Score'       => $score,
+                        'Rank'        => $rank,
                         'Checkpoints' => $checkpoints
                     ]);
                 }
@@ -148,7 +149,7 @@ class Dedimania extends DedimaniaApi
         //Remove faulty dedis
         $map->dedis()->where('Score', 0)->delete();
         while (true) {
-            $last = $map->dedis()->orderByDesc('Score')->first();
+            $last     = $map->dedis()->orderByDesc('Score')->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
 
             if (!$foreLast || !$last) {
@@ -258,10 +259,10 @@ class Dedimania extends DedimaniaApi
             //Player does not have a dedi on map
 
             $map->dedis()->create([
-                'Player' => $player->id,
-                'Map' => $map->id,
-                'Score' => $score,
-                'Rank' => 999,
+                'Player'      => $player->id,
+                'Map'         => $map->id,
+                'Score'       => $score,
+                'Rank'        => 999,
                 'Checkpoints' => $checkpoints,
             ]);
 
@@ -277,7 +278,7 @@ class Dedimania extends DedimaniaApi
     private static function fixDedimaniaRanks(Map $map, Player $player = null): ?Dedi
     {
         $dedis = $map->dedis()->orderBy('Score')->get();
-        $i = 1;
+        $i     = 1;
         foreach ($dedis as $dedi) {
             $dedi->update(['Rank' => $i]);
             $i++;
@@ -327,7 +328,7 @@ class Dedimania extends DedimaniaApi
      */
     public static function showDedisModal(Player $player)
     {
-        $map = MapController::getCurrentMap();
+        $map    = MapController::getCurrentMap();
         $chunks = $map->dedis()->orderBy('Score')->get()->chunk(25);
 
         $columns = [];
@@ -337,11 +338,18 @@ class Dedimania extends DedimaniaApi
             array_push($columns, $ranking);
         }
 
+        if ($map->mx_world_record != null) {
+            $mxScore = intval($map->mx_world_record->ReplayTime);
+            if ($mxScore > $chunks->first()->first()->Score) {
+                $chunks->first()->first()->Rank = 'WR';
+            }
+        }
+
         Template::show($player, 'components.modal', [
-            'id' => 'DediRecordsOverview',
-            'width' => 180,
-            'height' => 97,
-            'content' => implode('', $columns ?? []),
+            'id'            => 'DediRecordsOverview',
+            'width'         => 180,
+            'height'        => 97,
+            'content'       => implode('', $columns ?? []),
             'showAnimation' => true,
         ]);
     }
@@ -353,13 +361,21 @@ class Dedimania extends DedimaniaApi
      */
     public static function displayDedis(Player $player = null)
     {
-        $rows = config('ui.dedis.rows');
-        $map = MapController::getCurrentMap();
+        $rows  = config('ui.dedis.rows');
+        $map   = MapController::getCurrentMap();
         $dedis = new Collection();
 
         $topDedis = $map->dedis()->orderBy('Score')->take(3)->get();
+
+        if ($map->mx_world_record != null) {
+            $mxScore = intval($map->mx_world_record->ReplayTime);
+            if ($mxScore > $topDedis->first()->Score) {
+                $topDedis->first()->Rank = 'WR';
+            }
+        }
+
         $topPlayers = $topDedis->pluck('Player')->toArray();
-        $fill = $rows - $topDedis->count();
+        $fill       = $rows - $topDedis->count();
 
         if ($player && !in_array($player->id, $topPlayers)) {
             $dedi = $map->dedis()->where('Player', $player->id)->first();
@@ -367,20 +383,20 @@ class Dedimania extends DedimaniaApi
                 $halfFill = ceil($fill / 2);
 
                 $above = $map->dedis()
-                    ->where('Score', '<=', $dedi->Score)
-                    ->whereNotIn('Player', $topPlayers)
-                    ->orderByDesc('Score')
-                    ->take($halfFill)
-                    ->get();
+                             ->where('Score', '<=', $dedi->Score)
+                             ->whereNotIn('Player', $topPlayers)
+                             ->orderByDesc('Score')
+                             ->take($halfFill)
+                             ->get();
 
                 $bottomFill = $fill - $above->count();
 
                 $below = $map->dedis()
-                    ->where('Score', '>', $dedi->Score)
-                    ->whereNotIn('Player', $topPlayers)
-                    ->orderBy('Score')
-                    ->take($bottomFill)
-                    ->get();
+                             ->where('Score', '>', $dedi->Score)
+                             ->whereNotIn('Player', $topPlayers)
+                             ->orderBy('Score')
+                             ->take($bottomFill)
+                             ->get();
 
                 $dedis = $dedis->concat($above)->concat($below);
             } else {
@@ -406,13 +422,13 @@ class Dedimania extends DedimaniaApi
         $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.dedis')]);
 
         Template::show($player, 'ranking-box', $variables = [
-            'id' => 'Dedimania',
-            'title' => '🏆  DEDIMANIA',
-            'config' => config('ui.dedis'),
+            'id'         => 'Dedimania',
+            'title'      => '🏆  DEDIMANIA',
+            'config'     => config('ui.dedis'),
             'hideScript' => $hideScript,
-            'rows' => $rows,
-            'content' => Template::toString('dedimania-records.dedis', ['dedis' => $result]),
-            'action' => 'dedis.show',
+            'rows'       => $rows,
+            'content'    => Template::toString('dedimania-records.dedis', ['dedis' => $result]),
+            'action'     => 'dedis.show',
         ]);
     }
 
