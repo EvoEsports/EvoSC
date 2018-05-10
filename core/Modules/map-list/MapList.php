@@ -203,8 +203,6 @@ class MapList
 
         $mxDetails = $map->mx_details;
 
-        TemplateController::loadTemplates();
-
         $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking', 'mxDetails'));
 
         Template::show($player, 'components.modal', [
