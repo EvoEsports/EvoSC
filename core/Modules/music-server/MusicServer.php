@@ -11,6 +11,8 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use esc\Models\Song;
 use Illuminate\Support\Collection;
@@ -40,20 +42,18 @@ class MusicServer
         Hook::add('EndMatch', 'MusicServer::setNextSong');
         Hook::add('BeginMap', 'MusicServer::beginMap');
         Hook::add('PlayerConnect', 'MusicServer::displaySongWidget');
+
+        KeyController::createBind('X', 'MusicServer::reload');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::displaySongWidget($player);
     }
 
     public static function onConfigReload()
     {
-        self::displaySongWidget();
-    }
-
-    /**
-     * Show music widget on map start
-     * @param array ...$args
-     */
-    public static function beginMap(...$args)
-    {
-        self::$currentSong = self::$music->random();
         self::displaySongWidget();
     }
 
@@ -94,7 +94,7 @@ class MusicServer
             return;
         }
 
-        $song = self::$currentSong;
+        $song = self::$music->random();
 
         if ($song) {
             $lengthInSeconds = self::getTrackLengthInSeconds($song);
@@ -116,16 +116,16 @@ class MusicServer
     private static function showWidget(Player $player, $song, $lengthInSeconds)
     {
         $content = Template::toString('music-server.music', [
-            'song' => $song,
+            'song'            => $song,
             'lengthInSeconds' => $lengthInSeconds,
-            'config' => config('ui.music'),
-            'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
+            'config'          => config('ui.music'),
+            'hideSpeed'       => $player->user_settings->ui->hideSpeed ?? null
         ]);
 
         Template::show($player, 'components.icon-box', [
-            'id' => 'music-widget',
+            'id'      => 'music-widget',
             'content' => $content,
-            'config' => config('ui.music')
+            'config'  => config('ui.music')
         ]);
     }
 
@@ -136,21 +136,21 @@ class MusicServer
      */
     public static function displayMusicMenu(Player $player, $page = null)
     {
-        $perPage = 19;
+        $perPage    = 19;
         $songsCount = self::$music->count();
-        $songs = self::$music->sortBy('title')->forPage($page ?? 0, $perPage);
+        $songs      = self::$music->sortBy('title')->forPage($page ?? 0, $perPage);
 
         $queue = self::$songQueue->sortBy('time')->take(9);
 
-        $music = Template::toString('music-server.menu', ['songs' => $songs, 'queue' => $queue]);
+        $music      = Template::toString('music-server.menu', ['songs' => $songs, 'queue' => $queue]);
         $pagination = Template::toString('components.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
 
         Template::show($player, 'components.modal', [
-            'id' => '♫ Music',
-            'width' => 180,
-            'height' => 97,
-            'content' => $music,
-            'pagination' => $pagination,
+            'id'            => '♫ Music',
+            'width'         => 180,
+            'height'        => 97,
+            'content'       => $music,
+            'pagination'    => $pagination,
             'showAnimation' => isset($page) ? false : true
         ]);
     }
@@ -175,9 +175,9 @@ class MusicServer
 
         if ($song) {
             self::$songQueue->push([
-                'song' => $song,
+                'song'   => $song,
                 'wisher' => $callee,
-                'time' => time()
+                'time'   => time()
             ]);
 
             ChatController::messageAll($callee, ' added song ', secondary($song->title ?: ''), ' to the jukebox');
@@ -230,7 +230,7 @@ class MusicServer
 
         Log::info("Finished loading music.");
 
-        self::$music = $songs;
+        self::$music       = $songs;
         self::$currentSong = $songs->random();
     }
 
@@ -244,7 +244,7 @@ class MusicServer
         if (File::exists(cacheDir('music.json'))) {
             $musicJson = file_get_contents(cacheDir('music.json'));
         } else {
-            $res = RestClient::get(config('music.server'));
+            $res       = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
 
             $musicData = collect([

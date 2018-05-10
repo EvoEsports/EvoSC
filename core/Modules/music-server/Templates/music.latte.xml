@@ -1,16 +1,25 @@
-<label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
+<frame id="main-frame">
+    <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
+    <quad id="window" size="40 10" z-index="-5" ScriptEvents="1" />
+    <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
 
-<label pos="2 -1.5" z-index="1" size="36 3" text="{$song->title ?? $song->file}" halign="left" textcolor="fffe" textsize="1"/>
-<label pos="38 -6.8" z-index="1" size="16 3" text="{$song->artist}" halign="right" textcolor="fff9" textsize="0.45"/>
+    <frame id="content" pos="0 0">
+        <label pos="37 -2" z-index="1" size="35 3" text="{$song->title ?? $song->file}" halign="right" textcolor="fffe" textsize="1"/>
+        <label pos="37 -5.5" z-index="1" size="35 3" text="$t{$song->artist}" halign="right" textcolor="fffc" textsize="0.2"/>
 
-<quad pos="2 -5.2" size="36 0.4" bgcolor="0003" />
-<quad id="bar" pos="2 -5.2" size="0 0.4" bgcolor="{primary_color()|noescape}a" />
+        <frame pos="0 -8.5">
+            <quad pos="2 0" size="35 1" bgcolor="0003" />
+            <quad id="bar" pos="2 0" size="0 1" bgcolor="{primary_color()|noescape}a" />
 
-<quad pos="40 0" size="10 10" action="ms.menu.showpage" />
+            <frame pos="2 -4" z-index="10">
+                <label valign="center" pos="0 0" size="5 5" text="{$song->length}" textsize="1"/>
+                <label valign="center" id="play-stop" pos="7 0" text="" textsize="1" ScriptEvents="1" />
+                <label valign="center" id="skip" pos="11 0" text="" textsize="1" ScriptEvents="1" />
 
-<frame pos="20 -7" scale="0.4">
-    <label pos="-20 0" text="" action="music.next" />
-    <label id="passed" pos="-45 0" z-index="1" size="22 3" text="{$song->length}" textcolor="fffe" textsize="4"/>
+                <label valign="center" pos="15 0" z-index="1" size="21 4" text="{substr($song->title ?? $song->file, 0, 25)}" halign="left" textcolor="fffe" textsize="0.8"/>
+            </frame>
+        </frame>
+    </frame>
 </frame>
 
 <script><!--
@@ -20,7 +29,7 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
     AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
-    main() {
+main() {
     declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare player <=> InputPlayer;
     declare Boolean hidden = False;
@@ -33,32 +42,63 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
 
     declare music <=> Audio.CreateSound("{$song->url|noescape}", 1.0, True, False, False);
     declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
+    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlQuad);
+    declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
+    declare mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
     declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    declare timePassedLabel <=> (Page.MainFrame.GetFirstChild("passed") as CMlLabel);
-    declare Integer timeLeft = 0;
-    declare Integer timePassed = 0;
-    declare Integer playtimeMinutes = 0;
-    declare Integer playtimeSeconds = 0;
+    declare playStop <=> (Page.MainFrame.GetFirstChild("play-stop") as CMlLabel);
+    declare skip <=> (Page.MainFrame.GetFirstChild("skip") as CMlLabel);
     declare Text length = {$song->length};
-    declare Integer lengthInSeconds = {$lengthInSeconds};
-    declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
+    declare Boolean playing = True;
+    declare Real playPos = 0.0;
+
+    declare Text contentNormal = """<frame pos="0 0" />""";
+    declare Text contentHover = """<frame pos="0 6" />""";
+    declare Boolean hover = False;
+
     music.Play();
+
+    mainFrame.ClipWindowActive = True;
+    mainFrame.ClipWindowRelativePosition = <25.0,-5.3>;
+    mainFrame.ClipWindowSize = <50.0,7.0>;
 
     while (True) {
         yield;
 
-        timeLeft = (timeEnd/1000) - (CurrentTime/1000);
-        timePassed =  lengthInSeconds - timeLeft;
-        playtimeMinutes = MathLib::FloorInteger(timePassed/60.0);
-        playtimeSeconds = timePassed - (playtimeMinutes*60);
-        if(playtimeSeconds < 10){
-            timePassedLabel.SetText(playtimeMinutes ^ ":0" ^ playtimeSeconds ^ " / " ^ length);
-        }else{
-            timePassedLabel.SetText(playtimeMinutes ^ ":" ^ playtimeSeconds ^ " / " ^ length);
+        playPos = Audio.Sounds[0].PlayCursor / Audio.Sounds[0].PlayLength;
+        bar.Size = <(playPos * 35), 1.0>;
+
+        if(playPos > 99.5){
+            TriggerPageAction("music.next");
+            return;
         }
-        if(timePassed > 0){
-            bar.Size = <(timePassed / (lengthInSeconds * 1.0))*36.0,0.4>;
-            if(timePassed >= lengthInSeconds){
+
+        foreach(Event in PendingEvents){
+            //Hover effects on main
+            if(Event.Type == CMlScriptEvent::Type::MouseOver && (Event.Control == window || Event.Control == playStop || Event.Control == skip) && !hover){
+                anim(content, contentHover, 200);
+                hover = True;
+            }
+            if(Event.Type == CMlScriptEvent::Type::MouseOut && (Event.Control == window || Event.Control == playStop || Event.Control == skip) && hover){
+                anim(content, contentNormal, 200);
+                hover = False;
+            }
+
+            //play/stop button
+            if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == playStop){
+                if(playing){
+                    playing = False;
+                    playStop.SetText("");
+                    music.Stop();
+                }else{
+                    playing = True;
+                    playStop.SetText("");
+                    music.Play();
+                }
+            }
+
+            //skip button
+            if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == skip){
                 TriggerPageAction("music.next");
             }
         }
