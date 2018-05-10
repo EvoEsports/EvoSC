@@ -86,14 +86,16 @@ class MusicServer
      * Display the onscreen widget
      * @param Player|null $player
      */
-    public static function displaySongWidget(Player $player = null)
+    public static function displaySongWidget(Player $player = null, $song = null)
     {
-        if (!self::$music) {
-            Log::warning("Music not loaded, can not display widget.");
-            return;
-        }
+        if (!$song) {
+            if (!self::$music) {
+                Log::warning("Music not loaded, can not display widget.");
+                return;
+            }
 
-        $song = self::$music->random();
+            $song = self::$music->random();
+        }
 
         if ($song) {
             $lengthInSeconds = self::getTrackLengthInSeconds($song);
@@ -193,11 +195,7 @@ class MusicServer
     public static function playSong(Player $callee, $songId)
     {
         $song = self::$music->get($songId);
-
-        if ($song) {
-            self::$currentSong = $song;
-            self::displaySongWidget($callee);
-        }
+        self::displaySongWidget($callee, $song);
     }
 
     /**
