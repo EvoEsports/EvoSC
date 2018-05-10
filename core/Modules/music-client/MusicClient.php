@@ -91,7 +91,7 @@ class MusicClient
             $song = self::$music->get($songId);
         }
 
-        if (!$song) {
+        if (!isset($song)) {
             $song = self::$music->random();
         }
 
