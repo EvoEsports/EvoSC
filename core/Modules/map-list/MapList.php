@@ -2,7 +2,6 @@
 
 namespace esc\Modules\MapList;
 
-use esc\Classes\File;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
@@ -49,15 +48,15 @@ class MapList
         try {
             $records = [
                 'locals' => LocalRecord::whereIn('Map', $mapIds)
-                    ->wherePlayer($player->id)
-                    ->get()
-                    ->keyBy('Map')
-                    ->all(),
-                'dedis' => Dedi::whereIn('Map', $mapIds)
-                    ->wherePlayer($player->id)
-                    ->get()
-                    ->keyBy('Map')
-                    ->all(),
+                                       ->wherePlayer($player->id)
+                                       ->get()
+                                       ->keyBy('Map')
+                                       ->all(),
+                'dedis'  => Dedi::whereIn('Map', $mapIds)
+                                ->wherePlayer($player->id)
+                                ->get()
+                                ->keyBy('Map')
+                                ->all(),
             ];
         } catch (\Exception $e) {
             \esc\Classes\Log::error('Failed to load records for player ' . $player->Login . "\n" . $e->getTrace());
@@ -76,20 +75,20 @@ class MapList
             if ($filter == 'worst') {
 
                 $maps = self::getRecordsForPlayer($player)
-                    ->sortByDesc('Rank')
-                    ->pluck('map');
+                            ->sortByDesc('Rank')
+                            ->pluck('map');
 
             } elseif ($filter == 'best') {
 
                 $maps = self::getRecordsForPlayer($player)
-                    ->sortBy('Rank')
-                    ->pluck('map');
+                            ->sortBy('Rank')
+                            ->pluck('map');
 
             } elseif ($filter == 'nofinish') {
 
                 $records = self::getRecordsForPlayer($player)
-                    ->pluck('map.id')
-                    ->toArray();
+                               ->pluck('map.id')
+                               ->toArray();
 
                 $maps = maps()->whereNotIn('id', $records);
 
@@ -110,37 +109,37 @@ class MapList
         $pages = ceil(count($maps) / $perPage);
 
         $maps = $maps->forPage($page ?? 0, $perPage)
-            ->keyBy('id')
-            ->all();
+                     ->keyBy('id')
+                     ->all();
 
         $records = self::getRecordsForMapsAndPlayer($maps, $player);
 
         $queuedMaps = MapController::getQueue()
-            ->sortBy('timeRequested')
-            ->take($perPage);
+                                   ->sortBy('timeRequested')
+                                   ->take($perPage);
 
         $mapList = Template::toString('map-list.map-list', [
-            'maps' => $maps,
-            'player' => $player,
+            'maps'       => $maps,
+            'player'     => $player,
             'queuedMaps' => $queuedMaps,
-            'filter' => $filter,
-            'page' => $page,
-            'locals' => $records['locals'],
-            'dedis' => $records['dedis'],
+            'filter'     => $filter,
+            'page'       => $page,
+            'locals'     => $records['locals'],
+            'dedis'      => $records['dedis'],
         ]);
 
         $pagination = Template::toString('components.pagination', [
-            'pages' => $pages,
+            'pages'  => $pages,
             'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
-            'page' => $page,
+            'page'   => $page,
         ]);
 
         Template::show($player, 'components.modal', [
-            'id' => 'MapList',
-            'width' => 180,
-            'height' => 97,
-            'content' => $mapList,
-            'pagination' => $pagination,
+            'id'            => 'MapList',
+            'width'         => 180,
+            'height'        => 97,
+            'content'       => $mapList,
+            'pagination'    => $pagination,
             'showAnimation' => isset($page) ? false : true,
         ]);
     }
@@ -158,7 +157,7 @@ class MapList
     public static function queueMap(Player $player, $mapId)
     {
         $map = Map::where('id', intval($mapId))
-            ->first();
+                  ->first();
 
         if ($map) {
             MapController::queueMap($player, $map);
@@ -195,10 +194,12 @@ class MapList
         $map = Map::find($mapId);
 
         $locals = $map->locals()->orderBy('Score')->get()->take(10);
-        $dedis = $map->dedis()->orderBy('Score')->get()->take(10);
+        $dedis  = $map->dedis()->orderBy('Score')->get()->take(10);
 
         $localsRanking = Template::toString('components.ranking', ['ranks' => $locals]);
-        $dedisRanking = Template::toString('components.ranking', ['ranks' => $dedis]);
+        $dedisRanking  = Template::toString('components.ranking', ['ranks' => $dedis]);
+
+        MapController::loadMxDetails($map);
 
         $mxDetails = $map->mx_details;
 
@@ -207,12 +208,12 @@ class MapList
         $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking', 'mxDetails'));
 
         Template::show($player, 'components.modal', [
-            'id' => 'MapList',
-            'title' => 'Map details: ' . $map->Name,
-            'width' => 130,
-            'height' => 50,
-            'content' => $detailPage,
-            'onClose' => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
+            'id'            => 'MapList',
+            'title'         => 'Map details: ' . $map->Name,
+            'width'         => 130,
+            'height'        => 50,
+            'content'       => $detailPage,
+            'onClose'       => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
             'showAnimation' => true,
         ]);
     }
