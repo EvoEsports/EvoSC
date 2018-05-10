@@ -2,7 +2,6 @@
     <label pos="0 -12" z-index="0" size="79 5" text="Title"/>
     <label pos="55 -12" z-index="0" size="40 5" text="Artist"/>
     <label pos="85 -12" z-index="0" size="40 5" text="Album"/>
-    <label pos="165 -12" z-index="0" size="20 5" text="Next"/>
 
     {if count($songs)}
     {foreach $songs as $key => $song}
@@ -17,16 +16,4 @@
     <label pos="150 -{15 + $iterator->counter * 5}" z-index="0" size="18 4.8" textsize="1.8" valign="center" halign="center" text=" Recommend " textcolor="{primary_color()|noescape}a" action="ms.recommend,{$key}"/>
     {/foreach}
     {/if}
-
-    <frame pos="15 0">
-        {if count($queue)}
-        {foreach $queue as $item}
-        <label pos="149 -{13 + $iterator->counter * 8}" z-index="0" size="5 5" textsize="3" valign="center" text="{$iterator->counter}."/>
-        <label pos="154 -{12 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="1.4" valign="center" text="{$item['song']->title}"/>
-        <label pos="154 -{15 + $iterator->counter * 8}" z-index="0" size="38 5" textsize="0.8" valign="center" text="{$item['song']->artist}"/>
-        {/foreach}
-        {else}
-        <label pos="150 -20" z-index="0" size="34 5" textsize="1.8" valign="center" text="Random"/>
-        {/if}
-    </frame>
 </frame>

@@ -19,25 +19,19 @@ use Illuminate\Support\Collection;
 
 class MusicClient
 {
-    private static $startLoad;
     private static $music;
-    private static $currentSong;
-    private static $songQueue;
 
     public function __construct()
     {
         $this->readFiles();
-
-        self::$songQueue = new Collection();
 
         ManiaLinkEvent::add('ms.play', 'MusicClient::playSong');
         ManiaLinkEvent::add('ms.recommend', 'MusicClient::recommend');
         ManiaLinkEvent::add('music.next', 'MusicClient::nextSong');
         ManiaLinkEvent::add('ms.menu.showpage', 'MusicClient::displayMusicMenu');
 
-        ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Opens the music menu where you can queue music.');
+        ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Select music to play');
 
-        Hook::add('EndMatch', 'MusicClient::setNextSong');
         Hook::add('PlayerConnect', 'MusicClient::playerConnect');
     }
 
@@ -73,9 +67,7 @@ class MusicClient
         $songsCount = self::$music->count();
         $songs      = self::$music->sortBy('title')->forPage($page ?? 0, $perPage);
 
-        $queue = self::$songQueue->sortBy('time')->take(9);
-
-        $music      = Template::toString('music-client.menu', ['songs' => $songs, 'queue' => $queue]);
+        $music      = Template::toString('music-client.menu', ['songs' => $songs]);
         $pagination = Template::toString('components.pagination', ['pages' => ceil($songsCount / $perPage), 'action' => 'ms.menu.showpage', 'page' => $page]);
 
         Template::show($player, 'components.modal', [
@@ -131,7 +123,6 @@ class MusicClient
         Log::info("Finished loading music.");
 
         self::$music       = $songs;
-        self::$currentSong = $songs->random();
     }
 
     /**
