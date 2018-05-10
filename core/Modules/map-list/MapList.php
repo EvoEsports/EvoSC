@@ -7,6 +7,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
+use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
@@ -193,19 +194,23 @@ class MapList
     {
         $map = Map::find($mapId);
 
-        $locals = $map->locals()->orderBy('Score')->get()->take(5);
-        $dedis = $map->dedis()->orderBy('Score')->get()->take(5);
+        $locals = $map->locals()->orderBy('Score')->get()->take(9);
+        $dedis = $map->dedis()->orderBy('Score')->get()->take(9);
 
         $localsRanking = Template::toString('components.ranking', ['ranks' => $locals]);
         $dedisRanking = Template::toString('components.ranking', ['ranks' => $dedis]);
 
-        $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking'));
+        $mxDetails = $map->mx_details;
+
+        TemplateController::loadTemplates();
+
+        $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking', 'mxDetails'));
 
         Template::show($player, 'components.modal', [
             'id' => 'MapList',
             'title' => 'Map details: ' . $map->Name,
-            'width' => 120,
-            'height' => 50,
+            'width' => 130,
+            'height' => 42,
             'content' => $detailPage,
             'onClose' => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
             'showAnimation' => true,

@@ -1,15 +1,61 @@
-<label pos="0 0" size="79 5" textsize="1" text="by {$map->Author} ({$map->author->NickName ?? ''}$z) {formatScore($map->AuthorTime ?? 0)}"/>
+<frame pos="0 0">
+    <frame pos="0 0">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="AUTHOR" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$map->Author}" />
+    </frame>
 
-<label pos="114 0" halign="right" size="79 5" textsize="1" text="MX ID: {$map->MxId ?? '?'}"/>
+    <frame pos="0 -6">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="#MX ID" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="$l[https://tm.mania-exchange.com/tracks/{$mxDetails->TrackID}]{$mxDetails->TrackID} "/>
+    </frame>
 
-<label pos="0 -34" size="79 5" textsize="0.5" text="Last played: {isset($map->LastPlayed) ? $map->LastPlayed->diffForHumans() : 'never'}" textcolor="fffc"/>
+    <frame pos="0 -12">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="FIRST UPLOAD" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->UploadedAt|date}" />
+    </frame>
 
-<frame pos="0 -11" scale="0.8">
-    <label pos="3 3" text="DEDIMANIA TOP 5" textsize="1" />
+    {if $mxDetails->UpdatedAt != ''}
+    <frame pos="0 -18">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="UPDATED" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->UpdatedAt|date}" />
+    </frame>
+    {/if}
+</frame>
+
+<frame pos="21 0">
+    <frame pos="0 0">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="STYLE" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->StyleName}" />
+    </frame>
+
+    <frame pos="0 -6">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="MOOD" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->Mood}"/>
+    </frame>
+
+    <frame pos="0 -12">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="LAPS" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->Laps}" />
+    </frame>
+
+    <frame pos="0 -18">
+        <label pos="0 0" size="20 4" textsize="0.01" textcolor="bbbf" text="DIFFICULTY" />
+        <label pos="0 -2" size="20 4" textsize="1" textcolor="ffff" text="{$mxDetails->DifficultyName}" />
+    </frame>
+</frame>
+
+<label pos="0 -26" size="79 5" textsize="0.5" text="Last played: {isset($map->LastPlayed) ? $map->LastPlayed->diffForHumans() : 'never'}" textcolor="fffc"/>
+
+{if $mxDetails->Unreleased}
+<label pos="0 -28" size="50 4" textsize="0.5" textcolor="F00F" text="This track is not released" />
+{/if}
+
+<frame pos="41 -2" scale="0.7">
+    <label pos="3 3" text="DEDIMANIA RECORDS" textsize="1" />
     {$dedisRanking|noescape}
 </frame>
 
-<frame pos="50 -11" scale="0.8">
-    <label pos="3 3" text="LOCAL RECORDS TOP 5" textsize="1" />
+<frame pos="81 -2" scale="0.7">
+    <label pos="3 3" text="LOCAL RECORDS" textsize="1" />
     {$localsRanking|noescape}
 </frame>

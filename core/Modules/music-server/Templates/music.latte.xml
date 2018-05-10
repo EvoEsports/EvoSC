@@ -43,6 +43,7 @@ Void anim(CMlFrame frame, Text targetPos, Integer duration){
     declare Integer lengthInSeconds = {$lengthInSeconds};
     declare Integer timeEnd = CurrentTime + {$lengthInSeconds}000;
     music.Play();
+
     while (True) {
         yield;
 

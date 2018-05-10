@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
@@ -22,8 +23,17 @@ class TemplateController
         ChatCommand::add('reload-templates', 'TemplateController::loadTemplates', 'Reload templates', '//', 'user.ban');
 
         self::$templates = collect();
-        self::$latte = new Engine();
+        self::$latte     = new Engine();
+        self::addCustomFilters();
         self::loadTemplates();
+    }
+
+    private static function addCustomFilters()
+    {
+        self::$latte->addFilter('date', function ($str) {
+            $date = new Carbon($str);
+            return $date->format('Y-m-d');
+        });
     }
 
     private static function getTemplates(): Collection
@@ -47,24 +57,24 @@ class TemplateController
 
         //Get all template files in core directory
         self::$templates = File::getFilesRecursively(coreDir(), '/(\.latte\.xml|\.script\.txt)$/')
-            ->map(function (&$template) {
-                $templateObject = collect();
+                               ->map(function (&$template) {
+                                   $templateObject = collect();
 
-                //Get path relative to core directory
-                $relativePath = str_replace(coreDir('/'), '', $template);
+                                   //Get path relative to core directory
+                                   $relativePath = str_replace(coreDir('/'), '', $template);
 
-                //Generate template id from filename & path
-                $templateObject->id = self::getTemplateId($relativePath);
+                                   //Generate template id from filename & path
+                                   $templateObject->id = self::getTemplateId($relativePath);
 
-                //Load template contents
-                $templateObject->template = file_get_contents($template);
+                                   //Load template contents
+                                   $templateObject->template = file_get_contents($template);
 
-                //Assign as new value
-                return $templateObject;
-            });
+                                   //Assign as new value
+                                   return $templateObject;
+                               });
 
         //Set id <=> template map as loader for latte
-        $templateMap = self::$templates->pluck('template', 'id')->toArray();
+        $templateMap  = self::$templates->pluck('template', 'id')->toArray();
         $stringLoader = new StringLoader($templateMap);
         self::$latte->setLoader($stringLoader);
     }

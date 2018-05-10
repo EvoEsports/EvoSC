@@ -31,7 +31,7 @@ class MapController
     {
         self::loadMaps();
 
-        self::$queue = new Collection();
+        self::$queue    = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
 
         Hook::add('PlayerConnect', 'MapController::displayMapWidget');
@@ -60,13 +60,13 @@ class MapController
     public static function addTime(int $minutes = 10)
     {
         self::$addedTime = self::$addedTime + $minutes;
-        $totalNewTime = (config('server.roundTime', 7) + self::$addedTime) * 60;
+        $totalNewTime    = (config('server.roundTime', 7) + self::$addedTime) * 60;
         self::updateRoundtime($totalNewTime);
     }
 
     private static function updateRoundtime(int $timeInSeconds)
     {
-        $settings = \esc\Classes\Server::getModeScriptSettings();
+        $settings                = \esc\Classes\Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $timeInSeconds;
         \esc\Classes\Server::setModeScriptSettings($settings);
     }
@@ -82,7 +82,7 @@ class MapController
         $request = self::$queue->shift();
 
         if ($request) {
-            Log::info("Try set next map: " . $request->map->Name);
+            Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->FileName);
             ChatController::messageAll("\$n\$fff", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
@@ -100,6 +100,8 @@ class MapController
 
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
+
+        self::loadMxDetails($map);
 
         foreach (finishPlayers() as $player) {
             $player->setScore(0);
@@ -188,8 +190,8 @@ class MapController
             $map = self::$queue->first()->map;
         } else {
             $mapInfo = Server::getNextMapInfo();
-            $map = Map::where('UId', $mapInfo->uId)
-                ->first();
+            $map     = Map::where('UId', $mapInfo->uId)
+                          ->first();
         }
 
         return $map;
@@ -217,7 +219,7 @@ class MapController
         $currentMap = self::getCurrentMap();
 
         if (self::getQueue()
-            ->contains('map.UId', $currentMap->UId)) {
+                ->contains('map.UId', $currentMap->UId)) {
             ChatController::message($player, 'Map is already being replayed');
 
             return;
@@ -267,22 +269,22 @@ class MapController
 
         foreach ($maps as $mapInfo) {
             $map = Map::where('UId', $mapInfo->uId)
-                ->get()
-                ->first();
+                      ->get()
+                      ->first();
 
             if (!$map) {
                 //Map does not exist, create it
                 $map = Map::create([
-                    'UId' => $mapInfo->uId,
-                    'Name' => $mapInfo->name,
-                    'FileName' => $mapInfo->fileName,
-                    'Author' => $mapInfo->author,
-                    'AuthorTime' => $mapInfo->authorTime,
-                    'Mood' => $mapInfo->mood,
-                    'NbLaps' => $mapInfo->nbLaps,
+                    'UId'           => $mapInfo->uId,
+                    'Name'          => $mapInfo->name,
+                    'FileName'      => $mapInfo->fileName,
+                    'Author'        => $mapInfo->author,
+                    'AuthorTime'    => $mapInfo->authorTime,
+                    'Mood'          => $mapInfo->mood,
+                    'NbLaps'        => $mapInfo->nbLaps,
                     'NbCheckpoints' => $mapInfo->nbCheckpoints,
                     'Environnement' => $mapInfo->environnement,
-                    'Enabled' => true,
+                    'Enabled'       => true,
                 ]);
             }
 
@@ -295,11 +297,11 @@ class MapController
 
         //Disable maps
         Map::whereNotIn('UId', $enabledMapsUids)
-            ->update(['Enabled' => false]);
+           ->update(['Enabled' => false]);
 
         //Enable loaded maps
         Map::whereIn('UId', $enabledMapsUids)
-            ->update(['Enabled' => true]);
+           ->update(['Enabled' => true]);
     }
 
     /**
@@ -333,27 +335,29 @@ class MapController
         $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.map')]);
 
         Template::show($player, 'components.icon-box', [
-            'id' => 'map-widget',
-            'content' => $content,
-            'config' => config('ui.map'),
+            'id'         => 'map-widget',
+            'content'    => $content,
+            'config'     => config('ui.map'),
             'hideScript' => $hideScript
         ]);
     }
 
-    public static function getMapInformationFromMx(Map $map): array
+    public static function loadMxDetails(Map $map, bool $overwrite = false)
     {
-        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->MxId);
-        $i = json_decode($result->getBody()
-            ->getContents())[0];
+        if ($map->mx_details != null && !$overwrite) {
+            return;
+        }
 
-        var_dump($i);
+        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->UId);
 
-        $information = [
-            'UId' => $i->TrackUID,
-            'Name' => $i->GbxMapName,
-        ];
+        if ($result->getStatusCode() != 200) {
+            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());
+            return;
+        }
 
-        return $information;
+        $map->update(['mx_details' => $result->getBody()->getContents()]);
+
+        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->Name);
     }
 
     /**
@@ -374,8 +378,8 @@ class MapController
             }
 
             $map = Map::where('MxId', $mxId)
-                ->get()
-                ->first();
+                      ->get()
+                      ->first();
 
             if ($map) {
                 ChatController::messageAll($map, ' already exists');
@@ -404,12 +408,12 @@ class MapController
             File::put("$mapFolder/$fileName", $response->getBody());
 
             $map = Map::firstOrCreate([
-                'MxId' => $mxId,
+                'MxId'     => $mxId,
                 'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
             ]);
 
             $info = Server::getMapInfo($map->FileName)
-                ->toArray();
+                          ->toArray();
 
             if ($info) {
                 $map->update($info);
