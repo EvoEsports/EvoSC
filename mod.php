@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Connection;
 
+include 'core/import_uaseco.php';
+
 class RunEsc extends Command
 {
     protected function configure()
@@ -91,7 +93,7 @@ class Migrate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = json_decode(file_get_contents('config/db2.json'));
+        $config = json_decode(file_get_contents('config/db.json'));
 
         $capsule = new Capsule();
 
@@ -204,6 +206,7 @@ $application = new Application();
 $application->add(new RunEsc());
 $application->add(new MakeMigration());
 $application->add(new Migrate());
+$application->add(new ImportUaseco());
 
 try {
     $application->run();
