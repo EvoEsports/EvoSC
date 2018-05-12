@@ -68,13 +68,13 @@ class ImportUaseco extends Command
             'password'  => $source['password'],
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix'    => $source['table_prefix']
+            'prefix'    => $source['table_prefix'] ?? ''
         ]);
         $uaseco = $uasecoCapsule->getConnection();
 
 
-        //Import players
-        $output->writeln('Importing players');
+        //Import players & stats
+        $output->writeln('Importing players & stats');
         $uasecoPlayers = $uaseco->table('players')->get();
         $bar           = $this->getBar($output, $uasecoPlayers->count());
         foreach ($uasecoPlayers as $player) {
