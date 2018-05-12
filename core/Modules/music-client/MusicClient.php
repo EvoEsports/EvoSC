@@ -43,7 +43,7 @@ class MusicClient
 
     public static function playerConnect(Player $player)
     {
-        $content = Template::toString('music-client.music', [
+        $content = Template::toString('music-client.music2', [
             'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
         ]);
 
@@ -53,6 +53,7 @@ class MusicClient
             'config'  => config('ui.music')
         ]);
 
+        self::playSong($player);
         self::playSong($player);
     }
 
@@ -134,6 +135,8 @@ class MusicClient
 
         if (File::exists(cacheDir('music.json'))) {
             $musicJson = file_get_contents(cacheDir('music.json'));
+
+            $musicData = json_decode($musicJson);
         } else {
             $res       = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
@@ -147,8 +150,7 @@ class MusicClient
         }
 
         try {
-            $musicFiles = json_decode($musicJson);
-            MusicClient::setMusicFiles(collect($musicFiles));
+            MusicClient::setMusicFiles(collect(json_decode($musicData->data)));
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
         }

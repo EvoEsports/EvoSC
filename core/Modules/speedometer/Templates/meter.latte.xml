@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:speedometer" id="speedometer" version="3">
+    <frame pos="160 -82" z-index="100">
+        <label id="speed" pos="0 0" text="" halign="right" valign="bottom" textsize="8" textfont="Oswald" style="TextRaceChrono"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as MathLib
+
+    main(){
+        declare player <=> InputPlayer;
+        declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
+
+        while(True){
+            yield;
+
+            while(player == Null){
+                sleep(10);
+            }
+
+            speedLabel.Value = "" ^ MathLib::NearestInteger(player.Speed * 3.6);
+        }
+    }
+    --></script>
+</manialink>

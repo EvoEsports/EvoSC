@@ -3,8 +3,6 @@
     <quad id="window" size="40 10" z-index="-5" ScriptEvents="1" />
     <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
 
-    <audio id="audio" pos="0 1000" music="1" />
-
     <frame id="content" pos="0 0">
         <label id="title" pos="37 -2" z-index="1" size="35 3" text="" halign="right" textcolor="fffe" textsize="1"/>
         <label id="artist" pos="37 -5.5" z-index="1" size="35 3" text="" halign="right" textcolor="fffc" textsize="0.2"/>
@@ -46,7 +44,7 @@ main() {
     declare title2 <=> (Page.MainFrame.GetFirstChild("title2") as CMlLabel);
     declare artist <=> (Page.MainFrame.GetFirstChild("artist") as CMlLabel);
     declare length <=> (Page.MainFrame.GetFirstChild("length") as CMlLabel);
-    declare audio = (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
+    declare music = Audio.CreateSound("http://5.9.74.99/empty.ogg", 1.0, True, False, False);
     declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
     declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlQuad);
     declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
@@ -77,6 +75,7 @@ main() {
         declare Text Song_Title for InputPlayer = "-";
         declare Text Song_Artist for InputPlayer = "-";
         declare Text Song_Length for InputPlayer = "-";
+        declare Real UI_Hide_Speed for InputPlayer = 1.0;
 
         if(Song_Url == "-"){
             continue;
@@ -90,14 +89,14 @@ main() {
             artist.SetText(Song_Artist);
             length.SetText(Song_Length);
 
-            audio.Url = Song_Url;
-            sleep(300);
-            audio.Play();
+            Audio.DestroySound(music);
+            music = Audio.CreateSound(Song_Url, 1.0, True, True, False);
+            music.Play();
         }
 
-        log(Audio.Sounds);
+        songCounter = Audio.Sounds.count - 1;
 
-        //playPos = Audio.Sounds[songCounter].PlayCursor / Audio.Sounds[songCounter].PlayLength;
+        playPos = Audio.Sounds[songCounter].PlayCursor / Audio.Sounds[songCounter].PlayLength;
         bar.Size = <(playPos * 35), 1.0>;
 
         if(playPos > 0.99){
@@ -120,11 +119,11 @@ main() {
                 if(playing){
                     playing = False;
                     playStop.SetText("");
-                    audio.Stop();
+                    music.Stop();
                 }else{
                     playing = True;
                     playStop.SetText("");
-                    audio.Play();
+                    music.Play();
                 }
             }
 
@@ -134,30 +133,26 @@ main() {
             }
         }
 
-        if(player != Null){
-            declare Real UI_Hide_Speed for InputPlayer = 1.0;
+        speed = InputPlayer.Speed;
 
-            speed = player.Speed;
+        if(speed < 0){
+            speed = speed  * -1;
+        }
 
-            if(speed < 0){
-                speed = speed  * -1;
+        if(!isLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+            if(InputPlayer != Null && speed < UI_Hide_Speed && hidden){
+                anim(widget, visiblePos, duration);
+                hidden = False;
+            }
+        }else{
+            if(InputPlayer != Null && speed >= UI_Hide_Speed && !hidden){
+                anim(widget, hiddenPos, duration);
+                hidden = True;
             }
 
-            if(!isLapRace && player.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                if(player != Null && speed < UI_Hide_Speed && hidden){
-                    anim(widget, visiblePos, duration);
-                    hidden = False;
-                }
-            }else{
-                if(player != Null && speed >= UI_Hide_Speed && !hidden){
-                    anim(widget, hiddenPos, duration);
-                    hidden = True;
-                }
-
-                if(player != Null && speed < UI_Hide_Speed && hidden){
-                    anim(widget, visiblePos, duration);
-                    hidden = False;
-                }
+            if(InputPlayer != Null && speed < UI_Hide_Speed && hidden){
+                anim(widget, visiblePos, duration);
+                hidden = False;
             }
         }
     }
