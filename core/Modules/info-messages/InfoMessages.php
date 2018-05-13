@@ -57,8 +57,8 @@ class InfoMessages
         Template::show($player, 'components.modal', [
             'id'            => 'infomessages.settings',
             'title'         => 'Edit info-message',
-            'width'         => 180,
-            'height'        => 60,
+            'width'         => 124,
+            'height'        => 44,
             'content'       => $settings,
             'showAnimation' => true,
             'onClose'       => 'infomessages.show'
