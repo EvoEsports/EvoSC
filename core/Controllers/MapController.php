@@ -41,6 +41,7 @@ class MapController
         ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
         ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
         ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('res', 'MapController::forceReplay', 'Queue map for replay', '//', 'map.replay');
     }
 
     /**
