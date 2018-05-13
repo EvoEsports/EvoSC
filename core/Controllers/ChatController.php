@@ -34,14 +34,19 @@ $$: Writes a dollarsign
 
     private static $pattern;
     private static $chatCommands;
+    private static $mutedPlayers;
 
     public static function init()
     {
         self::$chatCommands = collect();
+        self::$mutedPlayers = collect();
 
         Server::call('ChatEnableManualRouting', [true, false]);
 
         HookController::add('PlayerChat', 'ChatController::playerChat');
+
+        ChatCommand::add('mute', 'ChatController::mute', 'Mutes a player by given nickname', '//', 'player.mute');
+        ChatCommand::add('unmute', 'ChatController::unmute', 'Unmute a player by given nickname', '//', 'player.mute');
     }
 
     public static function getChatCommands(): Collection
@@ -49,8 +54,43 @@ $$: Writes a dollarsign
         return self::$chatCommands;
     }
 
+    public static function mute(Player $player, $cmd, $nick)
+    {
+        $target = PlayerController::findPlayerByName($player, $nick);
+
+        if (!$target) {
+            //No target found
+            return;
+        }
+
+        $ply     = collect();
+        $ply->id = $target->id;
+
+        self::$mutedPlayers = self::$mutedPlayers->push($ply)->unique();
+    }
+
+    public static function unmute(Player $player, $cmd, $nick)
+    {
+        $target = PlayerController::findPlayerByName($player, $nick);
+
+        if (!$target) {
+            //No target found
+            return;
+        }
+
+        self::$mutedPlayers = self::$mutedPlayers->filter(function ($player) use ($target) {
+            return $player->id != $target->id;
+        });
+    }
+
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
+        if (preg_match('/^(\/|\/\/|##)/', $text)) {
+            //Catch invalid chat commands
+            ChatController::message($player, warning('Invalid chat command entered'));
+            return;
+        }
+
         if (preg_match(self::$pattern, $text, $matches)) {
             //chat command detected
             if (self::executeChatCommand($player, $text)) {
@@ -58,9 +98,8 @@ $$: Writes a dollarsign
             }
         }
 
-        if (preg_match('/^(\/|\/\/|##)/', $text)) {
-            //Catch invalid chat commands
-            ChatController::message($player, warning('Invalid chat command entered'));
+        if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
+            //Player is muted
             return;
         }
 
@@ -71,7 +110,7 @@ $$: Writes a dollarsign
 
         foreach ($parts as $part) {
             if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
-                $url = $matches[0];
+                $url  = $matches[0];
                 $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
                 $text = str_replace($url, $info, $text);
             }
@@ -99,7 +138,7 @@ $$: Writes a dollarsign
         if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
             foreach ($matches[1] as $match) {
                 //Replace all spaces in quotes to ;:;
-                $new = str_replace(' ', ';:;', $match);
+                $new  = str_replace(' ', ';:;', $match);
                 $text = str_replace("\"$match\"", $new, $text);
             }
         }
@@ -146,7 +185,7 @@ $$: Writes a dollarsign
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
         self::$chatCommands->push($chatCommand);
 
-        $triggers = [];
+        $triggers           = [];
         $chatCommandPattern = '/^(';
         foreach (self::$chatCommands as $cmd) {
             $escapedTrigger = '';
@@ -156,7 +195,7 @@ $$: Writes a dollarsign
             array_push($triggers, $escapedTrigger . $cmd->command);
         }
         $chatCommandPattern .= implode('|', $triggers) . ')/i';
-        self::$pattern = $chatCommandPattern;
+        self::$pattern      = $chatCommandPattern;
 
         Log::info("Chat command added: $trigger$command -> $callback", false);
     }
@@ -175,38 +214,38 @@ $$: Writes a dollarsign
             return;
         }
 
-        $icon = "";
+        $icon  = "";
         $color = config('color.primary');
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
-                    $icon = "";
+                    $icon  = "";
                     $color = config('color.secondary');
                     array_shift($parts);
                     break;
 
                 case 'info':
-                    $icon = "\$oi\$z";
+                    $icon  = "\$oi\$z";
                     $color = config('color.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
-                    $icon = "";
+                    $icon  = "";
                     $color = config('color.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
-                    $icon = "";
+                    $icon  = "";
                     $color = config('color.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
-                    $icon = "";
+                    $icon  = "";
                     $color = config('color.dedi');
                     array_shift($parts);
                     break;
