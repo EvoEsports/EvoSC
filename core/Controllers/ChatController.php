@@ -85,17 +85,17 @@ $$: Writes a dollarsign
 
     public static function playerChat(Player $player, $text, $isRegisteredCmd)
     {
-        if (preg_match('/^(\/|\/\/|##)/', $text)) {
-            //Catch invalid chat commands
-            ChatController::message($player, warning('Invalid chat command entered'));
-            return;
-        }
-
         if (preg_match(self::$pattern, $text, $matches)) {
             //chat command detected
             if (self::executeChatCommand($player, $text)) {
                 return;
             }
+        }
+
+        if (preg_match('/^(\/|\/\/|##)/', $text)) {
+            //Catch invalid chat commands
+            ChatController::message($player, warning('Invalid chat command entered'));
+            return;
         }
 
         if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
