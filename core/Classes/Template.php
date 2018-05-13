@@ -13,7 +13,7 @@ class Template
 
     public function __construct(string $index, string $template)
     {
-        $this->index = $index;
+        $this->index    = $index;
         $this->template = $template;
     }
 
@@ -58,5 +58,24 @@ class Template
         self::show($player, 'blank', [
             'id' => $index
         ]);
+    }
+
+    public static function getScript(string $templateId)
+    {
+        $template = TemplateController::getTemplates()->where('id', $templateId)->first();
+
+        if (!$template) {
+            //Unknown template
+            return null;
+        }
+
+        if ($scriptStartPos = strpos($template->template, '<script>')) {
+            $script       = substr($template->template, $scriptStartPos);
+            $scriptEndPos = strpos($script, '</script>') - 8;
+            return substr($script, 8, $scriptEndPos);
+        }
+
+        //template has no scripts
+        return null;
     }
 }

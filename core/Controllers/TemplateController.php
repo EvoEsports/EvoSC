@@ -38,9 +38,9 @@ class TemplateController
         });
     }
 
-    private static function getTemplates(): Collection
+    public static function getTemplates(): Collection
     {
-        return self::getTemplates();
+        return self::$templates;
     }
 
     public static function getTemplate(string $index, $values): string

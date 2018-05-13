@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Script;
 use esc\Classes\Template;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
@@ -26,6 +27,9 @@ class InfoMessages
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
+
+        Script::getScriptParts('components.modal');
+
         self::showSettings($player, null);
     }
 
