@@ -141,10 +141,9 @@ class MusicClient
             $res       = RestClient::get(config('music.server'));
             $musicJson = $res->getBody()->getContents();
 
-            $musicData = collect([
-                'date' => Carbon::now(),
-                'data' => $musicJson
-            ]);
+            $musicData = collect();
+            $musicJson->date = Carbon::now();
+            $musicJson->data = $musicJson;
 
             File::put(cacheDir('music.json'), $musicData->toJson());
         }
