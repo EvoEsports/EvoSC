@@ -133,23 +133,11 @@ class MusicClient
     {
         Log::info("Loading music...");
 
-        if (File::exists(cacheDir('music.json'))) {
-            $musicJson = file_get_contents(cacheDir('music.json'));
-
-            $musicData = json_decode($musicJson);
-        } else {
-            $res       = RestClient::get(config('music.server'));
-            $musicJson = $res->getBody()->getContents();
-
-            $musicData = collect();
-            $musicJson->date = Carbon::now();
-            $musicJson->data = $musicJson;
-
-            File::put(cacheDir('music.json'), $musicData->toJson());
-        }
+        $res       = RestClient::get(config('music.server'));
+        $musicJson = $res->getBody()->getContents();
 
         try {
-            MusicClient::setMusicFiles(collect(json_decode($musicData->data)));
+            MusicClient::setMusicFiles(collect(json_decode($musicJson)));
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music, make sure you have the url and token set', true);
         }
