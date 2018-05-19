@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-widget" id="music-widget" version="3">
-    <frame pos="0 0" data-pos="{config('ui.music.pos.visible')}" data-poshidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}" id="widget">
+    <frame pos="0 0" data-pos-visible="{config('ui.music.pos.visible')}" data-pos-hidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}" id="widget">
         <quad pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}"/>
         <quad pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
@@ -19,6 +19,7 @@
 
     <script><!--
 #Include "MathLib" as ML
+#Include "TextLib" as TL
 
 //struct song: Url, Title, Artist, Length
 
@@ -48,14 +49,37 @@ Void setSong(Text[] song){
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song[2]);
 }
 
+Void animate(CMlFrame frame, Text target){
+    AnimMgr.Add(frame, target, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+}
+
+Real getPlayerSpeed(){
+    declare Real speed = 0.0;
+
+    if(InputPlayer != Null){
+        speed = InputPlayer.Speed * 3.6;
+
+        if(speed < 0){
+            return -speed;
+        }
+    }
+
+    return speed;
+}
+
 main() {
-    music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    declare widget <=> (Page.MainFrame.GetFirstChild("music") as CMlControl);
     Songs = {esc\Modules\MusicClient\MusicClient::musicToManiaScriptArray()|noescape};
+    music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare Text visible = "<frame pos='" ^ widget.DataAttributeGet("pos-visible") ^ "' />";
+    declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
+    declare Boolean isHidden = False;
 
     setSong(getRandomSong());
 
-    widget.RelativePosition_V3 = <105.0,15.0>;
+    log(visible);
+    log(hidden);
+    animate(widget, visible);
 
     while(True){
         yield;
@@ -63,7 +87,15 @@ main() {
         if(InputPlayer != Null){
             declare hideSpeed for InputPlayer = 1.0;
 
+            if(getPlayerSpeed() >= hideSpeed && !isHidden){
+                isHidden = True;
+                animate(widget, hidden);
+            }
 
+            if(getPlayerSpeed() < hideSpeed && isHidden){
+                isHidden = False;
+                animate(widget, visible);
+            }
         }
     }
 }
