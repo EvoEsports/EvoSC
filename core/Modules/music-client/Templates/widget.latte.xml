@@ -24,7 +24,7 @@
         <quad pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1" />
     </framemodel>
 
-    <frame id="music-container" pos="-80 45" hidden="1">
+    <frame id="music-container" pos="-80 45" hidden="0">
         <frame id="list">
             <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
             <quad pos="0 -2.5" size="160 90" bgcolor="{background_color()|noescape}" opacity="0.5" />
@@ -42,12 +42,16 @@
             </frame>
 
             <frame pos="2 -89" z-index="2">
-                <label pos="0 0" text="Page" textsize="1"  valign="center"/>
-                <quad id="pagination-box" pos="10 0" size="3.5 3.5" bgcolor="{primary_color()|noescape}" valign="center" halign="center" z-index="-1" />
+                <quad id="pagination-box" pos="2 0" size="3.5 3.5" bgcolor="{primary_color()|noescape}" valign="center" halign="center" z-index="-1" />
 
                 {for $i = 0; $i < ceil(esc\Modules\MusicClient\MusicClient::getSongsCount() / 20); $i++}
-                <label class="page" pos="{$i * 4 + 10} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
+                <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
                 {/for}
+            </frame>
+
+            <frame pos="118 -89" z-index="3">
+                <label pos="-1 0" text="Search:" textsize="1" halign="right" valign="center"/>
+                <entry id="search" pos="0 0" size="40 3" default="" textsize="1" valign="center" ScriptEvents="1" />
             </frame>
         </frame>
     </frame>
@@ -102,16 +106,29 @@ Real getPlayerSpeed(){
     return speed;
 }
 
-Void populateList(){
+Void populateList(Text[][] songs){
     declare songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
+    declare lastKey = 0;
 
-    foreach(key => song in Songs){
+    foreach(key => song in songs){
         declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[key] as CMlFrame);
 
         (frame.Controls[0] as CMlLabel).SetText(song[1]);
         (frame.Controls[1] as CMlLabel).SetText(song[2]);
         (frame.Controls[2] as CMlLabel).SetText(song[3]);
         (frame.Controls[3] as CMlControl).DataAttributeSet("song-id", TL::ToText(key));
+
+        lastKey = key;
+    }
+
+    if(lastKey + 1 < Songs.count){
+        for(i, lastKey + 1, Songs.count - 1){
+            declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[i] as CMlFrame);
+
+            (frame.Controls[0] as CMlLabel).SetText("");
+            (frame.Controls[1] as CMlLabel).SetText("");
+            (frame.Controls[2] as CMlLabel).SetText("");
+        }
     }
 
     songList.ClipWindowActive = True;
@@ -131,6 +148,33 @@ Text getContainerTarget(Integer page){
     return target;
 }
 
+Void searchSong(Text search){
+    if(TL::Length(search) == 0){
+        populateList(Songs);
+        return;
+    }
+
+    declare Text[][] songsFound;
+
+    declare searchStringLength = TL::Length(search);
+
+    foreach(song in Songs){
+        declare songTitleLength = TL::Length(song[4]);
+
+        for(i, 0, songTitleLength - searchStringLength){
+            if(TL::SubString(song[4], i, searchStringLength) == search){
+                songsFound.add(song);
+                continue;
+            }
+        }
+    }
+
+    populateList(songsFound);
+
+    AnimMgr.Add((Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame), getContainerTarget(0), 200, CAnimManager::EAnimManagerEasing::CubicInOut);
+    AnimMgr.Add(paginationBox, "<quad pos='2 0' />", 200, CAnimManager::EAnimManagerEasing::CubicInOut);
+}
+
 main() {
     Songs = {esc\Modules\MusicClient\MusicClient::musicToManiaScriptArray()|noescape};
     music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
@@ -140,6 +184,7 @@ main() {
     declare CMlFrame songListContainer <=> (Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame);
     declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
     declare CMlQuad show <=> (Page.MainFrame.GetFirstChild("show") as CMlQuad);
+    declare CMlEntry search <=> (Page.MainFrame.GetFirstChild("search") as CMlEntry);
     declare CMlQuad background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
     declare CMlFrame musicContainer <=> (Page.MainFrame.GetFirstChild("music-container") as CMlFrame);
     declare Text visible = "<frame pos='" ^ widget.DataAttributeGet("pos-visible") ^ "' />";
@@ -147,8 +192,10 @@ main() {
     declare Boolean isHidden = False;
     declare Vec3 startPos;
 
-    populateList();
+    populateList(Songs);
     AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
+
+    sleep(100);
 
     while(True){
         yield;
@@ -178,6 +225,11 @@ main() {
                     continue;
                 }
 
+                if(event.Control == search){
+                    searchSong(search.Value);
+                    continue;
+                }
+
                 if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseClick){
                     declare songId = TL::ToInteger(event.Control.DataAttributeGet("song-id"));
                     setSong(getSong(songId));
@@ -197,7 +249,6 @@ main() {
                 if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
                     declare page = TL::ToInteger((event.Control as CMlLabel).Value) - 1;
                     AnimMgr.Add(songListContainer, getContainerTarget(page), 400, CAnimManager::EAnimManagerEasing::CubicInOut);
-                    log("<quad pos='" ^ event.Control.RelativePosition_V3 ^ "' />");
                     AnimMgr.Add(paginationBox, "<quad pos='" ^ event.Control.RelativePosition_V3[0] ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
                     continue;
                 }

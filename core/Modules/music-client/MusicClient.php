@@ -58,7 +58,8 @@ class MusicClient
     public static function musicToManiaScriptArray()
     {
         $music = self::$music->map(function ($song) {
-            return sprintf('["%s","%s","%s","%s"]', $song->url, $song->title, $song->artist, $song->length);
+            $search = strtolower("$song->title$song->artist");
+            return sprintf('["%s","%s","%s","%s","%s"]', $song->url, $song->title, $song->artist, $song->length, $search);
         })->implode(',');
 
         return sprintf('[%s]', $music);
