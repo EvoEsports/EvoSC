@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:music-widget" id="music-widget" version="3">
+    <frame pos="0 0" data-pos="{config('ui.music.pos.visible')}" data-poshidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}" id="widget">
+        <quad pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}"/>
+        <quad pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}"/>
+        <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
+        <audio id="music" play="1" music="1" hidden="1" />
+
+        <frame id="main-frame" z-index="1">
+            <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
+            <quad id="window" size="40 10" z-index="-5" ScriptEvents="1" />
+
+            <frame id="content" pos="0 0">
+                <label id="title" pos="38 -2.5" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3"/>
+                <label id="artist" pos="38 -6.5" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4"/>
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+#Include "MathLib" as ML
+
+//struct song: Url, Title, Artist, Length
+
+declare Text[][] Songs;
+declare CMlMediaPlayer music;
+
+Text[] getSong(Integer songId){
+    if(Songs.count > 0 && songId < Songs.count){
+        return Songs[songId];
+    }
+
+    return ["unknown","unknown","unknown","unknown"];
+}
+
+Text[] getRandomSong(){
+    if(Songs.count > 0){
+        return Songs[ML::Rand(0, Songs.count)];
+    }
+
+    return ["unknown","unknown","unknown","unknown"];
+}
+
+Void setSong(Text[] song){
+    music.Url = song[0];
+
+    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song[1]);
+    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song[2]);
+}
+
+main() {
+    music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    declare widget <=> (Page.MainFrame.GetFirstChild("music") as CMlControl);
+    Songs = {esc\Modules\MusicClient\MusicClient::musicToManiaScriptArray()|noescape};
+
+    setSong(getRandomSong());
+
+    widget.RelativePosition_V3 = <105.0,15.0>;
+
+    while(True){
+        yield;
+
+        if(InputPlayer != Null){
+            declare hideSpeed for InputPlayer = 1.0;
+
+
+        }
+    }
+}
+    --></script>
+</manialink>

@@ -40,6 +40,8 @@ class Template
             $values = [];
         }
 
+        $values['localPlayer'] = $player;
+
         $xml = TemplateController::getTemplate($index, $values);
         Server::sendDisplayManialinkPage($player->Login, $xml);
     }

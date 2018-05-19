@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\Template;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
@@ -33,8 +34,10 @@ class TemplateController
         self::$latte->addFilter('date', function ($str) {
             $date = new Carbon($str);
             return $date->format('Y-m-d');
+
         })->addFilter('score', function ($str) {
             return formatScore($str);
+
         });
     }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:song.set" id="song.set" version="3">
+<manialink name="ESC:music-widget.set-song" id="music-widget.set-song" version="3">
     <script>
         <!--
         main(){
@@ -7,15 +7,14 @@
                 sleep(10);
             }
 
-            declare Text Song_Url for InputPlayer;
-            declare Text Song_Title for InputPlayer;
-            declare Text Song_Artist for InputPlayer;
-            declare Text Song_Length for InputPlayer;
+            declare Text[] Music for InputPlayer;
 
-            Song_Url = "{$song->url|noescape}";
-            Song_Title = {$song->title};
-            Song_Artist = {$song->artist};
-            Song_Length = {$song->length};
+            Music.add("{$song->url|noescape}");
+            Music.add({$song->title});
+            Music.add({$song->artist});
+            Music.add({$song->length});
+
+            log(Music);
         }
         -->
     </script>

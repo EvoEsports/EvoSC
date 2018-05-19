@@ -2,19 +2,15 @@
 
 namespace esc\Modules\MusicClient;
 
-use Carbon\Carbon;
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\RestClient;
-use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
-use esc\Models\Song;
 use Illuminate\Support\Collection;
 
 class MusicClient
@@ -33,6 +29,8 @@ class MusicClient
         ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Select music to play');
 
         Hook::add('PlayerConnect', 'MusicClient::playerConnect');
+
+        KeyController::createBind('Y', 'MusicClient::playerConnect');
     }
 
     public static function recommend(Player $player, $songId)
@@ -43,18 +41,22 @@ class MusicClient
 
     public static function playerConnect(Player $player)
     {
-        $content = Template::toString('music-client.music2', [
-            'hideSpeed' => $player->user_settings->ui->hideSpeed ?? null
-        ]);
+        TemplateController::loadTemplates();
+        Template::show($player, 'music-client.widget');
+    }
 
-        Template::show($player, 'components.icon-box', [
-            'id'      => 'music-widget',
-            'content' => $content,
-            'config'  => config('ui.music')
-        ]);
+    public static function getRandomSong()
+    {
+        return self::$music->random();
+    }
 
-        self::playSong($player);
-        self::playSong($player);
+    public static function musicToManiaScriptArray()
+    {
+        $music = self::$music->map(function ($song) {
+            return sprintf('["%s","%s","%s","%s"]', $song->url, $song->title, $song->artist, $song->length);
+        })->implode(',');
+
+        return sprintf('[%s]', $music);
     }
 
     /**
@@ -123,7 +125,7 @@ class MusicClient
 
         Log::info("Finished loading music.");
 
-        self::$music       = $songs;
+        self::$music = $songs;
     }
 
     /**
