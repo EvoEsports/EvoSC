@@ -18,16 +18,17 @@
     </frame>
 
     <framemodel id="Song">
-        <label pos="0 0" size="58 3" text="Title" textsize="1" />
-        <label pos="60 0" size="38 3" text="Artist" textsize="1" />
-        <label pos="100 0" size="8 3" text="Length" textsize="1" />
-        <quad pos="0 0" size="140 2.5" bgcolor="fff0" ScriptEvents="1" />
+        <label pos="0 0" size="78 3" text="Title" textsize="1" textcolor="ffff" />
+        <label pos="80 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" />
+        <label pos="150 0" size="8 3" text="Length" textsize="1" textcolor="ffff" />
+        <quad pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1" />
     </framemodel>
 
     <frame id="music-container" pos="-80 45" hidden="1">
         <frame id="list">
             <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
-            <quad pos="0 -2.5" size="160 90" bgcolor="{background_color()|noescape}" />
+            <quad pos="0 -2.5" size="160 90" bgcolor="{background_color()|noescape}" opacity="0.5" />
+            <quad pos="0 -2.5" size="160 90" style="Bgs1" substyle="BgDialogBlur" />
             <label pos="1.5 0.5" size="20 3" text="Music" textsize="1.2" z-index="2" textcolor="ffff" />
             <quad id="close" pos="157 0.5" size="4 4" halign="center" ScriptEvents="1" />
             <label pos="157 0.5" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" textcolor="ffff" />
@@ -35,7 +36,7 @@
             <frame id="song-list" z-index="5" pos="2 -6">
                 <frame id="song-list-container" pos="0 0">
                     {for $i = 0; $i < esc\Modules\MusicClient\MusicClient::getSongsCount(); $i++}
-                    <frameinstance modelid="Song" pos="0 {$i * -4}" />
+                    <frameinstance modelid="Song" class="row" pos="0 {$i * -4}" ScriptEvents="1" />
                     {/for}
                 </frame>
             </frame>
@@ -122,6 +123,12 @@ Void populateList(){
     songList.ClipWindowSize = <160.0, 79.5>;
 }
 
+Void setRowColor(CMlControl frame, Text color){
+    AnimMgr.Add(frame.Parent.Controls[0], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
+    AnimMgr.Add(frame.Parent.Controls[1], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
+    AnimMgr.Add(frame.Parent.Controls[2], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
+}
+
 Text getContainerTarget(Integer page){
     declare pos = page * 80.0;
     declare target = "<frame pos='0 " ^ pos ^ "' />";
@@ -175,6 +182,16 @@ main() {
                 if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseClick){
                     declare songId = TL::ToInteger(event.Control.DataAttributeGet("song-id"));
                     setSong(getSong(songId));
+                    continue;
+                }
+
+                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseOver){
+                    setRowColor(event.Control, {primary_color()});
+                    continue;
+                }
+
+                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseOut){
+                    setRowColor(event.Control, "fff");
                     continue;
                 }
 
