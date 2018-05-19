@@ -1,18 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-widget" id="music-widget" version="3">
-    <frame pos="0 0" data-pos-visible="{config('ui.music.pos.visible')}" data-pos-hidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}" id="widget">
+    <frame id="widget" data-pos-visible="{config('ui.music.pos.visible')}" data-pos-hidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}">
         <quad pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}"/>
         <quad pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
-        <audio id="music" play="1" music="1" hidden="1" />
+        <audio id="music" music="1" hidden="1" />
 
         <frame id="main-frame" z-index="1">
-            <quad pos="40 0" size="10 10" action="ms.menu.showpage" />
+            <quad id="show" pos="0 0" size="50 10" ScriptEvents="1" />
             <quad id="window" size="40 10" z-index="-5" ScriptEvents="1" />
 
             <frame id="content" pos="0 0">
                 <label id="title" pos="38 -2.5" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3"/>
                 <label id="artist" pos="38 -6.5" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4"/>
+            </frame>
+        </frame>
+    </frame>
+
+    <framemodel id="Song">
+        <label pos="0 0" size="58 3" text="Title" textsize="1" />
+        <label pos="60 0" size="38 3" text="Artist" textsize="1" />
+        <label pos="100 0" size="8 3" text="Length" textsize="1" />
+        <quad pos="0 0" size="140 2.5" bgcolor="fff0" ScriptEvents="1" />
+    </framemodel>
+
+    <frame id="music-container" pos="-80 45" hidden="1">
+        <frame id="list">
+            <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
+            <quad pos="0 -2.5" size="160 90" bgcolor="{background_color()|noescape}" />
+            <label pos="1.5 0.5" size="20 3" text="Music" textsize="1.2" z-index="2" textcolor="ffff" />
+            <quad id="close" pos="157 0.5" size="4 4" halign="center" ScriptEvents="1" />
+            <label pos="157 0.5" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" textcolor="ffff" />
+
+            <frame id="song-list" z-index="5" pos="2 -6">
+                <frame id="song-list-container" pos="0 0">
+                    {for $i = 0; $i < esc\Modules\MusicClient\MusicClient::getSongsCount(); $i++}
+                    <frameinstance modelid="Song" pos="0 {$i * -4}" />
+                    {/for}
+                </frame>
+            </frame>
+
+            <frame pos="2 -89" z-index="2">
+                <label pos="0 0" text="Page" textsize="1"  valign="center"/>
+                <quad id="pagination-box" pos="10 0" size="3.5 3.5" bgcolor="{primary_color()|noescape}" valign="center" halign="center" z-index="-1" />
+
+                {for $i = 0; $i < ceil(esc\Modules\MusicClient\MusicClient::getSongsCount() / 20); $i++}
+                <label class="page" pos="{$i * 4 + 10} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
+                {/for}
             </frame>
         </frame>
     </frame>
@@ -25,6 +59,7 @@
 
 declare Text[][] Songs;
 declare CMlMediaPlayer music;
+declare CMlQuad paginationBox;
 
 Text[] getSong(Integer songId){
     if(Songs.count > 0 && songId < Songs.count){
@@ -43,7 +78,10 @@ Text[] getRandomSong(){
 }
 
 Void setSong(Text[] song){
+    music.Stop();
     music.Url = song[0];
+    sleep(5);
+    music.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song[1]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song[2]);
@@ -67,25 +105,57 @@ Real getPlayerSpeed(){
     return speed;
 }
 
+Void populateList(){
+    declare songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
+
+    foreach(key => song in Songs){
+        declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[key] as CMlFrame);
+
+        (frame.Controls[0] as CMlLabel).SetText(song[1]);
+        (frame.Controls[1] as CMlLabel).SetText(song[2]);
+        (frame.Controls[2] as CMlLabel).SetText(song[3]);
+        (frame.Controls[3] as CMlControl).DataAttributeSet("song-id", TL::ToText(key));
+    }
+
+    songList.ClipWindowActive = True;
+    songList.ClipWindowRelativePosition = <80.0, -40.0>;
+    songList.ClipWindowSize = <160.0, 79.5>;
+}
+
+Text getContainerTarget(Integer page){
+    declare pos = page * 80.0;
+    declare target = "<frame pos='0 " ^ pos ^ "' />";
+    return target;
+}
+
 main() {
     Songs = {esc\Modules\MusicClient\MusicClient::musicToManiaScriptArray()|noescape};
     music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare CMlFrame songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
+    declare CMlFrame songListContainer <=> (Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame);
+    declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
+    declare CMlQuad show <=> (Page.MainFrame.GetFirstChild("show") as CMlQuad);
+    declare CMlFrame musicContainer <=> (Page.MainFrame.GetFirstChild("music-container") as CMlFrame);
     declare Text visible = "<frame pos='" ^ widget.DataAttributeGet("pos-visible") ^ "' />";
     declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
     declare Boolean isHidden = False;
+    declare Vec3 startPos;
 
-    setSong(getRandomSong());
-
-    log(visible);
-    log(hidden);
-    animate(widget, visible);
+    populateList();
+    AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
 
     while(True){
         yield;
 
         if(InputPlayer != Null){
             declare hideSpeed for InputPlayer = 1.0;
+
+            if(startPos != MapStartLinePos){
+                startPos = MapStartLinePos;
+                setSong(getRandomSong());
+            }
 
             if(getPlayerSpeed() >= hideSpeed && !isHidden){
                 isHidden = True;
@@ -95,6 +165,36 @@ main() {
             if(getPlayerSpeed() < hideSpeed && isHidden){
                 isHidden = False;
                 animate(widget, visible);
+            }
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null){
+                    continue;
+                }
+
+                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare songId = TL::ToInteger(event.Control.DataAttributeGet("song-id"));
+                    setSong(getSong(songId));
+                    continue;
+                }
+
+                if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare page = TL::ToInteger((event.Control as CMlLabel).Value) - 1;
+                    AnimMgr.Add(songListContainer, getContainerTarget(page), 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+                    log("<quad pos='" ^ event.Control.RelativePosition_V3 ^ "' />");
+                    AnimMgr.Add(paginationBox, "<quad pos='" ^ event.Control.RelativePosition_V3[0] ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+                    continue;
+                }
+
+                if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
+                    musicContainer.Hide();
+                    continue;
+                }
+
+                if(event.Control == show && event.Type == CMlScriptEvent::Type::MouseClick){
+                    musicContainer.Show();
+                    continue;
+                }
             }
         }
     }

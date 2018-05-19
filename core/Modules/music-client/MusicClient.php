@@ -50,6 +50,11 @@ class MusicClient
         return self::$music->random();
     }
 
+    public static function getSongsCount()
+    {
+        return self::$music->count();
+    }
+
     public static function musicToManiaScriptArray()
     {
         $music = self::$music->map(function ($song) {
