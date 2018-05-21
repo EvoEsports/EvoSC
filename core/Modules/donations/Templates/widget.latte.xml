@@ -19,6 +19,9 @@
         }
 
         main(){
+            declare Text visible = "<frame pos='{config('donations.pos.visible')|noescape}' />";
+            declare Text hidden = "<frame pos='{config('donations.pos.hidden')|noescape}' />";
+
             declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg-quad") as CMlQuad);
             declare barQuad <=> (Page.MainFrame.GetFirstChild("bar-quad") as CMlQuad);
             declare contentFrame <=> (Page.MainFrame.GetFirstChild("content-frame") as CMlFrame);
@@ -50,6 +53,33 @@
                     }
                 }
 
+                if(InputPlayer != Null){
+                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
+
+                    speed = InputPlayer.Speed;
+
+                    if(speed < 0){
+                        speed = speed  * -1;
+                    }
+
+                    if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                        if(speed < UI_Hide_Speed && hidden){
+                            AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                            hidden = False;
+                        }
+                    }else{
+                        if(speed >= UI_Hide_Speed && !hidden){
+                            AnimMgr.Add(mainFrame, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                            hidden = True;
+                        }
+
+                        if(speed < UI_Hide_Speed && hidden){
+                            AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                            hidden = False;
+                        }
+                    }
+                }
+
                 if(barVisible){
                     declare posX = MouseX - xOffset;
 
@@ -59,8 +89,10 @@
                         barQuad.Size = <posCoef * 50, 5.0>;
                         amount = MathLib::NearestInteger((posCoef * 100)*(posCoef * 100));
 
-                        if(amount < 1){
-                            amount = 1;
+                        amount = (amount / 10) * 10;
+
+                        if(amount < 10){
+                            amount = 10;
                         }
 
                         if(amount > 1){
