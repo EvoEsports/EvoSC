@@ -67,7 +67,7 @@ declare CMlMediaPlayer music;
 declare CMlQuad paginationBox;
 
 Text[] getSong(Integer songId){
-    if(Songs.count > 0 && songId < Songs.count){
+    if(Songs.count > 0 && songId < Songs.count - 1){
         return Songs[songId];
     }
 
@@ -76,7 +76,7 @@ Text[] getSong(Integer songId){
 
 Text[] getRandomSong(){
     if(Songs.count > 0){
-        return Songs[ML::Rand(0, Songs.count)];
+        return Songs[ML::Rand(0, Songs.count - 1)];
     }
 
     return ["unknown","unknown","unknown","unknown"];
