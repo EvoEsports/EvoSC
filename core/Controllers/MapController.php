@@ -468,4 +468,12 @@ class MapController
     {
         return self::$timeLimit;
     }
+
+    /**
+     * @return int
+     */
+    public static function getAddedTime(): int
+    {
+        return self::$addedTime;
+    }
 }

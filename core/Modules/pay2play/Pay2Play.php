@@ -44,7 +44,11 @@ class Pay2Play
     public static function addTime(Player $player)
     {
         if (config('pay2play.addtime.enabled')) {
-            PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', 'Pay2Play::addTimePaySuccess');
+            if (MapController::getAddedTime() + 10 <= config('server.max-playtime') || $player->group->hasAccess('time')) {
+                PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', 'Pay2Play::addTimePaySuccess');
+            }else{
+                ChatController::message($player, '_warning', 'Maximum playtime for this round reached');
+            }
         }
     }
 
