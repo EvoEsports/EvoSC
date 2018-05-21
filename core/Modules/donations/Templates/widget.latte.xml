@@ -55,8 +55,7 @@
 
                 if(InputPlayer != Null){
                     declare Real UI_Hide_Speed for InputPlayer = 1.0;
-
-                    speed = InputPlayer.Speed;
+                    declare Real speed = InputPlayer.Speed;
 
                     if(speed < 0){
                         speed = speed  * -1;
