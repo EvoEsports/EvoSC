@@ -64,17 +64,17 @@
                     }
 
                     if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                        if(speed < UI_Hide_Speed && hidden){
+                        if(speed < UI_Hide_Speed && isHidden){
                             AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                             isHidden = False;
                         }
                     }else{
-                        if(speed >= UI_Hide_Speed && !hidden){
+                        if(speed >= UI_Hide_Speed && !isHidden){
                             AnimMgr.Add(mainFrame, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                             isHidden = True;
                         }
 
-                        if(speed < UI_Hide_Speed && hidden){
+                        if(speed < UI_Hide_Speed && isHidden){
                             AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                             isHidden = False;
                         }
