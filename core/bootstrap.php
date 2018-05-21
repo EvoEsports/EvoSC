@@ -57,10 +57,6 @@ function startEsc()
 
     \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
 
-    $settings = \esc\Classes\Server::getModeScriptSettings();
-    $settings['S_TimeLimit'] = config('server.roundTime', 7) * 60;
-    \esc\Classes\Server::setModeScriptSettings($settings);
-
     \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 }
 

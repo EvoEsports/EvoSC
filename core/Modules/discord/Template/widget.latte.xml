@@ -22,7 +22,6 @@
             declare Text hiddenPos = "<frame pos='{config('discord.pos.hidden')|noescape}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
             declare Boolean hidden = False;
-            declare Boolean isLapRace = Map.TMObjective_IsLapRace;
             declare Integer duration = 800;
             declare Real speed = 0.0;
 
@@ -38,7 +37,7 @@
                         speed = speed  * -1;
                     }
 
-                    if(!isLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
+                    if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
                         if(speed < UI_Hide_Speed && hidden){
                             anim(widget, visiblePos, duration);
                             hidden = False;

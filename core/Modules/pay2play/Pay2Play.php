@@ -1,0 +1,70 @@
+<?php
+
+namespace esc\Modules;
+
+use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
+use esc\Controllers\MapController;
+use esc\Controllers\PlanetsController;
+use esc\Controllers\TemplateController;
+use esc\Models\Player;
+
+class Pay2Play
+{
+    private static $priceAddTime;
+    private static $priceSkip;
+
+    public function __construct()
+    {
+        self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
+        self::$priceSkip    = config('pay2play.skip.cost') ?? 5000;
+
+        Hook::add('PlayerConnect', 'Pay2Play::showWidget');
+
+        ManiaLinkEvent::add('addtime', 'Pay2Play::addTime');
+        ManiaLinkEvent::add('skip', 'Pay2Play::skip');
+
+        KeyController::createBind('V', 'Pay2Play::reload');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::showWidget($player);
+    }
+
+    public static function showWidget(Player $player)
+    {
+        Template::show($player, 'pay2play.widget');
+    }
+
+    public static function addTime(Player $player)
+    {
+        if (config('pay2play.addtime.enabled')) {
+            PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', 'Pay2Play::addTimePaySuccess');
+        }
+    }
+
+    public static function addTimePaySuccess(Player $player, int $amount)
+    {
+        ChatController::messageAll('_info', $player, ' paid ', $amount, ' to add more time');
+        MapController::addTime(10);
+        onlinePlayers()->each([self::class, 'showWidget']);
+    }
+
+    public static function skip(Player $player)
+    {
+        if (config('pay2play.skip.enabled')) {
+            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', 'Pay2Play::skipPaySuccess');
+        }
+    }
+
+    public static function skipPaySuccess(Player $player, int $amount)
+    {
+        ChatController::messageAll('_info', $player, ' paid ', $amount, ' to skip map');
+        MapController::skip($player);
+    }
+}

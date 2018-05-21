@@ -9,6 +9,7 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
 use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -446,7 +447,7 @@ class MxKarma extends MXK
                     'mapname' => $map->Name,
                     'mapauthor' => $map->Author,
                     'isimport' => 'false',
-                    'maptime' => config('server.roundTime') * 60,
+                    'maptime' => MapController::getTimeLimit() * 60,
                     'votes' => $votes,
                 ];
 

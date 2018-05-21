@@ -11,7 +11,7 @@
   "maps": ".../server/UserData/Maps",
   "mps": ".../server/ManiaPlanetServer",
   "base": ".../server/",
-  "roundTime": 10,
+  "max-playtime": 30,
   "cp": false,
   "pw": ""
 }

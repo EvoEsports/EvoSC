@@ -22,13 +22,15 @@ use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 class MapController
 {
     private static $mapsPath;
-    private static $matchSettings;
     private static $currentMap;
     private static $queue;
     private static $addedTime = 0;
+    private static $timeLimit = 10;
 
     public static function init()
     {
+        self::$timeLimit = floor(Server::getRpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
+
         self::loadMaps();
 
         self::$queue    = new Collection();
@@ -42,6 +44,7 @@ class MapController
         ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
         ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
         ChatController::addCommand('res', 'MapController::forceReplay', 'Queue map for replay', '//', 'map.replay');
+        ChatController::addCommand('addtime', 'MapController::addTimeManually', 'Adds time (you can also substract)', '//', 'time');
     }
 
     /**
@@ -50,7 +53,7 @@ class MapController
     public static function resetTime()
     {
         self::$addedTime = 0;
-        self::updateRoundtime(config('server.roundTime', 7) * 60);
+        self::updateRoundtime(self::$timeLimit * 60);
     }
 
     /**
@@ -61,9 +64,16 @@ class MapController
     public static function addTime(int $minutes = 10)
     {
         self::$addedTime = self::$addedTime + $minutes;
-        $totalNewTime    = (config('server.roundTime', 7) + self::$addedTime) * 60;
+        $totalNewTime    = (self::$timeLimit + self::$addedTime) * 60;
         self::updateRoundtime($totalNewTime);
     }
+
+    public static function addTimeManually(Player $player, $cmd, int $amount)
+    {
+        self::addTime($amount);
+    }
+
+
 
     private static function updateRoundtime(int $timeInSeconds)
     {
@@ -97,8 +107,6 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->update(Server::getCurrentMapInfo()->toArray());
-
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
 
@@ -449,5 +457,13 @@ class MapController
         } catch (\Exception $e) {
             Log::logAddLine('MatchSettings', 'Failed to load matchsettings: ' . $filename);
         }
+    }
+
+    /**
+     * @return int
+     */
+    public static function getTimeLimit(): int
+    {
+        return self::$timeLimit;
     }
 }
