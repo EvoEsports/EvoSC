@@ -107,6 +107,8 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
+        $map->update(Server::getCurrentMapInfo()->toArray());
+
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
 

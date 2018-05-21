@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="{$id}" id="{$id}" version="3">
 <frame pos="{$config->pos->visible}" scale="{$config->scale ?? 0.8}" id="widget">
-    <quad pos="0 0" z-index="-2" size="50 10" style="Bgs1" substyle="BgDialogBlur"/>
-    <quad pos="0 0" z-index="-1" size="50 10" bgcolor="0001"/>
-    <quad pos="40 0" z-index="0" size="10 10" bgcolor="{header_color()|noescape}3"/>
-    <quad pos="40 0" z-index="1" size=".2 10" bgcolor="{primary_color()|noescape}9"/>
+    <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}9"/>
+    <quad pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
+    <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
     <frame pos="0 0">{$content|noescape}</frame>
 
     {$hideScript ?? ''|noescape}
