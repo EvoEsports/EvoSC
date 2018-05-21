@@ -3,9 +3,9 @@
 
     {if config('pay2play.addtime.enabled')}
     <frame pos="{config('pay2play.addtime.pos.visible')|noescape}" id="addtime">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
+        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" action="addtime"/>
 
-        <frame z-index="2" pos="4 -2" scale="0.5" action="addtime">
+        <frame z-index="2" pos="4 -2" scale="0.5">
             {if esc\Controllers\MapController::getTimeLimit() + 10 <= config('server.max-playtime')}
             <label pos="0 0"   size="12 3" halign="center" valign="center" textsize="1.2" text="PAY" />
             <label pos="0 -4"  size="12 3" halign="center" valign="center" textsize="1.2" text="{config('pay2play.addtime.cost')}" />
@@ -21,7 +21,7 @@
 
     {if config('pay2play.skip.enabled')}
     <frame pos="{config('pay2play.skip.pos.visible')|noescape}" id="skip">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
+        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" action="skip" />
 
         <frame z-index="2">
             <label pos="4 -4" halign="center" valign="center" text="PAY" />
