@@ -36,14 +36,14 @@
             <frame pos="2 -6" z-index="2">
                 <frame pos="0 0">
                     <quad id="sort-by-title" pos="0 0" size="30 3" bgcolor="0000" ScriptEvents="1" />
-                    <label pos="0 0" size="78 3" text="   Title" textsize="1" textcolor="ffff" />
+                    <label pos="3 0" size="78 3" text="Title" textsize="1" textcolor="ffff" />
                     <label class="arrow" pos="0 0.5" text="⏶" textsize="0.7" textcolor="ffff" opacity="0.2" />
                     <label class="arrow" pos="0 -0.5" text="⏷" textsize="0.7" textcolor="ffff" opacity="0.2" />
                 </frame>
 
                 <frame pos="80 0">
                     <quad id="sort-by-artist" pos="0 0" size="30 3" bgcolor="0000" ScriptEvents="1" />
-                    <label pos="0 0" size="58 3" text="   Artist" textsize="1" textcolor="ffff" />
+                    <label pos="3 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" />
                     <label class="arrow" pos="0 0.5" text="⏶" textsize="0.7" textcolor="ffff" opacity="0.2" />
                     <label class="arrow" pos="0 -0.5" text="⏷" textsize="0.7" textcolor="ffff" opacity="0.2" />
                 </frame>
