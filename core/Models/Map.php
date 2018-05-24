@@ -18,7 +18,7 @@ class Map extends Model
 
     public function locals()
     {
-        return $this->hasMany(LocalRecord::class, 'Map', 'id');
+        return $this->hasMany(LocalRecord::class, 'Map');
     }
 
     public function dedis()
@@ -34,6 +34,11 @@ class Map extends Model
     public function ratings()
     {
         return $this->hasMany(Karma::class, 'Map', 'id');
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(Player::class, 'map-favorites');
     }
 
     public function getMxDetailsAttribute($jsonMxDetails)

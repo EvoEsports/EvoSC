@@ -54,7 +54,7 @@
             <frame id="song-list" z-index="5" pos="2 -11">
                 <frame id="song-list-container" pos="0 0">
                     {for $i = 0; $i < esc\Modules\MusicClient\MusicClient::getSongsCount(); $i++}
-                    <frameinstance modelid="Song" class="row" pos="0 {$i * -4}" ScriptEvents="1" />
+                    <frameinstance modelid="Song" class="row" pos="0 {$i * -4}" ScriptEvents="1" hidden="1" />
                     {/for}
                 </frame>
             </frame>

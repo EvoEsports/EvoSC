@@ -106,6 +106,11 @@ class Player extends Model
         return $this->hasOne(Group::class, 'id', 'Group');
     }
 
+    public function favorites()
+    {
+        return $this->belongsToMany(Map::class, 'map-favorites');
+    }
+
     public function settings()
     {
         return $this->hasMany(UserSetting::class);

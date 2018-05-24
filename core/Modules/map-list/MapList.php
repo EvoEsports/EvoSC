@@ -2,9 +2,11 @@
 
 namespace esc\Modules\MapList;
 
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
@@ -25,6 +27,79 @@ class MapList
         ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
+
+        KeyController::createBind('X', 'MapList::reload');
+
+        ManiaLinkEvent::add('map.fav.add', 'MapList::favAdd');
+        ManiaLinkEvent::add('map.fav.remove', 'MapList::favRemove');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::showNewsMapList($player);
+    }
+
+    public static function favAdd(Player $player, int $mapId)
+    {
+        $player->favorites()->attach($mapId);
+    }
+
+    public static function favRemove(Player $player, int $mapId)
+    {
+        $player->favorites()->detach($mapId);
+    }
+
+    public static function getMapsCount()
+    {
+        return Map::count();
+    }
+
+    public static function mapsToManiaScriptArray(Player $player)
+    {
+        $locals = $player->locals->pluck('Rank', 'Map');
+        $dedis  = $player->dedis->pluck('Rank', 'Map');
+
+        $maps = Map::all()->map(function (Map $map) use ($locals, $dedis) {
+            $author = Player::whereId($map->Author)->get()->first();
+
+            $authorLogin = $author->Login ?? "n/a";
+            $authorNick  = stripAll($author->NickName ?? "n/a");
+
+            $local = $locals->get($map->id) ?: '-';
+            $dedi  = $dedis->get($map->id) ?: '-';
+
+            $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);
+            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $search);
+        })->implode("\n,");
+
+        return sprintf('[%s]', $maps);
+    }
+
+    public static function favoritesToManiaScriptArray(Player $player)
+    {
+        $locals = $player->locals->pluck('Rank', 'Map');
+        $dedis  = $player->dedis->pluck('Rank', 'Map');
+
+        $maps = $player->favorites->map(function (Map $map) use ($locals, $dedis) {
+            $author = Player::whereId($map->Author)->get()->first();
+
+            $authorLogin = $author->Login ?? "n/a";
+            $authorNick  = stripAll($author->NickName ?? "n/a");
+
+            $local = $locals->get($map->id) ?: '-';
+            $dedi  = $dedis->get($map->id) ?: '-';
+
+            $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);
+            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $search);
+        })->implode("\n,");
+
+        return sprintf('[%s]', $maps);
+    }
+
+    public static function showNewsMapList(Player $player)
+    {
+        Template::show($player, 'map-list.manialink', []);
     }
 
     public static function list(Player $player, $cmd, $filter = null)
