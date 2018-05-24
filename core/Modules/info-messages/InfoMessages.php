@@ -20,8 +20,6 @@ class InfoMessages
 
         ManiaLinkEvent::add('infomessages.show', 'InfoMessages::showSettings');
         ManiaLinkEvent::add('infomessages.edit', 'InfoMessages::showEdit');
-
-        KeyController::createBind('X', 'InfoMessages::reload');
     }
 
     public static function reload(Player $player)

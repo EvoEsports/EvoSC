@@ -29,8 +29,6 @@ class MusicClient
         ChatController::addCommand('music', 'MusicClient::displayMusicMenu', 'Select music to play');
 
         Hook::add('PlayerConnect', 'MusicClient::playerConnect');
-
-        KeyController::createBind('Y', 'MusicClient::playerConnect');
     }
 
     public static function recommend(Player $player, $songId)

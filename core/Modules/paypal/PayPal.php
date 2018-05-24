@@ -16,7 +16,6 @@ class PayPal
     {
         Hook::add('PlayerConnect', 'PayPal::show');
 
-        KeyController::createBind('X', 'PayPal::reload');
     }
 
     public static function reload(Player $player)

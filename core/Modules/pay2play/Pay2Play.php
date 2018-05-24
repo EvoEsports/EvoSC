@@ -26,8 +26,6 @@ class Pay2Play
 
         ManiaLinkEvent::add('addtime', 'Pay2Play::addTime');
         ManiaLinkEvent::add('skip', 'Pay2Play::skip');
-
-        KeyController::createBind('V', 'Pay2Play::reload');
     }
 
     public static function reload(Player $player)

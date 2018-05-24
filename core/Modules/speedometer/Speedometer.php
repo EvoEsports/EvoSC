@@ -15,7 +15,6 @@ class Speedometer
     {
         Hook::add('PlayerConnect', 'Speedometer::show');
 
-        KeyController::createBind('X', 'Speedometer::reload');
     }
 
     public static function reload(Player $player)
