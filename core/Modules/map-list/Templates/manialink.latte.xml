@@ -12,23 +12,23 @@
             <quad pos="0 0" size="160 6" bgcolor="{background_color()|noescape}" opacity="0.8" z-index="1" />
 
             <frame pos="10 -3" z-index="2">
-                <quad class="button" data-page="0" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.9" z-index="-1" ScriptEvents="1" />
+                <quad class="nav-button button" data-page="0" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.9" z-index="-1" ScriptEvents="1" />
                 <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Maplist" />
             </frame>
 
             <frame pos="27 -3" z-index="5">
-                <quad class="button" data-page="1" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="MX Info" />
+                <quad class="nav-button button" data-page="1" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
+                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Favorites" />
             </frame>
 
             <frame pos="44 -3" z-index="5">
-                <quad class="button" data-page="2" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Jukebox" />
+                <quad class="nav-button button" data-page="2" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
+                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="MX Info" />
             </frame>
 
             <frame pos="61 -3" z-index="5">
-                <quad class="button" data-page="3" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Favorites" />
+                <quad class="nav-button button" data-page="3" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
+                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Jukebox" />
             </frame>
         </frame>
 
@@ -41,7 +41,7 @@
             <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6" z-index="1" />
-            <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" data-is-fav="0" />
+            <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" />
             <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" JUKE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
             <label class="mx" pos="129 0" valign="center" halign="center" size="14 3" text=" MX INFO" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
         </framemodel>
@@ -71,10 +71,6 @@
 
             <frame data-tab="2" id="jukebox" hidden="1">
                 <label textcolor="ffff" textsize="1" text="jukebox" />
-            </frame>
-
-            <frame data-tab="3" id="favorites" hidden="1">
-                <label textcolor="ffff" textsize="1" text="favorites" />
             </frame>
         </frame>
     </frame>
@@ -126,6 +122,69 @@ Text[][] arraySortDesc(Text[][] array, Integer column){
     return SortedArrayDesc;
 }
 
+Void updateMapFav(Text mapId, Text isFav){
+    foreach(i => map in maps){
+        if(map[5] == mapId){
+            maps[i][6] = isFav;
+            return;
+        }
+    }
+}
+
+Text[] getMapById(Text mapId){
+    foreach(map in maps){
+        if(map[5] == mapId){
+            return map;
+        }
+    }
+
+    return [""];
+}
+
+Text[][] getFavorites(){
+    declare Text[][] favs;
+
+    foreach(map in maps){
+        if(map[6] == "1"){
+            favs.add(map);
+        }
+    }
+
+    return favs;
+}
+
+Void updateMapText(CMlFrame mapFrame, Text[] map, Integer arrayIndex){
+    mapFrame.DataAttributeSet("map-id", "" ^ map[5]);
+
+    (mapFrame.Controls[4] as CMlLabel).SetText(map[0]);
+    (mapFrame.Controls[5] as CMlLabel).SetText(map[1]);
+    (mapFrame.Controls[5] as CMlLabel).ToolTip = map[2];
+    (mapFrame.Controls[6] as CMlLabel).SetText(map[3]);
+    (mapFrame.Controls[7] as CMlLabel).SetText(map[4]);
+
+    if(map[6] == "1"){
+        (mapFrame.Controls[8] as CMlLabel).SetText("");
+    }else{
+        (mapFrame.Controls[8] as CMlLabel).SetText("");
+    }
+
+    mapFrame.Visible = True;
+}
+
+Void populate(Text[][] maps){
+    declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+
+    foreach(mapRow in mapList.Controls){
+        mapRow.Visible = False;
+    }
+
+    for(i, 0, maps.count - 1){
+        declare map = maps[i];
+        declare mapFrame = (mapList.Controls[i] as CMlFrame);
+        updateMapText(mapFrame, map, i);
+    }
+}
+
 Void navButtonClick(CMlQuad button){
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare Integer tab = int(button.DataAttributeGet("page"));
@@ -134,42 +193,33 @@ Void navButtonClick(CMlQuad button){
         ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
     }
 
+    log("Open tab: " ^ tab);
+
     foreach(tabFrame in tabs.Controls){
-        if(int(tabFrame.DataAttributeGet("tab")) == tab){
-            tabFrame.Visible = True;
-        }else{
-            tabFrame.Visible = False;
-        }
+        tabFrame.Visible = False;
+    }
+
+    if(tab == 0){
+        //map list
+        populate(maps);
+        tabs.Controls[0].Visible = True;
+    }
+    if(tab == 1){
+        //favorites
+        populate(getFavorites());
+        tabs.Controls[0].Visible = True;
+    }
+    if(tab == 2){
+        //mx info
+        tabs.Controls[1].Visible = True;
+    }
+    if(tab == 3){
+        //jukebox/map queue
+        tabs.Controls[2].Visible = True;
     }
 
     button.Opacity = 0.9;
     activeTab = int(button.DataAttributeGet("page"));
-}
-
-Void updateMapText(CMlFrame mapFrame, Text[] map){
-    mapFrame.Visible = True;
-    (mapFrame.Controls[4] as CMlLabel).SetText(map[0]);
-    (mapFrame.Controls[5] as CMlLabel).SetText(map[1]);
-    (mapFrame.Controls[5] as CMlLabel).ToolTip = map[2];
-    (mapFrame.Controls[6] as CMlLabel).SetText(map[3]);
-    (mapFrame.Controls[7] as CMlLabel).SetText(map[4]);
-    (mapFrame.Controls[8] as CMlLabel).DataAttributeSet("map-id", map[5]);
-
-    if(map[6] == "1"){
-        (mapFrame.Controls[8] as CMlLabel).SetText("");
-    }else{
-        (mapFrame.Controls[8] as CMlLabel).SetText("");
-    }
-}
-
-Void populate(Text[][] maps){
-    declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
-
-    for(i, 0, maps.count - 1){
-        declare map = maps[i];
-        declare mapFrame = (mapList.Controls[i] as CMlFrame);
-        updateMapText(mapFrame, map);
-    }
 }
 
 main() {
@@ -198,11 +248,8 @@ main() {
                     continue;
                 }
 
-                if(event.Control.HasClass("button")){
+                if(event.Control.HasClass("nav-button")){
                     declare button = (event.Control as CMlQuad);
-
-                    log(button.DataAttributeGet("page"));
-                    log(activeTab);
 
                     if(int(button.DataAttributeGet("page")) == activeTab){
                         continue;
@@ -229,18 +276,25 @@ main() {
                 }
 
                 if(event.Control.HasClass("fav")){
-                    declare favButton = (event.Control as CMlLabel);
-                    declare isFav = favButton.DataAttributeGet("is-fav") == "1";
-
                     if(event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
+                        declare isFav = getMapById(mapId)[6] == "1";
+
+                        log("MapId: " ^ mapId);
+
                         if(isFav){
-                            favButton.SetText("");
-                            favButton.DataAttributeSet("is-fav", "0");
-                            TriggerPageAction("map.fav.remove," ^ favButton.DataAttributeGet("map-id"));
+                            TriggerPageAction("map.fav.remove," ^ mapId);
+                            updateMapFav(mapId, "0");
                         }else{
-                            favButton.SetText("");
-                            favButton.DataAttributeSet("is-fav", "1");
-                            TriggerPageAction("map.fav.add," ^ favButton.DataAttributeGet("map-id"));
+                            TriggerPageAction("map.fav.add," ^ mapId);
+                            updateMapFav(mapId, "1");
+                        }
+
+                        if(activeTab == 0){
+                            populate(maps);
+                        }
+                        if(activeTab == 1){
+                            populate(getFavorites());
                         }
                     }
 
