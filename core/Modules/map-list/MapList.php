@@ -59,8 +59,9 @@ class MapList
     {
         $locals = $player->locals->pluck('Rank', 'Map');
         $dedis  = $player->dedis->pluck('Rank', 'Map');
+        $favorites = $player->favorites()->get(['id', 'Name'])->pluck('Name', 'id');
 
-        $maps = Map::all()->map(function (Map $map) use ($locals, $dedis) {
+        $maps = Map::all()->map(function (Map $map) use ($locals, $dedis, $favorites) {
             $author = Player::whereId($map->Author)->get()->first();
 
             $authorLogin = $author->Login ?? "n/a";
@@ -68,30 +69,10 @@ class MapList
 
             $local = $locals->get($map->id) ?: '-';
             $dedi  = $dedis->get($map->id) ?: '-';
+            $favorite = $favorites->get($map->id) ? 1 : 0;
 
             $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);
-            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $search);
-        })->implode("\n,");
-
-        return sprintf('[%s]', $maps);
-    }
-
-    public static function favoritesToManiaScriptArray(Player $player)
-    {
-        $locals = $player->locals->pluck('Rank', 'Map');
-        $dedis  = $player->dedis->pluck('Rank', 'Map');
-
-        $maps = $player->favorites->map(function (Map $map) use ($locals, $dedis) {
-            $author = Player::whereId($map->Author)->get()->first();
-
-            $authorLogin = $author->Login ?? "n/a";
-            $authorNick  = stripAll($author->NickName ?? "n/a");
-
-            $local = $locals->get($map->id) ?: '-';
-            $dedi  = $dedis->get($map->id) ?: '-';
-
-            $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);
-            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $search);
+            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $search);
         })->implode("\n,");
 
         return sprintf('[%s]', $maps);

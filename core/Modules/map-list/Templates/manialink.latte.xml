@@ -154,6 +154,12 @@ Void updateMapText(CMlFrame mapFrame, Text[] map){
     (mapFrame.Controls[6] as CMlLabel).SetText(map[3]);
     (mapFrame.Controls[7] as CMlLabel).SetText(map[4]);
     (mapFrame.Controls[8] as CMlLabel).DataAttributeSet("map-id", map[5]);
+
+    if(map[6] == "1"){
+        (mapFrame.Controls[8] as CMlLabel).SetText("");
+    }else{
+        (mapFrame.Controls[8] as CMlLabel).SetText("");
+    }
 }
 
 Void populate(Text[][] maps){
@@ -168,7 +174,6 @@ Void populate(Text[][] maps){
 
 main() {
     maps = {esc\Modules\MapList\MapList::mapsToManiaScriptArray($localPlayer)|noescape};
-    favorites = {esc\Modules\MapList\MapList::favoritesToManiaScriptArray($localPlayer)|noescape};
     tabs <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
     declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
     declare CMlFrame mapsContainer <=> (Page.MainFrame.GetFirstChild("maps-container") as CMlFrame);
@@ -212,16 +217,21 @@ main() {
                     continue;
                 }
 
+                if(event.Control.Parent.Controls[0].HasClass("row")){
+                    declare row = (event.Control.Parent.Controls[0] as CMlQuad);
+
+                    if(event.Type == CMlScriptEvent::Type::MouseOver){
+                        row.Opacity = 0.5;
+                    }
+                    if(event.Type == CMlScriptEvent::Type::MouseOut){
+                        row.Opacity = 0.0;
+                    }
+                }
+
                 if(event.Control.HasClass("fav")){
                     declare favButton = (event.Control as CMlLabel);
                     declare isFav = favButton.DataAttributeGet("is-fav") == "1";
 
-                    if(event.Type == CMlScriptEvent::Type::MouseOver){
-                        favButton.TextColor = <1.0, 0.7, 1.0>;
-                    }
-                    if(event.Type == CMlScriptEvent::Type::MouseOut){
-                        favButton.TextColor = <1.0, 1.0, 1.0>;
-                    }
                     if(event.Type == CMlScriptEvent::Type::MouseClick){
                         if(isFav){
                             favButton.SetText("");
