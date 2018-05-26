@@ -5,6 +5,7 @@ namespace esc\Migrations;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Facades\DB;
 
 class CreateAccessRightsTable extends Migration
 {
@@ -36,6 +37,8 @@ class CreateAccessRightsTable extends Migration
             ['name' => 'time', 'description' => 'Can change the countdown time'],
             ['name' => 'group', 'description' => 'Add/delete/update groups'],
         ];
+
+        $schemaBuilder->getConnection()->table('access-rights')->insert($seed);
     }
 
     /**

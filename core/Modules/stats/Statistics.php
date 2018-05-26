@@ -35,21 +35,21 @@ class Statistics
     private static function displayStatsWidget(Player $player, $values, $title, $config, $value_function)
     {
         $content = Template::toString('components.stat-list', [
-            'width' => $config->width,
-            'values' => $values,
+            'width'      => $config->width,
+            'values'     => $values,
             'value_func' => $value_function
         ]);
 
         $height = $config->show * 4.2 + 8;
 
         Template::show($player, 'components.box', [
-            'id' => str_slug($title),
-            'title' => $title,
-            'x' => $config->pos->x,
-            'y' => $config->pos->y,
-            'scale' => $config->scale,
-            'width' => $config->width,
-            'height' => $height,
+            'id'      => str_slug($title),
+            'title'   => $title,
+            'x'       => $config->pos->x,
+            'y'       => $config->pos->y,
+            'scale'   => $config->scale,
+            'width'   => $config->width,
+            'height'  => $height,
             'content' => $content
         ]);
     }
@@ -153,6 +153,10 @@ class Statistics
      */
     public static function playerConnect(Player $player)
     {
+        if (!$player) {
+            return;
+        }
+
         if (!$player->stats) {
             $player->stats()->create(['Player' => $player->id]);
         }
@@ -213,7 +217,7 @@ class Statistics
     public static function endMatch(...$args)
     {
         $finishedPlayers = finishPlayers();
-        $bestPlayer = $finishedPlayers->sortBy('Score')->first();
+        $bestPlayer      = $finishedPlayers->sortBy('Score')->first();
 
         foreach ($finishedPlayers as $player) {
             self::calculatePlayerServerScore($player);
@@ -233,7 +237,7 @@ class Statistics
     private static function calculatePlayerServerScore(Player $player)
     {
         $locals = $player->locals;
-        $score = 0;
+        $score  = 0;
 
         $locals->each(function (LocalRecord $local) use (&$score) {
             $score += (100 - $local->Rank);
