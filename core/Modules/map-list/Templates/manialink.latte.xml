@@ -47,7 +47,7 @@
         </framemodel>
 
         <framemodel id="QueueItem">
-            <quad pos="1 0" size="32 18" bgcolor="fff3" />
+            <quad pos="1 0" size="32 18" bgcolor="fff3" image="" imagefocus="" />
             <label pos="36 -5" textsize="2" size="120 4" text="Mapname" />
             <label pos="36 -10" textsize="1" size="120 4" text="Requested by player" />
         </framemodel>
@@ -241,11 +241,11 @@ Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
     frame.Visible = True;
     frame.DataAttributeSet("map-id", data[0]);
     (frame.Controls[1] as CMlLabel).SetText(data[2]);
-    (frame.Controls[2] as CMlLabel).SetText(data[3]);
+    (frame.Controls[2] as CMlLabel).SetText("Requested by " ^ data[3]);
 
     if(data[1] != ""){
         //set map image
-        (frame.Controls[0] as CMlQuad).ImageUrl = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1];
+        (frame.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1]);
     }
 }
 

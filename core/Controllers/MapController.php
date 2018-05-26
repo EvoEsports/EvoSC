@@ -435,7 +435,7 @@ class MapController
                 $response->getHeader('content-disposition')[0]);
 
             $mapFolder = self::$mapsPath;
-            File::put("$mapFolder/$fileName", $response->getBody());
+            File::put("$mapFolder$fileName", $response->getBody());
 
             $map = Map::firstOrCreate([
                 'MxId'     => $mxId,
