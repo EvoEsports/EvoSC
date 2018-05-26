@@ -116,14 +116,23 @@ class Player extends Model
         return $this->hasMany(UserSetting::class);
     }
 
+    public function hasAccess(string $right)
+    {
+        if (!$this->group) {
+            return false;
+        }
+
+        return $this->group->hasAccess($right);
+    }
+
     public function getSpectatorStatusAttribute($value)
     {
-        $object = collect([]);
-        $object->spectator = (bool)($value % 10);
+        $object                     = collect([]);
+        $object->spectator          = (bool)($value % 10);
         $object->temporarySpectator = (bool)(intval($value / 10) % 10);
-        $object->pureSpectator = (bool)(intval($value / 100) % 10);
-        $object->autoTarget = (bool)(intval($value / 1000) % 10);
-        $object->currentTargetId = intval($value / 10000);
+        $object->pureSpectator      = (bool)(intval($value / 100) % 10);
+        $object->autoTarget         = (bool)(intval($value / 1000) % 10);
+        $object->currentTargetId    = intval($value / 10000);
 
         return $object;
     }
@@ -155,7 +164,7 @@ class Player extends Model
         }
 
         $this->settings()->create([
-            'name' => $settingName,
+            'name'  => $settingName,
             'value' => $value
         ]);
     }
@@ -195,10 +204,10 @@ class Player extends Model
 
     public static function console(): Player
     {
-        $player = new Player();
-        $player->Login = config('server.name');
+        $player           = new Player();
+        $player->Login    = config('server.name');
         $player->NickName = config('server.name');
-        $player->Group = Group::find(1);
+        $player->Group    = Group::find(1);
         return $player;
     }
 }

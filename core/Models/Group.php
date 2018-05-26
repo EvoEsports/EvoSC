@@ -15,6 +15,11 @@ class Group extends Model
 
     public function hasAccess(string $accessRightName)
     {
+        if ($this->id == 1) {
+            //Masteradrmin always has access
+            return true;
+        }
+
         return $this->accessRights->where('name', $accessRightName)->isNotEmpty();
     }
 
