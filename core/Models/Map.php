@@ -10,9 +10,9 @@ class Map extends Model
 {
     protected $table = 'maps';
 
-    protected $fillable = ['UId', 'MxId', 'Name', 'FileName', 'Plays', 'Author', 'Mood', 'LapRace', 'LastPlayed', 'Environment', 'NbLaps', 'NbCheckpoints', 'AuthorTime', 'Enabled', 'mx_details', 'mx_world_record'];
+    protected $fillable = ['uid', 'filename', 'plays', 'author', 'last_played', 'enabled', 'mx_details', 'mx_world_record', 'gbx'];
 
-    protected $dates = ['LastPlayed'];
+    protected $dates = ['last_played'];
 
     public $timestamps = false;
 
@@ -28,7 +28,12 @@ class Map extends Model
 
     public function author()
     {
-        return $this->hasOne(Player::class, 'id', 'Author');
+        return $this->hasOne(Player::class, 'id', 'author');
+    }
+
+    public function getAuthorAttribute($playerId)
+    {
+        return Player::whereId($playerId)->first();
     }
 
     public function ratings()
@@ -55,12 +60,17 @@ class Map extends Model
         return json_decode($jsonMxWorldRecordDetails);
     }
 
+    public function getGbxAttribute($gbxJson)
+    {
+        return json_decode($gbxJson);
+    }
+
     public function canBeJuked(): bool
     {
-        $lastPlayedDate = $this->LastPlayed;
+        $lastPlayedDate = $this->last_played;
 
         if ($lastPlayedDate) {
-            return $this->LastPlayed->diffInSeconds() > 1800;
+            return $this->last_played->diffInSeconds() > 1800;
         }
 
         return true;

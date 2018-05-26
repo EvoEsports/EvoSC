@@ -252,7 +252,7 @@ Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
 
     if(data[1] != ""){
         //set map image
-        (frame.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1]);
+        (frame.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1] ^ "?image.jpg");
     }
 }
 
@@ -316,6 +316,10 @@ main() {
     mapListContainer.ClipWindowSize = <156.0, 80.0>;
 
     activeTab = 0;
+
+    foreach(map in maps){
+
+    }
 
     while(True){
         yield;

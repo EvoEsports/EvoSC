@@ -32,4 +32,9 @@ class Group extends Model
     {
         return $this->belongsTo(Player::class, 'id', 'Group');
     }
+
+    public function __toString()
+    {
+        return $this->Name;
+    }
 }

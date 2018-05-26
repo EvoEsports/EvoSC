@@ -105,8 +105,8 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->increment('Plays');
-        $map->update(['LastPlayed' => Carbon::now()]);
+        $map->increment('plays');
+        $map->update(['last_played' => Carbon::now()]);
 
         self::loadMxDetails($map);
 
@@ -170,7 +170,7 @@ class MapController
             Log::error($e);
         }
 
-        $map->update(['Enabled' => false]);
+        $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
         ChatController::messageAll('_info', $player->group, ' ', $player, ' disabled map ', $map);
@@ -197,7 +197,7 @@ class MapController
             $map = self::$queue->first()->map;
         } else {
             $mapInfo = Server::getNextMapInfo();
-            $map     = Map::where('UId', $mapInfo->uId)
+            $map     = Map::where('uid', $mapInfo->uId)
                           ->first();
         }
 
@@ -226,7 +226,7 @@ class MapController
         $currentMap = self::getCurrentMap();
 
         if (self::getQueue()
-                ->contains('map.UId', $currentMap->UId)) {
+                ->contains('map.uid', $currentMap->uid)) {
             ChatController::message($player, 'Map is already being replayed');
 
             return;
@@ -266,19 +266,27 @@ class MapController
         HookController::fireHookBatch($hooks, self::$queue);
     }
 
+    private static function getGbxInformation($filename)
+    {
+        $cmd = config('server.base') . '/ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename) . '"';
+        return shell_exec($cmd);
+    }
+
     /**
      * Loads maps from server directory
      */
     private static function loadMaps()
     {
+        Log::logAddLine('MapController', 'Loading maps');
+
         //Get loaded maps
         $maps = collect(Server::getMapList());
 
-        //get array with the UIDs
-        $enabledMapsUids = $maps->pluck('uId');
+        //get array with the uids
+        $enabledMapsuids = $maps->pluck('uid');
 
         foreach ($maps as $mapInfo) {
-            $map = Map::where('UId', $mapInfo->uId)
+            $map = Map::where('uid', $mapInfo->uId)
                       ->get()
                       ->first();
 
@@ -295,30 +303,29 @@ class MapController
                     ]);
                 }
 
-                $map = Map::create([
-                    'UId'         => $mapInfo->uId,
-                    'Name'        => $mapInfo->name,
-                    'FileName'    => $mapInfo->fileName,
-                    'Author'      => $authorId,
-                    'Environment' => $mapInfo->environnement,
-                    'Enabled'     => true,
+                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
+
+                $map = Map::updateOrCreate([
+                    'author'   => $authorId,
+                    'enabled'  => true,
+                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                    'filename' => $mapInfo->fileName,
+                    'uid'      => json_decode($gbxInfo)->MapUid,
                 ]);
             }
 
-            //If file location has changed, update
-            if ($map->FileName != $mapInfo->fileName) {
-                $map->update(['FileName' => $mapInfo->fileName]);
-                Log::logAddLine('MapController', 'Map moved ' . $map->FileName . ' .. ' . $mapInfo->fileName);
-            }
+            echo ".";
         }
 
+        echo "\n";
+
         //Disable maps
-        Map::whereNotIn('UId', $enabledMapsUids)
-           ->update(['Enabled' => false]);
+        Map::whereNotIn('uid', $enabledMapsuids)
+           ->update(['enabled' => false]);
 
         //Enable loaded maps
-        Map::whereIn('UId', $enabledMapsUids)
-           ->update(['Enabled' => true]);
+        Map::whereIn('uid', $enabledMapsuids)
+           ->update(['enabled' => true]);
     }
 
     /**
@@ -365,7 +372,7 @@ class MapController
             return;
         }
 
-        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->UId);
+        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
 
         if ($result->getStatusCode() != 200) {
             Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());

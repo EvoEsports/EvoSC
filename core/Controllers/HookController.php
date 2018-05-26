@@ -140,13 +140,13 @@ class HookController extends ModescriptCallbacks
 
             case 'BeginMap':
                 //SMapInfo Map
-                $map = Map::where('FileName', $arguments[0]['FileName'])->first();
+                $map = Map::where('filename', $arguments[0]['filename'])->first();
                 self::fireHookBatch($hooks, $map);
                 break;
 
             case 'EndMap':
                 //SMapInfo Map
-                $map = Map::where('FileName', $arguments[0]['FileName'])->first();
+                $map = Map::where('filename', $arguments[0]['filename'])->first();
                 self::fireHookBatch($hooks, $map);
                 break;
 

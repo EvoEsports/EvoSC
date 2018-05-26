@@ -78,6 +78,6 @@ function migrate()
 
 function beginMap()
 {
-    $map = \esc\Models\Map::where('FileName', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
+    $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
     esc\Controllers\HookController::fire('BeginMap', [$map]);
 }

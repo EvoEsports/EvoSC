@@ -219,14 +219,14 @@ class DedimaniaApi
         //string SessionId
         $params->addChild('param')->addChild('value', self::getSession()->Session);
 
-        //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
+        //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->UId,
-            'Name' => $map->Name,
-            'Environment' => Server::getCurrentMapInfo()->environnement,
-            'Author' => $map->Author,
-            'NbCheckpoints' => $map->NbCheckpoints,
-            'NbLaps' => $map->NbLaps,
+            'UId' => $map->gbx->MapUid,
+            'Name' => $map->gbx->Name,
+            'Environment' => $map->gbx->Environment,
+            'Author' => $map->gbx->AuthorLogin,
+            'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
+            'NbLaps' => $map->gbx->NbLaps,
         ]);
 
         //string GameMode
@@ -319,14 +319,14 @@ class DedimaniaApi
         //string SessionId
         $params->addChild('param')->addChild('value', self::getSession()->Session);
 
-        //MapInfo: struct {'UId': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
+        //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->UId,
-            'Name' => $map->Name,
-            'Environment' => Server::getCurrentMapInfo()->environnement,
-            'Author' => $map->Author,
-            'NbCheckpoints' => $map->NbCheckpoints,
-            'NbLaps' => $map->NbLaps,
+            'UId' => $map->gbx->MapUid,
+            'Name' => $map->gbx->Name,
+            'Environment' => $map->gbx->Environment,
+            'Author' => $map->gbx->AuthorLogin,
+            'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
+            'NbLaps' => $map->gbx->NbLaps,
         ]);
 
         //string GameMode
@@ -382,7 +382,7 @@ class DedimaniaApi
 
         //struct votesInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->Uid,
+            'UId' => $map->uid,
             'GameMode' => 'TA' //Change from hardcode
         ]);
 
