@@ -235,8 +235,7 @@ class MapList
 
     public static function queueMap(Player $player, $mapId)
     {
-        $map = Map::where('id', intval($mapId))
-                  ->first();
+        $map = Map::whereId($mapId)->first();
 
         if ($map) {
             MapController::queueMap($player, $map);

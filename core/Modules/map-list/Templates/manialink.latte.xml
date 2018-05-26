@@ -44,6 +44,7 @@
             <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" />
             <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" JUKE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
             <label class="mx" pos="129 0" valign="center" halign="center" size="14 3" text=" MX INFO" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
+            <label class="delete" pos="144 0" valign="center" halign="center" size="14 3" text="DELETE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
         </framemodel>
 
         <framemodel id="QueueItem">
@@ -343,6 +344,16 @@ main() {
                         if(activeTab == 1){
                             populate(getFavorites());
                         }
+                    }
+
+                    continue;
+                }
+
+                if(event.Control.HasClass("juke")){
+                    if(event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
+                        log("Add map to queue: " ^ mapId);
+                        TriggerPageAction("maplist.queue," ^ mapId);
                     }
 
                     continue;
