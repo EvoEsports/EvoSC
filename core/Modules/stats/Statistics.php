@@ -153,11 +153,11 @@ class Statistics
      */
     public static function playerConnect(Player $player)
     {
-        if (!$player) {
+        if ($player->id == null) {
             return;
         }
 
-        if (!$player->stats) {
+        if ($player->stats === null) {
             Stats::create([
                 'Player' => $player->id,
                 'Visits' => 1

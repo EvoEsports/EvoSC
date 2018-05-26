@@ -367,7 +367,7 @@ class Dedimania extends DedimaniaApi
 
         $topDedis = $map->dedis()->orderBy('Score')->take(3)->get();
 
-        if ($map->mx_world_record != null) {
+        if ($map->mx_world_record != null && $topDedis->isNotEmpty()) {
             $mxScore = intval($map->mx_world_record->ReplayTime);
             if ($mxScore > $topDedis->first()->Score) {
                 $topDedis->first()->Rank = 'WR';

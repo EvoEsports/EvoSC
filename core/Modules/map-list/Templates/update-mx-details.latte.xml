@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-mx-details" id="update-mx-details" version="3">
+    <script>
+        <!--
+        main(){
+            while(InputPlayer == Null){
+                sleep(50);
+            }
+
+            declare Text MxDetailsHash for InputPlayer;
+            declare Text[] MxDetails for InputPlayer;
+
+            MxDetailsHash = {uniqid()};
+            MxDetails = {$mx_details|noescape};
+        }
+        -->
+    </script>
+</manialink>

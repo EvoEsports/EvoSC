@@ -105,8 +105,6 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
-        $map->update(Server::getCurrentMapInfo()->toArray());
-
         $map->increment('Plays');
         $map->update(['LastPlayed' => Carbon::now()]);
 
@@ -286,7 +284,7 @@ class MapController
 
             if (!$map) {
                 //Map does not exist, create it
-                $author = Player::whereLogin($mapInfo->author)->first();
+                $author = Player::where('Login', $mapInfo->author)->first();
 
                 if ($author) {
                     $authorId = $author->id;
@@ -446,7 +444,7 @@ class MapController
                           ->toArray();
 
             if ($info) {
-                $map->update($info);
+//                $map->update($info);
             }
 
             try {

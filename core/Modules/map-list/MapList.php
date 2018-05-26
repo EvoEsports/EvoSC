@@ -2,6 +2,7 @@
 
 namespace esc\Modules\MapList;
 
+use Carbon\Carbon;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -27,6 +28,8 @@ class MapList
         ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
         ManiaLinkEvent::add('maplist.disable', 'MapList::disableMap', 'map.delete');
         ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
+
+        ManiaLinkEvent::add('maplist.mx', 'MapList::updateMxDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
 
@@ -76,6 +79,32 @@ class MapList
                 $item->issuer->NickName
             );
         })->implode(",\n");
+    }
+
+    public static function updateMxDetails(Player $player, $mapId)
+    {
+        $map = Map::whereId($mapId)->first();
+
+        if (!$map->mx_details) {
+            MapController::loadMxDetails($map);
+            $map = Map::whereId($mapId)->first();
+        }
+
+        $details = $map->mx_details;
+
+        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
+            $map->id,
+            $details->TrackID,
+            $map->author->Login,
+            $map->author->Login == $map->author->NickName ? $details->Username : $map->author->NickName,
+            (new Carbon($details->UploadedAt))->format('Y-m-d'),
+            (new Carbon($details->UpdatedAt))->format('Y-m-d'),
+            $map->Name
+        );
+
+        Template::show($player, 'map-list.update-mx-details', [
+            'mx_details' => $mxDetails
+        ]);
     }
 
     public static function mapsToManiaScriptArray(Player $player)

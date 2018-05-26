@@ -73,7 +73,12 @@
             </frame>
 
             <frame data-tab="1" id="mx" hidden="1">
-                <label textcolor="ffff" textsize="1" text="mx" />
+                <frame id="mx-details">
+                    <quad pos="0 0" size="80 45" bgcolor="ffff" opacity="1.0" image="" />
+                    <label class="mapname" pos="82 0" textcolor="ffff" textsize="1.5" text="Mapname" />
+                    <label class="author-nick" pos="82 -4" textcolor="ffff" textsize="1" text="authorNick" />
+                    <label class="author-login" pos="82 -7" textcolor="ffff" textsize="0.75" text="authorLogin" />
+                </frame>
             </frame>
 
             <frame data-tab="2" id="jukebox" hidden="1">
@@ -97,6 +102,7 @@ declare Text[][] maps;
 declare Text[][] favorites;
 
 declare Text lastQueueHash;
+declare Text lastMxDetailsHash;
 
 Integer int(Text textInteger){
     return TL::ToInteger(textInteger);
@@ -270,6 +276,29 @@ Void updateMapQueue(Text[][] items){
     }
 }
 
+Void updateMxDetails(Text[] details){
+    declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
+    declare mxDetails <=> (Page.MainFrame.GetFirstChild("mx-details") as CMlFrame);
+
+    (mxDetails.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ details[1] ^ "?image.jpg");
+    (mxDetails.Controls[1] as CMlLabel).SetText(details[6]);
+    (mxDetails.Controls[2] as CMlLabel).SetText(details[3]);
+    (mxDetails.Controls[3] as CMlLabel).SetText("(" ^ details[2] ^ ")");
+
+    for(i, 1, navbar.Controls.count - 1){
+        if(i == 2){
+            continue;
+        }
+
+        ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
+    }
+    ((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.9;
+
+    tabs.Controls[0].Visible = False;
+    tabs.Controls[1].Visible = True;
+    activeTab = 2;
+}
+
 main() {
     maps = {esc\Modules\MapList\MapList::mapsToManiaScriptArray($localPlayer)|noescape};
     tabs <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
@@ -278,6 +307,7 @@ main() {
     declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
 
     populate(maps);
 
@@ -352,8 +382,16 @@ main() {
                 if(event.Control.HasClass("juke")){
                     if(event.Type == CMlScriptEvent::Type::MouseClick){
                         declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
-                        log("Add map to queue: " ^ mapId);
                         TriggerPageAction("maplist.queue," ^ mapId);
+                    }
+
+                    continue;
+                }
+
+                if(event.Control.HasClass("mx")){
+                    if(event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
+                        TriggerPageAction("maplist.mx," ^ mapId);
                     }
 
                     continue;
@@ -390,6 +428,15 @@ main() {
                 declare Text[][] QueuedMaps for InputPlayer;
                 updateMapQueue(QueuedMaps);
                 lastQueueHash = QueueHash;
+            }
+
+            declare Text MxDetailsHash for InputPlayer;
+            if(lastMxDetailsHash != MxDetailsHash){
+                declare Text[] MxDetails for InputPlayer;
+                if(MxDetails.count > 0){
+                    updateMxDetails(MxDetails);
+                    lastMxDetailsHash = MxDetailsHash;
+                }
             }
         }
     }

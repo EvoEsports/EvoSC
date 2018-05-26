@@ -28,7 +28,7 @@ class Map extends Model
 
     public function author()
     {
-        return $this->hasOne(Player::class, 'Login', 'Author');
+        return $this->hasOne(Player::class, 'id', 'Author');
     }
 
     public function ratings()
@@ -43,7 +43,11 @@ class Map extends Model
 
     public function getMxDetailsAttribute($jsonMxDetails)
     {
-        return json_decode($jsonMxDetails)[0];
+        if($jsonMxDetails){
+            return json_decode($jsonMxDetails)[0];
+        }
+
+        return null;
     }
 
     public function getMxWorldRecordAttribute($jsonMxWorldRecordDetails)
