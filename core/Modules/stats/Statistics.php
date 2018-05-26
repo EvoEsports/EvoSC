@@ -158,7 +158,10 @@ class Statistics
         }
 
         if (!$player->stats) {
-            $player->stats()->create(['Player' => $player->id]);
+            Stats::create([
+                'Player' => $player->id,
+                'Visits' => 1
+            ]);
         }
 
         $player->stats()->increment('Visits');

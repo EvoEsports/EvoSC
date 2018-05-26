@@ -17,7 +17,6 @@ use Maniaplanet\DedicatedServer\InvalidArgumentException;
 
 class PlayerController
 {
-    private static $lastManialinkHash;
     private static $fakePlayers;
 
     public static function init()
