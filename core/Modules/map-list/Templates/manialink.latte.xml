@@ -28,7 +28,7 @@
 
             <frame pos="61 -3" z-index="5">
                 <quad class="nav-button button" data-page="3" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Jukebox" />
+                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Queued maps" />
             </frame>
         </frame>
 
@@ -44,6 +44,12 @@
             <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" />
             <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" JUKE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
             <label class="mx" pos="129 0" valign="center" halign="center" size="14 3" text=" MX INFO" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
+        </framemodel>
+
+        <framemodel id="QueueItem">
+            <quad pos="1 0" size="32 18" bgcolor="fff3" />
+            <label pos="36 -5" textsize="2" size="120 4" text="Mapname" />
+            <label pos="36 -10" textsize="1" size="120 4" text="Requested by player" />
         </framemodel>
 
         <frame id="tabs" pos="2 -13" z-index="2">
@@ -70,7 +76,12 @@
             </frame>
 
             <frame data-tab="2" id="jukebox" hidden="1">
-                <label textcolor="ffff" textsize="1" text="jukebox" />
+                <frame id="queue-list">
+                    <frameinstance pos="0 0" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -20" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -40" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -60" modelid="QueueItem" hidden="1" />
+                </frame>
             </frame>
         </frame>
     </frame>
@@ -83,6 +94,8 @@ declare Integer activeTab;
 declare CMlFrame tabs;
 declare Text[][] maps;
 declare Text[][] favorites;
+
+declare Text lastQueueHash;
 
 Integer int(Text textInteger){
     return TL::ToInteger(textInteger);
@@ -222,6 +235,40 @@ Void navButtonClick(CMlQuad button){
     activeTab = int(button.DataAttributeGet("page"));
 }
 
+Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
+    declare frame <=> (queueFrameControl as CMlFrame);
+
+    frame.Visible = True;
+    frame.DataAttributeSet("map-id", data[0]);
+    (frame.Controls[1] as CMlLabel).SetText(data[2]);
+    (frame.Controls[2] as CMlLabel).SetText(data[3]);
+
+    if(data[1] != ""){
+        //set map image
+        (frame.Controls[0] as CMlQuad).ImageUrl = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1];
+    }
+}
+
+Void updateMapQueue(Text[][] items){
+    declare queueList <=> (Page.MainFrame.GetFirstChild("queue-list") as CMlFrame);
+
+    foreach(control in queueList.Controls){
+        control.Visible = False;
+    }
+
+    declare Integer lastIteration = items.count;
+
+    if(lastIteration > 4){
+        lastIteration = 4;
+    }
+
+    lastIteration = lastIteration - 1;
+
+    for(i, 0, lastIteration){
+        updateQueueItem(queueList.Controls[i], items[i]);
+    }
+}
+
 main() {
     maps = {esc\Modules\MapList\MapList::mapsToManiaScriptArray($localPlayer)|noescape};
     tabs <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
@@ -325,6 +372,13 @@ main() {
                     AnimMgr.Add(paginationBox, "<quad pos='" ^ event.Control.RelativePosition_V3[0] ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
                     continue;
                 }
+            }
+
+            declare Text QueueHash for InputPlayer;
+            if(lastQueueHash != QueueHash){
+                declare Text[][] QueuedMaps for InputPlayer;
+                updateMapQueue(QueuedMaps);
+                lastQueueHash = QueueHash;
             }
         }
     }

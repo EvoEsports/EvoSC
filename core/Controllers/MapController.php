@@ -263,6 +263,9 @@ class MapController
         Log::info("$player->NickName juked map $map->Name");
 
         self::displayMapWidget();
+
+        $hooks = HookController::getHooks('QueueUpdated');
+        HookController::fireHookBatch($hooks, self::$queue);
     }
 
     /**
@@ -295,12 +298,12 @@ class MapController
                 }
 
                 $map = Map::create([
-                    'UId'           => $mapInfo->uId,
-                    'Name'          => $mapInfo->name,
-                    'FileName'      => $mapInfo->fileName,
-                    'Author'        => $authorId,
-                    'Environment'   => $mapInfo->environnement,
-                    'Enabled'       => true,
+                    'UId'         => $mapInfo->uId,
+                    'Name'        => $mapInfo->name,
+                    'FileName'    => $mapInfo->fileName,
+                    'Author'      => $authorId,
+                    'Environment' => $mapInfo->environnement,
+                    'Enabled'     => true,
                 ]);
             }
 

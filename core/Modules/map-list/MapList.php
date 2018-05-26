@@ -2,8 +2,10 @@
 
 namespace esc\Modules\MapList;
 
+use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\MapQueueItem;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
@@ -27,6 +29,8 @@ class MapList
         ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
+
+        Hook::add('QueueUpdated', 'MapList::mapQueueUpdated');
 
         KeyController::createBind('X', 'MapList::reload');
 
@@ -55,10 +59,29 @@ class MapList
         return Map::count();
     }
 
+    public static function mapQueueUpdated(Collection $queue)
+    {
+        onlinePlayers()->each(function (Player $player) use ($queue) {
+            Template::show($player, 'map-list.update-queue', []);
+        });
+    }
+
+    public static function mapQueueToManiaScriptArray()
+    {
+        return MapController::getQueue()->map(function (MapQueueItem $item) {
+            return sprintf('["%s", "%s", "%s", "%s"]',
+                $item->map->id,
+                $item->map->MxId,
+                $item->map->Name,
+                $item->issuer->NickName
+            );
+        })->implode(",\n");
+    }
+
     public static function mapsToManiaScriptArray(Player $player)
     {
-        $locals = $player->locals->pluck('Rank', 'Map');
-        $dedis  = $player->dedis->pluck('Rank', 'Map');
+        $locals    = $player->locals->pluck('Rank', 'Map');
+        $dedis     = $player->dedis->pluck('Rank', 'Map');
         $favorites = $player->favorites()->get(['id', 'Name'])->pluck('Name', 'id');
 
         $maps = Map::all()->map(function (Map $map) use ($locals, $dedis, $favorites) {
@@ -67,8 +90,8 @@ class MapList
             $authorLogin = $author->Login ?? "n/a";
             $authorNick  = stripAll($author->NickName ?? "n/a");
 
-            $local = $locals->get($map->id) ?: '-';
-            $dedi  = $dedis->get($map->id) ?: '-';
+            $local    = $locals->get($map->id) ?: '-';
+            $dedi     = $dedis->get($map->id) ?: '-';
             $favorite = $favorites->get($map->id) ? 1 : 0;
 
             $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-maps-queue" id="update-maps-queue" version="3">
+    <script>
+        <!--
+        main(){
+            while(InputPlayer == Null){
+                sleep(50);
+            }
+
+            declare Text QueueHash for InputPlayer;
+            declare Text[][] QueuedMaps for InputPlayer;
+
+            QueueHash = {uniqid()};
+            QueuedMaps = [{esc\Modules\MapList\MapList::mapQueueToManiaScriptArray()|noescape}];
+        }
+        -->
+    </script>
+</manialink>
