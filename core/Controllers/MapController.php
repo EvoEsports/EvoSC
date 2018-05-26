@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\Config;
-use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -72,7 +71,6 @@ class MapController
     {
         self::addTime($amount);
     }
-
 
 
     private static function updateRoundtime(int $timeInSeconds)
@@ -285,16 +283,23 @@ class MapController
 
             if (!$map) {
                 //Map does not exist, create it
+                $author = Player::whereLogin($mapInfo->author)->first();
+
+                if ($author) {
+                    $authorId = $author->id;
+                } else {
+                    $authorId = Player::insertGetId([
+                        'Login'    => $mapInfo->author,
+                        'NickName' => $mapInfo->author
+                    ]);
+                }
+
                 $map = Map::create([
                     'UId'           => $mapInfo->uId,
                     'Name'          => $mapInfo->name,
                     'FileName'      => $mapInfo->fileName,
-                    'Author'        => $mapInfo->author,
-                    'AuthorTime'    => $mapInfo->authorTime,
-                    'Mood'          => $mapInfo->mood,
-                    'NbLaps'        => $mapInfo->nbLaps,
-                    'NbCheckpoints' => $mapInfo->nbCheckpoints,
-                    'Environnement' => $mapInfo->environnement,
+                    'Author'        => $authorId,
+                    'Environment'   => $mapInfo->environnement,
                     'Enabled'       => true,
                 ]);
             }
