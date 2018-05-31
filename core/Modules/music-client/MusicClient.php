@@ -11,6 +11,8 @@ use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
 use Illuminate\Support\Collection;
 
 class MusicClient
@@ -139,8 +141,17 @@ class MusicClient
     {
         Log::info("Loading music...");
 
-        $res       = RestClient::get(config('music.server'));
-        $musicJson = $res->getBody()->getContents();
+        try {
+            $res = RestClient::get(config('music.server'));
+            $musicJson = $res->getBody()->getContents();
+        } catch (\Exception $e) {
+            Log::logAddLine('Music', 'Server connection failed: ' . $e->getMessage());
+            $musicJson = file_get_contents(cacheDir('music.json'));
+        }
+
+        if(!json_decode($musicJson)){
+            $musicJson = file_get_contents(cacheDir('music.json'));
+        }
 
         try {
             MusicClient::setMusicFiles(collect(json_decode($musicJson)));

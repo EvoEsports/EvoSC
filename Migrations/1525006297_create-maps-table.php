@@ -17,22 +17,15 @@ class CreateMapsTable extends Migration
     {
         $schemaBuilder->create('maps', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('UId')->nullable();
-            $table->integer('MxId')->nullable();
-            $table->string('Name')->nullable();
-            $table->string('Author')->nullable();
-            $table->string('FileName')->unique();
-            $table->string('Environment')->nullable();
-            $table->integer('NbCheckpoints')->nullable();
-            $table->integer('NbLaps')->nullable();
-            $table->integer('Plays')->default(0);
-            $table->string('Mood')->nullable();
-            $table->boolean('LapRace')->nullable();
-            $table->dateTime('LastPlayed')->nullable();
-            $table->boolean('Enabled')->default(false);
-            $table->integer('AuthorTime')->nullable();
+            $table->string('uid')->unique();
+            $table->integer('author');
+            $table->text('gbx')->nullable();
             $table->text('mx_details')->nullable();
             $table->text('mx_world_record')->nullable();
+            $table->string('filename')->unique();
+            $table->integer('plays')->default(0);
+            $table->dateTime('last_played')->nullable();
+            $table->boolean('enabled')->default(false);
         });
     }
 

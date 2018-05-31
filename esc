@@ -8,22 +8,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Connection;
 
-include 'core/import_uaseco.php';
-
-class RunEsc extends Command
-{
-    protected function configure()
-    {
-        $this->setName('run');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $output->writeln('Currently not available');
-    }
-}
+require 'core/import_uaseco.php';
+require 'core/run.php';
 
 class MakeMigration extends Command
 {
@@ -203,10 +190,10 @@ class Migrate extends Command
 
 $application = new Application();
 
-$application->add(new RunEsc());
 $application->add(new MakeMigration());
 $application->add(new Migrate());
 $application->add(new ImportUaseco());
+$application->add(new EscRun());
 
 try {
     $application->run();

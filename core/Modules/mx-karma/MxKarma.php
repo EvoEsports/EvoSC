@@ -443,7 +443,7 @@ class MxKarma extends MXK
                 $json = [
                     'gamemode' => self::getGameMode(),
                     'titleid' => Server::getVersion()->titleId,
-                    'mapuid' => $map->UId,
+                    'mapuid' => $map->uid,
                     'mapname' => $map->Name,
                     'mapauthor' => $map->Author,
                     'isimport' => 'false',
