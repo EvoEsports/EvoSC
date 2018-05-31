@@ -16,22 +16,22 @@ class HookController extends ModescriptCallbacks
     private static $hooks;
 
     private static $eventMap = [
-        'PlayerConnect' => 'PlayerConnect',
-        'ManiaPlanet.PlayerDisconnect' => 'PlayerDisconnect',
-        'ManiaPlanet.PlayerInfoChanged' => 'PlayerInfoChanged',
-        'ManiaPlanet.PlayerChat' => 'PlayerChat',
-        'ManiaPlanet.BeginMap' => 'BeginMap',
-        'ManiaPlanet.EndMap' => 'EndMap',
-        'ManiaPlanet.EndMatch' => 'EndMatch',
-        'ManiaPlanet.BeginMatch' => 'BeginMatch',
-        'TrackMania.PlayerCheckpoint' => 'PlayerCheckpoint',
-        'TrackMania.PlayerFinish' => 'PlayerFinish',
-        'TrackMania.PlayerIncoherence' => 'PlayerIncoherence',
+        'PlayerConnect'                         => 'PlayerConnect',
+        'ManiaPlanet.PlayerDisconnect'          => 'PlayerDisconnect',
+        'ManiaPlanet.PlayerInfoChanged'         => 'PlayerInfoChanged',
+        'ManiaPlanet.PlayerChat'                => 'PlayerChat',
+        'ManiaPlanet.BeginMap'                  => 'BeginMap',
+        'ManiaPlanet.EndMap'                    => 'EndMap',
+        'ManiaPlanet.EndMatch'                  => 'EndMatch',
+        'ManiaPlanet.BeginMatch'                => 'BeginMatch',
+        'TrackMania.PlayerCheckpoint'           => 'PlayerCheckpoint',
+        'TrackMania.PlayerFinish'               => 'PlayerFinish',
+        'TrackMania.PlayerIncoherence'          => 'PlayerIncoherence',
         'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
-        'ManiaPlanet.ModeScriptCallbackArray' => 'ManiaPlanet.ModeScriptCallbackArray',
-        'PlayerLocal' => 'PlayerLocal',
-//        'PlayerRateMap' => 'PlayerRateMap',
-//        'PlayerDonate' => 'PlayerDonate',
+        'ManiaPlanet.ModeScriptCallbackArray'   => 'ManiaPlanet.ModeScriptCallbackArray',
+        'PlayerLocal'                           => 'PlayerLocal',
+        //        'PlayerRateMap' => 'PlayerRateMap',
+        //        'PlayerDonate' => 'PlayerDonate',
     ];
 
     public static function init()
@@ -53,7 +53,7 @@ class HookController extends ModescriptCallbacks
     public static function add(string $event, string $staticFunction)
     {
         $hooks = self::getHooks();
-        $hook = new Hook($event, $staticFunction);
+        $hook  = new Hook($event, $staticFunction);
 
         if ($hooks) {
             self::getHooks()->add($hook);
@@ -70,7 +70,7 @@ class HookController extends ModescriptCallbacks
 
     private static function handleModeScriptCallbackArray(array $modescriptCallbackArray)
     {
-        $callback = $modescriptCallbackArray[0];
+        $callback  = $modescriptCallbackArray[0];
         $arguments = $modescriptCallbackArray[1];
 
         switch ($callback) {
@@ -141,14 +141,22 @@ class HookController extends ModescriptCallbacks
 
             case 'BeginMap':
                 //SMapInfo Map
-                $map = Map::where('filename', $arguments[0]['filename'])->first();
-                self::fireHookBatch($hooks, $map);
+                if (isset($arguments[0]->enabled)) {
+                    self::fireHookBatch($hooks, $arguments[0]);
+                }else{
+                    $map = Map::where('filename', $arguments[0]['FileName'])->first();
+                    self::fireHookBatch($hooks, $map);
+                }
                 break;
 
             case 'EndMap':
                 //SMapInfo Map
-                $map = Map::where('filename', $arguments[0]['filename'])->first();
-                self::fireHookBatch($hooks, $map);
+                if (isset($arguments[0]->enabled)) {
+                    self::fireHookBatch($hooks, $arguments[0]);
+                }else{
+                    $map = Map::where('filename', $arguments[0]['FileName'])->first();
+                    self::fireHookBatch($hooks, $map);
+                }
                 break;
 
             case 'BeginMatch':
@@ -165,7 +173,7 @@ class HookController extends ModescriptCallbacks
                 //SPlayerInfo PlayerInfo
                 PlayerController::playerInfoChanged($arguments);
                 $playerLogins = collect($arguments)->pluck('Login');
-                $players = Player::whereIn('Login', $playerLogins)->get();
+                $players      = Player::whereIn('Login', $playerLogins)->get();
                 self::fireHookBatch($hooks, $players);
                 break;
 
