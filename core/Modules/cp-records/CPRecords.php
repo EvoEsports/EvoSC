@@ -36,7 +36,7 @@ class CPRecords
         return null;
     }
 
-    public static function playerCheckpoint(Player $player, int $score, int $lap, int $cpId)
+    public static function playerCheckpoint(Player $player, $score, $lap, $cpId)
     {
         $checkpoint = self::getCheckpoint($cpId);
 
