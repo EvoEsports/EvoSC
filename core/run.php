@@ -16,10 +16,28 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->playLoop();
+        while (true) {
+            try {
+                $this->start();
+            } catch (\Exception $e) {
+                $crashReport = collect();
+                $crashReport->put('file', $e->getFile());
+                $crashReport->put('line', $e->getLine());
+                $crashReport->put('message', $e->getMessage());
+                $crashReport->put('trace', $e->getTraceAsString());
+
+                if (!is_dir(__DIR__ . '/../crash-reports')) {
+                    mkdir(__DIR__ . '/../crash-reports');
+                }
+
+                $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
+                file_put_contents($filename, $crashReport->toJson());
+                continue;
+            }
+        }
     }
 
-    private function playLoop()
+    private function start()
     {
         esc\Classes\Log::info("Starting...");
 
@@ -36,22 +54,7 @@ class EscRun extends Command
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
         while (true) {
-            try {
-                cycle();
-            } catch (Exception $e) {
-                $crashReport = collect();
-                $crashReport->put('file', $e->getFile());
-                $crashReport->put('line', $e->getLine());
-                $crashReport->put('message', $e->getMessage());
-                $crashReport->put('trace', $e->getTraceAsString());
-
-                if (!is_dir('../crash-reports')) {
-                    mkdir('../crash-reports');
-                }
-
-                $filename = sprintf('../crash-reports/%s.json', date('Y-m-d_Hi', time()));
-                file_put_contents($filename, $crashReport->toJson());
-            }
+            cycle();
         }
     }
 }

@@ -5,6 +5,7 @@ music/
 maps/
 logs/
 cache/
+crash-reports/
 
 !config/
 config/*
