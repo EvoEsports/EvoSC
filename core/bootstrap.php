@@ -72,10 +72,6 @@ function bootModules()
     esc\Controllers\ModuleController::bootModules();
 }
 
-function migrate()
-{
-}
-
 function beginMap()
 {
     $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
