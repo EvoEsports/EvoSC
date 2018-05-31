@@ -142,7 +142,6 @@ class HookController extends ModescriptCallbacks
             case 'BeginMap':
                 //SMapInfo Map
                 $map = Map::where('filename', $arguments[0]['filename'])->first();
-                throw new Exception('timeout blabla', 322);
                 self::fireHookBatch($hooks, $map);
                 break;
 
