@@ -16,15 +16,19 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        while (true) {
-            try {
-                $this->start();
-            } catch (\Exception $e) {
+        $this->start();
+    }
+
+    private function start()
+    {
+        register_shutdown_function(function () {
+            $error = error_get_last();
+            // fatal error, E_ERROR === 1
+            if ($error['type'] === E_ERROR) {
                 $crashReport = collect();
-                $crashReport->put('file', $e->getFile());
-                $crashReport->put('line', $e->getLine());
-                $crashReport->put('message', $e->getMessage());
-                $crashReport->put('trace', $e->getTraceAsString());
+                $crashReport->put('file', $error['file']);
+                $crashReport->put('line', $error['line']);
+                $crashReport->put('message', $error['message']);
 
                 if (!is_dir(__DIR__ . '/../crash-reports')) {
                     mkdir(__DIR__ . '/../crash-reports');
@@ -32,13 +36,11 @@ class EscRun extends Command
 
                 $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
                 file_put_contents($filename, $crashReport->toJson());
-                continue;
-            }
-        }
-    }
 
-    private function start()
-    {
+                $this->start();
+            }
+        });
+
         esc\Classes\Log::info("Starting...");
 
         startEsc();

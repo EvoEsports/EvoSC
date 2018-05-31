@@ -30,7 +30,7 @@ if (isset($_GET['report'])) {
 
             <div class="uk-margin">
                 <code>
-                    <?php echo str_replace("\n", '<br>', $report->trace); ?>
+                    <?php echo str_replace("\n", '<br>', $report->message); ?>
                 </code>
             </div>
         </div>
@@ -70,15 +70,13 @@ if (isset($_GET['report'])) {
                     <th>Date</th>
                     <th>File</th>
                     <th>Message</th>
-                    <th>First line of trace</th>
                     </thead>
                     <tbody>
                     <?php foreach ($reports as $report) { ?>
                         <tr>
                             <td><?php echo $report->date; ?></td>
                             <td><?php echo $report->file; ?></td>
-                            <td><?php echo $report->message; ?></td>
-                            <td><?php echo substr($report->trace, 0, strpos($report->trace, "\n")); ?></td>
+                            <td><?php echo substr($report->message, 0, strpos($report->message, "#")); ?></td>
                             <td><a href="/?report=<?php echo $report->filename; ?>">Details</a></td>
                         </tr>
                     <?php } ?>
