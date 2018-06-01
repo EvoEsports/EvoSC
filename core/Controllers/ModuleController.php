@@ -63,7 +63,7 @@ class ModuleController
         Template::hide($callee, 'modules');
     }
 
-    private static function outputModuleInformation($module)
+    public static function outputModuleInformation($module)
     {
         $name = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
         $author = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
@@ -108,11 +108,11 @@ class ModuleController
         self::loadModulesInformation($modules);
 
         //Output loaded modules
+        Log::getOutput()->writeln("");
         self::outputModuleInformation(json_decode('{"name":"Name","version":"Version","author":"Author"}'));
         self::outputModuleInformation(json_decode('{"name":"------------------------------","version":"------------","author":"------------------------------"}'));
-        self::$loadedModules->each(function ($module) {
-            self::outputModuleInformation($module);
-        });
+        self::$loadedModules->each([ModuleController::class, 'outputModuleInformation']);
+        Log::getOutput()->writeln("");
 
         //Boot modules
         Log::logAddLine('Modules', 'Booting modules');
