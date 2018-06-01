@@ -3,6 +3,8 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\Hook;
+
 class ModeScriptEventController
 {
     public static function handleModeScriptCallbacks($modeScriptCallback)
@@ -15,5 +17,7 @@ class ModeScriptEventController
                 echo "Calling unhandled MSC: $name \n";
                 break;
         }
+
+        Hook::fire($name, $arguments);
     }
 }

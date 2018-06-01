@@ -7,7 +7,6 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Models\Player;
 use esc\Models\Stats;
-use Illuminate\Support\Facades\DB;
 
 class EventController
 {
@@ -34,6 +33,8 @@ class EventController
                     echo "Calling unhandled: $name \n";
                     break;
             }
+
+            Hook::fire($name, $arguments);
         }
 
     }
