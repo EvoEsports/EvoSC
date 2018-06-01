@@ -48,8 +48,12 @@ class Map extends Model
 
     public function getMxDetailsAttribute($jsonMxDetails)
     {
-        if($jsonMxDetails){
-            return json_decode($jsonMxDetails)[0];
+        if ($jsonMxDetails) {
+            $data = json_decode($jsonMxDetails);
+
+            if (array_key_exists(0, $data)) {
+                return $data[0];
+            }
         }
 
         return null;
