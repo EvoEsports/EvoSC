@@ -262,8 +262,7 @@ class MapController
 
         self::displayMapWidget();
 
-        $hooks = HookController::getHooks('QueueUpdated');
-        HookController::fireHookBatch($hooks, self::$queue);
+        Hook::fire('QueueUpdated', self::$queue);
     }
 
     private static function getGbxInformation($filename)

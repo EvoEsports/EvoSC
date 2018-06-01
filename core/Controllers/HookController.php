@@ -37,11 +37,4 @@ class HookController
             Log::logAddLine('Hook', "Added $event -> $staticFunction", false);
         }
     }
-
-    static function fireHookBatch($hooks, ...$arguments)
-    {
-        foreach ($hooks as $hook) {
-            $hook->execute(...$arguments);
-        }
-    }
 }

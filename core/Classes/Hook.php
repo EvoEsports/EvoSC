@@ -65,14 +65,21 @@ class Hook
         HookController::add($event, $function);
     }
 
+    /**
+     * Fire all registered hooks
+     * @param string $hookName
+     * @param mixed ...$arguments
+     */
     public static function fire(string $hookName, ...$arguments)
     {
         $hooks = HookController::getHooks($hookName);
 
-        if($hooks->isEmpty()){
+        if ($hooks->isEmpty()) {
             return;
         }
 
-        HookController::fireHookBatch($hooks, ...$arguments);
+        foreach ($hooks as $hook) {
+            $hook->execute(...$arguments);
+        }
     }
 }
