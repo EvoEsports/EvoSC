@@ -60,9 +60,17 @@ function startEsc()
 
 function cycle()
 {
+    set_error_handler(function ($errno, $errstr, $errfile, $errline, array $errcontext) {
+        // error was suppressed with the @-operator
+        if (0 === error_reporting()) {
+            return false;
+        }
+
+        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+    });
+
     esc\Classes\Timer::startCycle();
 
-//    esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
     \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
 
     usleep(esc\Classes\Timer::getNextCyclePause());

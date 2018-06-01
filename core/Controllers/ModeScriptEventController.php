@@ -9,15 +9,22 @@ class ModeScriptEventController
 {
     public static function handleModeScriptCallbacks($modeScriptCallback)
     {
-        $name      = $modeScriptCallback[0];
-        $arguments = $modeScriptCallback[1];
+        if (!$modeScriptCallback) return;
 
-        switch ($name) {
-            default:
-                echo "Calling unhandled MSC: $name \n";
-                break;
+        $modeScriptCallbackName  = $modeScriptCallback[0];
+        $modeScriptCallbackArray = $modeScriptCallback[1];
+
+        foreach ($modeScriptCallbackArray as $callback) {
+            $name      = $callback[0];
+            $arguments = $callback[1];
+
+            switch ($name) {
+                default:
+                    echo "Calling unhandled MSC: $name \n";
+                    break;
+            }
+
+            Hook::fire($name, $arguments);
         }
-
-        Hook::fire($name, $arguments);
     }
 }

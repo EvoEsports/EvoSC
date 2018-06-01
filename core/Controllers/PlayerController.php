@@ -149,32 +149,9 @@ class PlayerController
      * @param bool $surpressJoinMessage
      * @return Player
      */
-    public static function playerConnect(Player $player, bool $surpressJoinMessage = false): Player
+    public static function playerConnect(Player $player): Player
     {
-        $player->setOnline();
-
-        $hooks = HookController::getHooks('PlayerConnect');
-        HookController::fireHookBatch($hooks, $player);
-
-        if (Database::hasTable('stats')) {
-            $stats = $player->stats;
-
-            if ($stats) {
-                if (!$surpressJoinMessage) {
-                    ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server. Total visits ', $stats->Visits, ' last visited ', secondary($stats->updated_at->diffForHumans()));
-                }
-            }
-
-            if (isset($stats->Rank) && $stats->Rank > 0) {
-                $total = Stats::where('Rank', '>', 0)->count();
-                ChatController::message($stats->player, '_info', 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
-            }
-        } else {
-            if (!$surpressJoinMessage) {
-                ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server.');
-            }
-        }
-
+        ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server.');
         Log::info($player->NickName . " joined the server.");
 
         return $player;

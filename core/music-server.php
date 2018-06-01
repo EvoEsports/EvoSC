@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(E_ERROR);
-
 include_once 'global-functions.php';
 
 $musicDir = musicDir();

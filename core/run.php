@@ -24,6 +24,9 @@ class EscRun extends Command
     {
         register_shutdown_function(function () {
             $error = error_get_last();
+
+            echo $error['type'] . "\n";
+
             // fatal error, E_ERROR === 1
             if ($error['type'] === E_ERROR) {
                 $crashReport = collect();
