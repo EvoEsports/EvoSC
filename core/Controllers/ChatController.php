@@ -4,11 +4,10 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\Hook;
 use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Server;
-use esc\Classes\Template;
 use esc\Models\Dedi;
 use esc\Models\Group;
 use esc\Models\LocalRecord;
@@ -43,7 +42,7 @@ $$: Writes a dollarsign
 
         Server::call('ChatEnableManualRouting', [true, false]);
 
-        HookController::add('PlayerChat', 'ChatController::playerChat');
+        Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
         ChatCommand::add('mute', 'ChatController::mute', 'Mutes a player by given nickname', '//', 'player.mute');
         ChatCommand::add('unmute', 'ChatController::unmute', 'Unmute a player by given nickname', '//', 'player.mute');
