@@ -3,6 +3,7 @@
 include 'autoload.php';
 include 'bootstrap.php';
 
+use esc\Classes\Log;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,7 +57,11 @@ class EscRun extends Command
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
         while (true) {
-            cycle();
+            try {
+                cycle();
+            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\TransportException $e) {
+                Log::logAddLine('XmlRpc', $e->getMessage());
+            }
         }
     }
 }
