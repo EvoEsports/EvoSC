@@ -11,11 +11,19 @@ class HookController
 {
     private static $hooks;
 
+    /**
+     * Initialize HookController
+     */
     public static function init()
     {
         self::$hooks = new Collection();
     }
 
+    /**
+     * Get all hooks, or all by name
+     * @param string|null $hook
+     * @return Collection|null
+     */
     static function getHooks(string $hook = null): ?Collection
     {
         if ($hook) {
@@ -27,14 +35,19 @@ class HookController
         return self::$hooks;
     }
 
-    public static function add(string $event, $staticFunction)
+    /**
+     * Add a hook
+     * @param string $event
+     * @param array $callback
+     */
+    public static function add(string $event, array $callback)
     {
         $hooks = self::getHooks();
-        $hook  = new Hook($event, $staticFunction);
+        $hook  = new Hook($event, $callback);
 
         if ($hooks) {
             self::getHooks()->add($hook);
-//            Log::logAddLine('Hook', "Added $event -> $staticFunction", false);
+            Log::logAddLine('Hook', "Added " . $callback[0] . " -> " . $callback[1], false);
         }
     }
 }

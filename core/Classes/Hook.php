@@ -17,7 +17,7 @@ class Hook
      * @param string $function
      * @param string|null $name
      */
-    public function __construct(string $event, $function, string $name = null)
+    public function __construct(string $event, array $function, string $name = null)
     {
         $this->event    = $event;
         $this->function = $function;
@@ -30,27 +30,10 @@ class Hook
     public function execute(...$arguments)
     {
         try {
-            if (is_string($this->function)) {
-                $className = explode('::', $this->function)[0];
-                $function  = explode('::', $this->function)[1];
-
-                $class = classes()->where('class', $className)->first();
-
-                if ($class) {
-                    call_user_func_array("$class->namespace::$function", $arguments);
-                } else {
-                    call_user_func_array($this->function, $arguments);
-                }
-
-                Log::logAddLine('Hook', "Execute: $this->function", false);
-            }
-
-            if (is_array($this->function)) {
-                call_user_func($this->function, ...$arguments);
-                Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], true);
-            }
+            call_user_func($this->function, ...$arguments);
+            Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], true);
         } catch (\Exception $e) {
-            Log::logAddLine('Hook ERROR', "Execution of $this->function() failed: " . $e->getMessage(), true);
+            Log::logAddLine('Hook ERROR', "Execution of " . $this->function[0] . " " . $this->function[1] . " failed: " . $e->getMessage(), true);
             Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
         }
     }
@@ -65,11 +48,11 @@ class Hook
 
     /**
      * @param string $event
-     * @param $function
+     * @param $callback
      */
-    public static function add(string $event, $function)
+    public static function add(string $event, array $callback)
     {
-        HookController::add($event, $function);
+        HookController::add($event, $callback);
     }
 
     /**
