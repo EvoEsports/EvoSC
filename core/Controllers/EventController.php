@@ -5,6 +5,7 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
@@ -52,6 +53,10 @@ class EventController
 
                 case 'ManiaPlanet.EndMatch':
                     Hook::fire('EndMatch');
+                    break;
+
+                case 'ManiaPlanet.PlayerManialinkPageAnswer':
+                    self::mpPlayerManialinkPageAnswer($arguments);
                     break;
 
                 case 'ManiaPlanet.ModeScriptCallbackArray':
@@ -113,7 +118,7 @@ class EventController
                 $player = Player::findOrFail($login);
                 Hook::fire('PlayerConnect', $player);
             } catch (\Exception $e) {
-                Log::logAddLine('EventController', "Error: Player ($login) not found!");
+                Log::logAddLine('mpPlayerConnect', "Error: Player ($login) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -134,7 +139,7 @@ class EventController
                 $player = Player::findOrFail($login);
                 Hook::fire('PlayerChat', $player, $text, false);
             } catch (\Exception $e) {
-                Log::logAddLine('EventController', "Error: Player ($login) not found!");
+                Log::logAddLine('mpPlayerChat', "Error: Player ($login) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -155,7 +160,7 @@ class EventController
                 Player::whereLogin($login)->update(['player_id' => 0]);
                 Hook::fire('PlayerDisconnect', $player, 0);
             } catch (\Exception $e) {
-                Log::logAddLine('EventController', "Error: Player ($login) not found!");
+                Log::logAddLine('mpPlayerDisconnect', "Error: Player ($login) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -175,7 +180,7 @@ class EventController
                 $map = Map::where('uid', $mapUid)->first();
                 Hook::fire('BeginMap', $map);
             } catch (\Exception $e) {
-                Log::logAddLine('EventController', "Error: Map ($mapUid) not found!");
+                Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -195,7 +200,27 @@ class EventController
                 $map = Map::where('uid', $mapUid)->first();
                 Hook::fire('EndMap', $map);
             } catch (\Exception $e) {
-                Log::logAddLine('EventController', "Error: Map ($mapUid) not found!");
+                Log::logAddLine('mpEndMap', "Error: Map ($mapUid) not found!");
+            }
+        } else {
+            throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $arguments
+     * @throws \Exception
+     */
+    private static function mpPlayerManialinkPageAnswer($arguments)
+    {
+        if (count($arguments) == 4 && is_string($arguments[1]) && is_string($arguments[2])) {
+            $login = $arguments[1];
+
+            try {
+                $player = Player::findOrFail($login);
+                ManiaLinkEvent::call($player, $arguments[2]);
+            } catch (\Exception $e) {
+                Log::logAddLine('mpPlayerManialinkPageAnswer', "Error: Player ($login) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');
