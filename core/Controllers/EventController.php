@@ -10,6 +10,10 @@ use esc\Models\Stats;
 
 class EventController
 {
+    /**
+     * @param $executedCallbacks
+     * @throws \Exception
+     */
     public static function handleCallbacks($executedCallbacks)
     {
         foreach ($executedCallbacks as $callback) {
@@ -25,6 +29,14 @@ class EventController
                     self::mpPlayerConnect($arguments);
                     break;
 
+                case 'ManiaPlanet.PlayerDisconnect':
+                    self::mpPlayerDisconnect($arguments);
+                    break;
+
+                case 'ManiaPlanet.PlayerChat':
+                    self::mpPlayerChat($arguments);
+                    break;
+
                 case 'ManiaPlanet.ModeScriptCallbackArray':
                     ModeScriptEventController::handleModeScriptCallbacks($callback);
                     break;
@@ -34,11 +46,14 @@ class EventController
                     break;
             }
 
-            Hook::fire($name, $arguments);
+//            Hook::fire($name, $arguments);
         }
 
     }
 
+    /**
+     * @param $playerInfos
+     */
     private static function mpPlayerInfoChanged($playerInfos)
     {
         foreach ($playerInfos as $playerInfo) {
@@ -78,8 +93,50 @@ class EventController
             $login = $playerInfo[0];
 
             try {
-                $player = Player::firstOrFail($login);
+                $player = Player::findOrFail($login);
                 Hook::fire('PlayerConnect', $player);
+            } catch (\Exception $e) {
+                Log::logAddLine('EventController', "Error: Player ($login) not found!");
+            }
+        } else {
+            throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $data
+     * @throws \Exception
+     */
+    private static function mpPlayerChat($data)
+    {
+        if (count($data) == 4 && is_string($data[1])) {
+            $login = $data[1];
+            $text  = $data[2];
+
+            try {
+                $player = Player::findOrFail($login);
+                Hook::fire('PlayerChat', $player, $text, false);
+            } catch (\Exception $e) {
+                Log::logAddLine('EventController', "Error: Player ($login) not found!");
+            }
+        } else {
+            throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $arguments
+     * @throws \Exception
+     */
+    private static function mpPlayerDisconnect($arguments)
+    {
+        if (count($arguments) == 2 && is_string($arguments[0])) {
+            $login = $arguments[0];
+
+            try {
+                $player = Player::findOrFail($login);
+                Player::whereLogin($login)->update(['player_id' => 0]);
+                Hook::fire('PlayerDisconnect', $player, 0);
             } catch (\Exception $e) {
                 Log::logAddLine('EventController', "Error: Player ($login) not found!");
             }

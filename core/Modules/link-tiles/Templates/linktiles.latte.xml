@@ -1,10 +1,3 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="LinkTiles" version="3">
-    {foreach $tiles as $tile}
-    <frame pos="{$tile->pos}">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" action="openlink,{$tile->url}" />
-        <label pos="4 -3.2" valign="center" halign="center" textsize="3" text="{$tile->icon}" />
-        <label pos="4 -8" size="6 2" valign="center" halign="center" textsize="0.005" text="$t{$tile->title}" />
-    </frame>
-    {/foreach}
 </manialink>

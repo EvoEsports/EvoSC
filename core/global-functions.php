@@ -3,7 +3,7 @@
 function formatScore(int $score): string
 {
     $seconds = floor($score / 1000);
-    $ms = $score - ($seconds * 1000);
+    $ms      = $score - ($seconds * 1000);
     $minutes = floor($seconds / 60);
     $seconds -= $minutes * 60;
 
@@ -13,7 +13,7 @@ function formatScore(int $score): string
 function formatScoreNoMinutes(int $score): string
 {
     $seconds = floor($score / 1000);
-    $ms = $score - ($seconds * 1000);
+    $ms      = $score - ($seconds * 1000);
 
     return sprintf('%d.%03d', $seconds, $ms);
 }
@@ -75,16 +75,22 @@ function baseDir(string $filename = ''): string
 
 function onlinePlayers(): \Illuminate\Support\Collection
 {
+    /*
+     * Get players from rpc and then get them from database
+     * Additional latency possible
+     *
     $playerlist = \esc\Classes\Server::getPlayerList();
     $logins = collect($playerlist)->pluck(['login']);
 
     return esc\Models\Player::whereIn('Login', $logins)->get();
+    */
+
+    return \esc\Models\Player::where('player_id', '>', 0)->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
 {
-    return esc\Models\Player::where('Score', '>', 0)
-        ->get();
+    return esc\Models\Player::where('Score', '>', 0)->get();
 }
 
 function cutZeroes(string $formattedScore): string
@@ -122,7 +128,7 @@ function getEscVersion(): string
 function maps()
 {
     return \esc\Models\Map::whereEnabled(true)
-        ->get();
+                          ->get();
 }
 
 function matchSettings(string $filename = null)
@@ -132,7 +138,7 @@ function matchSettings(string $filename = null)
 
 function getMapInfoFromFile(string $filename)
 {
-    $mps = config('server.mps');
+    $mps  = config('server.mps');
     $maps = config('server.maps') . '/';
     if (file_exists($maps . $filename) && file_exists($mps)) {
         $process = new \Symfony\Component\Process\Process($mps . ' /parsegbx=' . $maps . $filename);
@@ -144,7 +150,7 @@ function getMapInfoFromFile(string $filename)
 
 function call_func($function, ...$arguments)
 {
-    $className = explode('::', $function)[0];
+    $className    = explode('::', $function)[0];
     $functionName = explode('::', $function)[1];
 
     $class = classes()->where('class', $className)->first();
