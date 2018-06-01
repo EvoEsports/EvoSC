@@ -34,7 +34,7 @@ class ChatCommand
             return true;
         }
 
-        return $player->group->hasAccess($this->access);
+        return $player->hasAccess($this->access);
     }
 
     public static function add(string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null)

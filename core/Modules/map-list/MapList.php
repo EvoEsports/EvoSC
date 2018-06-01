@@ -122,9 +122,10 @@ class MapList
             $local    = $locals->get($map->id) ?: '-';
             $dedi     = $dedis->get($map->id) ?: '-';
             $favorite = $favorites->get($map->id) ? 1 : 0;
+            $mapName  = $map->gbx->Name;
 
-            $search = strtolower(stripAll($map->Name) . $authorNick . $authorLogin);
-            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $map->Name, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $search);
+            $search = strtolower(stripAll($mapName) . $authorNick . $authorLogin);
+            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $search);
         })->implode("\n,");
 
         return sprintf('[%s]', $maps);

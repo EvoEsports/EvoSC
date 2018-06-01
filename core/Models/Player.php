@@ -112,7 +112,7 @@ class Player extends Model
             return false;
         }
 
-        return $this->group->hasAccess($right);
+        return $this->hasAccess($right);
     }
 
     public function getSpectatorStatusAttribute($value)

@@ -39,7 +39,7 @@ class TimeWidget
 
     public static function addTime(Player $player)
     {
-        if ($player->group->hasAccess('time')) {
+        if ($player->hasAccess('time')) {
             MapController::addTime(1);
         }
     }

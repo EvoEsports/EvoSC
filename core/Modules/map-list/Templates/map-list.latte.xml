@@ -9,7 +9,7 @@
 <frame pos="0 -{3 + $iterator->counter * 3.2}">
     {if isset($map) && $map->canBeJuked()}
     <label pos="-1 0" z-index="-2" size="128 3" valign="center" action="maplist.queue,{$mapId}"/>
-    <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripStyle($map->Name ?: '')}"/>
+    <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripStyle($map->gbx->Name ?: '')}"/>
     {else}
     <label pos="-1 0" z-index="-2" size="128 3" valign="center" action="{$player->isAdmin() ? 'maplist.queue,'.$mapId : ''}"/>
     <label pos="0 0" z-index="0" size="62 3" textsize="1" valign="center" text="{stripColors(stripStyle($map->Name ?: ''))}" textcolor="999f"/>
