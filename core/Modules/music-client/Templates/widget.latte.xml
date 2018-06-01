@@ -129,6 +129,8 @@ Void populateList(Text[][] songs){
     declare lastKey = 0;
 
     foreach(key => song in songs){
+        log(song);
+
         declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[key] as CMlFrame);
 
         (frame.Controls[0] as CMlLabel).SetText(song[1]);
@@ -260,7 +262,7 @@ main() {
     declare Vec3 startPos;
     declare Integer sortDirection = 1;
 
-    populateList(arraySort(Songs, 0));
+    populateList(Songs);
     AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
 
     sleep(100);

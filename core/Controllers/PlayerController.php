@@ -165,14 +165,15 @@ class PlayerController
      */
     public static function playerFinish(Player $player, $score)
     {
-        if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
-            $player->setScore($score);
-            Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
-        }
-
         if ($player->isSpectator()) {
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
+            return;
+        }
+
+        if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
+            $player->setScore($score);
+            Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
         }
     }
 
@@ -191,53 +192,15 @@ class PlayerController
 
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
         ChatController::messageAll('_info', $player, ' left the server');
-        $player->setOffline();
-    }
-
-    /**
-     * Called on player info changed
-     *
-     * @param $infoplayerInfo
-     */
-    public static function playerInfoChanged($infoplayerInfo)
-    {
-        foreach ($infoplayerInfo as $info) {
-            if (Player::where('Login', $info['Login'])->get()->isEmpty()) {
-                $player = Player::create(['Login' => $info['Login'], 'Group' => 3]);
-            } else {
-                $player = Player::find($info['Login']);
-            }
-
-            if (!$player->stats && $player && $player->id) {
-                Stats::create(['Player' => $player->id]);
-            }
-
-            $info['spectator_status'] = $info['SpectatorStatus'];
-            $player->update($info);
-
-            if (!$player->player_id) {
-                self::playerConnect($player);
-            }
-        }
     }
 
     public static function getPlayerByServerId(int $id): ?Player
     {
-        try {
-            $players = collect(Server::getRpc()->getPlayerList());
-        } catch (\Exception $e) {
-            Log::logAddLine('PlayerController', 'Failed to get player list', true);
-            Log::logAddLine('PlayerController', $e->getTraceAsString());
+        try{
+            return Player::wherePlayerId($id)->first();
+        }catch(\Exception $e){
             return null;
         }
-
-        $playerInfo = $players->where('playerId', $id)->first();
-
-        if ($playerInfo) {
-            return Player::whereLogin($playerInfo->login)->first();
-        }
-
-        return null;
     }
 
     /**

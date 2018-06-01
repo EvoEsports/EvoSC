@@ -27,14 +27,14 @@ class HookController
         return self::$hooks;
     }
 
-    public static function add(string $event, string $staticFunction)
+    public static function add(string $event, $staticFunction)
     {
         $hooks = self::getHooks();
         $hook  = new Hook($event, $staticFunction);
 
         if ($hooks) {
             self::getHooks()->add($hook);
-            Log::logAddLine('Hook', "Added $event -> $staticFunction", false);
+//            Log::logAddLine('Hook', "Added $event -> $staticFunction", false);
         }
     }
 }

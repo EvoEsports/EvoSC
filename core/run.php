@@ -53,7 +53,7 @@ class EscRun extends Command
 
         //Set connected players online
         foreach (onlinePlayers() as $player) {
-            esc\Controllers\PlayerController::playerConnect($player, true);
+            \esc\Classes\Hook::fire('PlayerConnect', $player);
         }
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish

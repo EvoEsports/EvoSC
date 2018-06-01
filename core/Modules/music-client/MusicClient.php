@@ -17,7 +17,7 @@ class MusicClient
     {
         $this->getMusicLibrary();
 
-        Hook::add('PlayerConnect', 'MusicClient::playerConnect');
+        Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
     }
 
     /**
@@ -47,7 +47,7 @@ class MusicClient
     {
         $music = self::$music->map(function ($song) {
             $search = strtolower("$song->title$song->artist");
-            return sprintf('["%s","%s","%s","%s","%s"]', $song->id, $song->title, $song->artist, $song->length, $search);
+            return sprintf('["%s","%s","%s","%s","%s"]', $song->url, $song->title, $song->artist, $song->length, $search);
         })->implode(',');
 
         return sprintf('[%s]', $music);
@@ -70,9 +70,15 @@ class MusicClient
         $musicJson = $res->getBody()->getContents();
 
         try {
-            self::$music = collect(json_decode($musicJson));
+            self::$music = collect(json_decode($musicJson))->map([MusicClient::class, 'addSongUrls']);
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             Log::logAddLine('Music server', 'Failed to get music: ' . $e->getMessage(), true);
         }
+    }
+
+    public function addSongUrls($song)
+    {
+        $song->url = preg_replace('/\?token=.+/', '', config('music.server')) . $song->file;
+        return $song;
     }
 }

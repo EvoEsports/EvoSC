@@ -1,4 +1,4 @@
-![version:0.36.10](https://img.shields.io/badge/version-0.36.10-blue.svg?style=flat-square)
+![version:0.38.0](https://img.shields.io/badge/version-0.38.0-blue.svg?style=flat-square)
 [![GitHub license](https://img.shields.io/github/license/EvolutionTM/EvoSC.svg?style=flat-square)](https://github.com/EvolutionTM/EvoSC/blob/master/LICENSE.md)
 [![GitHub issues](https://img.shields.io/github/issues/EvolutionTM/EvoSC.svg?style=flat-square)](https://github.com/EvolutionTM/EvoSC/issues)
 
@@ -7,7 +7,7 @@
 
 # EvoSC
 
-A server controller for Trackmania² based on PHP 7.2 and Maniaplanet 4 support.
+A server controller for Trackmania² based on PHP 7 and Maniaplanet 4 support.
 
 ### Requirements
 * PHP 7
