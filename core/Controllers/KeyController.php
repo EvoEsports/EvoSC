@@ -18,7 +18,7 @@ class KeyController
     {
         self::$binds = collect();
 
-        Hook::add('PlayerConnect', 'KeyController::playerConnect');
+        Hook::add('PlayerConnect', [KeyController::class, 'playerConnect']);
 
         ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
     }

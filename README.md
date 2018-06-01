@@ -51,7 +51,7 @@ class MyModule
         
         //Register a hook
         //Args: string $event, string $function
-        \esc\Classes\Hook::add('HookName', 'MyModule::callbackFunc'); //core classes need namespace, module classes not
+        \esc\Classes\Hook::add('HookName', [MyModule::class, 'callbackFunc']); //core classes need namespace, module classes not
         
         //Register a chat command
         //Args: string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null

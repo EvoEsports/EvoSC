@@ -13,7 +13,7 @@ class Speedometer
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'Speedometer::show');
+        Hook::add('PlayerConnect', [Speedometer::class, 'show']);
 
     }
 

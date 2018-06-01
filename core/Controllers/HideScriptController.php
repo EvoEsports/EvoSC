@@ -17,7 +17,7 @@ class HideScriptController
         ManiaLinkEvent::add('hsc.toggle', 'HideScriptController::toggle');
         ManiaLinkEvent::add('hsc.set', 'HideScriptController::set');
 
-        Hook::add('PlayerConnect', 'HideScriptController::sendHideScriptSettings');
+        Hook::add('PlayerConnect', [HideScriptController::class, 'sendHideScriptSettings']);
     }
 
     public static function toggle(Player $player, $toggle)

@@ -22,7 +22,7 @@ class Pay2Play
         self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
         self::$priceSkip    = config('pay2play.skip.cost') ?? 5000;
 
-        Hook::add('PlayerConnect', 'Pay2Play::showWidget');
+        Hook::add('PlayerConnect', [Pay2Play::class, 'showWidget']);
 
         ManiaLinkEvent::add('addtime', 'Pay2Play::addTime');
         ManiaLinkEvent::add('skip', 'Pay2Play::skip');

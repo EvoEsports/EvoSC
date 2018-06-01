@@ -44,10 +44,10 @@ class MxKarma extends MXK
         self::$updatedVotes = collect([]);
         self::$ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
-        Hook::add('PlayerConnect', 'MxKarma::showWidget');
-        Hook::add('PlayerFinish', 'MxKarma::playerFinish');
-        Hook::add('BeginMap', 'MxKarma::beginMap');
-        Hook::add('EndMap', 'MxKarma::endMap');
+        Hook::add('PlayerConnect', [MxKarma::class, 'showWidget']);
+        Hook::add('PlayerFinish', [MxKarma::class, 'playerFinish']);
+        Hook::add('BeginMap', [MxKarma::class, 'beginMap']);
+        Hook::add('EndMap', [MxKarma::class, 'endMap']);
 
         ChatController::addCommand('+', 'MxKarma::votePlus', 'Rate the map ok', '');
         ChatController::addCommand('++', 'MxKarma::votePlusPlus', 'Rate the map good', '');

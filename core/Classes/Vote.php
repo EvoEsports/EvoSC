@@ -36,7 +36,7 @@ class Vote
     {
         self::$inProgress = false;
 
-        Hook::add('EndMatch', 'Vote::endMatch');
+        Hook::add('EndMatch', [Vote::class, 'endMatch']);
 
         ChatController::addCommand('vote', 'Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');
         ChatController::addCommand('replay', 'Vote::replayMap', 'Cast a vote to replay map');

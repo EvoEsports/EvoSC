@@ -33,7 +33,7 @@ class MapList
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
 
-        Hook::add('QueueUpdated', 'MapList::mapQueueUpdated');
+        Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
 
         KeyController::createBind('X', 'MapList::reload');
 

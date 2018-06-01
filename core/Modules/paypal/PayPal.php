@@ -14,7 +14,7 @@ class PayPal
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'PayPal::show');
+        Hook::add('PlayerConnect', [PayPal::class, 'show']);
 
     }
 

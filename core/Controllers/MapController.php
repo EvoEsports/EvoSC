@@ -35,9 +35,9 @@ class MapController
         self::$queue    = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
 
-        Hook::add('PlayerConnect', 'MapController::displayMapWidget');
-        Hook::add('BeginMap', 'MapController::beginMap');
-        Hook::add('EndMatch', 'MapController::endMatch');
+        Hook::add('PlayerConnect', [MapController::class, 'displayMapWidget']);
+        Hook::add('BeginMap', [MapController::class, 'beginMap']);
+        Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
         ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
         ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');

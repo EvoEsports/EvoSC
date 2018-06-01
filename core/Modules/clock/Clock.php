@@ -11,7 +11,7 @@ class Clock
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'Clock::displayClock');
+        Hook::add('PlayerConnect', [Clock::class, 'displayClock']);
     }
 
     public static function onConfigReload()

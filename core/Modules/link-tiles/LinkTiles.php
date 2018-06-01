@@ -14,7 +14,7 @@ class LinkTiles
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'LinkTiles::playerConnect');
+        Hook::add('PlayerConnect', [LinkTiles::class, 'playerConnect']);
 
         \esc\Classes\ManiaLinkEvent::add('openlink', 'LinkTiles::openLink');
 

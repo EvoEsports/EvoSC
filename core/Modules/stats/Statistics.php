@@ -20,14 +20,14 @@ class Statistics
      */
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'Statistics::playerConnect');
-        Hook::add('PlayerFinish', 'Statistics::playerFinish');
-        Hook::add('PlayerRateMap', 'Statistics::playerRateMap');
-        Hook::add('PlayerLocal', 'Statistics::playerLocal');
-        Hook::add('EndMatch', 'Statistics::endMatch');
+        Hook::add('PlayerConnect', [Statistics::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [Statistics::class, 'playerFinish']);
+        Hook::add('PlayerRateMap', [Statistics::class, 'playerRateMap']);
+        Hook::add('PlayerLocal', [Statistics::class, 'playerLocal']);
+        Hook::add('EndMatch', [Statistics::class, 'endMatch']);
 
-        Hook::add('ShowScores', 'Statistics::showScores');
-        Hook::add('BeginMap', 'Statistics::endMap');
+        Hook::add('ShowScores', [Statistics::class, 'showScores']);
+        Hook::add('BeginMap', [Statistics::class, 'endMap']);
 
         Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m');
     }

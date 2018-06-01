@@ -31,11 +31,11 @@ class Dedimania extends DedimaniaApi
     {
         self::$dedis = collect();
 
-        Hook::add('BeginMap', 'Dedimania::beginMap');
-        Hook::add('EndMatch', 'Dedimania::endMatch');
-        Hook::add('PlayerConnect', 'Dedimania::displayDedis');
-        Hook::add('PlayerConnect', 'DedimaniaApi::playerConnect');
-        Hook::add('PlayerFinish', 'Dedimania::playerFinish');
+        Hook::add('BeginMap', [Dedimania::class, 'beginMap']);
+        Hook::add('EndMatch', [Dedimania::class, 'endMatch']);
+        Hook::add('PlayerConnect', [Dedimania::class, 'displayDedis']);
+        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [Dedimania::class, 'playerFinish']);
 
         ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
 

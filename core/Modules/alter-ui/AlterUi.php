@@ -12,7 +12,7 @@ class AlterUi
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'AlterUi::push');
+        Hook::add('PlayerConnect', [AlterUi::class, 'push']);
     }
 
     public static function push(Player $player)

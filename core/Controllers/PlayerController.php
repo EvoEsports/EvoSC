@@ -21,8 +21,8 @@ class PlayerController
 
     public static function init()
     {
-        Hook::add('PlayerDisconnect', 'PlayerController::playerDisconnect');
-        Hook::add('PlayerFinish', 'PlayerController::playerFinish');
+        Hook::add('PlayerDisconnect', [PlayerController::class, 'playerDisconnect']);
+        Hook::add('PlayerFinish', [PlayerController::class, 'playerFinish']);
 
         self::$fakePlayers = collect([]);
         ChatController::addCommand('kick', 'PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');

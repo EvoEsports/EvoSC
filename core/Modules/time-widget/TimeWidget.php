@@ -13,9 +13,9 @@ class TimeWidget
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'TimeWidget::show');
-        Hook::add('BeginMatch', 'TimeWidget::show');
-        Hook::add('EndMatch', 'TimeWidget::hide');
+        Hook::add('PlayerConnect', [TimeWidget::class, 'show']);
+        Hook::add('BeginMatch', [TimeWidget::class, 'show']);
+        Hook::add('EndMatch', [TimeWidget::class, 'hide']);
 
         ManiaLinkEvent::add('tw.addTime', 'TimeWidget::addTime');
         ManiaLinkEvent::add('tw.requestMoreTime', 'TimeWidget::requestMoreTime');

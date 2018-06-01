@@ -15,7 +15,7 @@ class Donations
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'Donations::show');
+        Hook::add('PlayerConnect', [Donations::class, 'show']);
 
         ManiaLinkEvent::add('donate', 'Donations::donate');
 

@@ -31,7 +31,7 @@ class ManiaLinkEvent
     {
         self::$maniaLinkEvents = new Collection();
 
-        Hook::add('PlayerManialinkPageAnswer', '\esc\Classes\ManiaLinkEvent::call');
+        Hook::add('PlayerManialinkPageAnswer', [\esc\Classes\ManiaLinkEvent::class, 'call']);
     }
 
     public static function add(string $id, string $callback, string $access = null)

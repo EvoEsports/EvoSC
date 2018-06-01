@@ -10,9 +10,9 @@ class LiveRankings
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'LiveRankings::playerConnect');
-        Hook::add('PlayerLeave', 'LiveRankings::playerConnect'); //Update live ranks
-        Hook::add('PlayerFinish', 'LiveRankings::playerFinish');
+        Hook::add('PlayerConnect', [LiveRankings::class, 'playerConnect']);
+        Hook::add('PlayerLeave', [LiveRankings::class, 'playerConnect']); //Update live ranks
+        Hook::add('PlayerFinish', [LiveRankings::class, 'playerFinish']);
     }
 
     public static function show(Player $player)

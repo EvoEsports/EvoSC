@@ -16,9 +16,9 @@ class CPRecords
     {
         self::clearCheckpoints();
 
-        Hook::add('ShowScores', 'CPRecords::clearCheckpoints');
-        Hook::add('PlayerCheckpoint', 'CPRecords::playerCheckpoint');
-        Hook::add('PlayerConnect', 'CPRecords::playerConnect');
+        Hook::add('ShowScores', [CPRecords::class, 'clearCheckpoints']);
+        Hook::add('PlayerCheckpoint', [CPRecords::class, 'playerCheckpoint']);
+        Hook::add('PlayerConnect', [CPRecords::class, 'playerConnect']);
     }
 
     public static function clearCheckpoints(...$args)

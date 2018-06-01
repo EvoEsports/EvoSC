@@ -19,9 +19,9 @@ class PBRecords
 
     public function __construct()
     {
-        Hook::add('PlayerConnect', 'PBRecords::playerConnect');
-        Hook::add('EndMatch', 'PBRecords::endMatch');
-        Hook::add('BeginMatch', 'PBRecords::beginMatch');
+        Hook::add('PlayerConnect', [PBRecords::class, 'playerConnect']);
+        Hook::add('EndMatch', [PBRecords::class, 'endMatch']);
+        Hook::add('BeginMatch', [PBRecords::class, 'beginMatch']);
 
         ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
