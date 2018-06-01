@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Player extends Model
 {
     protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'Online', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
+    protected $fillable = ['Login', 'NickName', 'Score', 'player_id', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
     protected $primaryKey = 'Login';
     public $incrementing = false;
     public $timestamps = false;
@@ -49,22 +49,12 @@ class Player extends Model
     }
 
     /**
-     * Sets player online
-     * @return Player
-     */
-    public function setOnline(): Player
-    {
-        $this->update(['Online' => true]);
-        return $this;
-    }
-
-    /**
      * Sets player offline
      * @return Player
      */
     public function setOffline(): Player
     {
-        $this->update(['Online' => false]);
+        $this->update(['player_id' => 0]);
         return $this;
     }
 

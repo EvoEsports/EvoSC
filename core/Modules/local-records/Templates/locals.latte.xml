@@ -1,6 +1,6 @@
 {if count($locals)}
 {foreach $locals as $local}
-{if $local->player->Online}
+{if $local->player->player_id}
 <quad pos="0 -{$iterator->counter * 4 - 2.8}" size="8.4 3.8" z-index="0" bgcolor="{primary_color()|noescape}8"/>
 {/if}
 <label pos="8  -{$local->Rank * 4 - 1}" z-index="1" size="8 3" text="{$local->Rank}." textsize="1.2" valign="center" halign="right"/>

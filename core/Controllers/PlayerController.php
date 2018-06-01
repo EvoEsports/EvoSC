@@ -238,7 +238,7 @@ class PlayerController
             $info['spectator_status'] = $info['SpectatorStatus'];
             $player->update($info);
 
-            if (!$player->Online) {
+            if (!$player->player_id) {
                 self::playerConnect($player);
             }
         }

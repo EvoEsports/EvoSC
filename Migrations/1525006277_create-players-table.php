@@ -21,7 +21,7 @@ class CreatePlayersTable extends Migration
             $table->string('NickName')->default("unset");
             $table->integer('Group')->default(3);
             $table->integer('Score')->default(0);
-            $table->boolean('Online')->default(false);
+            $table->integer('player_id')->default(0);
             $table->integer('Afk')->default(0);
             $table->integer('spectator_status')->default(0);
             $table->integer('MaxRank')->default(15);

@@ -1,6 +1,6 @@
 {if count($players)}
 {foreach $players as $player}
-{if $player->Online}
+{if $player->player_id}
 <quad pos="0 -{$iterator->counter * 4 - 2.8}" size="8.4 3.8" z-index="0" bgcolor="{primary_color()|noescape}8"/>
 {/if}
 <label pos="8  -{$iterator->counter * 4 - 1}" z-index="1" size="8 3" text="{$iterator->counter}." textsize="1.2" valign="center" halign="right"/>

@@ -56,14 +56,15 @@ function startEsc()
     \esc\Controllers\PlanetsController::init();
 
     \esc\Controllers\ChatController::addCommand('config', 'Config::configReload', 'Reload config', '//', 'config');
-
-    \esc\Models\Player::whereOnline(true)->update(['Online' => false]);
 }
 
 function cycle()
 {
     esc\Classes\Timer::startCycle();
-    esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+
+//    esc\Controllers\HookController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
 
