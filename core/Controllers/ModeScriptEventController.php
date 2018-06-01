@@ -51,6 +51,8 @@ class ModeScriptEventController
                 Log::logAddLine('ScriptCallback', "Calling unhandled $callback", false);
                 break;
         }
+
+        Hook::fire($callback, $arguments);
     }
 
     static function tmScores($arguments)
@@ -64,7 +66,7 @@ class ModeScriptEventController
         $playerFinishHooks = HookController::getHooks('PlayerFinish');
 
         $playerLogin = json_decode($arguments[0])->login;
-        $player = Player::find($playerLogin);
+        $player      = Player::find($playerLogin);
 
         HookController::fireHookBatch($playerFinishHooks, $player, 0, "");
     }
@@ -72,12 +74,12 @@ class ModeScriptEventController
     static function tmWayPoint($arguments)
     {
         $playerCheckpointHooks = HookController::getHooks('PlayerCheckpoint');
-        $playerFinishHooks = HookController::getHooks('PlayerFinish');
+        $playerFinishHooks     = HookController::getHooks('PlayerFinish');
 
         $wayPoint = json_decode($arguments[0]);
 
         $player = Player::find($wayPoint->login);
-        $map = MapController::getCurrentMap();
+        $map    = MapController::getCurrentMap();
 
         $totalCps = $map->NbCheckpoints;
 
@@ -102,16 +104,16 @@ class ModeScriptEventController
     static function tmStartCountdown($arguments)
     {
         $playerStartCountdown = HookController::getHooks('PlayerStartCountdown');
-        $playerLogin = json_decode($arguments[0])->login;
-        $player = Player::find($playerLogin);
+        $playerLogin          = json_decode($arguments[0])->login;
+        $player               = Player::find($playerLogin);
         HookController::fireHookBatch($playerStartCountdown, $player);
     }
 
     static function tmStartLine($arguments)
     {
         $playerStartCountdown = HookController::getHooks('PlayerStartLine');
-        $playerLogin = json_decode($arguments[0])->login;
-        $player = Player::find($playerLogin);
+        $playerLogin          = json_decode($arguments[0])->login;
+        $player               = Player::find($playerLogin);
         HookController::fireHookBatch($playerStartCountdown, $player);
     }
 
@@ -122,7 +124,7 @@ class ModeScriptEventController
 
     static function tmPlayerConnect($arguments)
     {
-        $playerData = json_decode($arguments[0]);
+        $playerData         = json_decode($arguments[0]);
         $playerConnectHooks = HookController::getHooks('PlayerConnect');
 
         //string Login, bool IsSpectator
@@ -137,7 +139,7 @@ class ModeScriptEventController
 
     static function tmPlayerLeave($arguments)
     {
-        $playerData = json_decode($arguments[0]);
+        $playerData       = json_decode($arguments[0]);
         $playerLeaveHooks = HookController::getHooks('PlayerLeave');
 
         $player = Player::find($playerData->login);
