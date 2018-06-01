@@ -86,7 +86,7 @@ class MapController
      * @param $rankings
      * @param $winnerteam
      */
-    public static function endMatch($rankings = null, $winnerteam = null)
+    public static function endMatch()
     {
         $request = self::$queue->shift();
 

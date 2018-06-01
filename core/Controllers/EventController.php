@@ -5,6 +5,7 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 
@@ -37,6 +38,22 @@ class EventController
                     self::mpPlayerChat($arguments);
                     break;
 
+                case 'ManiaPlanet.BeginMap':
+                    self::mpBeginMap($arguments);
+                    break;
+
+                case 'ManiaPlanet.EndMap':
+                    self::mpEndMap($arguments);
+                    break;
+
+                case 'ManiaPlanet.BeginMatch':
+                    Hook::fire('BeginMatch');
+                    break;
+
+                case 'ManiaPlanet.EndMatch':
+                    Hook::fire('EndMatch');
+                    break;
+
                 case 'ManiaPlanet.ModeScriptCallbackArray':
                     ModeScriptEventController::handleModeScriptCallbacks($callback);
                     break;
@@ -46,7 +63,7 @@ class EventController
                     break;
             }
 
-//            Hook::fire($name, $arguments);
+            Hook::fire($name, $arguments);
         }
 
     }
@@ -139,6 +156,46 @@ class EventController
                 Hook::fire('PlayerDisconnect', $player, 0);
             } catch (\Exception $e) {
                 Log::logAddLine('EventController', "Error: Player ($login) not found!");
+            }
+        } else {
+            throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $arguments
+     * @throws \Exception
+     */
+    private static function mpBeginMap($arguments)
+    {
+        if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+            $mapUid = $arguments[0]['UId'];
+
+            try {
+                $map = Map::where('uid', $mapUid)->first();
+                Hook::fire('BeginMap', $map);
+            } catch (\Exception $e) {
+                Log::logAddLine('EventController', "Error: Map ($mapUid) not found!");
+            }
+        } else {
+            throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $arguments
+     * @throws \Exception
+     */
+    private static function mpEndMap($arguments)
+    {
+        if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+            $mapUid = $arguments[0]['UId'];
+
+            try {
+                $map = Map::where('uid', $mapUid)->first();
+                Hook::fire('EndMap', $map);
+            } catch (\Exception $e) {
+                Log::logAddLine('EventController', "Error: Map ($mapUid) not found!");
             }
         } else {
             throw new \Exception('Malformed callback');

@@ -142,7 +142,7 @@ class MusicClient
         Log::info("Loading music...");
 
         try {
-            $res = RestClient::get(config('music.server'));
+            $res = RestClient::get(config('music.server'), ['connect_timeout' => 2]);
             $musicJson = $res->getBody()->getContents();
         } catch (\Exception $e) {
             Log::logAddLine('Music', 'Server connection failed: ' . $e->getMessage());

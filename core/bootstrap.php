@@ -71,7 +71,21 @@ function cycle()
 
     esc\Classes\Timer::startCycle();
 
-    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+    try {
+        \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+    } catch (Exception $e) {
+        $crashReport = collect();
+        $crashReport->put('file', $e->getFile());
+        $crashReport->put('line', $e->getLine());
+        $crashReport->put('message', $e->getMessage() . "\n" . $e->getTraceAsString());
+
+        if (!is_dir(__DIR__ . '/../crash-reports')) {
+            mkdir(__DIR__ . '/../crash-reports');
+        }
+
+        $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
+        file_put_contents($filename, $crashReport->toJson());
+    }
 
     usleep(esc\Classes\Timer::getNextCyclePause());
 }
@@ -84,5 +98,5 @@ function bootModules()
 function beginMap()
 {
     $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
-    esc\Controllers\HookController::fire('BeginMap', [$map]);
+    esc\Classes\Hook::fire('BeginMap', $map);
 }

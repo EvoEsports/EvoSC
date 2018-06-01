@@ -168,7 +168,7 @@ class Dedimania extends DedimaniaApi
         }
     }
 
-    public static function endMatch($sPlayerRanking, int $winnerTeam)
+    public static function endMatch()
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);

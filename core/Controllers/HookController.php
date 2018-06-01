@@ -15,25 +15,6 @@ class HookController extends ModescriptCallbacks
 {
     private static $hooks;
 
-    private static $eventMap = [
-        'PlayerConnect'                         => 'PlayerConnect',
-        'ManiaPlanet.PlayerDisconnect'          => 'PlayerDisconnect',
-        'ManiaPlanet.PlayerInfoChanged'         => 'PlayerInfoChanged',
-        'ManiaPlanet.PlayerChat'                => 'PlayerChat',
-        'ManiaPlanet.BeginMap'                  => 'BeginMap',
-        'ManiaPlanet.EndMap'                    => 'EndMap',
-        'ManiaPlanet.EndMatch'                  => 'EndMatch',
-        'ManiaPlanet.BeginMatch'                => 'BeginMatch',
-        'TrackMania.PlayerCheckpoint'           => 'PlayerCheckpoint',
-        'TrackMania.PlayerFinish'               => 'PlayerFinish',
-        'TrackMania.PlayerIncoherence'          => 'PlayerIncoherence',
-        'ManiaPlanet.PlayerManialinkPageAnswer' => 'PlayerManialinkPageAnswer',
-        'ManiaPlanet.ModeScriptCallbackArray'   => 'ManiaPlanet.ModeScriptCallbackArray',
-        'PlayerLocal'                           => 'PlayerLocal',
-        //        'PlayerRateMap' => 'PlayerRateMap',
-        //        'PlayerDonate' => 'PlayerDonate',
-    ];
-
     public static function init()
     {
         self::$hooks = new Collection();
