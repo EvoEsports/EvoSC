@@ -115,7 +115,7 @@ class ModuleController
         Log::getOutput()->writeln("");
 
         //Boot modules
-        Log::logAddLine('Modules', 'Booting modules');
+        Log::logAddLine('Modules', 'Booting modules...');
 
         $moduleClasses->each(function ($module) {
             if (method_exists($module->namespace, '__construct')) {

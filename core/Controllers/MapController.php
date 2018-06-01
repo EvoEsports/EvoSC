@@ -277,7 +277,7 @@ class MapController
      */
     private static function loadMaps()
     {
-        Log::logAddLine('MapController', 'Loading maps');
+        Log::logAddLine('MapController', 'Loading maps...');
 
         //Get loaded maps
         $maps = collect(Server::getMapList());

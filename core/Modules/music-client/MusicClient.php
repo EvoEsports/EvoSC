@@ -129,8 +129,6 @@ class MusicClient
             $song->url = $url . '/' . $song->file;
         });
 
-        Log::info("Finished loading music.");
-
         self::$music = $songs;
     }
 
