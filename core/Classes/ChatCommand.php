@@ -14,7 +14,7 @@ class ChatCommand
     public $description;
     public $access;
 
-    public function __construct(string $trigger, string $command, string $callback, string $description = '', string $access = null)
+    public function __construct(string $trigger, string $command, array $callback, string $description = '', string $access = null)
     {
         $this->trigger = $trigger;
         $this->command = $command;
@@ -37,7 +37,7 @@ class ChatCommand
         return $player->hasAccess($this->access);
     }
 
-    public static function add(string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null)
+    public static function add(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
         ChatController::addCommand($command, $callback, $description, $trigger, $access);
     }

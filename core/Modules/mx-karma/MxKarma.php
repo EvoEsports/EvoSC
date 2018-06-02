@@ -49,12 +49,12 @@ class MxKarma extends MXK
         Hook::add('BeginMap', [MxKarma::class, 'beginMap']);
         Hook::add('EndMap', [MxKarma::class, 'endMap']);
 
-        ChatController::addCommand('+', 'MxKarma::votePlus', 'Rate the map ok', '');
-        ChatController::addCommand('++', 'MxKarma::votePlusPlus', 'Rate the map good', '');
-        ChatController::addCommand('+++', 'MxKarma::votePlusPlusPlus', 'Rate the map fantastic', '');
-        ChatController::addCommand('-', 'MxKarma::voteMinus', 'Rate the map playable', '');
-        ChatController::addCommand('--', 'MxKarma::voteMinusMinus', 'Rate the map bad', '');
-        ChatController::addCommand('---', 'MxKarma::voteMinusMinusMinus', 'Rate the map trash', '');
+        ChatController::addCommand('+', [MxKarma::class, 'votePlus'], 'Rate the map ok', '');
+        ChatController::addCommand('++', [MxKarma::class, 'votePlusPlus'], 'Rate the map good', '');
+        ChatController::addCommand('+++', [MxKarma::class, 'votePlusPlusPlus'], 'Rate the map fantastic', '');
+        ChatController::addCommand('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', '');
+        ChatController::addCommand('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', '');
+        ChatController::addCommand('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', '');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
 

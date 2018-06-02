@@ -39,11 +39,11 @@ class MapController
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
         Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
-        ChatController::addCommand('skip', 'MapController::skip', 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('settings', 'MapController::settings', 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', 'MapController::addMap', 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
-        ChatController::addCommand('res', 'MapController::forceReplay', 'Queue map for replay', '//', 'map.replay');
-        ChatController::addCommand('addtime', 'MapController::addTimeManually', 'Adds time (you can also substract)', '//', 'time');
+        ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'skip');
+        ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'ban');
+        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map.replay');
+        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
     }
 
     /**

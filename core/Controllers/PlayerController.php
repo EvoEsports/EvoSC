@@ -25,11 +25,11 @@ class PlayerController
         Hook::add('PlayerFinish', [PlayerController::class, 'playerFinish']);
 
         self::$fakePlayers = collect([]);
-        ChatController::addCommand('kick', 'PlayerController::kickPlayer', 'Kick player by nickname', '//', 'kick');
-        ChatController::addCommand('ban', 'PlayerController::banPlayer', 'Ban player by nickname', '//', 'ban');
+        ChatController::addCommand('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//', 'kick');
+        ChatController::addCommand('ban', [PlayerController::class, 'banPlayer'], 'Ban player by nickname', '//', 'ban');
 
-        ChatController::addCommand('fake', 'PlayerController::connectFakePlayers', 'Connect #n fake players', '##', 'ban');
-        ChatController::addCommand('disfake', 'PlayerController::disconnectFakePlayers', 'Disconnect all fake players', '##', 'ban');
+        ChatController::addCommand('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', '##', 'ban');
+        ChatController::addCommand('disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', '##', 'ban');
     }
 
     /**

@@ -23,7 +23,7 @@ class PBRecords
         Hook::add('EndMatch', [PBRecords::class, 'endMatch']);
         Hook::add('BeginMatch', [PBRecords::class, 'beginMatch']);
 
-        ChatController::addCommand('target', 'PBRecords::setTarget', 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
+        ChatController::addCommand('target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
         self::$targets = collect([]);
     }

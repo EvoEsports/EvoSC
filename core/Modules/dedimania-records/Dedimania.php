@@ -39,8 +39,8 @@ class Dedimania extends DedimaniaApi
 
         ManiaLinkEvent::add('dedis.show', [Dedimania::class, 'showDedisModal']);
 
-        ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
-        ChatController::addCommand('dedicps', 'Dedimania::printDediCps', 'SPrints cps for given dedi to chat');
+        ChatController::addCommand('maxrank', [Dedimania::class, 'printMaxRank'], 'Show from which rank dedis get saved');
+        ChatController::addCommand('dedicps', [Dedimania::class, 'printDediCps'], 'SPrints cps for given dedi to chat');
 
         Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
     }

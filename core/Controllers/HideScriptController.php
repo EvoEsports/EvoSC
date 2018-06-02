@@ -12,7 +12,7 @@ class HideScriptController
 {
     public static function init()
     {
-        ChatController::addCommand('hide', 'HideScriptController::showConfig', 'Configure UI hiding. Set speed/enabled.');
+        ChatController::addCommand('hide', [HideScriptController::class, 'showConfig'], 'Configure UI hiding. Set speed/enabled.');
 
         ManiaLinkEvent::add('hsc.toggle', [HideScriptController::class, 'toggle']);
         ManiaLinkEvent::add('hsc.set', [HideScriptController::class, 'set']);

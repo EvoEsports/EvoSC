@@ -31,7 +31,7 @@ class MapList
 
         ManiaLinkEvent::add('maplist.mx', [MapList::class, 'updateMxDetails']);
 
-        ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
+        ChatController::addCommand('list', [MapList::class, 'list'], 'Display list of maps');
 
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
 

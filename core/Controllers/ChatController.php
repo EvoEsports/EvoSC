@@ -164,7 +164,7 @@ $$: Writes a dollarsign
             //Command exists
             try {
                 //Run command callback
-                call_func($command->callback, ...$arguments);
+                call_user_func($command->callback, ...$arguments);
             } catch (\Exception $e) {
                 Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getMessage(), true);
                 Log::logAddLine('ChatController', $e->getTraceAsString(), false);
@@ -175,7 +175,7 @@ $$: Writes a dollarsign
         return $isValidCommand;
     }
 
-    public static function addCommand(string $command, string $callback, string $description = '-', string $trigger = '/', string $access = null)
+    public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
         if (!self::$chatCommands) {
             self::$chatCommands = collect();

@@ -38,12 +38,12 @@ class Vote
 
         Hook::add('EndMatch', [Vote::class, 'endMatch']);
 
-        ChatController::addCommand('vote', 'Vote::custom', 'Cast a vote, parameter is question', '//', 'vote');
-        ChatController::addCommand('replay', 'Vote::replayMap', 'Cast a vote to replay map');
-        ChatController::addCommand('res', 'Vote::replayMap', 'Cast a vote to replay map (Alias for /replay)');
-        ChatController::addCommand('skip', 'Vote::skipMap', 'Cast a vote to skip map');
-        ChatController::addCommand('y', 'Vote::voteYes', 'Vote yes');
-        ChatController::addCommand('n', 'Vote::voteNo', 'Vote no');
+        ChatController::addCommand('vote', [Vote::class, 'custom'], 'Cast a vote, parameter is question', '//', 'vote');
+        ChatController::addCommand('replay', [Vote::class, 'replayMap'], 'Cast a vote to replay map');
+        ChatController::addCommand('res', [Vote::class, 'replayMap'], 'Cast a vote to replay map (Alias for /replay)');
+        ChatController::addCommand('skip', [Vote::class, 'skipMap'], 'Cast a vote to skip map');
+        ChatController::addCommand('y', [Vote::class, 'voteYes'], 'Vote yes');
+        ChatController::addCommand('n', [Vote::class, 'voteNo'], 'Vote no');
 
         KeyController::createBind('F5', 'Vote::voteYes');
         KeyController::createBind('F6', 'Vote::voteNo');
