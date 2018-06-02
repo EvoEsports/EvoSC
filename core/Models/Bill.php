@@ -14,7 +14,7 @@ class Bill
     public $amount;
     public $expired;
 
-    public function __construct(Player $player, $id, $amount, $created_at, $label, $successFunction, $failFunction)
+    public function __construct(Player $player, $id, $amount, $created_at, $label, array $successFunction, array $failFunction)
     {
         $this->player          = $player;
         $this->id              = $id;

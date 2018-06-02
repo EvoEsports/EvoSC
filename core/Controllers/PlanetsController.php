@@ -29,13 +29,13 @@ class PlanetsController
 
         switch ($billState->state) {
             case 4:
-                call_func($bill->successFunction, $bill->player, $bill->amount);
+                call_user_func($bill->successFunction, $bill->player, $bill->amount);
                 $bill->expired = true;
                 break;
 
             case 5:
                 if($bill->failFunction){
-                    call_func($bill->failFunction, $bill->player);
+                    call_user_func($bill->failFunction, $bill->player);
                 }
                 $bill->expired = true;
                 break;
@@ -54,7 +54,7 @@ class PlanetsController
         Timer::create('bills.check', 'PlanetsController::checkBills', '1s');
     }
 
-    public static function createBill(Player $player, int $amount, string $label, string $successFunction, string $failFunction = null)
+    public static function createBill(Player $player, int $amount, string $label, array $successFunction, array $failFunction = null)
     {
         $billId = Server::sendBill($player->Login, $amount, $label);
 
