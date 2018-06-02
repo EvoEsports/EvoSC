@@ -34,6 +34,12 @@ class Template
         ]);
     }
 
+    /**
+     * @param Player $player
+     * @param string $index
+     * @param array|null $values
+     * @throws \Exception
+     */
     public static function show(Player $player, string $index, array $values = null)
     {
         if (!$values) {
@@ -42,7 +48,12 @@ class Template
 
         $values['localPlayer'] = $player;
 
-        $xml = TemplateController::getTemplate($index, $values);
+        try {
+            $xml = TemplateController::getTemplate($index, $values);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to compile template: ' . $index);
+        }
+
         Server::sendDisplayManialinkPage($player->Login, $xml);
     }
 

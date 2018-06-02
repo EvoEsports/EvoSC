@@ -23,6 +23,12 @@ class Help
         ManiaLinkEvent::add('help', [Help::class, 'switchHelp']);
     }
 
+    /**
+     * @param Player $player
+     * @param $type
+     * @param int $page
+     * @throws \Exception
+     */
     public static function switchHelp(Player $player, $type, $page = 1)
     {
         switch ($type) {
@@ -36,33 +42,39 @@ class Help
         }
     }
 
-    public static function showCommandsHelp(Player $player, $help, $page = 1)
+    /**
+     * @param Player $player
+     * @param null $help
+     * @param int $page
+     * @throws \Exception
+     */
+    public static function showCommandsHelp(Player $player, $help = null, int $page = 1)
     {
-        $page = (int)$page;
-
         $commands = ChatController::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
-            if (!$player || !$command) {
-                return false;
-            }
-
             return $command->hasAccess($player);
         })->sortBy('trigger');
 
         $commandsList = Template::toString('help.commands', ['commands' => $commands->forPage($page, 20), 'player' => $player]);
-        $pagination = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,commands', 'page' => $page]);
-        $navigation = self::getNavigation('Commands');
+        $pagination   = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,commands', 'page' => $page]);
+        $navigation   = self::getNavigation('Commands');
 
         Template::show($player, 'components.modal', [
-            'id' => 'help',
-            'title' => 'Help - Chat commands',
-            'width' => 180,
-            'height' => 97,
-            'content' => $commandsList,
+            'id'         => 'help',
+            'title'      => 'Help - Chat commands',
+            'width'      => 180,
+            'height'     => 97,
+            'content'    => $commandsList,
             'pagination' => $pagination,
             'navigation' => $navigation,
         ]);
     }
 
+    /**
+     * @param Player $player
+     * @param $help
+     * @param int $page
+     * @throws \Exception
+     */
     public static function showKeybindsHelp(Player $player, $help, $page = 1)
     {
         $page = (int)$page;
@@ -70,15 +82,15 @@ class Help
         $commands = KeyController::getKeybinds()->sortBy('trigger');
 
         $commandsList = Template::toString('help.keybinds', ['commands' => $commands->forPage($page, 20), 'player' => $player]);
-        $pagination = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,keybinds', 'page' => $page]);
-        $navigation = self::getNavigation('Keybinds');
+        $pagination   = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,keybinds', 'page' => $page]);
+        $navigation   = self::getNavigation('Keybinds');
 
         Template::show($player, 'components.modal', [
-            'id' => 'help',
-            'title' => 'Help - Keybinds',
-            'width' => 180,
-            'height' => 97,
-            'content' => $commandsList,
+            'id'         => 'help',
+            'title'      => 'Help - Keybinds',
+            'width'      => 180,
+            'height'     => 97,
+            'content'    => $commandsList,
             'pagination' => $pagination,
             'navigation' => $navigation,
         ]);

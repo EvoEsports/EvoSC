@@ -29,11 +29,6 @@ class ChatCommand
             return true;
         }
 
-        if ($player->group->id == 1) {
-            //Masteradmin has access to all
-            return true;
-        }
-
         return $player->hasAccess($this->access);
     }
 
@@ -49,6 +44,7 @@ class ChatCommand
 
     public function run(array $arguments)
     {
+        Log::logAddLine('ChatCommand', sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), false);
         call_user_func_array($this->callback, $arguments);
     }
 }

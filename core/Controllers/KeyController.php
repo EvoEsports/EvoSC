@@ -5,6 +5,7 @@ namespace esc\Controllers;
 
 use esc\Classes\File;
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Models\Player;
@@ -23,12 +24,12 @@ class KeyController
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
     }
 
-    public static function createBind(string $key, array $function)
+    public static function createBind(string $key, array $callback)
     {
         $bind = collect([]);
 
         $bind->key = $key;
-        $bind->function = $function;
+        $bind->function = $callback;
 
         self::$binds->push($bind);
     }
@@ -42,6 +43,7 @@ class KeyController
         }
 
         foreach ($binds as $bind) {
+            Log::logAddLine('KeyBind', sprintf('Call: %s -> %s(%s)', $bind->function[0], $bind->function[1], $player), false);
             call_user_func($bind->function, $player);
         }
     }

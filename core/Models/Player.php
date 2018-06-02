@@ -112,7 +112,7 @@ class Player extends Model
             return false;
         }
 
-        return $this->hasAccess($right);
+        return $this->group->hasAccess($right);
     }
 
     public function getSpectatorStatusAttribute($value)
@@ -199,5 +199,13 @@ class Player extends Model
         $player->NickName = config('server.name');
         $player->Group    = Group::find(1);
         return $player;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return stripAll("$this->NickName ($this->Login)");
     }
 }
