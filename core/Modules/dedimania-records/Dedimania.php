@@ -42,7 +42,7 @@ class Dedimania extends DedimaniaApi
         ChatController::addCommand('maxrank', [Dedimania::class, 'printMaxRank'], 'Show from which rank dedis get saved');
         ChatController::addCommand('dedicps', [Dedimania::class, 'printDediCps'], 'SPrints cps for given dedi to chat');
 
-        Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
+        Timer::create('dedimania.players.update', [Dedimania::class, 'reportConnectedPlayersToDedimania'], '4m');
     }
 
     public static function reportConnectedPlayersToDedimania()
@@ -55,7 +55,7 @@ class Dedimania extends DedimaniaApi
             var_dump($data);
         }
 
-        Timer::create('dedimania.players.update', 'Dedimania::reportConnectedPlayersToDedimania', '4m');
+        Timer::create('dedimania.players.update', [Dedimania::class, 'reportConnectedPlayersToDedimania'], '4m');
     }
 
     public static function printDediCps(Player $player, $cmd = null, $dediId = null)

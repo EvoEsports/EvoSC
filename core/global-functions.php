@@ -148,28 +148,6 @@ function getMapInfoFromFile(string $filename)
     }
 }
 
-function call_func($function, ...$arguments)
-{
-    $className    = explode('::', $function)[0];
-    $functionName = explode('::', $function)[1];
-
-    $class = classes()->where('class', $className)->first();
-
-    if ($class) {
-        if ($arguments) {
-            call_user_func_array("$class->namespace::$functionName", $arguments);
-        } else {
-            call_user_func("$class->namespace::$functionName");
-        }
-    } else {
-        if ($arguments) {
-            call_user_func_array($functionName, $arguments);
-        } else {
-            call_user_func($functionName);
-        }
-    }
-}
-
 //color functions
 function background_color()
 {

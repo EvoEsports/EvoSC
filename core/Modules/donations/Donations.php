@@ -40,7 +40,7 @@ class Donations
             return;
         }
 
-        PlanetsController::createBill($player, $amount, "Donate $amount Planets?", 'Donations::paySuccess');
+        PlanetsController::createBill($player, $amount, "Donate $amount Planets?", [Donations::class, 'paySuccess']);
     }
 
     public static function paySuccess(Player $player, $amount)

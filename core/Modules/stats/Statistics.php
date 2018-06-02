@@ -29,7 +29,7 @@ class Statistics
         Hook::add('ShowScores', [Statistics::class, 'showScores']);
         Hook::add('BeginMap', [Statistics::class, 'endMap']);
 
-        Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m');
+        Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m');
     }
 
     private static function displayStatsWidget(Player $player, $values, $title, $config, $value_function)
@@ -211,7 +211,7 @@ class Statistics
             $player->stats()->increment('Playtime');
         }
 
-        Timer::create('update-playtimes', 'Statistics::updatePlaytimes', '1m', true);
+        Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m', true);
     }
 
     /**

@@ -43,7 +43,7 @@ class Pay2Play
     {
         if (config('pay2play.addtime.enabled')) {
             if (MapController::getAddedTime() + 10 <= config('server.max-playtime') || $player->hasAccess('time')) {
-                PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', 'Pay2Play::addTimePaySuccess');
+                PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
             }else{
                 ChatController::message($player, '_warning', 'Maximum playtime for this round reached');
             }
@@ -60,7 +60,7 @@ class Pay2Play
     public static function skip(Player $player)
     {
         if (config('pay2play.skip.enabled')) {
-            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', 'Pay2Play::skipPaySuccess');
+            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', [Pay2Play::class, 'skipPaySuccess']);
         }
     }
 

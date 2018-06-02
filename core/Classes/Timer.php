@@ -15,7 +15,7 @@ class Timer
     public $callback;
     public $runtime;
 
-    private function __construct(string $id, string $callback, int $runtime)
+    private function __construct(string $id, array $callback, int $runtime)
     {
         $this->id = $id;
         $this->callback = $callback;
@@ -46,7 +46,7 @@ class Timer
      * @param string $delayTime
      * @param bool $override
      */
-    public static function create(string $id, string $callback, string $delayTime, bool $override = false)
+    public static function create(string $id, array $callback, string $delayTime, bool $override = false)
     {
         if (!self::$timers) self::$timers = new Collection();
 
@@ -107,7 +107,7 @@ class Timer
         self::$timers = self::$timers->diff($toRun);
 
         foreach ($toRun as $timer) {
-            call_func($timer->callback);
+            call_user_func($timer->callback);
         }
     }
 
@@ -199,6 +199,6 @@ class Timer
      */
     public function __toString()
     {
-        return sprintf('%s.%s.%d', $this->id, $this->callback, $this->runtime);
+        return sprintf('%s.%s.%d', $this->id, $this->callback[0].$this->callback[1], $this->runtime);
     }
 }

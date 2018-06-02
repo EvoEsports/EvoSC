@@ -20,7 +20,7 @@ class PlanetsController
         self::$openBills  = collect();
         self::$billStates = explode(', ', 'CreatingTransaction, Issued, ValidatingPayement, Payed, Refused, Error');
 
-        Timer::create('bills.check', 'PlanetsController::checkBills', '1s');
+        Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
 
     public static function checkBill(Bill &$bill)
@@ -51,7 +51,7 @@ class PlanetsController
     {
         $bills = self::$openBills->where('expired', false);
         $bills->each([self::class, 'checkBill']);
-        Timer::create('bills.check', 'PlanetsController::checkBills', '1s');
+        Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
 
     public static function createBill(Player $player, int $amount, string $label, array $successFunction, array $failFunction = null)

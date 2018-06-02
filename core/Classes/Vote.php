@@ -118,7 +118,7 @@ class Vote
         self::$startTime = time();
         self::$starter = $player;
 
-        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', [Vote::class, 'finishVote'], self::VOTE_TIME . 's');
 
         self::showVote();
     }
@@ -144,12 +144,12 @@ class Vote
         self::$inProgress = true;
         self::$message = 'Add 10 minutes playtime?';
         self::$startTime = time();
-        self::$action = 'Vote::doReplay';
+        self::$action = [Vote::class, 'doReplay'];
         self::$starter = $player;
 
         self::voteYes($player);
 
-        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', [Vote::class, 'finishVote'], self::VOTE_TIME . 's');
 
         ChatController::messageAll("\$fff ", $player, ' is asking for more time. Type /y or /n to vote.');
 
@@ -178,12 +178,12 @@ class Vote
         self::$inProgress = true;
         self::$message = 'Skip map?';
         self::$startTime = time();
-        self::$action = 'Vote::doSkip';
+        self::$action = [Vote::class, 'doSkip'];
         self::$starter = $player;
 
         self::voteYes($player);
 
-        Timer::create('vote.finish', 'Vote::finishVote', self::VOTE_TIME . 's');
+        Timer::create('vote.finish', [Vote::class, 'finishVote'], self::VOTE_TIME . 's');
 
         ChatController::messageAll("\$fff ", $player, ' is asking to skip the map. Type /y or /n to vote.');
 
