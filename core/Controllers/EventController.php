@@ -64,7 +64,6 @@ class EventController
                     break;
 
                 default:
-                    echo "Calling unhandled: $name \n";
                     break;
             }
 
@@ -116,9 +115,15 @@ class EventController
 
             try {
                 $player = Player::findOrFail($login);
-                Hook::fire('PlayerConnect', $player);
             } catch (\Exception $e) {
                 Log::logAddLine('mpPlayerConnect', "Error: Player ($login) not found!");
+            }
+
+            try {
+                Hook::fire('PlayerConnect', $player);
+            } catch (\Exception $e) {
+                Log::logAddLine('PlayerConnect', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -137,9 +142,15 @@ class EventController
 
             try {
                 $player = Player::findOrFail($login);
-                Hook::fire('PlayerChat', $player, $text, false);
             } catch (\Exception $e) {
                 Log::logAddLine('mpPlayerChat', "Error: Player ($login) not found!");
+            }
+
+            try {
+                Hook::fire('PlayerChat', $player, $text, false);
+            } catch (\Exception $e) {
+                Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -157,10 +168,16 @@ class EventController
 
             try {
                 $player = Player::findOrFail($login);
+            } catch (\Exception $e) {
+                Log::logAddLine('mpPlayerDisconnect', "Error: Player ($login) not found!");
+            }
+
+            try {
                 Player::whereLogin($login)->update(['player_id' => 0]);
                 Hook::fire('PlayerDisconnect', $player, 0);
             } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerDisconnect', "Error: Player ($login) not found!");
+                Log::logAddLine('PlayerDisconnect', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -178,9 +195,15 @@ class EventController
 
             try {
                 $map = Map::where('uid', $mapUid)->first();
-                Hook::fire('BeginMap', $map);
             } catch (\Exception $e) {
                 Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
+            }
+
+            try {
+                Hook::fire('BeginMap', $map);
+            } catch (\Exception $e) {
+                Log::logAddLine('Hook', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -198,9 +221,15 @@ class EventController
 
             try {
                 $map = Map::where('uid', $mapUid)->first();
-                Hook::fire('EndMap', $map);
             } catch (\Exception $e) {
                 Log::logAddLine('mpEndMap', "Error: Map ($mapUid) not found!");
+            }
+
+            try {
+                Hook::fire('EndMap', $map);
+            } catch (\Exception $e) {
+                Log::logAddLine('Hook', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -218,9 +247,15 @@ class EventController
 
             try {
                 $player = Player::findOrFail($login);
-                ManiaLinkEvent::call($player, $arguments[2]);
             } catch (\Exception $e) {
                 Log::logAddLine('mpPlayerManialinkPageAnswer', "Error: Player ($login) not found!");
+            }
+
+            try {
+                ManiaLinkEvent::call($player, $arguments[2]);
+            } catch (\Exception $e) {
+                Log::logAddLine('ManiaLinkEvent', "Error: " . $e->getMessage());
+                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');

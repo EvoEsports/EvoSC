@@ -267,7 +267,7 @@ $$: Writes a dollarsign
             }
 
             if ($part instanceof Map) {
-                $message .= $part->Name;
+                $message .= $part->gbx->Name;
                 continue;
             }
 

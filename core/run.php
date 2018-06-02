@@ -40,8 +40,6 @@ class EscRun extends Command
 
                 $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
                 file_put_contents($filename, $crashReport->toJson());
-
-                $this->start();
             }
         });
 

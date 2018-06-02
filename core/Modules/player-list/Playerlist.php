@@ -16,7 +16,7 @@ class Playerlist
 
     public static function show(Player $player)
     {
-        $players = Player::whereOnline(true)->orWhere('Score', '>', 0)->get();
+        $players = Player::where('player_id', '>', 0)->orWhere('Score', '>', 0)->get();
 
         $playerlist = Template::toString('player-list.players', compact('players'));
 

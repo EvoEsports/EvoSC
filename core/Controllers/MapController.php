@@ -93,10 +93,10 @@ class MapController
         if ($request) {
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->FileName);
-            ChatController::messageAll("\$n\$fff", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::messageAll("", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::messageAll("\$n\$fff", ' Next map is ', $nextMap);
+            ChatController::messageAll("", ' Next map is ', $nextMap);
         }
     }
 
