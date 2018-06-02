@@ -78,28 +78,46 @@ class EventController
     private static function mpPlayerInfoChanged($playerInfos)
     {
         foreach ($playerInfos as $playerInfo) {
-            $login    = $playerInfo['Login'];
-            $nickname = $playerInfo['NickName'];
-            $playerId = $playerInfo['PlayerId'];
+            $login           = $playerInfo['Login'];
+            $nickname        = $playerInfo['NickName'];
+            $playerId        = $playerInfo['PlayerId'];
+            $spectatorStatus = $playerInfo['SpectatorStatus'];
 
             $player = Player::find($login);
 
             if ($player) {
                 $player->update([
-                    'NickName'  => $nickname,
-                    'player_id' => $playerId
+                    'NickName'         => $nickname,
+                    'player_id'        => $playerId,
+                    'spectator_status' => $spectatorStatus
                 ]);
+
+                Hook::fire('PlayerInfoChanged', $player);
             } else {
                 $playerId = Player::insertGetId([
-                    'Login'     => $login,
-                    'NickName'  => $nickname,
-                    'player_id' => $playerId
+                    'Login'            => $login,
+                    'NickName'         => $nickname,
+                    'player_id'        => $playerId,
+                    'spectator_status' => $spectatorStatus
                 ]);
 
                 Stats::create([
                     'Player' => $playerId,
                     'Visits' => 1
                 ]);
+
+                $player = Player::whereId($playerId)->first();
+
+                Hook::fire('PlayerInfoChanged', $player);
+            }
+
+            $targetId = $player->spectator_status->currentTargetId;
+
+            if ($targetId > 0) {
+                $target = Player::wherePlayerId($targetId)->first();
+                Hook::fire('SpecStart', $player, $target);
+            }else{
+                Hook::fire('SpecStop', $player);
             }
         }
     }

@@ -50,7 +50,10 @@ class EscRun extends Command
         beginMap();
 
         //Set connected players online
-        foreach (onlinePlayers() as $player) {
+        $onlinePlayersLogins = collect(\esc\Classes\Server::getRpc()->getPlayerList())->pluck('login');
+        $onlinePlayers = esc\Models\Player::whereIn('Login', $onlinePlayersLogins)->get();
+        esc\Models\Player::whereNotIn('Login', $onlinePlayersLogins)->where('player_id', '>', 0)->update(['player_id' => 0]);
+        foreach ($onlinePlayers as $player) {
             \esc\Classes\Hook::fire('PlayerConnect', $player);
         }
 
