@@ -22,14 +22,14 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('maplist.show', 'MapList::showMapList');
-        ManiaLinkEvent::add('maplist.queue', 'MapList::queueMap');
-        ManiaLinkEvent::add('maplist.filter', 'MapList::filter');
-        ManiaLinkEvent::add('maplist.delete', 'MapList::deleteMap', 'map.delete');
-        ManiaLinkEvent::add('maplist.disable', 'MapList::disableMap', 'map.delete');
-        ManiaLinkEvent::add('maplist.details', 'MapList::showMapDetails');
+        ManiaLinkEvent::add('maplist.show', [MapList::class, 'showMapList']);
+        ManiaLinkEvent::add('maplist.queue', [MapList::class, 'queueMap']);
+        ManiaLinkEvent::add('maplist.filter', [MapList::class, 'filter']);
+        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
+        ManiaLinkEvent::add('maplist.disable', [MapList::class, 'disableMap'], 'map.delete');
+        ManiaLinkEvent::add('maplist.details', [MapList::class, 'showMapDetails']);
 
-        ManiaLinkEvent::add('maplist.mx', 'MapList::updateMxDetails');
+        ManiaLinkEvent::add('maplist.mx', [MapList::class, 'updateMxDetails']);
 
         ChatController::addCommand('list', 'MapList::list', 'Display list of maps');
 
@@ -37,8 +37,8 @@ class MapList
 
         KeyController::createBind('X', 'MapList::reload');
 
-        ManiaLinkEvent::add('map.fav.add', 'MapList::favAdd');
-        ManiaLinkEvent::add('map.fav.remove', 'MapList::favRemove');
+        ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
     }
 
     public static function reload(Player $player)

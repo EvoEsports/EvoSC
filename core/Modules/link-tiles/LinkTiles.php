@@ -16,7 +16,7 @@ class LinkTiles
     {
         Hook::add('PlayerConnect', [LinkTiles::class, 'playerConnect']);
 
-        \esc\Classes\ManiaLinkEvent::add('openlink', 'LinkTiles::openLink');
+        \esc\Classes\ManiaLinkEvent::add('openlink', [LinkTiles::class, 'openLink']);
 
         foreach (onlinePlayers() as $player) {
             LinkTiles::displayLinkTiles($player);

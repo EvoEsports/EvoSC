@@ -19,8 +19,8 @@ class ModuleController
     {
         self::$loadedModules = new Collection();
 
-        ManiaLinkEvent::add('modules.close', 'ModuleController::hideModules');
-        ManiaLinkEvent::add('module.reload', 'ModuleController::reloadModule');
+        ManiaLinkEvent::add('modules.close', [ModuleController::class, 'hideModules']);
+        ManiaLinkEvent::add('module.reload', [ModuleController::class, 'reloadModule']);
 
         ChatCommand::add('modules', 'ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
     }

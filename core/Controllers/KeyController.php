@@ -20,7 +20,7 @@ class KeyController
 
         Hook::add('PlayerConnect', [KeyController::class, 'playerConnect']);
 
-        ManiaLinkEvent::add('keybind', 'KeyController::executeBinds');
+        ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
     }
 
     public static function createBind(string $key, string $function)

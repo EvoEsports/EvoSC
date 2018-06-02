@@ -17,8 +17,8 @@ class TimeWidget
         Hook::add('BeginMatch', [TimeWidget::class, 'show']);
         Hook::add('EndMatch', [TimeWidget::class, 'hide']);
 
-        ManiaLinkEvent::add('tw.addTime', 'TimeWidget::addTime');
-        ManiaLinkEvent::add('tw.requestMoreTime', 'TimeWidget::requestMoreTime');
+        ManiaLinkEvent::add('tw.addTime', [TimeWidget::class, 'addTime']);
+        ManiaLinkEvent::add('tw.requestMoreTime', [TimeWidget::class, 'requestMoreTime']);
 
         TimeWidget::show();
     }

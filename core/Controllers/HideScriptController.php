@@ -14,8 +14,8 @@ class HideScriptController
     {
         ChatController::addCommand('hide', 'HideScriptController::showConfig', 'Configure UI hiding. Set speed/enabled.');
 
-        ManiaLinkEvent::add('hsc.toggle', 'HideScriptController::toggle');
-        ManiaLinkEvent::add('hsc.set', 'HideScriptController::set');
+        ManiaLinkEvent::add('hsc.toggle', [HideScriptController::class, 'toggle']);
+        ManiaLinkEvent::add('hsc.set', [HideScriptController::class, 'set']);
 
         Hook::add('PlayerConnect', [HideScriptController::class, 'sendHideScriptSettings']);
     }

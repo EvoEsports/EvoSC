@@ -18,8 +18,8 @@ class InfoMessages
     {
         ChatCommand::add('messages', 'InfoMessages::showSettings', 'Set up recurring server messages', '//', 'messages');
 
-        ManiaLinkEvent::add('infomessages.show', 'InfoMessages::showSettings');
-        ManiaLinkEvent::add('infomessages.edit', 'InfoMessages::showEdit');
+        ManiaLinkEvent::add('infomessages.show', [InfoMessages::class, 'showSettings']);
+        ManiaLinkEvent::add('infomessages.edit', [InfoMessages::class, 'showEdit']);
     }
 
     public static function reload(Player $player)

@@ -17,7 +17,7 @@ class Donations
     {
         Hook::add('PlayerConnect', [Donations::class, 'show']);
 
-        ManiaLinkEvent::add('donate', 'Donations::donate');
+        ManiaLinkEvent::add('donate', [Donations::class, 'donate']);
 
         ChatCommand::add('donate', 'Donations::donateCmd', 'Donate planets to the server "/donate <amount>"');
     }

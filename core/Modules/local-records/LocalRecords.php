@@ -25,8 +25,8 @@ class LocalRecords
         Hook::add('BeginMap', [LocalRecords::class, 'beginMap']);
         Hook::add('PlayerConnect', [LocalRecords::class, 'beginMap']);
 
-        ManiaLinkEvent::add('locals.show', 'LocalRecords::showLocalsModal');
-        ManiaLinkEvent::add('modal.hide', 'LocalRecords::hideLocalsModal');
+        ManiaLinkEvent::add('locals.show', [LocalRecords::class, 'showLocalsModal']);
+        ManiaLinkEvent::add('modal.hide', [LocalRecords::class, 'hideLocalsModal']);
     }
 
     /**

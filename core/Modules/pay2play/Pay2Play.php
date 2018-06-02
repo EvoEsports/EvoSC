@@ -24,8 +24,8 @@ class Pay2Play
 
         Hook::add('PlayerConnect', [Pay2Play::class, 'showWidget']);
 
-        ManiaLinkEvent::add('addtime', 'Pay2Play::addTime');
-        ManiaLinkEvent::add('skip', 'Pay2Play::skip');
+        ManiaLinkEvent::add('addtime', [Pay2Play::class, 'addTime']);
+        ManiaLinkEvent::add('skip', [Pay2Play::class, 'skip']);
     }
 
     public static function reload(Player $player)

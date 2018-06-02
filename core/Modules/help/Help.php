@@ -20,7 +20,7 @@ class Help
     {
         ChatController::addCommand('help', 'Help::showCommandsHelp', 'Show this help');
 
-        ManiaLinkEvent::add('help', 'Help::switchHelp');
+        ManiaLinkEvent::add('help', [Help::class, 'switchHelp']);
     }
 
     public static function switchHelp(Player $player, $type, $page = 1)

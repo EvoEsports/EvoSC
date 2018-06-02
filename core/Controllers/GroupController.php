@@ -21,10 +21,10 @@ class GroupController
         ChatCommand::add('group', 'GroupController::group', 'Group commands', '//', 'group');
         ChatCommand::add('groups', 'GroupController::displayGroups', 'Show groups overview', '//', 'group');
 
-        ManiaLinkEvent::add('group.delete', 'GroupController::groupDelete', 'group');
-        ManiaLinkEvent::add('group.edit', 'GroupController::groupEdit', 'group');
-        ManiaLinkEvent::add('group.toggle.access', 'GroupController::groupToggleAccessRight', 'group');
-        ManiaLinkEvent::add('groups.show', 'GroupController::groupsShow', 'group');
+        ManiaLinkEvent::add('group.delete', [GroupController::class, 'groupDelete'], 'group');
+        ManiaLinkEvent::add('group.edit', [GroupController::class, 'groupEdit'], 'group');
+        ManiaLinkEvent::add('group.toggle.access', [GroupController::class, 'groupToggleAccessRight'], 'group');
+        ManiaLinkEvent::add('groups.show', [GroupController::class, 'groupsShow'], 'group');
     }
 
     public static function createTables()

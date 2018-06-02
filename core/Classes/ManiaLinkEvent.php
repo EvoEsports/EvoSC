@@ -15,7 +15,7 @@ class ManiaLinkEvent
     public $callback;
     public $access;
 
-    private function __construct(string $id, string $callback, string $access = null)
+    private function __construct(string $id, array $callback, string $access = null)
     {
         $this->id = $id;
         $this->callback = $callback;
@@ -34,7 +34,7 @@ class ManiaLinkEvent
         Hook::add('PlayerManialinkPageAnswer', [\esc\Classes\ManiaLinkEvent::class, 'call']);
     }
 
-    public static function add(string $id, string $callback, string $access = null)
+    public static function add(string $id, array $callback, string $access = null)
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 
@@ -72,11 +72,10 @@ class ManiaLinkEvent
 
         if (strlen($event->id) < strlen($action)) {
             $arguments = explode(',', $action);
-            $arguments[0] = $ply;
-            call_func($event->callback, ...$arguments);
+            call_user_func($event->callback, $ply, ...$arguments);
             return;
         }
 
-        call_func($event->callback, $ply);
+        call_user_func($event->callback, $ply);
     }
 }

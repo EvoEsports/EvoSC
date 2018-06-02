@@ -37,7 +37,7 @@ class Dedimania extends DedimaniaApi
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerFinish', [Dedimania::class, 'playerFinish']);
 
-        ManiaLinkEvent::add('dedis.show', 'Dedimania::showDedisModal');
+        ManiaLinkEvent::add('dedis.show', [Dedimania::class, 'showDedisModal']);
 
         ChatController::addCommand('maxrank', 'Dedimania::printMaxRank', 'Show from which rank dedis get saved');
         ChatController::addCommand('dedicps', 'Dedimania::printDediCps', 'SPrints cps for given dedi to chat');
