@@ -46,9 +46,22 @@ class TemplateController
         return self::$templates;
     }
 
+    /**
+     * @param string $index
+     * @param $values
+     * @return string
+     */
     public static function getTemplate(string $index, $values): string
     {
-        return self::$latte->renderToString($index, $values);
+        try {
+            return self::$latte->renderToString($index, $values);
+        } catch (\Exception $e) {
+            $vals = implode(' ', $values);
+            Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " ($vals)");
+            createCrashReport($e);
+        }
+
+        return '';
     }
 
     public static function getBlankTemplate(string $index): string

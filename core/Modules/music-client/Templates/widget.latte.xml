@@ -2,7 +2,7 @@
 <manialink name="ESC:music-widget" id="music-widget" version="3">
     <frame id="widget" data-pos-visible="{config('ui.music.pos.visible')}" data-pos-hidden="{config('ui.music.pos.hidden')}" scale="{config('ui.music.pos.scale') ?? 0.8|noescape}">
         <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}9"/>
-        <quad pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
+        <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
         <audio id="music" music="1" hidden="1" />
 
@@ -255,6 +255,7 @@ main() {
     declare CMlQuad show <=> (Page.MainFrame.GetFirstChild("show") as CMlQuad);
     declare CMlEntry search <=> (Page.MainFrame.GetFirstChild("search") as CMlEntry);
     declare CMlQuad background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
+    declare CMlQuad backgroundIcon <=> (Page.MainFrame.GetFirstChild("icon-background") as CMlQuad);
     declare CMlFrame musicContainer <=> (Page.MainFrame.GetFirstChild("music-container") as CMlFrame);
     declare Text visible = "<frame pos='" ^ widget.DataAttributeGet("pos-visible") ^ "' />";
     declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
@@ -287,18 +288,21 @@ main() {
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     AnimMgr.Add(background, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(backgroundIcon, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }else{
                 if(speed >= UI_Hide_Speed && !isHidden){
                     AnimMgr.Add(widget, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     AnimMgr.Add(background, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(backgroundIcon, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = True;
                 }
 
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     AnimMgr.Add(background, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(backgroundIcon, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }

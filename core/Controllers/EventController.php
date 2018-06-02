@@ -254,7 +254,7 @@ class EventController
             try {
                 ManiaLinkEvent::call($player, $arguments[2]);
             } catch (\Exception $e) {
-                Log::logAddLine('ManiaLinkEvent', "Error: " . $e->getMessage());
+                Log::logAddLine('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
                 createCrashReport($e);
             }
         } else {

@@ -111,10 +111,10 @@ class MapList
     {
         $locals    = $player->locals->pluck('Rank', 'Map');
         $dedis     = $player->dedis->pluck('Rank', 'Map');
-        $favorites = $player->favorites()->get(['id', 'Name'])->pluck('Name', 'id');
+        $favorites = $player->favorites()->get(['id', 'gbx->Name as Name'])->pluck('Name', 'id');
 
         $maps = Map::all()->map(function (Map $map) use ($locals, $dedis, $favorites) {
-            $author = Player::whereId($map->Author)->get()->first();
+            $author = $map->author;
 
             $authorLogin = $author->Login ?? "n/a";
             $authorNick  = stripAll($author->NickName ?? "n/a");
@@ -133,7 +133,7 @@ class MapList
 
     public static function showNewsMapList(Player $player)
     {
-        Template::show($player, 'map-list.manialink', []);
+        Template::show($player, 'map-list.manialink');
     }
 
     public static function list(Player $player, $cmd, $filter = null)
@@ -179,7 +179,7 @@ class MapList
     public static function showMapList(Player $player, $page = null, $filter = null)
     {
         $perPage = 23;
-        $page = intval($page);
+        $page    = intval($page);
 
         if ($filter) {
             if ($filter == 'worst') {
