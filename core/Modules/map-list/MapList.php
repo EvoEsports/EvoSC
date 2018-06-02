@@ -264,7 +264,7 @@ class MapList
         Template::hide($player, 'MapList');
     }
 
-    public static function queueMap(Player $player, $cmd, $mapId)
+    public static function queueMap(Player $player, $mapId)
     {
         $map = Map::whereId($mapId)->first();
 
