@@ -23,7 +23,7 @@ class KeyController
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
     }
 
-    public static function createBind(string $key, string $function)
+    public static function createBind(string $key, array $function)
     {
         $bind = collect([]);
 
@@ -42,7 +42,7 @@ class KeyController
         }
 
         foreach ($binds as $bind) {
-            call_func($bind->function, $player);
+            call_user_func($bind->function, $player);
         }
     }
 

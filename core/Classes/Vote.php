@@ -45,8 +45,8 @@ class Vote
         ChatController::addCommand('y', [Vote::class, 'voteYes'], 'Vote yes');
         ChatController::addCommand('n', [Vote::class, 'voteNo'], 'Vote no');
 
-        KeyController::createBind('F5', 'Vote::voteYes');
-        KeyController::createBind('F6', 'Vote::voteNo');
+        KeyController::createBind('F5', [Vote::class, 'voteYes']);;
+        KeyController::createBind('F6', [Vote::class, 'voteNo']);;
     }
 
     public static function active(): bool

@@ -35,7 +35,7 @@ class MapList
 
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
 
-        KeyController::createBind('X', 'MapList::reload');
+        KeyController::createBind('X', [MapList::class, 'reload']);;
 
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
