@@ -8,6 +8,7 @@ use esc\Classes\RestClient;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use GuzzleHttp\Exception\ConnectException;
 
 class MusicClient
 {
@@ -60,7 +61,14 @@ class MusicClient
     {
         Log::info("Loading music...");
 
-        $res = RestClient::get(config('music.server'), ['connect_timeout' => 2]);
+        $wait = 5;
+
+        try {
+            $res = RestClient::get(config('music.server'), ['connect_timeout' => $wait]);
+        } catch (ConnectException $e) {
+            Log::logAddLine('MusicClient', 'Failed to connect to server after ' . $wait . ' seconds');
+            return;
+        }
 
         if ($res->getStatusCode() != 200) {
             Log::logAddLine('Music server', 'Failed to get music: ' . $res->getReasonPhrase(), true);

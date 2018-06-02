@@ -223,25 +223,25 @@ $$: Writes a dollarsign
                     break;
 
                 case 'info':
-                    $icon  = "\$oi\$z";
+                    $icon  = "";
                     $color = config('color.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
-                    $icon  = "";
+                    $icon  = "";
                     $color = config('color.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
-                    $icon  = "";
+                    $icon  = "";
                     $color = config('color.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
-                    $icon  = "";
+                    $icon  = "";
                     $color = config('color.dedi');
                     array_shift($parts);
                     break;
