@@ -44,8 +44,8 @@ $$: Writes a dollarsign
 
         Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
-        ChatCommand::add('mute', 'ChatController::mute', 'Mutes a player by given nickname', '//', 'player.mute');
-        ChatCommand::add('unmute', 'ChatController::unmute', 'Unmute a player by given nickname', '//', 'player.mute');
+        ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//', 'player.mute');
+        ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//', 'player.mute');
     }
 
     public static function getChatCommands(): Collection
@@ -196,7 +196,7 @@ $$: Writes a dollarsign
         $chatCommandPattern .= implode('|', $triggers) . ')/i';
         self::$pattern      = $chatCommandPattern;
 
-        Log::info("Chat command added: $trigger$command -> $callback", false);
+        Log::info("Chat command added: $trigger$command -> " . $callback[0] . $callback[1], false);
     }
 
     public static function messageAll(...$parts)

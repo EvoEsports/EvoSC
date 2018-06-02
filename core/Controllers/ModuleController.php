@@ -22,7 +22,7 @@ class ModuleController
         ManiaLinkEvent::add('modules.close', [ModuleController::class, 'hideModules']);
         ManiaLinkEvent::add('module.reload', [ModuleController::class, 'reloadModule']);
 
-        ChatCommand::add('modules', 'ModuleController::showModules', 'Display all loaded modules', '//', 'module.reload');
+        ChatCommand::add('modules', [ModuleController::class, 'showModules'], 'Display all loaded modules', '//', 'module.reload');
     }
 
     public static function reloadModule(Player $callee, string $moduleName)

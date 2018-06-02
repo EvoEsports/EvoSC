@@ -16,7 +16,7 @@ class InfoMessages
 {
     public function __construct()
     {
-        ChatCommand::add('messages', 'InfoMessages::showSettings', 'Set up recurring server messages', '//', 'messages');
+        ChatCommand::add('messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', '//', 'messages');
 
         ManiaLinkEvent::add('infomessages.show', [InfoMessages::class, 'showSettings']);
         ManiaLinkEvent::add('infomessages.edit', [InfoMessages::class, 'showEdit']);

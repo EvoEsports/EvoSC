@@ -19,7 +19,7 @@ class Donations
 
         ManiaLinkEvent::add('donate', [Donations::class, 'donate']);
 
-        ChatCommand::add('donate', 'Donations::donateCmd', 'Donate planets to the server "/donate <amount>"');
+        ChatCommand::add('donate', [Donations::class, 'donateCmd'], 'Donate planets to the server "/donate <amount>"');
     }
 
     public static function show(Player $player)

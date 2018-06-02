@@ -18,8 +18,8 @@ class GroupController
 {
     public static function init()
     {
-        ChatCommand::add('group', 'GroupController::group', 'Group commands', '//', 'group');
-        ChatCommand::add('groups', 'GroupController::displayGroups', 'Show groups overview', '//', 'group');
+        ChatCommand::add('group', [GroupController::class, 'group'], 'Group commands', '//', 'group');
+        ChatCommand::add('groups', [GroupController::class, 'displayGroups'], 'Show groups overview', '//', 'group');
 
         ManiaLinkEvent::add('group.delete', [GroupController::class, 'groupDelete'], 'group');
         ManiaLinkEvent::add('group.edit', [GroupController::class, 'groupEdit'], 'group');
