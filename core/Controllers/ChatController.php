@@ -33,6 +33,7 @@ $$: Writes a dollarsign
 
     private static $pattern;
     private static $chatCommands;
+    private static $chatCommandsCompiled;
     private static $mutedPlayers;
 
     public static function init()
@@ -82,9 +83,9 @@ $$: Writes a dollarsign
         });
     }
 
-    public static function playerChat(Player $player, $text, $isRegisteredCmd)
+    public static function playerChat(Player $player, $text)
     {
-        if (preg_match(self::$pattern, $text, $matches)) {
+        if (self::$chatCommandsCompiled->contains(explode(' ', $text)[0])) {
             //chat command detected
             if (self::executeChatCommand($player, $text)) {
                 return;
@@ -133,7 +134,7 @@ $$: Writes a dollarsign
     {
         $isValidCommand = false;
 
-        //(treat "this is a string" as single argument)
+        //treat "this is a string" as single argument
         if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
             foreach ($matches[1] as $match) {
                 //Replace all spaces in quotes to ;:;
@@ -152,8 +153,8 @@ $$: Writes a dollarsign
 
         //Find command
         $command = self::$chatCommands
-            ->filter(function (ChatCommand $cmd) use ($arguments) {
-                return "$cmd->trigger$cmd->command" == strtolower($arguments[0]);
+            ->filter(function (ChatCommand $command) use ($arguments) {
+                return strtolower($command->compile()) == strtolower($arguments[0]);
             })
             ->first();
 
@@ -164,7 +165,8 @@ $$: Writes a dollarsign
             //Command exists
             try {
                 //Run command callback
-                call_user_func($command->callback, ...$arguments);
+//                call_user_func($command->callback, ...$arguments);
+                $command->run($arguments);
             } catch (\Exception $e) {
                 Log::logAddLine('ChatController', 'Failed to execute chat command: ' . $e->getMessage(), true);
                 Log::logAddLine('ChatController', $e->getTraceAsString(), false);
@@ -175,28 +177,23 @@ $$: Writes a dollarsign
         return $isValidCommand;
     }
 
+    public static function compileChatCommand(ChatCommand $command)
+    {
+        return $command->compile();
+    }
+
     public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
         if (!self::$chatCommands) {
-            self::$chatCommands = collect();
+            self::$chatCommands         = collect();
+            self::$chatCommandsCompiled = collect();
         }
 
         $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
         self::$chatCommands->push($chatCommand);
+        self::$chatCommandsCompiled = self::$chatCommands->map([self::class, 'compileChatCommand']);
 
-        $triggers           = [];
-        $chatCommandPattern = '/^(';
-        foreach (self::$chatCommands as $cmd) {
-            $escapedTrigger = '';
-            foreach (str_split($cmd->trigger) as $part) {
-                $escapedTrigger .= '\\' . $part;
-            }
-            array_push($triggers, $escapedTrigger . $cmd->command);
-        }
-        $chatCommandPattern .= implode('|', $triggers) . ')/i';
-        self::$pattern      = $chatCommandPattern;
-
-        Log::info("Chat command added: $trigger$command -> " . $callback[0] . $callback[1], false);
+        Log::info("Chat command added: " . $chatCommand->compile(), false);
     }
 
     public static function messageAll(...$parts)

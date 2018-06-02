@@ -16,10 +16,10 @@ function getClassesInDirectory(&$classes, $path)
 
         //If php file, add to classes collection
         if (preg_match('/\.php$/', $classFile, $matches)) {
-            $class = collect();
-            $class->file = $file;
-            $type = explode(DIRECTORY_SEPARATOR, $path);
-            $class->dir = array_pop($type);
+            $class        = collect();
+            $class->file  = $file;
+            $type         = explode(DIRECTORY_SEPARATOR, $path);
+            $class->dir   = array_pop($type);
             $class->class = str_replace('.php', '', $classFile);
             $classes->push($class);
         }
@@ -58,6 +58,10 @@ function buildClassMap()
     $classes = getNameSpaces($classes);
 }
 
+/**
+ * @param $className
+ * @throws Exception
+ */
 function esc_class_loader($className)
 {
     global $classes;
@@ -70,6 +74,8 @@ function esc_class_loader($className)
         } else {
             die("Trying to load non-existant file: " . $class->file);
         }
+    } else {
+        \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className);
     }
 }
 
