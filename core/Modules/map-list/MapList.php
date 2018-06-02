@@ -179,6 +179,7 @@ class MapList
     public static function showMapList(Player $player, $page = null, $filter = null)
     {
         $perPage = 23;
+        $page = intval($page);
 
         if ($filter) {
             if ($filter == 'worst') {
@@ -205,7 +206,7 @@ class MapList
 
                 $maps = maps()
                     ->filter(function (Map $map) use ($filter) {
-                        $nameMatch = strpos(strtolower(stripAll($map->Name)), strtolower($filter));
+                        $nameMatch = strpos(strtolower(stripAll($map->gbx->Name)), strtolower($filter));
 
                         return (is_int($nameMatch) || $map->Author == $filter);
                     });
@@ -263,7 +264,7 @@ class MapList
         Template::hide($player, 'MapList');
     }
 
-    public static function queueMap(Player $player, $mapId)
+    public static function queueMap(Player $player, $cmd, $mapId)
     {
         $map = Map::whereId($mapId)->first();
 
@@ -315,7 +316,7 @@ class MapList
 
         Template::show($player, 'components.modal', [
             'id'            => 'MapList',
-            'title'         => 'Map details: ' . $map->Name,
+            'title'         => 'Map details: ' . $map->gbx->Name,
             'width'         => 130,
             'height'        => 50,
             'content'       => $detailPage,

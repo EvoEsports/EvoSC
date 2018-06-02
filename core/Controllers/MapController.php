@@ -92,7 +92,7 @@ class MapController
 
         if ($request) {
             Log::info("Setting next map: " . $request->map->Name);
-            Server::chooseNextMap($request->map->FileName);
+            Server::chooseNextMap($request->map->filename);
             ChatController::messageAll("", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
@@ -143,12 +143,12 @@ class MapController
     public static function deleteMap(Player $player, Map $map)
     {
         try {
-            Server::removeMap($map->FileName);
+            Server::removeMap($map->filename);
         } catch (FileException $e) {
             Log::error($e);
         }
 
-        $deleted = File::delete(Config::get('server.maps') . '/' . $map->FileName);
+        $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
 
         if ($deleted) {
             ChatController::messageAll('Admin removed map ', $map);
@@ -165,7 +165,7 @@ class MapController
     public static function disableMap(Player $player, Map $map)
     {
         try {
-            Server::removeMap($map->FileName);
+            Server::removeMap($map->filename);
         } catch (FileException $e) {
             Log::error($e);
         }
@@ -255,10 +255,10 @@ class MapController
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
 
-        Server::chooseNextMap(self::getNext()->FileName);
+        Server::chooseNextMap(self::getNext()->filename);
 
         ChatController::messageAll($player, ' juked map ', $map);
-        Log::info("$player->NickName juked map $map->Name");
+        Log::info("$player->NickName juked map " . $map->gbx->Name);
 
         self::displayMapWidget();
 
@@ -380,7 +380,7 @@ class MapController
 
         $map->update(['mx_details' => $result->getBody()->getContents()]);
 
-        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->Name);
+        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
 
         $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
 
@@ -391,7 +391,7 @@ class MapController
 
         $map->update(['mx_world_record' => $result->getBody()->getContents()]);
 
-        Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->Name);
+        Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->gbx->Name);
     }
 
     /**
@@ -446,7 +446,7 @@ class MapController
                 'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
             ]);
 
-            $info = Server::getMapInfo($map->FileName)
+            $info = Server::getMapInfo($map->filename)
                           ->toArray();
 
             if ($info) {
@@ -454,10 +454,10 @@ class MapController
             }
 
             try {
-                Server::addMap($map->FileName);
+                Server::addMap($map->filename);
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
             } catch (\Exception $e) {
-                Log::warning("Map $map->FileName already added.");
+                Log::warning("Map $map->filename already added.");
             }
 
             ChatController::messageAll('New map added: ', $map);
