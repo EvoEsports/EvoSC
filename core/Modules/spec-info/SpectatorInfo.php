@@ -38,6 +38,14 @@ class SpectatorInfo
 
         $spectators = Player::whereIn('Login', $spectatorLogins)->get();
 
-        Template::show($player, 'spec-info.widget', compact('spectators'));
+        if ($spectators->count() > 0) {
+            Template::show($player, 'spec-info.widget', compact('spectators'));
+
+            $spectators->each(function (Player $spectator) use ($spectators) {
+                Template::show($spectator, 'spec-info.widget', compact('spectators'));
+            });
+        } else {
+            Template::hide($player, 'spec-info.widget');
+        }
     }
 }

@@ -39,14 +39,19 @@ class Template
      * @param string $index
      * @param array|null $values
      */
-    public static function show(Player $player, string $index, array $values = null)
+    public static function show(Player $player, string $index, $values = null)
     {
         if (!$values) {
-            $values = [];
+            $values = collect();
         }
 
-        $values['localPlayer'] = $player;
-        $xml                   = TemplateController::getTemplate($index, $values);
+        if (is_array($values)) {
+            $values['localPlayer'] = $player;
+            $xml = TemplateController::getTemplate($index, $values);
+        } else {
+            $values->put('localPlayer', $player);
+            $xml = TemplateController::getTemplate($index, $values->toArray());
+        }
 
         if ($xml != '') {
             Server::sendDisplayManialinkPage($player->Login, $xml);
