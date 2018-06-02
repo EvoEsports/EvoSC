@@ -243,7 +243,7 @@ class MapController
      * @param Player $player
      * @param Map $map
      */
-    public static function queueMap(Player $player, Map $map)
+    public static function queueMap(Player $player, Map $map, $arg = null)
     {
         if (self::getQueue()
                 ->where('player', $player)
