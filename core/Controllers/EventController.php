@@ -115,7 +115,10 @@ class EventController
 
             if ($targetId > 0) {
                 $target = Player::wherePlayerId($targetId)->first();
-                Hook::fire('SpecStart', $player, $target);
+
+                if($target){
+                    Hook::fire('SpecStart', $player, $target);
+                }
             }else{
                 Hook::fire('SpecStop', $player);
             }

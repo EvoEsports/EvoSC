@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:spec-info" id="spec-info" version="3">
+    <frame pos="0 0">
+        {foreach $spectators as $key => $spectator}
+        <label pos="0 {$key * -3}" text="{$spectator->NickName|noescape}" textsize="1" halign="right" valign="center" />
+        <label pos="1 {$key * -3}" text="" textsize="1" halign="left" valign="center" />
+        {/foreach}
+    </frame>
 </manialink>

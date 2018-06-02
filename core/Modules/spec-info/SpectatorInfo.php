@@ -4,7 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
-use esc\Classes\Log;
+use esc\Classes\Template;
 use esc\Models\Player;
 
 class SpectatorInfo
@@ -13,24 +13,31 @@ class SpectatorInfo
 
     public function __construct()
     {
-        Hook::add('PlayerInfoChanged', [self::class, 'playerInfoChanged']);
+        self::$specTargets = collect();
+
+        Hook::add('SpecStart', [self::class, 'specStart']);
+        Hook::add('SpecStop', [self::class, 'specStop']);
     }
 
-    public static function playerInfoChanged(Player $player)
+    public static function specStart(Player $player, Player $target)
     {
-        $targetId = $player->spectator_status->currentTargetId;
+        self::$specTargets->put($player->Login, $target);
+        self::updateWidget($target);
+    }
 
-        if ($targetId == 0) {
-            return;
-        }
+    public static function specStop(Player $player)
+    {
+        self::$specTargets->put($player->Login, null);
+    }
 
-        try {
-            $target = Player::wherePlayerId($targetId)->firstOrFail();
-        } catch (\Exception $e) {
-            Log::logAddLine('SoectatorInfo', 'Failed to get target: ' . $e->getMessage());
-            createCrashReport($e);
-        }
+    public static function updateWidget(Player $player)
+    {
+        $spectatorLogins = self::$specTargets->filter(function (Player $target) use ($player) {
+            return $target === $player;
+        })->keys();
 
-        var_dump($target->NickName);
+        $spectators = Player::whereIn('Login', $spectatorLogins)->get();
+
+        Template::show($player, 'spec-info.widget', compact('spectators'));
     }
 }
