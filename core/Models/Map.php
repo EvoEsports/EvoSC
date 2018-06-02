@@ -79,4 +79,9 @@ class Map extends Model
 
         return true;
     }
+
+    public function __toString()
+    {
+        return stripAll($this->gbx->Name);
+    }
 }

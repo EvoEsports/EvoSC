@@ -206,6 +206,6 @@ class Player extends Model
      */
     public function __toString()
     {
-        return stripAll("$this->NickName ($this->Login)");
+        return $this->Login;
     }
 }
