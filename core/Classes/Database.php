@@ -23,13 +23,13 @@ class Database
 
         $capsule->addConnection([
             'driver' => 'mysql',
-            'host' => config('db.host'),
-            'database' => config('db.db'),
-            'username' => config('db.user'),
-            'password' => config('db.password'),
+            'host' => config('database.host'),
+            'database' => config('database.db'),
+            'username' => config('database.user'),
+            'password' => config('database.password'),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix' => config('db.prefix'),
+            'prefix' => config('database.prefix'),
         ]);
 
         $capsule->setAsGlobal();

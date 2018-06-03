@@ -1,0 +1,13 @@
+{
+  "name": "<deprecated>",
+  "login": "brakertest2",
+  "ip": "127.0.0.1",
+  "port": 5000,
+  "rpc": {
+    "login": "SuperAdmin",
+    "password": "hurrdurr"
+  },
+  "base": "/mnt/c/Users/Alex-Win/Projects/server",
+  "max-playtime": 30,
+  "default-matchsettings": "drtk01.txt"
+}

@@ -1,0 +1,14 @@
+{
+  "primary": "07A",
+  "secondary": "AEF",
+  "chat": "FE9",
+  "info": "357",
+  "warning": "F52",
+  "local": "28F",
+  "dedi": "147",
+  "ui": {
+    "background": "222",
+    "header": "07A",
+    "primary": "07A"
+  }
+}

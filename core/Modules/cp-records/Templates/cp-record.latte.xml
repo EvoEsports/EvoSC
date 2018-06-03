@@ -11,7 +11,7 @@
     <label pos="77.5 -4.5" z-index="1" size="62 10" textsize="5" text="{$cp->player->NickName}" halign="center" valign="center"/>
 
     {if isset($flash)}
-    <quad z-index="0" size="110 10" bgcolor="{primary_color()|noescape}f" id="{$flash}" opacity="1.0"/>
+    <quad z-index="0" size="110 10" bgcolor="{config('colors.primary')|noescape}" id="{$flash}" opacity="1.0"/>
 
     <script><!--
     main() {

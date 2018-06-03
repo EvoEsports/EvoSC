@@ -1,17 +1,14 @@
 {
-  "module": "ui",
-  "clock": {
-    "pos": "143 7"
-  },
   "playerlist": {
     "pos": {
       "visible": "120 71",
       "hidden": "170 71"
     },
-    "width": 50,
-    "height": 53,
+    "rows": 13,
     "scale": 0.8
   },
+
+
   "locals": {
     "pos": {
       "visible": "-160 89",
@@ -20,6 +17,8 @@
     "rows": 20,
     "scale": 0.75
   },
+
+
   "dedis": {
     "pos": {
       "visible": "-160 22",
@@ -28,6 +27,8 @@
     "rows": 20,
     "scale": 0.75
   },
+
+
   "mx-karma": {
     "pos": {
       "visible": "120 22.5",
@@ -37,6 +38,8 @@
     "height": 30,
     "scale": 0.8
   },
+
+
   "map": {
     "pos": {
       "visible": "120 89",
@@ -44,6 +47,8 @@
     },
     "scale": 0.8
   },
+
+
   "music": {
     "pos": {
       "visible": "120 80",
@@ -51,6 +56,8 @@
     },
     "scale": 0.8
   },
+
+
   "stats": {
     "visits": {
       "pos": {
@@ -61,6 +68,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "playtime": {
       "pos": {
         "x": -77,
@@ -70,6 +78,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "finish": {
       "pos": {
         "x": -39,
@@ -79,6 +88,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "records": {
       "pos": {
         "x": -1,
@@ -88,6 +98,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "winner": {
       "pos": {
         "x": 37,
@@ -97,6 +108,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "voter": {
       "pos": {
         "x": 75,
@@ -106,6 +118,7 @@
       "show": 6,
       "scale": 0.75
     },
+
     "topranks": {
       "pos": {
         "x": 75,
@@ -114,10 +127,6 @@
       "width": 50,
       "show": 6,
       "scale": 0.75
-    }
-  },
-  "ui_properties": {
-    "countdown": {
     }
   }
 }

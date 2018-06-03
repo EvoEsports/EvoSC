@@ -3,7 +3,7 @@
 namespace esc\Classes;
 
 
-use esc\Controllers\ChatController;
+use Illuminate\Support\Collection;
 
 class Config
 {
@@ -12,7 +12,7 @@ class Config
     public static function get($variable)
     {
         $variableExplode = explode('.', $variable);
-        $config = array_shift($variableExplode);
+        $config          = array_shift($variableExplode);
 
         if (!array_key_exists($config, self::$configs)) {
             Log::error("Trying to access unloaded config: $variable");
@@ -37,43 +37,74 @@ class Config
      */
     public static function loadConfigFiles(...$args)
     {
-        foreach (array_diff(scandir('config'), array('..', '.', '.gitignore', 'default')) as $configFile) {
-            try {
-                if (preg_match('/[a-z\-\_]+\.json/i', $configFile)) {
-                    $content = file_get_contents('config/' . $configFile);
-                } else {
-                    Log::warning("Malicious file in config folder: $configFile.");
-                    continue;
+        $moduleConfigFiles = self::getConfigFiles(coreDir('Modules' . DIRECTORY_SEPARATOR));
+        $moduleConfigFiles->each([self::class, 'loadConfigFile']);
+
+        $configFolderFiles = self::getConfigFiles(configDir());
+        $configFolderFiles->each([self::class, 'loadConfigFile']);
+
+        dd(self::$configs);
+    }
+
+    public static function loadConfigFile(string $filename)
+    {
+        $data   = file_get_contents($filename);
+        $config = json_decode($data);
+        $id     = preg_replace('/\.config\.json/i', '', basename($filename));
+
+        $configs = Config::getConfigs();
+
+        if (array_key_exists($id, $configs)) {
+            foreach ($config as $key => $attribute) {
+                $configs[$id]->{$key} = $config->{$key};
+            }
+        } else {
+            $configs[$id] = $config;
+        }
+
+        Config::setConfigs($configs);
+    }
+
+    private static function getConfigFiles($path): Collection
+    {
+        $collection = collect();
+
+        collect(scandir($path))->reject(function ($file) {
+            return preg_match('/^\./', $file);
+        })->each(function ($file) use ($path, &$collection) {
+            $fullFilePath = $path . $file;
+
+            if (is_dir($fullFilePath)) {
+                $newPath    = $fullFilePath . DIRECTORY_SEPARATOR;
+                $collection = $collection->merge(self::getConfigFiles($newPath));
+            } else {
+                if (preg_match('/\.config\.json/i', $file)) {
+                    $collection->push($fullFilePath);
                 }
-            } catch (\Exception $e) {
-                Log::error("File could not be read: $configFile.");
-                continue;
             }
+        });
 
-            $json = json_decode($content);
-
-            if (!$json) {
-                Log::error("Malformed json in config: $configFile.");
-                continue;
-            }
-
-            if (!isset($json->module)) {
-                Log::error("Missing 'module' parameter in config: $configFile.");
-                continue;
-            }
-
-            self::$configs[$json->module] = $json;
-
-            Log::getOutput()->writeln("<fg=green>loaded: $json->module</>");
-        }
-
-        if (count($args)) {
-            ChatController::messageAll(warning('Config files reloaded'));
-        }
+        return $collection;
     }
 
     public static function configReload()
     {
         self::loadConfigFiles();
+    }
+
+    /**
+     * @return array
+     */
+    public static function getConfigs(): array
+    {
+        return self::$configs;
+    }
+
+    /**
+     * @param array $configs
+     */
+    public static function setConfigs(array $configs): void
+    {
+        self::$configs = $configs;
     }
 }

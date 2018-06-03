@@ -1,0 +1,19 @@
+{
+  "addtime": {
+    "enabled": true,
+    "pos": {
+      "visible": "125 7",
+      "hidden": "160 7"
+    },
+    "cost": 10
+  },
+
+  "skip": {
+    "enabled": false,
+    "pos": {
+      "visible": "120 7",
+      "hidden": "160 7"
+    },
+    "cost": 5000
+  }
+}

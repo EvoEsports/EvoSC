@@ -68,6 +68,11 @@ function coreDir(string $filename = ''): string
     return __DIR__ . '/' . $filename;
 }
 
+function configDir(string $filename = ''): string
+{
+    return __DIR__ . '/../config/' . $filename;
+}
+
 function baseDir(string $filename = ''): string
 {
     return __DIR__ . '/../' . $filename;

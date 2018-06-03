@@ -59,24 +59,24 @@ class CPRecords
         $cps = new Collection();
 
         if (!$clear) {
-            $columns = config('cpr.columns');
+            $columns = config('cp-records.columns');
 
             foreach (self::$checkpoints as $checkpoint) {
-                $row = floor(($checkpoint->id) / $columns);
-                $y = $row * 10.5 - 10;
+                $row      = floor(($checkpoint->id) / $columns);
+                $y        = $row * 10.5 - 10;
                 $posInRow = $checkpoint->id % $columns;
-                $x = $posInRow * 110.5 - (110.5 * $columns / 2);
+                $x        = $posInRow * 110.5 - (110.5 * $columns / 2);
 
-                if(isset($cpId) && $cpId == $checkpoint->id){
+                if (isset($cpId) && $cpId == $checkpoint->id) {
                     $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
-                }else{
+                } else {
                     $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
                 }
             }
         }
 
         $manialink = sprintf(
-            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="CPRecords" version="3"><frame scale="0.3" pos="0 85.5">%s</frame></manialink>',
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="CPRecords" version="3"><frame scale="0.3" pos="' . config('cp-records.pos') . '">%s</frame></manialink>',
             $cps->implode('')
         );
 
