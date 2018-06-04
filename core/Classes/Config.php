@@ -42,8 +42,6 @@ class Config
 
         $configFolderFiles = self::getConfigFiles(configDir());
         $configFolderFiles->each([self::class, 'loadConfigFile']);
-
-        dd(self::$configs);
     }
 
     public static function loadConfigFile(string $filename)
