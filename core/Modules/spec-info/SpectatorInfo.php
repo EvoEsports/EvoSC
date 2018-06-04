@@ -32,7 +32,7 @@ class SpectatorInfo
 
     public static function updateWidget(Player $player)
     {
-        $spectatorLogins = self::$specTargets->filter(function (Player $target) use ($player) {
+        $spectatorLogins = self::$specTargets->filter(function ($target) use ($player) {
             return $target === $player;
         })->keys();
 
