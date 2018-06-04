@@ -16,11 +16,11 @@ function startEsc()
         esc\Classes\Log::info("Connecting to server...");
 
         esc\Classes\Server::init(
-            esc\Classes\Config::get('server.ip'),
-            esc\Classes\Config::get('server.port'),
+            config('server.ip'),
+            config('server.port'),
             5,
-            esc\Classes\Config::get('server.rpc.login'),
-            esc\Classes\Config::get('server.rpc.password')
+            config('server.rpc.login'),
+            config('server.rpc.password')
         );
 
         esc\Classes\Server::getStatus();

@@ -31,7 +31,7 @@ class MxKarma extends MXK
 
     public function __construct()
     {
-        MxKarma::setApiKey(config('mxk.key'));
+        MxKarma::setApiKey(config('mx-karma.key'));
 
         $client = new Client([
             'base_uri' => 'https://karma.mania-exchange.com/api2/',

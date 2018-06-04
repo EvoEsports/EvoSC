@@ -20,11 +20,11 @@ class Config
         }
 
         $out = self::$configs[$config];
+
         foreach ($variableExplode as $variable) {
             if (isset($out->{$variable})) {
                 $out = $out->{$variable};
             } else {
-//                Log::error("Trying to access undefined: " . implode('.', $variableExplode));
                 return null;
             }
         }
@@ -46,6 +46,10 @@ class Config
 
     public static function loadConfigFile(string $filename)
     {
+        if (preg_match('/\/default\//', $filename)) {
+            return;
+        }
+
         $data   = file_get_contents($filename);
         $config = json_decode($data);
         $id     = preg_replace('/\.config\.json/i', '', basename($filename));
