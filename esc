@@ -17,6 +17,7 @@ class MakeMigration extends Command
     protected function configure()
     {
         $this->setName('make:migration')
+            ->setDescription('Create migration, placed in /Migrations')
             ->addArgument('migration_name', InputArgument::REQUIRED, 'The migration name');
     }
 
@@ -75,7 +76,7 @@ class Migrate extends Command
 {
     protected function configure()
     {
-        $this->setName('migrate');
+        $this->setName('migrate')->setDescription('Run all database migrations. Run after pulling updates');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

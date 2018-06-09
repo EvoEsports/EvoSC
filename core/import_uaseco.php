@@ -11,6 +11,7 @@ class ImportUaseco extends Command
     protected function configure()
     {
         $this->setName('import:uaseco')
+             ->setDescription('Import data from uaseco database, params: host, database, user, password [, table_prefix]')
              ->addArgument('host', InputArgument::REQUIRED, 'Host')
              ->addArgument('db', InputArgument::REQUIRED, 'Database')
              ->addArgument('user', InputArgument::REQUIRED, 'User')
