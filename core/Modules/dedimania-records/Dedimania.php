@@ -86,7 +86,7 @@ class Dedimania extends DedimaniaApi
 
     public static function beginMap(Map $map)
     {
-        self::$newTimes = new Collection();
+        self::$newTimes = collect();
         $session        = self::getSession();
 
         if ($session == null) {

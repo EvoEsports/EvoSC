@@ -89,7 +89,7 @@ class DedimaniaApi
             'Login'         => config('dedimania.login'),
             'Code'          => config('dedimania.key'),
             'Path'          => Server::getDetailedPlayerInfo(config('dedimania.login'))->path,
-            'Packmask'      => Server::getServerPackMask(),
+            'Packmask'      => 'Stadium',
             'ServerVersion' => getEscVersion(),
             'ServerBuild'   => Server::getVersion()->build,
             'Tool'          => 'EvoSC',
@@ -105,7 +105,7 @@ class DedimaniaApi
         $data = self::post($xml);
 
         try {
-            return (string)$data->params->param->value->array->data->value->array->data->value->struct->member[0]->value->string;
+            return (string)$data->params->param->value->struct->member[0]->value->string;
         } catch (\Exception $e) {
             Log::logAddLine(self::class, 'Failed to create session');
             return null;

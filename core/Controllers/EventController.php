@@ -23,7 +23,7 @@ class EventController
             $arguments = $callback[1];
 
             if (isVerbose()) {
-                Log::logAddLine('EventController', "Call $name with " . implode(', ', $arguments), true);
+                Log::logAddLine('EventController', "Call $name", true);
             }
 
             switch ($name) {
