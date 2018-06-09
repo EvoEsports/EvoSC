@@ -215,7 +215,7 @@ class Vote
             call_user_func(self::$action);
         }
 
-        $voteText = '$' . config('color.secondary') . self::$message;
+        $voteText = '$' . config('colors.secondary') . self::$message;
 
         ChatController::messageAll("\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
 

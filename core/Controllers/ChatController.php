@@ -125,7 +125,7 @@ $$: Writes a dollarsign
             $nick = '$eee📷 ' . $nick;
         }
 
-        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('color.chat'), $text);
+        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
 
         Server::call('ChatSendServerMessage', [$chatText]);
     }
@@ -211,38 +211,38 @@ $$: Writes a dollarsign
         }
 
         $icon  = "";
-        $color = config('color.primary');
+        $color = config('colors.primary');
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
                     $icon  = "";
-                    $color = config('color.secondary');
+                    $color = config('colors.secondary');
                     array_shift($parts);
                     break;
 
                 case 'info':
                     $icon  = "";
-                    $color = config('color.info');
+                    $color = config('colors.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
                     $icon  = "";
-                    $color = config('color.warning');
+                    $color = config('colors.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
                     $icon  = "";
-                    $color = config('color.local');
+                    $color = config('colors.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
                     $icon  = "";
-                    $color = config('color.dedi');
+                    $color = config('colors.dedi');
                     array_shift($parts);
                     break;
 

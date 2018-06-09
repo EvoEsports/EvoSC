@@ -110,22 +110,22 @@ function cutZeroes(string $formattedScore): string
 
 function secondary(string $str = ""): string
 {
-    return '$' . config('color.secondary') . $str;
+    return '$' . config('colors.secondary') . $str;
 }
 
 function primary(string $str = ""): string
 {
-    return '$' . config('color.primary') . $str;
+    return '$' . config('colors.primary') . $str;
 }
 
 function warning(string $str = ""): string
 {
-    return '$' . config('color.warning') . $str;
+    return '$' . config('colors.warning') . $str;
 }
 
 function info(string $str = ""): string
 {
-    return '$' . config('color.warning') . $str;
+    return '$' . config('colors.warning') . $str;
 }
 
 function getEscVersion(): string
