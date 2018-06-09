@@ -197,7 +197,7 @@ class Vote
 
     public static function doSkip()
     {
-        MapController::skip(Player::console());
+        MapController::skip(console());
     }
 
     public static function finishVote()

@@ -10,6 +10,21 @@ function formatScore(int $score): string
     return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
+function serverName(): string
+{
+    global $serverName;
+    return $serverName;
+}
+
+function console(): \esc\Models\Player
+{
+    $player           = new \esc\Models\Player();
+    $player->Login    = serverName();
+    $player->NickName = serverName();
+    $player->Group    = \esc\Models\Group::find(1);
+    return $player;
+}
+
 function formatScoreNoMinutes(int $score): string
 {
     $seconds = floor($score / 1000);

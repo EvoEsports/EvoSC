@@ -192,15 +192,6 @@ class Player extends Model
         return strtolower($this->group->Name) == 'admin';
     }
 
-    public static function console(): Player
-    {
-        $player           = new Player();
-        $player->Login    = config('server.name');
-        $player->NickName = config('server.name');
-        $player->Group    = Group::find(1);
-        return $player;
-    }
-
     /**
      * @return string
      */

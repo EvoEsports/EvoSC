@@ -1,6 +1,7 @@
 <?php
 
 $escVersion = '0.38.*';
+$serverName = 'loading...';
 
 include 'global-functions.php';
 
@@ -12,6 +13,8 @@ esc\Classes\Config::loadConfigFiles();
 
 function startEsc()
 {
+    global $serverName;
+
     try {
         esc\Classes\Log::info("Connecting to server...");
 
@@ -23,7 +26,7 @@ function startEsc()
             config('server.rpc.password')
         );
 
-        esc\Classes\Server::getStatus();
+        $serverName = \esc\Classes\Server::getRpc()->getServerName();
 
         if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
             \esc\Classes\Server::autoSaveValidationReplays(true);
@@ -39,7 +42,7 @@ function startEsc()
     }
 
     esc\Classes\Database::init();
-    esc\Classes\RestClient::init(config('server.name'));
+    esc\Classes\RestClient::init(serverName());
     esc\Controllers\HookController::init();
     esc\Controllers\TemplateController::init();
     esc\Controllers\ChatController::init();

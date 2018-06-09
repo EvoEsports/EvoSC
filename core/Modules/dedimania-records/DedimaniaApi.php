@@ -89,7 +89,7 @@ class DedimaniaApi
             'Login'         => config('dedimania.login'),
             'Code'          => config('dedimania.key'),
             'Path'          => Server::getDetailedPlayerInfo(config('dedimania.login'))->path,
-            'Packmask'      => 'Stadium', /* TODO: Allow Canyon, etc */
+            'Packmask'      => Server::getServerPackMask(),
             'ServerVersion' => getEscVersion(),
             'ServerBuild'   => Server::getVersion()->build,
             'Tool'          => 'EvoSC',
