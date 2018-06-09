@@ -2,41 +2,47 @@
 
 namespace esc\Classes;
 
-use \Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Log
 {
     private static $output;
 
-    public static function setOutput(ConsoleOutput $output)
+    public static function setOutput(OutputInterface $output)
     {
         self::$output = $output;
     }
 
-    public static function getOutput(): ?ConsoleOutput
+    public static function getOutput(): ?OutputInterface
     {
         return self::$output;
     }
 
     public static function writeLn(string $line)
     {
-        self::$output->writeln(stripAll($line));
+        $output = self::getOutput();
+
+        if ($output) {
+            $output->writeln(stripAll($line));
+        } else {
+            echo stripAll($line) . "\n";
+        }
     }
 
     public static function logAddLine(string $prefix, string $string, $echo = true)
     {
-        $date = date("Y-m-d", time());
-        $time = date("H:i:s", time());
+        $date    = date("Y-m-d", time());
+        $time    = date("H:i:s", time());
         $logFile = sprintf("logs/%s.txt", $date);
 
-        if($prefix == 'Info'){
+        if ($prefix == 'Info') {
             $prefix = 'i';
         }
 
         $line = sprintf("[%s] [%s] %s", $time, $prefix, $string);
         $line = stripAll($line);
 
-        if ($echo == true) {
+        if ($echo == true || isVeryVerbose()) {
             switch ($prefix) {
                 case 'Module':
                     self::writeLn($line);

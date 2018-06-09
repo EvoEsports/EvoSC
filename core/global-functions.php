@@ -192,3 +192,18 @@ function createCrashReport($e)
     $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
     file_put_contents($filename, $crashReport->toJson());
 }
+
+function isVerbose(): bool
+{
+    return \esc\Classes\Log::getOutput()->isVerbose();
+}
+
+function isVeryVerbose(): bool
+{
+    return \esc\Classes\Log::getOutput()->isVeryVerbose();
+}
+
+function isDebug(): bool
+{
+    return \esc\Classes\Log::getOutput()->isDebug();
+}

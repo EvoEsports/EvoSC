@@ -121,7 +121,7 @@ class Timer
 
     /**
      * Calculate the sleep time
-     * @return float|int
+     * @return int
      */
     public static function getNextCyclePause(): int
     {

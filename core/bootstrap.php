@@ -5,15 +5,14 @@ $serverName = 'loading...';
 
 include 'global-functions.php';
 
-$output = new \Symfony\Component\Console\Output\ConsoleOutput();
-\esc\Classes\Log::setOutput($output);
-
 esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
 
-function startEsc()
+function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
 {
     global $serverName;
+
+    \esc\Classes\Log::setOutput($output);
 
     try {
         esc\Classes\Log::info("Connecting to server...");
@@ -56,38 +55,6 @@ function startEsc()
     esc\Controllers\ModuleController::init();
     \esc\Controllers\HideScriptController::init();
     \esc\Controllers\PlanetsController::init();
-}
-
-function cycle()
-{
-    set_error_handler(function ($errno, $errstr, $errfile, $errline, array $errcontext) {
-        // error was suppressed with the @-operator
-        if (0 === error_reporting()) {
-            return false;
-        }
-
-        throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-    });
-
-    esc\Classes\Timer::startCycle();
-
-    try {
-        \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-    } catch (Exception $e) {
-        $crashReport = collect();
-        $crashReport->put('file', $e->getFile());
-        $crashReport->put('line', $e->getLine());
-        $crashReport->put('message', $e->getMessage() . "\n" . $e->getTraceAsString());
-
-        if (!is_dir(__DIR__ . '/../crash-reports')) {
-            mkdir(__DIR__ . '/../crash-reports');
-        }
-
-        $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
-        file_put_contents($filename, $crashReport->toJson());
-    }
-
-    usleep(esc\Classes\Timer::getNextCyclePause());
 }
 
 function bootModules()

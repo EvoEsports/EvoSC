@@ -17,10 +17,10 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->start();
+        $this->start($output);
     }
 
-    private function start()
+    private function start(OutputInterface $output)
     {
         register_shutdown_function(function () {
             $error = error_get_last();
@@ -45,8 +45,18 @@ class EscRun extends Command
 
         esc\Classes\Log::info("Starting...");
 
-        startEsc();
+        startEsc($output);
+
+        if(isVerbose()){
+            Log::logAddLine('BOOT', 'Booting core finished.', true);
+        }
+
         bootModules();
+
+        if(isVerbose()){
+            Log::logAddLine('BOOT', 'Booting modules finished.', true);
+        }
+
         beginMap();
 
         //Set connected players online
@@ -55,6 +65,10 @@ class EscRun extends Command
         esc\Models\Player::whereNotIn('Login', $onlinePlayersLogins)->where('player_id', '>', 0)->update(['player_id' => 0]);
         foreach ($onlinePlayers as $player) {
             \esc\Classes\Hook::fire('PlayerConnect', $player);
+
+            if(isVeryVerbose()){
+                Log::logAddLine('BOOT', 'Connecting player ' . $player, true);
+            }
         }
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
@@ -62,7 +76,35 @@ class EscRun extends Command
 
         while (true) {
             try {
-                cycle();
+                esc\Classes\Timer::startCycle();
+
+                if (isDebug()) {
+                    \esc\Classes\Log::logAddLine('cycle', 'Started');
+                }
+
+                try {
+                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+                } catch (Exception $e) {
+                    $crashReport = collect();
+                    $crashReport->put('file', $e->getFile());
+                    $crashReport->put('line', $e->getLine());
+                    $crashReport->put('message', $e->getMessage() . "\n" . $e->getTraceAsString());
+
+                    if (!is_dir(__DIR__ . '/../crash-reports')) {
+                        mkdir(__DIR__ . '/../crash-reports');
+                    }
+
+                    $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
+                    file_put_contents($filename, $crashReport->toJson());
+                }
+
+                $pause = esc\Classes\Timer::getNextCyclePause();
+
+                if (isDebug()) {
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %d ms', $pause));
+                }
+
+                usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\TransportException $e) {
                 Log::logAddLine('XmlRpc', $e->getMessage());
             }

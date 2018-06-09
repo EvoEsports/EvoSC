@@ -22,6 +22,10 @@ class EventController
             $name      = $callback[0];
             $arguments = $callback[1];
 
+            if (isVerbose()) {
+                Log::logAddLine('EventController', "Call $name with " . implode(', ', $arguments), true);
+            }
+
             switch ($name) {
                 case 'ManiaPlanet.PlayerInfoChanged':
                     self::mpPlayerInfoChanged($arguments);
@@ -116,10 +120,10 @@ class EventController
             if ($targetId > 0) {
                 $target = Player::wherePlayerId($targetId)->first();
 
-                if($target){
+                if ($target) {
                     Hook::fire('SpecStart', $player, $target);
                 }
-            }else{
+            } else {
                 Hook::fire('SpecStop', $player);
             }
         }
