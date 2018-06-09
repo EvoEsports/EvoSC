@@ -29,6 +29,7 @@ class Dedimania extends DedimaniaApi
 
     public function __construct()
     {
+        DedimaniaApi::openSession();
         self::$dedis = collect();
 
         Hook::add('BeginMap', [Dedimania::class, 'beginMap']);
@@ -43,6 +44,7 @@ class Dedimania extends DedimaniaApi
         ChatController::addCommand('dedicps', [Dedimania::class, 'printDediCps'], 'SPrints cps for given dedi to chat');
 
         Timer::create('dedimania.players.update', [Dedimania::class, 'reportConnectedPlayersToDedimania'], '4m');
+
     }
 
     public static function reportConnectedPlayersToDedimania()
@@ -217,8 +219,8 @@ class Dedimania extends DedimaniaApi
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
-        if ($score < 3000) {
-            //ignore times under 3 seconds
+        if ($score < 8000) {
+            //ignore times under 8 seconds
             return;
         }
 
