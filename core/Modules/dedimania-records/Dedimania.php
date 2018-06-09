@@ -29,7 +29,6 @@ class Dedimania extends DedimaniaApi
 
     public function __construct()
     {
-        DedimaniaApi::openSession();
         self::$dedis = collect();
 
         Hook::add('BeginMap', [Dedimania::class, 'beginMap']);
