@@ -18,7 +18,7 @@ A server controller for Trackmania² based on PHP 7 and Maniaplanet 4 support.
 2. Run `composer install`
 3. Copy contents from `config/default` to `config` and fill out the required fields
 
-#EvoSC command line
+# EvoSC command line
 
 Get all available commands `php esc list`
 
