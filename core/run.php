@@ -84,10 +84,6 @@ class EscRun extends Command
             try {
                 esc\Classes\Timer::startCycle();
 
-                if (isDebug()) {
-                    \esc\Classes\Log::logAddLine('cycle', 'Started');
-                }
-
                 try {
                     \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
                 } catch (Exception $e) {
@@ -115,7 +111,7 @@ class EscRun extends Command
                     if ($pause / 1000 > $max) {
                         $max = $pause / 1000;
                     }
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Min: %.2fms, Max: %.2fms, Avg: %.2fms, )', $pause / 1000, $min, $max, $average));
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $pause / 1000, $min, $max, $average));
                 }
 
                 usleep($pause);
