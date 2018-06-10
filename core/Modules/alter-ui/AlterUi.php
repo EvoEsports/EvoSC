@@ -36,7 +36,7 @@ class AlterUi
         $properties .= sprintf('<warmup visible="0" pos="0.0 0.0 0.0" />');
         $properties .= sprintf('<endmap_ladder_recap visible="0" />');
         $properties .= sprintf('<multilap_info visible="0" />');
-        $properties .= sprintf('<spectator_info visible="1" pos="0.0 0.0 0.0" />');
+        $properties .= sprintf('<spectator_info visible="0" pos="0.0 0.0 0.0" />');
 
         try {
             \esc\Classes\Server::getRpc()->triggerModeScriptEvent('Trackmania.UI.SetProperties', ["<ui_properties>$properties</ui_properties>"]);
