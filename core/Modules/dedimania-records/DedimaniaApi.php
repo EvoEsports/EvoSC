@@ -24,38 +24,9 @@ class DedimaniaApi
     {
         $session = DedimaniaSession::whereExpired(false)->orderByDesc('updated_at')->first();
 
-        if ($session) {
-            Log::logAddLine(self::class, "Using stored session from $session->created_at", false);
-            $lastCheck = $session->updated_at->diffInMinutes(\Carbon\Carbon::now());
+        //TODO: Check session expired
 
-            //Check if session is valid every 5 minutes
-            if ($lastCheck > 5) {
-                $response = self::checkSession();
-                if ($response && isset($response->params->param->value->boolean)) {
-                    $ok = (bool)$response->params->param->value->boolean;
-                    if (!$ok) {
-                        Log::warning('Dedimania session expired. Creating new.');
-
-                        $session->update(['Expired' => true]);
-
-                        $sessionId = self::openSession();
-
-                        if ($sessionId == null) {
-                            Log::warning("Connection to Dedimania failed.");
-
-                            return null;
-                        }
-
-                        Log::logAddLine('Dedimania', "Session created: $sessionId");
-
-                        return DedimaniaSession::create(['Session' => $sessionId]);
-                    }
-
-                    //Update timestamp
-                    $session->touch();
-                }
-            }
-        } else {
+        if (!$session) {
             $sessionId = self::openSession();
 
             if ($sessionId == null) {
