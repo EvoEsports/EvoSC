@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 class Timer
 {
-    private static $interval = 20; //one tick each X milliseconds
+    private static $interval = 100; //one tick each X milliseconds
     private static $uStart;
     private static $timers;
 
@@ -191,6 +191,14 @@ class Timer
     public static function stop(string $id)
     {
         self::$timers = self::$timers->diff(self::$timers->where('id', $id));
+    }
+
+    /**
+     * @param int $interval
+     */
+    public static function setInterval(int $interval): void
+    {
+        self::$interval = $interval;
     }
 
     /**

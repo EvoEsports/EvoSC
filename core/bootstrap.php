@@ -40,6 +40,8 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
         exit(1);
     }
 
+    \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 100);
+
     esc\Classes\Database::init();
     esc\Classes\RestClient::init(serverName());
     esc\Controllers\HookController::init();
