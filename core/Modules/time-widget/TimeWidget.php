@@ -44,7 +44,7 @@ class TimeWidget
         }
     }
 
-    public static function requestMoreTime(Player $player)
+    public static function requestMoreTime(Player $player, $time)
     {
         Vote::replayMap($player);
     }

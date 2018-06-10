@@ -1,8 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink id="TimeWidget" version="3">
-<frame pos="160 -12.5" scale="0.8">
-    <quad pos="0 0" z-index="0" size="25 7" halign="right" action="tw.addTime"/>
-    <quad pos="0 -9.2" z-index="-1" size="30 4" bgcolor="{background_color()|noescape}6" halign="right" action="tw.requestMoreTime"/>
-    <label pos="-15 -11" z-index="1" text="🕑 Request more time" textsize="0.7" textcolor="eeef" halign="center" valign="center"/>
+<manialink name="ESC:add-time.widget" id="add-time.widget" version="3">
+<frame pos="152 -14.5" scale="0.8">
+    <quad id="quad" z-index="-2" size="20 4" bgcolor="{config('colors.ui.background')}" opacity="0.0" halign="center" valign="center" ScriptEvents="1"/>
+    <quad id="bar" pos="-10 0" z-index="-1" size="0 4"  bgcolor="{config('colors.ui.primary')}" opacity="0.9" halign="left" valign="center"/>
+    <label id="label" z-index="1" text="$s ADD TIME" textsize="0.8" textcolor="eeef" halign="center" valign="center"/>
 </frame>
+
+<script>
+    <!--
+#Include "MathLib" as ML
+
+declare quad <=> (Page.MainFrame.GetFirstChild("quad") as CMlQuad);
+declare bar <=> (Page.MainFrame.GetFirstChild("bar") as CMlQuad);
+declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
+
+declare Boolean hover = False;
+declare Text initialText = label.Value;
+declare Integer time;
+
+while(True){
+    yield;
+
+    foreach(event in PendingEvents){
+        if(event.Control == quad && event.Type == CMlScriptEvent::Type::MouseClick && hover){
+            TriggerPageAction("tw.requestMoreTime," ^ time);
+        }
+        if(event.Control == quad && event.Type == CMlScriptEvent::Type::MouseOver){
+            hover = True;
+            quad.Opacity = 0.5;
+            bar.Opacity = 0.9;
+        }
+        if(event.Control == quad && event.Type == CMlScriptEvent::Type::MouseOut){
+            hover = False;
+            quad.Opacity = 0.0;
+            bar.Opacity = 0.0;
+            label.SetText(initialText);
+        }
+    }
+
+    if(hover){
+        declare relativeX = (MouseX - 144) / 15;
+        declare x = ML::NearestInteger(relativeX * 15);
+
+        if(x < 1){
+            x = 1;
+        }
+
+        bar.Size = <(relativeX * 20), 4.0>;
+        label.SetText("+ " ^ x ^ " min");
+        time = x;
+    }
+}
+
+    -->
+</script>
 </manialink>
