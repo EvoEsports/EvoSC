@@ -27,23 +27,21 @@ class SpectatorInfo
 
     public static function specStop(Player $player)
     {
+        $target = self::$specTargets->get($player->Login);
         self::$specTargets->put($player->Login, null);
+        self::updateWidget($target);
     }
 
     public static function updateWidget(Player $player)
     {
         $spectatorLogins = self::$specTargets->filter(function ($target) use ($player) {
-            return $target === $player;
+            return $target->Login == $player->Login;
         })->keys();
 
         $spectators = Player::whereIn('Login', $spectatorLogins)->get();
 
         if ($spectators->count() > 0) {
             Template::show($player, 'spec-info.widget', compact('spectators'));
-
-            $spectators->each(function (Player $spectator) use ($spectators) {
-                Template::show($spectator, 'spec-info.widget', compact('spectators'));
-            });
         } else {
             Template::hide($player, 'spec-info.widget');
         }
