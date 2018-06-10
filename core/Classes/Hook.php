@@ -33,7 +33,7 @@ class Hook
             call_user_func($this->function, ...$arguments);
             Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
         } catch (\Exception $e) {
-            Log::logAddLine('Hook ERROR', "Execution of " . $this->function[0] . " " . $this->function[1] . " failed: " . $e->getMessage(), true);
+            Log::logAddLine('Hook', "ERROR: Execution of " . $this->function[0] . " " . $this->function[1] . " failed: " . $e->getMessage(), true);
             Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
         }
     }

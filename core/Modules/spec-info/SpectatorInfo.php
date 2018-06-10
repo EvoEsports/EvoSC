@@ -25,9 +25,9 @@ class SpectatorInfo
         self::updateWidget($target);
     }
 
-    public static function specStop(Player $player)
+    public static function specStop(Player $player, Player $target)
     {
-        $target = self::$specTargets->get($player->Login);
+        Template::hide($player, 'spec-info.widget');
         self::$specTargets->put($player->Login, null);
         self::updateWidget($target);
     }
@@ -35,13 +35,19 @@ class SpectatorInfo
     public static function updateWidget(Player $player)
     {
         $spectatorLogins = self::$specTargets->filter(function ($target) use ($player) {
-            return $target->Login == $player->Login;
-        })->keys();
+            if ($target instanceof Player) {
+                return $target->Login == $player->Login;
+            }
+        })->take(10)->keys();
 
         $spectators = Player::whereIn('Login', $spectatorLogins)->get();
 
         if ($spectators->count() > 0) {
             Template::show($player, 'spec-info.widget', compact('spectators'));
+
+            $spectators->each(function (Player $player) use ($spectators) {
+                Template::show($player, 'spec-info.widget', compact('spectators'));
+            });
         } else {
             Template::hide($player, 'spec-info.widget');
         }

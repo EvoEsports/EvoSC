@@ -87,7 +87,9 @@ class EventController
             $playerId        = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
 
-            $player = Player::find($login);
+            $player       = Player::find($login);
+            $specTargetId = $player->spectator_status->currentTargetId;
+            $wasSpectator = $specTargetId > 0;
 
             if ($player) {
                 $player->update([
@@ -120,11 +122,17 @@ class EventController
             if ($targetId > 0) {
                 $target = Player::wherePlayerId($targetId)->first();
 
-                if ($target) {
+                if ($target instanceof Player) {
                     Hook::fire('SpecStart', $player, $target);
                 }
             } else {
-                Hook::fire('SpecStop', $player);
+                if ($wasSpectator) {
+                    $target = Player::wherePlayerId($specTargetId)->first();
+
+                    if ($target instanceof Player) {
+                        Hook::fire('SpecStop', $player, $target);
+                    }
+                }
             }
         }
     }
