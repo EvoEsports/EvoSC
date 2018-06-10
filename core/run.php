@@ -74,6 +74,8 @@ class EscRun extends Command
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
+        $waitTimes = collect();
+
         while (true) {
             try {
                 esc\Classes\Timer::startCycle();
@@ -101,7 +103,9 @@ class EscRun extends Command
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
                 if (isDebug()) {
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms', $pause / 1000));
+                    $waitTimes->push($pause / 1000);
+                    $average = $waitTimes->avg();
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Avg. %.2f)', $pause / 1000, $average));
                 }
 
                 usleep($pause);
