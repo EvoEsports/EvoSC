@@ -78,6 +78,7 @@ class EscRun extends Command
             $waitTimes = collect();
             $min       = 10000;
             $max       = 0;
+            $waitTime  = config('server.controller-interval');
         }
 
         while (true) {
@@ -103,6 +104,7 @@ class EscRun extends Command
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
                 if (isDebug()) {
+                    $runTime = (($waitTime * 1000) - $pause) / 1000;
                     $waitTimes->push($pause / 1000);
                     $average = $waitTimes->avg();
                     if ($pause / 1000 < $min) {
@@ -111,7 +113,7 @@ class EscRun extends Command
                     if ($pause / 1000 > $max) {
                         $max = $pause / 1000;
                     }
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $pause / 1000, $min, $max, $average));
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms wait %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $pause / 1000, $min, $max, $average));
                 }
 
                 usleep($pause);
