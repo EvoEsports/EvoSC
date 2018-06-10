@@ -47,13 +47,13 @@ class EscRun extends Command
 
         startEsc($output);
 
-        if(isVerbose()){
+        if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting core finished.', true);
         }
 
         bootModules();
 
-        if(isVerbose()){
+        if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting modules finished.', true);
         }
 
@@ -61,12 +61,12 @@ class EscRun extends Command
 
         //Set connected players online
         $onlinePlayersLogins = collect(\esc\Classes\Server::getRpc()->getPlayerList())->pluck('login');
-        $onlinePlayers = esc\Models\Player::whereIn('Login', $onlinePlayersLogins)->get();
+        $onlinePlayers       = esc\Models\Player::whereIn('Login', $onlinePlayersLogins)->get();
         esc\Models\Player::whereNotIn('Login', $onlinePlayersLogins)->where('player_id', '>', 0)->update(['player_id' => 0]);
         foreach ($onlinePlayers as $player) {
             \esc\Classes\Hook::fire('PlayerConnect', $player);
 
-            if(isVeryVerbose()){
+            if (isVeryVerbose()) {
                 Log::logAddLine('BOOT', 'Connecting player ' . $player, true);
             }
         }
@@ -74,7 +74,11 @@ class EscRun extends Command
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
-        $waitTimes = collect();
+        if (isDebug()) {
+            $waitTimes = collect();
+            $min       = 10000;
+            $max       = 0;
+        }
 
         while (true) {
             try {
@@ -105,7 +109,13 @@ class EscRun extends Command
                 if (isDebug()) {
                     $waitTimes->push($pause / 1000);
                     $average = $waitTimes->avg();
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Avg. %.2f)', $pause / 1000, $average));
+                    if ($pause / 1000 < $min) {
+                        $min = $pause / 1000;
+                    }
+                    if ($pause / 1000 > $max) {
+                        $max = $pause / 1000;
+                    }
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms (Min: %.2fms, Max: %.2fms, Avg: %.2fms, )', $pause / 1000, $min, $max, $average));
                 }
 
                 usleep($pause);
