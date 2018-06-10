@@ -101,7 +101,7 @@ class EscRun extends Command
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
                 if (isDebug()) {
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %d ms', $pause));
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished, wait %.2f ms', $pause / 1000));
                 }
 
                 usleep($pause);
