@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:discord-widget" id="discord-widget" version="3">
     <frame pos="{config('discord.pos.visible')|noescape}" id="widget">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
+        <quad id="background" pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.75" z-index="-1" ScriptEvents="1" />
 
         <frame z-index="2">
             <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvolutionTM/EvoSC/master/core/Modules/discord/discord.png" imagefocus="" />
@@ -21,12 +21,25 @@
             declare Text visiblePos = "<frame pos='{config('discord.pos.visible')|noescape}' />";
             declare Text hiddenPos = "<frame pos='{config('discord.pos.hidden')|noescape}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+            declare background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
             declare Boolean hidden = False;
             declare Integer duration = 800;
             declare Real speed = 0.0;
 
             while(True){
                 yield;
+
+                foreach(event in PendingEvents){
+                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
+                        OpenLink("{config('discord.url')|noescape}", ::LinkType::ExternalBrowser);
+                    }
+                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOver){
+                        AnimMgr.Add(background, """<quad opacity="0.95" bgcolor="78d" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    }
+                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOut){
+                        AnimMgr.Add(background, """<quad opacity="0.75" bgcolor="{config('colors.ui.background')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    }
+                }
 
                 if(InputPlayer != Null){
                     declare Real UI_Hide_Speed for InputPlayer = 1.0;

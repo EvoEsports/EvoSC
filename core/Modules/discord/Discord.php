@@ -11,7 +11,9 @@ class Discord
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [Discord::class, 'show']);
+        if(config('discord.url')){
+            Hook::add('PlayerConnect', [Discord::class, 'show']);
+        }
     }
 
     public static function show(Player $player)

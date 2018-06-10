@@ -14,8 +14,9 @@ class PayPal
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [PayPal::class, 'show']);
-
+        if (config('paypal.url')) {
+            Hook::add('PlayerConnect', [PayPal::class, 'show']);
+        }
     }
 
     public static function reload(Player $player)
