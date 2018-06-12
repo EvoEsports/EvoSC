@@ -92,14 +92,19 @@ class MapList
 
         $details = $map->mx_details;
 
+        if (!$details) {
+            ChatController::message($player, '_warning', 'Could not load mx details for track ', $map);
+            return;
+        }
+
         $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
             $map->id,
-            $details->TrackID,
+            $map->gbx->MapUid,
             $map->author->Login,
             $map->author->Login == $map->author->NickName ? $details->Username : $map->author->NickName,
             (new Carbon($details->UploadedAt))->format('Y-m-d'),
             (new Carbon($details->UpdatedAt))->format('Y-m-d'),
-            $map->Name
+            $map->gbx->Name
         );
 
         Template::show($player, 'map-list.update-mx-details', [
@@ -311,6 +316,11 @@ class MapList
         MapController::loadMxDetails($map);
 
         $mxDetails = $map->mx_details;
+
+        if (!$mxDetails) {
+            ChatController::message($player, '_warning', 'Could not load mx details for track ', $map);
+            return;
+        }
 
         $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking', 'mxDetails'));
 
