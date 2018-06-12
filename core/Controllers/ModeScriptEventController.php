@@ -11,9 +11,15 @@ class ModeScriptEventController
 {
     public static function handleModeScriptCallbacks($modescriptCallbackArray)
     {
-        $callback  = $modescriptCallbackArray[0];
-        $arguments = $modescriptCallbackArray[1];
+        if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
+            self::call($modescriptCallbackArray[1][0], $modescriptCallbackArray[1][1]);
+        } else {
+            dd($modescriptCallbackArray);
+        }
+    }
 
+    private static function call($callback, $arguments)
+    {
         switch ($callback) {
             case 'Trackmania.Scores':
                 self::tmScores($arguments);
@@ -75,7 +81,7 @@ class ModeScriptEventController
         $player = Player::find($wayPoint->login);
         $map    = MapController::getCurrentMap();
 
-        $totalCps = $map->NbCheckpoints;
+        $totalCps = $map->gbx->CheckpointsPerLaps;
 
         //checkpoint passed
         Hook::fire('PlayerCheckpoint',
