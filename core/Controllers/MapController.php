@@ -33,7 +33,7 @@ class MapController
         self::loadMaps();
 
         self::$queue    = new Collection();
-        self::$mapsPath = Server::getMapsDirectory();
+        self::$mapsPath = config('server.base') . '/UserData/Maps/';
 
         Hook::add('PlayerConnect', [MapController::class, 'displayMapWidget']);
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
@@ -413,7 +413,7 @@ class MapController
                 return;
             }
 
-            $map = Map::where('MxId', $mxId)
+            $map = Map::where('mx_details->TrackID', $mxId)
                       ->get()
                       ->first();
 
@@ -437,23 +437,33 @@ class MapController
                 return;
             }
 
-            $fileName = preg_replace('/^attachment; filename="(.+)"$/', '\1',
-                $response->getHeader('content-disposition')[0]);
+            $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
+            $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
 
             $mapFolder = self::$mapsPath;
-            File::put("$mapFolder$fileName", $response->getBody());
+            File::put("$mapFolder$filename", $response->getBody());
+
+            $gbxInfo = self::getGbxInformation($filename);
+            $gbx     = json_decode($gbxInfo);
+
+            $author = Player::whereLogin($gbx->AuthorLogin)->first();
+
+            if (!$author) {
+                $authorId = Player::insertGetId([
+                    'Login'    => $gbx->AuthorLogin,
+                    'NickName' => $gbx->AuthorLogin,
+                ]);
+            } else {
+                $authorId = $author->id;
+            }
 
             $map = Map::firstOrCreate([
-                'MxId'     => $mxId,
-                'FileName' => html_entity_decode($fileName, ENT_QUOTES | ENT_HTML5),
+                'uid'      => $gbx->MapUid,
+                'author'   => $authorId,
+                'filename' => $filename,
+                'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                'enabled'  => 1
             ]);
-
-            $info = Server::getMapInfo($map->filename)
-                          ->toArray();
-
-            if ($info) {
-//                $map->update($info);
-            }
 
             try {
                 Server::addMap($map->filename);
