@@ -382,7 +382,7 @@ class MapController
 
         Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
 
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->gbx->MapUid);
+        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
 
         if ($result->getStatusCode() != 200) {
             Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
