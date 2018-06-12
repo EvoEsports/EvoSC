@@ -43,7 +43,7 @@ class MapList
 
     public static function reload(Player $player)
     {
-        TemplateController::loadTemplates();
+//        TemplateController::loadTemplates();
         self::showNewsMapList($player);
     }
 
