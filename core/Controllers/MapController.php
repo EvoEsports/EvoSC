@@ -378,13 +378,15 @@ class MapController
             return;
         }
 
-        $mxDetails = $result->getBody()->getContents();
+        $data = $result->getBody()->getContents();
 
-        $map->update(['mx_details' => $mxDetails]);
+        $map->update(['mx_details' => $data]);
 
         Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
 
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . json_decode($mxDetails)->TrackID);
+        $mxDetails = json_decode($data)[0];
+
+        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $mxDetails->TrackID);
 
         if ($result->getStatusCode() != 200) {
             Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
