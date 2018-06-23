@@ -5,6 +5,7 @@ namespace esc\Classes;
 
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class Template
 {
@@ -41,17 +42,18 @@ class Template
      */
     public static function show(Player $player, string $index, $values = null)
     {
-        if (!$values) {
-            $values = collect();
+        $data = [];
+
+        if ($values instanceof Collection) {
+            foreach ($values as $key => $value) {
+                $data[$key] = $value;
+            }
+        } else {
+            $data = $values;
         }
 
-        if (is_array($values)) {
-            $values['localPlayer'] = $player;
-            $xml = TemplateController::getTemplate($index, $values);
-        } else {
-            $values->put('localPlayer', $player);
-            $xml = TemplateController::getTemplate($index, $values->toArray());
-        }
+        $data['localPlayer'] = $player;
+        $xml                 = TemplateController::getTemplate($index, $data);
 
         if ($xml != '') {
             Server::sendDisplayManialinkPage($player->Login, $xml);
