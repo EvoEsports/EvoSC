@@ -83,12 +83,20 @@
                     <frame class="author" pos="30 -12">
                         <label pos="0 2" textcolor="ffff" textsize="2" text="$s👤 Author" />
                         <label class="author-nick" pos="7 -5" textcolor="ffff" textsize="0.5" text="authorNick" valign="center" />
-                        <label class="author-login" pos="7 -8" textcolor="ffff" textsize="0.5" text="authorLogin" valign="center" />
-                        <label pos="7 -11" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+                        <label class="author-login" pos="7 -9" textcolor="ffff" textsize="0.5" text="authorLogin" valign="center" />
+                        <label pos="7 -13" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+                        <label pos="7 -17" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+                        <label pos="7 -21" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+                        <label pos="7 -25" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+                        <label pos="7 -29" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
 
                         <label pos="6 -5" textcolor="ffff" textsize="0.5" halign="right" text="Nick:" valign="center" />
-                        <label pos="6 -8" textcolor="ffff" textsize="0.5" halign="right" text="Login:" valign="center" />
-                        <label pos="6 -11" textcolor="ffff" textsize="0.5" halign="right" text="Time:" valign="center" />
+                        <label pos="6 -9" textcolor="ffff" textsize="0.5" halign="right" text="Login:" valign="center" />
+                        <label pos="6 -13" textcolor="ffff" textsize="0.5" halign="right" text="Time:" valign="center" />
+                        <label pos="6 -17" textcolor="ffff" textsize="0.5" halign="right" text="Titlepack:" valign="center" />
+                        <label pos="6 -21" textcolor="ffff" textsize="0.5" halign="right" text="Mood:" valign="center" />
+                        <label pos="6 -25" textcolor="ffff" textsize="0.5" halign="right" text="Difficulty:" valign="center" />
+                        <label pos="6 -29" textcolor="ffff" textsize="0.5" halign="right" text="Style:" valign="center" />
                     </frame>
                 </frame>
             </frame>
@@ -298,6 +306,10 @@ Void updateMxDetails(Text[] details){
     (author.Controls[1] as CMlLabel).SetText(details[3]);
     (author.Controls[2] as CMlLabel).SetText(details[2]);
     (author.Controls[3] as CMlLabel).SetText(details[8]);
+    (author.Controls[4] as CMlLabel).SetText(details[9]);
+    (author.Controls[5] as CMlLabel).SetText(details[10]);
+    (author.Controls[6] as CMlLabel).SetText(details[12]);
+    (author.Controls[7] as CMlLabel).SetText(details[11]);
 
     for(i, 1, navbar.Controls.count - 1){
         if(i == 2){

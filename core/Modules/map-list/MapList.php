@@ -108,7 +108,7 @@ class MapList
         Log::logAddLine('MapList::updateMxDetails', json_encode($map->gbx));
         Log::logAddLine('MapList::updateMxDetails', json_encode($map->mx_details));
 
-        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
+        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
             $map->id,
             $map->gbx->MapUid,
             $map->author->Login,
@@ -117,7 +117,11 @@ class MapList
             (new Carbon($details->UpdatedAt))->format('Y-m-d'),
             $map->gbx->Name,
             $details->TrackID,
-            formatScore($map->gbx->AuthorTime)
+            formatScore($map->gbx->AuthorTime),
+            $map->mx_details->TitlePack,
+            $map->mx_details->Mood,
+            $map->mx_details->StyleName,
+            $map->mx_details->DifficultyName
         );
 
         Template::show($player, 'map-list.update-mx-details', [
