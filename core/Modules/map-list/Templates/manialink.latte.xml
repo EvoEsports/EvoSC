@@ -48,8 +48,9 @@
         </framemodel>
 
         <framemodel id="QueueItem">
-            <label pos="0 0" textsize="2" size="120 4" text="Mapname" />
-            <label pos="0 -5" textsize="1" size="120 4" text="Requested by player" />
+            <label pos="5 0" textsize="3" size="120 4" text="Mapname" />
+            <label pos="5 -5" textsize="0.9" size="120 4" text="Requested by player" />
+            <label pos="0 -0.5" textsize="2.5" size="120 4" text="N." />
         </framemodel>
 
         <frame id="tabs" pos="2 -13" z-index="2">
@@ -105,10 +106,12 @@
             <frame data-tab="2" id="jukebox" hidden="1">
                 <frame id="queue-list" pos="2 0">
                     <frameinstance pos="0 0" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -15" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -30" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -45" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -12" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -24" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -36" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -48" modelid="QueueItem" hidden="1" />
                     <frameinstance pos="0 -60" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -72" modelid="QueueItem" hidden="1" />
                 </frame>
             </frame>
         </frame>
@@ -264,13 +267,14 @@ Void navButtonClick(CMlQuad button){
     activeTab = int(button.DataAttributeGet("page"));
 }
 
-Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
+Void updateQueueItem(CMlControl queueFrameControl, Text[] data, Integer i){
     declare frame <=> (queueFrameControl as CMlFrame);
 
     frame.Visible = True;
     frame.DataAttributeSet("map-id", data[0]);
-    (frame.Controls[0] as CMlLabel).SetText(data[2]);
+    (frame.Controls[0] as CMlLabel).SetText("$s" ^ data[2]);
     (frame.Controls[1] as CMlLabel).SetText("Requested by " ^ data[3]);
+    (frame.Controls[2] as CMlLabel).SetText("$s" ^ i ^ ".");
 }
 
 Void updateMapQueue(Text[][] items){
@@ -282,14 +286,10 @@ Void updateMapQueue(Text[][] items){
 
     declare Integer lastIteration = items.count;
 
-    if(lastIteration > 4){
-        lastIteration = 4;
-    }
-
     lastIteration = lastIteration - 1;
 
     for(i, 0, lastIteration){
-        updateQueueItem(queueList.Controls[i], items[i]);
+        updateQueueItem(queueList.Controls[i], items[i], i + 1);
     }
 }
 

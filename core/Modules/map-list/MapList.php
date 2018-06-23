@@ -79,7 +79,7 @@ class MapList
 
     public static function mapQueueToManiaScriptArray()
     {
-        return MapController::getQueue()->take(5)->map(function (MapQueueItem $item) {
+        return MapController::getQueue()->take(7)->map(function (MapQueueItem $item) {
             return sprintf('["%s", "%s", "%s", "%s"]',
                 $item->map->id,
                 $item->map->gbx->MapUid,
