@@ -73,18 +73,22 @@
 
             <frame data-tab="1" id="mx" hidden="1">
                 <frame id="mx-details">
-                    <label class="mapname" pos="2 0" textcolor="ffff" textsize="1.5" text="Mapname" />
+                    <label class="mapname" pos="2 -2" textcolor="ffff" textsize="4" text="Mapname" />
 
-                    <frame class="dates" pos="2 -6" scale="0.8">
+                    <frame class="dates" pos="2 -10" scale="0.8">
                         <label pos="0 0" textcolor="ffff" textsize="0.75" text="uploadedAt" />
                         <label pos="0 -4" textcolor="ffff" textsize="0.75" text="updatedAt" />
                     </frame>
 
-                    <frame class="author" pos="30 -6">
-                        <label pos="0 0" textcolor="ffff" textsize="1.2" text="$oAuthor" />
-                        <label class="author-nick" pos="0 -4" textcolor="ffff" textsize="1" text="authorNick" />
-                        <label class="author-login" pos="0 -7" textcolor="ffff" textsize="0.75" text="authorLogin" />
-                        <label pos="0 -10" textcolor="ffff" textsize="0.75" text="authorTime" />
+                    <frame class="author" pos="30 -12">
+                        <label pos="0 2" textcolor="ffff" textsize="2" text="$s👤 Author" />
+                        <label class="author-nick" pos="7 -5" textcolor="ffff" textsize="0.5" text="authorNick" valign="center" />
+                        <label class="author-login" pos="7 -8" textcolor="ffff" textsize="0.5" text="authorLogin" valign="center" />
+                        <label pos="7 -11" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
+
+                        <label pos="6 -5" textcolor="ffff" textsize="0.5" halign="right" text="Nick:" valign="center" />
+                        <label pos="6 -8" textcolor="ffff" textsize="0.5" halign="right" text="Login:" valign="center" />
+                        <label pos="6 -11" textcolor="ffff" textsize="0.5" halign="right" text="Time:" valign="center" />
                     </frame>
                 </frame>
             </frame>
@@ -286,14 +290,25 @@ Void updateMxDetails(Text[] details){
     declare dates <=> (mxDetails.Controls[1] as CMlFrame);
     declare author <=> (mxDetails.Controls[2] as CMlFrame);
 
-    (mxDetails.Controls[0] as CMlLabel).SetText(details[6]);
+    (mxDetails.Controls[0] as CMlLabel).SetText("$s" ^ details[6]);
 
     (dates.Controls[0] as CMlLabel).SetText("Uploaded: " ^ details[4]);
     (dates.Controls[1] as CMlLabel).SetText("Updated: " ^ details[5]);
 
     (author.Controls[1] as CMlLabel).SetText(details[3]);
-    (author.Controls[2] as CMlLabel).SetText("(" ^ details[2] ^ ")");
+    (author.Controls[2] as CMlLabel).SetText(details[2]);
     (author.Controls[3] as CMlLabel).SetText(details[8]);
+
+    for(i, 1, navbar.Controls.count - 1){
+        if(i == 2){
+            continue;
+        }
+        ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
+    }
+    ((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.9;
+    tabs.Controls[0].Visible = False;
+    tabs.Controls[1].Visible = True;
+    activeTab = 2;
 }
 
 main() {

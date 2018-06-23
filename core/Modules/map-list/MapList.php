@@ -34,6 +34,7 @@ class MapList
         ChatController::addCommand('list', [MapList::class, 'list'], 'Display list of maps');
 
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
+        Hook::add('BeginMap', [MapList::class, 'beginMap']);
 
         KeyController::createBind('X', [MapList::class, 'reload']);;
 
@@ -66,6 +67,13 @@ class MapList
     {
         onlinePlayers()->each(function (Player $player) use ($queue) {
             Template::show($player, 'map-list.update-queue', []);
+        });
+    }
+
+    public static function beginMap(Map $map)
+    {
+        onlinePlayers()->each(function (Player $player) use ($map) {
+            MapList::updateMxDetails($player, $map->id);
         });
     }
 
