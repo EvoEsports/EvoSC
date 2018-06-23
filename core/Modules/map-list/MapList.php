@@ -118,10 +118,10 @@ class MapList
             $map->gbx->Name,
             $details->TrackID,
             formatScore($map->gbx->AuthorTime),
-            $map->mx_details->TitlePack,
-            $map->mx_details->Mood,
-            $map->mx_details->StyleName,
-            $map->mx_details->DifficultyName
+            $details->TitlePack,
+            $details->Mood,
+            $details->StyleName,
+            $details->DifficultyName
         );
 
         Template::show($player, 'map-list.update-mx-details', [
