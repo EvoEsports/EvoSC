@@ -61,10 +61,10 @@ class DedimaniaApi
             'Code'          => config('dedimania.key'),
             'Path'          => Server::getDetailedPlayerInfo(config('dedimania.login'))->path,
             'Packmask'      => 'Stadium',
-            'ServerVersion' => getEscVersion(),
+            'ServerVersion' => Server::getVersion()->version,
             'ServerBuild'   => Server::getVersion()->build,
             'Tool'          => 'EvoSC',
-            'Version'       => Server::getVersion()->version,
+            'Version'       => getEscVersion(),
             /*
             'ServerIP'      => ,
             'ServerPort'    => ,

@@ -53,7 +53,7 @@
 
             <frame id="song-list" z-index="5" pos="2 -11">
                 <frame id="song-list-container" pos="0 0">
-                    {for $i = 0; $i < esc\Modules\MusicClient\MusicClient::getSongsCount(); $i++}
+                    {for $i = 0; $i < 500; $i++}
                     <frameinstance modelid="Song" class="row" pos="0 {$i * -4}" ScriptEvents="1" hidden="1" />
                     {/for}
                 </frame>
@@ -62,7 +62,7 @@
             <frame pos="2 -94" z-index="2">
                 <quad id="pagination-box" pos="2 0" size="3.5 3.5" bgcolor="{primary_color()|noescape}" valign="center" halign="center" z-index="-1" />
 
-                {for $i = 0; $i < ceil(esc\Modules\MusicClient\MusicClient::getSongsCount() / 20); $i++}
+                {for $i = 0; $i < 25; $i++}
                 <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
                 {/for}
             </frame>
@@ -78,36 +78,41 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-//struct song: Url, Title, Artist, Length
-
-declare Text[][] Songs;
+declare Text[Text][] Songs;
+declare Text[Text][] curSongPool;
 declare CMlMediaPlayer music;
 declare CMlQuad paginationBox;
+declare Text url;
+declare Text token;
 
-Text[] getSong(Integer songId){
+Text[Text] getSong(Integer songId){
     if(Songs.count > 0 && songId < Songs.count - 1){
         return Songs[songId];
     }
 
-    return ["unknown","unknown","unknown","unknown"];
+    return ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
 }
 
-Text[] getRandomSong(){
+Text[Text] getRandomSong(){
     if(Songs.count > 0){
         return Songs[ML::Rand(0, Songs.count - 1)];
     }
 
-    return ["unknown","unknown","unknown","unknown"];
+    return ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
 }
 
-Void setSong(Text[] song){
+Text getUrl(Text[Text] song){
+    return url ^ song["file"];
+}
+
+Void setSong(Text[Text] song){
     music.Stop();
-    music.Url = song[0];
+    music.Url = getUrl(song);
     sleep(5);
     music.Play();
 
-    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song[1]);
-    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song[2]);
+    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
+    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
 }
 
 Real getPlayerSpeed(){
@@ -124,22 +129,35 @@ Real getPlayerSpeed(){
     return speed;
 }
 
-Void populateList(Text[][] songs){
+Void updatePagination(Integer songsVisible){
+    declare pages = ML::CeilingInteger(songsVisible / 20.0);
+
+    for(i, 1, pages){
+        paginationBox.Parent.Controls[i].Visible = True;
+    }
+    for(i, pages + 1, 25){
+        paginationBox.Parent.Controls[i].Visible = False;
+    }
+}
+
+Void populateList(Text[Text][] songs){
     declare songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
     declare lastKey = 0;
 
     foreach(key => song in songs){
-        log(song);
-
         declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[key] as CMlFrame);
 
-        (frame.Controls[0] as CMlLabel).SetText(song[1]);
-        (frame.Controls[1] as CMlLabel).SetText(song[2]);
-        (frame.Controls[2] as CMlLabel).SetText(song[3]);
-        (frame.Controls[3] as CMlControl).DataAttributeSet("song-id", TL::ToText(key));
+        frame.Visible = True;
+
+        (frame.Controls[0] as CMlLabel).SetText(song["title"]);
+        (frame.Controls[1] as CMlLabel).SetText(song["artist"]);
+        (frame.Controls[2] as CMlLabel).SetText(song["length"]);
+        frame.Controls[3].DataAttributeSet("song-id", song["id"]);
 
         lastKey = key;
     }
+
+    updatePagination(songs.count);
 
     if(lastKey + 1 < Songs.count){
         for(i, lastKey + 1, Songs.count - 1){
@@ -150,10 +168,6 @@ Void populateList(Text[][] songs){
             (frame.Controls[2] as CMlLabel).SetText("");
         }
     }
-
-    songList.ClipWindowActive = True;
-    songList.ClipWindowRelativePosition = <80.0, -40.0>;
-    songList.ClipWindowSize = <160.0, 79.5>;
 }
 
 Void setRowColor(CMlControl frame, Text color){
@@ -168,42 +182,95 @@ Text getContainerTarget(Integer page){
     return target;
 }
 
-Void searchSong(Text search){
-    if(TL::Length(search) == 0){
-        populateList(Songs);
-        return;
-    }
+Text slug(Text string){
+    declare Text out = "";
 
-    declare Text[][] songsFound;
+    for(i, 0, TL::Length(string) - 1){
+        declare Text char = TL::SubString(string, i, 1);
 
-    declare searchStringLength = TL::Length(search);
-
-    foreach(song in Songs){
-        declare songTitleLength = TL::Length(song[4]);
-
-        for(i, 0, songTitleLength - searchStringLength){
-            if(TL::SubString(song[4], i, searchStringLength) == search){
-                songsFound.add(song);
-                continue;
+        if(char != " "){
+            switch(char){
+                case "A": out = out ^ "a";
+                case "B": out = out ^ "b";
+                case "C": out = out ^ "c";
+                case "D": out = out ^ "d";
+                case "E": out = out ^ "e";
+                case "F": out = out ^ "f";
+                case "G": out = out ^ "g";
+                case "H": out = out ^ "h";
+                case "I": out = out ^ "i";
+                case "J": out = out ^ "j";
+                case "K": out = out ^ "k";
+                case "L": out = out ^ "l";
+                case "M": out = out ^ "m";
+                case "N": out = out ^ "n";
+                case "O": out = out ^ "o";
+                case "P": out = out ^ "p";
+                case "Q": out = out ^ "q";
+                case "R": out = out ^ "r";
+                case "S": out = out ^ "s";
+                case "T": out = out ^ "t";
+                case "U": out = out ^ "u";
+                case "V": out = out ^ "v";
+                case "W": out = out ^ "w";
+                case "X": out = out ^ "x";
+                case "Y": out = out ^ "y";
+                case "Z": out = out ^ "z";
+                default: out = out ^ char;
             }
         }
     }
 
+    return out;
+}
+
+Void searchSong(Text search){
+    if(TL::Length(search) == 0){
+        curSongPool = Songs;
+        populateList(Songs);
+        return;
+    }
+
+    declare Text[Text][] songsFound;
+    declare searchStringLength = TL::Length(search);
+
+    foreach(song in Songs){
+        declare songTitleLength = TL::Length(song["search"]);
+
+        for(i, 0, songTitleLength - searchStringLength){
+            if(TL::SubString(song["search"], i, searchStringLength) == search){
+                songsFound.add(song);
+                break;
+            }
+        }
+    }
+
+    curSongPool = songsFound;
     populateList(songsFound);
 
     AnimMgr.Add((Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame), getContainerTarget(0), 200, CAnimManager::EAnimManagerEasing::CubicInOut);
     AnimMgr.Add(paginationBox, "<quad pos='2 0' />", 200, CAnimManager::EAnimManagerEasing::CubicInOut);
 }
 
-Text[][] arraySort(Text[][] array, Integer column){
+Text columnToKey(Integer column){
+    switch(column){
+        case 0: return "artist";
+        case 1: return "title";
+    }
+
+    return "" ^ column;
+}
+
+Text[Text][] arraySort(Text[Text][] array, Integer column){
     declare Text[Integer] SortedColumn;
+    declare key = columnToKey(column);
 
     foreach (I => Data in array) {
-        SortedColumn[I] = Data[column];
+        SortedColumn[I] = Data[key];
     }
 
     SortedColumn = SortedColumn.sort();
-    declare Text[][] SortedArray;
+    declare Text[Text][] SortedArray;
 
     foreach (I => Data in SortedColumn) {
         SortedArray.add(array[I]);
@@ -212,9 +279,9 @@ Text[][] arraySort(Text[][] array, Integer column){
     return SortedArray;
 }
 
-Text[][] arraySortDesc(Text[][] array, Integer column){
-    declare Text[][] SortedArrayDesc;
-    declare Text[][] SortedArray = arraySort(array, column);
+Text[Text][] arraySortDesc(Text[Text][] array, Integer column){
+    declare Text[Text][] SortedArrayDesc;
+    declare Text[Text][] SortedArray = arraySort(array, column);
 
     for(i, 1, SortedArray.count){
         SortedArrayDesc.add(SortedArray[SortedArray.count - i]);
@@ -242,8 +309,83 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
     }
 }
 
+Text[Text][] parseJson(Text json){
+    if(TL::SubString(json, 0, 1) != "[" && TL::SubString(json, TL::Length(json) - 1, 1) != "]"){
+        log("Could not load music!");
+        return [["title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""]];
+    }
+
+    declare Text[Text][] songs;
+    declare curlyOpen = False;
+    declare stringOpen = False;
+    declare keyDone = False;
+    declare curText = "";
+    declare key = "";
+    declare value = "";
+    declare Text[Text] song;
+    declare id = 0;
+
+    for(pos, 1, TL::Length(json) - 2){
+        declare character = TL::SubString(json, pos, 1);
+
+        if(character == "{" && !curlyOpen){
+            song = ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
+            curlyOpen = True;
+            keyDone = False;
+            continue;
+        }
+
+        if(curlyOpen){
+            if(character == "\""){
+                stringOpen = !stringOpen;
+                continue;
+            }
+
+            if(character == ":" && !keyDone && !stringOpen){
+                keyDone = True;
+                continue;
+            }
+
+            if(character == "," && !stringOpen){
+                keyDone = False;
+                song[key] = value;
+                key = "";
+                value = "";
+                continue;
+            }
+
+            if(character == "}"){
+                curlyOpen = False;
+                song[key] = value;
+                key = "";
+                value = "";
+                song["search"] = slug(song["title"] ^ song["artist"]);
+                song["id"] = "" ^ id;
+                songs.add(song);
+                id = id + 1;
+                continue;
+            }
+
+            if(keyDone){
+                value = value ^ character;
+            }else{
+                key = key ^ character;
+            }
+        }
+    }
+
+    return songs;
+}
+
 main() {
-    Songs = {esc\Modules\MusicClient\MusicClient::musicToManiaScriptArray()|noescape};
+    url = "{config('music.url')|noescape}";
+    token = {config('music.token')};
+    log("Loading music...");
+    declare CHttpRequest getSongList = Http.CreateGet(url ^ "?token=" ^ token);
+    wait(getSongList.IsCompleted);
+    log("Finished loading music");
+    Songs = parseJson(getSongList.Result);
+
     music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
@@ -263,6 +405,11 @@ main() {
     declare Vec3 startPos;
     declare Integer sortDirection = 1;
 
+    songList.ClipWindowActive = True;
+    songList.ClipWindowRelativePosition = <80.0, -40.0>;
+    songList.ClipWindowSize = <160.0, 79.5>;
+
+    curSongPool = Songs;
     populateList(Songs);
     AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
 
@@ -319,9 +466,9 @@ main() {
 
                 if(event.Control == sortByTitle && event.Type == CMlScriptEvent::Type::MouseClick){
                     if(sortDirection == 1){
-                        populateList(arraySort(Songs, 1));
+                        populateList(arraySort(curSongPool, 1));
                     }else{
-                        populateList(arraySortDesc(Songs, 1));
+                        populateList(arraySortDesc(curSongPool, 1));
                     }
 
                     sortDirection = -sortDirection;
@@ -330,9 +477,9 @@ main() {
 
                 if(event.Control == sortByArtist && event.Type == CMlScriptEvent::Type::MouseClick){
                     if(sortDirection == 1){
-                        populateList(arraySort(Songs, 0));
+                        populateList(arraySort(curSongPool, 0));
                     }else{
-                        populateList(arraySortDesc(Songs, 0));
+                        populateList(arraySortDesc(curSongPool, 0));
                     }
 
                     sortDirection = -sortDirection;

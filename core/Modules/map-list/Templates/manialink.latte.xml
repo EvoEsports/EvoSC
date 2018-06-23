@@ -244,6 +244,8 @@ Void navButtonClick(CMlQuad button){
 
 Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
     declare frame <=> (queueFrameControl as CMlFrame);
+    declare image <=> (frame.Controls[0] as CMlQuad);
+    declare url = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1] ^ "?image.jpg";
 
     frame.Visible = True;
     frame.DataAttributeSet("map-id", data[0]);
@@ -252,7 +254,6 @@ Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
 
     if(data[1] != ""){
         //set map image
-        (frame.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1] ^ "?image.jpg");
     }
 }
 
@@ -279,8 +280,11 @@ Void updateMapQueue(Text[][] items){
 Void updateMxDetails(Text[] details){
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare mxDetails <=> (Page.MainFrame.GetFirstChild("mx-details") as CMlFrame);
+    declare image <=> (mxDetails.Controls[0] as CMlQuad);
+    declare url = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ details[7] ^ "?image.jpg";
 
-    (mxDetails.Controls[0] as CMlQuad).ChangeImageUrl("https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ details[1] ^ "?image.jpg");
+    image.ChangeImageUrl(url);
+
     (mxDetails.Controls[1] as CMlLabel).SetText(details[6]);
     (mxDetails.Controls[2] as CMlLabel).SetText(details[3]);
     (mxDetails.Controls[3] as CMlLabel).SetText("(" ^ details[2] ^ ")");
@@ -316,10 +320,6 @@ main() {
     mapListContainer.ClipWindowSize = <156.0, 80.0>;
 
     activeTab = 0;
-
-    foreach(map in maps){
-
-    }
 
     while(True){
         yield;
