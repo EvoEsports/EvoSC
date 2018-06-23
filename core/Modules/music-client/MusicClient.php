@@ -13,8 +13,6 @@ use GuzzleHttp\Exception\ConnectException;
 
 class MusicClient
 {
-    private static $music;
-
     public function __construct()
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
