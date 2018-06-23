@@ -405,13 +405,13 @@ main() {
     declare Vec3 startPos;
     declare Integer sortDirection = 1;
 
-    songList.ClipWindowActive = True;
-    songList.ClipWindowRelativePosition = <80.0, -40.0>;
-    songList.ClipWindowSize = <160.0, 79.5>;
-
     curSongPool = Songs;
     populateList(arraySort(curSongPool, 1));
     AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
+
+    songList.ClipWindowActive = True;
+    songList.ClipWindowRelativePosition = <80.0, -40.0>;
+    songList.ClipWindowSize = <160.0, 79.5>;
 
     sleep(100);
 

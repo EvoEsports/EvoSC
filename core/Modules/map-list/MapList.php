@@ -71,14 +71,14 @@ class MapList
 
     public static function mapQueueToManiaScriptArray()
     {
-        return MapController::getQueue()->map(function (MapQueueItem $item) {
+        return MapController::getQueue()->take(5)->map(function (MapQueueItem $item) {
             return sprintf('["%s", "%s", "%s", "%s"]',
                 $item->map->id,
-                $item->map->MxId,
-                $item->map->Name,
+                $item->map->gbx->MapUid,
+                $item->map->gbx->Name,
                 $item->issuer->NickName
             );
-        })->implode(",\n");
+        })->implode(",");
     }
 
     public static function updateMxDetails(Player $player, $mapId)
@@ -97,7 +97,10 @@ class MapList
             return;
         }
 
-        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
+        Log::logAddLine('MapList::updateMxDetails', json_encode($map->gbx));
+        Log::logAddLine('MapList::updateMxDetails', json_encode($map->mx_details));
+
+        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
             $map->id,
             $map->gbx->MapUid,
             $map->author->Login,
@@ -105,7 +108,8 @@ class MapList
             (new Carbon($details->UploadedAt))->format('Y-m-d'),
             (new Carbon($details->UpdatedAt))->format('Y-m-d'),
             $map->gbx->Name,
-            $details->TrackID
+            $details->TrackID,
+            formatScore($map->gbx->AuthorTime)
         );
 
         Template::show($player, 'map-list.update-mx-details', [

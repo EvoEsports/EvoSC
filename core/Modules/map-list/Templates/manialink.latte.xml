@@ -48,9 +48,8 @@
         </framemodel>
 
         <framemodel id="QueueItem">
-            <quad pos="1 0" size="32 18" bgcolor="fff3" image="" imagefocus="" />
-            <label pos="36 -5" textsize="2" size="120 4" text="Mapname" />
-            <label pos="36 -10" textsize="1" size="120 4" text="Requested by player" />
+            <label pos="0 0" textsize="2" size="120 4" text="Mapname" />
+            <label pos="0 -5" textsize="1" size="120 4" text="Requested by player" />
         </framemodel>
 
         <frame id="tabs" pos="2 -13" z-index="2">
@@ -74,18 +73,28 @@
 
             <frame data-tab="1" id="mx" hidden="1">
                 <frame id="mx-details">
-                    <quad pos="0 0" size="80 45" bgcolor="ffff" opacity="1.0" image="" />
-                    <label class="mapname" pos="82 0" textcolor="ffff" textsize="1.5" text="Mapname" />
-                    <label class="author-nick" pos="82 -4" textcolor="ffff" textsize="1" text="authorNick" />
-                    <label class="author-login" pos="82 -7" textcolor="ffff" textsize="0.75" text="authorLogin" />
+                    <label class="mapname" pos="2 0" textcolor="ffff" textsize="1.5" text="Mapname" />
+
+                    <frame class="dates" pos="2 -6" scale="0.8">
+                        <label pos="0 0" textcolor="ffff" textsize="0.75" text="uploadedAt" />
+                        <label pos="0 -4" textcolor="ffff" textsize="0.75" text="updatedAt" />
+                    </frame>
+
+                    <frame class="author" pos="30 -6">
+                        <label pos="0 0" textcolor="ffff" textsize="1.2" text="$oAuthor" />
+                        <label class="author-nick" pos="0 -4" textcolor="ffff" textsize="1" text="authorNick" />
+                        <label class="author-login" pos="0 -7" textcolor="ffff" textsize="0.75" text="authorLogin" />
+                        <label pos="0 -10" textcolor="ffff" textsize="0.75" text="authorTime" />
+                    </frame>
                 </frame>
             </frame>
 
             <frame data-tab="2" id="jukebox" hidden="1">
-                <frame id="queue-list">
+                <frame id="queue-list" pos="2 0">
                     <frameinstance pos="0 0" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -20" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -40" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -15" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -30" modelid="QueueItem" hidden="1" />
+                    <frameinstance pos="0 -45" modelid="QueueItem" hidden="1" />
                     <frameinstance pos="0 -60" modelid="QueueItem" hidden="1" />
                 </frame>
             </frame>
@@ -244,17 +253,11 @@ Void navButtonClick(CMlQuad button){
 
 Void updateQueueItem(CMlControl queueFrameControl, Text[] data){
     declare frame <=> (queueFrameControl as CMlFrame);
-    declare image <=> (frame.Controls[0] as CMlQuad);
-    declare url = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ data[1] ^ "?image.jpg";
 
     frame.Visible = True;
     frame.DataAttributeSet("map-id", data[0]);
-    (frame.Controls[1] as CMlLabel).SetText(data[2]);
-    (frame.Controls[2] as CMlLabel).SetText("Requested by " ^ data[3]);
-
-    if(data[1] != ""){
-        //set map image
-    }
+    (frame.Controls[0] as CMlLabel).SetText(data[2]);
+    (frame.Controls[1] as CMlLabel).SetText("Requested by " ^ data[3]);
 }
 
 Void updateMapQueue(Text[][] items){
@@ -280,27 +283,17 @@ Void updateMapQueue(Text[][] items){
 Void updateMxDetails(Text[] details){
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare mxDetails <=> (Page.MainFrame.GetFirstChild("mx-details") as CMlFrame);
-    declare image <=> (mxDetails.Controls[0] as CMlQuad);
-    declare url = "https://tm.mania-exchange.com/tracks/screenshot/normal/" ^ details[7] ^ "?image.jpg";
+    declare dates <=> (mxDetails.Controls[1] as CMlFrame);
+    declare author <=> (mxDetails.Controls[2] as CMlFrame);
 
-    image.ChangeImageUrl(url);
+    (mxDetails.Controls[0] as CMlLabel).SetText(details[6]);
 
-    (mxDetails.Controls[1] as CMlLabel).SetText(details[6]);
-    (mxDetails.Controls[2] as CMlLabel).SetText(details[3]);
-    (mxDetails.Controls[3] as CMlLabel).SetText("(" ^ details[2] ^ ")");
+    (dates.Controls[0] as CMlLabel).SetText("Uploaded: " ^ details[4]);
+    (dates.Controls[1] as CMlLabel).SetText("Updated: " ^ details[5]);
 
-    for(i, 1, navbar.Controls.count - 1){
-        if(i == 2){
-            continue;
-        }
-
-        ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
-    }
-    ((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.9;
-
-    tabs.Controls[0].Visible = False;
-    tabs.Controls[1].Visible = True;
-    activeTab = 2;
+    (author.Controls[1] as CMlLabel).SetText(details[3]);
+    (author.Controls[2] as CMlLabel).SetText("(" ^ details[2] ^ ")");
+    (author.Controls[3] as CMlLabel).SetText(details[8]);
 }
 
 main() {
