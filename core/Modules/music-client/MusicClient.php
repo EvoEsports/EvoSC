@@ -18,8 +18,6 @@ class MusicClient
     public function __construct()
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
-
-        KeyController::createBind('Y', [MusicClient::class, 'playerConnect']);
     }
 
     /**
@@ -28,7 +26,6 @@ class MusicClient
      */
     public static function playerConnect(Player $player)
     {
-        TemplateController::loadTemplates();
         Template::show($player, 'music-client.widget');
     }
 }
