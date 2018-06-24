@@ -401,8 +401,8 @@ main() {
 
             if(lastMapChangeHash != CurrentMapHash){
                 log(CurrentMap);
-                (widget.Controls[0] as CMlQuad).SetText(CurrentMap["name"]);
-                (widget.Controls[1] as CMlQuad).SetText("by " ^ CurrentMap["author"]);
+                (widget.Controls[0] as CMlLabel).SetText(CurrentMap["name"]);
+                (widget.Controls[1] as CMlLabel).SetText("by " ^ CurrentMap["author"]);
                 lastMapChangeHash = CurrentMapHash;
             }
 
