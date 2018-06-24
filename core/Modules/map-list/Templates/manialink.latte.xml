@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Maps" id="esc_maps" version="3">
+<manialink name="ESC:Maps:main" id="esc_maps" version="3">
     <frame id="maps-container" pos="-80 45" hidden="0">
         <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
         <quad pos="0 -2.5" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.5" />
@@ -353,6 +353,9 @@ main() {
     declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
     declare Boolean isHidden = False;
 
+    //update current map declarations
+    declare Text lastMapChangeHash = "";
+
     populate(maps);
 
     mapListContainer.ClipWindowActive = True;
@@ -365,6 +368,7 @@ main() {
         yield;
 
         if(InputPlayer != Null){
+            //hidescript
             declare UI_Hide_Speed for InputPlayer = 1.0;
             declare Real speed = ML::Abs(InputPlayer.Speed);
 
@@ -391,7 +395,16 @@ main() {
                 }
             }
 
+            //update current map info
+            declare Text CurrentMapHash for InputPlayer;
+            declare Text[Text] CurrentMap for InputPlayer;
 
+            if(lastMapChangeHash != CurrentMapHash){
+                log(CurrentMap);
+                (widget.Controls[0] as CMlQuad).SetText(CurrentMap["name"]);
+                (widget.Controls[1] as CMlQuad).SetText("by " ^ CurrentMap["author"]);
+                lastMapChangeHash = CurrentMapHash;
+            }
 
             foreach(event in PendingEvents){
                 if(event.Control == Null){

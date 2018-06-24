@@ -91,7 +91,8 @@ class MapList
     public static function beginMap(Map $map)
     {
         onlinePlayers()->each(function (Player $player) use ($map) {
-            MapList::updateMxDetails($player, $map->id);
+            //Update current map info
+            Template::show($player, 'map-list.update-current-map', ['map' => $map]);
         });
     }
 

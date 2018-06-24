@@ -31,7 +31,7 @@ class EscRun extends Command
   /_____/ |___/\____/____/\____/  $version
 ";
 
-        $output->writeln("<options=bold>$motd</>");
+        $output->writeln("<fg=cyan;options=bold>$motd</>");
 
         register_shutdown_function(function () {
             $error = error_get_last();

@@ -56,8 +56,14 @@ class TemplateController
         try {
             return self::$latte->renderToString($index, $values);
         } catch (\Exception $e) {
-            $vals = implode(' ', $values);
-            Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " ($vals)");
+            //Build parameter string
+            $parameters = [];
+            foreach($values as $key => $value){
+                array_push($parameters, "<options=bold>$key:</> <fg=yellow>$value</>");
+            }
+            $vals = implode(', ', $parameters);
+
+            Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
             createCrashReport($e);
         }
 
