@@ -81,7 +81,7 @@ class Migrate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $config = json_decode(file_get_contents('config/db.json'));
+        $config = json_decode(file_get_contents('config/database.json'));
 
         $capsule = new Capsule();
 
