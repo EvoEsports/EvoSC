@@ -138,9 +138,6 @@ class MapList
             return;
         }
 
-        Log::logAddLine('MapList::updateMxDetails', json_encode($map->gbx));
-        Log::logAddLine('MapList::updateMxDetails', json_encode($map->mx_details));
-
         $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
             $map->id,
             $map->gbx->MapUid,
