@@ -11,7 +11,7 @@
             declare Text[][] QueuedMaps for InputPlayer;
 
             QueueHash = {uniqid()};
-            QueuedMaps = [{esc\Modules\MapList\MapList::mapQueueToManiaScriptArray()|noescape}];
+            QueuedMaps = [{$queue|noescape}];
         }
         -->
     </script>

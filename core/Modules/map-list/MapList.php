@@ -22,54 +22,71 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('maplist.show', [MapList::class, 'showMapList']);
-        ManiaLinkEvent::add('maplist.queue', [MapList::class, 'queueMap']);
-        ManiaLinkEvent::add('maplist.filter', [MapList::class, 'filter']);
-        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
-        ManiaLinkEvent::add('maplist.disable', [MapList::class, 'disableMap'], 'map.delete');
-        ManiaLinkEvent::add('maplist.details', [MapList::class, 'showMapDetails']);
-
-        ManiaLinkEvent::add('maplist.mx', [MapList::class, 'updateMxDetails']);
-
-        ChatController::addCommand('list', [MapList::class, 'list'], 'Display list of maps');
+        ManiaLinkEvent::add('map.mx', [MapList::class, 'updateMxDetails']);
+        ManiaLinkEvent::add('map.queue', [MapList::class, 'queueMap']);
+        ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('BeginMap', [MapList::class, 'beginMap']);
+        Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
 
         KeyController::createBind('X', [MapList::class, 'reload']);;
+    }
 
-        ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
+    /**
+     * Send manialink to player
+     *
+     * @param Player $player
+     */
+    public static function playerConnect(Player $player)
+    {
+        self::sendManialink($player);
     }
 
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
-        self::showNewsMapList($player);
+        self::sendManialink($player);
     }
 
+    /**
+     * Player add favorite map
+     *
+     * @param Player $player
+     * @param int $mapId
+     */
     public static function favAdd(Player $player, int $mapId)
     {
         $player->favorites()->attach($mapId);
     }
 
+    /**
+     * Player remove favorite map
+     *
+     * @param Player $player
+     * @param int $mapId
+     */
     public static function favRemove(Player $player, int $mapId)
     {
         $player->favorites()->detach($mapId);
     }
 
+    /**
+     * Returns enabled maps count
+     *
+     * @return mixed
+     */
     public static function getMapsCount()
     {
-        return Map::count();
+        return Map::whereEnabled(true)->count();
     }
 
-    public static function mapQueueUpdated(Collection $queue)
-    {
-        onlinePlayers()->each(function (Player $player) use ($queue) {
-            Template::show($player, 'map-list.update-queue', []);
-        });
-    }
-
+    /**
+     * Send mx details of current map to everyone
+     *
+     * @param Map $map
+     */
     public static function beginMap(Map $map)
     {
         onlinePlayers()->each(function (Player $player) use ($map) {
@@ -77,9 +94,14 @@ class MapList
         });
     }
 
-    public static function mapQueueToManiaScriptArray()
+    /**
+     * Send updated map queue to everyone
+     *
+     * @param Collection $queue
+     */
+    public static function mapQueueUpdated(Collection $queue)
     {
-        return MapController::getQueue()->take(7)->map(function (MapQueueItem $item) {
+        $queue = $queue->take(7)->map(function (MapQueueItem $item) {
             return sprintf('["%s", "%s", "%s", "%s"]',
                 $item->map->id,
                 $item->map->gbx->MapUid,
@@ -87,8 +109,18 @@ class MapList
                 $item->issuer->NickName
             );
         })->implode(",");
+
+        onlinePlayers()->each(function (Player $player) use ($queue) {
+            Template::show($player, 'map-list.update-queue', compact('queue'));
+        });
     }
 
+    /**
+     * Sends requested mx details to player
+     *
+     * @param Player $player
+     * @param $mapId
+     */
     public static function updateMxDetails(Player $player, $mapId)
     {
         $map = Map::whereId($mapId)->first();
@@ -129,13 +161,19 @@ class MapList
         ]);
     }
 
+    /**
+     * Returns maps as MS array
+     *
+     * @param Player $player
+     * @return string
+     */
     public static function mapsToManiaScriptArray(Player $player)
     {
         $locals    = $player->locals->pluck('Rank', 'Map');
         $dedis     = $player->dedis->pluck('Rank', 'Map');
         $favorites = $player->favorites()->get(['id', 'gbx->Name as Name'])->pluck('Name', 'id');
 
-        $maps = Map::all()->map(function (Map $map) use ($locals, $dedis, $favorites) {
+        $maps = Map::whereEnabled(true)->get()->map(function (Map $map) use ($locals, $dedis, $favorites) {
             $author = $map->author;
 
             $authorLogin = $author->Login ?? "n/a";
@@ -153,137 +191,16 @@ class MapList
         return sprintf('[%s]', $maps);
     }
 
-    public static function showNewsMapList(Player $player)
+    /**
+     * Display maplist
+     *
+     * @param Player $player
+     */
+    public static function sendManialink(Player $player)
     {
-        Template::show($player, 'map-list.manialink');
-    }
+        $maps = self::mapsToManiaScriptArray($player);
 
-    public static function list(Player $player, $cmd, $filter = null)
-    {
-        self::showMapList($player, 1, $filter);
-    }
-
-    private static function getRecordsForPlayer(Player $player): Collection
-    {
-        $records = collect([])
-            ->concat($player->locals)
-            ->concat($player->dedis);
-
-        return $records;
-    }
-
-    private static function getRecordsForMapsAndPlayer($maps, Player $player): ?array
-    {
-        $mapIds = array_keys($maps);
-
-        try {
-            $records = [
-                'locals' => LocalRecord::whereIn('Map', $mapIds)
-                                       ->wherePlayer($player->id)
-                                       ->get()
-                                       ->keyBy('Map')
-                                       ->all(),
-                'dedis'  => Dedi::whereIn('Map', $mapIds)
-                                ->wherePlayer($player->id)
-                                ->get()
-                                ->keyBy('Map')
-                                ->all(),
-            ];
-        } catch (\Exception $e) {
-            \esc\Classes\Log::error('Failed to load records for player ' . $player->Login . "\n" . $e->getTrace());
-
-            return null;
-        }
-
-        return $records;
-    }
-
-    public static function showMapList(Player $player, $page = null, $filter = null)
-    {
-        $perPage = 23;
-        $page    = intval($page);
-
-        if ($filter) {
-            if ($filter == 'worst') {
-
-                $maps = self::getRecordsForPlayer($player)
-                            ->sortByDesc('Rank')
-                            ->pluck('map');
-
-            } elseif ($filter == 'best') {
-
-                $maps = self::getRecordsForPlayer($player)
-                            ->sortBy('Rank')
-                            ->pluck('map');
-
-            } elseif ($filter == 'nofinish') {
-
-                $records = self::getRecordsForPlayer($player)
-                               ->pluck('map.id')
-                               ->toArray();
-
-                $maps = maps()->whereNotIn('id', $records);
-
-            } else {
-
-                $maps = maps()
-                    ->filter(function (Map $map) use ($filter) {
-                        $nameMatch = strpos(strtolower(stripAll($map->gbx->Name)), strtolower($filter));
-
-                        return (is_int($nameMatch) || $map->Author == $filter);
-                    });
-
-            }
-        } else {
-            $maps = maps();
-        }
-
-        $pages = ceil(count($maps) / $perPage);
-
-        $maps = $maps->forPage($page ?? 0, $perPage)
-                     ->keyBy('id')
-                     ->all();
-
-        $records = self::getRecordsForMapsAndPlayer($maps, $player);
-
-        $queuedMaps = MapController::getQueue()
-                                   ->sortBy('timeRequested')
-                                   ->take($perPage);
-
-        $mapList = Template::toString('map-list.map-list', [
-            'maps'       => $maps,
-            'player'     => $player,
-            'queuedMaps' => $queuedMaps,
-            'filter'     => $filter,
-            'page'       => $page,
-            'locals'     => $records['locals'],
-            'dedis'      => $records['dedis'],
-        ]);
-
-        $pagination = Template::toString('components.pagination', [
-            'pages'  => $pages,
-            'action' => $filter ? "maplist.filter,$filter" : 'maplist.show',
-            'page'   => $page,
-        ]);
-
-        Template::show($player, 'components.modal', [
-            'id'            => 'MapList',
-            'width'         => 180,
-            'height'        => 97,
-            'content'       => $mapList,
-            'pagination'    => $pagination,
-            'showAnimation' => isset($page) ? false : true,
-        ]);
-    }
-
-    public static function filter(Player $player, $filter, $page = 1)
-    {
-        self::showMapList($player, $page, $filter);
-    }
-
-    public static function closeMapList(Player $player)
-    {
-        Template::hide($player, 'MapList');
+        Template::show($player, 'map-list.manialink', compact('maps'));
     }
 
     public static function queueMap(Player $player, $mapId)
@@ -291,64 +208,8 @@ class MapList
         $map = Map::whereId($mapId)->first();
 
         if ($map) {
-            MapController::queueMap($player, $map);
-            Template::hide($player, 'map-list.map-list');
-        } else {
-            ChatController::message($player, 'Invalid map selected');
+            $queue = MapController::queueMap($player, $map);
+            self::mapQueueUpdated($queue);
         }
-
-        self::closeMapList($player);
-    }
-
-    public static function disableMap(Player $player, $mapId)
-    {
-        $map = Map::where('id', intval($mapId))->first();
-
-        if ($map) {
-            MapController::disableMap($player, $map);
-            self::closeMapList($player);
-        }
-    }
-
-    public static function deleteMap(Player $player, $mapId)
-    {
-        $map = Map::where('id', intval($mapId))->first();
-
-        if ($map) {
-            MapController::deleteMap($player, $map);
-            self::closeMapList($player);
-        }
-    }
-
-    public static function showMapDetails(Player $player, $mapId, $page = 1, $filter = '', $returnToMaplist = false)
-    {
-        $map = Map::find($mapId);
-
-        $locals = $map->locals()->orderBy('Score')->get()->take(10);
-        $dedis  = $map->dedis()->orderBy('Score')->get()->take(10);
-
-        $localsRanking = Template::toString('components.ranking', ['ranks' => $locals]);
-        $dedisRanking  = Template::toString('components.ranking', ['ranks' => $dedis]);
-
-        MapController::loadMxDetails($map);
-
-        $mxDetails = $map->mx_details;
-
-        if (!$mxDetails) {
-            ChatController::message($player, '_warning', 'Could not load mx details for track ', $map);
-            return;
-        }
-
-        $detailPage = Template::toString('map-list.map-details', compact('map', 'localsRanking', 'dedisRanking', 'mxDetails'));
-
-        Template::show($player, 'components.modal', [
-            'id'            => 'MapList',
-            'title'         => 'Map details: ' . $map->gbx->Name,
-            'width'         => 130,
-            'height'        => 50,
-            'content'       => $detailPage,
-            'onClose'       => (strlen($filter) > 0 || $returnToMaplist) ? "maplist.filter,$filter,$page" : 'modal.hide,MapList',
-            'showAnimation' => true,
-        ]);
     }
 }

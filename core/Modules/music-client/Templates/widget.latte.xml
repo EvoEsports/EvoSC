@@ -183,44 +183,8 @@ Text getContainerTarget(Integer page){
 }
 
 Text slug(Text string){
-    declare Text out = "";
-
-    for(i, 0, TL::Length(string) - 1){
-        declare Text char = TL::SubString(string, i, 1);
-
-        if(char != " "){
-            switch(char){
-                case "A": out = out ^ "a";
-                case "B": out = out ^ "b";
-                case "C": out = out ^ "c";
-                case "D": out = out ^ "d";
-                case "E": out = out ^ "e";
-                case "F": out = out ^ "f";
-                case "G": out = out ^ "g";
-                case "H": out = out ^ "h";
-                case "I": out = out ^ "i";
-                case "J": out = out ^ "j";
-                case "K": out = out ^ "k";
-                case "L": out = out ^ "l";
-                case "M": out = out ^ "m";
-                case "N": out = out ^ "n";
-                case "O": out = out ^ "o";
-                case "P": out = out ^ "p";
-                case "Q": out = out ^ "q";
-                case "R": out = out ^ "r";
-                case "S": out = out ^ "s";
-                case "T": out = out ^ "t";
-                case "U": out = out ^ "u";
-                case "V": out = out ^ "v";
-                case "W": out = out ^ "w";
-                case "X": out = out ^ "x";
-                case "Y": out = out ^ "y";
-                case "Z": out = out ^ "z";
-                default: out = out ^ char;
-            }
-        }
-    }
-
+    declare Text out = TL::ToLowerCase(string);
+    out = TL::Replace(out, " ", "");
     return out;
 }
 

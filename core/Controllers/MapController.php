@@ -35,7 +35,6 @@ class MapController
         self::$queue    = new Collection();
         self::$mapsPath = config('server.base') . '/UserData/Maps/';
 
-        Hook::add('PlayerConnect', [MapController::class, 'displayMapWidget']);
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
         Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
@@ -115,7 +114,6 @@ class MapController
         }
 
         self::$currentMap = $map;
-        self::displayMapWidget();
 
         self::resetTime();
     }
@@ -234,7 +232,6 @@ class MapController
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
         ChatController::messageAll($player, ' queued map ', $currentMap, ' for replay');
-        self::displayMapWidget();
     }
 
     /**
@@ -250,7 +247,7 @@ class MapController
                 ->isNotEmpty() && !$player->isAdmin()) {
             ChatController::message($player, "You already have a map in queue", []);
 
-            return;
+            return null;
         }
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
@@ -260,9 +257,9 @@ class MapController
         ChatController::messageAll($player, ' juked map ', $map);
         Log::info("$player->NickName juked map " . $map->gbx->Name);
 
-        self::displayMapWidget();
-
         Hook::fire('QueueUpdated', self::$queue);
+
+        return self::$queue;
     }
 
     private static function getGbxInformation($filename)
@@ -325,44 +322,6 @@ class MapController
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
            ->update(['enabled' => true]);
-    }
-
-    /**
-     * Display the map widget
-     *
-     * @param Player|null $player
-     */
-    public static function displayMapWidget(Player $player = null)
-    {
-        $currentMap = self::getCurrentMap();
-
-        if ($player) {
-            self::showWidget($player, $currentMap);
-        } else {
-            onlinePlayers()->each(function (Player $player) use ($currentMap) {
-                self::showWidget($player, $currentMap);
-            });
-        }
-    }
-
-    private static function showWidget(Player $player, Map $currentMap = null)
-    {
-        if (!$currentMap) {
-            return;
-        }
-
-        $content = Template::toString('map', [
-            'map' => $currentMap
-        ]);
-
-        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.map')]);
-
-        Template::show($player, 'components.icon-box', [
-            'id'         => 'map-widget',
-            'content'    => $content,
-            'config'     => config('ui.map'),
-            'hideScript' => $hideScript
-        ]);
     }
 
     public static function loadMxDetails(Map $map, bool $overwrite = false)
