@@ -1,11 +1,10 @@
 <?php
 
-$escVersion = '0.39.9';
+$escVersion = '0.39.45';
 $serverName = 'loading...';
 
 include 'global-functions.php';
 
-esc\Classes\Log::info("Loading config files.");
 esc\Classes\Config::loadConfigFiles();
 
 function startEsc(Symfony\Component\Console\Output\OutputInterface $output)

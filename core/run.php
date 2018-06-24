@@ -22,6 +22,17 @@ class EscRun extends Command
 
     private function start(OutputInterface $output)
     {
+        $version = getEscVersion();
+
+        $motd = "      ______           _____ ______
+     / ____/   ______ / ___// ____/
+    / __/ | | / / __ \\__ \/ /     
+   / /___ | |/ / /_/ /__/ / /___   
+  /_____/ |___/\____/____/\____/  $version
+";
+
+        $output->writeln("<options=bold>$motd</>");
+
         register_shutdown_function(function () {
             $error = error_get_last();
 
