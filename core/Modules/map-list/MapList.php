@@ -17,6 +17,7 @@ use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class MapList
 {
@@ -169,9 +170,16 @@ class MapList
      */
     public static function mapsToManiaScriptArray(Player $player)
     {
-        $locals    = $player->locals->pluck('Rank', 'Map');
-        $dedis     = $player->dedis->pluck('Rank', 'Map');
-        $favorites = $player->favorites()->get(['id', 'gbx->Name as Name'])->pluck('Name', 'id');
+        $locals = $player->locals->pluck('Rank', 'Map');
+        $dedis  = $player->dedis->pluck('Rank', 'Map');
+
+        if (config('database.type') == 'mysql') {
+            $favorites = $player->favorites()->get(['id', 'gbx->Name as Name'])->pluck('Name', 'id');
+        } else {
+            $favorites = $player->favorites()->get()->map(function (Map $map) {
+                return ['id' => $map->id, 'Name' => $map->gbx->Name];
+            })->pluck('Name', 'id');
+        }
 
         $maps = Map::whereEnabled(true)->get()->map(function (Map $map) use ($locals, $dedis, $favorites) {
             $author = $map->author;
