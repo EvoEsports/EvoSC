@@ -13,7 +13,9 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
+use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
@@ -44,6 +46,7 @@ class Dedimania extends DedimaniaApi
 
         Timer::create('dedimania.players.update', [Dedimania::class, 'reportConnectedPlayersToDedimania'], '4m');
 
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reportConnectedPlayersToDedimania()
@@ -355,6 +358,12 @@ class Dedimania extends DedimaniaApi
         ]);
     }
 
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::displayDedis($player);
+    }
+
     /**
      * Show the dedi widget
      *
@@ -362,75 +371,15 @@ class Dedimania extends DedimaniaApi
      */
     public static function displayDedis(Player $player = null)
     {
-        $rows  = config('ui.dedis.rows');
-        $map   = MapController::getCurrentMap();
-        $dedis = new Collection();
-
-        $topDedis = $map->dedis()->orderBy('Score')->take(3)->get();
-
-        if ($map->mx_world_record != null && $topDedis->isNotEmpty()) {
-            $mxScore = intval($map->mx_world_record->ReplayTime);
-            if ($mxScore > $topDedis->first()->Score) {
-                $topDedis->first()->Rank = 'WR';
-            }
-        }
-
-        $topPlayers = $topDedis->pluck('Player')->toArray();
-        $fill       = $rows - $topDedis->count();
-
-        if ($player && !in_array($player->id, $topPlayers)) {
-            $dedi = $map->dedis()->where('Player', $player->id)->first();
-            if ($dedi) {
-                $halfFill = ceil($fill / 2);
-
-                $above = $map->dedis()
-                             ->where('Score', '<=', $dedi->Score)
-                             ->whereNotIn('Player', $topPlayers)
-                             ->orderByDesc('Score')
-                             ->take($halfFill)
-                             ->get();
-
-                $bottomFill = $fill - $above->count();
-
-                $below = $map->dedis()
-                             ->where('Score', '>', $dedi->Score)
-                             ->whereNotIn('Player', $topPlayers)
-                             ->orderBy('Score')
-                             ->take($bottomFill)
-                             ->get();
-
-                $dedis = $dedis->concat($above)->concat($below);
-            } else {
-                $dedis = $map->dedis()->whereNotIn('Player', $topPlayers)->orderByDesc('Score')->take($fill)->get();
-            }
-        } else {
-            $dedis = $map->dedis()->whereNotIn('Player', $topPlayers)->orderByDesc('Score')->take($fill)->get();
-        }
-
-        $result = $dedis->concat($topDedis)->sortBy('Score');
-
         if ($player) {
-            self::showDedis($player, $rows, $result);
-        } else {
-            foreach (onlinePlayers() as $player) {
-                self::showDedis($player, $rows, $result);
-            }
+            $map  = MapController::getCurrentMap();
+            $allDedis = $map->dedis->sortBy('Rank');
+            $localRank = $map->dedis()->wherePlayer($player->id)->first()->Rank ?? -1;
+            $records  = '[' . $allDedis->map(function (Dedi $dedi) {
+                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "nick" => "%s", "login" => "%s"]', $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), str_replace('"', "''", $dedi->player->NickName), $dedi->player->Login);
+                })->implode(",\n") . ']';
+            Template::show($player, 'dedimania-records.manialink', compact('records', 'localRank'));
         }
-    }
-
-    private static function showDedis(Player $player, $rows, $result)
-    {
-        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.dedis')]);
-
-        Template::show($player, 'ranking-box', $variables = [
-            'id'         => 'Dedimania',
-            'title'      => '🏆  DEDIMANIA',
-            'config'     => config('ui.dedis'),
-            'hideScript' => $hideScript,
-            'rows'       => $rows,
-            'content'    => Template::toString('dedimania-records.dedis', ['dedis' => $result]),
-            'action'     => 'dedis.show',
-        ]);
     }
 
     /**

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Dedimania" id="Dedimania2" version="3">
+    <framemodel id="record">
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+        <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
+        <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
+        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="1" hidden="1" valign="center" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('dedimania.pos')}" size="40 60" scale="{config('dedimania.scale')}">
+        <quad z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8"/>
+        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania"/>
+
+        <frame id="records-frame" pos="1 -7">
+            <frame id="records">
+                {for $i=0; $i<100; $i++}
+                <frameinstance modelid="record" pos="0 {$i * -3}"/>
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+
+    <frame id="window">
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text[Text][Integer] Records;
+    declare Integer LocalRank;
+
+    Void updateList(){
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        for(i, 1, Records.count){
+            declare Text[Text] record = Records[i];
+            declare recordLabels = (recordsFrame.Controls[i - 1] as CMlFrame);
+
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+        }
+    }
+
+    Void scrollToLocalRankPosition(){
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare Real relativeRankPos = LocalRank / 100.0;
+
+        declare Real y = LocalRank * 3.0 - 30.0;
+        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
+        AnimMgr.Add(recordsFrame, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+
+        ((recordsFrame.Controls[LocalRank - 1] as CMlFrame).Controls[3] as CMlQuad).Visible = True;
+    }
+
+    main(){
+        Records = {$records|noescape};
+        LocalRank = {$localRank|noescape};
+
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records-frame") as CMlFrame);
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        recordsFrame.ClipWindowActive = True;
+        recordsFrame.ClipWindowRelativePosition = <20.0, -25.6>;
+        recordsFrame.ClipWindowSize = <55.0, 54.6>;
+
+        updateList();
+
+        if(LocalRank != -1){
+            scrollToLocalRankPosition();
+        }
+
+        declare Boolean hidden = False;
+        declare Real width = widget.Size[0];
+
+        declare Vec2 vecVisible = widget.RelativePosition_V3;
+        declare Vec2 vecHidden = widget.RelativePosition_V3;
+
+        if(vecVisible[0] < 0.0){
+            vecHidden[0] = vecVisible[0] - width;
+        }else{
+            vecHidden[0] = vecVisible[0] + width;
+        }
+
+        declare Text visiblePos = """ <frame pos=" """ ^ vecVisible[0] ^ " " ^ vecVisible[1] ^ """ " /> """;
+        declare Text hiddenPos = """ <frame pos=" """ ^ vecHidden[0] ^ " " ^ vecHidden[1] ^ """ " /> """;
+
+        while(True){
+            yield;
+
+            if(InputPlayer == Null){
+                wait(InputPlayer != Null);
+            }
+
+            declare HideSpeed for InputPlayer = 1.0;
+            declare speed = ML::Abs(InputPlayer.Speed);
+
+            if(speed >= HideSpeed && !hidden){
+                hidden = True;
+                AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+
+            if(speed < HideSpeed && hidden){
+                hidden = False;
+                AnimMgr.Add(widget, visiblePos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+        }
+    }
+
+    --></script>
+</manialink>

@@ -1,5 +1,9 @@
 {
   "module": "dedimania",
   "login": "brakertest2",
-  "key": "7ba618f274"
+  "key": "7ba618f274",
+
+  "pos": "-160 22",
+  "scale": "0.95",
+  "rows": "20"
 }

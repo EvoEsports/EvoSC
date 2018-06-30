@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Maps:main" id="esc_maps" version="3">
-    <frame id="maps-container" pos="-80 45" hidden="0">
+    <frame id="maps-container" pos="-80 45" hidden="1">
         <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
         <quad pos="0 -2.5" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.5" />
         <quad pos="0 -2.5" size="160 95" style="Bgs1" substyle="BgDialogBlur" />
@@ -399,7 +399,7 @@ main() {
             declare Text CurrentMapHash for InputPlayer;
             declare Text[Text] CurrentMap for InputPlayer;
 
-            if(lastMapChangeHash != CurrentMapHash){
+            if(lastMapChangeHash != CurrentMapHash && CurrentMap.count > 0){
                 log(CurrentMap);
                 (widget.Controls[0] as CMlLabel).SetText(CurrentMap["name"]);
                 (widget.Controls[1] as CMlLabel).SetText("by " ^ CurrentMap["author"]);
