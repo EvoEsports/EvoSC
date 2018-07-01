@@ -372,13 +372,37 @@ class Dedimania extends DedimaniaApi
     public static function displayDedis(Player $player = null)
     {
         if ($player) {
-            $map  = MapController::getCurrentMap();
+            $map      = MapController::getCurrentMap();
             $allDedis = $map->dedis->sortBy('Rank');
-            $localRank = $map->dedis()->wherePlayer($player->id)->first()->Rank ?? -1;
-            $records  = '[' . $allDedis->map(function (Dedi $dedi) {
-                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "nick" => "%s", "login" => "%s"]', $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), str_replace('"', "''", $dedi->player->NickName), $dedi->player->Login);
+
+            $playerRecord = $map->dedis()->wherePlayer($player->id)->first();
+
+            if (!$playerRecord) {
+                //Fallback to local if no dedi
+                $playerRecord = $map->locals()->wherePlayer($player->id)->first();
+            }
+
+            if ($playerRecord) {
+                $localRank = $playerRecord->Rank;
+                $localCps  = explode(',', $playerRecord->Checkpoints);
+                array_walk($localCps, function(&$time){
+                    $time = intval($time);
+                });
+            } else {
+                $localRank = -1;
+                $localCps  = [];
+            }
+
+            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
+            $onlinePlayers = onlinePlayers()->pluck('Login');
+
+            $records = '[' . $allDedis->map(function (Dedi $dedi) {
+                    $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
+
+                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]', $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
                 })->implode(",\n") . ']';
-            Template::show($player, 'dedimania-records.manialink', compact('records', 'localRank'));
+
+            Template::show($player, 'dedimania-records.manialink', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
         }
     }
 

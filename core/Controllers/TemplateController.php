@@ -37,7 +37,8 @@ class TemplateController
 
         })->addFilter('score', function ($str) {
             return formatScore($str);
-
+        })->addFilter('cfg', function ($str) {
+            return config($str);
         });
     }
 
@@ -58,8 +59,12 @@ class TemplateController
         } catch (\Exception $e) {
             //Build parameter string
             $parameters = [];
-            foreach($values as $key => $value){
-                array_push($parameters, "<options=bold>$key:</> <fg=yellow>$value</>");
+            foreach ($values as $key => $value) {
+                if (is_array($value)) {
+                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . implode(', ', $value) . "</>");
+                } else {
+                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>$value</>");
+                }
             }
             $vals = implode(', ', $parameters);
 
