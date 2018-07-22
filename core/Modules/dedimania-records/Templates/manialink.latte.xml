@@ -55,9 +55,9 @@
                     {for $i=1; $i<$cpCount-1; $i++}
 
                     {if $cpCount > 12}
-                    <label pos="{(176 / ($cpCount-1)) * $i + 1} 0" text="score_{$i}" textsize="1" valign="bottom" rot="-40" />
+                    <label pos="{(176 / ($cpCount-1)) * $i + 1} 0" text="" textsize="1" valign="bottom" rot="-40" />
                     {else}
-                    <label pos="{(176 / ($cpCount-1)) * $i} 0" text="score_{$i}" textsize="1" valign="bottom" />
+                    <label pos="{(176 / ($cpCount-1)) * $i} 0" text="" textsize="1" valign="bottom" />
                     {/if}
 
                     {/for}
@@ -73,9 +73,9 @@
         </frame>
 
         <frame id="details" z-index="2" pos="2 -88" scale="1.0">
-            <label pos="2 -2" text="Playernickname" textsize="1.4" valign="top" />
-            <label pos="2 -6" text="player_login" textsize="0.8" valign="top" />
-            <label pos="2 -9.2" text="score" textsize="1" valign="top" />
+            <label pos="2 -2" text="" textsize="1.4" valign="top" />
+            <label pos="2 -6" text="" textsize="0.8" valign="top" />
+            <label pos="2 -9.2" text="" textsize="1" valign="top" />
         </frame>
     </frame>
 
