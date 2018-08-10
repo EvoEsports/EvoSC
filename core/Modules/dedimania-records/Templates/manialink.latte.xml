@@ -4,17 +4,26 @@
         <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
         <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
         <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
-        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="1" hidden="1" valign="center" />
+        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
     </framemodel>
 
     <frame id="widget" pos="{config('dedimania.pos')}" size="40 60" scale="{config('dedimania.scale')}">
         <quad z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8"/>
+        <quad z-index="-2" pos="0 -5" size="40 {config('dedimania.showtop') * 3.3}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania"/>
 
-        <frame id="records-frame" pos="1 -7">
+        <frame id="top-records-frame" pos="1 -7">
+            <frame id="top-records">
+                {for $i=0; $i<config('dedimania.showtop'); $i++}
+                <frameinstance modelid="record" pos="0 {$i * -3}"/>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="records-frame" pos="1 -16">
             <frame id="records">
-                {for $i=0; $i<1000; $i++}
+                {for $i=0; $i<1000-config('dedimania.showtop'); $i++}
                 <frameinstance modelid="record" pos="0 {$i * -3}"/>
                 {/for}
             </frame>
@@ -88,6 +97,9 @@
     declare Text[] LocalCps;
     declare CMlGraphCurve targetCurve;
 
+    declare CMlFrame topRecords;
+    declare CMlFrame records;
+
     Void enablePaginationBoxes(Integer records){
         declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
 
@@ -96,23 +108,49 @@
         }
     }
 
-    Void updateList(){
-        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+    Boolean loginIsOnline(Text login){
+        for(i, 1, Players.count){
+            declare player <=> Players[i - 1];
+            if(player.User.Login == login){
+                return True;
+            }
+        }
 
-        for(i, 1, Records.count){
-            declare Text[Text] record = Records[i];
-            declare recordLabels = (recordsFrame.Controls[i - 1] as CMlFrame);
+        return False;
+    }
 
+    Void updateRecord(Integer i, Text[Text] record){
+        if(i <= {config('dedimania.showtop')}){
+            declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
             (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
             (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
             (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
 
-            declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
-            (recordLoginLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
-            (recordLoginLabels.Controls[1] as CMlLabel).SetText(record["score"]);
-            (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
-            (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
-            recordLoginLabels.Visible = True;
+            if(loginIsOnline(record["login"])){
+                (recordLabels.Controls[3] as CMlQuad).Visible = True;
+            }
+        }else{
+            declare recordLabels = (records.Controls[i - {config('dedimania.showtop') + 1}] as CMlFrame);
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+
+            if(loginIsOnline(record["login"])){
+                (recordLabels.Controls[3] as CMlQuad).Visible = True;
+            }
+        }
+
+        declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
+        (recordLoginLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+        (recordLoginLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+        (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
+        (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
+        recordLoginLabels.Visible = True;
+    }
+
+    Void updateList(){
+        for(i, 1, Records.count){
+            updateRecord(i, Records[i]);
         }
 
         for(i, Records.count, 100){
@@ -131,7 +169,7 @@
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(recordsFrame, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
 
-        ((recordsFrame.Controls[LocalRank - 1] as CMlFrame).Controls[3] as CMlQuad).Visible = True;
+        log("Local rank: " ^ LocalRank);
     }
 
     Text formatScoreCorrect(Integer scoreIn){
@@ -257,6 +295,8 @@
         declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records-frame") as CMlFrame);
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
+        topRecords = (Page.MainFrame.GetFirstChild("top-records") as CMlFrame);
+        records = (Page.MainFrame.GetFirstChild("records") as CMlFrame);
 
         recordsFrame.ClipWindowActive = True;
         recordsFrame.ClipWindowRelativePosition = <20.0, -25.6>;
@@ -311,6 +351,8 @@
         for(i, 0, cpCount){
 	        targetCurve.Points.add(<1. * i, 100. * i>);
         }
+
+        declare Text lastUpdateHash = "";
 
         while(True){
             yield;
