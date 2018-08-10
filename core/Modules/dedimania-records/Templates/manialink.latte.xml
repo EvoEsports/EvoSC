@@ -9,7 +9,7 @@
 
     <frame id="widget" pos="{config('dedimania.pos')}" size="40 60" scale="{config('dedimania.scale')}">
         <quad z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8"/>
-        <quad z-index="-2" pos="0 -5" size="40 {config('dedimania.showtop') * 3.3}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
+        <quad z-index="-2" pos="0 -5" size="40 {config('dedimania.showtop') * 3.2}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania"/>
 
@@ -21,7 +21,7 @@
             </frame>
         </frame>
 
-        <frame id="records-frame" pos="1 -16">
+        <frame id="records-frame" pos="1 -{config('dedimania.showtop') * 3 + 7}">
             <frame id="records">
                 {for $i=0; $i<1000-config('dedimania.showtop'); $i++}
                 <frameinstance modelid="record" pos="0 {$i * -3}"/>
@@ -148,6 +148,37 @@
         recordLoginLabels.Visible = True;
     }
 
+    Void scrollToLocalRankPosition(){
+        declare Real relativeRankPos = LocalRank / 100.0;
+        declare Integer targetRank = LocalRank;
+
+        declare Integer totalVisible = 18;
+        declare Integer topVisible = {config('dedimania.showtop')};
+        declare Integer visible = totalVisible - topVisible;
+
+        if(topVisible - (LocalRank - topVisible) > 0){
+            targetRank = targetRank + (topVisible - (LocalRank - topVisible));
+        }
+
+        if((Records.count - LocalRank) < visible / 2){
+            targetRank = Records.count - (visible / 2);
+        }
+
+        declare Real y = targetRank * 3.0 - 30.0;
+        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
+        AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+
+        log("Local rank: " ^ LocalRank);
+    }
+
+    Void scrollToBottom(){
+        declare Integer visible = 18 - {config('dedimania.showtop')};
+        declare Integer targetRank = Records.count - (visible / 2) - 2;
+        declare Real y = targetRank * 3.0 - 30.0;
+        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
+        AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+    }
+
     Void updateList(){
         for(i, 1, Records.count){
             updateRecord(i, Records[i]);
@@ -159,17 +190,12 @@
         }
 
         enablePaginationBoxes(Records.count);
-    }
 
-    Void scrollToLocalRankPosition(){
-        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
-        declare Real relativeRankPos = LocalRank / 100.0;
-
-        declare Real y = LocalRank * 3.0 - 30.0;
-        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
-        AnimMgr.Add(recordsFrame, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
-
-        log("Local rank: " ^ LocalRank);
+        if(LocalRank != -1){
+            scrollToLocalRankPosition();
+        }else{
+            scrollToBottom();
+        }
     }
 
     Text formatScoreCorrect(Integer scoreIn){
@@ -286,6 +312,36 @@
         scoreLabel.SetText(Records[id]["score"]);
     }
 
+    Void updateRecord(Text[Text] updateRecord){
+        if(updateRecord["oldRank"] == "0"){
+            declare rank = TL::ToInteger(updateRecord["rank"]);
+            declare oldRank = Records.count + 1;
+
+            for(i, 1, oldRank - rank){
+                declare id = oldRank - i;
+                Records[id + 1] = Records[id];
+            }
+
+            Records[rank] = ["cps" => updateRecord["cps"], "score" => updateRecord["score"], "score_raw" => updateRecord["score"], "nick" => updateRecord["nick"], "login" => updateRecord["login"]];
+        }else{
+            declare rank = TL::ToInteger(updateRecord["rank"]);
+            declare oldRank = TL::ToInteger(updateRecord["oldRank"]);
+            declare Text[Text] updatedRecord = Records[oldRank];
+
+            for(i, 1, oldRank - rank){
+                declare id = oldRank - i;
+                Records[id + 1] = Records[id];
+            }
+
+            updatedRecord["rank"] = updateRecord["rank"];
+            updatedRecord["score"] = updateRecord["score"];
+            updatedRecord["cps"] = updateRecord["cps"];
+            Records[rank] = updatedRecord;
+        }
+
+        updateList();
+    }
+
     main(){
         Records = {$records|noescape};
         LocalRank = {$localRank|noescape};
@@ -299,14 +355,10 @@
         records = (Page.MainFrame.GetFirstChild("records") as CMlFrame);
 
         recordsFrame.ClipWindowActive = True;
-        recordsFrame.ClipWindowRelativePosition = <20.0, -25.6>;
+        recordsFrame.ClipWindowRelativePosition = <20.0, -25.7>;
         recordsFrame.ClipWindowSize = <55.0, 54.6>;
 
         updateList();
-
-        if(LocalRank != -1){
-            scrollToLocalRankPosition();
-        }
 
         declare Boolean hidden = False;
         declare Real width = widget.Size[0];
@@ -354,11 +406,28 @@
 
         declare Text lastUpdateHash = "";
 
+        declare Integer currentOnlinePlayers = Players.count;
+
         while(True){
             yield;
 
             if(InputPlayer == Null){
                 wait(InputPlayer != Null);
+            }
+
+            declare Text UpdateHash for InputPlayer = "";
+            declare Text[Text] UpdateRecord for InputPlayer;
+
+            if(UpdateHash != lastUpdateHash){
+                lastUpdateHash = UpdateHash;
+                updateRecord(UpdateRecord);
+                continue;
+            }
+
+            if(currentOnlinePlayers != Players.count){
+                currentOnlinePlayers = Players.count;
+                updateList();
+                continue;
             }
 
             declare HideSpeed for InputPlayer = 1.0;

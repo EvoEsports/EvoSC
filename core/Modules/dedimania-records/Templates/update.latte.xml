@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Dedimania:push-new-dedi" id="push-new-dedi" version="3">
+    <script>
+        <!--
+        main(){
+            wait(InputPlayer != Null);
+
+            declare Text UpdateHash for InputPlayer;
+            declare Text[Text] UpdateRecord for InputPlayer;
+
+            UpdateHash = {uniqid()};
+            UpdateRecord = {$updateRecord|noescape};
+        }
+        -->
+    </script>
+</manialink>

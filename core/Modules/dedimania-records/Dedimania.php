@@ -207,10 +207,14 @@ class Dedimania extends DedimaniaApi
         }
 
         self::$newTimes->push($dedi);
+    }
 
-        foreach (onlinePlayers() as $player) {
-            self::displayDedis($player);
-        }
+    public static function pushNewDediToPlayers(Dedi $record, $oldRank = null)
+    {
+        $nick = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
+        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]', $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick, $record->player->Login, $oldRank);
+
+        Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
     }
 
     /**
@@ -257,6 +261,7 @@ class Dedimania extends DedimaniaApi
                             ' (-' . formatScore($diff) . ')');
                     }
                     self::addNewTime($dedi);
+                    self::pushNewDediToPlayers($dedi, $oldRank);
                 }
             }
         } else {
@@ -274,6 +279,7 @@ class Dedimania extends DedimaniaApi
 
             if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                 self::addNewTime($dedi);
+                self::pushNewDediToPlayers($dedi);
                 ChatController::messageAll('_dedi', 'Player ', $player, ' gained the ', $dedi);
             }
         }
@@ -293,36 +299,6 @@ class Dedimania extends DedimaniaApi
         }
 
         return null;
-    }
-
-    /**
-     * Get insert position
-     *
-     * @param Map $map
-     * @param int $score
-     *
-     * @return int|null
-     */
-    private static function getRank(Map $map, int $score): ?int
-    {
-        $nextBetter = $map->dedis->where('Score', '<=', $score)->sortByDesc('Score')->first();
-
-        if ($nextBetter) {
-            return $nextBetter->Rank + 1;
-        }
-
-        return 1;
-    }
-
-    /**
-     * Push down worse ranks
-     *
-     * @param Map $map
-     * @param int $startRank
-     */
-    private static function pushDownRanks(Map $map, int $startRank)
-    {
-        $map->dedis()->where('Rank', '>=', $startRank)->orderByDesc('Rank')->increment('Rank');
     }
 
     /**
@@ -385,7 +361,7 @@ class Dedimania extends DedimaniaApi
             if ($playerRecord) {
                 $localRank = $playerRecord->Rank;
                 $localCps  = explode(',', $playerRecord->Checkpoints);
-                array_walk($localCps, function(&$time){
+                array_walk($localCps, function (&$time) {
                     $time = intval($time);
                 });
             } else {
@@ -393,7 +369,7 @@ class Dedimania extends DedimaniaApi
                 $localCps  = [];
             }
 
-            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
+            $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
             $onlinePlayers = onlinePlayers()->pluck('Login');
 
             $records = '[' . $allDedis->map(function (Dedi $dedi) {
