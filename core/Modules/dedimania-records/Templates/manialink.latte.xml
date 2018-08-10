@@ -8,7 +8,7 @@
     </framemodel>
 
     <frame id="widget" pos="{config('dedimania.pos')}" size="40 60" scale="{config('dedimania.scale')}">
-        <quad z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8"/>
+        <quad class="widget" z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
         <quad z-index="-2" pos="0 -5" size="40 {config('dedimania.showtop') * 3.2}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania"/>
@@ -30,7 +30,7 @@
         </frame>
     </frame>
 
-    <frame id="window" pos="-90 60">
+    <frame id="window" pos="-90 60" hidden="1">
         <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
         <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Dedimania records" z-index="1" />
@@ -473,6 +473,13 @@
 
                 if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
                     window.Hide();
+                    continue;
+                }
+
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                log("show");
+                    window.Show();
+                    continue;
                 }
             }
         }
