@@ -211,7 +211,7 @@ class Dedimania extends DedimaniaApi
 
     public static function pushNewDediToPlayers(Dedi $record, $oldRank = null)
     {
-        $nick = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
+        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
         $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]', $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick, $record->player->Login, $oldRank);
 
         Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
@@ -355,18 +355,25 @@ class Dedimania extends DedimaniaApi
 
             if (!$playerRecord) {
                 //Fallback to local if no dedi
-                $playerRecord = $map->locals()->wherePlayer($player->id)->first();
-            }
+                $record = $map->locals()->wherePlayer($player->id)->first();
 
-            if ($playerRecord) {
+                if ($record) {
+                    $localCps  = explode(',', $record->Checkpoints);
+                    array_walk($localCps, function (&$time) {
+                        $time = intval($time);
+                    });
+
+                    $localRank = -1;
+                } else {
+                    $localRank = -1;
+                    $localCps  = [];
+                }
+            } else {
                 $localRank = $playerRecord->Rank;
                 $localCps  = explode(',', $playerRecord->Checkpoints);
                 array_walk($localCps, function (&$time) {
                     $time = intval($time);
                 });
-            } else {
-                $localRank = -1;
-                $localCps  = [];
             }
 
             $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
