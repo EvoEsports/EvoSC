@@ -4,6 +4,8 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Controllers\KeyController;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class LiveRankings
@@ -11,38 +13,18 @@ class LiveRankings
     public function __construct()
     {
         Hook::add('PlayerConnect', [LiveRankings::class, 'playerConnect']);
-        Hook::add('PlayerLeave', [LiveRankings::class, 'playerConnect']); //Update live ranks
-        Hook::add('PlayerFinish', [LiveRankings::class, 'playerFinish']);
-    }
 
-    public static function show(Player $player)
-    {
-        //Get online players or players that finished (also display disconnected and finished players)
-        $players = finishPlayers()->sortBy('Score')->merge(onlinePlayers()->diff(finishPlayers()));
-
-        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.playerlist')]);
-
-        Template::show($player, 'ranking-box', [
-            'id'         => 'live-rankings',
-            'title'      => '🏆 LIVE RANKINGS',
-            'config'     => config('ui.playerlist'),
-            'hideScript' => $hideScript,
-            'rows'       => config('ui.playerlist.rows'),
-            'scale'      => config('ui.playerlist.scale'),
-            'content'    => Template::toString('live-rankings.playerlist', compact('players'))
-        ]);
-    }
-
-    public static function playerFinish(Player $player, $score)
-    {
-        if ($score > 0) {
-            //Update playerlist
-            onlinePlayers()->each([self::class, 'show']);
-        }
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function playerConnect(Player $player)
     {
-        onlinePlayers()->each([self::class, 'show']);
+        Template::show($player, 'live-rankings.widget');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        Template::show($player, 'live-rankings.widget');
     }
 }

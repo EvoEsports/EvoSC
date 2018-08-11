@@ -45,8 +45,6 @@ class Dedimania extends DedimaniaApi
         ChatController::addCommand('dedicps', [Dedimania::class, 'printDediCps'], 'SPrints cps for given dedi to chat');
 
         Timer::create('dedimania.players.update', [Dedimania::class, 'reportConnectedPlayersToDedimania'], '4m');
-
-        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reportConnectedPlayersToDedimania()

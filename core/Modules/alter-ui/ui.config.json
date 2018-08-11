@@ -1,11 +1,8 @@
 {
   "playerlist": {
-    "pos": {
-      "visible": "120 71",
-      "hidden": "170 71"
-    },
-    "rows": 13,
-    "scale": 0.8
+    "pos": "120 71.5",
+    "rows": 14,
+    "scale": 1.0
   },
 
 

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Liverankings" id="Liverankings" version="3">
+    <framemodel id="record">
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.4" text="78."/>
+        <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.4" text="0:00.000" textcolor="eee"/>
+        <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
+        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('ui.playerlist.pos')}" size="40 60" scale="{config('ui.playerlist.scale')}">
+        <quad class="widget" z-index="-5" size="40 {config('ui.playerlist.rows') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.6" ScriptEvents="1"/>
+        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.9"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking"/>
+
+        <frame id="ranking-frame" pos="1 -7">
+            <frame id="ranking">
+                {for $i=0; $i<500; $i++}
+                <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text[Text][] Rankings;
+
+    Text formatScoreCorrect(Integer scoreIn){
+        declare Text secondString;
+        declare Text msString;
+        declare Text sign = "";
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            sign = "-";
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        return sign ^ minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateSlot(CMlFrame rankingFrame, Text[Text] ranking){
+        declare slot = TL::ToInteger(ranking["slot"]);
+        declare frame = (rankingFrame.Controls[slot] as CMlFrame);
+
+        (frame.Controls[0] as CMlLabel).SetText(ranking["pos"] ^ ".");
+        (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(TL::ToInteger(ranking["score"])));
+        (frame.Controls[2] as CMlLabel).SetText(ranking["name"]);
+
+        declare rankingPos = TL::ToInteger(ranking["pos"]);
+        declare newPos = """ <frame pos="0 """ ^ ((rankingPos - 1) * -3) ^ """ " /> """;
+
+        AnimMgr.Add(frame, newPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        frame.Show();
+    }
+
+    Void updateSlotTexts(){
+        declare CMlFrame rankingFrame <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+
+        foreach(ranking in Rankings){
+            updateSlot(rankingFrame, ranking);
+        }
+    }
+
+    Void hideAll(CMlFrame ranking){
+        foreach(control in ranking.Controls){
+            control.Hide();
+        }
+    }
+
+    Integer getPlayerSlot(Text[Text][] rankings, Text playerName){
+        foreach(ranking in rankings){
+            if(ranking["name"] == playerName){
+                return TL::ToInteger(ranking["slot"]);
+            }
+        }
+
+        return -1;
+    }
+
+    Text[Text][] arraySort(Text[Text][] array, Text key){
+        declare Text[Integer] SortedColumn;
+
+        foreach (I => Data in array) {
+            SortedColumn[I] = Data[key];
+        }
+
+        SortedColumn = SortedColumn.sort();
+        declare Text[Text][] SortedArray;
+
+        foreach (I => Data in SortedColumn) {
+            SortedArray.add(array[I]);
+        }
+
+        return SortedArray;
+    }
+
+    Void assignRank(){
+        declare sortedRankings = arraySort(Rankings, "score");
+        declare Integer c = 1;
+
+        for(i, 0, sortedRankings.count - 1){
+            sortedRankings[i]["pos"] = TL::ToText(c);
+            c = c + 1;
+        }
+
+        Rankings = sortedRankings;
+    }
+
+    main(){
+        //Widget declarations
+        declare Text currentMapUid = "";
+        declare Integer slot = 0;
+        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+
+        ranking.ClipWindowActive = True;
+        ranking.ClipWindowRelativePosition = <20.0, -{sprintf('%.f', config('ui.playerlist.rows') * 3/2 - 1)|noescape}>;
+        ranking.ClipWindowSize = <39.0, {config('ui.playerlist.rows') * 3}.0>;
+
+        //Hide script declarations
+        declare Boolean hidden = False;
+        declare Real width = widget.Size[0];
+
+        declare Vec2 vecVisible = widget.RelativePosition_V3;
+        declare Vec2 vecHidden = widget.RelativePosition_V3;
+
+        if(vecVisible[0] < 0.0){
+            vecHidden[0] = vecVisible[0] - width;
+        }else{
+            vecHidden[0] = vecVisible[0] + width;
+        }
+
+        declare Text visiblePos = """ <frame pos=" """ ^ vecVisible[0] ^ " " ^ vecVisible[1] ^ """ " /> """;
+        declare Text hiddenPos = """ <frame pos=" """ ^ vecHidden[0] ^ " " ^ vecHidden[1] ^ """ " /> """;
+
+        while(True){
+            yield;
+
+            if(Map.MapInfo.MapUid != currentMapUid){
+                //Map changed
+                currentMapUid = Map.MapInfo.MapUid;
+
+                //Reset fields
+                Rankings = Text[Text][];
+                hideAll(ranking);
+                slot = 0;
+
+                //Add existing scores
+                foreach(score in Scores){
+                    if(score.BestLap.Time != -1){
+                        Rankings.add([
+                            "slot" => TL::ToText(slot),
+                            "name" => score.User.Name,
+                            "score" => TL::ToText(score.BestLap.Time),
+                            "pos" => "0"
+                        ]);
+
+                        assignRank();
+                        updateSlot(ranking, Rankings[slot]);
+
+                        slot = slot + 1;
+                    }
+                }
+            }
+
+            wait(InputPlayer != Null);
+
+            declare HideSpeed for InputPlayer = 1.0;
+            declare speed = ML::Abs(InputPlayer.Speed);
+
+            if(speed >= HideSpeed && !hidden){
+                hidden = True;
+                AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+
+            if(speed < HideSpeed && hidden){
+                hidden = False;
+                AnimMgr.Add(widget, visiblePos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+
+            foreach(event in RaceEvents){
+                if(event.Type == CTmRaceClientEvent::EType::WayPoint && event.IsEndLap){
+
+                    //Player finished lap
+                    declare playerSlot = getPlayerSlot(Rankings, event.Player.User.Name);
+                    if(playerSlot != -1){
+                        Rankings[playerSlot]["score"] = TL::ToText(event.LapTime);
+                        assignRank();
+                        updateSlot(ranking, Rankings[playerSlot]);
+                    }else{
+                        Rankings.add([
+                            "slot" => TL::ToText(slot),
+                            "name" => event.Player.User.Name,
+                            "score" => TL::ToText(event.LapTime),
+                            "pos" => "0"
+                        ]);
+
+                        assignRank();
+                        updateSlot(ranking, Rankings[slot]);
+
+                        slot = slot + 1;
+                    }
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>
