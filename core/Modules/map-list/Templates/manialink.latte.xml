@@ -70,6 +70,9 @@
                     <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
                     {/for}
                 </frame>
+
+                <label pos="135 -80.4" halign="right" textsize="0.9" text="Search:" />
+                <entry id="searchInput" pos="156 -80" size="20 3.5" halign="right" style="TextValueSmall" name="searchQuery" default="" textsize="1.2" />
             </frame>
 
             <frame data-tab="1" id="mx" hidden="1">
@@ -147,6 +150,29 @@ Text getContainerTarget(Integer page){
     declare pos = page * 80.0;
     declare target = "<frame pos='0 " ^ pos ^ "' />";
     return target;
+}
+
+Void goToPage(Integer pagePO){
+    declare page = pagePO - 1;
+    declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
+    declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    AnimMgr.Add(mapList, getContainerTarget(page), 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+    AnimMgr.Add(paginationBox, "<quad pos='" ^ (page * 4 + 2) ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+}
+
+Void enablePages(Integer totalItemsCount){
+    declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
+    declare CMlFrame pagination = (paginationBox.Parent as CMlFrame);
+    declare Integer pagesEnabled = totalItemsCount / 20;
+
+    for(i, 1, 5){
+        (pagination.Controls[i] as CMlLabel).Hide();
+    }
+    for(i, 1, pagesEnabled + 1){
+        (pagination.Controls[i] as CMlLabel).Show();
+    }
+
+    goToPage(1);
 }
 
 Text[][] arraySort(Text[][] array, Integer column){
@@ -238,6 +264,21 @@ Void populate(Text[][] maps){
         declare mapFrame = (mapList.Controls[i] as CMlFrame);
         updateMapText(mapFrame, map, i);
     }
+
+    enablePages(maps.count);
+}
+
+Void search(Text query){
+    declare Text[][] foundMaps;
+
+    foreach(map in maps){
+        log(map);
+        if(TL::Find(query, map[0] ^ map[1] ^ map[2], False, False)){
+            foundMaps.add(map);
+        }
+    }
+
+    populate(foundMaps);
 }
 
 Void navButtonClick(CMlQuad button){
@@ -344,6 +385,7 @@ main() {
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
+    declare searchInput <=> (Page.MainFrame.GetFirstChild("searchInput") as CMlEntry);
 
     //hidescript declarations
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
@@ -363,6 +405,8 @@ main() {
     mapListContainer.ClipWindowSize = <156.0, 80.0>;
 
     activeTab = 0;
+
+    declare Text lastMapSearchQueryHash = "";
 
     while(True){
         yield;
@@ -406,6 +450,16 @@ main() {
                 lastMapChangeHash = CurrentMapHash;
             }
 
+            //search command
+            declare Text MapSearchQueryHash for InputPlayer;
+            declare Text MapSearchQuery for InputPlayer;
+
+            if(lastMapSearchQueryHash != MapSearchQueryHash){
+                lastMapSearchQueryHash = MapSearchQueryHash;
+                mapsContainer.Show();
+                searchInput.SetText(MapSearchQuery, True);
+            }
+
             foreach(event in PendingEvents){
                 if(event.Control == Null){
                     continue;
@@ -414,6 +468,11 @@ main() {
                 if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
                     navButtonClick(((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad));
                     mapsContainer.Show();
+                    continue;
+                }
+
+                if(event.Control == searchInput){
+                    search(searchInput.Value);
                     continue;
                 }
 
@@ -513,9 +572,7 @@ main() {
                 }
 
                 if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare page = TL::ToInteger((event.Control as CMlLabel).Value) - 1;
-                    AnimMgr.Add(mapList, getContainerTarget(page), 400, CAnimManager::EAnimManagerEasing::CubicInOut);
-                    AnimMgr.Add(paginationBox, "<quad pos='" ^ event.Control.RelativePosition_V3[0] ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+                    goToPage(TL::ToInteger((event.Control as CMlLabel).Value));
                     continue;
                 }
             }

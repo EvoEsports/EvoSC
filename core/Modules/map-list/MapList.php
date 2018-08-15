@@ -32,6 +32,8 @@ class MapList
         Hook::add('BeginMap', [MapList::class, 'beginMap']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
 
+        ChatController::addCommand('list', [self::class, 'searchMap'], 'Search maps or open maplist');
+
         KeyController::createBind('X', [MapList::class, 'reload']);;
     }
 
@@ -49,6 +51,11 @@ class MapList
     {
         TemplateController::loadTemplates();
         self::sendManialink($player);
+    }
+
+    public static function searchMap(Player $player, $cmd, $query = "")
+    {
+        Template::show($player, 'map-list.update-search-query', compact('query'));
     }
 
     /**
@@ -190,8 +197,7 @@ class MapList
             $favorite = $favorites->get($map->id) ? 1 : 0;
             $mapName  = $map->gbx->Name;
 
-            $search = strtolower(stripAll($mapName) . $authorNick . $authorLogin);
-            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $search);
+            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite);
         })->implode("\n,");
 
         return sprintf('[%s]', $maps);
