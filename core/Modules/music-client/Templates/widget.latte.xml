@@ -10,9 +10,15 @@
             <quad id="show" pos="0 0" size="50 10" ScriptEvents="1" />
             <quad id="window" size="40 10" z-index="-5" ScriptEvents="1" />
 
-            <frame id="content" pos="0 0">
-                <label id="title" pos="38 -2.5" z-index="1" size="36 3" text="Loading" halign="right" textcolor="fffe" textsize="1.3"/>
-                <label id="artist" pos="38 -6.5" z-index="1" size="36 3" text="music..." halign="right" textcolor="fffc" textsize="0.4"/>
+            <frame id="content" pos="38 -2.5">
+                <label id="title" pos="0 0" z-index="1" size="36 3" text="Loading" halign="right" textcolor="fffe" textsize="1.3"/>
+                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="music..." halign="right" textcolor="fffc" textsize="0.4"/>
+            </frame>
+
+            <frame id="widget-controls" pos="0 0" z-index="10" hidden="1">
+                <quad class="music-control" size="40 10" bgcolor="{background_color()|noescape}c" />
+                <label class="music-control" pos="5 -5" textsize="4" size="0 0" text="" z-index="9" halign="center" valign="center" />
+                <label class="music-control" pos="15 -5" textsize="4" size="0 0" text="" z-index="9" halign="center" valign="center" />
             </frame>
         </frame>
     </frame>
@@ -355,6 +361,7 @@ main() {
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
     declare sortByArtist <=> (Page.MainFrame.GetFirstChild("sort-by-artist") as CMlQuad);
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);
     declare CMlFrame songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
     declare CMlFrame songListContainer <=> (Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame);
     declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
@@ -421,6 +428,22 @@ main() {
             foreach(event in PendingEvents){
                 if(event.Control == Null){
                     continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOver && (event.Control == show || event.Control.HasClass("music-control"))){
+                    widgetControls.Show();
+                }
+
+                log(event.Type);
+                if(event.Control.HasClass("music-control") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    log("click");
+                }
+                if(event.Control.HasClass("music-control") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    log("click");
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOut && (event.Control == show || event.Control.HasClass("music-control"))){
+                    widgetControls.Hide();
                 }
 
                 if(event.Control == search){

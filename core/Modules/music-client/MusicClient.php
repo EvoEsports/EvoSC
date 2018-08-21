@@ -16,6 +16,8 @@ class MusicClient
     public function __construct()
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
+
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     /**
@@ -25,5 +27,11 @@ class MusicClient
     public static function playerConnect(Player $player)
     {
         Template::show($player, 'music-client.widget');
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::playerConnect($player);
     }
 }

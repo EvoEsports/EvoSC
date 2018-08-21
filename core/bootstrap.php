@@ -56,6 +56,8 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
     esc\Controllers\ModuleController::init();
     \esc\Controllers\HideScriptController::init();
     \esc\Controllers\PlanetsController::init();
+
+    \esc\Modules\MatchSettingsManager::init();
 }
 
 function bootModules()

@@ -47,8 +47,14 @@ class File
         }
     }
 
-    public static function getDirectoryContents(string $path): Collection
+    public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
+        if ($filterPattern) {
+            return collect(scandir($path))->filter(function ($file) use ($filterPattern) {
+                return preg_match($filterPattern, $file);
+            });
+        }
+
         return collect(scandir($path));
     }
 
