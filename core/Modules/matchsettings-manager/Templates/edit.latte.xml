@@ -2,13 +2,15 @@
 <manialink name="ESC:MatchSettingsManager" id="MatchSettingsManager" version="3">
 
     <frame id="window" pos="-80 60">
-        <quad size="160 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
-        <quad size="160 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
-        <label pos="2 -3" valign="center" textsize="1" text="MatchSettings-Manager - Edit: {$matchSettingsFile}.txt" z-index="1" />
+        <quad size="160 120" pos="0 0" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="160 12" bgcolor="{config('colors.ui.header')}" opacity="0.7" z-index="0" />
+        <quad size="160 0.5" pos="0 -12" bgcolor="{config('colors.ui.header')}" opacity="1" z-index="1" />
+        <label pos="2 -3" valign="center" textsize="1.4" text="$sMatchSettings-Manager - Edit: {$matchSettingsFile}.txt" z-index="1" />
         <label class="close" pos="157 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
 
-        <frame pos="0 -9" z-index="2">
-            <label pos="15 0" size="26 4" textsize="0.5" text="ModeScript-Settings" valign="center" halign="center" ScriptEvents="1" focusareacolor1="333f" focusareacolor2="{config('colors.ui.header')}c" />
+        <frame pos="0 -9.5" z-index="2">
+            <label pos="15 0" size="28 5" textsize="0.5" text="ModeScript-Settings" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}f" focusareacolor2="{config('colors.ui.header')}f" />
+            <label pos="35 0" size="10 5" textsize="0.5" text="Maps" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
         </frame>
 
         <frame id="mode-script-settings" pos="2 -14" z-index="5">
@@ -19,10 +21,10 @@
                 <entry default="{$setting['type']}" hidden="1" />
                 <label pos="0 0"  size="60 4" valign="center" textsize="1.0" scale="0.8" text="{$setting['name']}" />
 
-                {if $iterator->counter % 2 == $col}
-                <quad pos="-2 0" size="80 6" bgcolor="222" opacity="0.9" valign="center" z-index="-1" />
+                {if $iterator->counter % 2 != 0}
+                <quad pos="-2 0" size="80 6" bgcolor="222" opacity="0.8" valign="center" z-index="-1" />
                 {else}
-                <quad pos="-2 0" size="80 6" bgcolor="333" opacity="0.9" valign="center" z-index="-1" />
+                <quad pos="-2 0" size="80 6" bgcolor="333" opacity="0.8" valign="center" z-index="-1" />
                 {/if}
 
                 {if $setting['type'] == 'real' || $setting['type'] == 'text'}
@@ -105,7 +107,7 @@
         xmlRef = {$xmlRef};
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
 
-        windowSetSize(window, 160.0, {count($xml->mode_script_settings->setting) * 3 + (count($xml->mode_script_settings->setting)%2!=0 ? 3 : 0) + 6.5});
+        windowSetSize(window, 160.0, {count($xml->mode_script_settings->setting) * 3 + (count($xml->mode_script_settings->setting)%2!=0 ? 3 : 0) + 12.5});
 
         while(True){
             yield;

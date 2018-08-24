@@ -4,7 +4,6 @@ namespace esc\Classes;
 
 
 use esc\Models\Player;
-use esc\Modules\MatchSettingsManager;
 
 class MatchSettings extends \SimpleXMLElement
 {
@@ -12,7 +11,8 @@ class MatchSettings extends \SimpleXMLElement
     public $id;
 
     private static $actions = [
-        'mss' => [self::class, 'updateModeScriptSettings']
+        'mss' => [self::class, 'updateModeScriptSettings'],
+        'map' => [self::class, 'updateMap'],
     ];
 
     public function handle(Player $player, string ...$cmd)
@@ -26,7 +26,7 @@ class MatchSettings extends \SimpleXMLElement
         }
     }
 
-    public function updateModeScriptSettings(Player $player, $name, $type, $value)
+    public function updateModeScriptSettings(Player $player, string $name, string $type, string $value)
     {
         foreach ($this->mode_script_settings->setting as $element) {
             if ($element['name'] == $name) {
@@ -37,5 +37,10 @@ class MatchSettings extends \SimpleXMLElement
         //Update file
         $file = config('server.base') . '/UserData/Maps/MatchSettings/' . $this->filename;
         $this->saveXML($file);
+    }
+
+    public function updateMap(Player $player, string $mapUid, string $enabledString)
+    {
+        $enabled = $enabledString == '1';
     }
 }
