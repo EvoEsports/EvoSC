@@ -6,6 +6,7 @@ namespace esc\Modules;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\MatchSettings;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
@@ -18,10 +19,12 @@ use Illuminate\Support\Collection;
 class MatchSettingsManager
 {
     private static $path;
+    private static $objects;
 
     public static function init()
     {
         self::$path = config('server.base') . '/UserData/Maps/MatchSettings/';
+        self::$objects = collect();
 
         ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
 
@@ -30,6 +33,8 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings']);
         ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
         ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview']);
+        ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings']);
+        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings']);
 
         KeyController::createBind('Y', [self::class, 'reload']);
     }
@@ -63,9 +68,41 @@ class MatchSettingsManager
     public static function editMatchSettings(Player $player, string $matchSettingsFile)
     {
         $content = File::get(self::$path . $matchSettingsFile . '.txt');
-        $xml = new \SimpleXMLElement($content);
+        $xml = new MatchSettings($content);
+        $xml->filename = $matchSettingsFile . '.txt';
+        $xmlRef = uniqid();
+        $xml->id = $xmlRef;
 
-        Template::show($player, 'matchsettings-manager.edit', compact('xml', 'matchSettingsFile'));
+        self::$objects->put($xmlRef, $xml);
+
+        if (!$xmlRef) {
+            Log::logAddLine('MatchSettingsManager', 'Failed to get reference for xml object');
+            return;
+        }
+
+        $modeScriptSettings = collect();
+        foreach ($xml->mode_script_settings->setting as $setting) {
+            $modeScriptSettings->push([
+                'name' => $setting['name'] . "",
+                'value' => $setting['value'] . "",
+                'type' => $setting['type'] . "",
+            ]);
+        }
+
+        $modeScriptSettings = $modeScriptSettings->sortBy('type', SORT_REGULAR, SORT_DESC)->split(2);
+
+        Template::show($player, 'matchsettings-manager.edit', compact('xml', 'matchSettingsFile', 'modeScriptSettings', 'xmlRef'));
+    }
+
+    public static function getXmlObject(string $reference): MatchSettings
+    {
+        return self::$objects->get($reference);
+    }
+
+    public static function updateMatchSettings(Player $player, string $reference, string ...$cmd)
+    {
+        $matchSettings = self::getXmlObject($reference);
+        $matchSettings->handle($player, ...$cmd);
     }
 
     public static function deleteMatchSetting(Player $player, string $matchSettingsFile)
