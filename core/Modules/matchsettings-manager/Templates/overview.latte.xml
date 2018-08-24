@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MatchSettingsManager:Overview" id="MSM_Overview" version="3">
+<manialink name="ESC:MatchSettingsManager" id="MatchSettingsManager" version="3">
 
     <frame id="overview" pos="-45 25">
         <quad size="90 {$settings->count() * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
@@ -103,6 +103,11 @@
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("load")){
                     declare settingsFile = event.Control.Parent.DataAttributeGet("setting");
                     TriggerPageAction("msm.load," ^ settingsFile);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit")){
+                    declare settingsFile = event.Control.Parent.DataAttributeGet("setting");
+                    TriggerPageAction("msm.edit," ^ settingsFile);
                 }
             }
         }

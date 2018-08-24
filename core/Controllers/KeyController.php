@@ -3,11 +3,11 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Exceptions\InvalidCallbackException;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -24,6 +24,10 @@ class KeyController
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
     }
 
+    /**
+     * @param string $key
+     * @param $callback
+     */
     public static function createBind(string $key, array $callback)
     {
         $bind = collect([]);

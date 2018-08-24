@@ -28,8 +28,17 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting']);
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings']);
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings']);
+        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
+        ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview']);
 
-        KeyController::createBind('Y', [self::class, 'showMatchSettingsOverview']);
+        KeyController::createBind('Y', [self::class, 'reload']);
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        $settings = preg_replace('/\.txt$/', '', MatchSettingsManager::getMatchSettings()->first());
+        MatchSettingsManager::editMatchSettings($player, $settings);
     }
 
     public static function showMatchSettingsOverview(Player $player)
@@ -51,6 +60,14 @@ class MatchSettingsManager
         return $files;
     }
 
+    public static function editMatchSettings(Player $player, string $matchSettingsFile)
+    {
+        $content = File::get(self::$path . $matchSettingsFile . '.txt');
+        $xml = new \SimpleXMLElement($content);
+
+        Template::show($player, 'matchsettings-manager.edit', compact('xml', 'matchSettingsFile'));
+    }
+
     public static function deleteMatchSetting(Player $player, string $matchSettingsFile)
     {
         $file = self::$path . $matchSettingsFile . '.txt';
@@ -69,7 +86,6 @@ class MatchSettingsManager
         onlinePlayers()->each([MapList::class, 'sendManialink']);
 
         ChatController::messageAll($player->group, ' ', $player->NickName, ' loads new settings ', secondary($matchSettingsFile));
-
         Log::logAddLine('MatchSettingsManager', "$player loads MatchSettings: $matchSettingsFile");
     }
 
@@ -77,20 +93,24 @@ class MatchSettingsManager
     {
         $files = self::getMatchSettings();
 
-        $file = $files->map(function (string $file) use ($name) {
+        //check for existing copy
+        $copyName = $files->map(function (string $file) use ($name) {
             if (preg_match("/$name - Copy \((\d+)\)/", $file, $matches)) {
                 return $name . ' - Copy (' . (intval($matches[1]) + 1) . ')';
             }
         })->filter()->last();
 
-        if (!$file) {
-            $file = $name . ' - Copy (1)';
+        if (!$copyName) {
+            //no existing copy, create first
+            $copyName = $name . ' - Copy (1)';
         }
 
         $originalFile = self::$path . $name . '.txt';
-        File::put(self::$path . $file . '.txt', File::get($originalFile));
+        File::put(self::$path . $copyName . '.txt', File::get($originalFile));
+
+        //update the manialink
         self::showMatchSettingsOverview($player);
 
-        Log::logAddLine('MatchSettingsManager', "$player duplicated MatchSettingsFile: $matchSettingsFile");
+        Log::logAddLine('MatchSettingsManager', "$player duplicated MatchSettingsFile: $name.txt");
     }
 }
