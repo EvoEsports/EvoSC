@@ -7,6 +7,8 @@ use esc\Classes\File;
 use esc\Classes\MatchSettings;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -14,11 +16,14 @@ class MatchSettingsManager
 {
     public static function init()
     {
-        ChatController::addCommand('matchsettings', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
+        ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
+
+        KeyController::createBind('Y', [self::class, 'showMatchSettingsOverview']);
     }
 
     public static function showMatchSettingsOverview(Player $player)
     {
+        TemplateController::loadTemplates();
         $settings = self::getMatchSettings();
 
         Template::show($player, 'matchsettings-manager.overview', compact('settings'));
