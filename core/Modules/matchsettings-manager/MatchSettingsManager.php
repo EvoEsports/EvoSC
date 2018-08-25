@@ -11,7 +11,6 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
-use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -174,7 +173,6 @@ class MatchSettingsManager
         $ms = self::getMatchSettingsObject($reference);
 
         $enabledMaps = collect();
-
         foreach ($ms->xml->map as $map) {
             $enabledMaps->push("$map->ident");
         }
@@ -252,8 +250,18 @@ class MatchSettingsManager
         $file = 'MatchSettings/' . $matchSettingsFile . '.txt';
         Server::loadMatchSettings($file);
 
-        //Reload maps (set enabled/disabled)
-        MapController::loadMaps();
+        $xml = new \SimpleXMLElement(File::get(config('server.base') . '/UserData/Maps/' . $file));
+        $enabledMaps = collect();
+        foreach ($xml->map as $map) {
+            $enabledMaps->push("$map->ident");
+        }
+
+        Map::whereNotNull('uid')->update([
+            'enabled' => 0
+        ]);
+        Map::whereIn('uid', $enabledMaps)->update([
+            'enabled' => 1
+        ]);
 
         //Update maps
         onlinePlayers()->each([MapList::class, 'sendManialink']);

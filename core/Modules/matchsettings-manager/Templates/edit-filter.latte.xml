@@ -50,6 +50,7 @@
                 //close clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
                     window.Hide();
+                    TriggerPageAction("msm.overview");
                     continue;
                 }
 

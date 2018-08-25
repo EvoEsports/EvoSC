@@ -108,6 +108,7 @@
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit")){
                     declare settingsFile = event.Control.Parent.DataAttributeGet("setting");
                     TriggerPageAction("msm.edit," ^ settingsFile);
+                    overview.Hide();
                 }
             }
         }

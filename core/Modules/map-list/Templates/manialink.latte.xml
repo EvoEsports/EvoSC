@@ -66,7 +66,7 @@
                 <frame pos="0 -81" z-index="2">
                     <quad id="pagination-box" pos="2 0" size="3.5 3.5" bgcolor="{primary_color()|noescape}" valign="center" halign="center" z-index="-1" />
 
-                    {for $i = 0; $i < ceil(esc\Modules\MapList\MapList::getMapsCount() / 20); $i++}
+                    {for $i = 0; $i < 5/*ceil(esc\Modules\MapList\MapList::getMapsCount() / 20)*/; $i++}
                     <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
                     {/for}
                 </frame>
