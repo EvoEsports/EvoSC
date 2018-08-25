@@ -11,7 +11,6 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
-use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -39,11 +38,18 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
         ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings']);
         ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps']);
+        ManiaLinkEvent::add('msm.edit_gameinfo', [self::class, 'editGameInfo']);
+        ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter']);
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings']);
 
         KeyController::createBind('Y', [self::class, 'reload']);
     }
 
+    /**
+     * Debug: reload
+     *
+     * @param Player $player
+     */
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
@@ -51,6 +57,11 @@ class MatchSettingsManager
         MatchSettingsManager::editMatchSettings($player, $settings);
     }
 
+    /**
+     * Show the match settings overview window
+     *
+     * @param Player $player
+     */
     public static function showMatchSettingsOverview(Player $player)
     {
         TemplateController::loadTemplates();
@@ -62,6 +73,11 @@ class MatchSettingsManager
         Template::show($player, 'matchsettings-manager.overview', compact('settings'));
     }
 
+    /**
+     * Get all match settings files
+     *
+     * @return Collection
+     */
     public static function getMatchSettings(): Collection
     {
         $path = config('server.base') . '/UserData/Maps/MatchSettings/';
@@ -70,6 +86,12 @@ class MatchSettingsManager
         return $files;
     }
 
+    /**
+     * Creates MatchSettings instance and opens editor window
+     *
+     * @param Player $player
+     * @param string $matchSettingsFile
+     */
     public static function editMatchSettings(Player $player, string $matchSettingsFile)
     {
         $content = File::get(self::$path . $matchSettingsFile . '.txt');
@@ -77,12 +99,18 @@ class MatchSettingsManager
         $ms = new MatchSettings($xml, uniqid(), $matchSettingsFile . '.txt');
 
         self::$objects->push($ms);
-        self::editMaps($player, $ms->id);
+        self::editGameInfo($player, $ms->id);
     }
 
+    /**
+     * Show edit mode script settings window
+     *
+     * @param Player $player
+     * @param string $reference
+     */
     public static function editModeScriptSettings(Player $player, string $reference)
     {
-        $ms = self::getXmlObject($reference);
+        $ms = self::getMatchSettingsObject($reference);
 
         $modeScriptSettings = collect();
         foreach ($ms->xml->mode_script_settings->setting as $setting) {
@@ -98,9 +126,41 @@ class MatchSettingsManager
         Template::show($player, 'matchsettings-manager.edit-modescript-settings', compact('ms', 'modeScriptSettings'));
     }
 
+    /**
+     * Show edit game info window
+     *
+     * @param Player $player
+     * @param string $reference
+     */
+    public static function editGameInfo(Player $player, string $reference)
+    {
+        $ms = self::getMatchSettingsObject($reference);
+
+        Template::show($player, 'matchsettings-manager.edit-gameinfo', compact('ms'));
+    }
+
+    /**
+     * Show edit filter window
+     *
+     * @param Player $player
+     * @param string $reference
+     */
+    public static function editFilter(Player $player, string $reference)
+    {
+        $ms = self::getMatchSettingsObject($reference);
+
+        Template::show($player, 'matchsettings-manager.edit-filter', compact('ms'));
+    }
+
+    /**
+     * Show edit enabled maps window
+     *
+     * @param Player $player
+     * @param string $reference
+     */
     public static function editMaps(Player $player, string $reference)
     {
-        $ms = self::getXmlObject($reference);
+        $ms = self::getMatchSettingsObject($reference);
 
         $enabledMaps = collect();
 
@@ -131,17 +191,36 @@ class MatchSettingsManager
         Template::show($player, 'matchsettings-manager.edit-maps', compact('ms', 'maps', 'mapsArray'));
     }
 
-    public static function getXmlObject(string $reference): MatchSettings
+    /**
+     * Returns MatchSettings instance by reference
+     *
+     * @param string $reference
+     * @return MatchSettings
+     */
+    public static function getMatchSettingsObject(string $reference): MatchSettings
     {
         return self::$objects->where('id', $reference)->first();
     }
 
+    /**
+     * Route update value request to MatchSettings
+     *
+     * @param Player $player
+     * @param string $reference
+     * @param string ...$cmd
+     */
     public static function updateMatchSettings(Player $player, string $reference, string ...$cmd)
     {
-        $matchSettings = self::getXmlObject($reference);
+        $matchSettings = self::getMatchSettingsObject($reference);
         $matchSettings->handle($player, ...$cmd);
     }
 
+    /**
+     * Delete match settings file
+     *
+     * @param Player $player
+     * @param string $matchSettingsFile
+     */
     public static function deleteMatchSetting(Player $player, string $matchSettingsFile)
     {
         $file = self::$path . $matchSettingsFile . '.txt';
@@ -151,6 +230,12 @@ class MatchSettingsManager
         Log::logAddLine('MatchSettingsManager', "$player deleted MatchSettingsFile: $matchSettingsFile");
     }
 
+    /**
+     * Load match settings into server
+     *
+     * @param Player $player
+     * @param string $matchSettingsFile
+     */
     public static function loadMatchSettings(Player $player, string $matchSettingsFile)
     {
         $file = 'MatchSettings/' . $matchSettingsFile . '.txt';
@@ -163,6 +248,12 @@ class MatchSettingsManager
         Log::logAddLine('MatchSettingsManager', "$player loads MatchSettings: $matchSettingsFile");
     }
 
+    /**
+     * Duplicate match settings file
+     *
+     * @param Player $player
+     * @param string $name
+     */
     public static function duplicateMatchSettings(Player $player, string $name)
     {
         $files = self::getMatchSettings();

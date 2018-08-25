@@ -38,9 +38,9 @@ class ManiaLinkEvent
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 
-        $event = new ManiaLinkEvent($id, $callback, $access);
+        $event = new ManiaLinkEvent(strtolower($id), $callback, $access);
 
-        $existingEvents = $maniaLinkEvents->where('id', $id);
+        $existingEvents = $maniaLinkEvents->where('id', strtolower($id));
         if ($existingEvents->isNotEmpty()) {
             self::$maniaLinkEvents = self::$maniaLinkEvents->diff($existingEvents);
         }
