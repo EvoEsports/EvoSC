@@ -11,6 +11,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -250,6 +251,9 @@ class MatchSettingsManager
     {
         $file = 'MatchSettings/' . $matchSettingsFile . '.txt';
         Server::loadMatchSettings($file);
+
+        //Reload maps (set enabled/disabled)
+        MapController::loadMaps();
 
         //Update maps
         onlinePlayers()->each([MapList::class, 'sendManialink']);

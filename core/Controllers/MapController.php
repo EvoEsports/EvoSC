@@ -271,7 +271,7 @@ class MapController
     /**
      * Loads maps from server directory
      */
-    private static function loadMaps()
+    public static function loadMaps()
     {
         Log::logAddLine('MapController', 'Loading maps...');
 
