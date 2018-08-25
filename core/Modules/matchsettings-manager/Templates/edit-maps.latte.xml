@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MSM:Maps" id="MSM:Maps" version="3">
+    <frame id="window" pos="-80 60">
+        <quad size="160 120" pos="0 0" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="160 12" bgcolor="{config('colors.ui.header')}" opacity="0.7" z-index="0" />
+        <quad size="160 0.5" pos="0 -12" bgcolor="{config('colors.ui.header')}" opacity="1" z-index="1" />
+        <label pos="2 -3" valign="center" textsize="1.4" text="$sMatchSettings-Manager - Edit: {$ms->filename}" z-index="1" />
+        <label class="close" pos="157 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+
+        <frame pos="0 -9.5" z-index="2">
+            <label class="mss" pos="15 0" size="28 5" textsize="0.5" text="ModeScript-Settings" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
+            <label pos="35 0" size="10 5" textsize="0.5" text="Maps" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}f" focusareacolor2="{config('colors.ui.header')}f" />
+        </frame>
+
+        <frame pos="0 -12.5" size="180 100" z-index="5">
+            <frame id="maps" pos="0 4">
+                {for $i=1; $i<=$maps->count(); $i++}
+                <frame pos="{($i % 2 == 0) * 80} {($i - ($i % 2 == 0)) * -2.5 - 4}">
+                    <label text="" hidden="1" />
+                    <label pos="2 0"  size="36 4" valign="center" textsize="0.8" text="map_name map_name map_name" z-index="1" />
+                    <label pos="61 0" size="20 4" valign="center" halign="right" textsize="0.9" text="author_login author_login" z-index="1" />
+
+                    <frame pos="70 0" z-index="1" id="switcher_{$i}">
+                        <label pos="-3 0" size="10 4" valign="center" halign="right" textsize="1" scale="0.6" text="OFF" ScriptActions="1" />
+                        <label pos="0 0" size="10 4" valign="center" halign="center" textsize="2" text="" ScriptActions="1" />
+                        <label pos="3 0" size="10 4" valign="center" halign="left" textsize="1" scale="0.6" text="ON" ScriptActions="1" />
+                    </frame>
+
+                    <label class="switch" pos="0 2.5" size="80 5" z-index="-5" focusareacolor1="222c" focusareacolor2="333e" ScriptEvents="1" data-id="{$i}" />
+                </frame>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="pagination" pos="4 -115.5" z-index="5">
+            {for $i=0; $i<ceil($maps->count()/40); $i++}
+            <label class="page" pos="{$i * 5} 0" size="4 4" textsize="1" text="{$i+1}" halign="center" valign="center" ScriptEvents="1" data-page="{$i}" />
+            {/for}
+            <quad pos="0 0" size="4 4" halign="center" valign="center" bgcolor="{config('colors.ui.header')}" opacity="1.0" />
+        </frame>
+
+        <frame id="search" pos="157 -115.5" z-index="5" hidden="0">
+            <label pos="-31" halign="right" valign="center" textsize="1" text="Filter:" />
+            <entry size="30 4" halign="right" valign="center" textsize="0.75" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text xmlRef;
+    declare Text[Text][] maps;
+
+    Void enablePages(Integer count){
+        declare totalPages = {ceil($maps->count()/40)};
+        declare paginationFrame <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
+
+        for(i, 0, totalPages - 1){
+            (paginationFrame.Controls[i] as CMlLabel).Show();
+        }
+        for(i, count, totalPages - 1){
+            (paginationFrame.Controls[i] as CMlLabel).Hide();
+        }
+    }
+
+    Void goToPage(Integer page){
+        declare totalPages = {ceil($maps->count()/40)};
+        declare mapsFrame <=> (Page.MainFrame.GetFirstChild("maps") as CMlFrame);
+        declare paginationFrame <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
+        declare quad = (paginationFrame.Controls[totalPages] as CMlQuad);
+
+        declare targetPos = """ <quad pos=" """ ^ (page * 5.0) ^""" 0.0" /> """;
+        AnimMgr.Add(quad, targetPos, 600, CAnimManager::EAnimManagerEasing::CubicInOut);
+
+        declare scrollPos = """ <frame pos="0 """ ^ (page * 100 + 4) ^ """ " /> """;
+        AnimMgr.Add(mapsFrame, scrollPos, 600, CAnimManager::EAnimManagerEasing::CubicInOut);
+    }
+
+    Void setSwitcherState(CMlControl control, Text state){
+        declare switcherFrame <=> (control as CMlFrame);
+
+        if(state == "1"){
+            (switcherFrame.Controls[1] as CMlLabel).SetText("");
+        }else{
+            (switcherFrame.Controls[1] as CMlLabel).SetText("");
+        }
+    }
+
+    Void handleSwitch(CMlControl control){
+        declare id = control.DataAttributeGet("id");
+        declare mapIdLabel = (control.Parent.Controls[0] as CMlLabel);
+        declare switcherControl = Page.MainFrame.GetFirstChild("switcher_" ^ id);
+        declare switcher = (switcherControl as CMlFrame);
+        declare enabled = (switcher.Controls[1] as CMlLabel).Value == "";
+
+        if(enabled){
+            //disable
+            setSwitcherState(switcherControl, "0");
+            TriggerPageAction("msm.update," ^ xmlRef ^ ",map," ^ mapIdLabel.Value ^ ",0");
+        }else{
+            //enable
+            setSwitcherState(switcherControl, "1");
+            TriggerPageAction("msm.update," ^ xmlRef ^ ",map," ^ mapIdLabel.Value ^ ",1");
+        }
+    }
+
+    Void fill(Text[Text][] maps){
+        declare mapsFrame <=> (Page.MainFrame.GetFirstChild("maps") as CMlFrame);
+
+        declare counter = 0;
+
+        foreach(map in maps){
+            declare frame = (mapsFrame.Controls[counter] as CMlFrame);
+            (frame.Controls[0] as CMlLabel).SetText(map["id"]);
+            (frame.Controls[1] as CMlLabel).SetText(map["name"]);
+            (frame.Controls[2] as CMlLabel).SetText(map["login"]);
+            setSwitcherState(frame.Controls[3], map["enabled"]);
+            counter = counter + 1;
+        }
+    }
+
+    main(){
+        xmlRef = {$ms->id};
+        maps = {$mapsArray|noescape};
+
+        fill(maps);
+        goToPage(0);
+
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                //close clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    window.Hide();
+                    continue;
+                }
+
+                //page button clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("page")){
+                    log(event.Control.RelativePosition_V3);
+                    goToPage(TL::ToInteger(event.Control.DataAttributeGet("page")));
+                    continue;
+                }
+
+                //switch clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("switch")){
+                    handleSwitch(event.Control);
+                    continue;
+                }
+
+                //modescript-settings tab clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("mss")){
+                    TriggerPageAction("msm.edit_mss," ^ xmlRef);
+                    window.Hide();
+                    continue;
+                }
+
+                log(event.Type);
+            }
+        }
+    }
+
+    --></script>
+</manialink>

@@ -374,15 +374,7 @@ class MapController
                 return;
             }
 
-            if (config('database.type') == 'mysql') {
-                $map = Map::where('mx_details->TrackID', $mxId)
-                          ->get()
-                          ->first();
-            } else {
-                $map = Map::all()->filter(function (Map $map) use ($mxId) {
-                    return $map->mx_details->TrackID == $mxId;
-                })->first();
-            }
+            $map = Map::getByMxId($mxId);
 
             if ($map) {
                 ChatController::messageAll($map, ' already exists');

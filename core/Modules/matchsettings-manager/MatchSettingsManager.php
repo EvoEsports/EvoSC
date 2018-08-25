@@ -11,7 +11,9 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\MapList\MapList;
 use Illuminate\Support\Collection;
@@ -31,9 +33,12 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting']);
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings']);
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings']);
-        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
         ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview']);
         ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings']);
+
+        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
+        ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings']);
+        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps']);
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings']);
 
         KeyController::createBind('Y', [self::class, 'reload']);
@@ -68,20 +73,19 @@ class MatchSettingsManager
     public static function editMatchSettings(Player $player, string $matchSettingsFile)
     {
         $content = File::get(self::$path . $matchSettingsFile . '.txt');
-        $xml = new MatchSettings($content);
-        $xml->filename = $matchSettingsFile . '.txt';
-        $xmlRef = uniqid();
-        $xml->id = $xmlRef;
+        $xml = new \SimpleXMLElement($content);
+        $ms = new MatchSettings($xml, uniqid(), $matchSettingsFile . '.txt');
 
-        self::$objects->put($xmlRef, $xml);
+        self::$objects->push($ms);
+        self::editMaps($player, $ms->id);
+    }
 
-        if (!$xmlRef) {
-            Log::logAddLine('MatchSettingsManager', 'Failed to get reference for xml object');
-            return;
-        }
+    public static function editModeScriptSettings(Player $player, string $reference)
+    {
+        $ms = self::getXmlObject($reference);
 
         $modeScriptSettings = collect();
-        foreach ($xml->mode_script_settings->setting as $setting) {
+        foreach ($ms->xml->mode_script_settings->setting as $setting) {
             $modeScriptSettings->push([
                 'name' => $setting['name'] . "",
                 'value' => $setting['value'] . "",
@@ -91,12 +95,45 @@ class MatchSettingsManager
 
         $modeScriptSettings = $modeScriptSettings->sortBy('type', SORT_REGULAR, SORT_DESC)->split(2);
 
-        Template::show($player, 'matchsettings-manager.edit', compact('xml', 'matchSettingsFile', 'modeScriptSettings', 'xmlRef'));
+        Template::show($player, 'matchsettings-manager.edit-modescript-settings', compact('ms', 'modeScriptSettings'));
+    }
+
+    public static function editMaps(Player $player, string $reference)
+    {
+        $ms = self::getXmlObject($reference);
+
+        $enabledMaps = collect();
+
+        foreach ($ms->xml->map as $map) {
+            $enabledMaps->push("$map->ident");
+        }
+
+        //Get currently enabled maps
+        $enabledMaps = Map::whereIn('uid', $enabledMaps)->get();
+
+        //Get currently disabled maps
+        $disabledMaps = Map::all()->diff($enabledMaps);
+
+        //make MS compatible
+        $enabledMaps = $enabledMaps->map(function (Map $map) {
+            return sprintf('["id"=>"%s", "name"=>"%s", "login"=>"%s", "enabled"=>"%d"]', $map->id, $map->gbx->Name, $map->gbx->AuthorLogin, 1);
+        });
+        $disabledMaps = $disabledMaps->map(function (Map $map) {
+            return sprintf('["id"=>"%s", "name"=>"%s", "login"=>"%s", "enabled"=>"%d"]', $map->id, $map->gbx->Name, $map->gbx->AuthorLogin, 0);
+        });
+
+        //Attach disabled at end of enabled maps
+        $maps = $enabledMaps->concat($disabledMaps);
+
+        //Make maniascript array
+        $mapsArray = '[' . $maps->implode(',') . ']';
+
+        Template::show($player, 'matchsettings-manager.edit-maps', compact('ms', 'maps', 'mapsArray'));
     }
 
     public static function getXmlObject(string $reference): MatchSettings
     {
-        return self::$objects->get($reference);
+        return self::$objects->where('id', $reference)->first();
     }
 
     public static function updateMatchSettings(Player $player, string $reference, string ...$cmd)

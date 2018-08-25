@@ -84,4 +84,30 @@ class Map extends Model
     {
         return stripAll($this->gbx->Name);
     }
+
+    public static function getByUid(string $mapUid): ?Map
+    {
+        if (config('database.type') == 'mysql') {
+            return Map::where('gbx->MapUid', $mapUid)
+                ->get()
+                ->first();
+        } else {
+            return Map::all()->filter(function (Map $map) use ($mapUid) {
+                return $map->gbx->MapUid == $mapUid;
+            })->first();
+        }
+    }
+
+    public static function getByMxId(string $mxId): ?Map
+    {
+        if (config('database.type') == 'mysql') {
+            return Map::where('mx_details->TrackID', $mxId)
+                ->get()
+                ->first();
+        } else {
+            return Map::all()->filter(function (Map $map) use ($mxId) {
+                return $map->mx_details->TrackID == $mxId;
+            })->first();
+        }
+    }
 }
