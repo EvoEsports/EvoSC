@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MSM:Maps" id="MSM:Maps" version="3">
+<manialink name="ESC:MSM:Maps" id="MatchSettingsManager:Editor" version="3">
     <frame id="window" pos="-80 60">
         <quad size="160 120" pos="0 0" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
         <quad size="160 12" bgcolor="{config('colors.ui.header')}" opacity="0.7" z-index="0" />
@@ -157,21 +157,18 @@
                 //modescript-settings tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("mss")){
                     TriggerPageAction("msm.edit_mss," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
 
                 //gameinfo tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("gameinfo")){
                     TriggerPageAction("msm.edit_gameinfo," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
 
                 //filter tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("filter")){
                     TriggerPageAction("msm.edit_filter," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
 

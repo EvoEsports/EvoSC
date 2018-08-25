@@ -136,7 +136,12 @@ class MatchSettingsManager
     {
         $ms = self::getMatchSettingsObject($reference);
 
-        Template::show($player, 'matchsettings-manager.edit-gameinfo', compact('ms'));
+        $gameInfos = collect();
+        foreach ($ms->xml->gameinfos->children() as $node) {
+            $gameInfos->put($node->getName(), sprintf("%s", $node));
+        }
+
+        Template::show($player, 'matchsettings-manager.edit-gameinfo', compact('ms', 'gameInfos'));
     }
 
     /**
@@ -149,7 +154,12 @@ class MatchSettingsManager
     {
         $ms = self::getMatchSettingsObject($reference);
 
-        Template::show($player, 'matchsettings-manager.edit-filter', compact('ms'));
+        $filter = collect();
+        foreach ($ms->xml->filter->children() as $node) {
+            $filter->put($node->getName(), sprintf("%s", $node));
+        }
+
+        Template::show($player, 'matchsettings-manager.edit-filter', compact('ms', 'filter'));
     }
 
     /**

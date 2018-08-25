@@ -16,6 +16,8 @@ class MatchSettings
     private static $actions = [
         'mss' => [self::class, 'updateModeScriptSettings'],
         'map' => [self::class, 'updateMap'],
+        'gameinfo' => [self::class, 'updateGameInfo'],
+        'filter' => [self::class, 'updateFilter']
     ];
 
     public function __construct(\SimpleXMLElement $xml, $id, $filename)
@@ -41,6 +43,18 @@ class MatchSettings
         } else {
             Log::logAddLine('MatchSettings', sprintf('Unknown update-action: %s [%s]', $command, implode(', ', $cmd)), true);
         }
+    }
+
+    public function updateGameInfo(Player $player, string $key, string $value)
+    {
+        $this->xml->gameinfos->{$key} = $value;
+        $this->save();
+    }
+
+    public function updateFilter(Player $player, string $key, string $value)
+    {
+        $this->xml->filter->{$key} = $value;
+        $this->save();
     }
 
     public function updateModeScriptSettings(Player $player, string $name, string $type, string $value)

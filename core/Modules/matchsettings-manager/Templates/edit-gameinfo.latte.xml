@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MSM:GameInfo" id="MSM:GameInfo" version="3">
+<manialink name="ESC:MSM:GameInfo" id="MatchSettingsManager:Editor" version="3">
 
     <frame id="window" pos="-80 60">
         <quad size="160 120" pos="0 0" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
@@ -15,7 +15,15 @@
             <label class="maps" pos="65 0" size="10 5" textsize="0.5" text="Maps" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
         </frame>
 
-        <frame id="game-info" pos="2 -14" z-index="5">
+        <frame id="game-info" pos="0 -10" z-index="5">
+            {foreach $gameInfos as $key => $value}
+            <frame pos="0 {$iterator->counter * -5}">
+                <label textsize="1" text="{$key}" valign="center" halign="right" pos="79 0" z-index="1" />
+                <entry class="entry" pos="81 0" size="78 4" valign="center" halign="left" default="{$value}" ScriptEvents="1" textsize="0.8" data-key="{$key}" focusareacolor1="0000" focusareacolor2="0006" />
+
+                <quad pos="0 2.5" size="160 5" bgcolor="{$iterator->counter % 2 == 0 ? '111c' : '222c'}" />
+            </frame>
+            {/foreach}
         </frame>
     </frame>
 
@@ -25,7 +33,10 @@
 
     declare Text xmlRef;
 
-    Void handleInt(CMlControl control){
+    Void handleEntry(CMlControl control){
+        declare entry <=> (control as CMlEntry);
+        declare key = entry.DataAttributeGet("key");
+        TriggerPageAction("msm.update," ^ xmlRef ^ ",gameinfo," ^ key ^ "," ^ entry.Value);
     }
 
     main(){
@@ -36,29 +47,33 @@
             yield;
 
             foreach(event in PendingEvents){
+                //close clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
                     window.Hide();
+                    continue;
+                }
+
+                //entry value changed
+                if(event.Type == CMlScriptEvent::Type::EntrySubmit && event.Control.HasClass("entry")){
+                    handleEntry(event.Control);
                     continue;
                 }
 
                 //modescript-settings tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("mss")){
                     TriggerPageAction("msm.edit_mss," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
 
                 //maps tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("maps")){
                     TriggerPageAction("msm.edit_maps," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
 
                 //filter tab clicked
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("filter")){
                     TriggerPageAction("msm.edit_filter," ^ xmlRef);
-                    window.Hide();
                     continue;
                 }
             }
