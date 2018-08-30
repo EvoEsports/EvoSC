@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+
+    <frame id="overview" pos="-45 25">
+        <quad size="90 {$groups->count() * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager" z-index="1" />
+        <label class="close" pos="87 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+
+        <frame pos="2 -1.5" z-index="2">
+            {foreach $groups as $group}
+            <frame pos="0 {$iterator->counter * -6 - 2}">
+                <label pos="0 -0.5" size="24 4" valign="center" text="{$group->Name}" textsize="1" />
+
+                {if !$group->Protected}
+                <frame pos="61.5 -0.5">
+                    <label class="edit_group" size="12 4" halign="center" valign="center" text=" Edit" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
+                </frame>
+                <label class="delete_group" pos="77 -0.5" size="17 4" halign="center" valign="center" text=" Delete" textsize="0.6" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" />
+                {else}
+                <frame pos="80 -0.5">
+                    <label class="edit_group" size="12 4" halign="center" valign="center" text=" Edit" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
+                </frame>
+                {/if}
+
+                {if $iterator->counter % 2 == 0}
+                <quad pos="-2 2.5" size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.05" z-index="-1" />
+                {else}
+                <quad pos="-2 2.5" size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.12" z-index="-1" />
+                {/if}
+            </frame>
+            {/foreach}
+        </frame>
+
+        <frame pos="0 {$groups->count() * -6 - 6.5}" z-index="5">
+            <label class="create_group" pos="11 -5" valign="center" halign="center" size="18 5" textsize="0.8" text="Create group" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" ScriptEvents="1"/>
+        </frame>
+    </frame>
+
+    <frame id="confirm-dialog" pos="-40 9" z-index="10" hidden="1">
+        <quad size="80 18" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
+
+        <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
+        <label class="cancel" pos="48 -13" z-index="0" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
+    </frame>
+
+    <frame id="input-dialog" pos="-40 11" z-index="10" hidden="1">
+        <quad size="80 22" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
+        <entry pos="40 -11" size="60 4" valign="center" halign="center" textsize="1" />
+
+        <label class="confirm" pos="32 -17" z-index="0" size="15 5" text="Confirm" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
+        <label class="cancel" pos="48 -17" z-index="0" size="15 5" text="Cancel" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    //Open confirm dialog and return decision
+    Boolean confirm(Text question){
+        declare confirmDialogFrame <=> (Page.MainFrame.GetFirstChild("confirm-dialog") as CMlFrame);
+        declare Boolean answer = False;
+        declare Boolean decided = False;
+
+        //show confirm dialog
+        confirmDialogFrame.Show();
+
+        //Set question text
+        (confirmDialogFrame.Controls[2] as CMlLabel).SetText(question);
+
+        while(!decided){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
+                    answer = True;
+                    decided = True;
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+                    decided = True;
+                }
+            }
+        }
+
+        //hide confirm dialog
+        confirmDialogFrame.Hide();
+
+        return answer;
+    }
+
+    //Open input dialog and return decision
+    Text input(Text text){
+        declare inputDialogFrame <=> (Page.MainFrame.GetFirstChild("input-dialog") as CMlFrame);
+        declare Text input = "";
+        declare Boolean decided = False;
+
+        //show confirm dialog
+        inputDialogFrame.Show();
+
+        //Set question text
+        (inputDialogFrame.Controls[2] as CMlLabel).SetText(text);
+
+        while(!decided){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
+                    input = (inputDialogFrame.Controls[3] as CMlEntry).Value;
+                    decided = True;
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+                    decided = True;
+                }
+            }
+        }
+
+        //hide input dialog
+        inputDialogFrame.Hide();
+        (inputDialogFrame.Controls[3] as CMlEntry).SetText("", False);
+
+        return input;
+    }
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    overview.Hide();
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("create_group")){
+                    declare Text input = input("Choose a name for the group");
+
+                    if(input != ""){
+                        TriggerPageAction("group.create," ^ input);
+                    }
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("delete_group")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+
+                    if(confirm("Do you really want to delete this group?")){
+                        TriggerPageAction("group.delete," ^ groupId);
+                    }
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit_group")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.edit," ^ groupId);
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>

@@ -30,7 +30,7 @@ class Group extends Model
 
     public function player()
     {
-        return $this->belongsTo(Player::class, 'id', 'Group');
+        return $this->hasMany(Player::class, 'Group');
     }
 
     public function __toString()

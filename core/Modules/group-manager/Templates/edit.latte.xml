@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:GroupsManagerEditor" id="GroupsManager" version="3">
+
+    <frame id="overview" pos="-45 50">
+        <quad size="90 {$accessRights->count() * 6 + 2}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Edit: {$group->Name}" z-index="1" />
+        <label class="close" pos="87 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+
+        {foreach $accessRights as $right}
+        <frame pos="2 {$iterator->counter * -6 - 4}">
+            <label pos="0.5 0.3" textsize="1" scale="1" text="" valign="center" textcolor="{config('colors.ui.header')}" z-index="1" hidden="{(!$group->hasAccess($right))}" />
+            <label pos="0.5 0.3" textsize="1" scale="1" text="" valign="center" textcolor="{config('colors.ui.background')}"  />
+            <label pos="5 1.5" textsize="1" text="{$right}" valign="center" />
+            <label pos="5 -1" textsize="1" scale="0.7" text="{$right->description}" valign="center" textcolor="aaaf" />
+            <label class="toggle" pos="-2 3" size="90 6" ScriptEvents="1" focusareacolor1="0000" data-id="{$right->id}" />
+        </frame>
+        {/foreach}
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+        declare groupId = {$group->id};
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    TriggerPageAction("group.overview");
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("toggle")){
+                    declare rightId = event.Control.DataAttributeGet("id");
+                    declare checkbox <=> (event.Control.Parent.Controls[0] as CMlLabel);
+
+                    if(checkbox.Visible){
+                        TriggerPageAction("group.deny," ^ groupId ^ "," ^ rightId);
+                        checkbox.Hide();
+                    }else{
+                        TriggerPageAction("group.allow," ^ groupId ^ "," ^ rightId);
+                        checkbox.Show();
+                    }
+
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>

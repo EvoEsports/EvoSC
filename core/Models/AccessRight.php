@@ -10,4 +10,9 @@ class AccessRight extends Model
     protected $table = 'access-rights';
 
     public $timestamps = false;
+
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

@@ -63,7 +63,7 @@ $$: Writes a dollarsign
             return;
         }
 
-        $ply     = collect();
+        $ply = collect();
         $ply->id = $target->id;
 
         self::$mutedPlayers = self::$mutedPlayers->push($ply)->unique();
@@ -110,7 +110,7 @@ $$: Writes a dollarsign
 
         foreach ($parts as $part) {
             if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
-                $url  = $matches[0];
+                $url = $matches[0];
                 $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
                 $text = str_replace($url, $info, $text);
             }
@@ -138,7 +138,7 @@ $$: Writes a dollarsign
         if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
             foreach ($matches[1] as $match) {
                 //Replace all spaces in quotes to ;:;
-                $new  = str_replace(' ', ';:;', $match);
+                $new = str_replace(' ', ';:;', $match);
                 $text = str_replace("\"$match\"", $new, $text);
             }
         }
@@ -185,7 +185,7 @@ $$: Writes a dollarsign
     public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
     {
         if (!self::$chatCommands) {
-            self::$chatCommands         = collect();
+            self::$chatCommands = collect();
             self::$chatCommandsCompiled = collect();
         }
 
@@ -210,38 +210,38 @@ $$: Writes a dollarsign
             return;
         }
 
-        $icon  = "";
+        $icon = "";
         $color = config('colors.primary');
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
-                    $icon  = "";
+                    $icon = "";
                     $color = config('colors.secondary');
                     array_shift($parts);
                     break;
 
                 case 'info':
-                    $icon  = "";
+                    $icon = "";
                     $color = config('colors.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
-                    $icon  = "";
+                    $icon = "";
                     $color = config('colors.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
-                    $icon  = "";
+                    $icon = "";
                     $color = config('colors.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
-                    $icon  = "";
+                    $icon = "";
                     $color = config('colors.dedi');
                     array_shift($parts);
                     break;

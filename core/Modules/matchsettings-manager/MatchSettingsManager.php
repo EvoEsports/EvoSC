@@ -22,7 +22,7 @@ class MatchSettingsManager
     private static $path;
     private static $objects;
 
-    public static function init()
+    public function __construct()
     {
         self::$path = config('server.base') . '/UserData/Maps/MatchSettings/';
         self::$objects = collect();
@@ -42,7 +42,7 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter']);
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings']);
 
-        KeyController::createBind('Y', [self::class, 'reload']);
+//        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     /**

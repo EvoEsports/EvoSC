@@ -66,7 +66,7 @@ class ManiaLinkEvent
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
             ChatController::message($ply, '_warning', 'Access denied');
-            Log::logAddLine('Access', 'Player ' . stripAll($ply->NickName) . ' tried to access forbidden: ' . $event->callback);
+            Log::logAddLine('Access', 'Player ' . stripAll($ply->NickName) . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::', $event->callback));
             return;
         }
 
