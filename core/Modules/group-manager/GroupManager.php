@@ -25,6 +25,8 @@ class GroupManager
         ManiaLinkEvent::add('group.edit', [self::class, 'groupEdit'], 'group');
         ManiaLinkEvent::add('group.allow', [self::class, 'groupAllow'], 'group');
         ManiaLinkEvent::add('group.deny', [self::class, 'groupDeny'], 'group');
+        ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group');
+        ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group');
 
         KeyController::createBind('Y', [self::class, 'reload']);
     }
@@ -33,7 +35,9 @@ class GroupManager
     {
         TemplateController::loadTemplates();
 
-        self::groupEdit($player, "" . Group::first()->id);
+        $group = Group::first();
+
+        self::groupMembers($player, "" . $group->id);
     }
 
     public static function showOverview(Player $player)
@@ -93,7 +97,7 @@ class GroupManager
         $group = Group::find($groupId);
         $right = AccessRight::find($rightId);
 
-        if($group && $right){
+        if ($group && $right) {
             $group->accessRights()->attach($right->id);
         }
     }
@@ -103,8 +107,29 @@ class GroupManager
         $group = Group::find($groupId);
         $right = AccessRight::find($rightId);
 
-        if($group && $right){
+        if ($group && $right) {
             $group->accessRights()->detach($right->id);
+        }
+    }
+
+    public static function groupMembers(Player $player, string $groupId)
+    {
+        $group = Group::find($groupId);
+
+        if ($group) {
+            $playerCount = $group->player()->count();
+            Template::show($player, 'group-manager.members', compact('group', 'playerCount'));
+        }
+    }
+
+    public static function groupMemberRemove(Player $player, string $groupId, string $memberLogin)
+    {
+        $member = Player::find($memberLogin);
+
+        if ($member) {
+            Player::whereLogin($memberLogin)->update(['Group' => 3]);
+            ChatController::messageAll($player->group, ' ', $player, ' removed ', $member, '\'s access rights.');
+            self::groupMembers($player, $groupId);
         }
     }
 }
