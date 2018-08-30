@@ -2,10 +2,10 @@
 <manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
 
     <frame id="overview" pos="-45 {$groups->count() * 3 + 5}">
-        <quad size="90 {$groups->count() * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
-        <quad size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <quad size="110 {$groups->count() * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="110 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Groups Manager" z-index="1" />
-        <label class="close" pos="87 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+        <label class="close" pos="107 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
 
         <frame pos="2 -1.5" z-index="2">
             {foreach $groups as $group}
@@ -14,27 +14,25 @@
                 <label pos="0 -2" size="24 4" valign="center" text="{$group->player()->count() ?: 'No'} Members" textsize="1" scale="0.5" textcolor="fffc" />
 
                 {if !$group->Protected}
-                <frame pos="61.5 -0.5">
+                <frame pos="83 -0.5">
                     {if $group->player()->count() > 0}
-                    <label pos="-29 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
+                    <label pos="-48 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
                     {/if}
+                    <label pos="-30 0" class="add" size="18 4" halign="center" valign="center" text=" Add Player" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
                     <label pos="-7 0" class="edit_group" size="26 4" halign="center" valign="center" text=" Edit Access Rights" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="delete_group" pos="15.5 -0" size="17 4" halign="center" valign="center" text=" Delete" textsize="0.6" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" />
                 </frame>
-                <label class="delete_group" pos="77 -0.5" size="17 4" halign="center" valign="center" text=" Delete" textsize="0.6" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" />
                 {else}
-                <frame pos="80 -0.5">
+                <frame pos="100 -0.5">
                     {if $group->id != 3 && $group->player()->count() > 0}
-                    <label pos="-28 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
+                    <label pos="-47 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
                     {/if}
+                    <label pos="-29 0" class="add" size="18 4" halign="center" valign="center" text=" Add Player" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
                     <label pos="-6 0" class="edit_group" size="26 4" halign="center" valign="center" text=" Edit Access Rights" textsize="0.6" ScriptEvents="1" data-id="{$group->id}" />
                 </frame>
                 {/if}
 
-                {if $iterator->counter % 2 == 0}
-                <quad pos="-2 2.5" size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.05" z-index="-1" />
-                {else}
-                <quad pos="-2 2.5" size="90 6" bgcolor="{config('colors.ui.header')}" opacity="0.12" z-index="-1" />
-                {/if}
+                <quad pos="-2 2.5" size="110 6" bgcolor="{config('colors.ui.header')}" opacity="{$iterator->counter % 2 == 0 ? 0.05 : 0.12}" z-index="-1" />
             </frame>
             {/foreach}
         </frame>
@@ -168,6 +166,11 @@
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit_group")){
                     declare Text groupId = event.Control.DataAttributeGet("id");
                     TriggerPageAction("group.edit," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("add")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.member_add_form," ^ groupId);
                 }
             }
         }

@@ -27,6 +27,8 @@ class GroupManager
         ManiaLinkEvent::add('group.deny', [self::class, 'groupDeny'], 'group');
         ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group');
         ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group');
+        ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
+        ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
 
         KeyController::createBind('Y', [self::class, 'reload']);
     }
@@ -37,7 +39,7 @@ class GroupManager
 
         $group = Group::first();
 
-        self::groupMembers($player, "" . $group->id);
+        self::showOverview($player);
     }
 
     public static function showOverview(Player $player)
@@ -130,6 +132,30 @@ class GroupManager
             Player::whereLogin($memberLogin)->update(['Group' => 3]);
             ChatController::messageAll($player->group, ' ', $player, ' removed ', $member, '\'s access rights.');
             self::groupMembers($player, $groupId);
+        }
+    }
+
+    public static function groupMemberAddForm(Player $player, string $groupId)
+    {
+        $players = onlinePlayers();
+        $playerCount = $players->count();
+
+        Template::show($player, 'group-manager.add', compact('players', 'groupId', 'playerCount'));
+    }
+
+    public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)
+    {
+        $newMember = Player::find($playerLogin);
+        $group = Group::find($groupId);
+
+        if ($newMember) {
+            if ($newMember->group->id == 3) {
+                ChatController::messageAll('_info', $player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group));
+            } else {
+                ChatController::messageAll('_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
+            }
+
+            Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
         }
     }
 }
