@@ -19,7 +19,7 @@ class EventController
     public static function handleCallbacks($executedCallbacks)
     {
         foreach ($executedCallbacks as $callback) {
-            $name      = $callback[0];
+            $name = $callback[0];
             $arguments = $callback[1];
 
             if (isVerbose()) {
@@ -82,28 +82,33 @@ class EventController
     private static function mpPlayerInfoChanged($playerInfos)
     {
         foreach ($playerInfos as $playerInfo) {
-            $login           = $playerInfo['Login'];
-            $nickname        = $playerInfo['NickName'];
-            $playerId        = $playerInfo['PlayerId'];
+            $login = $playerInfo['Login'];
+            $nickname = $playerInfo['NickName'];
+            $playerId = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
 
-            $player       = Player::find($login);
+            $player = Player::find($login);
+
+            if (!$player) {
+                $player = Player::create(['Login' => $login]);
+            }
+
             $specTargetId = $player->spectator_status->currentTargetId;
             $wasSpectator = $specTargetId > 0;
 
             if ($player) {
                 $player->update([
-                    'NickName'         => $nickname,
-                    'player_id'        => $playerId,
+                    'NickName' => $nickname,
+                    'player_id' => $playerId,
                     'spectator_status' => $spectatorStatus
                 ]);
 
                 Hook::fire('PlayerInfoChanged', $player);
             } else {
                 $playerId = Player::insertGetId([
-                    'Login'            => $login,
-                    'NickName'         => $nickname,
-                    'player_id'        => $playerId,
+                    'Login' => $login,
+                    'NickName' => $nickname,
+                    'player_id' => $playerId,
                     'spectator_status' => $spectatorStatus
                 ]);
 
@@ -171,7 +176,7 @@ class EventController
     {
         if (count($data) == 4 && is_string($data[1])) {
             $login = $data[1];
-            $text  = $data[2];
+            $text = $data[2];
 
             try {
                 $player = Player::findOrFail($login);
