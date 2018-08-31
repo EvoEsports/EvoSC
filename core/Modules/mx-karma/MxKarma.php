@@ -31,6 +31,10 @@ class MxKarma extends MXK
 
     public function __construct()
     {
+        if (!config('mx-karma.enabled')) {
+            return;
+        }
+
         MxKarma::setApiKey(config('mx-karma.key'));
 
         $client = new Client([

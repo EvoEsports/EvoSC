@@ -6,5 +6,6 @@
   "pos": "-160 22",
   "scale": "0.95",
   "rows": "20",
-  "showtop": 3
+  "showtop": 3,
+  "enabled": false
 }

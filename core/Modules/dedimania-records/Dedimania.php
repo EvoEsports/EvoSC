@@ -31,6 +31,10 @@ class Dedimania extends DedimaniaApi
 
     public function __construct()
     {
+        if (!config('dedimania.enabled')) {
+            return;
+        }
+
         self::$dedis = collect();
 
         Hook::add('BeginMap', [Dedimania::class, 'beginMap']);
@@ -49,7 +53,7 @@ class Dedimania extends DedimaniaApi
 
     public static function reportConnectedPlayersToDedimania()
     {
-        $map  = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
         $data = self::updateServerPlayers($map);
 
         if ($data && !isset($data->params->param->value->boolean)) {
@@ -66,7 +70,7 @@ class Dedimania extends DedimaniaApi
             return;
         }
 
-        $map  = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
         $dedi = $map->dedis()->where('Rank', $dediId)->first();
 
         if ($dedi && $dedi->Checkpoints) {
@@ -88,7 +92,7 @@ class Dedimania extends DedimaniaApi
     public static function beginMap(Map $map)
     {
         self::$newTimes = collect();
-        $session        = self::getSession();
+        $session = self::getSession();
 
         if ($session == null) {
             Log::warning("Dedimania offline. Using cached values.");
@@ -105,10 +109,10 @@ class Dedimania extends DedimaniaApi
             foreach ($records as $record) {
                 try {
 
-                    $login       = (string)$record->struct->member[0]->value->string;
-                    $nickname    = (string)$record->struct->member[1]->value->string;
-                    $score       = (int)$record->struct->member[2]->value->int;
-                    $rank        = (int)$record->struct->member[3]->value->int;
+                    $login = (string)$record->struct->member[0]->value->string;
+                    $nickname = (string)$record->struct->member[1]->value->string;
+                    $score = (int)$record->struct->member[2]->value->int;
+                    $rank = (int)$record->struct->member[3]->value->int;
                     $checkpoints = (string)$record->struct->member[5]->value->string;
 
                     $player = Player::firstOrCreate(['Login' => $login]);
@@ -124,7 +128,7 @@ class Dedimania extends DedimaniaApi
                         'Player'      => $player->id,
                         'Score'       => $score,
                         'Rank'        => $rank,
-                        'Checkpoints' => $checkpoints
+                        'Checkpoints' => $checkpoints,
                     ]);
                 }
             }
@@ -151,7 +155,7 @@ class Dedimania extends DedimaniaApi
         //Remove faulty dedis
         $map->dedis()->where('Score', 0)->delete();
         while (true) {
-            $last     = $map->dedis()->orderByDesc('Score')->first();
+            $last = $map->dedis()->orderByDesc('Score')->first();
             $foreLast = $map->dedis()->orderByDesc('Score')->skip(1)->take(1)->first();
 
             if (!$foreLast || !$last) {
@@ -209,8 +213,10 @@ class Dedimania extends DedimaniaApi
 
     public static function pushNewDediToPlayers(Dedi $record, $oldRank = null)
     {
-        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
-        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]', $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick, $record->player->Login, $oldRank);
+        $nick = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
+        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]',
+            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
+            $record->player->Login, $oldRank);
 
         Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
     }
@@ -219,7 +225,7 @@ class Dedimania extends DedimaniaApi
      * called on playerFinish
      *
      * @param Player $player
-     * @param int $score
+     * @param int    $score
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -286,7 +292,7 @@ class Dedimania extends DedimaniaApi
     private static function fixDedimaniaRanks(Map $map, Player $player = null): ?Dedi
     {
         $dedis = $map->dedis()->orderBy('Score')->get();
-        $i     = 1;
+        $i = 1;
         foreach ($dedis as $dedi) {
             $dedi->update(['Rank' => $i]);
             $i++;
@@ -306,7 +312,7 @@ class Dedimania extends DedimaniaApi
      */
     public static function showDedisModal(Player $player)
     {
-        $map    = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
         $chunks = $map->dedis()->orderBy('Score')->get()->chunk(25);
 
         $columns = [];
@@ -346,7 +352,7 @@ class Dedimania extends DedimaniaApi
     public static function displayDedis(Player $player = null)
     {
         if ($player) {
-            $map      = MapController::getCurrentMap();
+            $map = MapController::getCurrentMap();
             $allDedis = $map->dedis->sortBy('Rank');
 
             $playerRecord = $map->dedis()->wherePlayer($player->id)->first();
@@ -356,7 +362,7 @@ class Dedimania extends DedimaniaApi
                 $record = $map->locals()->wherePlayer($player->id)->first();
 
                 if ($record) {
-                    $localCps  = explode(',', $record->Checkpoints);
+                    $localCps = explode(',', $record->Checkpoints);
                     array_walk($localCps, function (&$time) {
                         $time = intval($time);
                     });
@@ -364,26 +370,29 @@ class Dedimania extends DedimaniaApi
                     $localRank = -1;
                 } else {
                     $localRank = -1;
-                    $localCps  = [];
+                    $localCps = [];
                 }
             } else {
                 $localRank = $playerRecord->Rank;
-                $localCps  = explode(',', $playerRecord->Checkpoints);
+                $localCps = explode(',', $playerRecord->Checkpoints);
                 array_walk($localCps, function (&$time) {
                     $time = intval($time);
                 });
             }
 
-            $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
+            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
             $onlinePlayers = onlinePlayers()->pluck('Login');
 
             $records = '[' . $allDedis->map(function (Dedi $dedi) {
                     $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
 
-                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]', $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
+                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
+                        $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick,
+                        $dedi->player->Login);
                 })->implode(",\n") . ']';
 
-            Template::show($player, 'dedimania-records.manialink', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
+            Template::show($player, 'dedimania-records.manialink',
+                compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
         }
     }
 
