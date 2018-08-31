@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\Statistics;
+namespace esc\Modules;
 
 use esc\Classes\Database;
 use esc\Classes\Hook;

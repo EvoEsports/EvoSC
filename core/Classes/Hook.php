@@ -30,10 +30,17 @@ class Hook
     public function execute(...$arguments)
     {
         try {
-            call_user_func($this->function, ...$arguments);
-            Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
+            if(is_callable($this->function, false,$callableName)){
+                call_user_func($this->function, ...$arguments);
+                Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
+            }else{
+                throw new \Exception("Function call invalid");
+            }
         } catch (\Exception $e) {
-            Log::logAddLine('Hook', "ERROR: Execution of " . $this->function[0] . " " . $this->function[1] . " failed: " . $e->getMessage(), true);
+            Log::logAddLine('Hook', "ERROR: " . $e->getMessage(), false);
+            Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
+        } catch (\TypeError $e) {
+            Log::logAddLine('Hook', "ERROR: " . $e->getMessage(), false);
             Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
         }
     }
