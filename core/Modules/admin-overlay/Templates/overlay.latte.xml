@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:AdminOverlay" id="AdminOverlay" version="3">
+
+    <frame id="cp" pos="100 -40" size="60 15" ScriptEvents="1">
+        <frame id="container" pos="60 0" z-index="1">
+            <quad size="60 15" bgcolor="{config('colors.ui.background')}" opacity="0.4" z-index="-1" />
+
+            <label class="add_time" pos="7.25 -3" size="12 3.5" halign="center" valign="center" textsize="0.25" text="+5 min" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            <label class="add_time" pos="7.25 -7.5" size="12 3.5" halign="center" valign="center" textsize="0.25" text="+10 min" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            <label class="add_time" pos="7.25 -12" size="12 3.5" halign="center" valign="center" textsize="0.25" text="+15 min" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+
+            <label class="replay" pos="18.5 -12" text="Replay" size="8.25 3.5" textsize="0.1" halign="center" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" z-index="1" />
+            <label class="skip" pos="28 -12" text="Skip" size="8.25 3.5" textsize="0.1" halign="center" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" z-index="1" />
+
+            <frame pos="18.5 -5.5" z-index="2">
+                <label class="players" size="8.25 8.25" halign="center" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" z-index="-1" />
+                <label pos="0 1.5" halign="center" valign="center" textsize="1" text="" />
+                <label pos="0 -2.5" halign="center" valign="center" textsize="1" text="PLAYERS" scale="0.5" />
+            </frame>
+
+            <frame pos="28 -5.5" z-index="2">
+                <label class="match_settings" size="8.25 8.25" halign="center" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" z-index="-1" />
+                <label pos="0 1.5" halign="center" valign="center" textsize="1" text="" />
+                <label pos="0 -1.75" halign="center" valign="center" textsize="1" text="   MATCH
+SETTINGS" scale="0.4" />
+            </frame>
+
+            <frame pos="37.5 -5.5" z-index="2">
+                <label class="groups" size="8.25 8.25" halign="center" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" z-index="-1" />
+                <label pos="0 1.5" halign="center" valign="center" textsize="1" text="" />
+                <label pos="0 -2.5" halign="center" valign="center" textsize="1" text="GROUPS" scale="0.5" />
+            </frame>
+        </frame>
+
+        <frame pos="46.5 -12.5" z-index="10" scale="0.9">
+            <label pos="0 0" halign="center" valign="center" textsize="1" text="" rot="-90" />
+            <label pos="8 0" halign="center" valign="center" textsize="1" text="ADMIN CP" scale="0.8" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare cp <=> (Page.MainFrame.GetFirstChild("cp") as CMlFrame);
+        declare container <=> (Page.MainFrame.GetFirstChild("container") as CMlFrame);
+
+        declare Boolean show = False;
+
+        declare x_min = cp.RelativePosition_V3[0] + 10.0;
+        declare y_min = cp.RelativePosition_V3[1];
+        declare x_max = cp.RelativePosition_V3[0] + cp.Size[0];
+        declare y_max = cp.RelativePosition_V3[1] - cp.Size[1];
+
+        log(<x_min, y_min>);
+        log(<x_max, y_max>);
+
+        while(True){
+            sleep(100);
+
+            declare Boolean insideX = (MouseX > x_min && MouseX < x_max);
+            declare Boolean insideY = (MouseY < y_min && MouseY > y_max);
+
+            if(!(insideX && insideY) && show){
+                show = False;
+                AnimMgr.Add(container, "<frame pos='60 0' />", 200, CAnimManager::EAnimManagerEasing::CubicInOut);
+            }
+            if(insideX && insideY && !show){
+                show = True;
+                AnimMgr.Add(container, "<frame pos='10 0' />", 200, CAnimManager::EAnimManagerEasing::CubicInOut);
+            }
+        }
+    }
+
+    --></script>
+</manialink>

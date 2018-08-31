@@ -30,7 +30,7 @@ class GroupManager
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
 
-        KeyController::createBind('Y', [self::class, 'reload']);
+        // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
