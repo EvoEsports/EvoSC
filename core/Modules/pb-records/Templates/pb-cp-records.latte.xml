@@ -215,11 +215,13 @@
                         respawn();
                     }
 
-                    foreach(Event in RaceEvents){
-                        if(Event.Player.User.Login == InputPlayer.User.Login){
-                            switch(Event.Type){
-                                case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
-                                case CTmRaceClientEvent::EType::Respawn: respawn();
+                    if(cps.count > 0){
+                        foreach(Event in RaceEvents){
+                            if(Event.Player.User.Login == InputPlayer.User.Login){
+                                switch(Event.Type){
+                                    case CTmRaceClientEvent::EType::WayPoint: wayPoint(Event);
+                                    case CTmRaceClientEvent::EType::Respawn: respawn();
+                                }
                             }
                         }
                     }
