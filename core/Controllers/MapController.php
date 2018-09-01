@@ -361,7 +361,15 @@ class MapController
 
         Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
 
-        $mxDetails = json_decode($data)[0];
+        $mxDetails = json_decode($data);
+
+        if(count($mxDetails) == 0){
+            Log::logAddLine('MapController', 'Failed to fetch MX world record: mxDetails is empty.');
+
+            return;
+        }
+
+        $mxDetails = $mxDetails[0];
 
         $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $mxDetails->TrackID);
 
