@@ -1,4 +1,4 @@
-![version:0.40.10](https://img.shields.io/badge/version-0.40.10-blue.svg?style=flat-square)
+![version:0.40.10](https://img.shields.io/badge/version-0.40.20-blue.svg?style=flat-square)
 [![GitHub license](https://img.shields.io/github/license/EvolutionTM/EvoSC.svg?style=flat-square)](https://github.com/EvolutionTM/EvoSC/blob/master/LICENSE.md)
 [![GitHub issues](https://img.shields.io/github/issues/EvolutionTM/EvoSC.svg?style=flat-square)](https://github.com/EvolutionTM/EvoSC/issues)
 

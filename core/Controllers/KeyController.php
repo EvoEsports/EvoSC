@@ -25,15 +25,17 @@ class KeyController
     }
 
     /**
-     * @param string $key
-     * @param $callback
+     * @param string      $key
+     * @param array       $callback
+     * @param string|null $access
      */
-    public static function createBind(string $key, array $callback)
+    public static function createBind(string $key, array $callback, string $access = null)
     {
         $bind = collect([]);
 
         $bind->key = $key;
         $bind->function = $callback;
+        $bind->access = $access;
 
         self::$binds->push($bind);
     }
@@ -47,7 +49,13 @@ class KeyController
         }
 
         foreach ($binds as $bind) {
-            Log::logAddLine('KeyBind', sprintf('Call: %s -> %s(%s)', $bind->function[0], $bind->function[1], $player), false);
+            if ($bind->access != null && !$player->hasAccess($bind->access)) {
+                //No access
+                return;
+            }
+
+            Log::logAddLine('KeyBind', sprintf('Call: %s -> %s(%s)', $bind->function[0], $bind->function[1], $player),
+                false);
             call_user_func($bind->function, $player);
         }
     }

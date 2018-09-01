@@ -4,7 +4,10 @@ namespace esc\Modules;
 
 use esc\Classes\File;
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Controllers\ChatController;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -16,9 +19,17 @@ class CPRecords
     {
         self::clearCheckpoints();
 
+        AccessRight::createIfNonExistent('cpr.reset', 'Reset top checkpoints');
+
         Hook::add('ShowScores', [CPRecords::class, 'clearCheckpoints']);
         Hook::add('PlayerCheckpoint', [CPRecords::class, 'playerCheckpoint']);
         Hook::add('PlayerConnect', [CPRecords::class, 'playerConnect']);
+
+        ManiaLinkEvent::add('cpr.reset', [self::class, 'reset'], 'cpr.reset');
+
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::addButton('', 'Reset Checkpoints', 'cpr.reset', 'map.reset');
+        }
     }
 
     public static function clearCheckpoints(...$args)
@@ -34,6 +45,12 @@ class CPRecords
         }
 
         return null;
+    }
+
+    public static function reset(Player $player)
+    {
+        ChatController::messageAll('_info', $player->group, ' ', $player, ' resets checkpoints.');
+        self::clearCheckpoints();
     }
 
     public static function playerCheckpoint(Player $player, $score, $lap, $cpId)
@@ -62,15 +79,17 @@ class CPRecords
             $columns = config('cp-records.columns');
 
             foreach (self::$checkpoints as $checkpoint) {
-                $row      = floor(($checkpoint->id) / $columns);
-                $y        = $row * 10.5 - 10;
+                $row = floor(($checkpoint->id) / $columns);
+                $y = $row * 10.5 - 10;
                 $posInRow = $checkpoint->id % $columns;
-                $x        = $posInRow * 110.5 - (110.5 * $columns / 2);
+                $x = $posInRow * 110.5 - (110.5 * $columns / 2);
 
                 if (isset($cpId) && $cpId == $checkpoint->id) {
-                    $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
+                    $cps->push(Template::toString('cp-records.cp-record',
+                        ['x' => $x, 'y' => -$y, 'cp' => $checkpoint, 'flash' => uniqid()]));
                 } else {
-                    $cps->push(Template::toString('cp-records.cp-record', ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
+                    $cps->push(Template::toString('cp-records.cp-record',
+                        ['x' => $x, 'y' => -$y, 'cp' => $checkpoint]));
                 }
             }
         }

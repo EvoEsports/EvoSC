@@ -7,13 +7,14 @@ use esc\Classes\Config;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MapQueueItem;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Classes\Template;
 use esc\Classes\Vote;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
@@ -32,7 +33,7 @@ class MapController
 
         self::loadMaps();
 
-        self::$queue    = new Collection();
+        self::$queue = new Collection();
         self::$mapsPath = config('server.base') . '/UserData/Maps/';
 
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
@@ -40,9 +41,22 @@ class MapController
 
         ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'skip');
         ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
-        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map.replay');
-        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
+        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>',
+            '//', 'map.add');
+        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//',
+            'map.replay');
+        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'],
+            'Adds time (you can also substract)', '//', 'time');
+
+        ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map.skip');
+        ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
+        ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
+
+        if(config('quick-buttons.enabled')){
+            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map.skip');
+            QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map.replay');
+            QuickButtons::addButton('', 'Reset Round', 'map.reset', 'map.reset');
+        }
     }
 
     /**
@@ -62,7 +76,7 @@ class MapController
     public static function addTime(int $minutes = 10)
     {
         self::$addedTime = self::$addedTime + $minutes;
-        $totalNewTime    = (self::$timeLimit + self::$addedTime) * 60;
+        $totalNewTime = (self::$timeLimit + self::$addedTime) * 60;
         self::updateRoundtime($totalNewTime);
     }
 
@@ -74,7 +88,7 @@ class MapController
 
     private static function updateRoundtime(int $timeInSeconds)
     {
-        $settings                = \esc\Classes\Server::getModeScriptSettings();
+        $settings = \esc\Classes\Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $timeInSeconds;
         \esc\Classes\Server::setModeScriptSettings($settings);
     }
@@ -153,7 +167,8 @@ class MapController
             try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map, ' permanently');
+                ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map,
+                    ' permanently');
             } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
             }
@@ -195,8 +210,8 @@ class MapController
             $map = self::$queue->first()->map;
         } else {
             $mapInfo = Server::getNextMapInfo();
-            $map     = Map::where('uid', $mapInfo->uId)
-                          ->first();
+            $map = Map::where('uid', $mapInfo->uId)
+                ->first();
         }
 
         return $map;
@@ -224,7 +239,7 @@ class MapController
         $currentMap = self::getCurrentMap();
 
         if (self::getQueue()
-                ->contains('map.uid', $currentMap->uid)) {
+            ->contains('map.uid', $currentMap->uid)) {
             ChatController::message($player, 'Map is already being replayed');
 
             return;
@@ -238,7 +253,7 @@ class MapController
      * Add a map to the queue
      *
      * @param Player $player
-     * @param Map $map
+     * @param Map    $map
      */
     public static function queueMap(Player $player, Map $map, $arg = null)
     {
@@ -264,7 +279,9 @@ class MapController
 
     private static function getGbxInformation($filename)
     {
-        $cmd = config('server.base') . '/ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename) . '"';
+        $cmd = config('server.base') . '/ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\',
+                DIRECTORY_SEPARATOR, $filename) . '"';
+
         return shell_exec($cmd);
     }
 
@@ -283,8 +300,8 @@ class MapController
 
         foreach ($maps as $mapInfo) {
             $map = Map::where('uid', $mapInfo->uId)
-                      ->get()
-                      ->first();
+                ->get()
+                ->first();
 
             if (!$map) {
                 //Map does not exist, create it
@@ -295,7 +312,7 @@ class MapController
                 } else {
                     $authorId = Player::insertGetId([
                         'Login'    => $mapInfo->author,
-                        'NickName' => $mapInfo->author
+                        'NickName' => $mapInfo->author,
                     ]);
                 }
 
@@ -317,11 +334,11 @@ class MapController
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-           ->update(['enabled' => false]);
+            ->update(['enabled' => false]);
 
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
-           ->update(['enabled' => true]);
+            ->update(['enabled' => true]);
     }
 
     public static function loadMxDetails(Map $map, bool $overwrite = false)
@@ -334,6 +351,7 @@ class MapController
 
         if ($result->getStatusCode() != 200) {
             Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());
+
             return;
         }
 
@@ -349,6 +367,7 @@ class MapController
 
         if ($result->getStatusCode() != 200) {
             Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
+
             return;
         }
 
@@ -396,14 +415,15 @@ class MapController
                 return;
             }
 
-            $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
+            $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1',
+                $response->getHeader('content-disposition')[0]);
             $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
 
             $mapFolder = self::$mapsPath;
             File::put("$mapFolder$filename", $response->getBody());
 
             $gbxInfo = self::getGbxInformation($filename);
-            $gbx     = json_decode($gbxInfo);
+            $gbx = json_decode($gbxInfo);
 
             $author = Player::whereLogin($gbx->AuthorLogin)->first();
 
@@ -421,7 +441,7 @@ class MapController
                 'author'   => $authorId,
                 'filename' => $filename,
                 'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                'enabled'  => 1
+                'enabled'  => 1,
             ]);
 
             try {
@@ -458,5 +478,10 @@ class MapController
     public static function getAddedTime(): int
     {
         return self::$addedTime;
+    }
+
+    public static function resetRound(Player $player)
+    {
+        Server::restartMap();
     }
 }

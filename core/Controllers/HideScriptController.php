@@ -7,6 +7,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Models\Player;
+use esc\Modules\QuickButtons;
 
 class HideScriptController
 {
@@ -14,10 +15,16 @@ class HideScriptController
     {
         ChatController::addCommand('hide', [HideScriptController::class, 'showConfig'], 'Configure UI hiding. Set speed/enabled.');
 
+        ManiaLinkEvent::add('hide.settings', [self::class, 'showConfig']);
         ManiaLinkEvent::add('hsc.toggle', [HideScriptController::class, 'toggle']);
         ManiaLinkEvent::add('hsc.set', [HideScriptController::class, 'set']);
 
         Hook::add('PlayerConnect', [HideScriptController::class, 'sendHideScriptSettings']);
+
+
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::addButton('', 'UI Hiding Config', 'hide.settings');
+        }
     }
 
     public static function toggle(Player $player, $toggle)
