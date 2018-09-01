@@ -21,7 +21,6 @@ class QuickButtons
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
 
-        KeyController::createBind('Y', [self::class, 'reload']);
         KeyController::createBind('Q', [self::class, 'addOne'], 'time');
 
         self::addButton('', '+5 min', 'time.add,5', 'time');
@@ -44,17 +43,16 @@ class QuickButtons
         self::$buttons->push($button);
     }
 
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showButtons($player);
-    }
-
     public static function showButtons(Player $player)
     {
         $buttons = self::$buttons->filter(function ($button) use ($player) {
+            if (!$button->access) {
+                //No access limitation
+                return true;
+            }
+
             //Only get buttons the player has access to
-            return $player->hasAccess($button->action);
+            return $player->hasAccess($button->access);
         })->map(function ($button) {
             //convert into maniascript format
             return sprintf('["%s", "%s", "%s"]', $button->icon, $button->text, $button->action);

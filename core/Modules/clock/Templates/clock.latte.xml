@@ -8,7 +8,7 @@
         <frame pos="-0.1 -0.05">
             <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
             <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
-            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{primary_color()|noescape}F"/></frame>
+            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{config('colors.ui.header')|noescape}F"/></frame>
         </frame>
     </frame>
 
