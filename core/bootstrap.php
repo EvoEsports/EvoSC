@@ -1,6 +1,6 @@
 <?php
 
-$escVersion = '0.40.2';
+$escVersion = '0.40.20';
 $serverName = 'loading...';
 
 include 'global-functions.php';

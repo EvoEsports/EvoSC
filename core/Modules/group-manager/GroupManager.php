@@ -30,6 +30,10 @@ class GroupManager
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
 
+        if(config('quick-buttons.enabled')){
+            QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
+        }
+
         // KeyController::createBind('Y', [self::class, 'reload']);
     }
 

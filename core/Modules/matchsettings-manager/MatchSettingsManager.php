@@ -29,18 +29,22 @@ class MatchSettingsManager
 
         ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
 
-        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting']);
-        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings']);
-        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings']);
-        ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview']);
-        ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings']);
+        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting'], 'ms.edit');
+        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings'], 'ms.edit');
+        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings'], 'ms.edit');
+        ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview'], 'ms.edit');
+        ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings'], 'ms.edit');
 
-        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings']);
-        ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings']);
-        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps']);
-        ManiaLinkEvent::add('msm.edit_gameinfo', [self::class, 'editGameInfo']);
-        ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter']);
-        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings']);
+        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings'], 'ms.edit');
+        ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings'], 'ms.edit');
+        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps'], 'ms.edit');
+        ManiaLinkEvent::add('msm.edit_gameinfo', [self::class, 'editGameInfo'], 'ms.edit');
+        ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter'], 'ms.edit');
+        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings'], 'ms.edit');
+
+        if(config('quick-buttons.enabled')){
+            QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
+        }
 
 //        KeyController::createBind('Y', [self::class, 'reload']);
     }
