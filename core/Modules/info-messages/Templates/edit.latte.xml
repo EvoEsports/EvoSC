@@ -10,5 +10,5 @@
     <entry pos="20 -16" size="100 3" style="TextValueSmall" name="color" default="{$message->delay ?? ''}" valign="center" />
     <label pos="20 -20" size="100 3" textsize="0.5" textcolor="fffa" text="8m = 8min  |  5m30s = 5min + 30sec  |  2h = 2hours  |  1w12h45s = 1week + 12hours + 45sec" valign="center" />
 
-    <label pos="35 -26.5" z-index="0" size="30 5" text="{$message->id == -1 ? 'CREATE' : 'UPDATE'}" halign="center" valign="center" focusareacolor1="{primary_color()|noescape}2" focusareacolor2="{primary_color()|noescape}a" scriptevents="1" textsize="1" action="infomessages.edit,-1"/>
+    <label pos="35 -26.5" z-index="0" size="30 5" text="{$message->id == -1 ? 'CREATE' : 'UPDATE'}" halign="center" valign="center" focusareacolor1="{config('colors.ui.header')|noescape}2" focusareacolor2="{config('colors.ui.header')|noescape}a" scriptevents="1" textsize="1" action="infomessages.edit,-1"/>
 </frame>

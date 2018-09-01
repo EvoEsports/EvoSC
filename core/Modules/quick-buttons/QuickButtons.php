@@ -21,7 +21,6 @@ class QuickButtons
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
 
-        KeyController::createBind('Y', [self::class, 'reload']);
         KeyController::createBind('Q', [self::class, 'addOne'], 'time');
 
         self::addButton('', '+5 min', 'time.add,5', 'time');
@@ -42,12 +41,6 @@ class QuickButtons
         $button->access = $access;
 
         self::$buttons->push($button);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showButtons($player);
     }
 
     public static function showButtons(Player $player)

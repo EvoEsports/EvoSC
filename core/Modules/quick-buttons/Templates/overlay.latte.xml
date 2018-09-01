@@ -8,7 +8,7 @@
         <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}c" />
     </framemodel>
 
-    <frame id="cp" pos="161.5 -14" ScriptEvents="1" scale="0.85">
+    <frame id="cp" pos="{config('quick-buttons.pos')}" ScriptEvents="1" scale="0.9">
         {for $i=0; $i<20; $i++}
         <frameinstance modelid="button" />
         {/for}
@@ -25,7 +25,7 @@
             declare frame = (control as CMlFrame);
 
             if(alignLeft){
-                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <3.25, -1.75>;
+                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <4.5, -1.75>;
                 (frame.Controls[1] as CMlLabel).RelativePosition_V3 = <8.5, -1.75>;
                 frame.Controls[1].HorizontalAlign = CMlControl::AlignHorizontal::Left;
                 frame.Controls[2].HorizontalAlign = CMlControl::AlignHorizontal::Left;

@@ -1,6 +1,6 @@
 {foreach $players as $player}
 {if $player->player_id}
-<quad pos="0 -{$iterator->counter * 4 - 1.8}" size="8.4 3.8" z-index="0" bgcolor="{$player->Afk ? 'aaa5' : primary_color().'8'}"/>
+<quad pos="0 -{$iterator->counter * 4 - 1.8}" size="8.4 3.8" z-index="0" bgcolor="{$player->Afk ? 'aaa5' : config('colors.ui.header').'8'}"/>
     {if $player->Afk}
     <label pos="1 -{$iterator->counter * 4 -1}" z-index="1" size="4 4" text="🕑" textsize=".25" textcolor="cccc"/>
     {/if}

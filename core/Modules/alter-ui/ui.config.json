@@ -45,16 +45,6 @@
     "scale": 0.8
   },
 
-
-  "music": {
-    "pos": {
-      "visible": "120 80",
-      "hidden": "128 80"
-    },
-    "scale": 0.8
-  },
-
-
   "stats": {
     "visits": {
       "pos": {

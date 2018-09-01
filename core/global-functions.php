@@ -169,11 +169,6 @@ function header_color()
     return config('colors.ui.header');
 }
 
-function primary_color()
-{
-    return config('colors.ui.primary');
-}
-
 function createCrashReport($e)
 {
     if (!($e instanceof \Exception)) {
