@@ -53,13 +53,13 @@ class QuickButtons
     public static function showButtons(Player $player)
     {
         $buttons = self::$buttons->filter(function ($button) use ($player) {
-            if (!$button->action) {
+            if (!$button->access) {
                 //No access limitation
                 return true;
             }
 
             //Only get buttons the player has access to
-            return $player->hasAccess($button->action);
+            return $player->hasAccess($button->access);
         })->map(function ($button) {
             //convert into maniascript format
             return sprintf('["%s", "%s", "%s"]', $button->icon, $button->text, $button->action);
