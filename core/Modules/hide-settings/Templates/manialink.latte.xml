@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:HideSettings" id="HideSettings" version="3">
+    <frame pos="0 0">
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+    }
+
+    --></script>
+</manialink>

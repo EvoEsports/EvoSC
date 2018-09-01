@@ -8,15 +8,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    protected $table = 'players';
-    protected $fillable = ['Login', 'NickName', 'Score', 'player_id', 'Afk', 'spectator_status', 'MaxRank', 'Banned'];
-    protected $primaryKey = 'Login';
-    public $incrementing = false;
-    public $timestamps = false;
+    protected $table        = 'players';
+    protected $fillable     = [
+        'Login',
+        'NickName',
+        'Score',
+        'player_id',
+        'Afk',
+        'spectator_status',
+        'MaxRank',
+        'Banned',
+    ];
+    protected $primaryKey   = 'Login';
+    public    $incrementing = false;
+    public    $timestamps   = false;
 
     /**
      * Gets the players current time (formatted)
+     *
      * @param bool $asMilliseconds
+     *
      * @return mixed|string
      */
     public function getTime(bool $asMilliseconds = false)
@@ -30,6 +41,7 @@ class Player extends Model
 
     /**
      * Sets the current time of the player
+     *
      * @param $score
      */
     public function setScore($score)
@@ -39,27 +51,33 @@ class Player extends Model
 
     /**
      * Checks if a player exists by login
+     *
      * @param string $login
+     *
      * @return bool
      */
     public static function exists(string $login)
     {
         $player = self::whereLogin($login)->first();
+
         return $player != null;
     }
 
     /**
      * Sets player offline
+     *
      * @return Player
      */
     public function setOffline(): Player
     {
         $this->update(['player_id' => 0]);
+
         return $this;
     }
 
     /**
      * Checks if player finished
+     *
      * @return bool
      */
     public function hasFinished(): bool
@@ -69,6 +87,7 @@ class Player extends Model
 
     /**
      * Get players locals
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function locals()
@@ -117,12 +136,12 @@ class Player extends Model
 
     public function getSpectatorStatusAttribute($value)
     {
-        $object                     = collect([]);
-        $object->spectator          = (bool)($value % 10);
+        $object = collect([]);
+        $object->spectator = (bool)($value % 10);
         $object->temporarySpectator = (bool)(intval($value / 10) % 10);
-        $object->pureSpectator      = (bool)(intval($value / 100) % 10);
-        $object->autoTarget         = (bool)(intval($value / 1000) % 10);
-        $object->currentTargetId    = intval($value / 10000);
+        $object->pureSpectator = (bool)(intval($value / 100) % 10);
+        $object->autoTarget = (bool)(intval($value / 1000) % 10);
+        $object->currentTargetId = intval($value / 10000);
 
         return $object;
     }
@@ -150,12 +169,13 @@ class Player extends Model
 
         if ($setting) {
             $setting->update(['value' => $value]);
+
             return;
         }
 
         $this->settings()->create([
             'name'  => $settingName,
-            'value' => $value
+            'value' => $value,
         ]);
     }
 

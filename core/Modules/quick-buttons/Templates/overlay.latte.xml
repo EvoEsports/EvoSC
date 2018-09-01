@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:QuickButtons" id="QuickButtons" version="3">
+
+    <framemodel id="button">
+        <label valign="center" halign="center" textsize="0.75" text="" textcolor="dddd" />
+        <label valign="center" size="23 2" textsize="1" text="button-text button-text" hidden="1" textcolor="dddd" scale="0.75" />
+        <quad size="5.5 4" bgcolor="{config('colors.ui.background')}7" />
+        <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.background')}c" />
+    </framemodel>
+
+    <frame id="cp" pos="161.5 -14" ScriptEvents="1" scale="0.85">
+        {for $i=0; $i<20; $i++}
+        <frameinstance modelid="button" />
+        {/for}
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    Void setupFrameInstances(CMlFrame cp, Boolean alignLeft){
+        declare Integer i = 0;
+
+        foreach(control in cp.Controls){
+            declare frame = (control as CMlFrame);
+
+            if(alignLeft){
+                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <3.25, -1.75>;
+                (frame.Controls[1] as CMlLabel).RelativePosition_V3 = <8.5, -1.75>;
+                frame.Controls[1].HorizontalAlign = CMlControl::AlignHorizontal::Left;
+                frame.Controls[2].HorizontalAlign = CMlControl::AlignHorizontal::Left;
+                frame.Controls[2].RelativePosition_V3 = <1.75, 0.0>;
+                frame.Controls[3].HorizontalAlign = CMlControl::AlignHorizontal::Left;
+                frame.Controls[3].RelativePosition_V3 = <1.75, 0.0>;
+            }else{
+                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <-4.25, -1.75>;
+                (frame.Controls[1] as CMlLabel).RelativePosition_V3 = <-8.5, -1.75>;
+                frame.Controls[1].HorizontalAlign = CMlControl::AlignHorizontal::Right;
+                frame.Controls[2].HorizontalAlign = CMlControl::AlignHorizontal::Right;
+                frame.Controls[2].RelativePosition_V3 = <-1.75, 0.0>;
+                frame.Controls[3].HorizontalAlign = CMlControl::AlignHorizontal::Right;
+                frame.Controls[3].RelativePosition_V3 = <-1.75, 0.0>;
+            }
+
+            frame.RelativePosition_V3 = <0.0, i * -4.0>;
+
+            i = i + 1;
+        }
+    }
+
+    Void fillButtons(CMlFrame cp, Text[][] values){
+        declare c = 0;
+
+        foreach(button in values){
+            declare frame = (cp.Controls[c] as CMlFrame);
+            (frame.Controls[0] as CMlLabel).SetText(button[0]);
+            (frame.Controls[1] as CMlLabel).SetText(button[1]);
+
+            (frame.Controls[3] as CMlLabel).DataAttributeSet("action", button[2]);
+            c = c  + 1;
+        }
+
+        for(i, values.count, 20 - 1){
+            (cp.Controls[i] as CMlFrame).Hide();
+        }
+    }
+
+    Void hoverEffect(CMlLabel label, Boolean hoverActive){
+        if(hoverActive){
+            label.Parent.Controls[1].Show();
+        }else{
+            label.Parent.Controls[1].Hide();
+        }
+    }
+
+    main(){
+        declare cp <=> (Page.MainFrame.GetFirstChild("cp") as CMlFrame);
+        declare Boolean alignLeft = cp.RelativePosition_V3[0] < 0.0;
+
+        setupFrameInstances(cp, alignLeft);
+
+        declare Text[][] buttons = [
+            {if $localPlayer->hasAccess('time')}
+            ["", "+5 min", "time.add,5"],
+            ["", "+10 min", "time.add,10"],
+            ["", "+15 min", "time.add,15"],
+            {/if}
+
+            {if $localPlayer->hasAccess('map.skip')}
+            ["", "SKIP", "skip"],
+            {/if}
+
+            {if $localPlayer->hasAccess('map.reset')}
+            ["", "RESET ROUND", "reset_round"],
+            {/if}
+
+            {if $localPlayer->hasAccess('map.reset')}
+            ["", "RESET CHECKPOINTS", "reset_cps"],
+            {/if}
+
+            {if $localPlayer->hasAccess('group')}
+            ["", "GROUPS", "group.overview"],
+            {/if}
+
+            {if $localPlayer->hasAccess('matchsettings')}
+            ["", "MATCHSETTINGS", "msm.overview"],
+            {/if}
+
+            ["", "PLAYERS", "players"],
+            ["", "HIDE SETTINGS", ""]
+        ];
+
+        fillButtons(cp, buttons);
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("trigger_action")){
+                    declare action = event.Control.DataAttributeGet("action");
+                    TriggerPageAction(action);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOver && event.Control.HasClass("trigger_action")){
+                    hoverEffect((event.Control as CMlLabel), True);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOut && event.Control.HasClass("trigger_action")){
+                    hoverEffect((event.Control as CMlLabel), False);
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>
