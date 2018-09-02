@@ -36,7 +36,7 @@
             <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6" z-index="1" />
             <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" />
-            <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" JUKE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" data-test="asd" />
+            <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" QUEUE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" data-test="asd" />
             <label class="mx" pos="129 0" valign="center" halign="center" size="14 3" text=" MX INFO" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
             <label class="delete" pos="144 0" valign="center" halign="center" size="14 3" text="DELETE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
         </framemodel>
@@ -102,18 +102,30 @@
             <quad pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
             <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
 
-            <label class="map-control fav" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
-            <label class="map-control details" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
-            <label class="map-control list" pos="28.3 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+            <frame pos="1.7 -5">
+                <label class="map-control fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1" halign="center" valign="center" />
+            </frame>
 
-            <label pos="1.7 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
-            <label pos="15 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
-            <label pos="28.3 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+            <frame pos="15 -5">
+                <label class="map-control details" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Details" z-index="1" halign="center" valign="center" />
+            </frame>
 
-            <label pos="1.7 -7" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1" halign="center" valign="center" />
-            <label pos="15 -7" textsize="1" scale="0.8" size="10 10" text="Details" z-index="1" halign="center" valign="center" />
-            <label pos="28.3 -7" textsize="1" scale="0.8" size="10 10" text="Maps" z-index="1" halign="center" valign="center" />
+            <frame pos="28.3 -5">
+                <label class="map-control list" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Maps" z-index="1" halign="center" valign="center" />
+            </frame>
+
         </frame>
+    </frame>
+
+    <frame id="minimal" pos="156 87" scale="0.9">
+        <label pos="" textsize="1" text="" valign="center" textcolor="dddb" opacity="0"/>
+        <label id="minimal-text" pos="-1 0" textsize="1" text="Titleinformation" halign="right" scale="0.8" valign="center" textcolor="dddb" opacity="0"/>
     </frame>
 
     <script><!--
@@ -126,6 +138,7 @@ declare Text[][] maps;
 declare Text[][] favorites;
 
 declare Text lastQueueHash;
+declare Text[] CurrentMap;
 
 Integer int(Text textInteger){
     return TL::ToInteger(textInteger);
@@ -156,8 +169,6 @@ Void enablePages(Integer totalItemsCount){
     for(i, 1, pagesEnabled + 1){
         (pagination.Controls[i] as CMlLabel).Show();
     }
-
-    goToPage(1);
 }
 
 Text[][] arraySort(Text[][] array, Integer column){
@@ -257,7 +268,6 @@ Void search(Text query){
     declare Text[][] foundMaps;
 
     foreach(map in maps){
-        log(map);
         if(TL::Find(query, map[0] ^ map[1] ^ map[2], False, False)){
             foundMaps.add(map);
         }
@@ -287,6 +297,7 @@ Void navButtonClick(CMlQuad button){
         //favorites
         populate(getFavorites());
         tabs.Controls[0].Visible = True;
+        goToPage(1);
     }
     if(tab == 2){
         //jukebox/map queue
@@ -323,6 +334,19 @@ Void updateMapQueue(Text[][] items){
     }
 }
 
+Void updateCurrentMap(Text newMapUid){
+    foreach(map in maps){
+        if(newMapUid == map[7]){
+            CurrentMap = map;
+            return;
+        }
+    }
+
+    CurrentMap = ["failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo"];
+    log("Map not found!! " ^ newMapUid);
+    return;
+}
+
 main() {
     maps = {$maps|noescape};
     tabs <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
@@ -331,6 +355,7 @@ main() {
     declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare CMlFrame minimal <=> (Page.MainFrame.GetFirstChild("minimal") as CMlFrame);
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare searchInput <=> (Page.MainFrame.GetFirstChild("searchInput") as CMlEntry);
@@ -348,6 +373,7 @@ main() {
 
     populate(maps);
     activeTab = 0;
+    goToPage(1);
 
     declare Text lastMapSearchQueryHash = "";
     declare Boolean controlsVisible = False;
@@ -365,16 +391,22 @@ main() {
             if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }else{
                 if(speed >= UI_Hide_Speed && !isHidden){
                     AnimMgr.Add(widget, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = True;
                 }
 
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }
@@ -382,8 +414,19 @@ main() {
             //map change detection
             if(Map.MapInfo.MapUid != currentMapId){
                 currentMapId = Map.MapInfo.MapUid;
-                (widget.Controls[0] as CMlLabel).SetText(Map.MapInfo.Name);
-                (widget.Controls[1] as CMlLabel).SetText(Map.AuthorLogin);
+                updateCurrentMap(Map.MapInfo.MapUid);
+                wait(CurrentMap.count > 0);
+                (widget.Controls[0] as CMlLabel).SetText(CurrentMap[0]);
+                (widget.Controls[1] as CMlLabel).SetText(CurrentMap[1]);
+                (minimal.Controls[1] as CMlLabel).SetText(CurrentMap[0] ^ "$z by " ^ CurrentMap[1]);
+
+                if(CurrentMap[6] == "1"){
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Remove");
+                }else{
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Add");
+                }
             }
 
             //search command
@@ -419,8 +462,27 @@ main() {
 
                 if(event.Control.HasClass("map-control") && event.Type == CMlScriptEvent::Type::MouseClick){
                     if(event.Control.HasClass("fav")){
+                        declare curMapId = CurrentMap[5];
+                        declare isFavCurrent = getMapById(curMapId)[6] == "1";
+                        if(isFavCurrent){
+                            updateMapFav(curMapId, "0");
+                            TriggerPageAction("map.fav.remove," ^ CurrentMap[5]);
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Add");
+                            continue;
+                        }else{
+                            updateMapFav(curMapId, "1");
+                            TriggerPageAction("map.fav.add," ^ CurrentMap[5]);
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Remove");
+                            continue;
+                        }
+                        if(activeTab == 1){
+                            populate(getFavorites());
+                        }
                     }
                     if(event.Control.HasClass("details")){
+                        TriggerPageAction("mx.details," ^ CurrentMap[5]);
                     }
                     if(event.Control.HasClass("list")){
                         navButtonClick(((navbar.Controls[0] as CMlFrame).Controls[0] as CMlQuad));

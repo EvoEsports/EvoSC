@@ -23,13 +23,11 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('map.mx', [MapList::class, 'updateMxDetails']);
         ManiaLinkEvent::add('map.queue', [MapList::class, 'queueMap']);
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
-        Hook::add('BeginMap', [MapList::class, 'beginMap']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
 
         ChatController::addCommand('list', [self::class, 'searchMap'], 'Search maps or open maplist');
@@ -91,19 +89,6 @@ class MapList
     }
 
     /**
-     * Send mx details of current map to everyone
-     *
-     * @param Map $map
-     */
-    public static function beginMap(Map $map)
-    {
-        onlinePlayers()->each(function (Player $player) use ($map) {
-            //Update current map info
-            Template::show($player, 'map-list.update-current-map', ['map' => $map]);
-        });
-    }
-
-    /**
      * Send updated map queue to everyone
      *
      * @param Collection $queue
@@ -122,45 +107,6 @@ class MapList
         onlinePlayers()->each(function (Player $player) use ($queue) {
             Template::show($player, 'map-list.update-queue', compact('queue'));
         });
-    }
-
-    /**
-     * Sends requested mx details to player
-     *
-     * @param Player $player
-     * @param $mapId
-     */
-    public static function updateMxDetails(Player $player, $mapId)
-    {
-        $map = Map::whereId($mapId)->first();
-
-        if (!$map->mx_details) {
-            MapController::loadMxDetails($map);
-            $map = Map::whereId($mapId)->first();
-        }
-
-        $details = $map->mx_details;
-
-        if (!$details) {
-            ChatController::message($player, '_warning', 'Could not load mx details for track ', $map);
-            return;
-        }
-
-        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
-            $map->id,
-            $map->gbx->MapUid,
-            $map->author->Login,
-            $map->author->Login == $map->author->NickName ? $details->Username : $map->author->NickName,
-            (new Carbon($details->UploadedAt))->format('Y-m-d'),
-            (new Carbon($details->UpdatedAt))->format('Y-m-d'),
-            $map->gbx->Name,
-            $details->TrackID,
-            formatScore($map->gbx->AuthorTime)
-        );
-
-        Template::show($player, 'map-list.update-mx-details', [
-            'mx_details' => $mxDetails
-        ]);
     }
 
     /**
@@ -193,7 +139,7 @@ class MapList
             $favorite = $favorites->get($map->id) ? 1 : 0;
             $mapName  = $map->gbx->Name;
 
-            return sprintf('["%s","%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite);
+            return sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $map->uid);
         })->implode("\n,");
 
         return sprintf('[%s]', $maps);
