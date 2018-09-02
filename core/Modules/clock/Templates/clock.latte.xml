@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="clock-widget" id="clock-widget" version="3">
-    <frame pos="{config('clock.pos.visible')|noescape}" id="widget">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" />
+    <frame pos="{config('clock.pos.visible')}" id="widget">
+        <quad pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" />
 

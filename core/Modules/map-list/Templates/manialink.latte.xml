@@ -89,7 +89,7 @@
         </frame>
     </frame>
 
-    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}" data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8">
+    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}" data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8" size="50 10">
         <label pos="38 -2" z-index="1" size="36 3" text="Map name" halign="right" textcolor="eeee" textsize="1.4"/>
         <label pos="38 -7" z-index="1" size="36 3" text="Author name" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
 
@@ -97,6 +97,23 @@
 
         <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.background')}9" ScriptEvents="1" />
         <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.header')}e" ScriptEvents="1" />
+
+        <frame id="controls" pos="5 -10.5" z-index="10">
+            <quad pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
+            <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
+
+            <label class="map-control fav" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+            <label class="map-control details" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+            <label class="map-control list" pos="28.3 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+
+            <label pos="1.7 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+            <label pos="15 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+            <label pos="28.3 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+
+            <label pos="1.7 -7" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1" halign="center" valign="center" />
+            <label pos="15 -7" textsize="1" scale="0.8" size="10 10" text="Details" z-index="1" halign="center" valign="center" />
+            <label pos="28.3 -7" textsize="1" scale="0.8" size="10 10" text="Maps" z-index="1" halign="center" valign="center" />
+        </frame>
     </frame>
 
     <script><!--
@@ -315,6 +332,7 @@ main() {
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
+    declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare searchInput <=> (Page.MainFrame.GetFirstChild("searchInput") as CMlEntry);
 
     //hidescript declarations
@@ -332,6 +350,7 @@ main() {
     activeTab = 0;
 
     declare Text lastMapSearchQueryHash = "";
+    declare Boolean controlsVisible = False;
 
     ((navbar.Controls[0] as CMlFrame).Controls[0] as CMlQuad).Opacity = 1.0;
 
@@ -377,24 +396,41 @@ main() {
                 searchInput.SetText(MapSearchQuery, True);
             }
 
+            declare x_min = widget.RelativePosition_V3[0];
+            declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);
+            declare y_min = widget.RelativePosition_V3[1];
+            declare y_max = widget.RelativePosition_V3[1] - (widget.Size[1] * widget.RelativeScale);
+            declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
+            declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
+
+            if(!(xInBounds && yInBounds) && controlsVisible){
+                controlsVisible = False;
+                AnimMgr.Add(widgetControls, " <frame pos='5.0 -10.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+            }
+            if((xInBounds && yInBounds) && !controlsVisible){
+                controlsVisible = True;
+                AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+            }
+
             foreach(event in PendingEvents){
                 if(event.Control == Null){
                     continue;
                 }
 
-                if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
-                    mapsContainer.Show();
+                if(event.Control.HasClass("map-control") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    if(event.Control.HasClass("fav")){
+                    }
+                    if(event.Control.HasClass("details")){
+                    }
+                    if(event.Control.HasClass("list")){
+                        navButtonClick(((navbar.Controls[0] as CMlFrame).Controls[0] as CMlQuad));
+                        mapsContainer.Show();
+                    }
                     continue;
                 }
 
                 if(event.Control == searchInput){
                     search(searchInput.Value);
-                    continue;
-                }
-
-                if(event.Control == backgroundIcon && event.Type == CMlScriptEvent::Type::MouseClick){
-                    navButtonClick(((navbar.Controls[1] as CMlFrame).Controls[0] as CMlQuad));
-                    mapsContainer.Show();
                     continue;
                 }
 

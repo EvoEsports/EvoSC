@@ -146,7 +146,7 @@ class MapList
             return;
         }
 
-        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
+        $mxDetails = sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]',
             $map->id,
             $map->gbx->MapUid,
             $map->author->Login,
@@ -155,11 +155,7 @@ class MapList
             (new Carbon($details->UpdatedAt))->format('Y-m-d'),
             $map->gbx->Name,
             $details->TrackID,
-            formatScore($map->gbx->AuthorTime),
-            $details->TitlePack,
-            $details->Mood,
-            $details->StyleName,
-            $details->DifficultyName
+            formatScore($map->gbx->AuthorTime)
         );
 
         Template::show($player, 'map-list.update-mx-details', [
