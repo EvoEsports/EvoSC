@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Maps:main" id="esc_maps" version="3">
     <frame id="maps-container" pos="-80 45" hidden="1">
-        <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
-        <quad pos="0 -2.5" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.5" />
-        <quad pos="0 -2.5" size="160 95" style="Bgs1" substyle="BgDialogBlur" />
+        <quad pos="0 2.5" size="160 11" bgcolor="{header_color()|noescape}c" />
+        <quad pos="0 -8" size="160 0.5" bgcolor="{header_color()|noescape}f" z-index="2" />
+        <quad pos="0 2.5" size="160 101" bgcolor="{background_color()|noescape}" opacity="0.75" />
+        <quad pos="0 -8.5" size="160 90" style="Bgs1" substyle="BgDialogBlur" />
         <label pos="1.5 -0.4" size="20 3" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
         <quad id="close" pos="157 0.5" size="4 4" halign="center" ScriptEvents="1" />
         <label pos="157 0.9" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" textcolor="ffff" />
 
-        <frame id="navbar" pos="0 -3.5" z-index="2">
-            <quad pos="0 0" size="160 6" bgcolor="{background_color()|noescape}" opacity="0.8" z-index="1" />
-
+        <frame id="navbar" pos="0 -3" z-index="2">
             <frame pos="10 -3" z-index="2">
-                <quad class="nav-button button" data-page="0" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.9" z-index="-1" ScriptEvents="1" />
+                <quad class="nav-button button" data-page="0" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
                 <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Maplist" />
             </frame>
 
             <frame pos="27 -3" z-index="5">
-                <quad class="nav-button button" data-page="1" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
+                <quad class="nav-button button" data-page="1" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
                 <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Favorites" />
             </frame>
 
             <frame pos="44 -3" z-index="5">
-                <quad class="nav-button button" data-page="2" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="MX Info" />
-            </frame>
-
-            <frame pos="61 -3" z-index="5">
-                <quad class="nav-button button" data-page="3" valign="center" halign="center" size="15 3" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
+                <quad class="nav-button button" data-page="2" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
                 <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Queued maps" />
             </frame>
         </frame>
@@ -42,7 +36,7 @@
             <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6" z-index="1" />
             <label class="fav" pos="105 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" />
-            <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" JUKE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" data-test="asd" />
+            <label class="juke" pos="115 0" valign="center" halign="center" size="12 3" text=" QUEUE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" data-test="asd" />
             <label class="mx" pos="129 0" valign="center" halign="center" size="14 3" text=" MX INFO" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
             <label class="delete" pos="144 0" valign="center" halign="center" size="14 3" text="DELETE" textcolor="ffff" textsize="0.2" z-index="1" ScriptEvents="1" />
         </framemodel>
@@ -54,8 +48,14 @@
         </framemodel>
 
         <frame id="tabs" pos="2 -13" z-index="2">
-            <frame data-tab="0" id="maps" hidden="0">
-                <frame id="map-list-container">
+            <frame data-tab="0" id="maps" hidden="0" scale="0.97" pos="0 -3">
+                <label pos="1  6" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="52 6" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="88 6" textsize="1" text="Local" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="96 6" textsize="1" text="Dedi" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="106 6" textsize="1" text="Favorite" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
+
+                <frame id="map-list-container" pos="0 3" size="160 80">
                     <frame id="map-list">
                         {for $i = 0; $i < esc\Modules\MapList\MapList::getMapsCount() + 20; $i++}
                         <frameinstance pos="0 {$i * -4}" modelid="Map" hidden="1" />
@@ -66,7 +66,7 @@
                 <frame pos="0 -81" z-index="2">
                     <quad id="pagination-box" pos="2 0" size="3.5 3.5" bgcolor="{config('colors.ui.header')|noescape}" valign="center" halign="center" z-index="-1" />
 
-                    {for $i = 0; $i < 5/*ceil(esc\Modules\MapList\MapList::getMapsCount() / 20)*/; $i++}
+                    {for $i = 0; $i < ceil(esc\Modules\MapList\MapList::getMapsCount() / 20); $i++}
                     <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
                     {/for}
                 </frame>
@@ -75,38 +75,7 @@
                 <entry id="searchInput" pos="156 -80" size="20 3.5" halign="right" style="TextValueSmall" name="searchQuery" default="" textsize="1.2" />
             </frame>
 
-            <frame data-tab="1" id="mx" hidden="1">
-                <frame id="mx-details">
-                    <label class="mapname" pos="2 -2" textcolor="ffff" textsize="4" text="Mapname" />
-
-                    <frame class="dates" pos="2 -15" scale="0.8">
-                        <label pos="0 -2" textcolor="ffff" textsize="0.75" text="uploadedAt" />
-                        <label pos="0 -6" textcolor="ffff" textsize="0.75" text="updatedAt" />
-                        <label pos="0 5" textcolor="ffff" textsize="2" text="12345" />
-                    </frame>
-
-                    <frame class="author" pos="30 -12">
-                        <label pos="0 2" textcolor="ffff" textsize="2" text="$s👤 Author" />
-                        <label class="author-nick" pos="9 -5" textcolor="ffff" textsize="0.5" text="authorNick" valign="center" />
-                        <label class="author-login" pos="9 -9" textcolor="ffff" textsize="0.5" text="authorLogin" valign="center" />
-                        <label pos="9 -13" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
-                        <label pos="9 -17" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
-                        <label pos="9 -21" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
-                        <label pos="9 -25" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
-                        <label pos="9 -29" textcolor="ffff" textsize="0.75" text="authorTime" valign="center" />
-
-                        <label pos="8 -5" textcolor="ffff" textsize="0.5" halign="right" text="Nick:" valign="center" />
-                        <label pos="8 -9" textcolor="ffff" textsize="0.5" halign="right" text="Login:" valign="center" />
-                        <label pos="8 -13" textcolor="ffff" textsize="0.5" halign="right" text="Time:" valign="center" />
-                        <label pos="8 -17" textcolor="ffff" textsize="0.5" halign="right" text="Titlepack:" valign="center" />
-                        <label pos="8 -21" textcolor="ffff" textsize="0.5" halign="right" text="Mood:" valign="center" />
-                        <label pos="8 -25" textcolor="ffff" textsize="0.5" halign="right" text="Difficulty:" valign="center" />
-                        <label pos="8 -29" textcolor="ffff" textsize="0.5" halign="right" text="Style:" valign="center" />
-                    </frame>
-                </frame>
-            </frame>
-
-            <frame data-tab="2" id="jukebox" hidden="1">
+            <frame data-tab="1" id="jukebox" hidden="1">
                 <frame id="queue-list" pos="2 0">
                     <frameinstance pos="0 0" modelid="QueueItem" hidden="1" />
                     <frameinstance pos="0 -12" modelid="QueueItem" hidden="1" />
@@ -120,7 +89,7 @@
         </frame>
     </frame>
 
-    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}" data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8">
+    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}" data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8" size="50 10">
         <label pos="38 -2" z-index="1" size="36 3" text="Map name" halign="right" textcolor="eeee" textsize="1.4"/>
         <label pos="38 -7" z-index="1" size="36 3" text="Author name" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
 
@@ -128,6 +97,35 @@
 
         <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.background')}9" ScriptEvents="1" />
         <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.header')}e" ScriptEvents="1" />
+
+        <frame id="controls" pos="5 -10.5" z-index="10">
+            <quad pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
+            <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
+
+            <frame pos="1.7 -5">
+                <label class="map-control fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1" halign="center" valign="center" />
+            </frame>
+
+            <frame pos="15 -5">
+                <label class="map-control details" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Details" z-index="1" halign="center" valign="center" />
+            </frame>
+
+            <frame pos="28.3 -5">
+                <label class="map-control list" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Maps" z-index="1" halign="center" valign="center" />
+            </frame>
+
+        </frame>
+    </frame>
+
+    <frame id="minimal" pos="156 87" scale="0.9">
+        <label pos="" textsize="1" text="" valign="center" textcolor="dddb" opacity="0"/>
+        <label id="minimal-text" pos="-1 0" textsize="1" text="Titleinformation" halign="right" scale="0.8" valign="center" textcolor="dddb" opacity="0"/>
     </frame>
 
     <script><!--
@@ -140,14 +138,14 @@ declare Text[][] maps;
 declare Text[][] favorites;
 
 declare Text lastQueueHash;
-declare Text lastMxDetailsHash;
+declare Text[] CurrentMap;
 
 Integer int(Text textInteger){
     return TL::ToInteger(textInteger);
 }
 
 Text getContainerTarget(Integer page){
-    declare pos = page * 80.0;
+    declare pos = page * 80.0 - 2.0;
     declare target = "<frame pos='0 " ^ pos ^ "' />";
     return target;
 }
@@ -165,14 +163,12 @@ Void enablePages(Integer totalItemsCount){
     declare CMlFrame pagination = (paginationBox.Parent as CMlFrame);
     declare Integer pagesEnabled = totalItemsCount / 20;
 
-    for(i, 1, 5){
+    for(i, 1, {ceil(esc\Modules\MapList\MapList::getMapsCount() / 20)}){
         (pagination.Controls[i] as CMlLabel).Hide();
     }
     for(i, 1, pagesEnabled + 1){
         (pagination.Controls[i] as CMlLabel).Show();
     }
-
-    goToPage(1);
 }
 
 Text[][] arraySort(Text[][] array, Integer column){
@@ -272,7 +268,6 @@ Void search(Text query){
     declare Text[][] foundMaps;
 
     foreach(map in maps){
-        log(map);
         if(TL::Find(query, map[0] ^ map[1] ^ map[2], False, False)){
             foundMaps.add(map);
         }
@@ -285,11 +280,9 @@ Void navButtonClick(CMlQuad button){
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare Integer tab = int(button.DataAttributeGet("page"));
 
-    for(i, 1, navbar.Controls.count - 1){
+    for(i, 0, navbar.Controls.count - 1){
         ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
     }
-
-    log("Open tab: " ^ tab);
 
     foreach(tabFrame in tabs.Controls){
         tabFrame.Visible = False;
@@ -304,17 +297,14 @@ Void navButtonClick(CMlQuad button){
         //favorites
         populate(getFavorites());
         tabs.Controls[0].Visible = True;
+        goToPage(1);
     }
     if(tab == 2){
-        //mx info
+        //jukebox/map queue
         tabs.Controls[1].Visible = True;
     }
-    if(tab == 3){
-        //jukebox/map queue
-        tabs.Controls[2].Visible = True;
-    }
 
-    button.Opacity = 0.9;
+    button.Opacity = 1.0;
     activeTab = int(button.DataAttributeGet("page"));
 }
 
@@ -344,36 +334,17 @@ Void updateMapQueue(Text[][] items){
     }
 }
 
-Void updateMxDetails(Text[] details){
-    declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
-    declare mxDetails <=> (Page.MainFrame.GetFirstChild("mx-details") as CMlFrame);
-    declare dates <=> (mxDetails.Controls[1] as CMlFrame);
-    declare author <=> (mxDetails.Controls[2] as CMlFrame);
-
-    (mxDetails.Controls[0] as CMlLabel).SetText("$s" ^ details[6]);
-
-    (dates.Controls[0] as CMlLabel).SetText("Uploaded: " ^ details[4]);
-    (dates.Controls[1] as CMlLabel).SetText("Updated: " ^ details[5]);
-    (dates.Controls[2] as CMlLabel).SetText("$l[https://tm.mania-exchange.com/tracks/" ^ details[7] ^ "]" ^ details[7] ^ " ");
-
-    (author.Controls[1] as CMlLabel).SetText(details[3]);
-    (author.Controls[2] as CMlLabel).SetText(details[2]);
-    (author.Controls[3] as CMlLabel).SetText(details[8]);
-    (author.Controls[4] as CMlLabel).SetText(details[9]);
-    (author.Controls[5] as CMlLabel).SetText(details[10]);
-    (author.Controls[6] as CMlLabel).SetText(details[12]);
-    (author.Controls[7] as CMlLabel).SetText(details[11]);
-
-    for(i, 1, navbar.Controls.count - 1){
-        if(i == 2){
-            continue;
+Void updateCurrentMap(Text newMapUid){
+    foreach(map in maps){
+        if(newMapUid == map[7]){
+            CurrentMap = map;
+            return;
         }
-        ((navbar.Controls[i] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.2;
     }
-    ((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad).Opacity = 0.9;
-    tabs.Controls[0].Visible = False;
-    tabs.Controls[1].Visible = True;
-    activeTab = 2;
+
+    CurrentMap = ["failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo","failed to get mapinfo"];
+    log("Map not found!! " ^ newMapUid);
+    return;
 }
 
 main() {
@@ -384,7 +355,9 @@ main() {
     declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare CMlFrame minimal <=> (Page.MainFrame.GetFirstChild("minimal") as CMlFrame);
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
+    declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare searchInput <=> (Page.MainFrame.GetFirstChild("searchInput") as CMlEntry);
 
     //hidescript declarations
@@ -395,18 +368,17 @@ main() {
     declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
     declare Boolean isHidden = False;
 
-    //update current map declarations
-    declare Text lastMapChangeHash = "";
+    //current map detection
+    declare Text currentMapId = "";
 
     populate(maps);
-
-    mapListContainer.ClipWindowActive = True;
-    mapListContainer.ClipWindowRelativePosition = <78.0, -38.0>;
-    mapListContainer.ClipWindowSize = <156.0, 80.0>;
-
     activeTab = 0;
+    goToPage(1);
 
     declare Text lastMapSearchQueryHash = "";
+    declare Boolean controlsVisible = False;
+
+    ((navbar.Controls[0] as CMlFrame).Controls[0] as CMlQuad).Opacity = 1.0;
 
     while(True){
         yield;
@@ -419,35 +391,42 @@ main() {
             if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(background, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(backgroundIcon, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }else{
                 if(speed >= UI_Hide_Speed && !isHidden){
                     AnimMgr.Add(widget, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(background, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(backgroundIcon, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = True;
                 }
 
                 if(speed < UI_Hide_Speed && isHidden){
                     AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(background, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(backgroundIcon, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                     isHidden = False;
                 }
             }
 
-            //update current map info
-            declare Text CurrentMapHash for InputPlayer;
-            declare Text[Text] CurrentMap for InputPlayer;
+            //map change detection
+            if(Map.MapInfo.MapUid != currentMapId){
+                currentMapId = Map.MapInfo.MapUid;
+                updateCurrentMap(Map.MapInfo.MapUid);
+                wait(CurrentMap.count > 0);
+                (widget.Controls[0] as CMlLabel).SetText(CurrentMap[0]);
+                (widget.Controls[1] as CMlLabel).SetText(CurrentMap[1]);
+                (minimal.Controls[1] as CMlLabel).SetText(CurrentMap[0] ^ "$z by " ^ CurrentMap[1]);
 
-            if(lastMapChangeHash != CurrentMapHash && CurrentMap.count > 0){
-                log(CurrentMap);
-                (widget.Controls[0] as CMlLabel).SetText(CurrentMap["name"]);
-                (widget.Controls[1] as CMlLabel).SetText("by " ^ CurrentMap["author"]);
-                lastMapChangeHash = CurrentMapHash;
+                if(CurrentMap[6] == "1"){
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Remove");
+                }else{
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                    ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Add");
+                }
             }
 
             //search command
@@ -460,25 +439,60 @@ main() {
                 searchInput.SetText(MapSearchQuery, True);
             }
 
+            declare x_min = widget.RelativePosition_V3[0];
+            declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);
+            declare y_min = widget.RelativePosition_V3[1];
+            declare y_max = widget.RelativePosition_V3[1] - (widget.Size[1] * widget.RelativeScale);
+            declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
+            declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
+
+            if(!(xInBounds && yInBounds) && controlsVisible){
+                controlsVisible = False;
+                AnimMgr.Add(widgetControls, " <frame pos='5.0 -10.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+            }
+            if((xInBounds && yInBounds) && !controlsVisible){
+                controlsVisible = True;
+                AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+            }
+
             foreach(event in PendingEvents){
                 if(event.Control == Null){
                     continue;
                 }
 
-                if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
-                    navButtonClick(((navbar.Controls[3] as CMlFrame).Controls[0] as CMlQuad));
-                    mapsContainer.Show();
+                if(event.Control.HasClass("map-control") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    if(event.Control.HasClass("fav")){
+                        declare curMapId = CurrentMap[5];
+                        declare isFavCurrent = getMapById(curMapId)[6] == "1";
+                        if(isFavCurrent){
+                            updateMapFav(curMapId, "0");
+                            TriggerPageAction("map.fav.remove," ^ CurrentMap[5]);
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Add");
+                            continue;
+                        }else{
+                            updateMapFav(curMapId, "1");
+                            TriggerPageAction("map.fav.add," ^ CurrentMap[5]);
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
+                            ((widgetControls.Controls[2] as CMlFrame).Controls[2] as CMlLabel).SetText("Remove");
+                            continue;
+                        }
+                        if(activeTab == 1){
+                            populate(getFavorites());
+                        }
+                    }
+                    if(event.Control.HasClass("details")){
+                        TriggerPageAction("mx.details," ^ CurrentMap[5]);
+                    }
+                    if(event.Control.HasClass("list")){
+                        navButtonClick(((navbar.Controls[0] as CMlFrame).Controls[0] as CMlQuad));
+                        mapsContainer.Show();
+                    }
                     continue;
                 }
 
                 if(event.Control == searchInput){
                     search(searchInput.Value);
-                    continue;
-                }
-
-                if(event.Control == backgroundIcon && event.Type == CMlScriptEvent::Type::MouseClick){
-                    navButtonClick(((navbar.Controls[1] as CMlFrame).Controls[0] as CMlQuad));
-                    mapsContainer.Show();
                     continue;
                 }
 
@@ -514,8 +528,6 @@ main() {
                         declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
                         declare isFav = getMapById(mapId)[6] == "1";
 
-                        log("MapId: " ^ mapId);
-
                         if(isFav){
                             TriggerPageAction("map.fav.remove," ^ mapId);
                             updateMapFav(mapId, "0");
@@ -547,7 +559,7 @@ main() {
                 if(event.Control.HasClass("mx")){
                     if(event.Type == CMlScriptEvent::Type::MouseClick){
                         declare mapId = (event.Control as CMlLabel).Parent.DataAttributeGet("map-id");
-                        TriggerPageAction("map.mx," ^ mapId);
+                        TriggerPageAction("mx.details," ^ mapId);
                     }
 
                     continue;
@@ -582,15 +594,6 @@ main() {
                 declare Text[][] QueuedMaps for InputPlayer;
                 updateMapQueue(QueuedMaps);
                 lastQueueHash = QueueHash;
-            }
-
-            declare Text MxDetailsHash for InputPlayer;
-            if(lastMxDetailsHash != MxDetailsHash){
-                declare Text[] MxDetails for InputPlayer;
-                if(MxDetails.count > 0){
-                    updateMxDetails(MxDetails);
-                    lastMxDetailsHash = MxDetailsHash;
-                }
             }
         }
     }

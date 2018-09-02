@@ -3,7 +3,7 @@
 
     {if config('pay2play.addtime.enabled')}
     <frame pos="{config('pay2play.addtime.pos.visible')|noescape}" id="addtime">
-        <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" action="addtime"/>
+        <quad pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" action="addtime"/>
 
         <frame z-index="2" pos="4 -2" scale="0.5">
             {if esc\Controllers\MapController::getAddedTime() + 10 <= config('server.max-playtime')}

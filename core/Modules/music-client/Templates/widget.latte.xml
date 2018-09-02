@@ -12,7 +12,7 @@
                 <label id="artist" pos="0 -4" z-index="1" size="36 3" text="music..." halign="right" textcolor="fffc" textsize="0.4"/>
             </frame>
 
-            <frame id="widget-controls" pos="5 -10" z-index="10">
+            <frame id="widget-controls" pos="5 -10.5" z-index="10">
                 <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
                 <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
 
@@ -447,7 +447,7 @@ main() {
 
             if(!(xInBounds && yInBounds) && controlsVisible){
                 controlsVisible = False;
-                AnimMgr.Add(widgetControls, " <frame pos='5.0 -10.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+                AnimMgr.Add(widgetControls, " <frame pos='5.0 -10.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
             }
             if((xInBounds && yInBounds) && !controlsVisible){
                 controlsVisible = True;
