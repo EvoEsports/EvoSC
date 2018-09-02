@@ -21,12 +21,17 @@ class Help
         ChatController::addCommand('help', [Help::class, 'showCommandsHelp'], 'Show this help');
 
         ManiaLinkEvent::add('help', [Help::class, 'switchHelp']);
+
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::addButton('', 'Help', 'help,commands,1');
+        }
     }
 
     /**
      * @param Player $player
-     * @param $type
-     * @param int $page
+     * @param        $type
+     * @param int    $page
+     *
      * @throws \Exception
      */
     public static function switchHelp(Player $player, $type, $page = 1)
@@ -44,8 +49,9 @@ class Help
 
     /**
      * @param Player $player
-     * @param null $help
-     * @param int $page
+     * @param null   $help
+     * @param int    $page
+     *
      * @throws \Exception
      */
     public static function showCommandsHelp(Player $player, $help = null, int $page = 1)
@@ -54,9 +60,11 @@ class Help
             return $command->hasAccess($player);
         })->sortBy('trigger');
 
-        $commandsList = Template::toString('help.commands', ['commands' => $commands->forPage($page, 20), 'player' => $player]);
-        $pagination   = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,commands', 'page' => $page]);
-        $navigation   = self::getNavigation('Commands');
+        $commandsList = Template::toString('help.commands',
+            ['commands' => $commands->forPage($page, 20), 'player' => $player]);
+        $pagination = Template::toString('components.pagination',
+            ['pages' => ceil($commands->count() / 20), 'action' => 'help,commands', 'page' => $page]);
+        $navigation = self::getNavigation('Commands');
 
         Template::show($player, 'components.modal', [
             'id'         => 'help',
@@ -71,8 +79,9 @@ class Help
 
     /**
      * @param Player $player
-     * @param $help
-     * @param int $page
+     * @param        $help
+     * @param int    $page
+     *
      * @throws \Exception
      */
     public static function showKeybindsHelp(Player $player, $help, $page = 1)
@@ -81,9 +90,11 @@ class Help
 
         $commands = KeyController::getKeybinds()->sortBy('trigger');
 
-        $commandsList = Template::toString('help.keybinds', ['commands' => $commands->forPage($page, 20), 'player' => $player]);
-        $pagination   = Template::toString('components.pagination', ['pages' => ceil($commands->count() / 20), 'action' => 'help,keybinds', 'page' => $page]);
-        $navigation   = self::getNavigation('Keybinds');
+        $commandsList = Template::toString('help.keybinds',
+            ['commands' => $commands->forPage($page, 20), 'player' => $player]);
+        $pagination = Template::toString('components.pagination',
+            ['pages' => ceil($commands->count() / 20), 'action' => 'help,keybinds', 'page' => $page]);
+        $navigation = self::getNavigation('Keybinds');
 
         Template::show($player, 'components.modal', [
             'id'         => 'help',
