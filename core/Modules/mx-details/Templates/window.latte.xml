@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MXDetails" id="MXDetails" version="3">
+    <frame id="overview" pos="-60 19" z-index="50">
+        <quad size="110 38" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" ScriptEvents="1" />
+        <quad size="110 38" pos="0 -6" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
+        <quad size="110 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Map Details" z-index="1" />
+        <label class="close" pos="107 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+
+        <frame pos="16 -10" scale="0.95">
+            <label pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-ID" halign="right" valign="center" />
+            <label pos="+1 0" size="20 5" textsize="1" text="$l[https://tm.mania-exchange.com/tracks/{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
+
+            <label pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Name" halign="right" valign="center" />
+            <label pos="+1 -5" size="20 5" textsize="1" text="{$map->gbx->Name}" valign="center" />
+
+            <label pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Name" halign="right" valign="center" />
+            <label pos="+1 -10" size="20 5" textsize="1" text="{$map->author->NickName}" valign="center" />
+
+            <label pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Login" halign="right" valign="center" />
+            <label pos="+1 -15" size="20 5" textsize="1" text="{$map->author->Login}" valign="center" />
+
+            <label pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Uploaded" halign="right" valign="center" />
+            <label pos="+1 -20" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" />
+
+            <label pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Updated" halign="right" valign="center" />
+            <label pos="+1 -25" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UpdatedAt)}" valign="center" />
+
+            <label pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Released" halign="right" valign="center" />
+            <label pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Unreleased ? '' : ''}" valign="center" />
+        </frame>
+
+        <frame pos="54 -10" scale="0.95">
+            <label pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="TitlePack" halign="right" valign="center" />
+            <label pos="+1 0" size="20 5" textsize="1" text="{$map->gbx->TitleId}" valign="center" />
+
+            <label pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Style" halign="right" valign="center" />
+            <label pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_details->StyleName}" valign="center" />
+
+            <label pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Difficulty" halign="right" valign="center" />
+            <label pos="+1 -10" size="20 5" textsize="1" text="{$map->mx_details->DifficultyName}" valign="center" />
+
+            <label pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Length" halign="right" valign="center" />
+            <label pos="+1 -15" size="20 5" textsize="1" text="~{$map->mx_details->LengthName}" valign="center" />
+
+            <label pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Mood" halign="right" valign="center" />
+            <label pos="+1 -20" size="20 5" textsize="1" text="{$map->mx_details->Mood}" valign="center" />
+
+            <label pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Checkpoints" halign="right" valign="center" />
+            <label pos="+1 -25" size="20 5" textsize="1" text="{$map->gbx->CheckpointsPerLaps}" valign="center" />
+
+            <label pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Multi-Lap" halign="right" valign="center" />
+            <label pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Laps > 1 ? '' : ''}" valign="center" />
+        </frame>
+
+        <frame pos="95 -10" scale="0.95">
+            <label pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Time" halign="right" valign="center" />
+            <label pos="+1 0" size="20 5" textsize="1" text="{formatScore($map->gbx->AuthorTime)}" valign="center" />
+
+            <label pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-World-Record" halign="right" valign="center" />
+            <label pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_world_record ? formatScore($map->mx_world_record->ReplayTime) : '0'}" valign="center" />
+
+            <label pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="1. Dedi" halign="right" valign="center" />
+            <label pos="+1 -10" size="20 5" textsize="1" text="{$map->dedis->first() ? formatScore($map->dedis->first()->Score) : '-'}" valign="center" />
+
+
+            <label pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="MX-Karma" halign="center" valign="center" scale="0.75" />
+            {if $map->mx_details->RatingVoteCount > 0}
+            <label pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="{sprintf('%.1f', $map->mx_details->RatingVoteAverage)}% - {$map->mx_details->RatingVoteCount} Votes" halign="center" valign="center" />
+            <label pos="0 -25" size="30 5" textsize="3" text="{$rating}" valign="center" halign="center" textcolor="{config('colors.ui.header')}" z-index="1" />
+            {else}
+            <label pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="This map was not rated yet" halign="center" valign="center" textcolor="fff3" />
+            {/if}
+            <label pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    overview.Hide();
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>
