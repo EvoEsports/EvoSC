@@ -1,3 +1,8 @@
+![version:0.41.8](https://img.shields.io/badge/version-0.41.8-blue.svg?style=flat-square)
+
+
+
+
 # EvoSC
 
 A server controller for Trackmania² based on PHP 7 and Maniaplanet 4 support.

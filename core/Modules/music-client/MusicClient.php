@@ -17,7 +17,7 @@ class MusicClient
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
 
-       KeyController::createBind('Y', [self::class, 'reload']);
+       // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     /**

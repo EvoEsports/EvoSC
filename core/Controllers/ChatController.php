@@ -206,7 +206,7 @@ $$: Writes a dollarsign
     public static function message(?Player $recipient, ...$parts)
     {
         if (!$recipient || !isset($recipient->Login) || $recipient->Login == null) {
-            Log::warning('Do not send message to null player');
+            Log::warning('Do not send message to non existent player');
             return;
         }
 
