@@ -133,8 +133,11 @@ class EscRun extends Command
                 }
 
                 usleep($pause);
-            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\TransportException $e) {
-                Log::logAddLine('XmlRpc', $e->getMessage());
+            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
+                Log::logAddLine('Maniaplanet', $e->getMessage());
+            } catch (Error $e){
+                Log::logAddLine('cycle', 'EvoSC encountered an error: ' . $e->getMessage());
+                Log::logAddLine('cycle', $e->getTraceAsString(), false);
             }
         }
     }

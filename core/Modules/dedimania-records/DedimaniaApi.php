@@ -312,7 +312,7 @@ class DedimaniaApi
                     if (!$data->params->param->value->boolean) {
                         //Request failed
 
-                        \esc\Controllers\ChatController::messageAll('Updating dedis failed');
+                        \esc\Controllers\ChatController::message('Updating dedis failed');
                     }
                 }
             }
@@ -361,7 +361,7 @@ Return struct {'Login': string, 'MaxRank': int, 'Banned': boolean, 'OptionsEnabl
             ]);
 
             if ($player->Banned) {
-                \esc\Controllers\ChatController::messageAll($player, warning(' is banned from dedimania.'));
+                \esc\Controllers\ChatController::message($player, warning(' is banned from dedimania.'));
             }
         }
 

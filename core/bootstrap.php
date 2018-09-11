@@ -56,6 +56,8 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
     esc\Controllers\ModuleController::init();
     \esc\Controllers\HideScriptController::init();
     \esc\Controllers\PlanetsController::init();
+
+    \esc\Controllers\ChatController::addCommand('setconfig', [\esc\Classes\Config::class, 'setChatCmd'], 'Sets config value', '//', 'config');
 }
 
 function bootModules()

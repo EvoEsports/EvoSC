@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -22,6 +23,15 @@ class KeyController
         Hook::add('PlayerConnect', [KeyController::class, 'playerConnect']);
 
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
+
+        self::createBind('Q', [self::class, 'reloadConfig']);
+    }
+
+    public static function reloadConfig(Player $player)
+    {
+        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' reloads config.');
+        Config::loadConfigFiles();
+        Hook::fire('ConfigUpdated');
     }
 
     /**

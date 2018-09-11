@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="clock-widget" id="clock-widget" version="3">
     <frame pos="{config('clock.pos.visible')}" id="widget">
-        <quad pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" />
+        <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" />
 
@@ -23,6 +23,7 @@
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare pointerHours <=> (Page.MainFrame.GetFirstChild("pointerHours") as CMlQuad);
             declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
+            declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
             declare pointerSeconds <=> (Page.MainFrame.GetFirstChild("pointerSeconds") as CMlQuad);
             declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
             declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
@@ -71,16 +72,19 @@
                         if(speed < UI_Hide_Speed && hidden){
                             anim(widget, visiblePos, duration);
                             hidden = False;
+                            AnimMgr.Add(bg, "<quad opacity='0.6' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
                         }
                     }else{
                         if(speed >= UI_Hide_Speed && !hidden){
                             anim(widget, hiddenPos, duration);
                             hidden = True;
+                            AnimMgr.Add(bg, "<quad opacity='0.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
                         }
 
                         if(speed < UI_Hide_Speed && hidden){
                             anim(widget, visiblePos, duration);
                             hidden = False;
+                            AnimMgr.Add(bg, "<quad opacity='0.6' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
                         }
                     }
                 }

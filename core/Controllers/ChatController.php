@@ -45,8 +45,10 @@ $$: Writes a dollarsign
 
         Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
-        ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//', 'player.mute');
-        ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//', 'player.mute');
+        ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//',
+            'player.mute');
+        ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//',
+            'player.mute');
     }
 
     public static function getChatCommands(): Collection
@@ -95,6 +97,7 @@ $$: Writes a dollarsign
         if (preg_match('/^(\/|\/\/|##)/', $text)) {
             //Catch invalid chat commands
             ChatController::message($player, warning('Invalid chat command entered'));
+
             return;
         }
 
@@ -182,8 +185,13 @@ $$: Writes a dollarsign
         return $command->compile();
     }
 
-    public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
-    {
+    public static function addCommand(
+        string $command,
+        array $callback,
+        string $description = '-',
+        string $trigger = '/',
+        string $access = null
+    ) {
         if (!self::$chatCommands) {
             self::$chatCommands = collect();
             self::$chatCommandsCompiled = collect();
@@ -196,17 +204,30 @@ $$: Writes a dollarsign
         Log::info("Chat command added: " . $chatCommand->compile(), false);
     }
 
-    public static function messageAll(...$parts)
+    /**
+     * @param \esc\Models\Player|\Illuminate\Support\Collection $recipient
+     * @param mixed                                             ...$parts
+     */
+    public static function message($recipients, ...$parts)
     {
-        foreach (onlinePlayers() as $player) {
-            self::message($player, ...$parts);
+        if ($recipients instanceof Player) {
+            self::sendMessage($recipients, ...$parts);
+        } else {
+            $recipients->each(function (Player $player) use ($parts) {
+                ChatController::sendMessage($player, ...$parts);
+            });
         }
     }
 
-    public static function message(?Player $recipient, ...$parts)
+    /**
+     * @param \esc\Models\Player|\Illuminate\Support\Collection $recipient
+     * @param mixed                                             ...$parts
+     */
+    public static function sendMessage(Player $recipient, ...$parts)
     {
         if (!$recipient || !isset($recipient->Login) || $recipient->Login == null) {
             Log::warning('Do not send message to non existent player');
+
             return;
         }
 
@@ -319,6 +340,7 @@ $$: Writes a dollarsign
         } catch (\Exception $e) {
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
             Log::logAddLine('', $e->getTraceAsString(), false);
+
             return;
         }
     }

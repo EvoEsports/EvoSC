@@ -75,7 +75,7 @@ class PlayerController
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
-            ChatController::messageAll($player->group->Name, ' ', $player, ' kicked ', $playerToBeKicked, '. Reason: ', secondary($reason));
+            ChatController::message($player->group->Name, ' ', $player, ' kicked ', $playerToBeKicked, '. Reason: ', secondary($reason));
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to kick player: ' . $e->getMessage(), true);
             Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
@@ -100,7 +100,7 @@ class PlayerController
             $reason = implode(" ", $message);
             Server::ban($playerToBeBanned->Login, $reason);
             Server::blackList($playerToBeBanned->Login);
-            ChatController::messageAll($player->group->Name, ' ', $player, ' banned ', $playerToBeBanned, '. Reason: ', secondary($reason));
+            ChatController::message($player->group->Name, ' ', $player, ' banned ', $playerToBeBanned, '. Reason: ', secondary($reason));
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to ban player: ' . $e->getMessage(), true);
             Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
@@ -120,7 +120,7 @@ class PlayerController
             return;
         }
 
-        ChatController::messageAll('Adding ', intval($n), ' fake players');
+        ChatController::message('Adding ', intval($n), ' fake players');
 
         for ($i = 0; $i < intval($n); $i++) {
             $login = Server::connectFakePlayer();
@@ -151,7 +151,7 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        ChatController::messageAll('_info', $player->group->Name, ' ', $player, ' joined the server.');
+        ChatController::message('_info', $player->group->Name, ' ', $player, ' joined the server.');
         Log::info($player->NickName . " joined the server.");
 
         return $player;
@@ -191,7 +191,7 @@ class PlayerController
         }
 
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
-        ChatController::messageAll('_info', $player, ' left the server');
+        ChatController::message('_info', $player, ' left the server');
     }
 
     public static function getPlayerByServerId(int $id): ?Player

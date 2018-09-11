@@ -108,10 +108,10 @@ class MapController
         if ($request) {
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::messageAll("", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::message("", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::messageAll("", ' Next map is ', $nextMap);
+            ChatController::message("", ' Next map is ', $nextMap);
         }
     }
 
@@ -165,11 +165,11 @@ class MapController
         $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
 
         if ($deleted) {
-            ChatController::messageAll('Admin removed map ', $map);
+            ChatController::message('Admin removed map ', $map);
             try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                ChatController::messageAll('_info', $player->group, ' ', $player, ' removed map ', $map,
+                ChatController::message('_info', $player->group, ' ', $player, ' removed map ', $map,
                     ' permanently');
             } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
@@ -188,7 +188,7 @@ class MapController
         $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        ChatController::messageAll('_info', $player->group, ' ', $player, ' disabled map ', $map);
+        ChatController::message('_info', $player->group, ' ', $player, ' disabled map ', $map);
     }
 
     /**
@@ -226,7 +226,7 @@ class MapController
      */
     public static function skip(Player $player)
     {
-        ChatController::messageAll($player->group, ' ', $player, ' skips map');
+        ChatController::message($player->group, ' ', $player, ' skips map');
         MapController::goToNextMap();
         Vote::stopVote();
     }
@@ -248,7 +248,7 @@ class MapController
         }
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::messageAll($player, ' queued map ', $currentMap, ' for replay');
+        ChatController::message($player, ' queued map ', $currentMap, ' for replay');
     }
 
     /**
@@ -271,7 +271,7 @@ class MapController
 
         Server::chooseNextMap(self::getNext()->filename);
 
-        ChatController::messageAll($player, ' juked map ', $map);
+        ChatController::message($player, ' juked map ', $map);
         Log::info("$player->NickName juked map " . $map->gbx->Name);
 
         Hook::fire('QueueUpdated', self::$queue);
@@ -398,7 +398,7 @@ class MapController
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::messageAll("Requested map with invalid id: " . $mxId);
+                ChatController::message("Requested map with invalid id: " . $mxId);
 
                 return;
             }
@@ -406,7 +406,7 @@ class MapController
             $map = Map::getByMxId($mxId);
 
             if ($map) {
-                ChatController::messageAll($map, ' already exists');
+                ChatController::message($map, ' already exists');
                 continue;
             }
 
@@ -414,7 +414,7 @@ class MapController
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-                ChatController::messageAll("Can not reach mania exchange.");
+                ChatController::message("Can not reach mania exchange.");
 
                 return;
             }
@@ -461,7 +461,7 @@ class MapController
                 Log::warning("Map $map->filename already added.");
             }
 
-            ChatController::messageAll('New map added: ', $map);
+            ChatController::message('New map added: ', $map);
         }
     }
 

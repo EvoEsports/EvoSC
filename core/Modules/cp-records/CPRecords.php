@@ -49,7 +49,7 @@ class CPRecords
 
     public static function reset(Player $player)
     {
-        ChatController::messageAll('_info', $player->group, ' ', $player, ' resets checkpoints.');
+        ChatController::message('_info', $player->group, ' ', $player, ' resets checkpoints.');
         self::clearCheckpoints();
     }
 

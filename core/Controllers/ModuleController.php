@@ -31,7 +31,7 @@ class ModuleController
 
         if ($module) {
             $module->load($callee);
-            ChatController::messageAll('_info', $callee, ' reloads module ', $module);
+            ChatController::message('_info', $callee, ' reloads module ', $module);
         }
     }
 

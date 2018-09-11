@@ -52,7 +52,7 @@ class Pay2Play
 
     public static function addTimePaySuccess(Player $player, int $amount)
     {
-        ChatController::messageAll('_info', $player, ' paid ', $amount, ' to add more time');
+        ChatController::message('_info', $player, ' paid ', $amount, ' to add more time');
         MapController::addTime(10);
         onlinePlayers()->each([self::class, 'showWidget']);
     }
@@ -66,7 +66,7 @@ class Pay2Play
 
     public static function skipPaySuccess(Player $player, int $amount)
     {
-        ChatController::messageAll('_info', $player, ' paid ', $amount, ' to skip map');
+        ChatController::message('_info', $player, ' paid ', $amount, ' to skip map');
         MapController::skip($player);
     }
 }

@@ -59,7 +59,7 @@ class LocalRecords
         $local = $map->locals()->wherePlayer($player->id)->first();
         if ($local != null) {
             if ($score == $local->Score) {
-                ChatController::messageAll('_local', 'Player ', $player, ' equaled his/her ', $local);
+                ChatController::message('_local', 'Player ', $player, ' equaled his/her ', $local);
                 return;
             }
 
@@ -71,9 +71,9 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
 
                 if ($oldRank == $local->Rank) {
-                    ChatController::messageAll('_local', 'Player ', $player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::message('_local', 'Player ', $player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
-                    ChatController::messageAll('_local', 'Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
+                    ChatController::message('_local', 'Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
                 Hook::fire('PlayerLocal', $player, $local);
                 self::displayLocalRecords();
@@ -88,7 +88,7 @@ class LocalRecords
                     'Rank' => 999,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
-                ChatController::messageAll('_local', 'Player ', $player, ' claimed the ', $local);
+                ChatController::message('_local', 'Player ', $player, ' claimed the ', $local);
                 Hook::fire('PlayerLocal', $player, $local);
                 self::displayLocalRecords();
             }

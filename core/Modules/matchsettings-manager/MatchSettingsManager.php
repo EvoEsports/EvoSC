@@ -270,7 +270,7 @@ class MatchSettingsManager
         //Update maps
         onlinePlayers()->each([MapList::class, 'sendManialink']);
 
-        ChatController::messageAll($player->group, ' ', $player->NickName, ' loads new settings ', secondary($matchSettingsFile));
+        ChatController::message($player->group, ' ', $player->NickName, ' loads new settings ', secondary($matchSettingsFile));
         Log::logAddLine('MatchSettingsManager', "$player loads MatchSettings: $matchSettingsFile");
     }
 
