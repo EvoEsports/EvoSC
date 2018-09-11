@@ -244,7 +244,7 @@ class Dedimania extends DedimaniaApi
             //Player has dedi on map
 
             if ($score == $dedi->Score) {
-                ChatController::message('_dedi', 'Player ', $player, ' equaled his/her ', $dedi);
+                ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' equaled his/her ', $dedi);
 
                 return;
             }
@@ -258,10 +258,10 @@ class Dedimania extends DedimaniaApi
 
                 if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                     if ($oldRank == $dedi->Rank) {
-                        ChatController::message('_dedi', 'Player ', $player, ' secured his/her ', $dedi,
+                        ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' secured his/her ', $dedi,
                             ' (-' . formatScore($diff) . ')');
                     } else {
-                        ChatController::message('_dedi', 'Player ', $player, ' gained the ', $dedi,
+                        ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi,
                             ' (-' . formatScore($diff) . ')');
                     }
                     self::addNewTime($dedi);
@@ -284,7 +284,7 @@ class Dedimania extends DedimaniaApi
             if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                 self::addNewTime($dedi);
                 self::pushNewDediToPlayers($dedi);
-                ChatController::message('_dedi', 'Player ', $player, ' gained the ', $dedi);
+                ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
             }
         }
     }

@@ -120,7 +120,7 @@ class PlayerController
             return;
         }
 
-        ChatController::message('Adding ', intval($n), ' fake players');
+        ChatController::message(onlinePlayers(), 'Adding ', intval($n), ' fake players');
 
         for ($i = 0; $i < intval($n); $i++) {
             $login = Server::connectFakePlayer();
@@ -151,7 +151,7 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        ChatController::message('_info', $player->group->Name, ' ', $player, ' joined the server.');
+        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' joined the server.');
         Log::info($player->NickName . " joined the server.");
 
         return $player;
@@ -191,7 +191,7 @@ class PlayerController
         }
 
         Log::info($player->NickName . " left the server [" . ($disconnectReason ?: 'disconnected') . "].");
-        ChatController::message('_info', $player, ' left the server');
+        ChatController::message(onlinePlayers(), '_info', $player, ' left the server');
     }
 
     public static function getPlayerByServerId(int $id): ?Player

@@ -151,7 +151,7 @@ class Vote
 
         Timer::create('vote.finish', [Vote::class, 'finishVote'], self::VOTE_TIME . 's');
 
-        ChatController::message("\$fff ", $player, ' is asking for more time. Type /y or /n to vote.');
+        ChatController::message(onlinePlayers(), "\$fff ", $player, ' is asking for more time. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -185,7 +185,7 @@ class Vote
 
         Timer::create('vote.finish', [Vote::class, 'finishVote'], self::VOTE_TIME . 's');
 
-        ChatController::message("\$fff ", $player, ' is asking to skip the map. Type /y or /n to vote.');
+        ChatController::message(onlinePlayers(), "\$fff ", $player, ' is asking to skip the map. Type /y or /n to vote.');
 
         self::showVote();
     }
@@ -217,7 +217,7 @@ class Vote
 
         $voteText = '$' . config('colors.secondary') . self::$message;
 
-        ChatController::message("\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
+        ChatController::message(onlinePlayers(), "\$fff ", 'Vote ', $voteText, ' ended with ', secondary($successful ? 'yes' : 'no'));
 
         self::stopVote();
     }

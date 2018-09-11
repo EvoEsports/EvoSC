@@ -154,9 +154,9 @@ class GroupManager
 
         if ($newMember) {
             if ($newMember->group->id == 3) {
-                ChatController::message('_info', $player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group));
+                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group));
             } else {
-                ChatController::message('_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
+                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
             }
 
             Player::whereLogin($playerLogin)->update(['Group' => $group->id]);

@@ -116,7 +116,7 @@ class MxKarma extends MXK
 
         self::$updatedVotes->push($player->id);
 
-        ChatController::message('_info', $player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])));
+        ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])));
         Log::info(stripAll($player->NickName) . " rated " . stripAll($map->Name) . " @ $rating|" . self::$ratings[$rating]);
 
         foreach (onlinePlayers() as $player) {

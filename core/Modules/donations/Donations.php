@@ -46,7 +46,7 @@ class Donations
     public static function paySuccess(Player $player, $amount)
     {
         $player->stats()->increment('Donations', $amount);
-        ChatController::message('_info', $player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!');
+        ChatController::message(onlinePlayers(), '_info', $player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!');
 
         Hook::fire('PlayerDonate', $player, $amount);
     }

@@ -108,10 +108,10 @@ class MapController
         if ($request) {
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message("", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::message(onlinePlayers(), "", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::message("", ' Next map is ', $nextMap);
+            ChatController::message(onlinePlayers(), "", ' Next map is ', $nextMap);
         }
     }
 
@@ -165,11 +165,11 @@ class MapController
         $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
 
         if ($deleted) {
-            ChatController::message('Admin removed map ', $map);
+            ChatController::message(onlinePlayers(), 'Admin removed map ', $map);
             try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                ChatController::message('_info', $player->group, ' ', $player, ' removed map ', $map,
+                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' removed map ', $map,
                     ' permanently');
             } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
@@ -188,7 +188,7 @@ class MapController
         $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        ChatController::message('_info', $player->group, ' ', $player, ' disabled map ', $map);
+        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' disabled map ', $map);
     }
 
     /**
@@ -398,7 +398,7 @@ class MapController
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::message("Requested map with invalid id: " . $mxId);
+                ChatController::message(onlinePlayers(), "Requested map with invalid id: " . $mxId);
 
                 return;
             }
@@ -414,7 +414,7 @@ class MapController
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-                ChatController::message("Can not reach mania exchange.");
+                ChatController::message(onlinePlayers(), "Can not reach mania exchange.");
 
                 return;
             }
@@ -461,7 +461,7 @@ class MapController
                 Log::warning("Map $map->filename already added.");
             }
 
-            ChatController::message('New map added: ', $map);
+            ChatController::message(onlinePlayers(), 'New map added: ', $map);
         }
     }
 

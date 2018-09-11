@@ -312,7 +312,7 @@ class DedimaniaApi
                     if (!$data->params->param->value->boolean) {
                         //Request failed
 
-                        \esc\Controllers\ChatController::message('Updating dedis failed');
+                        \esc\Controllers\ChatController::message(onlinePlayers(), 'Updating dedis failed');
                     }
                 }
             }
