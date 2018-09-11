@@ -18,7 +18,7 @@ class MxMapDetails
     {
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
 
-        KeyController::createBind('Y', [self::class, 'reload']);
+        // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

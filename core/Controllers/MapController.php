@@ -52,7 +52,7 @@ class MapController
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
         ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
 
-        if(config('quick-buttons.enabled')){
+        if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map.skip');
             QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map.replay');
             QuickButtons::addButton('', 'Reset Round', 'map.reset', 'map.reset');
@@ -91,6 +91,8 @@ class MapController
         $settings = \esc\Classes\Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $timeInSeconds;
         \esc\Classes\Server::setModeScriptSettings($settings);
+
+        Hook::fire('TimeLimitUpdated', $timeInSeconds);
     }
 
     /**
@@ -363,7 +365,7 @@ class MapController
 
         $mxDetails = json_decode($data);
 
-        if(count($mxDetails) == 0){
+        if (count($mxDetails) == 0) {
             Log::logAddLine('MapController', 'Failed to fetch MX world record: mxDetails is empty.');
 
             return;
@@ -460,15 +462,6 @@ class MapController
             }
 
             ChatController::messageAll('New map added: ', $map);
-        }
-    }
-
-    public static function settings(Player $player, $cmd, $filename)
-    {
-        try {
-            Server::loadMatchSettings(matchSettings($filename));
-        } catch (\Exception $e) {
-            Log::logAddLine('MatchSettings', 'Failed to load matchsettings: ' . $filename);
         }
     }
 
