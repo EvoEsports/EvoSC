@@ -342,7 +342,7 @@ Return struct {'Login': string, 'MaxRank': int, 'Banned': boolean, 'OptionsEnabl
         $params->addChild('param')->addChild('string', $player->Login);
 
         //string Nickname
-        $params->addChild('param')->addChild('string', $player->NickName);
+        $params->addChild('param')->addChild('string', $player);
 
         //string Path
         $params->addChild('param')->addChild('string', Server::getDetailedPlayerInfo(Config::get('dedimania.login'))->path);

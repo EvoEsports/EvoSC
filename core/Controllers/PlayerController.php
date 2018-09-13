@@ -51,7 +51,7 @@ class PlayerController
     public static function findPlayerByName(Player $callee, $nick): ?Player
     {
         $players = onlinePlayers()->filter(function (Player $player) use ($nick) {
-            return str_contains(stripStyle(stripColors(strtolower($player->NickName))), strtolower($nick));
+            return str_contains(stripStyle(stripColors(strtolower($player))), strtolower($nick));
         });
 
         if ($players->count() == 0) {
@@ -222,7 +222,7 @@ class PlayerController
     public static function playerConnect(Player $player): Player
     {
         ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' joined the server.');
-        Log::info($player->NickName . " joined the server.");
+        Log::info($player . " joined the server.");
 
         return $player;
     }
@@ -244,7 +244,7 @@ class PlayerController
 
         if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
             $player->setScore($score);
-            Log::info($player->NickName . " finished with time ($score) " . $player->getTime());
+            Log::info($player . " finished with time ($score) " . $player->getTime());
         }
     }
 

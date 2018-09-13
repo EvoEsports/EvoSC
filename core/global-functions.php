@@ -20,7 +20,7 @@ function console(): \esc\Models\Player
 {
     $player           = new \esc\Models\Player();
     $player->Login    = serverName();
-    $player->NickName = serverName();
+    $player = serverName();
     $player->Group    = \esc\Models\Group::find(1);
     return $player;
 }

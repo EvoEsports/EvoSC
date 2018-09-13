@@ -87,7 +87,7 @@ class ImportUaseco extends Command
             } else {
                 $plyId = $esc->table('players')->insertGetId([
                     'Login'    => $player->Login,
-                    'NickName' => $player->Nickname,
+                    'NickName' => $player,
                 ]);
             }
 

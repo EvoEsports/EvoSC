@@ -272,7 +272,7 @@ class MapController
         Server::chooseNextMap(self::getNext()->filename);
 
         ChatController::message($player, ' juked map ', $map);
-        Log::info("$player->NickName juked map " . $map->gbx->Name);
+        Log::info("$player juked map " . $map->gbx->Name);
 
         Hook::fire('QueueUpdated', self::$queue);
 
