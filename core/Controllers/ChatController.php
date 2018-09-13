@@ -107,7 +107,7 @@ $$: Writes a dollarsign
         }
 
         Log::logAddLine($player, $text);
-        $nick = $player;
+        $nick = $player->NickName;
 
         $parts = explode(" ", $text);
 
