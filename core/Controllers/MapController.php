@@ -29,7 +29,7 @@ class MapController
 
     public static function init()
     {
-        self::$timeLimit = floor(Server::getRpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
+        self::$timeLimit = floor(Server::rpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
 
         self::loadMaps();
 
@@ -226,7 +226,7 @@ class MapController
      */
     public static function skip(Player $player)
     {
-        ChatController::message($player->group, ' ', $player, ' skips map');
+        ChatController::message(onlinePlayers(),$player, ' skips map');
         MapController::goToNextMap();
         Vote::stopVote();
     }

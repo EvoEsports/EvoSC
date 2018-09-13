@@ -18,14 +18,14 @@ class Server
         self::call('SendHideManialinkPage');
     }
 
-    public static function getRpc(): Connection
+    public static function rpc(): Connection
     {
         return self::$rpc;
     }
 
     public static function call(string $rpc_func, $args = null)
     {
-        self::getRpc()->execute($rpc_func, $args);
+        self::rpc()->execute($rpc_func, $args);
     }
 
     public static function __callStatic($name, $arguments)

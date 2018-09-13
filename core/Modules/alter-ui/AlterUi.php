@@ -39,7 +39,7 @@ class AlterUi
         $properties .= sprintf('<spectator_info visible="0" pos="0.0 0.0 0.0" />');
 
         try {
-            \esc\Classes\Server::getRpc()->triggerModeScriptEvent('Trackmania.UI.SetProperties', ["<ui_properties>$properties</ui_properties>"]);
+            \esc\Classes\Server::rpc()->triggerModeScriptEvent('Trackmania.UI.SetProperties', ["<ui_properties>$properties</ui_properties>"]);
         } catch (\Maniaplanet\DedicatedServer\InvalidArgumentException $e) {
             echo $e->getMessage();
         }

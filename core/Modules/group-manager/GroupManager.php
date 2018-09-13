@@ -134,7 +134,7 @@ class GroupManager
 
         if ($member) {
             Player::whereLogin($memberLogin)->update(['Group' => 3]);
-            ChatController::message($player->group, ' ', $player, ' removed ', $member, '\'s access rights.');
+            ChatController::message(onlinePlayers(),$player, ' removed ', $member, '\'s access rights.');
             self::groupMembers($player, $groupId);
         }
     }

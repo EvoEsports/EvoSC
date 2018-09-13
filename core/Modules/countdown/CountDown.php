@@ -22,7 +22,7 @@ class CountDown
         Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
-        KeyController::createBind('Y', [self::class, 'reload']);
+        // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

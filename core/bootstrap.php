@@ -24,7 +24,7 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
             config('server.rpc.password')
         );
 
-        $serverName = \esc\Classes\Server::getRpc()->getServerName();
+        $serverName = \esc\Classes\Server::rpc()->getServerName();
 
         if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
             \esc\Classes\Server::autoSaveValidationReplays(true);
