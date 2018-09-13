@@ -164,6 +164,12 @@ class PBRecords
             return $local;
         }
 
-        return $map->dedis()->orderByDesc('Score')->first();
+        $dedi = $map->dedis()->orderByDesc('Score')->first();
+
+        if(!$dedi){
+            return $map->locals()->orderByDesc('Score')->first();
+        }
+
+        return $dedi;
     }
 }
