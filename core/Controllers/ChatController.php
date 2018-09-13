@@ -185,13 +185,8 @@ $$: Writes a dollarsign
         return $command->compile();
     }
 
-    public static function addCommand(
-        string $command,
-        array $callback,
-        string $description = '-',
-        string $trigger = '/',
-        string $access = null
-    ) {
+    public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
+    {
         if (!self::$chatCommands) {
             self::$chatCommands = collect();
             self::$chatCommandsCompiled = collect();
@@ -277,13 +272,16 @@ $$: Writes a dollarsign
 
         $message = '$s';
 
-        foreach ($parts as $part) {
+        foreach ($parts as $key => $part) {
             if ($part === null) {
                 continue;
             }
 
             if ($part instanceof Player) {
-                $message .= $part->NickName;
+                if($key == 0){
+                    $message .= primary($part->group->Name) . ' ';
+                }
+                $message .= secondary($part->NickName);
                 continue;
             }
 

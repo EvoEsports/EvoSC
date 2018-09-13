@@ -41,12 +41,9 @@ class MapController
 
         ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'skip');
         ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>',
-            '//', 'map.add');
-        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//',
-            'map.replay');
-        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'],
-            'Adds time (you can also substract)', '//', 'time');
+        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
+        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map.replay');
+        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
 
         ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map.skip');
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
@@ -103,12 +100,20 @@ class MapController
      */
     public static function endMatch()
     {
-        $request = self::$queue->shift();
+        $request = self::$queue->first();
 
         if ($request) {
+            $nextMapUid = Server::rpc()->getNextMapInfo()->uId;
+
+            if ($request->map->Uid != $nextMapUid) {
+                //Preloaded map does not match top of queue anymore
+                $request = self::$queue->shift();
+            }
+
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), "", ' Next map is ', $request->map, ' as requested by ', $request->issuer);
+            ChatController::message(onlinePlayers(), "", ' Next map is ', $request->map, ' as requested by ',
+                $request->issuer);
         } else {
             $nextMap = self::getNext();
             ChatController::message(onlinePlayers(), "", ' Next map is ', $nextMap);
@@ -213,7 +218,7 @@ class MapController
         } else {
             $mapInfo = Server::getNextMapInfo();
             $map = Map::where('uid', $mapInfo->uId)
-                ->first();
+                      ->first();
         }
 
         return $map;
@@ -226,7 +231,7 @@ class MapController
      */
     public static function skip(Player $player)
     {
-        ChatController::message(onlinePlayers(),$player, ' skips map');
+        ChatController::message(onlinePlayers(), $player, ' skips map');
         MapController::goToNextMap();
         Vote::stopVote();
     }
@@ -241,21 +246,24 @@ class MapController
         $currentMap = self::getCurrentMap();
 
         if (self::getQueue()
-            ->contains('map.uid', $currentMap->uid)) {
+                ->contains('map.uid', $currentMap->uid)) {
             ChatController::message($player, 'Map is already being replayed');
 
             return;
         }
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::message($player, ' queued map ', $currentMap, ' for replay');
+        ChatController::message(onlinePlayers(), $player, ' queued map ', $currentMap, ' for replay');
     }
 
     /**
-     * Add a map to the queue
+     * Adds a map to the queue
      *
-     * @param Player $player
-     * @param Map    $map
+     * @param \esc\Models\Player $player
+     * @param \esc\Models\Map    $map
+     * @param null               $arg
+     *
+     * @return null
      */
     public static function queueMap(Player $player, Map $map, $arg = null)
     {
@@ -269,9 +277,10 @@ class MapController
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
 
+        //Preload map -> faster map change
         Server::chooseNextMap(self::getNext()->filename);
 
-        ChatController::message($player, ' juked map ', $map);
+        ChatController::message(onlinePlayers(), $player, ' juked map ', $map);
         Log::info("$player juked map " . $map->gbx->Name);
 
         Hook::fire('QueueUpdated', self::$queue);
@@ -302,8 +311,8 @@ class MapController
 
         foreach ($maps as $mapInfo) {
             $map = Map::where('uid', $mapInfo->uId)
-                ->get()
-                ->first();
+                      ->get()
+                      ->first();
 
             if (!$map) {
                 //Map does not exist, create it
@@ -336,11 +345,11 @@ class MapController
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-            ->update(['enabled' => false]);
+           ->update(['enabled' => false]);
 
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
-            ->update(['enabled' => true]);
+           ->update(['enabled' => true]);
     }
 
     public static function loadMxDetails(Map $map, bool $overwrite = false)
