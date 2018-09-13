@@ -22,10 +22,17 @@ class PBRecords
         Hook::add('PlayerConnect', [PBRecords::class, 'playerConnect']);
         Hook::add('EndMatch', [PBRecords::class, 'endMatch']);
         Hook::add('BeginMatch', [PBRecords::class, 'beginMatch']);
+        Hook::add('PlayerLocal', [PBRecords::class, 'playerMadeRecord']);
+        Hook::add('PlayerDedi', [PBRecords::class, 'playerMadeRecord']);
 
         ChatController::addCommand('target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
         self::$targets = collect([]);
+    }
+
+    public static function playerMadeRecord(Player $player, $record)
+    {
+        self::playerConnect($player);
     }
 
     public static function playerConnect(Player $player)
@@ -132,14 +139,14 @@ class PBRecords
         $map = MapController::getCurrentMap();
 
         $local = $map->locals()
-            ->wherePlayer($player->id)
-            ->get()
-            ->first();
+                     ->wherePlayer($player->id)
+                     ->get()
+                     ->first();
 
         $dedi = $map->dedis()
-            ->wherePlayer($player->id)
-            ->get()
-            ->first();
+                    ->wherePlayer($player->id)
+                    ->get()
+                    ->first();
 
         if ($local && $dedi) {
             if ($dedi->Score <= $local->Score) {
