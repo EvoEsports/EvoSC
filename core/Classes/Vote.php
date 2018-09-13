@@ -257,7 +257,7 @@ class Vote
 
     public static function stopVote(Player $player = null)
     {
-        if (!self::$inProgress) {
+        if (!self::$inProgress && $player) {
             ChatController::message($player, 'There is currently no vote to stop');
 
             return;
