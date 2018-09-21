@@ -238,7 +238,7 @@ class DedimaniaApi
         $params = $xml->addChild('params');
 
         //string SessionId
-        $params->addChild('param')->addChild('value', self::getSession()->Session);
+        $params->addChild('param')->addChild('value', self::getSessionKey());
 
         //struct SrvInfo
         self::paramAddStruct($params->addChild('param'), [

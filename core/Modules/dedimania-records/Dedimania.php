@@ -221,8 +221,9 @@ class Dedimania extends DedimaniaApi
     /**
      * called on playerFinish
      *
-     * @param Player $player
-     * @param int    $score
+     * @param \esc\Models\Player $player
+     * @param int                $score
+     * @param string             $checkpoints
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -231,11 +232,11 @@ class Dedimania extends DedimaniaApi
             return;
         }
 
-        Log::logAddLine('Dedimania', 'Player ' . $player->Login . ' finished with time ' . formatScore($score));
-
         $map     = MapController::getCurrentMap();
         $dedi    = $map->dedis()->wherePlayer($player->id)->first();
         $newRank = self::getRankForScore($map, $score);
+
+        Log::logAddLine('Dedimania', $player . ' finished with time ' . formatScore($score));
 
         if ($dedi) {
             //Player has dedi on map
