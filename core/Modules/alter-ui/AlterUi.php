@@ -25,7 +25,7 @@ class AlterUi
         $properties .= sprintf('<chat visible="1" offset="0.0" linecount="40.0" />');
         $properties .= sprintf('<checkpoint_list visible="0" pos="0.0 0.0 0.0" />');
         $properties .= sprintf('<checkpoint_ranking visible="0" pos="0.0 0.0 0.0" />');
-        $properties .= sprintf('<countdown visible="0" pos="155.0 0.0 0.0" />');
+        $properties .= sprintf('<countdown visible="1" pos="155.0 0.0 0.0" />');
         $properties .= sprintf('<go visible="1" />');
         $properties .= sprintf('<chrono visible="1" pos="146.0 -85.0 100.0" />');
         $properties .= sprintf('<speed_and_distance visible="0" pos="152.0 -75.0 0.0" />');
