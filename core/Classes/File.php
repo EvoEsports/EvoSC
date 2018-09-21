@@ -11,6 +11,7 @@ class File
     {
         if (!$fileName) {
             Log::error("Could not load file $fileName");
+
             return null;
         }
 
@@ -21,9 +22,11 @@ class File
         return null;
     }
 
-    public static function put(string $fileName, string $content)
+    public static function put(string $fileName, string $content): bool
     {
         file_put_contents($fileName, $content);
+
+        return self::exists($fileName);
     }
 
     public static function fileAppendLine($fileName, $line)
@@ -62,20 +65,21 @@ class File
     {
         $files = collect();
 
-        File::getDirectoryContents($baseDirectory)->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
-            $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
+        File::getDirectoryContents($baseDirectory)
+            ->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
+                $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
 
-            if (is_dir($path) && !in_array($file, ['.', '..'])) {
-                //Check directory contents
-                $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
-            } else {
-                //File is not directory
-                if (preg_match($filterPattern, $file)) {
-                    //Add template
-                    $files->push($path);
+                if (is_dir($path) && !in_array($file, ['.', '..'])) {
+                    //Check directory contents
+                    $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
+                } else {
+                    //File is not directory
+                    if (preg_match($filterPattern, $file)) {
+                        //Add template
+                        $files->push($path);
+                    }
                 }
-            }
-        });
+            });
 
         return $files;
     }
@@ -85,6 +89,7 @@ class File
         if (file_exists($path) && is_file($path)) {
             unlink($path);
             Log::logAddLine('File', 'Deleted file: ' . $path);
+
             return true;
         }
 

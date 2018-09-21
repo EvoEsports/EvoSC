@@ -154,7 +154,7 @@
         declare Real relativeRankPos = LocalRank / 100.0;
         declare Integer targetRank = LocalRank;
 
-        declare Integer totalVisible = 18;
+        declare Integer totalVisible = {config('dedimania.rows')};
         declare Integer topVisible = {config('dedimania.showtop')};
         declare Integer visible = totalVisible - topVisible;
 
@@ -166,14 +166,21 @@
             targetRank = Records.count - (visible / 2) - 2;
         }
 
+        if(targetRank < totalVisible / 2){
+            targetRank = targetRank + (totalVisible / 2 - targetRank);
+        }
+
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
     }
 
     Void scrollToBottom(){
-        declare Integer visible = 18 - {config('dedimania.showtop')};
+        declare Integer visible = {config('dedimania.rows')} - {config('dedimania.showtop')};
         declare Integer targetRank = Records.count - (visible / 2) - 2;
+
+        log("target-rank: " ^ targetRank);
+
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);

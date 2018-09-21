@@ -8,7 +8,7 @@
     <label pos="42 -4.5" z-index="0" size="31 10" text="{formatScore($cp->score)}" textcolor="cdff" opacity="0.3" textsize="5.5" halign="right" valign="center"/>
     <label pos="42 -4.5" z-index="2" size="31 10" text="{cutZeroes(formatScore($cp->score))}" textsize="5.5" halign="right" valign="center"/>
 
-    <label pos="77.5 -4.5" z-index="2" size="62 10" textsize="5" text="{$cp->player->NickName}" halign="center" valign="center"/>
+    <label pos="77.5 -4.5" z-index="2" size="62 10" textsize="5" text="{$cp->player}" halign="center" valign="center"/>
 
     {if isset($flash)}
     <quad z-index="1" size="110 10" bgcolor="{config('colors.ui.header')|noescape}" id="{$flash}" opacity="1.0"/>

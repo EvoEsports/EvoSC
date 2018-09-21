@@ -217,6 +217,7 @@ class Player extends Model
      */
     public function __toString()
     {
-        return $this->Login;
+        return $this->NickName
+            ;
     }
 }
