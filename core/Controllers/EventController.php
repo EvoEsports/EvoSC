@@ -90,7 +90,8 @@ class EventController
             $player = Player::find($login);
 
             if (!$player) {
-                $player = Player::create(['Login' => $login]);
+                Player::create(['Login' => $login]);
+                $player = Player::find($login);
             }
 
             $specTargetId = $player->spectator_status->currentTargetId;

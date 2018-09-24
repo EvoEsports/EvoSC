@@ -3,8 +3,7 @@
 <frame pos="-160 -45" scale="0.75">
     <quad pos="0 0" z-index="-2" size="50 16" style="Bgs1" substyle="BgDialogBlur"/>
     <label pos="2 -2" z-index="1" size="49 2.8" text="{$message}" textsize="1"/>
-    <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="{header_color()|noescape}3"/>
-    <quad pos="50 -6.5" z-index="2" size="50 .4" bgcolor="{background_color()|noescape}6" halign="right"/>
+    <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="{config('colors.ui.header')}3"/>
     <quad id="bar" pos="50 -6.5" z-index="3" size="50 .4" bgcolor="{config('colors.ui.header')|noescape}c" halign="right"/>
 
     <quad pos="2 -9" z-index="1" size="{$yes} 1" bgcolor="1f8c"/>

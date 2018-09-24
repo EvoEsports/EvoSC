@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:roundtime" id="roundtime" version="3">
+    <frame pos="80 -86" z-index="100">
+        <label id="speed" pos="0 0" text="" halign="right" valign="center" textsize="5.5" textprefix="" textfont="RajdhaniMono"/>
+        <label pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="" textfont="RajdhaniMono"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare player <=> InputPlayer;
+        declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
+        declare Boolean hidden = False;
+
+        while(True){
+            yield;
+
+            while(player == Null){
+                sleep(10);
+            }
+
+            speedLabel.Value = TL::TimeToText(player.CurLap.Time, True);
+        }
+    }
+    --></script>
+</manialink>

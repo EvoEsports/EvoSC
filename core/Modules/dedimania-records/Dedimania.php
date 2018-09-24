@@ -115,8 +115,8 @@ class Dedimania extends DedimaniaApi
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);
-        self::$newTimes = collect();
-        $map->dedis()->update(['New' => 0]);
+        // self::$newTimes = collect();
+        // $map->dedis()->update(['New' => 0]);
     }
 
     private static function insertRecord(Map $map, $record)
@@ -263,6 +263,8 @@ class Dedimania extends DedimaniaApi
                     }
                     self::addNewTime($dedi);
                     self::sendUpdateDediManialink($dedi, $oldRank);
+                } else {
+                    Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
                 }
             }
         } else {
@@ -283,6 +285,8 @@ class Dedimania extends DedimaniaApi
                 self::addNewTime($dedi);
                 self::sendUpdateDediManialink($dedi);
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
+            } else {
+                Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
             }
         }
     }
@@ -293,6 +297,10 @@ class Dedimania extends DedimaniaApi
 
         if (!$betterOrEarlierEqualRecords) {
             //There is no better record or there are no records on this map
+            if ($map->dedis()->count() == 0) {
+                return 1;
+            }
+
             return $map->dedis()->count() + 1;
         }
 

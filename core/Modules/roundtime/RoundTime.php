@@ -9,7 +9,7 @@ use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
-class Speedometer
+class RoundTime
 {
     public function __construct()
     {
@@ -26,6 +26,6 @@ class Speedometer
 
     public static function show(Player $player)
     {
-        Template::show($player, 'speedometer.meter');
+        Template::show($player, 'roundtime.meter');
     }
 }

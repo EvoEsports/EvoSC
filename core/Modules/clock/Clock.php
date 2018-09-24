@@ -23,7 +23,7 @@ class Clock
 
     public static function configUpdated(Config $config = null)
     {
-        if ($config && $config->id == "clock" || $config->id == "colors") {
+        if ($config && isset($config->id) && $config->id == "clock" || $config->id == "colors") {
             onlinePlayers()->each(function (Player $player) use ($config) {
                 $clock = $config->data;
                 Template::show($player, 'clock.clock', compact('clock'));

@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
-    <frame pos="160 -82" z-index="100">
-        <label id="speed" pos="0 0" text="" halign="right" valign="bottom" textsize="8" style="TextRaceMessageBig"/>
-    </frame>
-
-    <frame id="sd-frame" pos="0 -55" hidden="0">
-        <quad size="7 3" bgcolor="6a6" halign="center" valign="center" />
-        <label size="7 3" text="$s SD" textcolor="ffff" z-index="2" textsize="0.2"  halign="center" valign="center" />
+    <frame id="speedometer" pos="80 -78.5" z-index="100">
+        <label id="speed" pos="0 0" text="" halign="right" valign="center" textsize="7" textprefix="" textfont="RajdhaniMono"/>
+        <label pos="0.5 -1.9" text="KM/H" halign="left" valign="center" textsize="1.8" textprefix="" textfont="RajdhaniMono"/>
     </frame>
 
     <script><!--
@@ -15,8 +11,9 @@
     main(){
         declare player <=> InputPlayer;
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
-        declare sdFrame <=> (Page.MainFrame.GetFirstChild("sd-frame") as CMlFrame);
+        declare speedometer <=> (Page.MainFrame.GetFirstChild("speedometer") as CMlFrame);
         declare speed = 0;
+        declare Boolean hidden = False;
 
         while(True){
             yield;
@@ -33,10 +30,13 @@
 
             speedLabel.Value = "" ^ speed;
 
-            if(speed > 410){
-                sdFrame.Show();
-            }else{
-                sdFrame.Hide();
+            if(player.CurLap.Time == -4 && !hidden){
+                hidden = True;
+                speedometer.Hide();
+            }
+            if(player.CurLap.Time != -4 && hidden){
+                hidden = False;
+                speedometer.Show();
             }
         }
     }

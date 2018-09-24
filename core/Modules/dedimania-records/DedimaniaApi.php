@@ -10,6 +10,7 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Models\Map;
 use esc\Models\Player;
+use function GuzzleHttp\debug_resource;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
@@ -144,9 +145,7 @@ class DedimaniaApi
      */
     static function getChallengeRecords(Map $map): ?Collection
     {
-        if (!self::$enabled) {
-            return null;
-        }
+        Log::logAddLine('DedimaniaApi', sprintf('getChallengeRecords(%s)', $map));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.GetChallengeRecords');
@@ -177,7 +176,7 @@ class DedimaniaApi
         self::paramAddStruct($params->addChild('param'), [
             'SrvName'    => Server::getServerName(),
             'Comment'    => Server::getServerComment(),
-            'Private'    => Server::getServerPassword() ? true : false,
+            'Private'    => Server::getServerPassword() ? 1 : 0,
             'NumPlayers' => onlinePlayers()->where('spectator_status', 0)->count(),
             'MaxPlayers' => Server::getMaxPlayers()['CurrentValue'],
             'NumSpecs'   => onlinePlayers()->where('spectator_status', '>', 0)->count(),
@@ -188,7 +187,7 @@ class DedimaniaApi
         $players = onlinePlayers()->map(function (Player $player) {
             return [
                 'Login'  => $player->Login,
-                'IsSpec' => $player->isSpectator(),
+                'IsSpec' => $player->isSpectator() ? 1 : 0,
             ];
         });
 
@@ -233,6 +232,8 @@ class DedimaniaApi
      */
     static function updateServerPlayers(Map $map)
     {
+        Log::logAddLine('DedimaniaApi', sprintf('updateServerPlayers(%s)', $map));
+
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.UpdateServerPlayers');
         $params = $xml->addChild('params');
@@ -244,7 +245,7 @@ class DedimaniaApi
         self::paramAddStruct($params->addChild('param'), [
             'SrvName'    => Server::getServerName(),
             'Comment'    => Server::getServerComment(),
-            'Private'    => Server::getServerPassword() ? true : false,
+            'Private'    => Server::getServerPassword() ? 1 : 0,
             'NumPlayers' => onlinePlayers()->where('spectator_status', 0)->count(),
             'MaxPlayers' => Server::getMaxPlayers()['CurrentValue'],
             'NumSpecs'   => onlinePlayers()->where('spectator_status', '>', 0)->count(),
@@ -261,7 +262,7 @@ class DedimaniaApi
         $players = onlinePlayers()->map(function (Player $player) {
             return [
                 'Login'  => $player->Login,
-                'IsSpec' => $player->isSpectator(),
+                'IsSpec' => $player->isSpectator() ? 1 : 0,
                 'Vote'   => -1,
             ];
         });
@@ -290,6 +291,8 @@ class DedimaniaApi
             return;
         }
 
+        Log::logAddLine('DedimaniaApi', sprintf('setChallengeTimes(%s) New records: %d', $map, count(self::$newTimes)));
+
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
         $params = $xml->addChild('params');
@@ -310,12 +313,17 @@ class DedimaniaApi
         //string GameMode
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
+        Log::logAddLine('DedimaniaApi', 'New Times:');
+        Log::logAddLine('DedimaniaApi', serialize(self::$newTimes));
+
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
         foreach (self::$newTimes->sortBy('Score') as $dedi) {
             if ($dedi->Rank > 100) {
                 continue;
             }
+
+            Log::logAddLine('DedimaniaApi', sprintf('Add %s\'s time %s', $dedi->player, formatScore($dedi->Score)), isVerbose());
 
             $checkpoints = $dedi->Checkpoints;
 
@@ -370,6 +378,9 @@ class DedimaniaApi
             //Send the request
             $data = self::post($xml);
 
+            Log::logAddLine('DedimaniaApi', 'Response:');
+            Log::logAddLine('DedimaniaApi', serialize($data));
+
             if ($data) {
                 //Got response
 
@@ -379,6 +390,7 @@ class DedimaniaApi
                     if (!$data->params->param->value->boolean) {
                         //Request failed
 
+                        Log::logAddLine('DedimaniaApi', 'Failed to update dedis.', true);
                         \esc\Controllers\ChatController::message(onlinePlayers(), 'Updating dedis failed');
                     }
                 }
@@ -402,6 +414,10 @@ class DedimaniaApi
      */
     public static function playerConnect(Player $player)
     {
+        if (isVerbose()) {
+            Log::logAddLine('DedimaniaApi', sprintf('playerConnect(%s)', $player), true);
+        }
+
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.PlayerConnect');
         $params = $xml->addChild('params');
@@ -419,7 +435,7 @@ class DedimaniaApi
         $params->addChild('param')->addChild('string', Server::getDetailedPlayerInfo(config('dedimania.login'))->path);
 
         //boolean IsSpec
-        $params->addChild('param')->addChild('boolean', $player->isSpectator());
+        $params->addChild('param')->addChild('boolean', $player->isSpectator() ? 1 : 0);
 
         $responseData = self::post($xml);
 
@@ -466,7 +482,9 @@ class DedimaniaApi
                 continue;
             }
 
-            Log::logAddLine('Dedimania', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), isDebug());
+            if (isVerbose()) {
+                Log::logAddLine('DedimaniaApi', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
+            }
 
             switch (gettype($value)) {
                 case 'integer':
@@ -506,6 +524,14 @@ class DedimaniaApi
         $xmlData = $array->addChild('data');
 
         foreach ($data as $key => $value) {
+
+            if (isVerbose()) {
+                if (gettype($value) == 'array') {
+                    Log::logAddLine('DedimaniaApi', sprintf('paramAddArray %s => [%s]', $key, implode(', ', $value)), true);
+                } else {
+                    Log::logAddLine('DedimaniaApi', sprintf('paramAddArray %s => %s', $key, $value), true);
+                }
+            }
 
             switch (gettype($value)) {
                 case 'integer':
