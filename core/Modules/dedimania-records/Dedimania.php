@@ -260,8 +260,8 @@ class Dedimania extends DedimaniaApi
                 //Player improved his record
                 if ($newRank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                     $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
-                    $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
                     $diff = $dedi->Score - $score;
+                    $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
 
                     if ($oldRank == $newRank) {
                         ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')');
