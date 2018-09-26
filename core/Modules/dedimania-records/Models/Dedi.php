@@ -3,12 +3,13 @@
 namespace esc\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 class Dedi extends Model
 {
     protected $table = 'dedi-records';
 
-    protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints'];
+    protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints', 'ghost_replay', 'New'];
 
     public $timestamps = false;
 
@@ -34,5 +35,14 @@ class Dedi extends Model
     public function score(): string
     {
         return formatScore($this->Score);
+    }
+
+    public function getGhostReplayAttribute(): ?string
+    {
+        if (isset($this->ghost_replay) && $this->ghost_replay != null) {
+            return ghost($this->ghost_replay);
+        }
+
+        return null;
     }
 }

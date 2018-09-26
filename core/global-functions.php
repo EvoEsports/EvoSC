@@ -93,8 +93,12 @@ function baseDir(string $filename = ''): string
     return __DIR__ . '/../' . $filename;
 }
 
-function onlinePlayers(): \Illuminate\Support\Collection
+function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
 {
+    if(!$withSpectators){
+        return \esc\Models\Player::where('player_id', '>', 0)->whereSpectatorStatus(0)->get();
+    }
+
     return \esc\Models\Player::where('player_id', '>', 0)->get();
 }
 

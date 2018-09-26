@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
@@ -46,8 +47,7 @@ class Dedimania extends DedimaniaApi
         }
 
         //Session exists and is not expired
-        self::$enabled  = true;
-        self::$newTimes = collect();
+        self::$enabled = true;
         Log::logAddLine('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
 
         //Add hooks
@@ -115,8 +115,7 @@ class Dedimania extends DedimaniaApi
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);
-        // self::$newTimes = collect();
-        // $map->dedis()->update(['New' => 0]);
+        $map->dedis()->update(['New' => 0]);
     }
 
     private static function insertRecord(Map $map, $record)
@@ -213,7 +212,7 @@ class Dedimania extends DedimaniaApi
         $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
         $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]',
             $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank);
+            $record->player->Login, $oldRank ?? -1);
 
         Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
     }
@@ -236,6 +235,11 @@ class Dedimania extends DedimaniaApi
         $dedi    = $map->dedis()->wherePlayer($player->id)->first();
         $newRank = self::getRankForScore($map, $score);
 
+        if ($newRank == 1) {
+            //Ghost replay is needed for 1. dedi
+            self::saveGhostReplay($dedi);
+        }
+
         Log::logAddLine('Dedimania', $player . ' finished with time ' . formatScore($score));
 
         if ($dedi) {
@@ -243,6 +247,7 @@ class Dedimania extends DedimaniaApi
 
             if ($score == $dedi->Score) {
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' equaled his/her ', $dedi);
+                Log::logAddLine('Dedimania', $player . ' equaled his/her record.', isVerbose());
 
                 return;
             }
@@ -250,6 +255,8 @@ class Dedimania extends DedimaniaApi
             $oldRank = $dedi->Rank;
 
             if ($score < $dedi->Score) {
+                Log::logAddLine('Dedimania', $player . ' improved his/her record.', isVerbose());
+
                 //Player improved his record
                 if ($newRank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                     $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
@@ -261,7 +268,7 @@ class Dedimania extends DedimaniaApi
                     } else {
                         ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
                     }
-                    self::addNewTime($dedi);
+
                     self::sendUpdateDediManialink($dedi, $oldRank);
                 } else {
                     Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
@@ -277,6 +284,7 @@ class Dedimania extends DedimaniaApi
                 'Score'       => $score,
                 'Rank'        => $newRank,
                 'Checkpoints' => $checkpoints,
+                'New'         => 1,
             ]);
 
             $dedi = $map->dedis()->wherePlayer($player->id)->first();
@@ -296,45 +304,30 @@ class Dedimania extends DedimaniaApi
         $betterOrEarlierEqualRecords = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->get()->first();
 
         if (!$betterOrEarlierEqualRecords) {
-            //There is no better record or there are no records on this map
-            if ($map->dedis()->count() == 0) {
-                return 1;
-            }
-
-            return $map->dedis()->count() + 1;
+            return 1;
         }
 
         return $betterOrEarlierEqualRecords->Rank + 1;
     }
 
-    private static function addNewTime(Dedi $dedi)
+    private static function saveGhostReplay(Dedi $dedi)
     {
-        $existingDedi = self::$newTimes->where('Player', $dedi->Player);
+        $oldGhostReplay = $dedi->ghost_replay;
 
-        if ($existingDedi->isNotEmpty()) {
-            if (isset($existingDedi->ghostReplayFile) && file_exists($existingDedi->ghostReplayFile)) {
-                unlink($existingDedi->ghostReplayFile);
-            }
-
-            self::$newTimes = self::$newTimes->diff($existingDedi);
+        if ($oldGhostReplay && File::exists($oldGhostReplay)) {
+            unlink($oldGhostReplay);
         }
 
         $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($dedi->map->Name), $dedi->Score);
 
         try {
             $saved = Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
+
+            if ($saved) {
+                $dedi->update(['ghost_replay' => $ghostFile]);
+            }
         } catch (\Exception $e) {
             Log::error('Could not save ghost: ' . $e->getMessage());
         }
-
-        if (isset($saved) && !$saved) {
-            Log::error('Saving top 1 dedi failed');
-
-            return;
-        } else {
-            $dedi->ghostReplayFile = $ghostFile;
-        }
-
-        self::$newTimes->push($dedi);
     }
 }

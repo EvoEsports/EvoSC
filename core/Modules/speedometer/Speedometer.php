@@ -13,7 +13,7 @@ class Speedometer
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [RoundTime::class, 'show']);
+        Hook::add('PlayerConnect', [self::class, 'show']);
 
         KeyController::createBind('Y', [self::class, 'reload']);
     }

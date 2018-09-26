@@ -23,6 +23,7 @@ class CreateDediRecordsTable extends Migration
             $table->integer('Rank');
             $table->text('Checkpoints')->nullable();
             $table->boolean('New')->default(false);
+            $table->string('ghost_replay')->nullable();
         });
     }
 

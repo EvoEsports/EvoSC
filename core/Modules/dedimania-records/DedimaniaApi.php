@@ -8,6 +8,7 @@ use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
+use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use function GuzzleHttp\debug_resource;
@@ -16,7 +17,6 @@ use SimpleXMLElement;
 
 class DedimaniaApi
 {
-    protected static $newTimes;
     protected static $enabled = false;
     protected static $maxRank = 15;
 
@@ -283,15 +283,16 @@ class DedimaniaApi
      */
     static function setChallengeTimes(Map $map)
     {
-        if (count(self::$newTimes) == 0) {
-            //No new records
+        $newTimes = Dedi::where('New', 1)->get();
 
-            Log::logAddLine('Dedimania', 'No records made');
+        if ($newTimes->count() == 0) {
+            //No new records
+            Log::logAddLine('DedimaniaApi', 'No records made');
 
             return;
         }
 
-        Log::logAddLine('DedimaniaApi', sprintf('setChallengeTimes(%s) New records: %d', $map, count(self::$newTimes)));
+        Log::logAddLine('DedimaniaApi', sprintf('setChallengeTimes(%s) New records: %d', $map, $newTimes->count()));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
@@ -302,7 +303,7 @@ class DedimaniaApi
 
         //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'uid'           => $map->gbx->MapUid,
+            'UId'           => $map->gbx->MapUid,
             'Name'          => $map->gbx->Name,
             'Environment'   => $map->gbx->Environment,
             'Author'        => $map->gbx->AuthorLogin,
@@ -314,11 +315,14 @@ class DedimaniaApi
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
         Log::logAddLine('DedimaniaApi', 'New Times:');
-        Log::logAddLine('DedimaniaApi', serialize(self::$newTimes));
+        Log::logAddLine('DedimaniaApi', $newTimes->toJson());
 
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
-        foreach (self::$newTimes->sortBy('Score') as $dedi) {
+
+        $sortedScores = $newTimes->sortBy('Score');
+
+        foreach ($sortedScores as $dedi) {
             if ($dedi->Rank > 100) {
                 continue;
             }
@@ -349,23 +353,29 @@ class DedimaniaApi
             .. Top1GReplay: GhostReplay for the same time as VReplay, base64 encoded: send only if supposed new top1, else send an empty string !
         */
 
-        $bestRecord = self::$newTimes->sortBy('Score')->first();
+        $bestRecord = $sortedScores->first();
+
+        Log::logAddLine('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
 
         try {
             $VReplay = Server::getValidationReplay($bestRecord->player->Login);
         } catch (\Exception $e) {
-            $VReplay = $e->getMessage();
-            Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage());
-            Log::logAddLine('DedimaniaApi', $e->getTraceAsString(), false);
+            Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
+            Log::logAddLine('DedimaniaApi', $e->getTraceAsString());
+            return;
         }
 
-        $VReplayChecks = $map->dedis()->wherePlayer($bestRecord->id)->first()->Checkpoints ?? "";
+        $VReplayChecks = $bestRecord->Checkpoints;
         $Top1GReplay   = '';
 
         try {
             //Check if there is top1 dedi
-            if (self::$newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = file_get_contents(ghost($dedi->ghostReplayFile)) ?? "";
+            if ($newTimes->where('Rank', 1)->isNotEmpty()) {
+                $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
+
+                if($Top1GReplay == ''){
+                    Log::logAddLine('DedimaniaApi', 'Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
+                }
             }
 
             //Add replays
@@ -379,7 +389,8 @@ class DedimaniaApi
             $data = self::post($xml);
 
             Log::logAddLine('DedimaniaApi', 'Response:');
-            Log::logAddLine('DedimaniaApi', serialize($data));
+            // Log::logAddLine('DedimaniaApi', $data->asXML());
+            $data->saveXML(cacheDir('dedimania_' . time()));
 
             if ($data) {
                 //Got response
@@ -395,8 +406,8 @@ class DedimaniaApi
                     }
                 }
             }
-        } catch (\Maniaplanet\DedicatedServer\Xmlrpc\FaultException $e) {
-            Log::error('Error saving dedis: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
     }
 
@@ -483,7 +494,7 @@ class DedimaniaApi
             }
 
             if (isVerbose()) {
-                Log::logAddLine('DedimaniaApi', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
+                // Log::logAddLine('DedimaniaApi', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
             }
 
             switch (gettype($value)) {
