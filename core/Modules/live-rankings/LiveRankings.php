@@ -13,16 +13,18 @@ class LiveRankings
     public function __construct()
     {
         Hook::add('PlayerConnect', [LiveRankings::class, 'playerConnect']);
-    }
 
-    public static function playerConnect(Player $player)
-    {
-        Template::show($player, 'live-rankings.widget');
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
+        self::playerConnect($player);
+    }
+
+    public static function playerConnect(Player $player)
+    {
         Template::show($player, 'live-rankings.widget');
     }
 }

@@ -356,6 +356,8 @@
         AnimMgr.Add(windowRecords, targetPos, 600, CAnimManager::EAnimManagerEasing::CubicInOut);
     }
 
+    {(new esc\Classes\HideScript())|noescape}
+
     main(){
         Records = {$records|noescape};
         LocalRank = {$localRank|noescape};
@@ -449,18 +451,7 @@
                 continue;
             }
 
-            declare HideSpeed for InputPlayer = 1.0;
-            declare speed = ML::Abs(InputPlayer.Speed);
-
-            if(speed >= HideSpeed && !hidden){
-                hidden = True;
-                AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-            }
-
-            if(speed < HideSpeed && hidden){
-                hidden = False;
-                AnimMgr.Add(widget, visiblePos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-            }
+            hidescript();
 
             foreach(event in PendingEvents){
                 if(event.Control == Null){
