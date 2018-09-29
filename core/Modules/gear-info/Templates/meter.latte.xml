@@ -22,6 +22,8 @@
                 sleep(100);
             }
 
+            log(player.EngineCurGear);
+
             speed = MathLib::NearestInteger(player.Speed * 3.6);
 
             if(speed < 0){

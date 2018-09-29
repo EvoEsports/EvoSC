@@ -31,15 +31,6 @@ class Statistics
         Hook::add('EndMatch', [Statistics::class, 'showScores']);
 
         Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m');
-
-        KeyController::createBind('Y', [self::class, 'reload']);
-    }
-
-    public static function reload(Player $player)
-    {
-        Config::configReload();
-        TemplateController::loadTemplates();
-        self::showScores();
     }
 
     public static function showScores(...$args)

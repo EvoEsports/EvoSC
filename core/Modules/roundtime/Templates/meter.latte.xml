@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:roundtime" id="roundtime" version="3">
-    <frame pos="80 -86" z-index="100">
-        <label id="speed" pos="0 0" text="" halign="right" valign="center" textsize="5.5" textprefix="" textfont="RajdhaniMono"/>
-        <label pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="" textfont="RajdhaniMono"/>
+    <frame id="main" pos="80 -86" z-index="100">
+        <label id="speed" pos="0 0" text="" halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="RajdhaniMono"/>
+        <label pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="RajdhaniMono"/>
     </frame>
 
     <script><!--
@@ -11,6 +11,7 @@
 
     main(){
         declare player <=> InputPlayer;
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
         declare Boolean hidden = False;
 
@@ -18,10 +19,19 @@
             yield;
 
             while(player == Null){
-                sleep(10);
+                sleep(100);
             }
 
             speedLabel.Value = TL::TimeToText(player.CurLap.Time, True);
+
+            if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
+                mainFrame.Hide();
+                hidden = True;
+            }
+            if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
+                mainFrame.Show();
+                hidden = False;
+            }
         }
     }
     --></script>
