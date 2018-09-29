@@ -53,7 +53,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
         return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 function config(string $id, $default = null)

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Statistics" id="Statistics" version="3">
+    <frame id="main">
+        {foreach $statCollection as $statisticWidget}
+        <frame pos="{$statisticWidget->config->pos}" scale="{$statisticWidget->config->scale ?? 0.75}" data-show="{$statisticWidget->config->show ?? 6}">
+            <quad pos="0 0" z-index="-1" size="50 {($statisticWidget->config->show ?? 6) * 4 + 8}" bgcolor="{background_color()|noescape}a" />
+            <label pos="2 -3" z-index="1" size="48 3" text="{$statisticWidget->title}" textsize=".8" valign="center"/>
+            <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.header')}c"/>
+            <frame pos="0 -5" size="50 {($statisticWidget->config->show ?? 6) * 5}">
+                {foreach $statisticWidget->records as $player => $stat}
+                <label pos="1 {$iterator->counter * -4}" halign="left" valign="center" text="{$player}" textsize="1" />
+                <label pos="49 {$iterator->counter * -4}" halign="right" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}" textsize="1" />
+                {/foreach}
+            </frame>
+        </frame>
+        {/foreach}
+    </frame>
+
+    <script>
+        <!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+Void prepare(CMlFrame widget){
+    declare Integer show = TL::ToInteger(widget.DataAttributeGet("show"));
+
+    declare Real x_orig = widget.RelativePosition_V3[0];
+    declare Real y_orig = widget.RelativePosition_V3[1];
+    widget.DataAttributeSet("target", "<frame pos='" ^ x_orig ^ " " ^ y_orig ^ "' />");
+    widget.DataAttributeSet("hidden", "<frame pos='" ^ x_orig ^ " " ^ (y_orig + show * 4 + 10) ^ "' />");
+    widget.RelativePosition_V3[1] = widget.RelativePosition_V3[1] + show * 4 + 10;
+}
+
+Void show(CMlFrame widget){
+    AnimMgr.Add(widget, widget.DataAttributeGet("target"), 800, CAnimManager::EAnimManagerEasing::BackOut);
+}
+
+Void hide(CMlFrame widget){
+    AnimMgr.Add(widget, widget.DataAttributeGet("hidden"), 800, CAnimManager::EAnimManagerEasing::BackOut);
+}
+
+main(){
+    declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
+    declare currentMap = Map.MapInfo.MapUid;
+
+    foreach(widget in mainFrame.Controls){
+        prepare((widget as CMlFrame));
+    }
+
+    foreach(widget in mainFrame.Controls){
+        show((widget as CMlFrame));
+        sleep(100);
+    }
+
+    while(currentMap == Map.MapInfo.MapUid){
+        sleep(7500);
+    }
+
+    foreach(widget in mainFrame.Controls){
+        hide((widget as CMlFrame));
+        sleep(100);
+    }
+}
+        -->
+    </script>
+</manialink>

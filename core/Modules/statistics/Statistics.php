@@ -2,16 +2,18 @@
 
 namespace esc\Modules;
 
-use esc\Classes\Database;
+use esc\Classes\Config;
 use esc\Classes\Hook;
+use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
+use esc\Controllers\TemplateController;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
 use esc\Models\Stats;
-use Illuminate\Database\Schema\Blueprint;
 
 class Statistics
 {
@@ -26,126 +28,48 @@ class Statistics
         Hook::add('PlayerLocal', [Statistics::class, 'playerLocal']);
         Hook::add('EndMatch', [Statistics::class, 'endMatch']);
 
-        Hook::add('ShowScores', [Statistics::class, 'showScores']);
-        Hook::add('BeginMap', [Statistics::class, 'endMap']);
+        Hook::add('EndMatch', [Statistics::class, 'showScores']);
 
         Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m');
+
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
-    private static function displayStatsWidget(Player $player, $values, $title, $config, $value_function)
+    public static function reload(Player $player)
     {
-        $content = Template::toString('components.stat-list', [
-            'width'      => $config->width,
-            'values'     => $values,
-            'value_func' => $value_function
-        ]);
-
-        $height = $config->show * 4.2 + 8;
-
-        Template::show($player, 'components.box', [
-            'id'      => str_slug($title),
-            'title'   => $title,
-            'x'       => $config->pos->x,
-            'y'       => $config->pos->y,
-            'scale'   => $config->scale,
-            'width'   => $config->width,
-            'height'  => $height,
-            'content' => $content
-        ]);
-    }
-
-    public static function showStats(Player $player)
-    {
-        $statsConfig = config('ui.stats');
-
-        $mostVisits = Stats::orderByDesc('Visits')->take($statsConfig->visits->show)->get();
-        self::displayStatsWidget($player,
-            $mostVisits,
-            'Top visitors',
-            $statsConfig->visits,
-            function (Stats $stats) {
-                return $stats->Visits;
-            }
-        );
-
-        $mostPlayed = Stats::orderByDesc('Playtime')->take($statsConfig->playtime->show)->get();
-        self::displayStatsWidget($player,
-            $mostPlayed,
-            'Most played',
-            $statsConfig->playtime,
-            function (Stats $stats) {
-                $hours = $stats->Playtime / 60;
-                return ($hours >= 1 ? round($hours, 1) . 'h' : $stats->Playtime . 'min');
-            }
-        );
-
-        $mostFinished = Stats::orderByDesc('Finishes')->take($statsConfig->finish->show)->get();
-        self::displayStatsWidget($player,
-            $mostFinished,
-            'Most finishes',
-            $statsConfig->finish,
-            function (Stats $stats) {
-                return $stats->Finishes;
-            }
-        );
-
-        $mostRecords = Stats::orderByDesc('Locals')->take($statsConfig->records->show)->get();
-        self::displayStatsWidget($player,
-            $mostRecords,
-            'Most records',
-            $statsConfig->records,
-            function (Stats $stats) {
-                return $stats->Locals;
-            }
-        );
-
-        $topWinners = Stats::orderByDesc('Wins')->take($statsConfig->winner->show)->get();
-        self::displayStatsWidget($player,
-            $topWinners,
-            'Top winners',
-            $statsConfig->winner,
-            function (Stats $stats) {
-                return $stats->Wins;
-            }
-        );
-
-//        $topVoters = Stats::orderByDesc('Ratings')->take($statsConfig->voter->show)->get();
-//        self::displayStatsWidget($player,
-//            $topVoters,
-//            'Top voters',
-//            $statsConfig->voter,
-//            function (Stats $stats) {
-//                return $stats->Ratings;
-//            }
-//        );
-
-        $topRanks = Stats::where('Rank', '>', 0)->orderBy('Rank')->take($statsConfig->topranks->show)->get();
-        self::displayStatsWidget($player,
-            $topRanks,
-            'Top ranks',
-            $statsConfig->topranks,
-            function (Stats $stats) {
-                return $stats->Score;
-            }
-        );
+        Config::configReload();
+        TemplateController::loadTemplates();
+        self::showScores();
     }
 
     public static function showScores(...$args)
     {
-        foreach (onlinePlayers() as $player) {
-            self::showStats($player);
-        }
-    }
+        $statCollection = collect();
 
-    public static function endMap(...$args)
-    {
-        Template::hideAll('top-visitors');
-        Template::hideAll('most-played');
-        Template::hideAll('most-finishes');
-        Template::hideAll('most-records');
-        Template::hideAll('top-winners');
-        Template::hideAll('top-voters');
-        Template::hideAll('top-ranks');
+        //Top visitors
+        $statCollection->push(new StatisticWidget('Visits', " Top visitors"));
+
+        //Most played
+        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($min) {
+            //Get playtime as hours
+            return round($min / 60, 1);
+        }));
+
+        //Most finishes
+        $statCollection->push(new StatisticWidget('Finishes', "🏁 Most Finishes"));
+
+        //Top winners
+        $statCollection->push(new StatisticWidget('Wins', " Top Winners"));
+
+        //Top Ranks
+        $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '#', '', null, true));
+
+        //Top Donators
+        $statCollection->push(new StatisticWidget('Donations', " Top Donators"));
+
+        foreach (onlinePlayers() as $player) {
+            Template::show($player, 'statistics.widgets', compact('statCollection'));
+        }
     }
 
     /**
@@ -160,7 +84,7 @@ class Statistics
         if ($player->stats === null) {
             Stats::create([
                 'Player' => $player->id,
-                'Visits' => 1
+                'Visits' => 1,
             ]);
         }
 
@@ -169,7 +93,7 @@ class Statistics
 
     /**
      * @param Player $player
-     * @param int $score
+     * @param int    $score
      */
     public static function playerFinish(Player $player, int $score)
     {
@@ -183,7 +107,7 @@ class Statistics
 
     /**
      * @param Player $player
-     * @param Karma $karma
+     * @param Karma  $karma
      */
     public static function playerRateMap(Player $player, Karma $karma)
     {
@@ -192,13 +116,13 @@ class Statistics
     }
 
     /**
-     * @param Player $player
+     * @param Player      $player
      * @param LocalRecord $local
      */
     public static function playerLocal(Player $player, LocalRecord $local)
     {
         $player->stats()->update([
-            'Locals' => $player->locals->count()
+            'Locals' => $player->locals->count(),
         ]);
     }
 
@@ -247,7 +171,7 @@ class Statistics
         });
 
         $player->stats()->update([
-            'Score' => $score
+            'Score' => $score,
         ]);
     }
 
@@ -263,7 +187,7 @@ class Statistics
 
         $stats->each(function (Stats $stats) use (&$counter, $total) {
             $stats->update([
-                'Rank' => $counter++
+                'Rank' => $counter++,
             ]);
 
             if ($stats->player->player_id) {

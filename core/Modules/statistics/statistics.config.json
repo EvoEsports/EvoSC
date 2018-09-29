@@ -1,0 +1,32 @@
+{
+  "Visits": {
+    "pos"  : "-121 89",
+    "scale": 0.78,
+    "show" : 6
+  },
+  "Playtime": {
+    "pos"  : "-81 89",
+    "scale": 0.78,
+    "show" : 6
+  },
+  "Finishes": {
+    "pos"  : "-41 89",
+    "scale": 0.78,
+    "show" : 6
+  },
+  "Wins": {
+    "pos"  : "-1 89",
+    "scale": 0.78,
+    "show" : 6
+  },
+  "Rank": {
+    "pos"  : "39 89",
+    "scale": 0.78,
+    "show" : 6
+  },
+  "Donations": {
+    "pos"  : "79 89",
+    "scale": 0.78,
+    "show" : 6
+  }
+}
