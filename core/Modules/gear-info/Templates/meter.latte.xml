@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:speedometer" id="speedometer" version="3">
-    <frame id="speedometer" pos="80 -79.5" z-index="100">
-        <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="RajdhaniMono"/>
-        <label pos="0.5 -1.5" text="Km/H" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="RajdhaniMono"/>
+<manialink name="ESC:gear-info" id="gear-info" version="3">
+    <frame id="main" pos="0 0" z-index="100">
+        <label id="up" halign="center" valign="center" textsize="5.5" textprefix="" text="" opacity="0" />
+        <label id="down" halign="center" valign="center" textsize="5.5" textprefix="" text="" opacity="0" />
     </frame>
 
     <script><!--
-    #Include "MathLib" as MathLib
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    Void resetLabel(CMlLabel label){
+        label.Hide();
+        label.RelativePosition_V3 = <0.0, 0.0>;
+        label.Opacity = 0.8;
+    }
+
+    Void animUp(){
+        declare up <=> (Page.MainFrame.GetFirstChild("up") as CMlLabel);
+        resetLabel(up);
+        AnimMgr.Add(up, "<label pos='0 5' opacity='0' />", 1200, CAnimManager::EAnimManagerEasing::QuintOut);
+    }
+
+    Void animDown(){
+        declare down <=> (Page.MainFrame.GetFirstChild("down") as CMlLabel);
+        resetLabel(down);
+        AnimMgr.Add(down, "<label pos='0 -5' opacity='0' />", 1200, CAnimManager::EAnimManagerEasing::QuintOut);
+    }
 
     main(){
         declare player <=> InputPlayer;
-        declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
-        declare speedometer <=> (Page.MainFrame.GetFirstChild("speedometer") as CMlFrame);
-        declare speed = 0;
-        declare Boolean hidden = False;
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("speed") as CMlFrame);
+        declare Integer gear = 1;
 
         while(True){
             yield;
+            wait(player != Null);
 
-            while(player == Null){
-                sleep(100);
-            }
-
-            log(player.EngineCurGear);
-
-            speed = MathLib::NearestInteger(player.Speed * 3.6);
-
-            if(speed < 0){
-                speed = -speed;
-            }
-
-            speedLabel.Value = "" ^ speed;
-
-            if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
-                speedometer.Hide();
-                hidden = True;
-            }
-            if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
-                speedometer.Show();
-                hidden = False;
+            if(gear != player.EngineCurGear){
+                if(gear < player.EngineCurGear){
+                    animUp();
+                }else{
+                    animDown();
+                }
+                gear = player.EngineCurGear;
             }
         }
     }
