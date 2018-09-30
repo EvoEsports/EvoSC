@@ -7,7 +7,13 @@ use Illuminate\Support\Collection;
 
 class File
 {
-    public static function get(string $fileName = null): ?string
+    /**
+     * @param string|null $fileName
+     * @param bool        $json_decode
+     *
+     * @return null|string|Object
+     */
+    public static function get(string $fileName = null, bool $json_decode = false)
     {
         if (!$fileName) {
             Log::error("Could not load file $fileName");
@@ -16,6 +22,10 @@ class File
         }
 
         if (file_exists($fileName)) {
+            if ($json_decode) {
+                return json_decode(file_get_contents($fileName));
+            }
+
             return file_get_contents($fileName);
         }
 

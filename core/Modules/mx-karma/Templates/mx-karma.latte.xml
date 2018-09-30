@@ -1,12 +1,12 @@
 <label pos="48  3" z-index="1" size="25 4" text="{$stars}"     halign="right" valign="center" textcolor="ffff" textsize="1.1"/>
 
 {if $finished}
-<label pos="5  -3.2" z-index="1" size="7 4" text="+++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,100"/>
-<label pos="13 -3.2" z-index="1" size="7 4" text="++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,80"/>
-<label pos="21 -3.2" z-index="1" size="7 4"  text="+"    halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,60"/>
-<label pos="29 -3.2" z-index="1" size="7 4" text="-"      halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,40"/>
-<label pos="37 -3.2" z-index="1" size="7 4" text="--"     halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,20"/>
-<label pos="45 -3.2" z-index="1" size="7 4" text="---"    halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,0"/>
+<label pos="5  -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="+++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,100"/>
+<label pos="13 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="++"     halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,80"/>
+<label pos="21 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="+"    halign="center" valign="center" textcolor="9f99" textsize="1" action="mxk.vote,60"/>
+<label pos="29 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="-"      halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,40"/>
+<label pos="37 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="--"     halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,20"/>
+<label pos="45 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="0006" text="---"    halign="center" valign="center" textcolor="f999" textsize="1" action="mxk.vote,0"/>
 {else}
 <label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote"     halign="left" valign="center" textcolor="fffc" textsize="1"/>
 {/if}

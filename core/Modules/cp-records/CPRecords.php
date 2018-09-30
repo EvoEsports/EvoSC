@@ -7,6 +7,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\MapController;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
@@ -17,7 +18,7 @@ class CPRecords
 
     public function __construct()
     {
-        self::clearCheckpoints();
+        self::loadFromCache();
 
         AccessRight::createIfNonExistent('cpr.reset', 'Reset top checkpoints');
 
@@ -36,6 +37,7 @@ class CPRecords
     {
         self::$checkpoints = [];
         self::showCheckpointRecords(true);
+        self::saveToCache();
     }
 
     private static function getCheckpoint(int $id): ?Checkpoint
@@ -64,6 +66,7 @@ class CPRecords
         self::$checkpoints[$cpId] = new Checkpoint($player, $score, $cpId);
 
         self::showCheckpointRecords(false, $cpId);
+        self::saveToCache();
     }
 
     public static function playerConnect()
@@ -79,10 +82,10 @@ class CPRecords
             $columns = config('cp-records.columns');
 
             foreach (self::$checkpoints as $checkpoint) {
-                $row = floor(($checkpoint->id) / $columns);
-                $y = $row * 10.5 - 10;
+                $row      = floor(($checkpoint->id) / $columns);
+                $y        = $row * 10.5 - 10;
                 $posInRow = $checkpoint->id % $columns;
-                $x = $posInRow * 110.5 - (110.5 * $columns / 2);
+                $x        = $posInRow * 110.5 - (110.5 * $columns / 2);
 
                 if (isset($cpId) && $cpId == $checkpoint->id) {
                     $cps->push(Template::toString('cp-records.cp-record',
@@ -100,5 +103,31 @@ class CPRecords
         );
 
         \esc\Classes\Server::sendDisplayManialinkPage('', $manialink);
+    }
+
+    private static function saveToCache()
+    {
+        $data = collect([
+            'map'         => MapController::getCurrentMap()->uid,
+            'checkpoints' => self::$checkpoints,
+        ]);
+
+        $file = cacheDir('checkpoints.json');
+        File::put($file, $data->toJson());
+    }
+
+    private static function loadFromCache()
+    {
+        $file = cacheDir('checkpoints.json');
+        $data = File::get($file, true);
+
+        if (empty($data->map)) {
+            return;
+        }
+
+        self::$checkpoints = $data->checkpoints;
+        array_walk(self::$checkpoints, function ($record) {
+            $record->player = Player::find($record->player->Login);
+        });
     }
 }

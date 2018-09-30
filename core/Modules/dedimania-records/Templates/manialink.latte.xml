@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Dedimania" id="Dedimania2" version="3">
-    <framemodel id="record">
+    <framemodel id="record" hidden="1">
         <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
         <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
         <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
@@ -41,10 +41,10 @@
             <frame id="window-records">
                 {for $i=0; $i<500; $i++}
                 <frame pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}">
-                    <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
-                    <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
-                    <label z-index="2" valign="center" pos="13 0" size="9 2" textsize="0.4" text="login login" hidden="1"/>
-                    <label z-index="2" valign="center" pos="13 0" size="30 2" textsize="0.4" text="name name name name name"/>
+                    <label z-index="4" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+                    <label z-index="4" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
+                    <label z-index="4" valign="center" pos="13 0" size="9 2" textsize="0.4" text="login login" hidden="1"/>
+                    <label z-index="4" valign="center" pos="13 0" size="30 2" textsize="0.4" text="name name name name name"/>
                     <quad class="record-login" pos="-1 -0.2" size="44 3" bgcolor="{config('colors.ui.header')}" opacity="0" z-index="3" valign="center" ScriptEvents="1" />
                 </frame>
                 {/for}
@@ -78,15 +78,20 @@
 
         <frame z-index="2" id="pagination" pos="3.7 -85.5">
             {for $i=0; $i<10; $i++}
-            <label class="pagebox" z-index="1" pos="{$i * 4} 0" size="3 3" halign="center" valign="center" textcolor="fff" text="{$i + 1}" textsize="0.2" ScriptEvents="1" data-page="{$i}" />
+            <label class="pagebox" z-index="1" pos="{$i * 4 + 8} 0" size="3 3" halign="center" valign="center" textcolor="fff" text="{$i + 1}" textsize="0.2" ScriptEvents="1" data-page="{$i}" />
             {/for}
-            <quad id="current-page-quad" pos="0 0" size="3 3" halign="center" valign="center" bgcolor="{config('colors.ui.header')}" />
+            <quad id="current-page-quad" pos="8 0" size="3 3" halign="center" valign="center" bgcolor="{config('colors.ui.header')}" />
+            <label pos="-1 0.25" textsize="0.5" text="Page:" valign="center" />
         </frame>
 
-        <frame id="details" z-index="2" pos="2 -88" scale="1.0">
-            <label pos="2 -2" text="" textsize="1.4" valign="top" />
-            <label pos="2 -6" text="" textsize="0.8" valign="top" />
-            <label pos="2 -9.2" text="" textsize="1" valign="top" />
+        <frame z-index="2" id="compare-info" pos="91 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Compare to:" valign="center" />
+            <label id="compare-to" pos="14 0.25" textsize="0.5" text="Hover over record to compare" valign="center" />
+        </frame>
+
+        <frame z-index="2" pos="46.5 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Baseline:" valign="center" />
+            <label id="compare-base" pos="11 0.25" size="30 4" textsize="0.5" text="" valign="center" />
         </frame>
     </frame>
 
@@ -102,10 +107,20 @@
     declare CMlFrame topRecords;
     declare CMlFrame records;
 
+    Void setCompareTo(Text nick){
+        declare compareTo <=> (Page.MainFrame.GetFirstChild("compare-to") as CMlLabel);
+        compareTo.SetText(nick);
+    }
+
+    Void setBaseline(Text baseline){
+        declare compareBase <=> (Page.MainFrame.GetFirstChild("compare-base") as CMlLabel);
+        compareBase.SetText(baseline);
+    }
+
     Void enablePaginationBoxes(Integer records){
         declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
 
-        for(i, ML::CeilingInteger(records / 100.0) - 1, 9 ){
+        for(i, ML::CeilingInteger(records / 100.0), 9 ){
             (pagination.Controls[i] as CMlLabel).Visible = False;
         }
     }
@@ -121,25 +136,51 @@
         return False;
     }
 
+    Void updateOnlinePlayers(){
+        foreach(control in records.Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                (frame.Controls[3] as CMlQuad).Visible = loginIsOnline(login);
+            }
+        }
+        foreach(control in topRecords.Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                (frame.Controls[3] as CMlQuad).Visible = loginIsOnline(login);
+            }
+        }
+        foreach(control in (Page.MainFrame.GetFirstChild("window-records") as CMlFrame).Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                if(loginIsOnline(login)){
+                    (frame.Controls[4] as CMlQuad).Opacity = 0.55;
+                }else{
+                    (frame.Controls[4] as CMlQuad).Opacity = 0.0;
+                }
+            }
+        }
+    }
+
     Void updateRecord(Integer i, Text[Text] record){
+        log(i);
+
         if(i <= {config('dedimania.showtop')}){
             declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
             (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
             (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
             (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
-
-            if(loginIsOnline(record["login"])){
-                (recordLabels.Controls[3] as CMlQuad).Visible = True;
-            }
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
         }else{
             declare recordLabels = (records.Controls[i - {config('dedimania.showtop') + 1}] as CMlFrame);
             (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
             (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
             (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
-
-            if(loginIsOnline(record["login"])){
-                (recordLabels.Controls[3] as CMlQuad).Visible = True;
-            }
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
         }
 
         declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
@@ -148,6 +189,7 @@
         (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
         (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
         recordLoginLabels.Visible = True;
+        recordLoginLabels.DataAttributeSet("login", record["login"]);
     }
 
     Void scrollToLocalRankPosition(){
@@ -249,6 +291,11 @@
 
     Void showCps(CMlFrame record){
         declare id = TL::ToInteger(record.DataAttributeGet("id")) + 1;
+
+        if(id > Records.count){
+            return;
+        }
+
         declare score = TL::ToInteger(Records[id]["score_raw"]);
         declare cpTimes = TL::Split(",", Records[id]["cps"]);
         declare targetCps = (Page.MainFrame.GetFirstChild("targetCps") as CMlFrame);
@@ -309,14 +356,7 @@
             }
         }
 
-        declare details <=> (Page.MainFrame.GetFirstChild("details") as CMlFrame);
-        declare nickname <=> (details.Controls[0] as CMlLabel);
-        declare login <=> (details.Controls[1] as CMlLabel);
-        declare scoreLabel <=> (details.Controls[2] as CMlLabel);
-
-        nickname.SetText(Records[id]["nick"]);
-        login.SetText(Records[id]["login"]);
-        scoreLabel.SetText(Records[id]["score"]);
+        setCompareTo(Records[id]["score"] ^ " " ^ Records[id]["nick"] ^ "$z$ccc [" ^ Records[id]["login"] ^ "]");
     }
 
     Void updateRecord(Text[Text] updateRecord){
@@ -359,6 +399,8 @@
     {(new esc\Classes\HideScript())|noescape}
 
     main(){
+        log("Starting dedimania...");
+
         Records = {$records|noescape};
         LocalRank = {$localRank|noescape};
         LocalCps = TL::Split(",", {implode(",", $localCps)});
@@ -380,6 +422,9 @@
         windowRecordsClip.ClipWindowSize = <176.0, 100.0>;
 
         updateList();
+        updateOnlinePlayers();
+
+        log("Dedimania started.");
 
         declare Boolean hidden = False;
         declare Real width = widget.Size[0];
@@ -395,6 +440,19 @@
 
         declare Text visiblePos = """ <frame pos=" """ ^ vecVisible[0] ^ " " ^ vecVisible[1] ^ """ " /> """;
         declare Text hiddenPos = """ <frame pos=" """ ^ vecHidden[0] ^ " " ^ vecHidden[1] ^ """ " /> """;
+
+        //baseline setBaseline
+        if(Records.count > 0){
+            if(LocalRank == -1){
+                for(i, 0, 100){
+                    if(Records.existskey(i)){
+                        setBaseline(Records[i]["score"] ^ " " ^ Records[i]["nick"] ^ "$z$ccc [" ^ Records[i]["login"] ^ "]");
+                    }
+                }
+            }else{
+                setBaseline(Records[LocalRank]["score"] ^ " " ^ Records[LocalRank]["nick"] ^ "$z$ccc [" ^ Records[LocalRank]["login"] ^ "]");
+        }
+        }
 
         //graph
         declare CMlGraph graph = (Page.GetFirstChild("graph") as CMlGraph);
@@ -426,7 +484,6 @@
         }
 
         declare Text lastUpdateHash = "";
-
         declare Integer currentOnlinePlayers = Players.count;
 
         while(True){
@@ -448,6 +505,7 @@
             if(currentOnlinePlayers != Players.count){
                 currentOnlinePlayers = Players.count;
                 updateList();
+                updateOnlinePlayers();
                 continue;
             }
 

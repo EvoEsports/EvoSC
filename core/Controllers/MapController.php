@@ -135,8 +135,6 @@ class MapController
         }
 
         self::$currentMap = $map;
-
-        self::resetTime();
     }
 
     /**
