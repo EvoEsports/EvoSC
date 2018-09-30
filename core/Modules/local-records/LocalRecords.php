@@ -9,7 +9,10 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\HookController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
+use esc\Controllers\TemplateController;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
@@ -23,27 +26,74 @@ class LocalRecords
     {
         Hook::add('PlayerFinish', [LocalRecords::class, 'playerFinish']);
         Hook::add('BeginMap', [LocalRecords::class, 'beginMap']);
-        Hook::add('PlayerConnect', [LocalRecords::class, 'beginMap']);
+        Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
 
-        ManiaLinkEvent::add('locals.show', [LocalRecords::class, 'showLocalsModal']);
-        ManiaLinkEvent::add('modal.hide', [LocalRecords::class, 'hideLocalsModal']);
+        KeyController::createBind('Y', [self::class, 'reload']);
     }
 
-    /**
-     * Checks if player has local
-     * @param Map $map
-     * @param Player $player
-     * @return bool
-     */
-    private static function playerHasLocal(Map $map, Player $player): bool
+    public static function reload(Player $player)
     {
-        return $map->locals()->wherePlayer($player->id)->first() != null;
+        TemplateController::loadTemplates();
+        self::showManialink($player);
+    }
+
+    public static function showManialink(Player $player)
+    {
+        if ($player) {
+            $map = MapController::getCurrentMap();
+
+            if (!$map) {
+                return;
+            }
+
+            $allDedis = $map->locals->sortBy('Rank');
+
+            //Get player dedi
+            $playerRecord = $map->locals()->wherePlayer($player->id)->first();
+
+            if (!$playerRecord) {
+                //Player has no dedi, get player local
+                $record = $map->locals()->wherePlayer($player->id)->first();
+
+                if ($record) {
+                    $localCps = explode(',', $record->Checkpoints);
+                    array_walk($localCps, function (&$time) {
+                        $time = intval($time);
+                    });
+
+                    $localRank = -1;
+                } else {
+                    //Player does not have a local
+                    $localRank = -1;
+                    $localCps  = [];
+                }
+            } else {
+                $localRank = $playerRecord->Rank;
+                $localCps  = explode(',', $playerRecord->Checkpoints);
+                array_walk($localCps, function (&$time) {
+                    $time = intval($time);
+                });
+            }
+
+            $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
+            $onlinePlayers = onlinePlayers()->pluck('Login');
+
+            $records = '[' . $allDedis->map(function (LocalRecord $dedi) {
+                    $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
+
+                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
+                        $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
+                })->implode(",\n") . ']';
+
+            Template::show($player, 'local-records.manialink2', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
+        }
     }
 
     /**
      * Called @ PlayerFinish
+     *
      * @param Player $player
-     * @param int $score
+     * @param int    $score
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -60,6 +110,7 @@ class LocalRecords
         if ($local != null) {
             if ($score == $local->Score) {
                 ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' equaled his/her ', $local);
+
                 return;
             }
 
@@ -81,11 +132,11 @@ class LocalRecords
         } else {
             if ($localCount < 100) {
                 $map->locals()->create([
-                    'Player' => $player->id,
-                    'Map' => $map->id,
-                    'Score' => $score,
+                    'Player'      => $player->id,
+                    'Map'         => $map->id,
+                    'Score'       => $score,
                     'Checkpoints' => $checkpoints,
-                    'Rank' => 999,
+                    'Rank'        => 999,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
                 ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' claimed the ', $local);
@@ -97,14 +148,16 @@ class LocalRecords
 
     /**
      * Fix local ranks
-     * @param Map $map
+     *
+     * @param Map         $map
      * @param Player|null $player
+     *
      * @return null
      */
     private static function fixLocalRecordRanks(Map $map, Player $player = null)
     {
         $locals = $map->locals()->orderBy('Score')->get();
-        $i = 1;
+        $i      = 1;
         foreach ($locals as $local) {
             $local->update(['Rank' => $i]);
             $i++;
@@ -122,67 +175,5 @@ class LocalRecords
      */
     public static function beginMap()
     {
-        self::displayLocalRecords();
-    }
-
-    /**
-     * Display the locals overview
-     * @param Player $player
-     */
-    public static function showLocalsModal(Player $player)
-    {
-        $map = MapController::getCurrentMap();
-        $chunks = $map->locals()->orderBy('Score')->get()->chunk(25);
-
-        $columns = [];
-        foreach ($chunks as $key => $chunk) {
-            $ranking = Template::toString('components.ranking', ['ranks' => $chunk]);
-            array_push($columns, '<frame pos="' . ($key * 45) . ' 0" scale="0.8">' . $ranking . '</frame>');
-        }
-
-        Template::show($player, 'components.modal', [
-            'id' => 'LocalRecordsOverview',
-            'width' => 180,
-            'height' => 97,
-            'content' => implode('', $columns),
-            'showAnimation' => true
-        ]);
-    }
-
-    /**
-     * Hide locals overview
-     * @param Player $player
-     * @param string $id
-     */
-    public static function hideLocalsModal(Player $player, string $id)
-    {
-        Template::hide($player, $id);
-    }
-
-    /**
-     * Display locals widget
-     */
-    public static function displayLocalRecords()
-    {
-        $locals = MapController::getCurrentMap()
-            ->locals()
-            ->orderBy('Rank')
-            ->get()
-            ->take(config('ui.locals.rows'));
-
-        onlinePlayers()->each(function (Player $player) use ($locals) {
-            $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.locals')]);
-
-            Template::show($player, 'ranking-box', [
-                'id' => 'local-records',
-                'title' => '🏆  LOCAL RECORDS',
-                'config' => config('ui.locals'),
-                'hideScript' => $hideScript,
-                'rows' => config('ui.locals.rows'),
-                'scale' => config('ui.locals.scale'),
-                'content' => Template::toString('local-records.locals', compact('locals')),
-                'action' => 'locals.show'
-            ]);
-        });
     }
 }

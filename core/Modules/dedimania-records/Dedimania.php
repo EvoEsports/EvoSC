@@ -48,8 +48,6 @@ class Dedimania extends DedimaniaApi
             }
         }
 
-        KeyController::createBind('Y', [self::class, 'reload']);
-
         //Session exists and is not expired
         self::$enabled = true;
         Log::logAddLine('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
@@ -64,12 +62,6 @@ class Dedimania extends DedimaniaApi
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showManialink($player);
     }
 
     public static function reportConnectedPlayers()
@@ -220,9 +212,9 @@ class Dedimania extends DedimaniaApi
     public static function sendUpdateDediManialink(Dedi $record, $oldRank = null)
     {
         $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
-        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%d"]',
+        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
             $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank ?? -1);
+            $record->player->Login, $oldRank ?? "0");
 
         Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
     }

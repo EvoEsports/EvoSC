@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Locals2" id="Locals2" version="3">
+    <framemodel id="record" hidden="1">
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+        <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
+        <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
+        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('locals.pos')}" size="40 60" scale="{config('locals.scale')}" z-index="100">
+        <quad class="widget" z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="40 {config('locals.showtop') * 3.2}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
+        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records"/>
+
+        <frame id="top-records-frame" pos="1 -7">
+            <frame id="top-records">
+                {for $i=0; $i<config('locals.showtop'); $i++}
+                <frameinstance modelid="record" pos="0 {$i * -3}"/>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="records-frame" pos="1 -{config('locals.showtop') * 3 + 7}">
+            <frame id="records">
+                {for $i=0; $i<500-config('locals.showtop'); $i++}
+                <frameinstance modelid="record" pos="0 {$i * -3}"/>
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+
+    <frame id="window" pos="-90 60" hidden="1">
+        <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Local records" z-index="1" />
+        <quad id="close" pos="176 -3" size="4 4" halign="center" ScriptEvents="1" />
+        <label pos="176 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" />
+
+        <frame id="window-records-clip" pos="2 -9" z-index="2">
+            <frame id="window-records">
+                {for $i=0; $i<500; $i++}
+                <frame pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}">
+                    <label z-index="4" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+                    <label z-index="4" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
+                    <label z-index="4" valign="center" pos="13 0" size="9 2" textsize="0.4" text="login login" hidden="1"/>
+                    <label z-index="4" valign="center" pos="13 0" size="30 2" textsize="0.4" text="name name name name name"/>
+                    <quad class="record-login" pos="-1 -0.2" size="44 3" bgcolor="{config('colors.ui.header')}" opacity="0" z-index="3" valign="center" ScriptEvents="1" />
+                </frame>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame z-index="1" pos="2 -88">
+            <quad size="176 36" bgcolor="0006" />
+            <graph id="graph" size="176 36" pos="0 0" z-index="3" />
+
+            <frame pos="1 -35" z-index="2">
+                <label pos="1 0" text="" textsize="1" valign="bottom" textcolor="fff6" />
+                {for $i=1; $i<$cpCount-1; $i++}
+                <label pos="{(176 / ($cpCount-1)) * $i - 3.5} 0" text="{$i}" textsize="1" valign="bottom" textcolor="fff6" />
+                {/for}
+                <label pos="170 0" text="" textsize="1" valign="bottom" textcolor="fff6" />
+
+                <frame id="targetCps">
+                    {for $i=1; $i<$cpCount-1; $i++}
+
+                    {if $cpCount > 12}
+                    <label pos="{(176 / ($cpCount-1)) * $i + 1} 0" text="" textsize="1" valign="bottom" rot="-40" />
+                    {else}
+                    <label pos="{(176 / ($cpCount-1)) * $i} 0" text="" textsize="1" valign="bottom" />
+                    {/if}
+
+                    {/for}
+                </frame>
+            </frame>
+        </frame>
+
+        <frame z-index="2" id="pagination" pos="3.7 -85.5">
+            {for $i=0; $i<10; $i++}
+            <label class="pagebox" z-index="1" pos="{$i * 4 + 8} 0" size="3 3" halign="center" valign="center" textcolor="fff" text="{$i + 1}" textsize="0.2" ScriptEvents="1" data-page="{$i}" />
+            {/for}
+            <quad id="current-page-quad" pos="8 0" size="3 3" halign="center" valign="center" bgcolor="{config('colors.ui.header')}" />
+            <label pos="-1 0.25" textsize="0.5" text="Page:" valign="center" />
+        </frame>
+
+        <frame z-index="2" id="compare-info" pos="91 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Compare to:" valign="center" />
+            <label id="compare-to" pos="14 0.25" textsize="0.5" text="Hover over record to compare" valign="center" />
+        </frame>
+
+        <frame z-index="2" pos="46.5 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Baseline:" valign="center" />
+            <label id="compare-base" pos="11 0.25" size="30 4" textsize="0.5" text="" valign="center" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text[Text][Integer] Records;
+    declare Integer LocalRank;
+    declare Text[] LocalCps;
+    declare CMlGraphCurve targetCurve;
+
+    declare CMlFrame topRecords;
+    declare CMlFrame records;
+
+    Void setCompareTo(Text nick){
+        declare compareTo <=> (Page.MainFrame.GetFirstChild("compare-to") as CMlLabel);
+        compareTo.SetText(nick);
+    }
+
+    Void setBaseline(Text baseline){
+        declare compareBase <=> (Page.MainFrame.GetFirstChild("compare-base") as CMlLabel);
+        compareBase.SetText(baseline);
+    }
+
+    Void enablePaginationBoxes(Integer records){
+        declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
+
+        for(i, ML::CeilingInteger(records / 100.0), 9 ){
+            (pagination.Controls[i] as CMlLabel).Visible = False;
+        }
+    }
+
+    Boolean loginIsOnline(Text login){
+        for(i, 1, Players.count){
+            declare player <=> Players[i - 1];
+            if(player.User.Login == login){
+                return True;
+            }
+        }
+
+        return False;
+    }
+
+    Void updateOnlinePlayers(){
+        foreach(control in records.Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                (frame.Controls[3] as CMlQuad).Visible = loginIsOnline(login);
+            }
+        }
+        foreach(control in topRecords.Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                (frame.Controls[3] as CMlQuad).Visible = loginIsOnline(login);
+            }
+        }
+        foreach(control in (Page.MainFrame.GetFirstChild("window-records") as CMlFrame).Controls){
+            declare frame <=> (control as CMlFrame);
+            declare login = frame.DataAttributeGet("login");
+            if(login != ""){
+                if(loginIsOnline(login)){
+                    (frame.Controls[4] as CMlQuad).Opacity = 0.55;
+                }else{
+                    (frame.Controls[4] as CMlQuad).Opacity = 0.0;
+                }
+            }
+        }
+    }
+
+    Void updateRecord(Integer i, Text[Text] record){
+        log(i);
+
+        if(i <= {config('locals.showtop', 3)}){
+            declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
+        }else{
+            declare recordLabels = (records.Controls[i - {config('locals.showtop') + 1}] as CMlFrame);
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
+        }
+
+        declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
+        (recordLoginLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+        (recordLoginLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+        (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
+        (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
+        recordLoginLabels.Visible = True;
+        recordLoginLabels.DataAttributeSet("login", record["login"]);
+    }
+
+    Void scrollToLocalRankPosition(){
+        declare Real relativeRankPos = LocalRank / 100.0;
+        declare Integer targetRank = LocalRank;
+
+        declare Integer totalVisible = {config('locals.rows', 18)};
+        declare Integer topVisible = {config('locals.showtop', 3)};
+        declare Integer visible = totalVisible - topVisible;
+
+        if(topVisible - (LocalRank - topVisible) > 0){
+            targetRank = targetRank + (topVisible - (LocalRank - topVisible));
+        }
+
+        if((Records.count - LocalRank) < visible / 2){
+            targetRank = Records.count - (visible / 2) - 2;
+        }
+
+        if(targetRank < totalVisible / 2){
+            targetRank = targetRank + (totalVisible / 2 - targetRank);
+        }
+
+        declare Real y = targetRank * 3.0 - 30.0;
+        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
+        AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+    }
+
+    Void scrollToBottom(){
+        declare Integer visible = {config('locals.rows', 18)} - {config('locals.showtop', 3)};
+        declare Integer targetRank = Records.count - (visible / 2) - 2;
+
+        log("target-rank: " ^ targetRank);
+
+        declare Real y = targetRank * 3.0 - 30.0;
+        declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
+        AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+    }
+
+    Void updateList(){
+        for(i, 1, Records.count){
+            updateRecord(i, Records[i]);
+        }
+
+        for(i, Records.count, 100){
+            declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
+            recordLoginLabels.Visible = False;
+        }
+
+        enablePaginationBoxes(Records.count);
+
+        if(LocalRank != -1){
+            scrollToLocalRankPosition();
+        }else{
+            scrollToBottom();
+        }
+    }
+
+    Text formatScoreCorrect(Integer scoreIn){
+        declare Text secondString;
+        declare Text msString;
+        declare Text sign = "+";
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            sign = "-";
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(minutes > 0){
+            return sign ^ minutes ^ ":" ^ secondString ^ "." ^ msString;
+        }
+
+        return sign ^ secondString ^ "." ^ msString;
+    }
+
+    Void showCps(CMlFrame record){
+        declare id = TL::ToInteger(record.DataAttributeGet("id")) + 1;
+
+        if(id > Records.count){
+            return;
+        }
+
+        declare score = TL::ToInteger(Records[id]["score_raw"]);
+        declare cpTimes = TL::Split(",", Records[id]["cps"]);
+        declare targetCps = (Page.MainFrame.GetFirstChild("targetCps") as CMlFrame);
+
+        targetCurve.Points[0] = <0.0, 250.0>;
+        for(i, 0, cpTimes.count - 1){
+            if(LocalCps.count > 0){
+                declare timeDiff = TL::ToInteger(cpTimes[i]) - TL::ToInteger(LocalCps[i]);
+                declare diffText = formatScoreCorrect(timeDiff);
+                targetCurve.Points[i + 1] = <1.0 * i, 0.08 * timeDiff + 250.0>;
+
+                if(i > 0 && i < cpTimes.count - 1){
+                    (targetCps.Controls[i - 1] as CMlLabel).SetText(diffText);
+
+                    if(timeDiff < 0){
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 1.0, 0.5>;
+                    }else if(timeDiff == 0){
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 0.75, 1.0>;
+                    }else{
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <1.0, 0.5, 0.5>;
+                    }
+                }
+            }else{
+                declare compareTo = TL::Split(",", Records[1]["cps"]);
+                declare timeDiff = TL::ToInteger(cpTimes[i]) - TL::ToInteger(compareTo[i]);
+                declare diffText = formatScoreCorrect(timeDiff);
+                targetCurve.Points[i + 1] = <1.0 * i, 0.08 * timeDiff + 250.0>;
+
+                if(i > 0 && i < cpTimes.count - 1){
+                    (targetCps.Controls[i - 1] as CMlLabel).SetText(diffText);
+
+                    if(timeDiff < 0){
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 1.0, 0.5>;
+                    }else if(timeDiff == 0){
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 0.75, 1.0>;
+                    }else{
+                        (targetCps.Controls[i - 1] as CMlLabel).TextColor = <1.0, 0.5, 0.5>;
+                    }
+                }
+            }
+        }
+
+        if(LocalCps.count > 0){
+            if(LocalRank > id){
+                targetCurve.Color = <0.2, 1.0, 0.2>;
+            }else if(LocalRank == id){
+                targetCurve.Color = <0.0, 0.5, 1.0>;
+            }else{
+                targetCurve.Color = <1.0, 0.2, 0.2>;
+            }
+        }else{
+            if(1 > id){
+                targetCurve.Color = <0.2, 1.0, 0.2>;
+            }else if(1 == id){
+                targetCurve.Color = <0.0, 0.5, 1.0>;
+            }else{
+                targetCurve.Color = <1.0, 0.2, 0.2>;
+            }
+        }
+
+        setCompareTo(Records[id]["score"] ^ " " ^ Records[id]["nick"] ^ "$z$ccc [" ^ Records[id]["login"] ^ "]");
+    }
+
+    Void updateRecord(Text[Text] updateRecord){
+        if(updateRecord["oldRank"] == "0"){
+            declare rank = TL::ToInteger(updateRecord["rank"]);
+            declare oldRank = Records.count + 1;
+
+            for(i, 1, oldRank - rank){
+                declare id = oldRank - i;
+                Records[id + 1] = Records[id];
+            }
+
+            Records[rank] = ["cps" => updateRecord["cps"], "score" => updateRecord["score"], "score_raw" => updateRecord["score"], "nick" => updateRecord["nick"], "login" => updateRecord["login"]];
+        }else{
+            declare rank = TL::ToInteger(updateRecord["rank"]);
+            declare oldRank = TL::ToInteger(updateRecord["oldRank"]);
+            declare Text[Text] updatedRecord = Records[oldRank];
+
+            for(i, 1, oldRank - rank){
+                declare id = oldRank - i;
+                Records[id + 1] = Records[id];
+            }
+
+            updatedRecord["rank"] = updateRecord["rank"];
+            updatedRecord["score"] = updateRecord["score"];
+            updatedRecord["cps"] = updateRecord["cps"];
+            Records[rank] = updatedRecord;
+        }
+
+        updateList();
+    }
+
+    Void scrollToPage(Text pageText){
+        declare Integer page = TL::ToInteger(pageText);
+        declare CMlFrame windowRecords <=> (Page.MainFrame.GetFirstChild("window-records") as CMlFrame);
+        declare Text targetPos = """ <frame pos=" """ ^ (page * -176) ^ """ 0" /> """;
+        AnimMgr.Add(windowRecords, targetPos, 600, CAnimManager::EAnimManagerEasing::CubicInOut);
+    }
+
+    {(new esc\Classes\HideScript())|noescape}
+
+    main(){
+        log("Starting local records...");
+
+        {if strlen($records) == 2}
+            log("No local records");
+            while(True){
+                yield;
+                hidescript();
+            }
+            return;
+        {else}
+        Records = {$records|noescape};
+        {/if}
+        LocalRank = {$localRank|noescape};
+        LocalCps = TL::Split(",", {implode(",", $localCps)});
+
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records-frame") as CMlFrame);
+        declare windowRecordsClip <=> (Page.MainFrame.GetFirstChild("window-records-clip") as CMlFrame);
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
+        topRecords = (Page.MainFrame.GetFirstChild("top-records") as CMlFrame);
+        records = (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        recordsFrame.ClipWindowActive = True;
+        recordsFrame.ClipWindowRelativePosition = <20.0, -25.7>;
+        recordsFrame.ClipWindowSize = <55.0, 54.6>;
+
+        windowRecordsClip.ClipWindowActive = True;
+        windowRecordsClip.ClipWindowRelativePosition = <88.0, -49.0>;
+        windowRecordsClip.ClipWindowSize = <176.0, 100.0>;
+
+        updateList();
+        updateOnlinePlayers();
+
+        log("Local records started.");
+
+        declare Boolean hidden = False;
+        declare Real width = widget.Size[0];
+
+        declare Vec2 vecVisible = widget.RelativePosition_V3;
+        declare Vec2 vecHidden = widget.RelativePosition_V3;
+
+        if(vecVisible[0] < 0.0){
+            vecHidden[0] = vecVisible[0] - width;
+        }else{
+            vecHidden[0] = vecVisible[0] + width;
+        }
+
+        declare Text visiblePos = """ <frame pos=" """ ^ vecVisible[0] ^ " " ^ vecVisible[1] ^ """ " /> """;
+        declare Text hiddenPos = """ <frame pos=" """ ^ vecHidden[0] ^ " " ^ vecHidden[1] ^ """ " /> """;
+
+        //baseline setBaseline
+        if(Records.count > 0){
+            if(LocalRank == -1){
+                for(i, 0, 100){
+                    if(Records.existskey(i)){
+                        setBaseline(Records[i]["score"] ^ " " ^ Records[i]["nick"] ^ "$z$ccc [" ^ Records[i]["login"] ^ "]");
+                    }
+                }
+            }else{
+                setBaseline(Records[LocalRank]["score"] ^ " " ^ Records[LocalRank]["nick"] ^ "$z$ccc [" ^ Records[LocalRank]["login"] ^ "]");
+        }
+        }
+
+        //graph
+        declare CMlGraph graph = (Page.GetFirstChild("graph") as CMlGraph);
+        declare Real graphMaxHeight = TL::ToInteger(Records[Records.count]["score_raw"]) * 1.0;
+
+        declare Integer cpCount = TL::Split(",", Records[1]["cps"]).count;
+        graph.CoordsMin = <0., 0.>;
+        graph.CoordsMax = <((cpCount - 1) * 1.0), 500.>;
+
+        for(i, 1, cpCount - 1){
+            declare line = graph.AddCurve();
+            line.Color = <0.25, 0.25, 0.25>;
+            line.Width = 0.1;
+            line.Points.add(<1. * i - 0.0001, 0.0>);
+            line.Points.add(<1. * i, 500.0>);
+        }
+
+        declare myCurve = graph.AddCurve();
+        myCurve.Color = <0.5, 0.5, 0.5>;
+        myCurve.Width = 0.2;
+        myCurve.Points.add(<0.0, 250.0>);
+        myCurve.Points.add(<cpCount * 1.0, 250.0>);
+
+        targetCurve = graph.AddCurve();
+        targetCurve.Color = <1.0, 0.2, 0.2>;
+        targetCurve.Width = 0.5;
+        for(i, 0, cpCount){
+	        targetCurve.Points.add(<1. * i, 100. * i>);
+        }
+
+        declare Text lastUpdateHash = "";
+        declare Integer currentOnlinePlayers = Players.count;
+
+        while(True){
+            yield;
+
+            if(InputPlayer == Null){
+                wait(InputPlayer != Null);
+            }
+
+            declare Text UpdateHash for InputPlayer = "";
+            declare Text[Text] UpdateRecord for InputPlayer;
+
+            if(UpdateHash != lastUpdateHash){
+                lastUpdateHash = UpdateHash;
+                updateRecord(UpdateRecord);
+                continue;
+            }
+
+            if(currentOnlinePlayers != Players.count){
+                currentOnlinePlayers = Players.count;
+                updateList();
+                updateOnlinePlayers();
+                continue;
+            }
+
+            hidescript();
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null){
+                    continue;
+                }
+
+                if(event.Control.HasClass("record-login")){
+                    showCps(event.Control.Parent);
+                    continue;
+                }
+
+                if(event.Control.HasClass("pagebox") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    Page.MainFrame.GetFirstChild("current-page-quad").RelativePosition_V3 = event.Control.RelativePosition_V3;
+                    scrollToPage(event.Control.DataAttributeGet("page"));
+                    continue;
+                }
+
+                if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                    continue;
+                }
+
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                log("show");
+                    window.Show();
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>
