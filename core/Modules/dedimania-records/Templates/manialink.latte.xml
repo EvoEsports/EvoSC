@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Dedimania" id="Dedimania2" version="3">
     <framemodel id="record" hidden="1">
-        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="4 2" textsize="0.6" text="78."/>
         <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
         <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
         <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
@@ -219,9 +219,7 @@
 
     Void scrollToBottom(){
         declare Integer visible = {config('dedimania.rows')} - {config('dedimania.showtop')};
-        declare Integer targetRank = Records.count - (visible / 2) - 2;
-
-        log("target-rank: " ^ targetRank);
+        declare Integer targetRank = Records.count - (visible / 2);
 
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
@@ -233,12 +231,12 @@
             updateRecord(i, Records[i]);
         }
 
-        for(i, Records.count, 100){
+        for(i, Records.count + 1, 200){
             declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
             recordLoginLabels.Visible = False;
         }
 
-        enablePaginationBoxes(Records.count);
+        enablePaginationBoxes(Records.count - 1);
 
         if(LocalRank != -1){
             scrollToLocalRankPosition();

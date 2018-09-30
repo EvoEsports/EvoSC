@@ -104,6 +104,8 @@ class LocalRecords
 
         $map = MapController::getCurrentMap();
 
+        $resendManialink = $map->locals->isEmpty();
+
         $localCount = $map->locals()->count();
 
         $local = $map->locals()->wherePlayer($player->id)->first();
@@ -127,7 +129,7 @@ class LocalRecords
                     ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
                 Hook::fire('PlayerLocal', $player, $local);
-                self::displayLocalRecords();
+                self::sendUpdateDediManialink($local, $oldRank);
             }
         } else {
             if ($localCount < 100) {
@@ -141,9 +143,23 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
                 ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' claimed the ', $local);
                 Hook::fire('PlayerLocal', $player, $local);
-                self::displayLocalRecords();
+                self::sendUpdateDediManialink($local);
             }
         }
+
+        if ($resendManialink) {
+            onlinePlayers()->each([self::class, 'showManialink']);
+        }
+    }
+
+    public static function sendUpdateDediManialink(LocalRecord $record, $oldRank = null)
+    {
+        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
+        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
+            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
+            $record->player->Login, $oldRank ?? "0");
+
+        Template::showAll('local-records.update', compact('updateRecord', 'oldRank'));
     }
 
     /**
@@ -175,5 +191,6 @@ class LocalRecords
      */
     public static function beginMap()
     {
+        onlinePlayers()->each([self::class, 'showManialink']);
     }
 }

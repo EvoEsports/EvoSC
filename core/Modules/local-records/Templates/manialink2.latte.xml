@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Locals2" id="Locals2" version="3">
     <framemodel id="record" hidden="1">
-        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="4 2" textsize="0.6" text="78."/>
         <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
         <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
         <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
@@ -35,12 +35,12 @@
         <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Local records" z-index="1" />
         <quad id="close" pos="176 -3" size="4 4" halign="center" ScriptEvents="1" />
-        <label pos="176 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" />
+        <label pos="176 -3" size="5 5" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="000f" />
 
-        <frame id="window-records-clip" pos="2 -9" z-index="2">
+        <frame pos="2 -9" z-index="2">
             <frame id="window-records">
                 {for $i=0; $i<500; $i++}
-                <frame pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}">
+                <frame pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}" hidden="1">
                     <label z-index="4" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.6" text="78."/>
                     <label z-index="4" valign="center" pos="4 0" size="8 2" textsize="0.8" text="0:00.000" textcolor="eee"/>
                     <label z-index="4" valign="center" pos="13 0" size="9 2" textsize="0.4" text="login login" hidden="1"/>
@@ -164,34 +164,6 @@
         }
     }
 
-    Void updateRecord(Integer i, Text[Text] record){
-        log(i);
-
-        if(i <= {config('locals.showtop', 3)}){
-            declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
-            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
-            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
-            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
-            recordLabels.Visible = True;
-            recordLabels.DataAttributeSet("login", record["login"]);
-        }else{
-            declare recordLabels = (records.Controls[i - {config('locals.showtop') + 1}] as CMlFrame);
-            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
-            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
-            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
-            recordLabels.Visible = True;
-            recordLabels.DataAttributeSet("login", record["login"]);
-        }
-
-        declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
-        (recordLoginLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
-        (recordLoginLabels.Controls[1] as CMlLabel).SetText(record["score"]);
-        (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
-        (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
-        recordLoginLabels.Visible = True;
-        recordLoginLabels.DataAttributeSet("login", record["login"]);
-    }
-
     Void scrollToLocalRankPosition(){
         declare Real relativeRankPos = LocalRank / 100.0;
         declare Integer targetRank = LocalRank;
@@ -221,11 +193,35 @@
         declare Integer visible = {config('locals.rows', 18)} - {config('locals.showtop', 3)};
         declare Integer targetRank = Records.count - (visible / 2) - 2;
 
-        log("target-rank: " ^ targetRank);
-
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
+    }
+
+    Void updateRecord(Integer i, Text[Text] record){
+        if(i <= {config('locals.showtop', 3)}){
+            declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
+        }else{
+            declare recordLabels = (records.Controls[i - {config('locals.showtop') + 1}] as CMlFrame);
+            (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+            (recordLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+            (recordLabels.Controls[2] as CMlLabel).SetText(record["nick"]);
+            recordLabels.Visible = True;
+            recordLabels.DataAttributeSet("login", record["login"]);
+        }
+
+        declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
+        (recordLoginLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
+        (recordLoginLabels.Controls[1] as CMlLabel).SetText(record["score"]);
+        (recordLoginLabels.Controls[2] as CMlLabel).SetText(record["login"]);
+        (recordLoginLabels.Controls[3] as CMlLabel).SetText(record["nick"]);
+        recordLoginLabels.Visible = True;
+        recordLoginLabels.DataAttributeSet("login", record["login"]);
     }
 
     Void updateList(){
@@ -233,12 +229,12 @@
             updateRecord(i, Records[i]);
         }
 
-        for(i, Records.count, 100){
+        for(i, Records.count + 1, 200){
             declare recordLoginLabels = (Page.MainFrame.GetFirstChild("record-login-" ^ (i - 1)) as CMlFrame);
             recordLoginLabels.Visible = False;
         }
 
-        enablePaginationBoxes(Records.count);
+        enablePaginationBoxes(Records.count - 1);
 
         if(LocalRank != -1){
             scrollToLocalRankPosition();
@@ -360,7 +356,11 @@
     }
 
     Void updateRecord(Text[Text] updateRecord){
-        if(updateRecord["oldRank"] == "0"){
+        if(updateRecord.count == 0){
+            return;
+        }
+
+        if(updateRecord.count > 0 && updateRecord["oldRank"] == "0"){
             declare rank = TL::ToInteger(updateRecord["rank"]);
             declare oldRank = Records.count + 1;
 
@@ -415,20 +415,10 @@
         LocalCps = TL::Split(",", {implode(",", $localCps)});
 
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records-frame") as CMlFrame);
-        declare windowRecordsClip <=> (Page.MainFrame.GetFirstChild("window-records-clip") as CMlFrame);
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
         topRecords = (Page.MainFrame.GetFirstChild("top-records") as CMlFrame);
         records = (Page.MainFrame.GetFirstChild("records") as CMlFrame);
-
-        recordsFrame.ClipWindowActive = True;
-        recordsFrame.ClipWindowRelativePosition = <20.0, -25.7>;
-        recordsFrame.ClipWindowSize = <55.0, 54.6>;
-
-        windowRecordsClip.ClipWindowActive = True;
-        windowRecordsClip.ClipWindowRelativePosition = <88.0, -49.0>;
-        windowRecordsClip.ClipWindowSize = <176.0, 100.0>;
 
         updateList();
         updateOnlinePlayers();
@@ -502,12 +492,12 @@
                 wait(InputPlayer != Null);
             }
 
-            declare Text UpdateHash for InputPlayer = "";
-            declare Text[Text] UpdateRecord for InputPlayer;
+            declare Text UpdateLocalHash for LocalUser = "";
+            declare Text[Text] UpdateLocalRecord for InputPlayer;
 
-            if(UpdateHash != lastUpdateHash){
-                lastUpdateHash = UpdateHash;
-                updateRecord(UpdateRecord);
+            if(UpdateLocalHash != lastUpdateHash){
+                lastUpdateHash = UpdateLocalHash;
+                updateRecord(UpdateLocalRecord);
                 continue;
             }
 
@@ -542,7 +532,6 @@
                 }
 
                 if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
-                log("show");
                     window.Show();
                     continue;
                 }
