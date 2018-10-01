@@ -5,6 +5,13 @@ namespace esc\Classes;
 
 class HideScript
 {
+    public $targetId;
+
+    public function __construct($targetId = "widget")
+    {
+        $this->targetId = $targetId;
+    }
+
     public function __toString()
     {
         return '
@@ -15,7 +22,7 @@ Void hidescript(){
         return;
     }
 
-    declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
     declare Boolean hidden = widget.DataAttributeGet("hidden") == "true";
     declare Real speed = ML::Abs(InputPlayer.Speed * 3.6);
 
@@ -37,11 +44,12 @@ Void hidescript(){
     declare Text visiblePos = "<frame pos=\'" ^ widget.DataAttributeGet("orig-x") ^ " " ^ widget.DataAttributeGet("orig-y") ^ "\' />";
     declare Text hiddenPos = "<frame pos=\'" ^ widget.DataAttributeGet("hidden-x") ^ " " ^ widget.DataAttributeGet("hidden-y") ^ "\' />";
 
-    if(speed > hideSpeed && !hidden){
+    //if(speed > hideSpeed && InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running && !hidden){
+    if(speed >= hideSpeed && InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running && !hidden){
         widget.DataAttributeSet("hidden", "true");
         AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
-    if(speed < hideSpeed && hidden){
+    if((speed < hideSpeed && hidden) || (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running && hidden)){
         widget.DataAttributeSet("hidden", "false");
         AnimMgr.Add(widget, visiblePos, 600, CAnimManager::EAnimManagerEasing::ExpInOut);
     }

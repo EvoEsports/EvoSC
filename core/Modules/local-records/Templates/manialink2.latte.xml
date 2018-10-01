@@ -8,8 +8,8 @@
     </framemodel>
 
     <frame id="widget" pos="{config('locals.pos')}" size="40 60" scale="{config('locals.scale')}" z-index="100">
-        <quad class="widget" z-index="-1" size="40 60" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
-        <quad z-index="-2" pos="0 -5" size="40 {config('locals.showtop') * 3.2}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
+        <quad class="widget" z-index="-1" size="40 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="40 {config('locals.showtop') * 3 + 1.5}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records"/>
 
@@ -107,6 +107,43 @@
     declare CMlFrame topRecords;
     declare CMlFrame records;
 
+    Void setupGraphs(){
+        log("Setting up graphs");
+
+        if(Records.count == 0 || targetCurve != Null){
+            log("No records");
+            return;
+        }
+
+        declare CMlGraph graph = (Page.GetFirstChild("graph") as CMlGraph);
+        declare Real graphMaxHeight = TL::ToInteger(Records[Records.count]["score_raw"]) * 1.0;
+
+        declare Integer cpCount = TL::Split(",", Records[1]["cps"]).count;
+        graph.CoordsMin = <0., 0.>;
+        graph.CoordsMax = <((cpCount - 1) * 1.0), 500.>;
+
+        for(i, 1, cpCount - 1){
+            declare line = graph.AddCurve();
+            line.Color = <0.25, 0.25, 0.25>;
+            line.Width = 0.1;
+            line.Points.add(<1. * i - 0.0001, 0.0>);
+            line.Points.add(<1. * i, 500.0>);
+        }
+
+        declare myCurve = graph.AddCurve();
+        myCurve.Color = <0.5, 0.5, 0.5>;
+        myCurve.Width = 0.2;
+        myCurve.Points.add(<0.0, 250.0>);
+        myCurve.Points.add(<cpCount * 1.0, 250.0>);
+
+        targetCurve = graph.AddCurve();
+        targetCurve.Color = <1.0, 0.2, 0.2>;
+        targetCurve.Width = 0.5;
+        for(i, 0, cpCount){
+	        targetCurve.Points.add(<1. * i, 100. * i>);
+        }
+    }
+
     Void setCompareTo(Text nick){
         declare compareTo <=> (Page.MainFrame.GetFirstChild("compare-to") as CMlLabel);
         compareTo.SetText(nick);
@@ -180,8 +217,8 @@
             targetRank = Records.count - (visible / 2) - 2;
         }
 
-        if(targetRank < totalVisible / 2){
-            targetRank = targetRank + (totalVisible / 2 - targetRank);
+        if(targetRank <= totalVisible / 2){
+            return;
         }
 
         declare Real y = targetRank * 3.0 - 30.0;
@@ -190,15 +227,21 @@
     }
 
     Void scrollToBottom(){
-        declare Integer visible = {config('locals.rows', 18)} - {config('locals.showtop', 3)};
-        declare Integer targetRank = Records.count - (visible / 2) - 2;
+        declare Integer totalVisible = {config('locals.rows', 18)};
+        declare Integer topVisible = {config('locals.showtop', 3)};
+        declare Integer visible = totalVisible - topVisible;
+        declare Integer targetRank = Records.count - (visible / 2);
+
+        if(targetRank <= visible/2){
+            return;
+        }
 
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
     }
 
-    Void updateRecord(Integer i, Text[Text] record){
+    Void updateLabels(Integer i, Text[Text] record){
         if(i <= {config('locals.showtop', 3)}){
             declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
             (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
@@ -226,7 +269,8 @@
 
     Void updateList(){
         for(i, 1, Records.count){
-            updateRecord(i, Records[i]);
+            updateLabels(i, Records[i]);
+            updateLabels(i, Records[i]);
         }
 
         for(i, Records.count + 1, 200){
@@ -355,12 +399,16 @@
         setCompareTo(Records[id]["score"] ^ " " ^ Records[id]["nick"] ^ "$z$ccc [" ^ Records[id]["login"] ^ "]");
     }
 
+    //Called when new record is made
     Void updateRecord(Text[Text] updateRecord){
+        log("new updateRecord: ");
+        log(updateRecord);
+
         if(updateRecord.count == 0){
             return;
         }
 
-        if(updateRecord.count > 0 && updateRecord["oldRank"] == "0"){
+        if(updateRecord["oldRank"] == "-1"){
             declare rank = TL::ToInteger(updateRecord["rank"]);
             declare oldRank = Records.count + 1;
 
@@ -370,6 +418,13 @@
             }
 
             Records[rank] = ["cps" => updateRecord["cps"], "score" => updateRecord["score"], "score_raw" => updateRecord["score"], "nick" => updateRecord["nick"], "login" => updateRecord["login"]];
+        }else if(updateRecord["oldRank"] == updateRecord["rank"]){
+            declare rank = TL::ToInteger(updateRecord["oldRank"]);
+            declare Text[Text] updatedRecord = Records[rank];
+            updatedRecord["score"] = updateRecord["score"];
+            updatedRecord["cps"] = updateRecord["cps"];
+
+            Records[rank] = updatedRecord;
         }else{
             declare rank = TL::ToInteger(updateRecord["rank"]);
             declare oldRank = TL::ToInteger(updateRecord["oldRank"]);
@@ -383,10 +438,12 @@
             updatedRecord["rank"] = updateRecord["rank"];
             updatedRecord["score"] = updateRecord["score"];
             updatedRecord["cps"] = updateRecord["cps"];
+
             Records[rank] = updatedRecord;
         }
 
         updateList();
+        setupGraphs();
     }
 
     Void scrollToPage(Text pageText){
@@ -401,15 +458,10 @@
     main(){
         log("Starting local records...");
 
-        {if strlen($records) == 2}
-            log("No local records");
-            while(True){
-                yield;
-                hidescript();
-            }
-            return;
+        {if strlen($records) == 0}
+            Records = Text[Text][Integer];
         {else}
-        Records = {$records|noescape};
+            Records = [{$records|noescape}];
         {/if}
         LocalRank = {$localRank|noescape};
         LocalCps = TL::Split(",", {implode(",", $localCps)});
@@ -454,33 +506,7 @@
         }
 
         //graph
-        declare CMlGraph graph = (Page.GetFirstChild("graph") as CMlGraph);
-        declare Real graphMaxHeight = TL::ToInteger(Records[Records.count]["score_raw"]) * 1.0;
-
-        declare Integer cpCount = TL::Split(",", Records[1]["cps"]).count;
-        graph.CoordsMin = <0., 0.>;
-        graph.CoordsMax = <((cpCount - 1) * 1.0), 500.>;
-
-        for(i, 1, cpCount - 1){
-            declare line = graph.AddCurve();
-            line.Color = <0.25, 0.25, 0.25>;
-            line.Width = 0.1;
-            line.Points.add(<1. * i - 0.0001, 0.0>);
-            line.Points.add(<1. * i, 500.0>);
-        }
-
-        declare myCurve = graph.AddCurve();
-        myCurve.Color = <0.5, 0.5, 0.5>;
-        myCurve.Width = 0.2;
-        myCurve.Points.add(<0.0, 250.0>);
-        myCurve.Points.add(<cpCount * 1.0, 250.0>);
-
-        targetCurve = graph.AddCurve();
-        targetCurve.Color = <1.0, 0.2, 0.2>;
-        targetCurve.Width = 0.5;
-        for(i, 0, cpCount){
-	        targetCurve.Points.add(<1. * i, 100. * i>);
-        }
+        setupGraphs();
 
         declare Text lastUpdateHash = "";
         declare Integer currentOnlinePlayers = Players.count;
@@ -493,9 +519,10 @@
             }
 
             declare Text UpdateLocalHash for LocalUser = "";
-            declare Text[Text] UpdateLocalRecord for InputPlayer;
+            declare Text UpdateLocalMap for LocalUser;
+            declare Text[Text] UpdateLocalRecord for LocalUser;
 
-            if(UpdateLocalHash != lastUpdateHash){
+            if(UpdateLocalHash != lastUpdateHash && UpdateLocalMap == Map.MapInfo.MapUid){
                 lastUpdateHash = UpdateLocalHash;
                 updateRecord(UpdateLocalRecord);
                 continue;

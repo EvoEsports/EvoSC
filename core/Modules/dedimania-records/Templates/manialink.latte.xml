@@ -165,8 +165,6 @@
     }
 
     Void updateRecord(Integer i, Text[Text] record){
-        log(i);
-
         if(i <= {config('dedimania.showtop')}){
             declare recordLabels = (topRecords.Controls[i - 1] as CMlFrame);
             (recordLabels.Controls[0] as CMlLabel).SetText(i ^ ".");
@@ -204,13 +202,17 @@
             targetRank = targetRank + (topVisible - (LocalRank - topVisible));
         }
 
-        if((Records.count - LocalRank) < visible / 2){
+        if((Records.count - LocalRank) <= visible / 2){
+            return;
             targetRank = Records.count - (visible / 2) - 2;
         }
 
-        if(targetRank < totalVisible / 2){
+        if(targetRank <= totalVisible / 2){
             targetRank = targetRank + (totalVisible / 2 - targetRank);
         }
+
+        log("totalVisible: " ^ totalVisible);
+        log("target-rank: " ^ targetRank);
 
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
@@ -218,8 +220,14 @@
     }
 
     Void scrollToBottom(){
-        declare Integer visible = {config('dedimania.rows')} - {config('dedimania.showtop')};
+        declare Integer totalVisible = {config('dedimania.rows')};
+        declare Integer topVisible = {config('dedimania.showtop')};
+        declare Integer visible = totalVisible - topVisible;
         declare Integer targetRank = Records.count - (visible / 2);
+
+        if(targetRank <= visible/2){
+            return;
+        }
 
         declare Real y = targetRank * 3.0 - 30.0;
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
@@ -531,7 +539,6 @@
                 }
 
                 if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
-                log("show");
                     window.Show();
                     continue;
                 }

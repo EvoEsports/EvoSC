@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Dedimania:push-new-local" id="push-new-local" version="3">
+<manialink name="ESC:Locals:push-new-local" id="push-new-local" version="3">
     <script>
         <!--
         main(){
             declare Text UpdateLocalHash for LocalUser;
+            declare Text UpdateLocalMap for LocalUser;
             declare Text[Text] UpdateLocalRecord for LocalUser;
 
             UpdateLocalHash = {uniqid()};
             UpdateLocalRecord = {$updateRecord|noescape};
+            UpdateLocalMap = Map.MapInfo.MapUid;
         }
         -->
     </script>

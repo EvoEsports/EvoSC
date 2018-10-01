@@ -2,6 +2,7 @@
 
 namespace esc\Modules\LocalRecords;
 
+use esc\Classes\Config;
 use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -15,7 +16,6 @@ use esc\Controllers\TemplateController;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Database\Schema\Blueprint;
 
 class LocalRecords
 {
@@ -33,6 +33,7 @@ class LocalRecords
 
     public static function reload(Player $player)
     {
+        Config::configReload();
         TemplateController::loadTemplates();
         self::showManialink($player);
     }
@@ -78,12 +79,12 @@ class LocalRecords
             $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
             $onlinePlayers = onlinePlayers()->pluck('Login');
 
-            $records = '[' . $allDedis->map(function (LocalRecord $dedi) {
+            $records = $allDedis->map(function (LocalRecord $dedi) {
                     $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
 
                     return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
                         $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
-                })->implode(",\n") . ']';
+                })->implode(",\n");
 
             Template::show($player, 'local-records.manialink2', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
         }
@@ -103,8 +104,6 @@ class LocalRecords
         }
 
         $map = MapController::getCurrentMap();
-
-        $resendManialink = $map->locals->isEmpty();
 
         $localCount = $map->locals()->count();
 
@@ -146,10 +145,6 @@ class LocalRecords
                 self::sendUpdateDediManialink($local);
             }
         }
-
-        if ($resendManialink) {
-            onlinePlayers()->each([self::class, 'showManialink']);
-        }
     }
 
     public static function sendUpdateDediManialink(LocalRecord $record, $oldRank = null)
@@ -157,9 +152,11 @@ class LocalRecords
         $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
         $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
             $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank ?? "0");
+            $record->player->Login, $oldRank ?: "-1");
 
-        Template::showAll('local-records.update', compact('updateRecord', 'oldRank'));
+        var_dump($updateRecord);
+
+        Template::showAll('local-records.update', compact('updateRecord'));
     }
 
     /**
