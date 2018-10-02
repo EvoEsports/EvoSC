@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Liverankings" id="Liverankings" version="3">
     <framemodel id="record">
-        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="3 2" textsize="0.4" text="78."/>
-        <label z-index="2" valign="center" pos="4 0" size="8 2" textsize="0.4" text="0:00.000" textcolor="eee"/>
-        <label z-index="2" valign="center" pos="13 0" size="25 2" textsize="0.4" text="name name name name name"/>
-        <quad pos="-1 -0.2" size="40 3" bgcolor="{config('colors.ui.header')}" opacity="0.5" z-index="1" hidden="1" valign="center" />
+        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78."/>
+        <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4"/>
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef"/>
+        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name"/>
     </framemodel>
 
     <frame id="widget" pos="{config('ui.playerlist.pos')}" size="40 60" scale="{config('ui.playerlist.scale')}">
@@ -23,13 +23,121 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
+    Text[Text][] arraySort(Text[Text][] array, Text column){
+        declare Text[Integer] SortedColumn;
+
+        foreach (I => Data in array) {
+            SortedColumn[I] = Data[column];
+        }
+
+        SortedColumn = SortedColumn.sort();
+        declare Text[Text][] SortedArray;
+
+        foreach (I => Data in SortedColumn) {
+            SortedArray.add(array[I]);
+        }
+
+        return SortedArray;
+    }
+
+    Text formatScoreCorrect(Integer score, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0 && !cutZeroes){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(!cutZeroes){
+            return minutes ^ ":" ^ secondString ^ "." ^ msString;
+        }
+
+        return secondString ^ "." ^ msString;
+    }
+
+    Void updateLabels(CMlFrame ranking, Integer position, Text[Text] rank){
+        declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
+        (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
+        (frame.Controls[1] as CMlLabel).SetText(rank["score"]);
+        (frame.Controls[2] as CMlLabel).SetText(rank["scoreCZ"]);
+        (frame.Controls[3] as CMlLabel).SetText(rank["nick"]);
+        frame.Show();
+    }
+
+    Void updateList(){
+        declare players = Text[Text][];
+        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        declare Integer max = {config('live-rankings.show')};
+        declare Integer i = 0;
+
+        foreach(player in Players){
+            declare score = player.Score.BestLap.Time;
+
+            if(score > 0){
+                declare nick = player.User.Name;
+                declare Text[Text] array = ["score" => formatScoreCorrect(score, False), "scoreCZ" => formatScoreCorrect(score, True), "nick" => nick];
+                players.add(array);
+            }
+        }
+
+        players = arraySort(players, "score");
+
+        foreach(rank in players){
+            if(i > max){
+                return;
+            }
+
+            i = i + 1;
+
+            updateLabels(ranking, i, rank);
+        }
+    }
+
+    Void reset(){
+        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        foreach(control in ranking.Controls){
+            control.Hide();
+        }
+    }
+
     {(new esc\Classes\HideScript())|noescape}
 
     main(){
-        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        declare Text currentMapUid = Map.MapInfo.MapUid;
+
+        updateList();
 
         while(True){
             yield;
+
+            foreach(event in RaceEvents){
+                if(event.IsEndLap == True){
+                    updateList();
+                }
+            }
+
+            if(currentMapUid != Map.MapInfo.MapUid){
+                currentMapUid = Map.MapInfo.MapUid;
+                reset();
+            }
 
             hidescript();
         }
