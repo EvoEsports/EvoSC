@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:donations-widget" id="donations-widget" version="3">
-    <frame id="main-frame" pos="{config('donations.pos.visible')}" scale="0.8">
+    <frame id="main-frame" pos="{config('donations.pos.visible')}" size="50 5" scale="0.8">
         <quad size="50 5" z-index="0" bgcolor="{background_color()|noescape}9" id="bg-quad" ScriptEvents="1" />
 
         <frame id="content-frame" pos="0 -7.55" z-index="1">
@@ -12,7 +12,10 @@
 
     <script>
         <!--
-        #Include "MathLib" as MathLib
+        #Include "MathLib" as ML
+        #Include "TextLib" as TL
+
+        {(new esc\Classes\HideScript('main-frame'))|noescape}
 
         Void anim(CMlFrame frame, Text targetPos){
             AnimMgr.Add(frame, targetPos, 200, CAnimManager::EAnimManagerEasing::CubicInOut);
@@ -33,10 +36,6 @@
             declare Integer amount = 0;
             declare Real xOffset = {sprintf('%.1f', floatval(explode(' ', config('donations.pos.visible'))[0]))|noescape};
 
-            mainFrame.ClipWindowActive = True;
-            mainFrame.ClipWindowRelativePosition = <25.0,-2.5>;
-            mainFrame.ClipWindowSize = <52.0,4.9>;
-
             while(True){
                 yield;
 
@@ -55,31 +54,7 @@
                     }
                 }
 
-                if(InputPlayer != Null){
-                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
-                    declare Real speed = InputPlayer.Speed;
-
-                    if(speed < 0){
-                        speed = speed  * -1;
-                    }
-
-                    if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                        if(speed < UI_Hide_Speed && isHidden){
-                            AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                            isHidden = False;
-                        }
-                    }else{
-                        if(speed >= UI_Hide_Speed && !isHidden){
-                            AnimMgr.Add(mainFrame, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                            isHidden = True;
-                        }
-
-                        if(speed < UI_Hide_Speed && isHidden){
-                            AnimMgr.Add(mainFrame, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                            isHidden = False;
-                        }
-                    }
-                }
+                hidescript();
 
                 if(barVisible){
                     declare posX = MouseX - xOffset;
@@ -88,7 +63,7 @@
                         declare posCoef = posX / 39.8333;
 
                         barQuad.Size = <posCoef * 50, 5.0>;
-                        amount = MathLib::NearestInteger((posCoef * 100)*(posCoef * 100));
+                        amount = ML::NearestInteger((posCoef * 100)*(posCoef * 100));
 
                         amount = (amount / 10) * 10;
 

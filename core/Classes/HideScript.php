@@ -32,9 +32,9 @@ Void hidescript(){
 
         declare Vec2 posHidden = widget.RelativePosition_V3;
         if(widget.RelativePosition_V3[0] < 0.0){
-            posHidden[0] = posHidden[0] - widget.Size[0];
+            posHidden[0] = posHidden[0] - widget.Size[0] * widget.Scale;
         }else{
-            posHidden[0] = posHidden[0] + widget.Size[0];
+            posHidden[0] = posHidden[0] + widget.Size[0] * widget.Scale;
         }
 
         widget.DataAttributeSet("hidden-x", TL::ToText(posHidden[0]));

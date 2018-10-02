@@ -154,8 +154,6 @@ class LocalRecords
             $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
             $record->player->Login, $oldRank ?: "-1");
 
-        var_dump($updateRecord);
-
         Template::showAll('local-records.update', compact('updateRecord'));
     }
 
