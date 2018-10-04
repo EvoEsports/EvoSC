@@ -33,10 +33,11 @@ class MapController
 
         self::loadMaps();
 
-        self::$queue = new Collection();
+        self::$queue    = new Collection();
         self::$mapsPath = config('server.base') . '/UserData/Maps/';
 
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
+        Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
         Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
         ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'skip');
@@ -73,7 +74,7 @@ class MapController
     public static function addTime(int $minutes = 10)
     {
         self::$addedTime = self::$addedTime + $minutes;
-        $totalNewTime = (self::$timeLimit + self::$addedTime) * 60;
+        $totalNewTime    = (self::$timeLimit + self::$addedTime) * 60;
         self::updateRoundtime($totalNewTime);
     }
 
@@ -85,7 +86,7 @@ class MapController
 
     private static function updateRoundtime(int $timeInSeconds)
     {
-        $settings = \esc\Classes\Server::getModeScriptSettings();
+        $settings                = \esc\Classes\Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $timeInSeconds;
         \esc\Classes\Server::setModeScriptSettings($settings);
 
@@ -135,6 +136,11 @@ class MapController
         }
 
         self::$currentMap = $map;
+    }
+
+    public static function beginMatch()
+    {
+        self::resetTime();
     }
 
     /**
@@ -215,8 +221,8 @@ class MapController
             $map = self::$queue->first()->map;
         } else {
             $mapInfo = Server::getNextMapInfo();
-            $map = Map::where('uid', $mapInfo->uId)
-                      ->first();
+            $map     = Map::where('uid', $mapInfo->uId)
+                          ->first();
         }
 
         return $map;
@@ -366,8 +372,13 @@ class MapController
 
         $data = $result->getBody()->getContents();
 
-        $map->update(['mx_details' => $data]);
+        if ($data == '[]') {
+            Log::logAddLine('MapController', 'No MX information available for: ' . $map->gbx->Name);
 
+            return;
+        }
+
+        $map->update(['mx_details' => $data]);
         Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
 
         $mxDetails = json_decode($data);
@@ -387,7 +398,6 @@ class MapController
 
             return;
         }
-
         $map->update(['mx_world_record' => $result->getBody()->getContents()]);
 
         Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->gbx->Name);
@@ -440,7 +450,7 @@ class MapController
             File::put("$mapFolder$filename", $response->getBody());
 
             $gbxInfo = self::getGbxInformation($filename);
-            $gbx = json_decode($gbxInfo);
+            $gbx     = json_decode($gbxInfo);
 
             $author = Player::whereLogin($gbx->AuthorLogin)->first();
 

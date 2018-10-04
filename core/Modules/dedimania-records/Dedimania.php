@@ -198,14 +198,14 @@ class Dedimania extends DedimaniaApi
             $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
             $onlinePlayers = onlinePlayers()->pluck('Login');
 
-            $records = '[' . $allDedis->map(function (Dedi $dedi) {
+            $records = $allDedis->map(function (Dedi $dedi) {
                     $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
 
                     return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
                         $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
-                })->implode(",\n") . ']';
+                })->implode(",\n");
 
-            Template::show($player, 'dedimania-records.manialink', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
+            Template::show($player, 'dedimania-records.manialink2', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
         }
     }
 

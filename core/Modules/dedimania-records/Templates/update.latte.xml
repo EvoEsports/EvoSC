@@ -3,13 +3,13 @@
     <script>
         <!--
         main(){
-            wait(InputPlayer != Null);
+            declare Text UpdateDediHash for LocalUser;
+            declare Text UpdateDediMap for LocalUser;
+            declare Text[Text] UpdateDedi for LocalUser;
 
-            declare Text UpdateHash for InputPlayer;
-            declare Text[Text] UpdateRecord for InputPlayer;
-
-            UpdateHash = {uniqid()};
-            UpdateRecord = {$updateRecord|noescape};
+            UpdateDediHash = {uniqid()};
+            UpdateDedi = {$updateRecord|noescape};
+            UpdateDediMap = Map.MapInfo.MapUid;
         }
         -->
     </script>

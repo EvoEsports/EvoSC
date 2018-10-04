@@ -4,8 +4,8 @@
   "key": "7ba618f274",
 
   "pos": "-160 22",
-  "scale": "0.95",
-  "rows": 20,
+  "scale": 0.95,
+  "rows": 30,
   "showtop": 3,
   "enabled": false
 }

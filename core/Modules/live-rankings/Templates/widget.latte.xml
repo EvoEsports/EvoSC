@@ -23,22 +23,7 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    Text[Text][] arraySort(Text[Text][] array, Text column){
-        declare Text[Integer] SortedColumn;
-
-        foreach (I => Data in array) {
-            SortedColumn[I] = Data[column];
-        }
-
-        SortedColumn = SortedColumn.sort();
-        declare Text[Text][] SortedArray;
-
-        foreach (I => Data in SortedColumn) {
-            SortedArray.add(array[I]);
-        }
-
-        return SortedArray;
-    }
+    declare Integer[Text] scores;
 
     Text formatScoreCorrect(Integer score, Boolean cutZeroes){
         declare Text secondString;
@@ -73,41 +58,30 @@
         return secondString ^ "." ^ msString;
     }
 
-    Void updateLabels(CMlFrame ranking, Integer position, Text[Text] rank){
+    Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
         declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
         (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
-        (frame.Controls[1] as CMlLabel).SetText(rank["score"]);
-        (frame.Controls[2] as CMlLabel).SetText(rank["scoreCZ"]);
-        (frame.Controls[3] as CMlLabel).SetText(rank["nick"]);
+        (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
+        (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+        (frame.Controls[3] as CMlLabel).SetText(name);
         frame.Show();
     }
 
     Void updateList(){
-        declare players = Text[Text][];
         declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
         declare Integer max = {config('live-rankings.show')};
         declare Integer i = 0;
 
-        foreach(player in Players){
-            declare score = player.Score.BestLap.Time;
+        scores = scores.sort();
 
-            if(score > 0){
-                declare nick = player.User.Name;
-                declare Text[Text] array = ["score" => formatScoreCorrect(score, False), "scoreCZ" => formatScoreCorrect(score, True), "nick" => nick];
-                players.add(array);
-            }
-        }
-
-        players = arraySort(players, "score");
-
-        foreach(rank in players){
+        foreach(name => score in scores){
             if(i > max){
                 return;
             }
 
             i = i + 1;
 
-            updateLabels(ranking, i, rank);
+            updateLabels(ranking, i, name, score);
         }
     }
 
@@ -116,6 +90,7 @@
         foreach(control in ranking.Controls){
             control.Hide();
         }
+        scores = Integer[Text];
     }
 
     {(new esc\Classes\HideScript())|noescape}
@@ -123,14 +98,29 @@
     main(){
         declare Text currentMapUid = Map.MapInfo.MapUid;
 
+        reset();
+
+        foreach(player in Players){
+            declare score = player.Score.BestLap.Time;
+            if(score > 0){
+                scores[player.User.Name] = score;
+            }
+        }
+
         updateList();
 
         while(True){
             yield;
 
             foreach(event in RaceEvents){
+                log(event.IsEndLap);
                 if(event.IsEndLap == True){
-                    updateList();
+                    log("endlap");
+                    if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
+                        scores[event.Player.Name] = event.LapTime;
+                        updateList();
+                    }
+                    break;
                 }
             }
 
