@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:LocalRecords" id="LocalRecords" version="3">
-    <frame pos="{config('locals.pos')}" scale="{config('locals.scale')}">
-        <quad size="50 100" />
-    </frame>
-</manialink>
