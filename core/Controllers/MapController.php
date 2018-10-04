@@ -14,6 +14,7 @@ use esc\Classes\Server;
 use esc\Classes\Vote;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\MatchSettingsManager;
 use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -474,9 +475,11 @@ class MapController
             try {
                 Server::addMap($map->filename);
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+                MatchSettingsManager::loadMatchSettings($player, str_replace('.txt', '', config('server.default-matchsettings')));
             } catch (\Exception $e) {
                 Log::warning("Map $map->filename already added.");
             }
+
 
             ChatController::message(onlinePlayers(), 'New map added: ', $map);
         }

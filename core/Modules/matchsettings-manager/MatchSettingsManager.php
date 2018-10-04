@@ -24,7 +24,7 @@ class MatchSettingsManager
 
     public function __construct()
     {
-        self::$path = config('server.base') . '/UserData/Maps/MatchSettings/';
+        self::$path    = config('server.base') . '/UserData/Maps/MatchSettings/';
         self::$objects = collect();
 
         ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
@@ -42,7 +42,7 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter'], 'ms.edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings'], 'ms.edit');
 
-        if(config('quick-buttons.enabled')){
+        if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
         }
 
@@ -84,7 +84,7 @@ class MatchSettingsManager
      */
     public static function getMatchSettings(): Collection
     {
-        $path = config('server.base') . '/UserData/Maps/MatchSettings/';
+        $path  = config('server.base') . '/UserData/Maps/MatchSettings/';
         $files = File::getDirectoryContents($path, '/\.txt$/');
 
         return $files;
@@ -99,8 +99,8 @@ class MatchSettingsManager
     public static function editMatchSettings(Player $player, string $matchSettingsFile)
     {
         $content = File::get(self::$path . $matchSettingsFile . '.txt');
-        $xml = new \SimpleXMLElement($content);
-        $ms = new MatchSettings($xml, uniqid(), $matchSettingsFile . '.txt');
+        $xml     = new \SimpleXMLElement($content);
+        $ms      = new MatchSettings($xml, uniqid(), $matchSettingsFile . '.txt');
 
         self::$objects->push($ms);
         self::editGameInfo($player, $ms->id);
@@ -119,9 +119,9 @@ class MatchSettingsManager
         $modeScriptSettings = collect();
         foreach ($ms->xml->mode_script_settings->setting as $setting) {
             $modeScriptSettings->push([
-                'name' => $setting['name'] . "",
+                'name'  => $setting['name'] . "",
                 'value' => $setting['value'] . "",
-                'type' => $setting['type'] . "",
+                'type'  => $setting['type'] . "",
             ]);
         }
 
@@ -188,7 +188,7 @@ class MatchSettingsManager
         $disabledMaps = Map::all()->diff($enabledMaps);
 
         //make MS compatible
-        $enabledMaps = $enabledMaps->map(function (Map $map) {
+        $enabledMaps  = $enabledMaps->map(function (Map $map) {
             return sprintf('["id"=>"%s", "name"=>"%s", "login"=>"%s", "enabled"=>"%d"]', $map->id, $map->gbx->Name, $map->gbx->AuthorLogin, 1);
         });
         $disabledMaps = $disabledMaps->map(function (Map $map) {
@@ -208,6 +208,7 @@ class MatchSettingsManager
      * Returns MatchSettings instance by reference
      *
      * @param string $reference
+     *
      * @return MatchSettings
      */
     public static function getMatchSettingsObject(string $reference): MatchSettings
@@ -246,31 +247,34 @@ class MatchSettingsManager
     /**
      * Load match settings into server
      *
-     * @param Player $player
-     * @param string $matchSettingsFile
+     * @param \esc\Models\Player $player
+     * @param string             $matchSettingsFile
+     * @param bool               $silent
      */
-    public static function loadMatchSettings(Player $player, string $matchSettingsFile)
+    public static function loadMatchSettings(Player $player, string $matchSettingsFile, bool $silent = false)
     {
         $file = 'MatchSettings/' . $matchSettingsFile . '.txt';
         Server::loadMatchSettings($file);
 
-        $xml = new \SimpleXMLElement(File::get(config('server.base') . '/UserData/Maps/' . $file));
+        $xml         = new \SimpleXMLElement(File::get(config('server.base') . '/UserData/Maps/' . $file));
         $enabledMaps = collect();
         foreach ($xml->map as $map) {
             $enabledMaps->push("$map->ident");
         }
 
         Map::whereNotNull('uid')->update([
-            'enabled' => 0
+            'enabled' => 0,
         ]);
         Map::whereIn('uid', $enabledMaps)->update([
-            'enabled' => 1
+            'enabled' => 1,
         ]);
 
         //Update maps
         onlinePlayers()->each([MapList::class, 'sendManialink']);
 
-        ChatController::message(onlinePlayers(),$player, ' loads new settings ', secondary($matchSettingsFile));
+        if (!$silent) {
+            ChatController::message(onlinePlayers(), $player, ' loads new settings ', secondary($matchSettingsFile));
+        }
         Log::logAddLine('MatchSettingsManager', "$player loads MatchSettings: $matchSettingsFile");
     }
 
