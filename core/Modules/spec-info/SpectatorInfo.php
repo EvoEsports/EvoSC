@@ -27,7 +27,7 @@ class SpectatorInfo
 
     public static function specStop(Player $player, Player $target)
     {
-        Template::hide($player, 'spec-info.widget');
+        Template::show($player, 'spec-info.hide');
         self::$specTargets->put($player->Login, null);
         self::updateWidget($target);
     }
@@ -49,7 +49,7 @@ class SpectatorInfo
                 Template::show($player, 'spec-info.widget', compact('spectators'));
             });
         } else {
-            Template::hide($player, 'spec-info.widget');
+            Template::show($player, 'spec-info.hide');
         }
     }
 }
