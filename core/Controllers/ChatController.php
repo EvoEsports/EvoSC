@@ -228,6 +228,7 @@ $$: Writes a dollarsign
 
         $icon  = "";
         $color = config('colors.primary');
+        $groupColor = config('colors.primary');
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
@@ -235,36 +236,42 @@ $$: Writes a dollarsign
                 case 'secondary':
                     $icon  = "";
                     $color = config('colors.secondary');
+                    $groupColor = config('colors.secondary');
                     array_shift($parts);
                     break;
 
                 case 'info':
                     $icon  = "";
                     $color = config('colors.info');
+                    $groupColor = config('colors.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
                     $icon  = "";
                     $color = config('colors.warning');
+                    $groupColor = config('colors.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
                     $icon  = "";
                     $color = config('colors.local');
+                    $groupColor = config('colors.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
                     $icon  = "";
                     $color = config('colors.dedi');
+                    $groupColor = config('colors.dedi');
                     array_shift($parts);
                     break;
 
                 default:
                     if (preg_match('/[0-9a-f]{3}/', $matches[1])) {
                         $color = $matches[1];
+                        $groupColor = $matches[1];
                         array_shift($parts);
                     }
             }
@@ -279,7 +286,7 @@ $$: Writes a dollarsign
 
             if ($part instanceof Player) {
                 if ($key == 0) {
-                    $message .= primary($part->group->Name) . ' ';
+                    $message .= '$' . $groupColor . ($part->group->Name) . ' ';
                 }
                 $message .= secondary($part->NickName);
                 continue;

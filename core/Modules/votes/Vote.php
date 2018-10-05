@@ -24,7 +24,7 @@ class Vote
 
         $this->voters    = collect();
         $this->callback  = $callback;
-        $this->duration  = 30;
+        $this->duration  = config('votes.vote-duration', 30);
         $this->voteId    = uniqid();
         $this->question  = $question;
         $this->arguments = $arguments;
@@ -45,7 +45,9 @@ class Vote
     public function voteFinished(): bool
     {
         if ($this->allPlayersVoted()) {
-            // return true;
+            Template::hideAll('votes.vote');
+
+            return true;
         }
 
         return $this->secondsLeft() <= 0;
