@@ -34,14 +34,14 @@ class Hook
                 call_user_func($this->function, ...$arguments);
                 Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
             }else{
-                throw new \Exception("Function call invalid");
+                throw new \Exception("Function call invalid, must use: [ClassName, ClassFunctionName]");
             }
         } catch (\Exception $e) {
-            Log::logAddLine('Hook', "ERROR: " . $e->getMessage(), false);
-            Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
+            Log::logAddLine('Hook', "Exception: " . $e->getMessage(), isVerbose());
+            Log::logAddLine('Stack trace', $e->getTraceAsString(), isVerbose());
         } catch (\TypeError $e) {
-            Log::logAddLine('Hook', "ERROR: " . $e->getMessage(), false);
-            Log::logAddLine('Stack trace', $e->getTraceAsString(), false);
+            Log::logAddLine('Hook', "TypeError: " . $e->getMessage(), isVerbose());
+            Log::logAddLine('Stack trace', $e->getTraceAsString(), isVerbose());
         }
     }
 

@@ -52,7 +52,7 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
     esc\Controllers\MapController::init();
     esc\Controllers\PlayerController::init();
     \esc\Controllers\KeyController::init();
-    esc\Classes\Vote::init();
+    esc\Classes\VoteOld::init();
     esc\Controllers\ModuleController::init();
     \esc\Controllers\HideScriptController::init();
     \esc\Controllers\PlanetsController::init();
