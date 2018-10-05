@@ -5,7 +5,8 @@
       "visible": "125 7",
       "hidden": "160 7"
     },
-    "cost": 10
+    "cost": 100,
+    "forceable": false
   },
 
   "skip": {

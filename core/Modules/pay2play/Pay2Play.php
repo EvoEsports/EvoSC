@@ -28,12 +28,6 @@ class Pay2Play
         ManiaLinkEvent::add('skip', [Pay2Play::class, 'skip']);
     }
 
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showWidget($player);
-    }
-
     public static function showWidget(Player $player)
     {
         Template::show($player, 'pay2play.widget');
@@ -42,9 +36,17 @@ class Pay2Play
     public static function addTime(Player $player)
     {
         if (config('pay2play.addtime.enabled')) {
-            if (MapController::getAddedTime() + 10 <= config('server.max-playtime') || $player->hasAccess('time')) {
+
+            if (config('votes.enabled')) {
+                if (Votes::addTimeFailed() && !config('pay2play.addtime.forceable')) {
+                    ChatController::message($player,'_info', 'Can not force more playtime after a vote failed.');
+                    return;
+                }
+            }
+
+            if (MapController::getAddedTime() + 10 <= config('server.max-playtime')) {
                 PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
-            }else{
+            } else {
                 ChatController::message($player, '_warning', 'Maximum playtime for this round reached');
             }
         }

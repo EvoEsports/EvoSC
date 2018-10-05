@@ -10,6 +10,8 @@ use esc\Modules\Votes;
 
 class PredefinedVotes
 {
+    protected static $addTimeFailed = false;
+
     /**
      * Start a vote for more time
      *

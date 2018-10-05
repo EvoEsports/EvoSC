@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" version="3">
-    <frame id="widget" pos="-160 -45" scale="0.75">
-        <quad pos="0 0" z-index="-2" size="50 16" style="Bgs1" substyle="BgDialogBlur"/>
+    <frame id="widget" pos="-160 -27" scale="0.76">
+        <quad pos="0 0" z-index="-2" size="50 16" bgcolor="{config('colors.ui.background')}c" />
         <label pos="2 -2" z-index="1" size="49 2.8" text=" {$vote->question}" textsize="1"/>
         <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="{config('colors.ui.header')}c"/>
 
         {($yesWidth = $vote->voters->count() > 0 ? $vote->getYesVoters()->count() / $vote->voters->count() : 0)}
         {($noWidth = $vote->voters->count() > 0 ? $vote->getNoVoters()->count() / $vote->voters->count() : 0)}
 
-        <quad pos="2 -9" z-index="1" size="{$yesWidth * 46} 1" bgcolor="1f8c"/>
-        <quad pos="48 -9" z-index="1" size="{$noWidth * 46} 1" halign="right" bgcolor="f33c"/>
+        <quad pos="2 -9" z-index="1" size="46 1" bgcolor="3333"/>
+        <quad pos="2 -9" z-index="2" size="{$yesWidth * 46} 1" bgcolor="1f8c"/>
+        <quad pos="48 -9" z-index="2" size="{$noWidth * 46} 1" halign="right" bgcolor="f33c"/>
 
         <label pos="2 -13" z-index="1" size="49 2.8" halign="left" text="$fff{$vote->getYesVoters()->count()} YES $cccF5" valign="center" textsize="0.6"/>
         <label pos="48 -13" z-index="1" size="49 2.8" halign="right" text="$cccF6 $fff{$vote->getNoVoters()->count()} NO" valign="center" textsize="0.6"/>
@@ -17,11 +18,16 @@
         <label id="tleft" pos="25 -13" z-index="1" size="49 2.8" halign="center" text="" valign="center" textsize="0.6" textcolor="fff8"/>
 
         <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
     main() {
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare circles <=> (Page.MainFrame.GetFirstChild("circles") as CMlFrame);
         declare tleft <=> (Page.MainFrame.GetFirstChild("tleft") as CMlLabel);
         declare Integer timeEnd = CurrentTime + {$vote->secondsLeft()}000;
-        declare Integer voteDuration = {$vote->duration}000;
+        declare Integer timeTotal = {$vote->duration};
+        declare Integer voteDuration = timeTotal * 1000;
         declare Integer timeLeft = 0;
         declare Real size = 50.0;
 
@@ -29,6 +35,7 @@
             yield;
             timeLeft = timeEnd - CurrentTime;
             tleft.SetText("" ^ (timeLeft/1000 + 1));
+            sleep(200);
         }
 
         widget.Hide();

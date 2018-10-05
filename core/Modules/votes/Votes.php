@@ -9,7 +9,6 @@ use esc\Classes\Template;
 use esc\Classes\Vote;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
-use esc\Controllers\MapController;
 use esc\Models\Player;
 
 class Votes extends PredefinedVotes
@@ -22,6 +21,8 @@ class Votes extends PredefinedVotes
         ChatController::addCommand('skip', [self::class, 'askSkip'], 'Ask to skip map');
 
         Hook::add('CycleFinished', [self::class, 'checkCurrentVote']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
 
         KeyController::createBind('F5', [self::class, 'voteYes']);
         KeyController::createBind('F6', [self::class, 'voteNo']);
@@ -42,6 +43,24 @@ class Votes extends PredefinedVotes
         self::$activeVote = $vote;
     }
 
+    public static function beginMatch()
+    {
+        self::$addTimeFailed = false;
+    }
+
+    public static function addTimeFailed(): bool
+    {
+        return self::$addTimeFailed;
+    }
+
+    public static function endMatch()
+    {
+        if (self::voteInProgress()) {
+            ChatController::message(onlinePlayers(false), '_info', 'Vote ', secondary(self::$activeVote->question), ' was not successful.');
+            self::$activeVote = null;
+        }
+    }
+
     public static function checkCurrentVote()
     {
         if (!self::voteInProgress()) {
@@ -52,10 +71,13 @@ class Votes extends PredefinedVotes
 
         if ($vote->voteFinished()) {
             if ($vote->isSuccessfull()) {
-                ChatController::message(onlinePlayers(), '_info', 'Vote was successful.');
+                ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($vote->question), ' was successful.');
                 $vote->execute();
             } else {
-                ChatController::message(onlinePlayers(), '_info', 'Vote was not successful.');
+                ChatController::message(onlinePlayers(false), '_info', 'Vote ', secondary($vote->question), ' was not successful.');
+                if($vote->question == 'Add 10 minutes playtime?'){
+                    self::$addTimeFailed = true;
+                }
             }
 
             self::$activeVote = null;
