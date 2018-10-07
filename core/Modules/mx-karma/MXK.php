@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\MxKarma;
+namespace esc\Classes;
 
 class MXK
 {

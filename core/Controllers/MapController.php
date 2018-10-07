@@ -11,7 +11,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MapQueueItem;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Classes\VoteOld;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\MatchSettingsManager;
@@ -238,7 +237,6 @@ class MapController
     {
         ChatController::message(onlinePlayers(), $player, ' skips map');
         MapController::goToNextMap();
-        VoteOld::stopVote();
     }
 
     /**

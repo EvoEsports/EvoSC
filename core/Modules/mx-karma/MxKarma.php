@@ -1,11 +1,10 @@
 <?php
 
-namespace esc\Modules\MxKarma;
+namespace esc\Modules;
 
-use esc\Classes\Database;
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\MXK;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
@@ -14,7 +13,6 @@ use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use stdClass;
 
@@ -46,7 +44,7 @@ class MxKarma extends MXK
         MxKarma::startSession();
 
         self::$updatedVotes = collect([]);
-        self::$ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
+        self::$ratings      = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
         Hook::add('PlayerConnect', [MxKarma::class, 'showWidget']);
         Hook::add('PlayerFinish', [MxKarma::class, 'playerFinish']);
@@ -61,19 +59,6 @@ class MxKarma extends MXK
         ChatController::addCommand('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', '');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
-
-        MxKarma::createTables();
-    }
-
-    public static function createTables()
-    {
-        Database::create('mx-karma', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('Player');
-            $table->integer('Map');
-            $table->integer('Rating');
-            $table->unique(['Map', 'Player']);
-        });
     }
 
     /* +++ 100, ++ 80, + 60, - 40, -- 20, - 0*/
@@ -95,9 +80,9 @@ class MxKarma extends MXK
         $map = \esc\Controllers\MapController::getCurrentMap();
 
         $karma = $map->ratings()
-            ->wherePlayer($player->id)
-            ->get()
-            ->first();
+                     ->wherePlayer($player->id)
+                     ->get()
+                     ->first();
 
         if ($karma != null) {
             if ($karma->Rating == $rating) {
@@ -109,7 +94,7 @@ class MxKarma extends MXK
         } else {
             $karma = Karma::create([
                 'Player' => $player->id,
-                'Map' => $map->id,
+                'Map'    => $map->id,
                 'Rating' => $rating,
             ]);
         }
@@ -173,27 +158,42 @@ class MxKarma extends MXK
     }
 
     /**
-     * Called on endMap
+     * @param \esc\Models\Map|null $map
      *
-     * @param Map $map
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function endMap(Map $map = null)
     {
+        if (self::$updatedVotes->isEmpty()) {
+            //No new votes
+            return;
+        }
+
         if ($map) {
             $votes = [];
 
-            $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray());
+            $ratings = $map->ratings()->whereIn('Player', self::$updatedVotes->toArray())->get();
+
+            Log::logAddLine('MxKarma', $ratings->count() . ' new map ratings:', isVerbose());
+            Log::logAddLine('MxKarma', $ratings->toJson(), isVeryVerbose());
 
             foreach ($ratings as $rating) {
-                if (!$rating->player) {
-                    var_dump($rating);
+                if (!$rating->Player) {
+                    Log::logAddLine('MxKarma', 'Invalid rating encountered.', isVerbose());
+                    Log::logAddLine('MxKarma', $rating->toJson(), isVeryVerbose());
+                    continue;
+                }
+
+                $player = Player::whereId($rating->Player)->first();
+
+                if (!$player) {
                     continue;
                 }
 
                 array_push($votes, [
-                    'login' => $rating->player->Login,
-                    'nickname' => $rating->player->NickName,
-                    'vote' => $rating->rating,
+                    'login'    => $player->Login,
+                    'nickname' => $player->NickName,
+                    'vote'     => $rating->Rating,
                 ]);
             }
 
@@ -271,7 +271,7 @@ class MxKarma extends MXK
 
     public static function getUpdatedVotesAverage()
     {
-        $map = \esc\Controllers\MapController::getCurrentMap();
+        $map   = MapController::getCurrentMap();
         $items = collect([]);
 
         for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
@@ -279,8 +279,8 @@ class MxKarma extends MXK
         }
 
         $newRatings = $map->ratings()
-            ->whereIn('Player', self::$updatedVotes->toArray())
-            ->get();
+                          ->whereIn('Player', self::$updatedVotes->toArray())
+                          ->get();
 
         foreach ($newRatings as $rating) {
             $items->push($rating->Rating);
@@ -293,7 +293,7 @@ class MxKarma extends MXK
      * Unlock voting if player finished
      *
      * @param Player $player
-     * @param int $score
+     * @param int    $score
      */
     public static function playerFinish(Player $player, int $score)
     {
@@ -310,16 +310,16 @@ class MxKarma extends MXK
         $mapUid = Server::getCurrentMapInfo()->uId;
 
         if (self::$currentMap != $mapUid) {
-            self::$mapKarma = self::call(MXK::getMapRating);
+            self::$mapKarma   = self::call(MXK::getMapRating);
             self::$currentMap = $mapUid;
         }
 
         $average = self::getUpdatedVotesAverage();
 
         $starString = '';
-        $stars = $average / 20;
-        $full = floor($stars);
-        $left = $stars - $full;
+        $stars      = $average / 20;
+        $full       = floor($stars);
+        $left       = $stars - $full;
 
         for ($i = 0; $i < $full; $i++) {
             $starString .= '';
@@ -337,15 +337,15 @@ class MxKarma extends MXK
         $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.mx-karma')]);
 
         Template::show($player, 'ranking-box', [
-            'id' => 'MXKarma',
-            'title' => '  MX KARMA',
-            'config' => config('ui.mx-karma'),
+            'id'         => 'MXKarma',
+            'title'      => '  MX KARMA',
+            'config'     => config('ui.mx-karma'),
             'hideScript' => $hideScript,
-            'rows' => 1.5,
-            'content' => Template::toString('mx-karma.mx-karma', [
-                'karma' => self::$mapKarma,
-                'average' => $average,
-                'stars' => $starString,
+            'rows'       => 1.5,
+            'content'    => Template::toString('mx-karma.mx-karma', [
+                'karma'    => self::$mapKarma,
+                'average'  => $average,
+                'stars'    => $starString,
                 'finished' => self::playerFinished($player),
             ]),
         ]);
@@ -383,9 +383,10 @@ class MxKarma extends MXK
     /**
      * Call MX Karma method
      *
-     * @param int $method
-     * @param Map|null $map
+     * @param int        $method
+     * @param Map|null   $map
      * @param array|null $votes
+     *
      * @return null|stdClass
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -396,9 +397,9 @@ class MxKarma extends MXK
                 $requestMethod = 'GET';
 
                 $query = [
-                    'serverLogin' => config('server.login'),
+                    'serverLogin'           => config('server.login'),
                     'applicationIdentifier' => 'ESC v' . getEscVersion(),
-                    'testMode' => 'false',
+                    'testMode'              => 'false',
                 ];
 
                 $function = 'startSession';
@@ -408,7 +409,7 @@ class MxKarma extends MXK
                 $requestMethod = 'GET';
 
                 $query = [
-                    'sessionKey' => self::getSession()->sessionKey,
+                    'sessionKey'     => self::getSession()->sessionKey,
                     'activationHash' => hash("sha512", (self::$apiKey . self::getSession()->sessionSeed)),
                 ];
 
@@ -423,9 +424,9 @@ class MxKarma extends MXK
                 ];
 
                 $json = [
-                    'gamemode' => self::getGameMode(),
-                    'titleid' => Server::getVersion()->titleId,
-                    'mapuid' => Server::getCurrentMapInfo()->uId,
+                    'gamemode'     => self::getGameMode(),
+                    'titleid'      => Server::getVersion()->titleId,
+                    'mapuid'       => Server::getCurrentMapInfo()->uId,
                     'getvotesonly' => 'false',
                     'playerlogins' => [],
                 ];
@@ -445,14 +446,14 @@ class MxKarma extends MXK
                 ];
 
                 $json = [
-                    'gamemode' => self::getGameMode(),
-                    'titleid' => Server::getVersion()->titleId,
-                    'mapuid' => $map->uid,
-                    'mapname' => $map->Name,
+                    'gamemode'  => self::getGameMode(),
+                    'titleid'   => Server::getVersion()->titleId,
+                    'mapuid'    => $map->Uid,
+                    'mapname'   => $map->Name,
                     'mapauthor' => $map->Author,
-                    'isimport' => 'false',
-                    'maptime' => MapController::getTimeLimit() * 60,
-                    'votes' => $votes,
+                    'isimport'  => 'false',
+                    'maptime'   => MapController::getTimeLimit() * 60,
+                    'votes'     => $votes,
                 ];
 
                 $function = 'saveVotes';
@@ -466,10 +467,10 @@ class MxKarma extends MXK
 
         //Do the request to mx servers
         $response = self::getClient()
-            ->request($requestMethod, $function, [
-                'query' => $query ?? null,
-                'json' => $json ?? null,
-            ]);
+                        ->request($requestMethod, $function, [
+                            'query' => $query ?? null,
+                            'json'  => $json ?? null,
+                        ]);
 
         //Check if request was successful
         if ($response->getStatusCode() != 200) {
@@ -479,11 +480,12 @@ class MxKarma extends MXK
         }
 
         $responseBody = $response->getBody();
-        $mxResponse = json_decode($responseBody);
+        $mxResponse   = json_decode($responseBody);
 
         //Check if method was executed properly
         if (!$mxResponse->success) {
-            Log::error('MX Karma method execution failed ' . $requestMethod . '(' . $function . '): ' . $mxResponse->data->message);
+            Log::logAddLine('MxKarma', sprintf('%s->%s failed', $requestMethod, $function), isVerbose());
+            Log::logAddLine('MxKarma', $responseBody, isVeryVerbose());
 
             return null;
         }
