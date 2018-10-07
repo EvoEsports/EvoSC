@@ -22,6 +22,8 @@ class Votes extends PredefinedVotes
         ChatController::addCommand('time', [self::class, 'askMoreTime'], 'Ask for more time');
         ChatController::addCommand('res', [self::class, 'askMoreTime'], 'Ask for more time');
         ChatController::addCommand('skip', [self::class, 'askSkip'], 'Ask to skip map');
+        ChatController::addCommand('y', [self::class, 'voteYes'], 'Vote yes');
+        ChatController::addCommand('n', [self::class, 'voteNo'], 'Vote no');
 
         Hook::add('CycleFinished', [self::class, 'checkCurrentVote']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
@@ -37,6 +39,28 @@ class Votes extends PredefinedVotes
             QuickButtons::addButton('', 'Approve vote', 'vote.approve', 'vote');
             QuickButtons::addButton('', 'Decline vote', 'vote.decline', 'vote');
         }
+    }
+
+    public static function finishCurrentVote()
+    {
+        if (!self::voteInProgress()) {
+            return;
+        }
+
+        $vote = self::getCurrentVote();
+
+        if ($vote->isSuccessfull()) {
+            ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($vote->question), ' was successful.');
+            $vote->execute();
+        } else {
+            ChatController::message(onlinePlayers(false), '_info', 'Vote ', secondary($vote->question), ' was not successful.');
+            if ($vote->question == 'Add 10 minutes playtime?') {
+                self::$addTimeFailed = true;
+            }
+        }
+
+        self::hideVote();
+        self::$activeVote = null;
     }
 
     public static function hideVote()
@@ -103,30 +127,6 @@ class Votes extends PredefinedVotes
     {
         if (self::voteInProgress()) {
             ChatController::message(onlinePlayers(false), '_info', 'Vote ', secondary(self::$activeVote->question), ' was not successful.');
-            self::$activeVote = null;
-        }
-    }
-
-    public static function checkCurrentVote()
-    {
-        if (!self::voteInProgress()) {
-            return;
-        }
-
-        $vote = self::getCurrentVote();
-
-        if ($vote->voteFinished()) {
-            if ($vote->isSuccessfull()) {
-                ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($vote->question), ' was successful.');
-                $vote->execute();
-            } else {
-                ChatController::message(onlinePlayers(false), '_info', 'Vote ', secondary($vote->question), ' was not successful.');
-                if ($vote->question == 'Add 10 minutes playtime?') {
-                    self::$addTimeFailed = true;
-                }
-            }
-
-            self::hideVote();
             self::$activeVote = null;
         }
     }

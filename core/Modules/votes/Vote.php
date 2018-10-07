@@ -5,6 +5,7 @@ namespace esc\Classes;
 
 use esc\Controllers\ChatController;
 use esc\Models\Player;
+use esc\Modules\Votes;
 use Illuminate\Support\Collection;
 
 class Vote
@@ -30,6 +31,8 @@ class Vote
         $this->arguments = $arguments;
 
         ChatController::message(onlinePlayers(false), '_info', 'A vote started: ', secondary($question));
+
+        Timer::create('vote.finish', [Votes::class, 'finishCurrentVote'], '' . $this->duration);
     }
 
     public function allPlayersVoted(): bool

@@ -96,8 +96,6 @@ class EscRun extends Command
             try {
                 esc\Classes\Timer::startCycle();
 
-                \esc\Classes\Hook::fire('CycleStarted');
-
                 try {
                     \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
                 } catch (Exception $e) {
@@ -133,8 +131,6 @@ class EscRun extends Command
 
                     \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
                 }
-
-                \esc\Classes\Hook::fire('CycleFinished');
 
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
