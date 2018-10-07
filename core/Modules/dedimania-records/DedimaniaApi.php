@@ -12,6 +12,7 @@ use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use function GuzzleHttp\debug_resource;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
@@ -362,6 +363,7 @@ class DedimaniaApi
         } catch (\Exception $e) {
             Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
             Log::logAddLine('DedimaniaApi', $e->getTraceAsString());
+
             return;
         }
 
@@ -373,7 +375,7 @@ class DedimaniaApi
             if ($newTimes->where('Rank', 1)->isNotEmpty()) {
                 $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
 
-                if($Top1GReplay == ''){
+                if ($Top1GReplay == '') {
                     Log::logAddLine('DedimaniaApi', 'Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
                 }
             }
@@ -590,7 +592,12 @@ class DedimaniaApi
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             Log::logAddLine('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
-            Log::logAddLine('Dedimania', $e->getTraceAsString(), false);
+            Log::logAddLine('Dedimania', $e->getTraceAsString(), isVerbose());
+
+            return null;
+        } catch (RequestException $e) {
+            Log::logAddLine('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
+            Log::logAddLine('Dedimania', $e->getTraceAsString(), isVerbose());
 
             return null;
         }
