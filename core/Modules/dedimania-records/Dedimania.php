@@ -296,6 +296,7 @@ class Dedimania extends DedimaniaApi
                 self::sendUpdateDediManialink($dedi);
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
             } else {
+                $dedi->update(['New' => 0]);
                 Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
             }
         }

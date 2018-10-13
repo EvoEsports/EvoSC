@@ -41,6 +41,17 @@ class Map extends Model
         return $this->hasMany(Karma::class, 'Map', 'id');
     }
 
+    public function getAverageRatingAttribute()
+    {
+        $mxDetails = $this->mx_details;
+
+        if ($mxDetails && $mxDetails->RatingVoteCount > 0) {
+            return $mxDetails->RatingVoteAverage;
+        }
+
+        return $this->ratings()->pluck('Rating')->average();
+    }
+
     public function favorites()
     {
         return $this->belongsToMany(Player::class, 'map-favorites');
@@ -89,8 +100,8 @@ class Map extends Model
     {
         if (config('database.type') == 'mysql') {
             return Map::where('gbx->MapUid', $mapUid)
-                ->get()
-                ->first();
+                      ->get()
+                      ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mapUid) {
                 return $map->gbx->MapUid == $mapUid;
@@ -102,8 +113,8 @@ class Map extends Model
     {
         if (config('database.type') == 'mysql') {
             return Map::where('mx_details->TrackID', $mxId)
-                ->get()
-                ->first();
+                      ->get()
+                      ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mxId) {
                 return $map->mx_details->TrackID == $mxId;

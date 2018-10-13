@@ -286,7 +286,7 @@ $$: Writes a dollarsign
 
             if ($part instanceof Player) {
                 if ($key == 0) {
-                    $message .= '$' . $groupColor . ($part->group->Name) . ' ';
+                    $message .= '$s$' . $groupColor . ($part->group->Name) . ' ';
                 }
                 $message .= secondary($part->NickName);
                 continue;

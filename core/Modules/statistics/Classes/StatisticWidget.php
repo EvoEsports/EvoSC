@@ -13,7 +13,7 @@ class StatisticWidget
     public $prefix;
     public $suffix;
 
-    public function __construct(string $stat, string $title, string $prefix = '', string $suffix = '', $function = null, $sortASc = false)
+    public function __construct(string $stat, string $title, string $prefix = '', string $suffix = '', $function = null, $sortAsc = false)
     {
         $this->stat   = $stat;
         $this->title  = $title;
@@ -21,7 +21,7 @@ class StatisticWidget
 
         $this->records = Stats::orderByDesc($stat)->get();
 
-        if ($sortASc) {
+        if ($sortAsc) {
             $this->records = $this->records->sortBy($stat);
         }
 
@@ -30,7 +30,7 @@ class StatisticWidget
 
         //Get rid of zero value records
         $this->records = $this->records->filter(function ($value) {
-            return floatval($value) > 0;
+            return $value > 0;
         });
 
         if ($function) {

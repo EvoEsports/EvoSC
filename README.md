@@ -1,4 +1,4 @@
-![version:0.43.0](https://img.shields.io/badge/version-0.43.0-blue.svg?style=flat-square)
+![version:0.44.0](https://img.shields.io/badge/version-0.44.0-blue.svg?style=flat-square)
 
 
 

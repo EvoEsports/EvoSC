@@ -23,10 +23,13 @@ class MapList
 {
     public function __construct()
     {
+        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
+        ManiaLinkEvent::add('maplist.delete-perm', [MapList::class, 'deleteMapPerm'], 'map.delete-perm');
         ManiaLinkEvent::add('map.queue', [MapList::class, 'queueMap']);
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
+        Hook::add('MapPoolUpdated', [MapList::class, 'mapPoolUpdated']);
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
 
@@ -60,7 +63,7 @@ class MapList
      * Player add favorite map
      *
      * @param Player $player
-     * @param int $mapId
+     * @param int    $mapId
      */
     public static function favAdd(Player $player, int $mapId)
     {
@@ -71,7 +74,7 @@ class MapList
      * Player remove favorite map
      *
      * @param Player $player
-     * @param int $mapId
+     * @param int    $mapId
      */
     public static function favRemove(Player $player, int $mapId)
     {
@@ -86,6 +89,39 @@ class MapList
     public static function getMapsCount()
     {
         return Map::whereEnabled(true)->count();
+    }
+
+    public static function mapPoolUpdated()
+    {
+        onlinePlayers()->each([self::class, 'sendUpdatedMaplist']);
+    }
+
+    public static function sendUpdatedMaplist(Player $player)
+    {
+        $maps = self::mapsToManiaScriptArray($player);
+        Template::show($player, 'map-list.update-maps', compact('maps'));
+    }
+
+    public static function deleteMap(Player $player, $mapId)
+    {
+        $map = Map::find($mapId);
+
+        if (!$map) {
+            return;
+        }
+
+        MapController::disableMap($player, $map);
+    }
+
+    public static function deleteMapPerm(Player $player, $mapId)
+    {
+        $map = Map::find($mapId);
+
+        if (!$map) {
+            return;
+        }
+
+        MapController::deleteMap($player, $map);
     }
 
     /**
@@ -113,6 +149,7 @@ class MapList
      * Returns maps as MS array
      *
      * @param Player $player
+     *
      * @return string
      */
     public static function mapsToManiaScriptArray(Player $player)
@@ -138,8 +175,10 @@ class MapList
             $dedi     = $dedis->get($map->id) ?: '-';
             $favorite = $favorites->get($map->id) ? 1 : 0;
             $mapName  = $map->gbx->Name;
+            $rating   = $map->average_rating;
 
-            return sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $map->uid);
+
+            return sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $map->uid, $rating);
         })->implode("\n,");
 
         return sprintf('[%s]', $maps);

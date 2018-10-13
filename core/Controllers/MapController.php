@@ -174,12 +174,12 @@ class MapController
         $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
 
         if ($deleted) {
-            ChatController::message(onlinePlayers(), 'Admin removed map ', $map);
+            ChatController::message(onlinePlayers(), '_info', $player, ' removed map ', $map);
             try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' removed map ', $map,
-                    ' permanently');
+                ChatController::message(onlinePlayers(), '_info', $player, ' deleted map ', secondary($map), 'permanently.');
+                Hook::fire('MapPoolUpdated');
             } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
             }
@@ -197,7 +197,8 @@ class MapController
         $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' disabled map ', $map);
+        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' disabled map ', secondary($map));
+        Hook::fire('MapPoolUpdated');
     }
 
     /**
@@ -473,7 +474,7 @@ class MapController
             try {
                 Server::addMap($map->filename);
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                MatchSettingsManager::loadMatchSettings($player, str_replace('.txt', '', config('server.default-matchsettings')));
+                Hook::fire('MapPoolUpdated');
             } catch (\Exception $e) {
                 Log::warning("Map $map->filename already added.");
             }

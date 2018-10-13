@@ -18,7 +18,7 @@ class CPRecords
 
     public function __construct()
     {
-        self::loadFromCache();
+        // self::loadFromCache();
 
         AccessRight::createIfNonExistent('cpr.reset', 'Reset top checkpoints');
 

@@ -163,7 +163,7 @@ class DedimaniaApi
 
         self::paramAddStruct($params->addChild('param'), [
             'UId'           => $map->gbx->MapUid,
-            'Name'          => $map->gbx->Name,
+            'Name'          => str_replace('&', '', $map->gbx->Name),
             'Environment'   => $map->gbx->Environment,
             'Author'        => $map->gbx->AuthorLogin,
             'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
@@ -171,6 +171,7 @@ class DedimaniaApi
         ]);
 
         //string GameMode
+
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
         //struct SrvInfo
