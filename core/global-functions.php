@@ -66,6 +66,11 @@ function cacheDir(string $filename = ''): string
     return __DIR__ . '/../cache/' . $filename;
 }
 
+function logDir(string $filename = ''): string
+{
+    return __DIR__ . '/../logs/' . $filename;
+}
+
 function ghost(string $filename = ''): string
 {
     $basePath = str_replace('/', '/', config('server.base'));

@@ -11,6 +11,16 @@ function startEsc(Symfony\Component\Console\Output\OutputInterface $output)
 {
     global $serverName;
 
+    //Check that cache directory exists
+    if(!is_dir(cacheDir())){
+        mkdir(cacheDir());
+    }
+
+    //Check that logs directory exists
+    if(!is_dir(logDir())){
+        mkdir(logDir());
+    }
+
     \esc\Classes\Log::setOutput($output);
 
     try {
