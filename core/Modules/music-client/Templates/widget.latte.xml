@@ -13,8 +13,8 @@
             </frame>
 
             <frame id="loading" pos="12 -5">
-                <frame id="progress" pos="0 0">
-                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4"/>
+                <frame id="progress" pos="0 0" scale="0.5">
+                    <label pos="0.15 0.7" z-index="1" text="" halign="center" valign="center" textcolor="fffe" textsize="4"/>
                 </frame>
                 <label pos="6 0" z-index="1" text="Loading" halign="left" valign="center" textcolor="fffe" textsize="1"/>
             </frame>
@@ -33,11 +33,6 @@
                 <label pos="15 -7" textsize="1" scale="0.8" size="10 10" text="Music" z-index="1" halign="center" valign="center" />
             </frame>
         </frame>
-    </frame>
-
-    <frame id="minimal" pos="156 78" scale="0.9">
-        <label pos="" textsize="1" text="♫" valign="center" textcolor="dddb" opacity="0"/>
-        <label id="minimal-text" pos="-1 0" textsize="1" text="Titleinformation" halign="right" scale="0.8" valign="center" textcolor="dddb" opacity="0"/>
     </frame>
 
     <framemodel id="Song">
@@ -163,14 +158,12 @@ Void setSong(Text[Text] song){
         progress.RelativeRotation = progress.RelativeRotation + 4.0;
     }
 
-    music.Stop();
     music.Url = url;
-    sleep(5);
+    sleep(100);
     music.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
-    (Page.MainFrame.GetFirstChild("minimal-text") as CMlLabel).SetText(song["title"] ^ " - " ^ song["artist"]);
     stopLoading();
 }
 
@@ -402,6 +395,8 @@ Text[Text][] parseJson(Text json){
     return songs;
 }
 
+{(new esc\Classes\HideScript())|noescape}
+
 main() {
     startLoading();
     musicEnabled = False;
@@ -423,7 +418,6 @@ main() {
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
     declare sortByArtist <=> (Page.MainFrame.GetFirstChild("sort-by-artist") as CMlQuad);
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-    declare CMlFrame minimal <=> (Page.MainFrame.GetFirstChild("minimal") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);
     declare CMlFrame songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
     declare CMlFrame songListContainer <=> (Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame);
@@ -461,6 +455,8 @@ main() {
     while(True){
         yield;
 
+        hidescript();
+
         if(InputPlayer != Null){
             if(startPos != MapStartLinePos){
                 startPos = MapStartLinePos;
@@ -469,36 +465,6 @@ main() {
 
             if(loading){
                 progress.RelativeRotation = progress.RelativeRotation + 0.5;
-            }
-
-            declare UI_Hide_Speed for InputPlayer = 1.0;
-            declare Real speed = InputPlayer.Speed;
-
-            if(speed < 0){
-                speed = speed  * -1;
-            }
-
-            if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                if(speed < UI_Hide_Speed && isHidden){
-                    AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = False;
-                }
-            }else{
-                if(speed >= UI_Hide_Speed && !isHidden){
-                    AnimMgr.Add(widget, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='1.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='1.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = True;
-                }
-
-                if(speed < UI_Hide_Speed && isHidden){
-                    AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = False;
-                }
             }
 
             declare x_min = widget.RelativePosition_V3[0];

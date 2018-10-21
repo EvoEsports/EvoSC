@@ -26,6 +26,7 @@ class MapList
         ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
         ManiaLinkEvent::add('maplist.delete-perm', [MapList::class, 'deleteMapPerm'], 'map.delete-perm');
         ManiaLinkEvent::add('map.queue', [MapList::class, 'queueMap']);
+        ManiaLinkEvent::add('map.drop', [MapList::class, 'queueDropMap']);
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
@@ -81,6 +82,15 @@ class MapList
         $player->favorites()->detach($mapId);
     }
 
+    public static function queueDropMap(Player $player, $mapId)
+    {
+        $map = Map::find($mapId);
+
+        MapController::unqueueMap($map);
+
+        ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');
+    }
+
     /**
      * Returns enabled maps count
      *
@@ -131,11 +141,9 @@ class MapList
      */
     public static function mapQueueUpdated(Collection $queue)
     {
-        $queue = $queue->take(7)->map(function (MapQueueItem $item) {
-            return sprintf('["%s", "%s", "%s", "%s"]',
+        $queue = $queue->take(21)->map(function (MapQueueItem $item) {
+            return sprintf('["%s", "%s"]',
                 $item->map->id,
-                $item->map->gbx->MapUid,
-                $item->map->gbx->Name,
                 $item->issuer->NickName
             );
         })->implode(",");

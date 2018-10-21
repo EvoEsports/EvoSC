@@ -504,4 +504,9 @@ class MapController
     {
         Server::restartMap();
     }
+
+    public static function unqueueMap(Map $map)
+    {
+        self::$queue = self::$queue->diff($map);
+    }
 }

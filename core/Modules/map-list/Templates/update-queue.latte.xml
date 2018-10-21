@@ -3,9 +3,7 @@
     <script>
         <!--
         main(){
-            while(InputPlayer == Null){
-                sleep(50);
-            }
+            wait(InputPlayer != Null);
 
             declare Text QueueHash for InputPlayer;
             declare Text[][] QueuedMaps for InputPlayer;

@@ -6,8 +6,7 @@
         <quad pos="0 2.5" size="151 101" bgcolor="{background_color()|noescape}" opacity="0.75" />
         <quad pos="0 -8.5" size="151 90" style="Bgs1" substyle="BgDialogBlur" />
         <label pos="1.5 -0.4" size="20 3" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
-        <quad id="close" pos="148 0.5" size="4 4" halign="center" ScriptEvents="1" />
-        <label pos="148 0.9" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" textcolor="ffff" />
+        <label class="close" pos="148 -0.5" size="6 6" text="❌" textsize="1.2" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
 
         <frame id="navbar" pos="0 -3" z-index="2">
             <frame pos="10 -3" z-index="2">
@@ -45,10 +44,13 @@
         </framemodel>
 
         <framemodel id="QueueItem">
-            <label pos="5 0" textsize="3" size="120 4" text="Mapname" />
-            <label pos="5 -5" textsize="0.9" size="120 4" text="Requested by player" />
-            <label pos="0 -0.5" textsize="2.5" size="120 4" text="N." />
-            <label pos="100 -0.5" textsize="2.5" size="20 4" text="Unqueue" focusareacolor1="0003" />
+            <label pos="-1" textsize="0.5" size="120 4" text="Mapname"  valign="center" textprefix="$s" />
+            <label pos="110" textsize="0.5" size="16 4" text="Requested by player"  valign="center" textprefix="$s" />
+            <label pos="48" textsize="0.5" size="120 4" text="Author" valign="center" textprefix="$s" />
+            <label pos="83.5" textsize="0.5" size="120 4" text="Local" valign="center" halign="center" textprefix="$s" />
+            <label pos="92" textsize="0.5" size="120 4" text="Dedi" valign="center" halign="center" textprefix="$s" />
+            <label pos="137" textsize="0.2" size="10 3" text=" Drop" focusareacolor1="f003" focusareacolor2="f00c" ScriptEvents="1" valign="center" halign="center" class="drop" />
+            <label pos="144" textsize="0.2" size="3 3" text="" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" ScriptEvents="1" valign="center" halign="center" class="details" />
         </framemodel>
 
         <frame id="tabs" pos="2 -13" z-index="2">
@@ -81,14 +83,16 @@
             </frame>
 
             <frame data-tab="1" id="jukebox" hidden="1">
-                <frame id="queue-list" pos="2 0">
-                    <frameinstance pos="0 0" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -12" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -24" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -36" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -48" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -60" modelid="QueueItem" hidden="1" />
-                    <frameinstance pos="0 -72" modelid="QueueItem" hidden="1" />
+                <label pos="1  2.8" textsize="0.9" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="50 2.8" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="86 2.8" textsize="1" text="Local" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="94 2.8" textsize="1" text="Dedi" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
+                <label pos="112 2.8" size="20 5" textsize="0.9" text="requested by" scale="0.8" textcolor="{config('colors.ui.header')}" />
+
+                <frame id="queue-list" pos="2 -2">
+                    {for $i=0; $i<21; $i++}
+                    <frameinstance pos="0 {$i * -4}" modelid="QueueItem" hidden="1" />
+                    {/for}
                 </frame>
             </frame>
         </frame>
@@ -126,11 +130,6 @@
             </frame>
 
         </frame>
-    </frame>
-
-    <frame id="minimal" pos="156 87" scale="0.9">
-        <label pos="" textsize="1" text="" valign="center" textcolor="dddb" opacity="0"/>
-        <label id="minimal-text" pos="-1 0" textsize="1" text="Titleinformation" halign="right" scale="0.8" valign="center" textcolor="dddb" opacity="0"/>
     </frame>
 
     <frame id="delete-dialog" pos="-40 9" z-index="10" hidden="1">
@@ -406,12 +405,19 @@ Void search(Text query){
 
 Void updateQueueItem(CMlControl queueFrameControl, Text[] data, Integer i){
     declare frame <=> (queueFrameControl as CMlFrame);
+    declare map = getMapById(data[0]);
 
     frame.Visible = True;
     frame.DataAttributeSet("map-id", data[0]);
-    (frame.Controls[0] as CMlLabel).SetText("$s" ^ data[2]);
-    (frame.Controls[1] as CMlLabel).SetText("Requested by " ^ data[3]);
-    (frame.Controls[2] as CMlLabel).SetText("$s" ^ i ^ ".");
+    (frame.Controls[0] as CMlLabel).SetText(map[0]);
+    (frame.Controls[1] as CMlLabel).SetText(data[1]);
+    (frame.Controls[2] as CMlLabel).SetText(map[1]);
+    (frame.Controls[3] as CMlLabel).SetText(map[3]);
+    (frame.Controls[4] as CMlLabel).SetText(map[4]);
+
+    //drop-button
+    declare Boolean canDrop = ({$localPlayer->hasAccess('queue.drop') ? 'True' : 'False'|noescape} || data[1] == LocalUser.Name);
+    (frame.Controls[5] as CMlLabel).Visible = canDrop;
 }
 
 Void updateMapQueue(Text[][] items){
@@ -443,15 +449,15 @@ Void updateCurrentMap(Text newMapUid){
     return;
 }
 
+{(new esc\Classes\HideScript())|noescape}
+
 main() {
     maps = {$maps|noescape};
     tabs <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
-    declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
     declare CMlFrame mapsContainer <=> (Page.MainFrame.GetFirstChild("maps-container") as CMlFrame);
     declare CMlQuad paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     declare CMlFrame mapListContainer <=> (Page.MainFrame.GetFirstChild("map-list-container") as CMlFrame);
     declare CMlFrame mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
-    declare CMlFrame minimal <=> (Page.MainFrame.GetFirstChild("minimal") as CMlFrame);
     declare CMlFrame navbar <=> (Page.MainFrame.GetFirstChild("navbar") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare searchInput <=> (Page.MainFrame.GetFirstChild("searchInput") as CMlEntry);
@@ -479,34 +485,9 @@ main() {
     while(True){
         yield;
 
+        hidescript();
+
         if(InputPlayer != Null){
-            //hidescript
-            declare UI_Hide_Speed for InputPlayer = 1.0;
-            declare Real speed = ML::Abs(InputPlayer.Speed);
-
-            if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                if(speed < UI_Hide_Speed && isHidden){
-                    AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = False;
-                }
-            }else{
-                if(speed >= UI_Hide_Speed && !isHidden){
-                    AnimMgr.Add(widget, hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.75' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = True;
-                }
-
-                if(speed < UI_Hide_Speed && isHidden){
-                    AnimMgr.Add(widget, visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[0], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(minimal.Controls[1], " <label opacity='0.0' /> ", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    isHidden = False;
-                }
-            }
-
             //map change detection
             if(Map.MapInfo.MapUid != currentMapId){
                 currentMapId = Map.MapInfo.MapUid;
@@ -514,7 +495,6 @@ main() {
                 wait(CurrentMap.count > 0);
                 (widget.Controls[0] as CMlLabel).SetText(CurrentMap[0]);
                 (widget.Controls[1] as CMlLabel).SetText(CurrentMap[1]);
-                (minimal.Controls[1] as CMlLabel).SetText(CurrentMap[0] ^ "$z by " ^ CurrentMap[1]);
 
                 if(CurrentMap[6] == "1"){
                     ((widgetControls.Controls[2] as CMlFrame).Controls[1] as CMlLabel).SetText("");
@@ -674,13 +654,25 @@ main() {
                     continue;
                 }
 
-                if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                     mapsContainer.Hide();
                     continue;
                 }
 
                 if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
                     goToPage(TL::ToInteger((event.Control as CMlLabel).Value));
+                    continue;
+                }
+
+                if(event.Control.HasClass("drop") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare mapId = event.Control.Parent.DataAttributeGet("map-id");
+                    TriggerPageAction("map.drop," ^ mapId);
+                    continue;
+                }
+
+                if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare mapId = event.Control.Parent.DataAttributeGet("map-id");
+                    TriggerPageAction("mx.details," ^ mapId);
                     continue;
                 }
 
@@ -693,11 +685,6 @@ main() {
                     if(answer == 2){
                         TriggerPageAction("maplist.delete-perm," ^ mapFrame.DataAttributeGet("map-id"));
                     }
-                }
-
-                if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
-                    mapsContainer.Hide();
-                    continue;
                 }
 
                 if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
