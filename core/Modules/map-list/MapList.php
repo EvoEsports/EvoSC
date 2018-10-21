@@ -30,6 +30,7 @@ class MapList
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
+        Hook::add('BeginMap', [MapList::class, 'beginMap']);
         Hook::add('MapPoolUpdated', [MapList::class, 'mapPoolUpdated']);
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
@@ -85,10 +86,15 @@ class MapList
     public static function queueDropMap(Player $player, $mapId)
     {
         $map = Map::find($mapId);
-
-        MapController::unqueueMap($map);
-
+        $queue = MapController::unqueueMap($map);
+        self::mapQueueUpdated($queue);
         ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');
+    }
+
+    public static function beginMap(Map $map)
+    {
+        $queue = MapController::getQueue();
+        self::mapQueueUpdated($queue);
     }
 
     /**

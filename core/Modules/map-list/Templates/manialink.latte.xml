@@ -693,9 +693,9 @@ main() {
                 }
             }
 
-            declare Text QueueHash for InputPlayer;
+            declare Text QueueHash for LocalUser;
             if(lastQueueHash != QueueHash){
-                declare Text[][] QueuedMaps for InputPlayer;
+                declare Text[][] QueuedMaps for LocalUser;
                 updateMapQueue(QueuedMaps);
                 lastQueueHash = QueueHash;
             }
