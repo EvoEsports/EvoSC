@@ -7,9 +7,16 @@
         <audio id="music" music="1" hidden="1" />
 
         <frame id="main-frame" z-index="1" size="50 10">
-            <frame id="content" pos="38 -2.5">
-                <label id="title" pos="0 0" z-index="1" size="36 3" text="Loading" halign="right" textcolor="fffe" textsize="1.3"/>
-                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="music..." halign="right" textcolor="fffc" textsize="0.4"/>
+            <frame id="content" pos="38 -2.5" hidden="1">
+                <label id="title" pos="0 0" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3"/>
+                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4"/>
+            </frame>
+
+            <frame id="loading" pos="12 -5">
+                <frame id="progress" pos="0 0">
+                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4"/>
+                </frame>
+                <label pos="6 0" z-index="1" text="Loading" halign="left" valign="center" textcolor="fffe" textsize="1"/>
             </frame>
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
@@ -98,8 +105,27 @@ declare Text[Text][] Songs;
 declare Text[Text][] curSongPool;
 declare CMlMediaPlayer music;
 declare CMlQuad paginationBox;
+declare CMlFrame progress;
 declare Text url;
 declare Text token;
+declare Boolean musicEnabled;
+declare Boolean loading;
+
+Void startLoading(){
+    declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
+    declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
+    loadingFrame.Show();
+    content.Hide();
+    loading = True;
+}
+
+Void stopLoading(){
+    declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
+    declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
+    loadingFrame.Hide();
+    content.Show();
+    loading = False;
+}
 
 Text[Text] getSong(Integer songId){
     if(Songs.count > 0 && songId < Songs.count - 1){
@@ -118,18 +144,34 @@ Text[Text] getRandomSong(){
 }
 
 Text getUrl(Text[Text] song){
-    return url ^ song["file"];
+    return url ^ "/index.php?token=" ^ token ^ "&song=" ^ song["file"];
 }
 
 Void setSong(Text[Text] song){
+    declare url = getUrl(song);
+
+    if(!Http.IsValidUrl(url)){
+        log("Invalid URL:" ^ url);
+        return;
+    }
+
+    startLoading();
+    declare request = Http.CreateGet(url, True);
+
+    while(!request.IsCompleted){
+        yield;
+        progress.RelativeRotation = progress.RelativeRotation + 4.0;
+    }
+
     music.Stop();
-    music.Url = getUrl(song);
+    music.Url = url;
     sleep(5);
     music.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
     (Page.MainFrame.GetFirstChild("minimal-text") as CMlLabel).SetText(song["title"] ^ " - " ^ song["artist"]);
+    stopLoading();
 }
 
 Real getPlayerSpeed(){
@@ -293,6 +335,7 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
 Text[Text][] parseJson(Text json){
     if(TL::SubString(json, 0, 1) != "[" && TL::SubString(json, TL::Length(json) - 1, 1) != "]"){
         log("Could not load music!");
+        musicEnabled = False;
         return [["title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""]];
     }
 
@@ -355,20 +398,28 @@ Text[Text][] parseJson(Text json){
         }
     }
 
+    musicEnabled = True;
     return songs;
 }
 
 main() {
+    startLoading();
+    musicEnabled = False;
     url = "{config('music.url')|noescape}";
     token = {config('music.token')};
+
+    //Get the songlist json
     log("Loading music...");
     declare CHttpRequest getSongList = Http.CreateGet(url ^ "?token=" ^ token);
     wait(getSongList.IsCompleted);
     log("Finished loading music");
+
+    //Parse the json
     Songs = parseJson(getSongList.Result);
 
     music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
+    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
     declare sortByArtist <=> (Page.MainFrame.GetFirstChild("sort-by-artist") as CMlQuad);
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
@@ -388,7 +439,15 @@ main() {
     declare Vec3 startPos;
     declare Integer sortDirection = 1;
 
-                        music.Volume = 1.0;
+    if(!musicEnabled){
+        widget.Hide();
+        log("Music disabled");
+        return;
+    }
+
+    stopLoading();
+
+    music.Volume = 1.0;
 
     curSongPool = Songs;
     populateList(arraySort(curSongPool, 1));
@@ -406,6 +465,10 @@ main() {
             if(startPos != MapStartLinePos){
                 startPos = MapStartLinePos;
                 setSong(getRandomSong());
+            }
+
+            if(loading){
+                progress.RelativeRotation = progress.RelativeRotation + 0.5;
             }
 
             declare UI_Hide_Speed for InputPlayer = 1.0;
