@@ -23,6 +23,7 @@ class PlayerController
 
     public static function init()
     {
+        Hook::add('PlayerConnect', [PlayerController::class, 'playerConnect']);
         Hook::add('PlayerDisconnect', [PlayerController::class, 'playerDisconnect']);
         Hook::add('PlayerFinish', [PlayerController::class, 'playerFinish']);
 
@@ -88,7 +89,7 @@ class PlayerController
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
-            ChatController::message(onlinePlayers(),$player, ' kicked ', $playerToBeKicked, '. Reason: ',
+            ChatController::message(onlinePlayers(), $player, ' kicked ', $playerToBeKicked, '. Reason: ',
                 secondary($reason));
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to kick player: ' . $e->getMessage(), true);
@@ -168,7 +169,7 @@ class PlayerController
             $reason = implode(" ", $message);
             Server::ban($playerToBeBanned->Login, $reason);
             Server::blackList($playerToBeBanned->Login);
-            ChatController::message(onlinePlayers(),$player, ' banned ', $playerToBeBanned, '. Reason: ',
+            ChatController::message(onlinePlayers(), $player, ' banned ', $playerToBeBanned, '. Reason: ',
                 secondary($reason));
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to ban player: ' . $e->getMessage(), true);
@@ -221,7 +222,7 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' joined the server.');
+        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits));
         Log::info($player . " joined the server.");
 
         return $player;

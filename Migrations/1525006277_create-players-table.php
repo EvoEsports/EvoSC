@@ -20,6 +20,7 @@ class CreatePlayersTable extends Migration
             $table->string('Login')->unique();
             $table->string('NickName')->default("unset");
             $table->integer('Group')->default(3);
+            $table->string('path')->nullable();
             $table->integer('Score')->default(0);
             $table->integer('player_id')->default(0);
             $table->integer('Afk')->default(0);

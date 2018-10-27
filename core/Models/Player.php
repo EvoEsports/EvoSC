@@ -15,6 +15,7 @@ class Player extends Model
         'Score',
         'player_id',
         'Afk',
+        'path',
         'spectator_status',
         'MaxRank',
         'Banned',
@@ -85,6 +86,21 @@ class Player extends Model
         return $this->Score > 0;
     }
 
+    public function getPathAttribute($path)
+    {
+        $parts = explode('|', $path);
+
+        while (in_array($parts[0], ['World', 'Europe', 'Asia', 'North America', 'South America'])) {
+            array_shift($parts);
+        }
+
+        if (count($parts) > 1) {
+            array_pop($parts);
+        }
+
+        return implode(', ', $parts);
+    }
+
     /**
      * Get players locals
      *
@@ -136,12 +152,12 @@ class Player extends Model
 
     public function getSpectatorStatusAttribute($value)
     {
-        $object = collect([]);
-        $object->spectator = (bool)($value % 10);
+        $object                     = collect([]);
+        $object->spectator          = (bool)($value % 10);
         $object->temporarySpectator = (bool)(intval($value / 10) % 10);
-        $object->pureSpectator = (bool)(intval($value / 100) % 10);
-        $object->autoTarget = (bool)(intval($value / 1000) % 10);
-        $object->currentTargetId = intval($value / 10000);
+        $object->pureSpectator      = (bool)(intval($value / 100) % 10);
+        $object->autoTarget         = (bool)(intval($value / 1000) % 10);
+        $object->currentTargetId    = intval($value / 10000);
 
         return $object;
     }
@@ -217,7 +233,6 @@ class Player extends Model
      */
     public function __toString()
     {
-        return $this->NickName
-            ;
+        return $this->NickName;
     }
 }

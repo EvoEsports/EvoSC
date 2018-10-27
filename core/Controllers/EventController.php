@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Server;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
@@ -14,12 +15,13 @@ class EventController
 {
     /**
      * @param $executedCallbacks
+     *
      * @throws \Exception
      */
     public static function handleCallbacks($executedCallbacks)
     {
         foreach ($executedCallbacks as $callback) {
-            $name = $callback[0];
+            $name      = $callback[0];
             $arguments = $callback[1];
 
             if (isVerbose()) {
@@ -82,10 +84,11 @@ class EventController
     private static function mpPlayerInfoChanged($playerInfos)
     {
         foreach ($playerInfos as $playerInfo) {
-            $login = $playerInfo['Login'];
-            $nickname = $playerInfo['NickName'];
-            $playerId = $playerInfo['PlayerId'];
+            $login           = $playerInfo['Login'];
+            $nickname        = $playerInfo['NickName'];
+            $playerId        = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
+            $countryPath     = Server::rpc()->getDetailedPlayerInfo($login)->path;
 
             $player = Player::find($login);
 
@@ -99,23 +102,25 @@ class EventController
 
             if ($player) {
                 $player->update([
-                    'NickName' => $nickname,
-                    'player_id' => $playerId,
-                    'spectator_status' => $spectatorStatus
+                    'NickName'         => $nickname,
+                    'player_id'        => $playerId,
+                    'spectator_status' => $spectatorStatus,
+                    'path'             => $countryPath,
                 ]);
 
                 Hook::fire('PlayerInfoChanged', $player);
             } else {
                 $playerId = Player::insertGetId([
-                    'Login' => $login,
-                    'NickName' => $nickname,
-                    'player_id' => $playerId,
-                    'spectator_status' => $spectatorStatus
+                    'Login'            => $login,
+                    'NickName'         => $nickname,
+                    'player_id'        => $playerId,
+                    'spectator_status' => $spectatorStatus,
+                    'path'             => $countryPath,
                 ]);
 
                 Stats::create([
                     'Player' => $playerId,
-                    'Visits' => 1
+                    'Visits' => 1,
                 ]);
 
                 $player = Player::whereId($playerId)->first();
@@ -145,6 +150,7 @@ class EventController
 
     /**
      * @param $playerInfo
+     *
      * @throws \Exception
      */
     private static function mpPlayerConnect($playerInfo)
@@ -171,13 +177,14 @@ class EventController
 
     /**
      * @param $data
+     *
      * @throws \Exception
      */
     private static function mpPlayerChat($data)
     {
         if (count($data) == 4 && is_string($data[1])) {
             $login = $data[1];
-            $text = $data[2];
+            $text  = $data[2];
 
             try {
                 $player = Player::findOrFail($login);
@@ -198,6 +205,7 @@ class EventController
 
     /**
      * @param $arguments
+     *
      * @throws \Exception
      */
     private static function mpPlayerDisconnect($arguments)
@@ -225,6 +233,7 @@ class EventController
 
     /**
      * @param $arguments
+     *
      * @throws \Exception
      */
     private static function mpBeginMap($arguments)
@@ -251,6 +260,7 @@ class EventController
 
     /**
      * @param $arguments
+     *
      * @throws \Exception
      */
     private static function mpEndMap($arguments)
@@ -277,6 +287,7 @@ class EventController
 
     /**
      * @param $arguments
+     *
      * @throws \Exception
      */
     private static function mpPlayerManialinkPageAnswer($arguments)
