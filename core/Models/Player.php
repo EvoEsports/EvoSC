@@ -3,6 +3,7 @@
 namespace esc\Models;
 
 
+use Carbon\Carbon;
 use esc\Modules\MxKarma\MxKarma;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,10 +20,12 @@ class Player extends Model
         'spectator_status',
         'MaxRank',
         'Banned',
+        'last_visit',
     ];
     protected $primaryKey   = 'Login';
     public    $incrementing = false;
     public    $timestamps   = false;
+    protected $dates        = ['last_visit'];
 
     /**
      * Gets the players current time (formatted)
@@ -234,5 +237,10 @@ class Player extends Model
     public function __toString()
     {
         return $this->NickName;
+    }
+
+    public function getLastVisitAttribute($date): Carbon
+    {
+        return new Carbon($date);
     }
 }

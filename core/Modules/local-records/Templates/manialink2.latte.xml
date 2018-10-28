@@ -221,7 +221,14 @@
             return;
         }
 
-        declare Real y = targetRank * 3.0 - 30.0;
+        log("[local-records] scroll to " ^ targetRank);
+        declare Real y;
+        if(targetRank % 2 == 0){
+            y = targetRank * 3.0 - 31.2;
+        }else{
+            y = targetRank * 3.0 - 30.0;
+        }
+
         declare Text targetPos = """ <frame pos="0 """ ^ y ^ """" /> """;
         AnimMgr.Add(records, targetPos, 800, CAnimManager::EAnimManagerEasing::QuartOut);
     }

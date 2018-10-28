@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use Carbon\Carbon;
 use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -222,8 +223,15 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits));
+
+        $diffString = $player->last_visit->diffForHumans();
+
+        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
         Log::info($player . " joined the server.");
+
+        $player->update([
+            'last_visit' => (new Carbon()),
+        ]);
 
         return $player;
     }
