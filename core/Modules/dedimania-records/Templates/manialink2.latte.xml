@@ -11,7 +11,7 @@
         <quad class="widget" z-index="-1" size="40 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
         <quad z-index="-2" pos="0 -5" size="40 {config('dedimania.showtop') * 3 + 1.5}" bgcolor="{config('colors.ui.background')}" opacity="0"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records {config('dedimania.rows')}"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records"/>
 
         <frame id="top-records-frame" pos="1 -7">
             <frame id="top-records">

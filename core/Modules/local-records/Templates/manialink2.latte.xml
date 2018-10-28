@@ -21,7 +21,7 @@
             </frame>
         </frame>
 
-        <frame id="records-frame" pos="1 -{config('locals.showtop') * 3 + 7}">
+        <frame id="records-frame" size="48 {config('locals.rows') * 3}" pos="1 -{config('locals.showtop') * 3 + 6}">
             <frame id="records">
                 {for $i=0; $i<500-config('locals.showtop'); $i++}
                 <frameinstance modelid="record" pos="0 {$i * -3}"/>
