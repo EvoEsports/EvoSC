@@ -81,7 +81,7 @@ class CPRecords
         if (!$clear) {
             $columns = config('cp-records.columns');
 
-            foreach (self::$checkpoints as $checkpoint) {
+            foreach (self::$checkpoints ?? [] as $checkpoint) {
                 $row      = floor(($checkpoint->id) / $columns);
                 $y        = $row * 10.5 - 10;
                 $posInRow = $checkpoint->id % $columns;

@@ -318,7 +318,7 @@ class MapController
         $maps = collect(Server::getMapList());
 
         //get array with the uids
-        $enabledMapsuids = $maps->pluck('uid');
+        $enabledMapsuids = $maps->pluck('uId');
 
         foreach ($maps as $mapInfo) {
             $map = Map::where('uid', $mapInfo->uId)
@@ -342,10 +342,17 @@ class MapController
 
                 $map = Map::updateOrCreate([
                     'author'   => $authorId,
-                    'enabled'  => true,
                     'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
                     'filename' => $mapInfo->fileName,
                     'uid'      => json_decode($gbxInfo)->MapUid,
+                ]);
+            }
+
+            if (!$map->gbx) {
+                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
+                $map->update([
+                    'gbx' => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                    'uid' => json_decode($gbxInfo)->MapUid,
                 ]);
             }
 

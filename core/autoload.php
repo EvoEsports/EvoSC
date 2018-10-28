@@ -75,7 +75,7 @@ function esc_class_loader($className)
             die("Trying to load non-existant file: " . $class->file);
         }
     } else {
-        \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className);
+        \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className, isVeryVerbose());
     }
 }
 

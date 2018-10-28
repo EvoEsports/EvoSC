@@ -32,12 +32,13 @@ class ImportUaseco extends Command
     {
         $source = $input->getArguments();
 
-        if (!file_exists('config/db.json')) {
-            $output->writeln('config/db.json not found');
+        if (!file_exists('config/database.config.json')) {
+            $output->writeln('config/database.config.json not found');
+
             return;
         }
 
-        $targetConfig = json_decode(file_get_contents('config/db.json'));
+        $targetConfig = json_decode(file_get_contents('config/database.config.json'));
 
 
         //Connect to esc database
@@ -54,10 +55,11 @@ class ImportUaseco extends Command
         ]);
         $esc = $escCapsule->getConnection();
 
+        /*
         $esc->getSchemaBuilder()->dropAllTables();
         $migrationOutput = shell_exec('php mod.php migrate');
         $output->writeln($migrationOutput);
-
+        */
 
         //Connect to uaseco database
         $uasecoCapsule = new Capsule();
@@ -69,7 +71,7 @@ class ImportUaseco extends Command
             'password'  => $source['password'],
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'prefix'    => $source['table_prefix'] ?? ''
+            'prefix'    => $source['table_prefix'] ?? '',
         ]);
         $uaseco = $uasecoCapsule->getConnection();
 
@@ -79,15 +81,21 @@ class ImportUaseco extends Command
         $uasecoPlayers = $uaseco->table('players')->get();
         $bar           = $this->getBar($output, $uasecoPlayers->count());
         foreach ($uasecoPlayers as $player) {
-
             $ply = $esc->table('players')->whereLogin($player->Login)->first();
 
             if ($ply) {
                 $plyId = $ply->id;
+                $ply->update([
+                    'path'       => $player->Zone,
+                    'NickName'   => $player->Nickname,
+                    'last_visit' => $player->LastVisit,
+                ]);
             } else {
                 $plyId = $esc->table('players')->insertGetId([
-                    'Login'    => $player->Login,
-                    'NickName' => $player,
+                    'Login'      => $player->Login,
+                    'path'       => $player->Zone,
+                    'NickName'   => $player->Nickname,
+                    'last_visit' => $player->LastVisit,
                 ]);
             }
 
@@ -100,7 +108,7 @@ class ImportUaseco extends Command
                 'Finishes'   => $player->MostFinished,
                 'Locals'     => $player->MostRecords,
                 'updated_at' => $player->LastVisit,
-                'created_at' => $player->LastVisit
+                'created_at' => $player->LastVisit,
             ]);
 
             $bar->advance();
@@ -114,11 +122,11 @@ class ImportUaseco extends Command
         $authors = $uaseco->table('authors')->get();
         $bar     = $this->getBar($output, $authors->count());
         foreach ($authors as $author) {
-
             if ($esc->table('players')->where('Login', $author->Login)->get()->isEmpty()) {
                 $esc->table('players')->insert([
                     'Login'    => $author->Login,
                     'NickName' => $author->Nickname,
+                    'path'     => $author->Zone,
                 ]);
             }
 
@@ -133,20 +141,14 @@ class ImportUaseco extends Command
         $maps = $uaseco->table('maps')->get();
         $bar  = $this->getBar($output, $maps->count());
         foreach ($maps as $map) {
-
             $authorLogin = $uaseco->table('authors')->where('AuthorId', $map->AuthorId)->first()->Login;
             $author      = $esc->table('players')->whereLogin($authorLogin)->first();
 
-            $uasecoMap               = (array)$map;
-            $uasecoMap['FileName']   = $map->Filename;
-            $uasecoMap['UId']        = $map->Uid;
-            $uasecoMap['LapRace']    = $map->MultiLap == 'true' ? 1 : 0;
-            $uasecoMap['Author']     = $author->id;
-            $uasecoMap['LastPlayed'] = \Carbon\Carbon::yesterday(); //Make it instantly available
-
-            $data = collect($uasecoMap)->only(['FileName', 'UId', 'LapRace', 'Author', 'LastPlayed', 'Environment', 'NbCheckpoints', 'Mood', 'Name'])->toArray();
-
-            $esc->table('maps')->insert($data);
+            $esc->table('maps')->insert([
+                'filename' => $map->Filename,
+                'author' => $author->id,
+                'uid' => $map->Uid,
+            ]);
 
             $bar->advance();
         }
@@ -158,20 +160,19 @@ class ImportUaseco extends Command
         //Import map ratings
         $output->writeln('Importing map-ratings');
         $ratings = $uaseco->table('ratings')->get();
-        $bar = $this->getBar($output, $ratings->count());
+        $bar     = $this->getBar($output, $ratings->count());
         foreach ($ratings as $rating) {
-
-            $mxKarma = [0, 20, 40, null, 60, 80, 100][$rating->Score + 3];
+            $mxKarma     = [0, 20, 40, 50, 60, 80, 100][$rating->Score + 3];
             $playerLogin = $uaseco->table('players')->where('PlayerId', $rating->PlayerId)->first()->Login;
-            $player = $esc->table('players')->whereLogin($playerLogin)->first();
+            $player      = $esc->table('players')->whereLogin($playerLogin)->first();
 
             $mapUid = $uaseco->table('maps')->where('MapId', $rating->MapId)->first()->Uid;
-            $map = $esc->table('maps')->where('UId', $mapUid)->first();
+            $map    = $esc->table('maps')->where('UId', $mapUid)->first();
 
             $esc->table('mx-karma')->insert([
                 'Player' => $player->id,
-                'Map' => $map->id,
-                'rating' => $mxKarma
+                'Map'    => $map->id,
+                'rating' => $mxKarma,
             ]);
 
             $bar->advance();
@@ -183,21 +184,21 @@ class ImportUaseco extends Command
         //Import map ratings
         $output->writeln('Importing local records');
         $rankCount = 1000;
-        $records = $uaseco->table('records')->get();
-        $bar = $this->getBar($output, $records->count());
+        $records   = $uaseco->table('records')->get();
+        $bar       = $this->getBar($output, $records->count());
         foreach ($records as $record) {
             $playerLogin = $uaseco->table('players')->where('PlayerId', $record->PlayerId)->first()->Login;
-            $player = $esc->table('players')->whereLogin($playerLogin)->first();
+            $player      = $esc->table('players')->whereLogin($playerLogin)->first();
 
             $mapUid = $uaseco->table('maps')->where('MapId', $record->MapId)->first()->Uid;
-            $map = $esc->table('maps')->where('UId', $mapUid)->first();
+            $map    = $esc->table('maps')->where('UId', $mapUid)->first();
 
             $esc->table('local-records')->insert([
-                'Map' => $map->id,
-                'Player' => $player->id,
-                'Score' => $record->Score,
+                'Map'         => $map->id,
+                'Player'      => $player->id,
+                'Score'       => $record->Score,
                 'Checkpoints' => $record->Checkpoints,
-                'Rank' => $rankCount++
+                'Rank'        => $rankCount++,
             ]);
             $bar->advance();
         }
@@ -208,9 +209,9 @@ class ImportUaseco extends Command
         //Fix local records ranks
         $output->writeln('Fixing local records ranks');
         $maps = $esc->table('maps')->get();
-        $bar = $this->getBar($output, $esc->table('local-records')->count());
+        $bar  = $this->getBar($output, $esc->table('local-records')->count());
         foreach ($maps as $map) {
-            $i = 1;
+            $i      = 1;
             $locals = $esc->table('local-records')->whereMap($map->id)->orderBy('Score')->get();
             foreach ($locals as $local) {
                 $esc->table('local-records')->whereId($local->id)->update(['Rank' => $i]);

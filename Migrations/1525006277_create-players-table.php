@@ -28,6 +28,7 @@ class CreatePlayersTable extends Migration
             $table->integer('MaxRank')->default(15);
             $table->boolean('Banned')->default(false);
             $table->text('user_settings')->nullable();
+            $table->dateTime('last_visit')->nullable();
         });
     }
 
