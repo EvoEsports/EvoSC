@@ -113,11 +113,11 @@ class MapController
 
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), "", ' Next map is ', secondary($request->map), ' as requested by ',
+            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' as requested by ',
                 $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::message(onlinePlayers(), "", ' Next map is ', secondary($nextMap));
+            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($nextMap));
         }
     }
 
@@ -236,7 +236,7 @@ class MapController
      */
     public static function skip(Player $player)
     {
-        ChatController::message(onlinePlayers(), $player, ' skips map');
+        ChatController::message(onlinePlayers(), '_info', $player, ' skips map');
         MapController::goToNextMap();
     }
 
@@ -257,7 +257,7 @@ class MapController
         }
 
         self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::message(onlinePlayers(), $player, ' queued map ', $currentMap, ' for replay');
+        ChatController::message(onlinePlayers(), '_info', $player, ' queued map ', $currentMap, ' for replay');
     }
 
     /**

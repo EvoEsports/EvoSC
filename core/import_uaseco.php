@@ -30,6 +30,8 @@ class ImportUaseco extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        \esc\Classes\Log::setOutput($output);
+
         $source = $input->getArguments();
 
         if (!file_exists('config/database.config.json')) {

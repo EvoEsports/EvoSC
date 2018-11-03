@@ -196,7 +196,9 @@ $application->add(new Migrate());
 $application->add(new ImportUaseco());
 $application->add(new EscRun());
 
+
 try {
+    file_put_contents(__DIR__ . '/.pid', getmypid());
     $application->run();
 } catch (\Exception $e) {
     die($e);
