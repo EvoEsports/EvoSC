@@ -199,15 +199,15 @@ function createCrashReport($e)
 
 function isVerbose(): bool
 {
-    return \esc\Classes\Log::getOutput()->isVerbose();
+    return false;
 }
 
 function isVeryVerbose(): bool
 {
-    return \esc\Classes\Log::getOutput()->isVeryVerbose();
+    return false;
 }
 
 function isDebug(): bool
 {
-    return \esc\Classes\Log::getOutput()->isDebug();
+    return false;
 }

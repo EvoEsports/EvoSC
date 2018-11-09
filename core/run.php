@@ -1,7 +1,7 @@
 <?php
 
-include 'autoload.php';
-include 'bootstrap.php';
+require 'autoload.php';
+require 'global-functions.php';
 
 use esc\Classes\Log;
 use Symfony\Component\Console\Command\Command;
@@ -12,18 +12,67 @@ class EscRun extends Command
 {
     protected function configure()
     {
-        $this->setName('run')->setDescription('Run Evo Server Controller');
+        $this->setName('run')
+             ->setDescription('Run Evo Server Controller');
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        global $escVersion;
+        global $serverName;
+
+        $escVersion = '0.44.0';
+
+        esc\Classes\Config::loadConfigFiles();
+
+        //Check that cache directory exists
+        if (!is_dir(cacheDir())) {
+            mkdir(cacheDir());
+        }
+
+        //Check that logs directory exists
+        if (!is_dir(logDir())) {
+            mkdir(logDir());
+        }
+
+        try {
+            $output->writeln("Connecting to server...");
+
+            esc\Classes\Server::init(
+                config('server.ip'),
+                config('server.port'),
+                5,
+                config('server.rpc.login'),
+                config('server.rpc.password')
+            );
+
+            $serverName = \esc\Classes\Server::rpc()->getServerName();
+
+            if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
+                \esc\Classes\Server::autoSaveValidationReplays(true);
+            }
+            if (!\esc\Classes\Server::isAutoSaveReplaysEnabled()) {
+                \esc\Classes\Server::autoSaveReplays(true);
+            }
+
+            $output->writeln("Connection established.");
+        } catch (\Exception $e) {
+            $msg = $e->getMessage();
+            $output->writeln("<error>$msg</error>");
+            exit(1);
+        }
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->start($output);
-    }
+        \esc\Classes\Log::setOutput($output);
 
-    private function start(OutputInterface $output)
-    {
         $version = getEscVersion();
-
         $motd = "      ______           _____ ______
      / ____/  _______ / ___// ____/
     / __/| | / / __ \\__ \/ /     
@@ -33,42 +82,39 @@ class EscRun extends Command
 
         $output->writeln("<fg=cyan;options=bold>$motd</>");
 
-        register_shutdown_function(function () {
-            $error = error_get_last();
-
-            echo $error['type'] . "\n";
-
-            // fatal error, E_ERROR === 1
-            if ($error['type'] === E_ERROR) {
-                $crashReport = collect();
-                $crashReport->put('file', $error['file']);
-                $crashReport->put('line', $error['line']);
-                $crashReport->put('message', $error['message']);
-
-                if (!is_dir(__DIR__ . '/../crash-reports')) {
-                    mkdir(__DIR__ . '/../crash-reports');
-                }
-
-                $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
-                file_put_contents($filename, $crashReport->toJson());
-            }
-        });
-
         esc\Classes\Log::info("Starting...");
 
-        startEsc($output);
+        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 100);
+
+        esc\Classes\Database::init();
+        esc\Classes\RestClient::init(serverName());
+        esc\Controllers\HookController::init();
+        esc\Controllers\TemplateController::init();
+        esc\Controllers\ChatController::init();
+        esc\Classes\ManiaLinkEvent::init();
+        esc\Controllers\GroupController::init();
+        esc\Controllers\AccessController::init();
+        esc\Controllers\MapController::init();
+        esc\Controllers\PlayerController::init();
+        \esc\Controllers\KeyController::init();
+        esc\Controllers\ModuleController::init();
+        \esc\Controllers\HideScriptController::init();
+        \esc\Controllers\PlanetsController::init();
+
+        \esc\Controllers\ChatController::addCommand('setconfig', [\esc\Classes\Config::class, 'setChatCmd'], 'Sets config value', '//', 'config');
 
         if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting core finished.', true);
         }
 
-        bootModules();
+        esc\Controllers\ModuleController::bootModules();
 
         if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting modules finished.', true);
         }
 
-        beginMap();
+        $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
+        esc\Classes\Hook::fire('BeginMap', $map);
 
         //Set connected players online
         $onlinePlayersLogins = collect(\esc\Classes\Server::rpc()->getPlayerList())->pluck('login');
@@ -85,6 +131,11 @@ class EscRun extends Command
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
 
+        $this->loop();
+    }
+
+    private function loop()
+    {
         if (isDebug()) {
             $runTimes = collect();
             $min      = 10000;
@@ -96,21 +147,7 @@ class EscRun extends Command
             try {
                 esc\Classes\Timer::startCycle();
 
-                try {
-                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-                } catch (Exception $e) {
-                    $crashReport = collect();
-                    $crashReport->put('file', $e->getFile());
-                    $crashReport->put('line', $e->getLine());
-                    $crashReport->put('message', $e->getMessage() . "\n" . $e->getTraceAsString());
-
-                    if (!is_dir(__DIR__ . '/../crash-reports')) {
-                        mkdir(__DIR__ . '/../crash-reports');
-                    }
-
-                    $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
-                    file_put_contents($filename, $crashReport->toJson());
-                }
+                \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
 
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
@@ -135,7 +172,7 @@ class EscRun extends Command
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
                 Log::logAddLine('Maniaplanet', $e->getMessage());
-            } catch (Error $e){
+            } catch (Error $e) {
                 Log::logAddLine('cycle', 'EvoSC encountered an error: ' . $e->getMessage());
                 Log::logAddLine('cycle', $e->getTraceAsString(), false);
             }

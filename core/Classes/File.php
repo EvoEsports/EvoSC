@@ -39,17 +39,13 @@ class File
         return self::exists($fileName);
     }
 
-    public static function fileAppendLine($fileName, $line)
+    public static function appendLine($fileName, $line)
     {
-        if (file_exists($fileName)) {
-            $data = file_get_contents($fileName);
-        } else {
-            $data = "";
+        if (!file_exists($fileName)) {
+            file_put_contents($fileName, $line);
         }
 
-        $data .= "\n" . $line;
-
-        file_put_contents($fileName, $data);
+        file_put_contents($fileName, $line, FILE_APPEND);
     }
 
     public static function createDirectory(string $name)

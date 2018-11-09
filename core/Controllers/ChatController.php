@@ -15,6 +15,7 @@ use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Song;
 use Illuminate\Support\Collection;
+use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 class ChatController
 {
@@ -41,7 +42,13 @@ $$: Writes a dollarsign
         self::$chatCommands = collect();
         self::$mutedPlayers = collect();
 
-        Server::call('ChatEnableManualRouting', [true, false]);
+        try {
+            Server::call('ChatEnableManualRouting', [true, false]);
+        } catch (FaultException $e) {
+            $msg = $e->getMessage();
+            Log::getOutput()->writeln("<error>$msg There might already be a running instance.</error>");
+            exit(2);
+        }
 
         Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
@@ -226,51 +233,51 @@ $$: Writes a dollarsign
             return;
         }
 
-        $icon  = "";
-        $color = config('colors.primary');
+        $icon       = "";
+        $color      = config('colors.primary');
         $groupColor = config('colors.primary');
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
-                    $icon  = "";
-                    $color = config('colors.secondary');
+                    $icon       = "";
+                    $color      = config('colors.secondary');
                     $groupColor = config('colors.secondary');
                     array_shift($parts);
                     break;
 
                 case 'info':
-                    $icon  = "";
-                    $color = config('colors.info');
+                    $icon       = "";
+                    $color      = config('colors.info');
                     $groupColor = config('colors.info');
                     array_shift($parts);
                     break;
 
                 case 'warning':
-                    $icon  = "";
-                    $color = config('colors.warning');
+                    $icon       = "";
+                    $color      = config('colors.warning');
                     $groupColor = config('colors.warning');
                     array_shift($parts);
                     break;
 
                 case 'local':
-                    $icon  = "";
-                    $color = config('colors.local');
+                    $icon       = "";
+                    $color      = config('colors.local');
                     $groupColor = config('colors.local');
                     array_shift($parts);
                     break;
 
                 case 'dedi':
-                    $icon  = "";
-                    $color = config('colors.dedi');
+                    $icon       = "";
+                    $color      = config('colors.dedi');
                     $groupColor = config('colors.dedi');
                     array_shift($parts);
                     break;
 
                 default:
                     if (preg_match('/[0-9a-f]{3}/', $matches[1])) {
-                        $color = $matches[1];
+                        $color      = $matches[1];
                         $groupColor = $matches[1];
                         array_shift($parts);
                     }
@@ -342,7 +349,7 @@ $$: Writes a dollarsign
 
         try {
             Server::chatSendServerMessage($message, $recipient->Login);
-            Log::logAddLine('Chat', $message);
+            Log::logAddLine("Chat -> $recipient", $message);
         } catch (\Exception $e) {
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
             Log::logAddLine('', $e->getTraceAsString(), false);

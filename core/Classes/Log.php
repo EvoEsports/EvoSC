@@ -21,12 +21,7 @@ class Log
     public static function writeLn(string $line)
     {
         $output = self::getOutput();
-
-        if ($output) {
-            $output->writeln(stripAll($line));
-        } else {
-            echo stripAll($line) . "\n";
-        }
+        $output->writeln(stripAll($line));
     }
 
     public static function logAddLine(string $prefix, string $string, $echo = true)
@@ -45,19 +40,17 @@ class Log
         if ($echo == true || isVeryVerbose()) {
             switch ($prefix) {
                 case 'Module':
-                    self::writeLn($line);
+                case 'Modules':
+                case 'Hook':
+                    self::writeLn("<fg=blue>$line</>");
                     break;
 
                 case 'Info':
-                    self::writeLn($line);
-                    break;
-
-                case 'Hook':
-                    self::writeLn($line);
+                    self::writeLn("<info>$line</info>");
                     break;
 
                 case 'Warning':
-                    self::writeLn($line);
+                    self::writeLn("<fg=red>$line</>");
                     break;
 
                 case 'Dedimania':
@@ -65,7 +58,7 @@ class Log
                     break;
 
                 case 'ERROR':
-                    self::writeLn($line);
+                    self::writeLn("<error>$line</error>");
                     break;
 
                 case 'Debug':
@@ -77,7 +70,7 @@ class Log
             }
         }
 
-        File::fileAppendLine($logFile, $line);
+        File::appendLine($logFile, $line);
     }
 
     public static function info($message, bool $echo = true)
