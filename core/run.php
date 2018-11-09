@@ -21,7 +21,7 @@ class EscRun extends Command
         global $escVersion;
         global $serverName;
 
-        $escVersion = '0.44.0';
+        $escVersion = '0.45.1';
 
         esc\Classes\Config::loadConfigFiles();
 
