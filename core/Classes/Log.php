@@ -45,6 +45,7 @@ class Log
                     self::writeLn("<fg=blue>$line</>");
                     break;
 
+                case 'i':
                 case 'Info':
                     self::writeLn("<info>$line</info>");
                     break;
@@ -59,6 +60,10 @@ class Log
 
                 case 'ERROR':
                     self::writeLn("<error>$line</error>");
+                    break;
+
+                case 'Chat':
+                    self::writeLn("<fg=yellow;>$line</>");
                     break;
 
                 case 'Debug':

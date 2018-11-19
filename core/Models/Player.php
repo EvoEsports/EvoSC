@@ -172,8 +172,6 @@ class Player extends Model
 
     public function setSetting($settingName, $value)
     {
-        Player::whereLogin($this->Login)->update(["user_settings->$settingName" => $value]);
-
         $setting = $this->settings()->whereName($settingName)->first();
 
         if (is_bool($value)) {

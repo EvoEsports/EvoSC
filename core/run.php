@@ -73,7 +73,7 @@ class EscRun extends Command
         \esc\Classes\Log::setOutput($output);
 
         $version = getEscVersion();
-        $motd = "      ______           _____ ______
+        $motd    = "      ______           _____ ______
      / ____/  _______ / ___// ____/
     / __/| | / / __ \\__ \/ /     
    / /___| |/ / /_/ /__/ / /___   
@@ -98,7 +98,6 @@ class EscRun extends Command
         esc\Controllers\PlayerController::init();
         \esc\Controllers\KeyController::init();
         esc\Controllers\ModuleController::init();
-        \esc\Controllers\HideScriptController::init();
         \esc\Controllers\PlanetsController::init();
 
         \esc\Controllers\ChatController::addCommand('setconfig', [\esc\Classes\Config::class, 'setChatCmd'], 'Sets config value', '//', 'config');
@@ -147,7 +146,12 @@ class EscRun extends Command
             try {
                 esc\Classes\Timer::startCycle();
 
-                \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+                try {
+                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+                } catch (Exception $e) {
+                    Log::logAddLine('ERROR', $e->getMessage(), true);
+                    Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
+                }
 
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
