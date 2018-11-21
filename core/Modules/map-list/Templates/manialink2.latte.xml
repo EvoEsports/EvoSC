@@ -54,12 +54,15 @@
 
                 <frame id="pagination" pos="2 -81.5" scale="0.9">
                     <label id="page-info" pos="6 0" valign="center" halign="center" text="1/1" textsize="0.8" ScriptEvents="1" />
-                    <label class="previous-page" pos="0 0" size="4 4" valign="center" halign="center" text="⏴" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
-                    <label class="next-page" pos="12 0" size="4 4" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+                    <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+                    <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
                 </frame>
 
-                <label pos="125 -80.4" halign="right" textsize="0.9" text="Search:" />
-                <entry id="search-input" class="search-input" pos="151 -80" size="25 3.5" halign="right" style="TextValueSmall" default="" textsize="1.2" />
+                <frame pos="124 -81.5" scale="0.9">
+                    <label pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" />
+                    <entry id="search-input" class="search-input" pos="26.5 0" size="25 3.5" halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2" />
+                    <label id="clear-search" class="clear-search" pos="0 0" size="3.5 3.5" halign="center" valign="center" textsize="0.25" text="" focusareacolor1="f003" focusareacolor2="f009" ScriptEvents="1" hidden="1" />
+                </frame>
             </frame>
         </frame>
     </frame>
@@ -119,6 +122,26 @@ declare Integer lastMapsCount;
 declare Integer currentPage;
 declare CMlFrame mapListFrame;
 
+Text getLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+
+    if(Locals.existskey(mapId)){
+        return TL::ToText(Locals[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+
+    if(Dedis.existskey(mapId)){
+        return TL::ToText(Dedis[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
 Text getStarString(Real rating){
     if(rating == -1){
         return "$666";
@@ -163,8 +186,8 @@ Void updateView(Text[Text][] mapPool, Integer page){
         mapFrame.DataAttributeSet("map-id", map["id"]);
         (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
         (mapFrame.Controls[2] as CMlLabel).SetText(map["author_nick"]);
-        (mapFrame.Controls[3] as CMlLabel).SetText("");
-        (mapFrame.Controls[4] as CMlLabel).SetText("");
+        (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
+        (mapFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
         (mapFrame.Controls[6] as CMlLabel).SetText(getStarString(TL::ToReal(map["rating"])));
         mapFrame.Show();
 
@@ -183,10 +206,12 @@ Void updateView(Text[Text][] mapPool, Integer page){
 Void search(){
     declare Text[Text][] mapsFound = Text[Text][];
     declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+    declare clearSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
 
     if(input.Value == ""){
         currentMapPool = maps;
         updateView(maps, 0);
+        clearSearch.Hide();
         return;
     }
 
@@ -200,6 +225,7 @@ Void search(){
 
     currentMapPool = mapsFound;
     updateView(mapsFound, 0);
+    clearSearch.Show();
 }
 
 Boolean checkMapChanges(){
@@ -247,6 +273,11 @@ main() {
 
             if(event.Control.HasClass("search-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
                 search();
+            }
+
+            if(event.Control.HasClass("clear-search") && event.Type == CMlScriptEvent::Type::MouseClick){
+                declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+                input.SetText("", True);
             }
 
             if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){

@@ -64,8 +64,17 @@ class MapList
             ];
         })->toJson();
 
+        self::sendRecords($player);
         Template::show($player, 'map-list.update-map-list', compact('maps'));
         Template::show($player, 'map-list.manialink2');
+    }
+
+    public static function sendRecords(Player $player)
+    {
+        $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
+        $dedis = $player->dedis()->pluck('Rank', 'Map')->toJson();
+
+        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
