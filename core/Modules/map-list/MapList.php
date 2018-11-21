@@ -53,7 +53,19 @@ class MapList
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
-        self::sendManialink($player);
+
+        $maps = Map::whereEnabled(true)->get()->map(function (Map $map) {
+            return [
+                'id'           => (string)$map->id,
+                'name'         => $map->gbx->Name,
+                'author_login' => $map->author->Login,
+                'author_nick'  => $map->author->NickName,
+                'rating'       => $map->average_rating,
+            ];
+        })->toJson();
+
+        Template::show($player, 'map-list.update-map-list', compact('maps'));
+        Template::show($player, 'map-list.manialink2');
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
@@ -85,7 +97,7 @@ class MapList
 
     public static function queueDropMap(Player $player, $mapId)
     {
-        $map = Map::find($mapId);
+        $map   = Map::find($mapId);
         $queue = MapController::unqueueMap($map);
         self::mapQueueUpdated($queue);
         ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');

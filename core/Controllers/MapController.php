@@ -113,7 +113,7 @@ class MapController
 
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' as requested by ',
+            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
                 $request->issuer);
         } else {
             $nextMap = self::getNext();
@@ -127,6 +127,7 @@ class MapController
     public static function beginMap(Map $map)
     {
         $map->increment('plays');
+        $map->increment('cooldown');
         $map->update(['last_played' => Carbon::now()]);
 
         self::loadMxDetails($map);
