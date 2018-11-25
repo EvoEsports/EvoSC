@@ -136,7 +136,18 @@ class MapList
     public static function sendUpdatedMaplist(Player $player)
     {
         $maps = self::mapsToManiaScriptArray($player);
-        Template::show($player, 'map-list.update-maps', compact('maps'));
+        Template::show($player, 'map-list.update-maps', compact('maps')); //delete
+
+        $maps = Map::whereEnabled(true)->get()->map(function (Map $map) {
+            return [
+                'id'           => (string)$map->id,
+                'name'         => $map->gbx->Name,
+                'author_login' => $map->author->Login,
+                'author_nick'  => $map->author->NickName,
+                'rating'       => $map->average_rating,
+            ];
+        })->toJson();
+        Template::show($player, 'map-list.update-map-list', compact('maps'));
     }
 
     public static function deleteMap(Player $player, $mapId)
