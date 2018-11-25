@@ -84,7 +84,7 @@
 
         <frame id="controls" pos="5 -10.5" z-index="10">
             <quad pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
-            <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
+            <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}6" z-index="-2" />
 
             <frame pos="1.7 -5">
                 <label class="map-control fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
@@ -129,6 +129,24 @@ declare Integer currentPage;
 declare Integer currentTab;
 declare Real buttonsWidth;
 declare CMlFrame mapListFrame;
+declare Text currentMapUid;
+declare Text[Text] currentMap;
+
+Text[Text] findMapByUid(Text Uid){
+    foreach(map in maps){
+        if(map["uid"] == Uid){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Void updateWidget(Text[Text] map){
+    declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    (widget.Controls[0] as CMlLabel).SetText(map["name"]);
+    (widget.Controls[1] as CMlLabel).SetText(map["author_nick"]);
+}
 
 Void resizeWindow(){
     declare searchFrame <=> (Page.MainFrame.GetFirstChild("search-frame") as CMlFrame);
@@ -381,6 +399,9 @@ main() {
     currentTab = 0;
 
     mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
+    declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
+    declare controlsVisible = False;
 
     rearrangeButtons();
 
@@ -394,6 +415,16 @@ main() {
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                 mapListFrame.Hide();
+                continue;
+            }
+
+            if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                TriggerPageAction("mx.details," ^ currentMap["id"]);
+                continue;
+            }
+
+            if(event.Control.HasClass("list") && event.Type == CMlScriptEvent::Type::MouseClick){
+                mapListFrame.Show();
                 continue;
             }
 
@@ -430,6 +461,7 @@ main() {
                 declare mapFrame = (event.Control.Parent.Parent as CMlFrame);
 
                 if(event.Type == CMlScriptEvent::Type::MouseClick){
+                    (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
                     buttonPressed(mapFrame, event.Control);
                     continue;
                 }
@@ -457,9 +489,31 @@ main() {
             updateView(currentMapPool, currentPage);
         }
 
+        if(currentMapUid != Map.MapInfo.MapUid){
+            currentMapUid = Map.MapInfo.MapUid;
+            currentMap = findMapByUid(currentMapUid);
+            updateWidget(currentMap);
+        }
+
         checkMapSearchQuery();
 
         maniaLinkDrag();
+
+        declare x_min = widget.RelativePosition_V3[0];
+        declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);
+        declare y_min = widget.RelativePosition_V3[1];
+        declare y_max = widget.RelativePosition_V3[1] - (widget.Size[1] * widget.RelativeScale);
+        declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
+        declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
+
+        if(!(xInBounds && yInBounds) && controlsVisible){
+            controlsVisible = False;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 -10.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
+        if((xInBounds && yInBounds) && !controlsVisible){
+            controlsVisible = True;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
     }
 }
     --></script>

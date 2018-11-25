@@ -61,6 +61,7 @@ class MapList
                 'author_login' => $map->author->Login,
                 'author_nick'  => $map->author->NickName,
                 'rating'       => $map->average_rating,
+                'uid'          => $map->gbx->MapUid,
             ];
         })->toJson();
 
@@ -72,7 +73,7 @@ class MapList
     public static function sendRecords(Player $player)
     {
         $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
-        $dedis = $player->dedis()->pluck('Rank', 'Map')->toJson();
+        $dedis  = $player->dedis()->pluck('Rank', 'Map')->toJson();
 
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
@@ -145,6 +146,7 @@ class MapList
                 'author_login' => $map->author->Login,
                 'author_nick'  => $map->author->NickName,
                 'rating'       => $map->average_rating,
+                'uid'          => $map->gbx->MapUid,
             ];
         })->toJson();
         Template::show($player, 'map-list.update-map-list', compact('maps'));

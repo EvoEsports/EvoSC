@@ -21,7 +21,7 @@
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
                 <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
-                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}f" z-index="-2" />
+                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}6" z-index="-2" />
 
                 <label class="skip" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
                 <label class="music-list" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
