@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Maps:main" id="esc_maps" version="3">
-    <frame id="map-list-window" pos="-75.5 45" size="151 101" hidden="0">
-        <quad pos="0 0" size="122 11" bgcolor="{header_color()|noescape}c" />
-        <quad pos="0 -10.5" size="151 0.5" bgcolor="{header_color()|noescape}f" z-index="2" />
-        <quad pos="0 0" size="151 150" bgcolor="{background_color()|noescape}" opacity="0.75" />
-        <quad pos="0 0" size="151 150" style="Bgs1" substyle="BgDialogBlur" />
+    <frame id="map-list-window" pos="-75.5 45" size="122 101" hidden="0" z-index="300">
+        <quad id="handle" pos="0 0" size="200 11" bgcolor="{header_color()|noescape}c" />
+        <quad pos="0 -10.5" size="200 0.5" bgcolor="{header_color()|noescape}f" z-index="2" />
+        <quad pos="0 0" size="200 150" bgcolor="{background_color()|noescape}" opacity="0.75" />
+        <quad pos="0 0" size="200 150" style="Bgs1" substyle="BgDialogBlur" />
         <label pos="1.5 -3" size="20 5" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
-        <label class="close" pos="148 -3" size="6 6" text="❌" textsize="1.2" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
+        <label id="close" class="close" pos="119 -3" size="6 6" text="❌" textsize="1.2" z-index="50" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
 
         <frame id="navbar" pos="0 -5.5" z-index="2">
             <frame pos="10 -3" z-index="2">
@@ -31,12 +31,12 @@
             <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6" z-index="1" />
-            <label class="fav" pos="115 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label class="fav" pos="115.5 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
             <label pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textcolor="ffff" textsize="0.6" z-index="1" />
 
             <frame id="buttons" pos="120 0">
-                <label class="btn juke" data-tab="0,1" size="13 3" text=" Juke" textsize="0.6" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
-                <label class="btn info" data-tab="0,1" size="13 3" text=" Info" textsize="0.6" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+                <label class="btn juke" data-tab="0,1" size="11 3" text=" Juke" textsize="0.4" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+                <label class="btn info" data-tab="0,1" size="10 3" text=" Info" textsize="0.4" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
             </frame>
         </framemodel>
 
@@ -61,7 +61,7 @@
                     <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
                 </frame>
 
-                <frame pos="124 -81.5" scale="0.9">
+                <frame id="search-frame" pos="124 -81.5" scale="0.9">
                     <label pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" />
                     <entry id="search-input" class="search-input" pos="26.5 0" size="25 3.5" halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2" />
                     <label id="clear-search" class="clear-search" pos="0 0" size="3.5 3.5" halign="center" valign="center" textsize="0.25" text="" focusareacolor1="f003" focusareacolor2="f009" ScriptEvents="1" hidden="1" />
@@ -124,10 +124,19 @@ declare Text[Text][] currentMapPool;
 declare Integer lastMapsCount;
 declare Integer currentPage;
 declare Integer currentTab;
+declare Real buttonsWidth;
 declare CMlFrame mapListFrame;
 
 Void resizeWindow(){
-    //baseWidth = 122
+    declare searchFrame <=> (Page.MainFrame.GetFirstChild("search-frame") as CMlFrame);
+    declare closeButton <=> (Page.MainFrame.GetFirstChild("close") as CMlLabel);
+    declare header <=> (Page.MainFrame.GetFirstChild("handle") as CMlQuad);
+    declare width = buttonsWidth + 119.0;
+    mapListFrame.Size = <width, mapListFrame.Size[1]>;
+    header.Size = <width, header.Size[1]>;
+    mapListFrame.RelativePosition_V3 = <width / -2.0, mapListFrame.RelativePosition_V3[1]>;
+    searchFrame.RelativePosition_V3 = <width - 26.0, searchFrame.RelativePosition_V3[1]>;
+    closeButton.RelativePosition_V3 = <width - 3.0, closeButton.RelativePosition_V3[1]>;
 }
 
 Void rearrangeButtons(){
@@ -144,7 +153,13 @@ Void rearrangeButtons(){
             button.RelativePosition_V3 = <offset, 0.0>;
             padding = offset + width / 2.0 + 1.0;
         }
+
+        if(padding > buttonsWidth){
+            buttonsWidth = padding;
+        }
     }
+
+    resizeWindow();
 }
 
 Text getLocal(Text mapId){
@@ -283,8 +298,16 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
 
     if(control.HasClass("juke")){
         TriggerPageAction("map.queue," ^ mapId);
+        return;
+    }
+
+    if(control.HasClass("info")){
+        TriggerPageAction("mx.details," ^ mapId);
+        return;
     }
 }
+
+{(new esc\Classes\ManiaLinkDrag())|noescape}
 
 main() {
     lastMapsCount = 0;
@@ -368,6 +391,8 @@ main() {
         }
 
         checkMapSearchQuery();
+
+        maniaLinkDrag();
     }
 }
     --></script>
