@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Maps:main" id="esc_maps" version="3">
-    <frame id="map-list-window" pos="-75.5 45" hidden="0">
-        <quad pos="0 2.5" size="151 11" bgcolor="{header_color()|noescape}c" />
-        <quad pos="0 -8" size="151 0.5" bgcolor="{header_color()|noescape}f" z-index="2" />
-        <quad pos="0 2.5" size="151 101" bgcolor="{background_color()|noescape}" opacity="0.75" />
-        <quad pos="0 -8.5" size="151 90" style="Bgs1" substyle="BgDialogBlur" />
-        <label pos="1.5 -0.4" size="20 3" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
-        <label class="close" pos="148 -0.5" size="6 6" text="❌" textsize="1.2" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
+    <frame id="map-list-window" pos="-75.5 45" size="151 101" hidden="0">
+        <quad pos="0 0" size="122 11" bgcolor="{header_color()|noescape}c" />
+        <quad pos="0 -10.5" size="151 0.5" bgcolor="{header_color()|noescape}f" z-index="2" />
+        <quad pos="0 0" size="151 150" bgcolor="{background_color()|noescape}" opacity="0.75" />
+        <quad pos="0 0" size="151 150" style="Bgs1" substyle="BgDialogBlur" />
+        <label pos="1.5 -3" size="20 5" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
+        <label class="close" pos="148 -3" size="6 6" text="❌" textsize="1.2" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
 
-        <frame id="navbar" pos="0 -3" z-index="2">
+        <frame id="navbar" pos="0 -5.5" z-index="2">
             <frame pos="10 -3" z-index="2">
                 <quad id="maps-button" class="nav-button button" data-page="0" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
                 <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Maplist" />
@@ -26,17 +26,22 @@
         </frame>
 
         <framemodel id="Map">
-            <quad class="row" valign="center" size="162 4" bgcolor="{header_color()|noescape}" opacity="0" ScriptEvents="1" />
+            <quad valign="center" pos="-2 0" size="162 4.5" bgcolor="{header_color()|noescape}" opacity="0" />
             <label pos="1 0" valign="center" size="40 3" text="map name lol asdfasdasdsad" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6" z-index="1" />
             <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6" z-index="1" />
             <label class="fav" pos="115 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
             <label pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textcolor="ffff" textsize="0.6" z-index="1" />
+
+            <frame id="buttons" pos="120 0">
+                <label class="btn juke" data-tab="0,1" size="13 3" text=" Juke" textsize="0.6" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+                <label class="btn info" data-tab="0,1" size="13 3" text=" Info" textsize="0.6" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            </frame>
         </framemodel>
 
         <frame pos="2 -13" z-index="2">
-            <frame scale="0.97" pos="0 -3">
+            <frame scale="0.97" pos="0 -6">
                 <label pos="1  6" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}" />
                 <label pos="52 6" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}" />
                 <label pos="88 6" textsize="1" text="Local" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
@@ -44,12 +49,10 @@
                 <label pos="106 6" textsize="1" text="Karma" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
                 <label pos="117 6" textsize="1" text="Favorite" halign="center" scale="0.8" textcolor="{config('colors.ui.header')}" />
 
-                <frame id="map-list-container" pos="0 2" size="152 80">
-                    <frame id="map-list">
-                        {for $i = 0; $i < 20; $i++}
-                        <frameinstance pos="0 {$i * -4 - 1}" modelid="Map" hidden="0" />
-                        {/for}
-                    </frame>
+                <frame id="map-list" pos="0 2">
+                    {for $i = 0; $i < 20; $i++}
+                    <frameinstance pos="0 {$i * -4 - 2}" modelid="Map" hidden="0" />
+                    {/for}
                 </frame>
 
                 <frame id="pagination" pos="2 -81.5" scale="0.9">
@@ -120,7 +123,29 @@ declare Text[Text][] maps;
 declare Text[Text][] currentMapPool;
 declare Integer lastMapsCount;
 declare Integer currentPage;
+declare Integer currentTab;
 declare CMlFrame mapListFrame;
+
+Void resizeWindow(){
+    //baseWidth = 122
+}
+
+Void rearrangeButtons(){
+    declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare Real padding;
+
+    foreach(control in mapList.Controls){
+        declare buttonsFrame = ((control as CMlFrame).GetFirstChild("buttons") as CMlFrame);
+        padding = 0.0;
+
+        foreach(button in buttonsFrame.Controls){
+            declare Real width = button.Size[0];
+            declare offset = width / 2.0 + padding;
+            button.RelativePosition_V3 = <offset, 0.0>;
+            padding = offset + width / 2.0 + 1.0;
+        }
+    }
+}
 
 Text getLocal(Text mapId){
     declare Integer[Text] Locals for LocalUser;
@@ -253,11 +278,22 @@ Void checkMapSearchQuery(){
     }
 }
 
+Void buttonPressed(CMlFrame mapFrame, CMlControl control){
+    declare mapId = mapFrame.DataAttributeGet("map-id");
+
+    if(control.HasClass("juke")){
+        TriggerPageAction("map.queue," ^ mapId);
+    }
+}
+
 main() {
     lastMapsCount = 0;
     currentPage = 0;
+    currentTab = 0;
 
     mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
+
+    rearrangeButtons();
 
     while(True){
         yield;
@@ -269,15 +305,18 @@ main() {
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                 mapListFrame.Hide();
+                continue;
             }
 
             if(event.Control.HasClass("search-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
                 search();
+                continue;
             }
 
             if(event.Control.HasClass("clear-search") && event.Type == CMlScriptEvent::Type::MouseClick){
                 declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
                 input.SetText("", True);
+                continue;
             }
 
             if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -286,6 +325,7 @@ main() {
                     currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
                 }
                 updateView(currentMapPool, currentPage);
+                continue;
             }
 
             if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -294,6 +334,26 @@ main() {
                     currentPage = 0;
                 }
                 updateView(currentMapPool, currentPage);
+                continue;
+            }
+
+            if(event.Control.HasClass("btn")){
+                declare mapFrame = (event.Control.Parent.Parent as CMlFrame);
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick){
+                    buttonPressed(mapFrame, event.Control);
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOver){
+                    (mapFrame.Controls[0] as CMlQuad).Opacity = 0.5;
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseOut){
+                    (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                    continue;
+                }
             }
         }
 
