@@ -8,21 +8,11 @@
         <label pos="1.5 -3" size="20 5" text=" Maps" valign="center" textsize="1.2" z-index="2" textcolor="ffff" />
         <label id="close" class="close" pos="119 -3" size="6 6" text="❌" textsize="1.2" z-index="50" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}f" ScriptEvents="1" />
 
-        <frame id="navbar" pos="0 -5.5" z-index="2">
-            <frame pos="10 -3" z-index="2">
-                <quad id="maps-button" class="nav-button button" data-page="0" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Maplist" />
-            </frame>
-
-            <frame pos="27 -3" z-index="5">
-                <quad class="nav-button button" data-page="1" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Favorites" />
-            </frame>
-
-            <frame pos="44 -3" z-index="5">
-                <quad class="nav-button button" data-page="2" valign="center" halign="center" size="15 4" bgcolor="{header_color()|noescape}" opacity="0.2" z-index="-1" ScriptEvents="1" />
-                <label textcolor="ffff" textsize="0.3" valign="center" halign="center" text="Queued maps" />
-            </frame>
+        <frame id="navbar" pos="0 -5.5" z-index="5">
+            <label class="nav-btn" pos="10 -3" textsize="0.3" textcolor="ffff" data-tab="0" text="Maps" valign="center" halign="center" size="15 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            <label class="nav-btn" pos="27 -3" textsize="0.3" textcolor="ffff" data-tab="1" text="Favorites" valign="center" halign="center" size="15 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            <label class="nav-btn" pos="44 -3" textsize="0.3" textcolor="ffff" data-tab="2" text="Juked maps" valign="center" halign="center" size="15 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
+            <quad id="nav-active" pos="10 -3" size="15 4" bgcolor="{config('colors.ui.header')}f" z-index="-1" halign="center" valign="center" />
         </frame>
 
         <framemodel id="Map">
@@ -59,7 +49,8 @@
                 </frame>
 
                 <frame id="pagination" pos="2 -81.5" scale="0.9">
-                    <label id="page-info" pos="6 0" valign="center" halign="center" text="1/1" textsize="0.8" ScriptEvents="1" />
+                    <entry id="page-input" class="page-input" pos="6 0" size="8 3.5" valign="center" halign="center" text="1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1" hidden="1" />
+                    <label id="page-info" class="enable-page-input" pos="6 0" size="8 3.5" valign="center" halign="center" text="1/1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1" />
                     <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
                     <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c" />
                 </frame>
@@ -122,6 +113,7 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
+declare Text[] favorites;
 declare Text[Text][] maps;
 declare Text[Text][] currentMapPool;
 declare Integer lastMapsCount;
@@ -164,11 +156,17 @@ Void rearrangeButtons(){
     declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
     declare Real padding;
 
+    buttonsWidth = 0.0;
+
     foreach(control in mapList.Controls){
         declare buttonsFrame = ((control as CMlFrame).GetFirstChild("buttons") as CMlFrame);
         padding = 0.0;
 
         foreach(button in buttonsFrame.Controls){
+            if(!button.Visible){
+                continue;
+            }
+
             declare Real width = button.Size[0];
             declare offset = width / 2.0 + padding;
             button.RelativePosition_V3 = <offset, 0.0>;
@@ -181,6 +179,24 @@ Void rearrangeButtons(){
     }
 
     resizeWindow();
+}
+
+Void switchButtons(Text tab){
+    declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    Page.GetClassChildren("btn", mapList, True);
+    foreach(control in Page.GetClassChildren_Result){
+        control.Visible = TL::Find(tab, control.DataAttributeGet("tab"), False, False);
+    }
+    rearrangeButtons();
+    resizeWindow();
+}
+
+Void tabButtonPressed(CMlControl control){
+    declare activeBg <=> (Page.MainFrame.GetFirstChild("nav-active") as CMlQuad);
+    declare btn <=> (control as CMlLabel);
+    declare tab = btn.DataAttributeGet("tab");
+    activeBg.RelativePosition_V3 = control.RelativePosition_V3;
+    switchButtons(tab);
 }
 
 Text getLocal(Text mapId){
@@ -379,7 +395,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     }
 
     if(control.HasClass("delete")){
-        declare answer = confirm("Delete map?");
+        declare answer = confirm("Disable map?");
 
         if(answer == 0){
             return;
@@ -393,10 +409,13 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
 
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
+{(new esc\Classes\HideScript())|noescape}
+
 main() {
     lastMapsCount = 0;
     currentPage = 0;
     currentTab = 0;
+    favorites = {$favorites|noescape};
 
     mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
     declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
@@ -423,8 +442,47 @@ main() {
                 continue;
             }
 
+            if(event.Control.HasClass("enable-page-input") && event.Type == CMlScriptEvent::Type::MouseClick){
+                declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+                declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+                pageInfo.Hide();
+                pageInput.Value = "";
+                pageInput.Show();
+                pageInput.Focus();
+                continue;
+            }
+
+            if(event.Control.HasClass("page-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+                declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+                declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+                declare page = TL::ToInteger(pageInput.Value);
+
+                if(page != -1){
+                    currentPage = page - 1;
+
+                    if(currentPage < 0){
+                        currentPage = 0;
+                    }
+                    if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
+                        currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                    }
+
+                    updateView(currentMapPool, currentPage);
+                }
+
+                pageInfo.Show();
+                pageInput.Hide();
+
+                continue;
+            }
+
             if(event.Control.HasClass("list") && event.Type == CMlScriptEvent::Type::MouseClick){
                 mapListFrame.Show();
+                continue;
+            }
+
+            if(event.Control.HasClass("nav-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+                tabButtonPressed(event.Control);
                 continue;
             }
 
@@ -497,7 +555,9 @@ main() {
 
         checkMapSearchQuery();
 
-        maniaLinkDrag();
+        //maniaLinkDrag();
+
+        hidescript();
 
         declare x_min = widget.RelativePosition_V3[0];
         declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);

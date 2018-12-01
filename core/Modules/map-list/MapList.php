@@ -54,7 +54,24 @@ class MapList
     {
         TemplateController::loadTemplates();
 
-        $maps = Map::whereEnabled(true)->get()->map(function (Map $map) {
+        $maps = self::getMapsJson();
+        $favorites = self::getMapFavoritesJson($player);
+
+        self::sendRecordsJson($player);
+        Template::show($player, 'map-list.update-map-list', compact('maps'));
+        Template::show($player, 'map-list.manialink2', compact('favorites'));
+    }
+
+    private static function getMapFavoritesJson(Player $player): string
+    {
+        return $player->favorites->pluck('id')->map(function ($id) {
+            return "$id";
+        })->toJson();
+    }
+
+    private static function getMapsJson(): string
+    {
+        return Map::whereEnabled(true)->get()->map(function (Map $map) {
             return [
                 'id'           => (string)$map->id,
                 'name'         => $map->gbx->Name,
@@ -64,13 +81,9 @@ class MapList
                 'uid'          => $map->gbx->MapUid,
             ];
         })->toJson();
-
-        self::sendRecords($player);
-        Template::show($player, 'map-list.update-map-list', compact('maps'));
-        Template::show($player, 'map-list.manialink2');
     }
 
-    public static function sendRecords(Player $player)
+    public static function sendRecordsJson(Player $player)
     {
         $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
         $dedis  = $player->dedis()->pluck('Rank', 'Map')->toJson();
@@ -149,6 +162,7 @@ class MapList
                 'uid'          => $map->gbx->MapUid,
             ];
         })->toJson();
+
         Template::show($player, 'map-list.update-map-list', compact('maps'));
     }
 
