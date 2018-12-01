@@ -113,7 +113,7 @@ class MapController
 
             Log::info("Setting next map: " . $request->map->Name);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' as requested by ',
+            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
                 $request->issuer);
         } else {
             $nextMap = self::getNext();
@@ -127,6 +127,7 @@ class MapController
     public static function beginMap(Map $map)
     {
         $map->increment('plays');
+        $map->increment('cooldown');
         $map->update(['last_played' => Carbon::now()]);
 
         self::loadMxDetails($map);
@@ -273,16 +274,10 @@ class MapController
     {
         if (self::getQueue()
                 ->where('player', $player)
-                ->isNotEmpty() && !$player->isAdmin()) {
+                ->isNotEmpty()) {
 
-            //Player already has map in queue and is not admin
+            //Player already has map in queue
             ChatController::message($player, "You already have a map in queue", []);
-
-            return self::$queue;
-        }
-
-        if (self::getQueue()->contains('map', $map)) {
-            ChatController::message($player, '_warning', $map, ' is already in queue.');
 
             return self::$queue;
         }
@@ -295,6 +290,15 @@ class MapController
         ChatController::message(onlinePlayers(), $player, ' juked map ', $map);
         Log::info("$player juked map " . $map->gbx->Name);
         Hook::fire('QueueUpdated', self::$queue);
+
+        return self::$queue;
+    }
+
+    public static function unqueueMap(Map $map): Collection
+    {
+        self::$queue = self::getQueue()->reject(function (MapQueueItem $mqi) use ($map) {
+            return $mqi->map == $map;
+        })->values();
 
         return self::$queue;
     }
@@ -517,14 +521,5 @@ class MapController
     public static function resetRound(Player $player)
     {
         Server::restartMap();
-    }
-
-    public static function unqueueMap(Map $map): Collection
-    {
-        self::$queue = self::getQueue()->reject(function (MapQueueItem $mqi) use ($map) {
-            return $mqi->map == $map;
-        });
-
-        return self::$queue;
     }
 }

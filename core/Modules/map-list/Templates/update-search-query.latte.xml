@@ -3,13 +3,8 @@
     <script>
         <!--
         main(){
-            wait(InputPlayer != Null);
-
-            declare Text MapSearchQueryHash for InputPlayer;
-            declare Text MapSearchQuery for InputPlayer;
-
-            MapSearchQueryHash = {uniqid()};
-            MapSearchQuery = {$query};
+            declare Text MapSearchQuery for LocalUser;
+            MapSearchQuery = {$query == "" ? " " : $query};
         }
         -->
     </script>

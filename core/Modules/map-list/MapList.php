@@ -30,7 +30,6 @@ class MapList
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
-        Hook::add('BeginMap', [MapList::class, 'beginMap']);
         Hook::add('MapPoolUpdated', [MapList::class, 'mapPoolUpdated']);
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
@@ -47,6 +46,9 @@ class MapList
      */
     public static function playerConnect(Player $player)
     {
+        $mapQueue = self::getMapQueueJson();
+        Template::show($player, 'map-list.update-map-queue', compact('mapQueue'));
+        self::sendRecordsJson($player);
         self::sendManialink($player);
     }
 
@@ -54,6 +56,20 @@ class MapList
     {
         TemplateController::loadTemplates();
         self::sendManialink($player);
+    }
+
+    private static function getMapFavoritesJson(Player $player): string
+    {
+        return $player->favorites->pluck('id')->toJson();
+    }
+
+
+    public static function sendRecordsJson(Player $player)
+    {
+        $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
+        $dedis  = $player->dedis()->pluck('Rank', 'Map')->toJson();
+
+        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
@@ -86,15 +102,20 @@ class MapList
     public static function queueDropMap(Player $player, $mapId)
     {
         $map = Map::find($mapId);
-        $queue = MapController::unqueueMap($map);
-        self::mapQueueUpdated($queue);
-        ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');
-    }
+        $queueItem = MapController::getQueue()->where('map', $map)->first();
 
-    public static function beginMap(Map $map)
-    {
-        $queue = MapController::getQueue();
-        self::mapQueueUpdated($queue);
+        if (!$queueItem) {
+            return;
+        }
+
+        if($queueItem->issuer->Login != $player->Login){
+            ChatController::sendMessage($player, '_warning', 'You can not drop other players maps');
+            return;
+        }
+
+        MapController::unqueueMap($map);
+        self::mapQueueUpdated();
+        ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');
     }
 
     /**
@@ -109,13 +130,28 @@ class MapList
 
     public static function mapPoolUpdated()
     {
-        onlinePlayers()->each([self::class, 'sendUpdatedMaplist']);
+        $maps = self::getMapListJson();
+        Template::showAll('map-list.update-map-list', compact('maps'));
     }
 
     public static function sendUpdatedMaplist(Player $player)
     {
-        $maps = self::mapsToManiaScriptArray($player);
-        Template::show($player, 'map-list.update-maps', compact('maps'));
+        $maps = self::getMapListJson();
+        Template::show($player, 'map-list.update-map-list', compact('maps'));
+    }
+
+    private static function getMapListJson(): string
+    {
+        return Map::whereEnabled(true)->get()->map(function (Map $map) {
+            return [
+                'id'           => (string)$map->id,
+                'name'         => $map->gbx->Name,
+                'author_login' => $map->author->Login,
+                'author_nick'  => $map->author->NickName,
+                'rating'       => $map->average_rating,
+                'uid'          => $map->gbx->MapUid,
+            ];
+        })->toJson();
     }
 
     public static function deleteMap(Player $player, $mapId)
@@ -145,57 +181,20 @@ class MapList
      *
      * @param Collection $queue
      */
-    public static function mapQueueUpdated(Collection $queue)
+    public static function mapQueueUpdated()
     {
-        $queue = $queue->take(21)->map(function (MapQueueItem $item) {
-            return sprintf('["%s", "%s"]',
-                $item->map->id,
-                $item->issuer->NickName
-            );
-        })->implode(",");
-
-        onlinePlayers()->each(function (Player $player) use ($queue) {
-            Template::show($player, 'map-list.update-queue', compact('queue'));
-        });
+        $mapQueue = self::getMapQueueJson();
+        Template::showAll('map-list.update-map-queue', compact('mapQueue'));
     }
 
-    /**
-     * Returns maps as MS array
-     *
-     * @param Player $player
-     *
-     * @return string
-     */
-    public static function mapsToManiaScriptArray(Player $player)
+    private static function getMapQueueJson(): string
     {
-        $locals = $player->locals->pluck('Rank', 'Map');
-        $dedis  = $player->dedis->pluck('Rank', 'Map');
-
-        if (config('database.type') == 'mysql') {
-            $favorites = $player->favorites()->get(['id', 'gbx->Name as Name'])->pluck('Name', 'id');
-        } else {
-            $favorites = $player->favorites()->get()->map(function (Map $map) {
-                return ['id' => $map->id, 'Name' => $map->gbx->Name];
-            })->pluck('Name', 'id');
-        }
-
-        $maps = Map::whereEnabled(true)->get()->map(function (Map $map) use ($locals, $dedis, $favorites) {
-            $author = $map->author;
-
-            $authorLogin = $author->Login ?? "n/a";
-            $authorNick  = stripAll($author->NickName ?? "n/a");
-
-            $local    = $locals->get($map->id) ?: '-';
-            $dedi     = $dedis->get($map->id) ?: '-';
-            $favorite = $favorites->get($map->id) ? 1 : 0;
-            $mapName  = $map->gbx->Name;
-            $rating   = $map->average_rating;
-
-
-            return sprintf('["%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s"]', $mapName, $authorNick, $authorLogin, $local, $dedi, $map->id, $favorite, $map->uid, $rating);
-        })->implode("\n,");
-
-        return sprintf('[%s]', $maps);
+        return MapController::getQueue()->map(function (MapQueueItem $item) {
+            return [
+                'id' => '' . $item->map->id,
+                'by' => $item->issuer->Login,
+            ];
+        })->toJson();
     }
 
     /**
@@ -205,9 +204,8 @@ class MapList
      */
     public static function sendManialink(Player $player)
     {
-        $maps = self::mapsToManiaScriptArray($player);
-
-        Template::show($player, 'map-list.manialink', compact('maps'));
+        $favorites = self::getMapFavoritesJson($player);
+        Template::show($player, 'map-list.manialink', compact('favorites'));
     }
 
     public static function queueMap(Player $player, $mapId)
@@ -215,8 +213,7 @@ class MapList
         $map = Map::whereId($mapId)->first();
 
         if ($map) {
-            $queue = MapController::queueMap($player, $map);
-            self::mapQueueUpdated($queue);
+            MapController::queueMap($player, $map);
         }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MXDetails" id="MXDetails" version="3">
-    <frame id="overview" pos="-60 19" z-index="50">
+    <frame id="overview" pos="-60 19" z-index="450">
+        <quad id="handle" size="104 6" z-index="5" />
         <quad size="110 38" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" ScriptEvents="1" />
         <quad size="110 38" pos="0 -6" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
         <quad size="110 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
@@ -79,6 +80,8 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
     main(){
         declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
 
@@ -91,6 +94,8 @@
                     continue;
                 }
             }
+
+            maniaLinkDrag();
         }
     }
 

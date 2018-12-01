@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-maps" id="update-maps" version="3">
+    <script>
+        <!--
+        main(){
+            declare Text[Text][] Maps for LocalUser;
+            declare Text mapsJson = """{$maps|noescape}""";
+
+            Maps.fromjson(mapsJson);
+        }
+        -->
+    </script>
+</manialink>
