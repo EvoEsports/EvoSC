@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MXDetails" id="MXDetails" version="3">
     <frame id="overview" pos="-60 19" z-index="450">
+        <quad id="handle" size="104 6" z-index="5" />
         <quad size="110 38" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" ScriptEvents="1" />
         <quad size="110 38" pos="0 -6" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
-        <quad id="handle" size="110 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <quad size="110 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Map Details" z-index="1" />
         <label class="close" pos="107 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
 
