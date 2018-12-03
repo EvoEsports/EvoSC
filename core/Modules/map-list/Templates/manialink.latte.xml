@@ -406,6 +406,7 @@ Void search(){
         }
     }
 
+    currentPage = 0;
     currentMapPool = mapsFound;
     updateView(mapsFound, 0);
     clearSearch.Show();

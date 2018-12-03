@@ -18,6 +18,7 @@ use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
+use mysql_xdevapi\Exception;
 
 class MapController
 {
@@ -34,7 +35,7 @@ class MapController
         self::loadMaps();
 
         self::$queue    = new Collection();
-        self::$mapsPath = config('server.base') . '/UserData/Maps/';
+        self::$mapsPath = config('server.base') . 'UserData/Maps/';
 
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
         Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
@@ -151,6 +152,10 @@ class MapController
      */
     public static function getCurrentMap(): ?Map
     {
+        if (!self::$currentMap) {
+            throw new Exception("Current map is null");
+        }
+
         return self::$currentMap;
     }
 
@@ -433,7 +438,7 @@ class MapController
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::message(onlinePlayers(), "Requested map with invalid id: " . $mxId);
+                ChatController::message($player, "Requested map with invalid id: " . $mxId);
 
                 return;
             }
@@ -441,7 +446,7 @@ class MapController
             $map = Map::getByMxId($mxId);
 
             if ($map) {
-                ChatController::message($map, ' already exists');
+                ChatController::message($player, $map, ' already exists');
                 continue;
             }
 
@@ -449,7 +454,7 @@ class MapController
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
-                ChatController::message(onlinePlayers(), "Can not reach mania exchange.");
+                ChatController::message($player, "Can not reach mania exchange.");
 
                 return;
             }
@@ -461,11 +466,21 @@ class MapController
             }
 
             $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1',
-                $response->getHeader('content-disposition')[0]);
+            $response->getHeader('content-disposition')[0]);
             $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
+            $filename = str_replace('..', '.', $filename);
 
             $mapFolder = self::$mapsPath;
-            File::put("$mapFolder$filename", $response->getBody());
+            $body = $response->getBody();
+            var_dump("$mapFolder$filename");
+
+            file_put_contents("$mapFolder$filename", $body);
+
+            if(!file_exists("$mapFolder$filename")){
+                ChatController::message($player, '_warning', "Map download ($mxId) failed.");
+                continue;
+            }
+
 
             $gbxInfo = self::getGbxInformation($filename);
             $gbx     = json_decode($gbxInfo);

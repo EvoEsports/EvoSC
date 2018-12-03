@@ -52,8 +52,6 @@ Void playerCountChanged(Integer playerCount){
     playerlist.RelativePosition_V3 = <-(bg.Size[0]/2), (bg.Size[1]/2) + 2.5>;
 
     foreach(key => player in Players){
-        log(key);
-        log(player);
         declare row <=> (content.Controls[key] as CMlFrame);
         row.DataAttributeSet("login", player.User.Login);
         (row.Controls[1] as CMlLabel).SetText(player.User.Name);

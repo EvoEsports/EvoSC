@@ -117,7 +117,13 @@ class Map extends Model
                       ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mxId) {
-                return $map->mx_details->TrackID == $mxId;
+                $details = $map->mx_details;
+
+                if (!$details) {
+                    return false;
+                }
+
+                return $details->TrackID == $mxId;
             })->first();
         }
     }

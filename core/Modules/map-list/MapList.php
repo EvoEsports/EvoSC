@@ -204,6 +204,7 @@ class MapList
      */
     public static function sendManialink(Player $player)
     {
+        self::sendUpdatedMaplist($player);
         $favorites = self::getMapFavoritesJson($player);
         Template::show($player, 'map-list.manialink', compact('favorites'));
     }

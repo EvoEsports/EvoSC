@@ -45,7 +45,7 @@ class File
             file_put_contents($fileName, $line);
         }
 
-        file_put_contents($fileName, $line, FILE_APPEND);
+        file_put_contents($fileName, "\n" . $line, FILE_APPEND);
     }
 
     public static function createDirectory(string $name)

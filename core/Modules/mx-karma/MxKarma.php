@@ -273,7 +273,11 @@ class MxKarma extends MXK
 
     public static function getUpdatedVotesAverage()
     {
-        $map   = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
+
+        if (!$map) {
+            return 0.0;
+        }
 
         $items = collect([]);
 
@@ -357,6 +361,10 @@ class MxKarma extends MXK
     public static function playerFinished(Player $player): bool
     {
         $map = \esc\Controllers\MapController::getCurrentMap();
+
+        if (!$map) {
+            return false;
+        }
 
         if ($player->Score > 0) {
             return true;
