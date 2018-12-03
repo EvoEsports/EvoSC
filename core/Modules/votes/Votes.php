@@ -25,7 +25,6 @@ class Votes extends PredefinedVotes
         ChatController::addCommand('y', [self::class, 'voteYes'], 'Vote yes');
         ChatController::addCommand('n', [self::class, 'voteNo'], 'Vote no');
 
-        Hook::add('CycleFinished', [self::class, 'checkCurrentVote']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
 

@@ -30,14 +30,14 @@ class Vote
         $this->question  = $question;
         $this->arguments = $arguments;
 
-        ChatController::message(onlinePlayers(false), '_info', 'A vote started: ', secondary($question));
+        ChatController::message(onlinePlayers(true), '_info', 'A vote started: ', secondary($question));
 
-        Timer::create('vote.finish', [Votes::class, 'finishCurrentVote'], '' . $this->duration);
+        Timer::create('vote.finish', [Votes::class, 'finishCurrentVote'], $this->duration . 's');
     }
 
     public function allPlayersVoted(): bool
     {
-        return $this->voters && $this->voters->count() == onlinePlayers(false)->count();
+        return ($this->voters != null) && $this->voters->count() == onlinePlayers(true)->count();
     }
 
     public function secondsLeft(): int
