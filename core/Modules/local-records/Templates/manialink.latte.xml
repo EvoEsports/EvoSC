@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Dedimania" id="Dedimania" version="3">
+<manialink name="ESC:Locals2" id="Locals2" version="3">
     <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
 
     <framemodel id="record" hidden="0">
@@ -11,14 +11,14 @@
         <quad class="record" pos="-1 -0.2" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
     </framemodel>
 
-    <frame id="widget" pos="{config('dedimania.pos')}" scale="{config('dedimania.scale')}" z-index="100">
-        <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
-        <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
+    <frame id="widget" pos="{config('locals.pos')}" scale="{config('locals.scale')}" z-index="100">
+        <quad class="widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
         <quad size="45 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textfont="RajdhaniMono"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records" textfont="RajdhaniMono"/>
 
         <frame id="records" pos="1 -7">
-            {for $i=0; $i<config('dedimania.rows'); $i++}
+            {for $i=0; $i<config('locals.rows'); $i++}
             <frameinstance modelid="record" pos="0 {$i * -3}"/>
             {/for}
         </frame>
@@ -28,7 +28,7 @@
         <quad id="handle" size="175 6" z-index="5" />
         <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
         <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
-        <label pos="2 -3" valign="center" textsize="1" text="🏆 Dedimania records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
+        <label pos="2 -3" valign="center" textsize="1" text="🏆 Local records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
         <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
 
         <frame pos="2 -9" z-index="2">
@@ -131,7 +131,10 @@
     }
 
     Void setupGraphs(){
+        log("Setting up graphs");
+
         if(records.count == 0 || targetCurve != Null){
+            log("No records");
             return;
         }
 
@@ -272,6 +275,7 @@
 
         if(playerIsOnline){
             (recordFrame.Controls[0] as CMlLabel).TextColor = headerColor;
+            log(headerColor);
         }else{
             (recordFrame.Controls[0] as CMlLabel).TextColor = <1.0, 1.0, 1.0>;
         }
@@ -288,10 +292,6 @@
     }
 
     Void updateWidget(){
-        if(records.count == 0){
-            return;
-        }
-
         declare recordsSelection = Text[Text][];
         declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
         declare myRank = getMyRank();
@@ -371,9 +371,9 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
-        rows = {config('dedimania.rows')};
-        showTop = {config('dedimania.showtop')};
-        records.fromjson("""{$dedisJson|noescape}""");
+        rows = {config('locals.rows')};
+        showTop = {config('locals.showtop')};
+        records.fromjson("""{$localsJson|noescape}""");
         headerColor = (Page.MainFrame.GetFirstChild("header-color") as CMlLabel).TextColor;
 
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
@@ -382,7 +382,8 @@
         updateWindow();
         setupGraphs();
 
-        log("records: " ^ records.count);
+        log("locals-count: " ^ records.count);
+        log("my-local: " ^ getMyRank());
 
         declare myRank = getMyRank();
         if(myRank != "-1"){

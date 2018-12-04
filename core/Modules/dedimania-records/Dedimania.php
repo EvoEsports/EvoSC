@@ -53,11 +53,10 @@ class Dedimania extends DedimaniaApi
         Log::logAddLine('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
 
         //Add hooks
-        Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
 
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
@@ -116,9 +115,7 @@ class Dedimania extends DedimaniaApi
         Log::logAddLine('Dedimania', "Loaded records for map $map");
 
         //Send manialink to online players
-        if (onlinePlayers()->count() > 0) {
-            onlinePlayers()->each([self::class, 'showManialink']);
-        }
+        onlinePlayers()->each([self::class, 'showManialink']);
     }
 
     public static function endMatch()
@@ -126,6 +123,49 @@ class Dedimania extends DedimaniaApi
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);
         $map->dedis()->update(['New' => 0]);
+    }
+
+    public static function showManialink(Player $player)
+    {
+        if ($player) {
+            $map = MapController::getCurrentMap();
+
+            if (!$map) {
+                return;
+            }
+
+            $dedis   = $map->dedis->sortBy('Rank');
+            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
+
+            $playerIds = $dedis->pluck('Player');
+            $players   = Player::whereIn('id', $playerIds)->get();
+
+            $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
+                $player = $players->where('id', $dedi->Player)->first();
+
+                return [
+                    'rank'  => $dedi->Rank,
+                    'cps'   => $dedi->Checkpoints,
+                    'score' => $dedi->Score,
+                    'nick'  => $player->NickName,
+                    'login' => $player->Login,
+                ];
+            })->toJson();
+
+            Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
+        }
+    }
+
+    public static function sendUpdateDediManialink(Dedi $record, $oldRank = null)
+    {
+        /*
+        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
+        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
+            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
+            $record->player->Login, $oldRank ?? "0");
+
+        Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
+        */
     }
 
     private static function insertRecord(Map $map, $record)
@@ -163,47 +203,6 @@ class Dedimania extends DedimaniaApi
             'Rank'        => $record->rank,
             'Checkpoints' => $record->checkpoints,
         ]);
-    }
-
-    public static function showManialink(Player $player)
-    {
-        if ($player) {
-            $map = MapController::getCurrentMap();
-
-            if (!$map) {
-                return;
-            }
-
-            $dedis   = $map->dedis->sortBy('Rank');
-            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
-
-            $playerIds = $dedis->pluck('Player');
-            $players   = Player::whereIn('id', $playerIds)->get();
-
-            $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
-                $player = $players->where('id', $dedi->Player)->first();
-
-                return [
-                    'rank'  => $dedi->Rank,
-                    'cps'   => $dedi->Checkpoints,
-                    'score' => $dedi->Score,
-                    'nick'  => $player->NickName,
-                    'login' => $player->Login,
-                ];
-            })->toJson();
-
-            Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
-        }
-    }
-
-    public static function sendUpdateDediManialink(Dedi $record, $oldRank = null)
-    {
-        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
-        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
-            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank ?? "0");
-
-        Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
     }
 
     /**

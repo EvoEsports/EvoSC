@@ -47,46 +47,25 @@ class LocalRecords
                 return;
             }
 
-            $allDedis = $map->locals->sortBy('Rank');
+            $locals  = $map->locals()->orderBy('Rank')->get();
+            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
 
-            //Get player dedi
-            $playerRecord = $map->locals()->wherePlayer($player->id)->first();
+            $playerIds = $locals->pluck('Player');
+            $players   = Player::whereIn('id', $playerIds)->get();
 
-            if (!$playerRecord) {
-                //Player has no dedi, get player local
-                $record = $map->locals()->wherePlayer($player->id)->first();
+            $localsJson = $locals->map(function (LocalRecord $local) use ($players) {
+                $player = $players->where('id', $local->Player)->first();
 
-                if ($record) {
-                    $localCps = explode(',', $record->Checkpoints);
-                    array_walk($localCps, function (&$time) {
-                        $time = intval($time);
-                    });
+                return [
+                    'rank'  => $local->Rank,
+                    'cps'   => $local->Checkpoints,
+                    'score' => $local->Score,
+                    'nick'  => $player->NickName,
+                    'login' => $player->Login,
+                ];
+            })->toJson();
 
-                    $localRank = -1;
-                } else {
-                    //Player does not have a local
-                    $localRank = -1;
-                    $localCps  = [];
-                }
-            } else {
-                $localRank = $playerRecord->Rank;
-                $localCps  = explode(',', $playerRecord->Checkpoints);
-                array_walk($localCps, function (&$time) {
-                    $time = intval($time);
-                });
-            }
-
-            $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
-            $onlinePlayers = onlinePlayers()->pluck('Login');
-
-            $records = $allDedis->map(function (LocalRecord $dedi) {
-                    $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
-
-                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
-                        $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
-                })->implode(",\n");
-
-            Template::show($player, 'local-records.manialink2', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
+            Template::show($player, 'local-records.manialink', compact('localsJson', 'cpCount'));
         }
     }
 
