@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Dedimania" id="Dedimania" version="3">
+    <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
+
+    <framemodel id="record" hidden="0">
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
+        <label z-index="2" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
+        <label z-index="3" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
+        <label z-index="2" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
+        <quad pos="-2 -0.2" size="45 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="1" hidden="1" valign="center" />
+        <quad class="record" pos="-2 -0.2" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('dedimania.pos')}" scale="{config('dedimania.scale')}" z-index="100">
+        <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
+        <quad size="45 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textfont="RajdhaniMono"/>
+
+        <frame id="records" pos="1 -7">
+            {for $i=0; $i<config('dedimania.rows'); $i++}
+            <frameinstance modelid="record" pos="0 {$i * -3}"/>
+            {/for}
+        </frame>
+    </frame>
+
+    <frame id="window" pos="-90 60" hidden="1">
+        <quad id="handle" size="175 6" z-index="5" />
+        <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="🏆 Dedimania records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
+        <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
+
+        <frame pos="2 -9" z-index="2">
+            <frame id="window-records">
+                {for $i=0; $i<100; $i++}
+                <frameinstance class="window-record" modelid="record" pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}" hidden="0"/>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame z-index="1" pos="2 -88">
+            <quad size="176 36" bgcolor="0006" />
+            <graph id="graph" size="176 36" pos="0 0" z-index="3" />
+
+            <frame pos="1 -35" z-index="2">
+                <label pos="1 0" text="" textsize="1" valign="bottom" textcolor="fff6" />
+                {for $i=1; $i<$cpCount-1; $i++}
+                <label pos="{(176 / ($cpCount-1)) * $i - 3.5} 0" text="{$i}" textsize="1" valign="bottom" textcolor="fff6" />
+                {/for}
+                <label pos="170 0" text="" textsize="1" valign="bottom" textcolor="fff6" />
+
+                <frame id="targetCps">
+                    {for $i=1; $i<$cpCount-1; $i++}
+
+                    {if $cpCount > 12}
+                    <label pos="{(176 / ($cpCount-1)) * $i + 1} 0" text="" textsize="1" valign="bottom" rot="-40" />
+                    {else}
+                    <label pos="{(176 / ($cpCount-1)) * $i} 0" text="" textsize="1" valign="bottom" />
+                    {/if}
+
+                    {/for}
+                </frame>
+            </frame>
+        </frame>
+
+        <frame z-index="2" id="compare-info" pos="91 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Compare to:" valign="center" />
+            <label id="compare-to" pos="14 0.25" textsize="0.5" text="Hover over record to compare" valign="center" />
+        </frame>
+
+        <frame z-index="2" pos="46.5 -85.5">
+            <label pos="0 0.25" textsize="0.5" text="Baseline:" valign="center" />
+            <label id="compare-base" pos="11 0.25" size="30 4" textsize="0.5" text="" valign="center" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text[Text][] records;
+    declare Text[Text] base;
+    declare Text[Text] target;
+    declare Integer rows;
+    declare Integer showTop;
+    declare Vec3 headerColor;
+
+    declare CMlGraphCurve targetCurve;
+
+    Text formatDiffCorrect(Integer scoreIn){
+        declare Text secondString;
+        declare Text msString;
+        declare Text sign = "+";
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            sign = "-";
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(minutes > 0){
+            return sign ^ minutes ^ ":" ^ secondString ^ "." ^ msString;
+        }
+
+        return sign ^ secondString ^ "." ^ msString;
+    }
+
+    Void setupGraphs(){
+        log("Setting up graphs");
+
+        if(records.count == 0 || targetCurve != Null){
+            log("No records");
+            return;
+        }
+
+        declare CMlGraph graph = (Page.GetFirstChild("graph") as CMlGraph);
+        declare Real graphMaxHeight = TL::ToInteger(records[records.count - 1]["score"]) * 1.0;
+
+        declare Integer cpCount = TL::Split(",", records[0]["cps"]).count;
+        graph.CoordsMin = <0., 0.>;
+        graph.CoordsMax = <((cpCount - 1) * 1.0), 500.>;
+
+        for(i, 1, cpCount - 1){
+            declare line = graph.AddCurve();
+            line.Color = <0.25, 0.25, 0.25>;
+            line.Width = 0.1;
+            line.Points.add(<1. * i - 0.0001, 0.0>);
+            line.Points.add(<1. * i, 500.0>);
+        }
+
+        declare myCurve = graph.AddCurve();
+        myCurve.Color = <0.5, 0.5, 0.5>;
+        myCurve.Width = 0.2;
+        myCurve.Points.add(<0.0, 250.0>);
+        myCurve.Points.add(<cpCount * 1.0, 250.0>);
+
+        targetCurve = graph.AddCurve();
+        targetCurve.Color = <1.0, 0.2, 0.2>;
+        targetCurve.Width = 0.5;
+        for(i, 0, cpCount){
+	        targetCurve.Points.add(<1. * i, 100. * i>);
+        }
+    }
+
+    Void showDiff(){
+        declare score = TL::ToInteger(target["score"]);
+        declare targetCpTimes = TL::Split(",", target["cps"]);
+        declare targetCps = (Page.MainFrame.GetFirstChild("targetCps") as CMlFrame);
+
+        declare baseCpTimes = TL::Split(",", base["cps"]);
+
+        targetCurve.Points[0] = <0.0, 250.0>;
+        for(i, 0, targetCpTimes.count - 1){
+            declare timeDiff = TL::ToInteger(targetCpTimes[i]) - TL::ToInteger(baseCpTimes[i]);
+            declare diffText = formatDiffCorrect(timeDiff);
+            targetCurve.Points[i + 1] = <1.0 * i, 0.08 * timeDiff + 250.0>;
+
+            if(i > 0 && i < targetCpTimes.count - 1){
+                (targetCps.Controls[i - 1] as CMlLabel).SetText(diffText);
+
+                if(timeDiff < 0){
+                    (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 1.0, 0.5>;
+                }else if(timeDiff == 0){
+                    (targetCps.Controls[i - 1] as CMlLabel).TextColor = <0.5, 0.75, 1.0>;
+                }else{
+                    (targetCps.Controls[i - 1] as CMlLabel).TextColor = <1.0, 0.5, 0.5>;
+                }
+            }
+        }
+
+        if(base["rank"] > target["rank"]){
+            targetCurve.Color = <0.2, 1.0, 0.2>;
+        }else if(base["rank"] == target["rank"]){
+            targetCurve.Color = <0.0, 0.5, 1.0>;
+        }else{
+            targetCurve.Color = <1.0, 0.2, 0.2>;
+        }
+
+        //setCompareTo(records[id]["score"] ^ " " ^ records[id]["nick"] ^ "$z$ccc [" ^ records[id]["login"] ^ "]");
+    }
+
+    Text getMyRank(){
+        declare myLogin = LocalUser.Login;
+
+        foreach(record in records){
+            if(record["login"] == myLogin){
+                return record["rank"];
+            }
+        }
+
+        return "-1";
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateRecordFrame(CMlFrame recordFrame, Text[Text] record, Boolean playerIsOnline){
+        (recordFrame.Controls[0] as CMlLabel).SetText(record["rank"] ^ ".");
+        (recordFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(TL::ToInteger(record["score"]), False));
+        (recordFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(TL::ToInteger(record["score"]), True));
+        (recordFrame.Controls[3] as CMlLabel).SetText(record["nick"]);
+        (recordFrame.Controls[4] as CMlLabel).Visible = playerIsOnline;
+
+        if(playerIsOnline){
+            (recordFrame.Controls[0] as CMlLabel).TextColor = headerColor;
+            log(headerColor);
+        }else{
+            (recordFrame.Controls[0] as CMlLabel).TextColor = <1.0, 1.0, 1.0>;
+        }
+
+        recordFrame.Show();
+    }
+
+    Text[] getOnlinePlayers(){
+        declare onlinePlayers = Text[];
+        foreach(player in Players){
+            onlinePlayers.add(player.User.Login);
+        }
+        return onlinePlayers;
+    }
+
+    Void updateWidget(){
+        declare recordsSelection = Text[Text][];
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare myRank = getMyRank();
+
+        for(i, 0, showTop - 1){
+            recordsSelection.add(records[i]);
+        }
+
+        declare remaining = rows - showTop;
+
+        if(myRank == "-1"){
+            declare end = records.count - 1;
+            declare start = end - remaining + 1;
+
+            for(i, start, end){
+                recordsSelection.add(records[i]);
+            }
+        }else{
+            declare firstHalfFilled = 0;
+            declare half = ML::NearestInteger((remaining - 1) / 2.0);
+
+            declare start = (TL::ToInteger(myRank) - 1) - half - 1;
+            if(start < showTop){
+                firstHalfFilled = half - (showTop - start);
+                start = showTop;
+            }else{
+                firstHalfFilled = half;
+            }
+
+            declare remain = remaining - firstHalfFilled;
+            declare end = start + firstHalfFilled + remain;
+
+            if(end >= records.count){
+                end = records.count - 1;
+            }
+
+            for(i, start, end){
+                recordsSelection.add(records[i]);
+            }
+        }
+
+        declare onlinePlayers = getOnlinePlayers();
+
+        for(i, 0, recordsSelection.count - 1){
+            declare record = recordsSelection[i];
+            if(i >= recordsFrame.Controls.count){
+                break;
+            }
+            declare recordFrame = (recordsFrame.Controls[i] as CMlFrame);
+            declare playerIsOnline = onlinePlayers.exists(record["login"]);
+            updateRecordFrame(recordFrame, record, playerIsOnline);
+        }
+    }
+
+    Void updateWindow(){
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("window-records") as CMlFrame);
+        declare onlinePlayers = getOnlinePlayers();
+
+        for(i, 0, records.count - 1){
+            declare record = records[i];
+
+            if(i >= recordsFrame.Controls.count){
+                break;
+            }
+
+            declare recordFrame = (recordsFrame.Controls[i] as CMlFrame);
+            declare playerIsOnline = onlinePlayers.exists(record["login"]);
+            updateRecordFrame(recordFrame, record, playerIsOnline);
+        }
+
+        for(i, records.count, 99){
+            (recordsFrame.Controls[i] as CMlFrame).Hide();
+        }
+    }
+
+    {(new esc\Classes\HideScript())|noescape}
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        rows = {config('dedimania.rows')};
+        showTop = {config('dedimania.showtop')};
+        records.fromjson("""{$dedisJson|noescape}""");
+        headerColor = (Page.MainFrame.GetFirstChild("header-color") as CMlLabel).TextColor;
+
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        updateWidget();
+        updateWindow();
+        setupGraphs();
+
+        log(records.count);
+
+        declare myRank = getMyRank();
+        if(myRank != "-1"){
+            base = records[TL::ToInteger(myRank) - 1];
+        }
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null){
+                    continue;
+                }
+
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                }
+
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Show();
+                }
+
+                if(event.Control.HasClass("record") && event.Type == CMlScriptEvent::Type::MouseOver){
+                    if(event.Control.Parent.HasClass("window-record")){
+                        declare index = TL::ToInteger(event.Control.Parent.DataAttributeGet("id"));
+                        target = records[index];
+                        showDiff();
+                    }
+                }
+
+                if(event.Control.HasClass("record") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    if(!event.Control.Parent.HasClass("window-record")){
+                        window.Show();
+                    }
+                }
+            }
+
+            hidescript();
+
+            if(window.Visible){
+                maniaLinkDrag();
+            }
+        }
+    }
+
+    --></script>
+</manialink>

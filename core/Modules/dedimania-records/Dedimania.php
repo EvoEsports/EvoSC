@@ -62,6 +62,14 @@ class Dedimania extends DedimaniaApi
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
+
+        KeyController::createBind('Y', [self::class, 'reload']);
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::showManialink($player);
     }
 
     public static function reportConnectedPlayers()
@@ -166,46 +174,25 @@ class Dedimania extends DedimaniaApi
                 return;
             }
 
-            $allDedis = $map->dedis->sortBy('Rank');
+            $dedis   = $map->dedis->sortBy('Rank');
+            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
 
-            //Get player dedi
-            $playerRecord = $map->dedis()->wherePlayer($player->id)->first();
+            $playerIds = $dedis->pluck('Player');
+            $players   = Player::whereIn('id', $playerIds)->get();
 
-            if (!$playerRecord) {
-                //Player has no dedi, get player local
-                $record = $map->locals()->wherePlayer($player->id)->first();
+            $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
+                $player = $players->where('id', $dedi->Player)->first();
 
-                if ($record) {
-                    $localCps = explode(',', $record->Checkpoints);
-                    array_walk($localCps, function (&$time) {
-                        $time = intval($time);
-                    });
+                return [
+                    'rank'  => $dedi->Rank,
+                    'cps'   => $dedi->Checkpoints,
+                    'score' => $dedi->Score,
+                    'nick'  => $player->NickName,
+                    'login' => $player->Login,
+                ];
+            })->toJson();
 
-                    $localRank = -1;
-                } else {
-                    //Player does not have a local
-                    $localRank = -1;
-                    $localCps  = [];
-                }
-            } else {
-                $localRank = $playerRecord->Rank;
-                $localCps  = explode(',', $playerRecord->Checkpoints);
-                array_walk($localCps, function (&$time) {
-                    $time = intval($time);
-                });
-            }
-
-            $cpCount       = (int)$map->gbx->CheckpointsPerLaps;
-            $onlinePlayers = onlinePlayers()->pluck('Login');
-
-            $records = $allDedis->map(function (Dedi $dedi) {
-                    $nick = str_replace('\\', "\\\\", str_replace('"', "''", $dedi->player->NickName));
-
-                    return sprintf('%d => ["cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s"]',
-                        $dedi->Rank, $dedi->Checkpoints, formatScore($dedi->Score), $dedi->Score, $nick, $dedi->player->Login);
-                })->implode(",\n");
-
-            Template::show($player, 'dedimania-records.manialink2', compact('records', 'localRank', 'localCps', 'cpCount', 'onlinePlayers'));
+            Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
         }
     }
 

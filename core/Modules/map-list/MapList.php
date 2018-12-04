@@ -36,7 +36,7 @@ class MapList
 
         ChatController::addCommand('list', [self::class, 'searchMap'], 'Search maps or open maplist');
 
-        KeyController::createBind('X', [MapList::class, 'reload']);;
+        // KeyController::createBind('X', [MapList::class, 'reload']);;
     }
 
     /**

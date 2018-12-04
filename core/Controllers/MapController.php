@@ -112,7 +112,7 @@ class MapController
                 $request = self::$queue->shift();
             }
 
-            Log::info("Setting next map: " . $request->map->Name);
+            Log::info("Setting next map: " . $request->map);
             Server::chooseNextMap($request->map->filename);
             ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
                 $request->issuer);

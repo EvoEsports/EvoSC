@@ -425,18 +425,21 @@
         }else{
             declare rank = TL::ToInteger(updateRecord["rank"]);
             declare oldRank = TL::ToInteger(updateRecord["oldRank"]);
-            declare Text[Text] updatedRecord = Records[oldRank];
 
-            for(i, 1, oldRank - rank){
-                declare id = oldRank - i;
-                Records[id + 1] = Records[id];
+            if(oldRank < Records.count){
+                declare Text[Text] updatedRecord = Records[oldRank];
+
+                for(i, 1, oldRank - rank){
+                    declare id = oldRank - i;
+                    Records[id + 1] = Records[id];
+                }
+
+                updatedRecord["rank"] = updateRecord["rank"];
+                updatedRecord["score"] = updateRecord["score"];
+                updatedRecord["cps"] = updateRecord["cps"];
+
+                Records[rank] = updatedRecord;
             }
-
-            updatedRecord["rank"] = updateRecord["rank"];
-            updatedRecord["score"] = updateRecord["score"];
-            updatedRecord["cps"] = updateRecord["cps"];
-
-            Records[rank] = updatedRecord;
         }
 
         if(updateRecord["login"] == LocalUser.Login){
