@@ -27,8 +27,6 @@ class LocalRecords
         Hook::add('PlayerFinish', [LocalRecords::class, 'playerFinish']);
         Hook::add('BeginMap', [LocalRecords::class, 'beginMap']);
         Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
-
-        // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

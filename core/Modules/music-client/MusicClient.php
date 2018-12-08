@@ -17,11 +17,12 @@ class MusicClient
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
 
-       // KeyController::createBind('Y', [self::class, 'reload']);
+        //KeyController::createBind('X', [self::class, 'reload']);
     }
 
     /**
      * Hook: PlayerConnect
+     *
      * @param Player $player
      */
     public static function playerConnect(Player $player)

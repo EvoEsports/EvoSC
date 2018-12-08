@@ -2,7 +2,7 @@
 <manialink name="ESC:RankingBox:{$id}" id="{$id}" version="3">
     <frame pos="{$config->pos->visible}" scale="{$config->scale ?? 1}" id="widget">
         <quad pos="0 0" z-index="-1" size="50 {$rows * 4.1 + 6}" bgcolor="{background_color()|noescape}a" action="{$action ?? ''}" />
-        <label pos="2 -3" z-index="1" size="48 3" text="{$title}" textsize=".8" valign="center"/>
+        <label textfont="RajdhaniMono" pos="2 -3" z-index="1" size="48 3" text="{$title}" textsize=".8" valign="center"/>
         <quad pos="0 0" z-index="0" size="50 6" bgcolor="{header_color()|noescape}c"/>
         <frame z-index="2" pos="0 -6">{$content|noescape}</frame>
     </frame>

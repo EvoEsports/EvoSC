@@ -3,20 +3,20 @@
     <frame id="widget" pos="{config('music.pos.visible')}" data-pos-visible="{config('music.pos.visible')}" data-pos-hidden="{config('music.pos.hidden')}" scale="{config('music.pos.scale') ?? 0.8|noescape}">
         <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}9"/>
         <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
-        <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff"/>
-        <audio id="music" music="1" hidden="1" />
+        <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff" textfont="RajdhaniMono"/>
+        <audio pos="0 0" id="music" music="0" hidden="0" />
 
         <frame id="main-frame" z-index="1" size="50 10">
             <frame id="content" pos="38 -2.5" hidden="1">
-                <label id="title" pos="0 0" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3"/>
-                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4"/>
+                <label id="title" pos="0 0" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3" textfont="RajdhaniMono" />
+                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4" textfont="RajdhaniMono" />
             </frame>
 
-            <frame id="loading" pos="12 -5">
-                <frame id="progress" pos="0 0" scale="0.5">
-                    <label pos="0.15 0.7" z-index="1" text="" halign="center" valign="center" textcolor="fffe" textsize="4"/>
+            <frame id="loading" pos="10 -5">
+                <frame id="progress" pos="0 -0.25" scale="0.5">
+                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4"/>
                 </frame>
-                <label pos="6 0" z-index="1" text="Loading" halign="left" valign="center" textcolor="fffe" textsize="1"/>
+                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe" textsize="1"/>
             </frame>
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
@@ -36,9 +36,9 @@
     </frame>
 
     <framemodel id="Song">
-        <label pos="0 0" size="78 3" text="Title" textsize="1" textcolor="ffff" />
-        <label pos="80 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" />
-        <label pos="148 0" size="9 3" text="Length" textsize="1" textcolor="ffff" />
+        <label pos="0 0" size="78 3" text="Title" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
+        <label pos="80 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
+        <label pos="148 0" size="9 3" text="Length" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
         <quad pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1" />
     </framemodel>
 
@@ -96,13 +96,12 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-declare Text[Text][] Songs;
+declare Text[Text][] music;
 declare Text[Text][] curSongPool;
-declare CMlMediaPlayer music;
+declare CMlMediaPlayer player;
 declare CMlQuad paginationBox;
 declare CMlFrame progress;
 declare Text url;
-declare Text token;
 declare Boolean musicEnabled;
 declare Boolean loading;
 
@@ -122,63 +121,48 @@ Void stopLoading(){
     loading = False;
 }
 
-Text[Text] getSong(Integer songId){
-    if(Songs.count > 0 && songId < Songs.count - 1){
-        return Songs[songId];
+Text[Text] getSong(Text filename){
+    foreach(song in music){
+        if(song["file"] == filename){
+            return song;
+        }
     }
 
-    return ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
+    return Text[Text];
 }
 
 Text[Text] getRandomSong(){
-    if(Songs.count > 0){
-        return Songs[ML::Rand(0, Songs.count - 1)];
+    if(music.count > 0){
+        return music[ML::Rand(0, music.count - 1)];
     }
 
-    return ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
+    return Text[Text];
 }
 
 Text getUrl(Text[Text] song){
-    return url ^ "/index.php?token=" ^ token ^ "&song=" ^ song["file"];
+    return url ^ "/?song=" ^ TL::URLEncode(song["file"]);
 }
 
 Void setSong(Text[Text] song){
     declare url = getUrl(song);
 
     if(!Http.IsValidUrl(url)){
-        log("Invalid URL:" ^ url);
+        log("[ESC:music-client] Invalid URL: " ^ url);
         return;
     }
 
+    log("[ESC:music-client] Set: " ^ url);
+
+    declare src = Audio.CreateSound(url, 1.0, True, True, False);
+    wait(src.DownloadInProgress == False);
+    log("Finished setting music");
+
     startLoading();
-    declare request = Http.CreateGet(url, True);
 
-    while(!request.IsCompleted){
-        yield;
-        progress.RelativeRotation = progress.RelativeRotation + 4.0;
-    }
-
-    music.Url = url;
-    sleep(100);
-    music.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
     stopLoading();
-}
-
-Real getPlayerSpeed(){
-    declare Real speed = 0.0;
-
-    if(InputPlayer != Null){
-        speed = InputPlayer.Speed * 3.6;
-
-        if(speed < 0){
-            return -speed;
-        }
-    }
-
-    return speed;
 }
 
 Void updatePagination(Integer songsVisible){
@@ -204,15 +188,15 @@ Void populateList(Text[Text][] songs){
         (frame.Controls[0] as CMlLabel).SetText(song["title"]);
         (frame.Controls[1] as CMlLabel).SetText(song["artist"]);
         (frame.Controls[2] as CMlLabel).SetText(song["length"]);
-        frame.Controls[3].DataAttributeSet("song-id", song["id"]);
+        frame.Controls[3].DataAttributeSet("file", song["file"]);
 
         lastKey = key;
     }
 
     updatePagination(songs.count);
 
-    if(lastKey + 1 < Songs.count){
-        for(i, lastKey + 1, Songs.count - 1){
+    if(lastKey + 1 < music.count){
+        for(i, lastKey + 1, music.count - 1){
             declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[i] as CMlFrame);
 
             (frame.Controls[0] as CMlLabel).SetText("");
@@ -242,22 +226,19 @@ Text slug(Text string){
 
 Void searchSong(Text search){
     if(TL::Length(search) == 0){
-        curSongPool = Songs;
-        populateList(Songs);
+        curSongPool = music;
+        populateList(music);
         return;
     }
 
     declare Text[Text][] songsFound;
     declare searchStringLength = TL::Length(search);
 
-    foreach(song in Songs){
-        declare songTitleLength = TL::Length(song["search"]);
-
-        for(i, 0, songTitleLength - searchStringLength){
-            if(TL::SubString(song["search"], i, searchStringLength) == search){
-                songsFound.add(song);
-                break;
-            }
+    foreach(song in music){
+        declare searchText = song["title"] ^ song["artist"] ^ song["album"];
+        if(TL::Find(search, searchText, False, False)){
+            songsFound.add(song);
+            break;
         }
     }
 
@@ -325,94 +306,32 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
     }
 }
 
-Text[Text][] parseJson(Text json){
-    if(TL::SubString(json, 0, 1) != "[" && TL::SubString(json, TL::Length(json) - 1, 1) != "]"){
-        log("Could not load music!");
-        musicEnabled = False;
-        return [["title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""]];
-    }
-
-    declare Text[Text][] songs;
-    declare curlyOpen = False;
-    declare stringOpen = False;
-    declare keyDone = False;
-    declare curText = "";
-    declare key = "";
-    declare value = "";
-    declare Text[Text] song;
-    declare id = 0;
-
-    for(pos, 1, TL::Length(json) - 2){
-        declare character = TL::SubString(json, pos, 1);
-
-        if(character == "{" && !curlyOpen){
-            song = ["id" => "", "title" => "", "artist" => "", "file" => "", "length" => "", "album" => "", "search" => ""];
-            curlyOpen = True;
-            keyDone = False;
-            continue;
-        }
-
-        if(curlyOpen){
-            if(character == "\""){
-                stringOpen = !stringOpen;
-                continue;
-            }
-
-            if(character == ":" && !keyDone && !stringOpen){
-                keyDone = True;
-                continue;
-            }
-
-            if(character == "," && !stringOpen){
-                keyDone = False;
-                song[key] = value;
-                key = "";
-                value = "";
-                continue;
-            }
-
-            if(character == "}"){
-                curlyOpen = False;
-                song[key] = value;
-                key = "";
-                value = "";
-                song["search"] = slug(song["title"] ^ song["artist"]);
-                song["id"] = "" ^ id;
-                songs.add(song);
-                id = id + 1;
-                continue;
-            }
-
-            if(keyDone){
-                value = value ^ character;
-            }else{
-                key = key ^ character;
-            }
-        }
-    }
-
-    musicEnabled = True;
-    return songs;
-}
-
 {(new esc\Classes\HideScript())|noescape}
 
 main() {
     startLoading();
     musicEnabled = False;
     url = "{config('music.url')|noescape}";
-    token = {config('music.token')};
 
-    //Get the songlist json
-    log("Loading music...");
-    declare CHttpRequest getSongList = Http.CreateGet(url ^ "?token=" ^ token);
+    log("[ESC:music-client] Request music list");
+    declare CHttpRequest getSongList = Http.CreateGet(url);
     wait(getSongList.IsCompleted);
-    log("Finished loading music");
 
-    //Parse the json
-    Songs = parseJson(getSongList.Result);
+    log("[ESC:music-client] Got music list, parsing list.");
+    music.fromjson(getSongList.Result);
 
-    music <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    log("[ESC:music-client] Loaded " ^ music.count ^ " songs");
+
+        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
+        log("[ESC:music-client] Music disabled");
+        return;
+    if(music.count == 0){
+        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
+        log("[ESC:music-client] Music disabled");
+        return;
+    }
+
+    player <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
     progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
@@ -433,24 +352,18 @@ main() {
     declare Vec3 startPos;
     declare Integer sortDirection = 1;
 
-    if(!musicEnabled){
-        widget.Hide();
-        log("Music disabled");
-        return;
-    }
-
     stopLoading();
 
-    music.Volume = 1.0;
+    player.Volume = 1.0;
 
-    curSongPool = Songs;
+    curSongPool = music;
     populateList(arraySort(curSongPool, 1));
     AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
 
     declare controlsVisible = False;
     declare musicPlaying = True;
 
-    sleep(100);
+    sleep(5);
 
     while(True){
         yield;
@@ -525,18 +438,17 @@ main() {
                     updateArrows(event.Control, sortDirection, 0);
                 }
 
-                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare songId = TL::ToInteger(event.Control.DataAttributeGet("song-id"));
-                    setSong(getSong(songId));
+                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    setSong(getSong(event.Control.DataAttributeGet("file")));
                     continue;
                 }
 
-                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseOver){
+                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseOver){
                     setRowColor(event.Control, {config('colors.ui.header')});
                     continue;
                 }
 
-                if(event.Control.DataAttributeExists("song-id") && event.Type == CMlScriptEvent::Type::MouseOut){
+                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseOut){
                     setRowColor(event.Control, "fff");
                     continue;
                 }

@@ -7,13 +7,13 @@
 
         <frame z-index="2" pos="4 -2" scale="0.5">
             {if esc\Controllers\MapController::getAddedTime() + 10 <= config('server.max-playtime')}
-            <label pos="0 0"   size="12 3" halign="center" valign="center" textsize="1.2" text="PAY" />
-            <label pos="0 -4"  size="12 3" halign="center" valign="center" textsize="1.2" text="{config('pay2play.addtime.cost')}" />
-            <label pos="0 -8"  size="12 3" halign="center" valign="center" textsize="1.2" text="PLANETS TO" />
-            <label pos="0 -12" size="12 3" halign="center" valign="center" textsize="1.2" text="ADD 10 MIN" />
+            <label pos="0 0"   size="12 3" halign="center" valign="center" textsize="1.2" text="PAY" textfont="RajdhaniMono" />
+            <label pos="0 -4"  size="12 3" halign="center" valign="center" textsize="1.2" text="{config('pay2play.addtime.cost')}" textfont="RajdhaniMono" />
+            <label pos="0 -8"  size="12 3" halign="center" valign="center" textsize="1.2" text="PLANETS TO" textfont="RajdhaniMono" />
+            <label pos="0 -12" size="12 3" halign="center" valign="center" textsize="1.2" text="ADD 10 MIN" textfont="RajdhaniMono" />
             {else}
-            <label pos="0 -4"  size="12 3" halign="center" valign="center" textsize="1.2" text="TIME LIMIT" />
-            <label pos="0 -8"  size="12 3" halign="center" valign="center" textsize="1.2" text="REACHED" />
+            <label pos="0 -4"  size="12 3" halign="center" valign="center" textsize="1.2" text="TIME LIMIT" textfont="RajdhaniMono" />
+            <label pos="0 -8"  size="12 3" halign="center" valign="center" textsize="1.2" text="REACHED" textfont="RajdhaniMono" />
             {/if}
         </frame>
     </frame>
@@ -24,10 +24,10 @@
         <quad pos="0 0" size="8 10" bgcolor="0007" z-index="-1" action="skip" />
 
         <frame z-index="2">
-            <label pos="4 -4" halign="center" valign="center" text="PAY" />
-            <label pos="4 -6" halign="center" valign="center" text="{config('pay2play.skip.cost')}" />
-            <label pos="4 -8" halign="center" valign="center" text="TO SKIP" />
-            <label pos="4 -8" halign="center" valign="center" text="MAP" />
+            <label pos="4 -4" halign="center" valign="center" text="PAY" textfont="RajdhaniMono" />
+            <label pos="4 -6" halign="center" valign="center" text="{config('pay2play.skip.cost')}" textfont="RajdhaniMono" />
+            <label pos="4 -8" halign="center" valign="center" text="TO SKIP" textfont="RajdhaniMono" />
+            <label pos="4 -8" halign="center" valign="center" text="MAP" textfont="RajdhaniMono" />
         </frame>
     </frame>
     {/if}
