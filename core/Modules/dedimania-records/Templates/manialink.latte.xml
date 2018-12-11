@@ -2,7 +2,7 @@
 <manialink name="ESC:Dedimania" id="Dedimania" version="3">
     <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
 
-    <framemodel id="record" hidden="0">
+    <framemodel id="record" hidden="1">
         <label z-index="2" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
         <label z-index="2" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
         <label z-index="3" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>

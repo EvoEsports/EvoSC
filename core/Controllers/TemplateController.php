@@ -69,6 +69,7 @@ class TemplateController
             $vals = implode(', ', $parameters);
 
             Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
+            var_dump($e->getTraceAsString());
             createCrashReport($e);
         }
 

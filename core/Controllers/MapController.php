@@ -32,10 +32,10 @@ class MapController
     {
         self::$timeLimit = floor(Server::rpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
 
-        self::loadMaps();
-
         self::$queue    = new Collection();
         self::$mapsPath = config('server.base') . 'UserData/Maps/';
+
+        self::loadMaps();
 
         Hook::add('BeginMap', [MapController::class, 'beginMap']);
         Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
@@ -323,13 +323,20 @@ class MapController
     {
         Log::logAddLine('MapController', 'Loading maps...');
 
-        //Get loaded maps
+        //Get loaded matchsettings maps
         $maps = collect(Server::getMapList());
 
         //get array with the uids
         $enabledMapsuids = $maps->pluck('uId');
 
         foreach ($maps as $mapInfo) {
+            $mapFile = self::$mapsPath . $mapInfo->fileName;
+
+            if (!File::exists($mapFile)) {
+                throw new Exception("File $mapFile not found.");
+                continue;
+            }
+
             $map = Map::where('uid', $mapInfo->uId)
                       ->get()
                       ->first();
@@ -466,17 +473,17 @@ class MapController
             }
 
             $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1',
-            $response->getHeader('content-disposition')[0]);
+                $response->getHeader('content-disposition')[0]);
             $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
             $filename = str_replace('..', '.', $filename);
 
             $mapFolder = self::$mapsPath;
-            $body = $response->getBody();
+            $body      = $response->getBody();
             var_dump("$mapFolder$filename");
 
             file_put_contents("$mapFolder$filename", $body);
 
-            if(!file_exists("$mapFolder$filename")){
+            if (!file_exists("$mapFolder$filename")) {
                 ChatController::message($player, '_warning', "Map download ($mxId) failed.");
                 continue;
             }

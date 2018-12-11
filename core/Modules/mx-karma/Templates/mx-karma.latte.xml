@@ -1,12 +1,38 @@
-<label pos="48  3" z-index="1" size="25 4" text="{$stars}"     halign="right" valign="center" textcolor="ffff" textsize="1.1" textfont="RajdhaniMono"/>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MxKarma" id="MxKarma" version="3">
+    <frame id="widget" pos="{config('mx-karma.pos')|noescape}" scale="{config('mx-karma.scale')}">
+        <quad pos="0 0" z-index="-1" size="50 12" bgcolor="{config('colors.ui.background')|noescape}a"  hidden="0"/>
+        <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.header')|noescape}c" hidden="1"/>
+        <label textfont="RajdhaniMono" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".8" valign="center"/>
 
-{if $finished}
-<label pos="5  -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="+++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,100" textfont="RajdhaniMono" />
-<label pos="13 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,80" textfont="RajdhaniMono" />
-<label pos="21 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="+"    halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,60" textfont="RajdhaniMono" />
-<label pos="29 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="-"      halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,40" textfont="RajdhaniMono" />
-<label pos="37 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="--"     halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,20" textfont="RajdhaniMono" />
-<label pos="45 -3.2" z-index="1" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="---"    halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,0" textfont="RajdhaniMono" />
-{else}
-<label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote"     halign="left" valign="center" textcolor="fffc" textsize="1" textfont="RajdhaniMono" />
-{/if}
+        <frame z-index="2" pos="0 -6">
+            <label pos="48  3" z-index="1" size="25 4" text="{$starString}" halign="right" valign="center" textcolor="ffff" textsize="1.1" textfont="RajdhaniMono"/>
+
+            {if $finished}
+            <label pos="5  -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 100 ? '3c35' : '0000'}" focusareacolor2="3c35" text="+++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,100" textfont="RajdhaniMono" />
+            <label pos="13 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 80 ? '3c35' : '0000'}" focusareacolor2="3c35" text="++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,80" textfont="RajdhaniMono" />
+            <label pos="21 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 60 ? '3c35' : '0000'}" focusareacolor2="3c35" text="+"    halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,60" textfont="RajdhaniMono" />
+            <label pos="29 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 40 ? 'c335' : '0000'}" focusareacolor2="c335" text="-"      halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,40" textfont="RajdhaniMono" />
+            <label pos="37 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 20 ? 'c335' : '0000'}" focusareacolor2="c335" text="--"     halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,20" textfont="RajdhaniMono" />
+            <label pos="45 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 0 ? 'c335' : '0000'}" focusareacolor2="c335" text="---"    halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,0" textfont="RajdhaniMono" />
+            {else}
+            <label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote"     halign="left" valign="center" textcolor="fffc" textsize="1" textfont="RajdhaniMono" />
+            {/if}
+        </frame>
+    </frame>
+
+    <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+{(new esc\Classes\HideScript())|noescape}
+
+main(){
+    while(True){
+        hidescript();
+        yield;
+    }
+}
+    --></script>
+</manialink>
+

@@ -104,7 +104,7 @@ class MxKarma extends MXK
         self::$updatedVotes->push($player->id);
 
         ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])));
-        Log::info(stripAll($player) . " rated " . stripAll($map->Name) . " @ $rating|" . self::$ratings[$rating]);
+        Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
 
         foreach (onlinePlayers() as $player) {
             self::showWidget($player);
@@ -314,7 +314,8 @@ class MxKarma extends MXK
      */
     public static function showWidget(Player $player)
     {
-        $mapUid = Server::getCurrentMapInfo()->uId;
+        $map    = MapController::getCurrentMap();
+        $mapUid = $map->uid;
 
         if (self::$currentMap != $mapUid) {
             self::$mapKarma   = self::call(MXK::getMapRating);
@@ -341,21 +342,10 @@ class MxKarma extends MXK
             $starString .= '';
         }
 
-        $hideScript = Template::toString('scripts.hide', ['hideSpeed' => $player->user_settings->ui->hideSpeed ?? null, 'config' => config('ui.mx-karma')]);
-
-        Template::show($player, 'ranking-box', [
-            'id'         => 'MXKarma',
-            'title'      => '  MX KARMA',
-            'config'     => config('ui.mx-karma'),
-            'hideScript' => $hideScript,
-            'rows'       => 1.5,
-            'content'    => Template::toString('mx-karma.mx-karma', [
-                'karma'    => self::$mapKarma,
-                'average'  => $average,
-                'stars'    => $starString,
-                'finished' => self::playerFinished($player),
-            ]),
-        ]);
+        $finished = self::playerFinished($player);
+        $myRating = $map->ratings()->where('Player', $player->id)->first();
+        $myRating = $myRating ? $myRating->Rating : null;
+        Template::show($player, 'mx-karma.mx-karma', compact('starString', 'finished', 'myRating'));
     }
 
     public static function playerFinished(Player $player): bool

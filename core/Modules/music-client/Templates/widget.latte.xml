@@ -5,6 +5,7 @@
         <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff" textfont="RajdhaniMono"/>
         <audio pos="0 0" id="music" music="0" hidden="0" />
+        <audio id="audio" music="1" />
 
         <frame id="main-frame" z-index="1" size="50 10">
             <frame id="content" pos="38 -2.5" hidden="1">
@@ -14,9 +15,9 @@
 
             <frame id="loading" pos="10 -5">
                 <frame id="progress" pos="0 -0.25" scale="0.5">
-                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4"/>
+                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4" textfont="RajdhaniMono"/>
                 </frame>
-                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe" textsize="1"/>
+                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe" textsize="1" textfont="RajdhaniMono"/>
             </frame>
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
@@ -105,6 +106,8 @@ declare Text url;
 declare Boolean musicEnabled;
 declare Boolean loading;
 
+{(new esc\Classes\HideScript())|noescape}
+
 Void startLoading(){
     declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
     declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
@@ -154,11 +157,13 @@ Void setSong(Text[Text] song){
     log("[ESC:music-client] Set: " ^ url);
 
     declare src = Audio.CreateSound(url, 1.0, True, True, False);
-    wait(src.DownloadInProgress == False);
-    log("Finished setting music");
-
     startLoading();
-
+    while(src.DownloadInProgress == True){
+        progress.RelativeRotation = progress.RelativeRotation + 2.0;
+        hidescript();
+        yield;
+    }
+    log("Finished setting music");
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
@@ -306,8 +311,6 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
     }
 }
 
-{(new esc\Classes\HideScript())|noescape}
-
 main() {
     startLoading();
     musicEnabled = False;
@@ -322,9 +325,9 @@ main() {
 
     log("[ESC:music-client] Loaded " ^ music.count ^ " songs");
 
-        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-        log("[ESC:music-client] Music disabled");
-        return;
+        //(Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
+        //return;
+
     if(music.count == 0){
         (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
         log("[ESC:music-client] Music disabled");
@@ -377,7 +380,7 @@ main() {
             }
 
             if(loading){
-                progress.RelativeRotation = progress.RelativeRotation + 0.5;
+                progress.RelativeRotation = progress.RelativeRotation + 2.0;
             }
 
             declare x_min = widget.RelativePosition_V3[0];
