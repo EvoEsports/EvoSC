@@ -31,10 +31,7 @@ class PlayerController
         self::$fakePlayers = collect([]);
         ChatController::addCommand('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//',
             'kick');
-        ChatController::addCommand('ban', [PlayerController::class, 'banPlayer'], 'Ban player by nickname', '//',
-            'ban');
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'kick');
-        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'ban');
 
         ChatController::addCommand('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players',
             '##', 'ban');
@@ -121,60 +118,6 @@ class PlayerController
                 secondary(' Reason: ' . $reason));
         } else {
             ChatController::message(onlinePlayers(), '_info', $player, ' kicked ', secondary($toBeKicked));
-        }
-    }
-
-    public static function banPlayerEvent(Player $player, $login, $length, $reason = "")
-    {
-        try {
-            $toBeKicked = Player::find($login);
-        } catch (\Exception $e) {
-            $toBeKicked = $login;
-        }
-
-        try {
-            $kicked = Server::rpc()->kick($login, $reason);
-        } catch (Exception $e) {
-            $kicked = Server::rpc()->disconnectFakePlayer($login);
-        }
-
-        if (!$kicked) {
-            return;
-        }
-
-        if (strlen($reason) > 0) {
-            ChatController::message(onlinePlayers(), '_info', $player, ' kicked ', secondary($toBeKicked),
-                secondary(' Reason: ' . $reason));
-        } else {
-            ChatController::message(onlinePlayers(), '_info', $player, ' kicked ', secondary($toBeKicked));
-        }
-    }
-
-    /**
-     * Ban a player
-     *
-     * @param Player $player
-     * @param        $cmd
-     * @param        $nick
-     * @param mixed  ...$message
-     */
-    public static function banPlayer(Player $player, $cmd, $nick, ...$message)
-    {
-        $playerToBeBanned = self::findPlayerByName($player, $nick);
-
-        if (!$playerToBeBanned) {
-            return;
-        }
-
-        try {
-            $reason = implode(" ", $message);
-            Server::ban($playerToBeBanned->Login, $reason);
-            Server::blackList($playerToBeBanned->Login);
-            ChatController::message(onlinePlayers(), $player, ' banned ', $playerToBeBanned, '. Reason: ',
-                secondary($reason));
-        } catch (InvalidArgumentException $e) {
-            Log::logAddLine('PlayerController', 'Failed to ban player: ' . $e->getMessage(), true);
-            Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
         }
     }
 
