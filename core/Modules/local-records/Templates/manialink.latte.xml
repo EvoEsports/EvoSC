@@ -27,7 +27,7 @@
     <frame id="window" pos="-90 60" hidden="1">
         <quad id="handle" size="175 6" z-index="5" />
         <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
-        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="0" />
+        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="🏆 Local records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
         <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
 
