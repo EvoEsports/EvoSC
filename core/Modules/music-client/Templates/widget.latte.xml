@@ -156,14 +156,11 @@ Void setSong(Text[Text] song){
 
     log("[ESC:music-client] Set: " ^ url);
 
-    declare src = Audio.CreateSound(url, 1.0, True, True, False);
+    declare audio <=> (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
     startLoading();
-    while(src.DownloadInProgress == True){
-        progress.RelativeRotation = progress.RelativeRotation + 2.0;
-        hidescript();
-        yield;
-    }
-    log("Finished setting music");
+    audio.Url = url;
+    sleep(40);
+    audio.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
     (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);

@@ -113,9 +113,7 @@
             yield;
 
             foreach(event in RaceEvents){
-                log(event.IsEndLap);
                 if(event.IsEndLap == True){
-                    log("endlap");
                     if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
                         scores[event.Player.Name] = event.LapTime;
                         updateList();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Locals2" id="Locals2" version="3">
+<manialink name="ESC:Locals-Records" id="Locals" version="3">
     <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
 
     <framemodel id="record" hidden="1">
@@ -297,6 +297,10 @@
         declare myRank = getMyRank();
 
         for(i, 0, showTop - 1){
+            if(i >= records.count){
+                continue;
+            }
+
             recordsSelection.add(records[i]);
         }
 

@@ -384,13 +384,15 @@
 
         log("records: " ^ records.count);
 
-        declare myRank = getMyRank();
-        if(myRank != "-1"){
-            base = records[TL::ToInteger(myRank) - 1];
-            updateBaseText(records[TL::ToInteger(myRank) - 1]["nick"]);
-        }else{
-            base = records[0];
-            updateBaseText(records[0]["nick"]);
+        if(records.count > 0){
+            declare myRank = getMyRank();
+            if(myRank != "-1"){
+                base = records[TL::ToInteger(myRank) - 1];
+                updateBaseText(records[TL::ToInteger(myRank) - 1]["nick"]);
+            }else{
+                base = records[0];
+                updateBaseText(records[0]["nick"]);
+            }
         }
 
         while(True){
