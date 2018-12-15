@@ -33,7 +33,7 @@ class MapController
         self::$timeLimit = floor(Server::rpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
 
         self::$queue    = new Collection();
-        self::$mapsPath = config('server.base') . 'UserData/Maps/';
+        self::$mapsPath = Server::getMapsDirectory();
 
         self::loadMaps();
 
@@ -308,9 +308,9 @@ class MapController
         return self::$queue;
     }
 
-    private static function getGbxInformation($filename)
+    private static function getGbxInformation($filename): string
     {
-        $cmd = config('server.base') . '/ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\',
+        $cmd = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\',
                 DIRECTORY_SEPARATOR, $filename) . '"';
 
         return shell_exec($cmd);

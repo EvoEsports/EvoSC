@@ -53,7 +53,7 @@ class Statistics
         $statCollection->push(new StatisticWidget('Wins', " Top Winners"));
 
         //Top Ranks
-        $statCollection->push(new StatisticWidget('Score', " Top Ranks", '#'));
+        $statCollection->push(new StatisticWidget('Score', " Top Ranks", '', ' Points'));
 
         //Top Donators
         $statCollection->push(new StatisticWidget('Donations', " Top Donators"));

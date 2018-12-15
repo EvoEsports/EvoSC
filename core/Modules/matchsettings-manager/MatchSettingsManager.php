@@ -24,7 +24,7 @@ class MatchSettingsManager
 
     public function __construct()
     {
-        self::$path    = config('server.base') . '/UserData/Maps/MatchSettings/';
+        self::$path    = Server::getMapsDirectory() . '/MatchSettings/';
         self::$objects = collect();
 
         ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
@@ -84,8 +84,7 @@ class MatchSettingsManager
      */
     public static function getMatchSettings(): Collection
     {
-        $path  = config('server.base') . '/UserData/Maps/MatchSettings/';
-        $files = File::getDirectoryContents($path, '/\.txt$/');
+        $files = File::getDirectoryContents(self::$path, '/\.txt$/');
 
         return $files;
     }
@@ -256,7 +255,7 @@ class MatchSettingsManager
         $file = 'MatchSettings/' . $matchSettingsFile . '.txt';
         Server::loadMatchSettings($file);
 
-        $xml         = new \SimpleXMLElement(File::get(config('server.base') . '/UserData/Maps/' . $file));
+        $xml         = new \SimpleXMLElement(File::get(self::$path . $file));
         $enabledMaps = collect();
         foreach ($xml->map as $map) {
             $enabledMaps->push("$map->ident");

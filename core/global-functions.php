@@ -73,9 +73,7 @@ function logDir(string $filename = ''): string
 
 function ghost(string $filename = ''): string
 {
-    $basePath = str_replace('/', '/', config('server.base'));
-
-    return $basePath . 'UserData/Replays/Ghosts/' . $filename . '.Replay.Gbx';
+    return \esc\Classes\Server::GameDataDirectory() . '/Replays/Ghosts/' . $filename . '.Replay.Gbx';
 }
 
 function musicDir(string $filename = ''): string
@@ -152,7 +150,7 @@ function maps()
 
 function matchSettings(string $filename = null)
 {
-    return config('server.base') . '/UserData/Maps/MatchSettings/' . ($filename);
+    return \esc\Classes\Server::getMapsDirectory() . '/MatchSettings/' . ($filename);
 }
 
 function getMapInfoFromFile(string $filename)

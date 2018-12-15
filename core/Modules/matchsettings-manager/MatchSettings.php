@@ -94,7 +94,7 @@ class MatchSettings
 
     public function save()
     {
-        $file = config('server.base') . '/UserData/Maps/MatchSettings/' . $this->filename;
+        $file = Server::getMapsDirectory() . '/MatchSettings/' . $this->filename;
         $this->xml->saveXML($file);
     }
 }
