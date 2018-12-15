@@ -129,6 +129,7 @@ class EscRun extends Command
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
+        \esc\Classes\Server::rpc()->disableServiceAnnounces(true);
 
         $this->loop();
     }

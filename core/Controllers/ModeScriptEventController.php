@@ -14,7 +14,7 @@ class ModeScriptEventController
         if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
             self::call($modescriptCallbackArray[1][0], $modescriptCallbackArray[1][1]);
         } else {
-            dd($modescriptCallbackArray);
+            var_dump($modescriptCallbackArray);
         }
     }
 
@@ -54,7 +54,7 @@ class ModeScriptEventController
                 break;
 
             default:
-                Log::logAddLine('ScriptCallback', "Calling unhandled $callback", false);
+                Log::logAddLine('ScriptCallback', "Calling unhandled $callback", isVeryVerbose());
                 break;
         }
 

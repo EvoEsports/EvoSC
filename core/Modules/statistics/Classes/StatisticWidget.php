@@ -19,10 +19,10 @@ class StatisticWidget
         $this->title  = $title;
         $this->config = config('statistics.' . $stat);
 
-        $this->records = Stats::orderByDesc($stat)->get();
-
         if ($sortAsc) {
-            $this->records = $this->records->sortBy($stat);
+            $this->records = Stats::orderBy($stat)->get();
+        }else{
+            $this->records = Stats::orderByDesc($stat)->get();
         }
 
         //Get records as nickname => value

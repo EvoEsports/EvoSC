@@ -309,6 +309,9 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
 }
 
 main() {
+    declare netwrite Text Upstream for UI;
+    Upstream = "hello";
+
     startLoading();
     musicEnabled = False;
     url = "{config('music.url')|noescape}";
