@@ -156,16 +156,25 @@ class Dedimania extends DedimaniaApi
         }
     }
 
-    public static function sendUpdateDediManialink(Dedi $record, $oldRank = null)
+    public static function sendUpdatedDedis(Map $map)
     {
-        /*
-        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
-        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
-            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank ?? "0");
+        $dedis     = $map->dedis()->orderBy('Rank')->get();
+        $playerIds = $dedis->pluck('Player');
+        $players   = Player::whereIn('id', $playerIds)->get();
 
-        Template::showAll('dedimania-records.update', compact('updateRecord', 'oldRank'));
-        */
+        $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
+            $player = $players->where('id', $dedi->Player)->first();
+
+            return [
+                'rank'  => $dedi->Rank,
+                'cps'   => $dedi->Checkpoints,
+                'score' => $dedi->Score,
+                'nick'  => $player->NickName,
+                'login' => $player->Login,
+            ];
+        })->toJson();
+
+        Template::showAll('dedimania-records.update', compact('dedisJson'));
     }
 
     private static function insertRecord(Map $map, $record)
@@ -257,7 +266,7 @@ class Dedimania extends DedimaniaApi
                         ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
                     }
 
-                    self::sendUpdateDediManialink($dedi, $oldRank);
+                    self::sendUpdatedDedis($map);
                 } else {
                     Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
                 }
@@ -279,7 +288,7 @@ class Dedimania extends DedimaniaApi
 
             if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
                 self::addNewTime($dedi);
-                self::sendUpdateDediManialink($dedi);
+                self::sendUpdatedDedis($map);
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
             } else {
                 $dedi->update(['New' => 0]);

@@ -3,13 +3,9 @@
 namespace esc\Modules\MusicClient;
 
 use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\RestClient;
 use esc\Classes\Template;
-use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
-use GuzzleHttp\Exception\ConnectException;
 
 class MusicClient
 {
@@ -17,7 +13,7 @@ class MusicClient
     {
         Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
 
-        KeyController::createBind('X', [self::class, 'reload']);
+        // KeyController::createBind('X', [self::class, 'reload']);
     }
 
     /**

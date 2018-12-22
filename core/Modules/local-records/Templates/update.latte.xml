@@ -3,13 +3,10 @@
     <script>
         <!--
         main(){
-            declare Text UpdateLocalHash for LocalUser;
-            declare Text UpdateLocalMap for LocalUser;
-            declare Text[Text] UpdateLocalRecord for LocalUser;
+            declare Text[Text][] CurrentLocals for LocalUser;
+            declare Text localsJson = """{$localsJson|noescape}""";
 
-            UpdateLocalHash = {uniqid()};
-            UpdateLocalRecord = {$updateRecord|noescape};
-            UpdateLocalMap = Map.MapInfo.MapUid;
+            CurrentLocals.fromjson(localsJson);
         }
         -->
     </script>

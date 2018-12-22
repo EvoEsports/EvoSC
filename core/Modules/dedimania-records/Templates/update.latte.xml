@@ -3,13 +3,10 @@
     <script>
         <!--
         main(){
-            declare Text UpdateDediHash for LocalUser;
-            declare Text UpdateDediMap for LocalUser;
-            declare Text[Text] UpdateDedi for LocalUser;
+            declare Text[Text][] CurrentDedis for LocalUser;
+            declare Text dedisJson = """{$dedisJson|noescape}""";
 
-            UpdateDediHash = {uniqid()};
-            UpdateDedi = {$updateRecord|noescape};
-            UpdateDediMap = Map.MapInfo.MapUid;
+            CurrentDedis.fromjson(dedisJson);
         }
         -->
     </script>

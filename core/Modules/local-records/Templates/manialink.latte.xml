@@ -27,7 +27,7 @@
     <frame id="window" pos="-90 60" hidden="1">
         <quad id="handle" size="175 6" z-index="5" />
         <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
-        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="0" />
+        <quad size="180 120" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="🏆 Local records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
         <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
 
@@ -315,7 +315,7 @@
             }
         }else{
             declare firstHalfFilled = 0;
-            declare half = ML::NearestInteger((remaining - 1) / 2.0);
+            declare half = ML::NearestInteger(remaining / 2.0);
 
             declare start = (TL::ToInteger(myRank) - 1) - half - 1;
             if(start < showTop){
@@ -331,6 +331,9 @@
             if(end >= records.count){
                 end = records.count - 1;
             }
+
+            declare empty = start + firstHalfFilled + remain - end;
+            start = start - empty + 1;
 
             for(i, start, end){
                 recordsSelection.add(records[i]);
@@ -375,6 +378,8 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
+        declare Text[Text][] CurrentLocals for LocalUser;
+
         rows = {config('locals.rows')};
         showTop = {config('locals.showtop')};
         records.fromjson("""{$localsJson|noescape}""");
@@ -428,6 +433,13 @@
                         window.Show();
                     }
                 }
+            }
+
+            if(CurrentLocals.count > 0){
+                records = CurrentLocals;
+                updateWidget();
+                updateWindow();
+                CurrentLocals = Text[Text][];
             }
 
             hidescript();

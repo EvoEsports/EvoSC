@@ -105,7 +105,7 @@ class LocalRecords
                     ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
                 Hook::fire('PlayerLocal', $player, $local);
-                self::sendUpdateDediManialink($local, $oldRank);
+                self::sendUpdatedLocals($map);
             }
         } else {
             if ($localCount < 100) {
@@ -119,19 +119,30 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
                 ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' claimed the ', $local);
                 Hook::fire('PlayerLocal', $player, $local);
-                self::sendUpdateDediManialink($local);
+                self::sendUpdatedLocals($map);
             }
         }
     }
 
-    public static function sendUpdateDediManialink(LocalRecord $record, $oldRank = null)
+    public static function sendUpdatedLocals(Map $map)
     {
-        $nick         = str_replace('\\', "\\\\", str_replace('"', "''", $record->player->NickName));
-        $updateRecord = sprintf('["rank" => "%d", "cps" => "%s", "score" => "%s", "score_raw" => "%s", "nick" => "%s", "login" => "%s", "oldRank" => "%s"]',
-            $record->Rank, $record->Checkpoints, formatScore($record->Score), $record->Score, $nick,
-            $record->player->Login, $oldRank ?: "-1");
+        $locals    = $map->locals()->orderBy('Rank')->get();
+        $playerIds = $locals->pluck('Player');
+        $players   = Player::whereIn('id', $playerIds)->get();
 
-        Template::showAll('local-records.update', compact('updateRecord'));
+        $localsJson = $locals->map(function (LocalRecord $local) use ($players) {
+            $player = $players->where('id', $local->Player)->first();
+
+            return [
+                'rank'  => $local->Rank,
+                'cps'   => $local->Checkpoints,
+                'score' => $local->Score,
+                'nick'  => $player->NickName,
+                'login' => $player->Login,
+            ];
+        })->toJson();
+
+        Template::showAll('local-records.update', compact('localsJson'));
     }
 
     /**
