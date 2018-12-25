@@ -191,10 +191,14 @@ class Migrate extends Command
 
 $application = new Application();
 
+$run = new EscRun();
+
 $application->add(new MakeMigration());
 $application->add(new Migrate());
 $application->add(new ImportUaseco());
-$application->add(new EscRun());
+$application->add($run);
+
+$application->setDefaultCommand($run);
 
 
 try {

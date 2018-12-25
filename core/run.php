@@ -13,7 +13,23 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
-             ->setDescription('Run Evo Server Controller');
+             ->setDescription('Run Evo Server Controller')
+             ->addOption('daemon', 'd', \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL, 'Run command as daemon.', null);
+
+        $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+
+        $dispatcher->addListener(\Symfony\Component\Console\ConsoleEvents::ERROR, function (\Symfony\Component\Console\Event\ConsoleErrorEvent $event) {
+            $output = $event->getOutput();
+            $command = $event->getCommand();
+
+            $output->writeln(sprintf('Exception thrown while running <info>%s</info>', $command->getName()));
+
+            // gets the current exit code (the exception code or the exit code set by a ConsoleEvents::TERMINATE event)
+            $exitCode = $event->getExitCode();
+
+            // changes the exception to another one
+            $event->setException(new \LogicException('Caught exception', $exitCode, $event->getError()));
+        });
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -21,7 +37,7 @@ class EscRun extends Command
         global $escVersion;
         global $serverName;
 
-        $escVersion = '0.45.1';
+        $escVersion = '0.46.0';
 
         esc\Classes\Config::loadConfigFiles();
 
@@ -144,43 +160,40 @@ class EscRun extends Command
         }
 
         while (true) {
+            esc\Classes\Timer::startCycle();
+
+            /*
             try {
-                esc\Classes\Timer::startCycle();
-
-                try {
-                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-                } catch (Exception $e) {
-                    Log::logAddLine('ERROR', $e->getMessage(), true);
-                    Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
-                }
-
-                $pause = esc\Classes\Timer::getNextCyclePause();
-
-                if (isDebug()) {
-                    $runTime = (($waitTime * 1000) - $pause) / 1000;
-
-                    $runTimes->push($runTime);
-
-                    $average = $runTimes->avg();
-
-                    if ($runTime < $min) {
-                        $min = $runTime;
-                    }
-
-                    if ($runTime > $max) {
-                        $max = $runTime;
-                    }
-
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
-                }
-
-                usleep($pause);
-            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
-                Log::logAddLine('Maniaplanet', $e->getMessage());
-            } catch (Error $e) {
-                Log::logAddLine('cycle', 'EvoSC encountered an error: ' . $e->getMessage());
-                Log::logAddLine('cycle', $e->getTraceAsString(), false);
+                \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+            } catch (Exception $e) {
+                Log::logAddLine('ERROR', $e->getMessage(), true);
+                Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
             }
+            */
+
+            \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+
+            $pause = esc\Classes\Timer::getNextCyclePause();
+
+            if (isDebug()) {
+                $runTime = (($waitTime * 1000) - $pause) / 1000;
+
+                $runTimes->push($runTime);
+
+                $average = $runTimes->avg();
+
+                if ($runTime < $min) {
+                    $min = $runTime;
+                }
+
+                if ($runTime > $max) {
+                    $max = $runTime;
+                }
+
+                \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
+            }
+
+            usleep($pause);
         }
     }
 }

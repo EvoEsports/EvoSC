@@ -53,10 +53,11 @@ class Dedimania extends DedimaniaApi
         Log::logAddLine('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
 
         //Add hooks
+        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'showManialink']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
-        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
 
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:CpPositionTracker" id="CpPositionTracker" version="3">
+    <framemodel id="record">
+        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('cp-pos-tracker.pos')}" size="40 60" scale="{config('cp-pos-tracker.scale')}">
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="RajdhaniMono" />
+
+        <frame id="ranking" pos="1 -7">
+            {for $i=0; $i < config('cp-pos-tracker.show'); $i++}
+            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct Position {
+        Integer cp;
+        Integer time;
+        Text login;
+        Text nick;
+    }
+
+    declare Position[Text] positions;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Position[Integer][Integer] getTable(){
+        declare Integer max = 0;
+
+        foreach(pos in positions){
+            if(pos.cp > max){
+                max = pos.cp;
+            }
+        }
+
+        declare Position[Integer][Integer] table = Position[Integer][Integer];
+
+        for(i, 0, max){
+            table[i] = Position[Integer];
+        }
+
+        foreach(pos in positions){
+            table[pos.cp][pos.time] = pos;
+        }
+
+        return table;
+    }
+
+    Void updateView(){
+        declare ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        declare table = getTable();
+        declare Integer i = 0;
+
+        foreach(cp => group in table){
+            if(group.count > 0){
+                foreach(pos in group){
+                    if(i < {config('cp-pos-tracker.show')}){
+                        declare record = (ranking.Controls[i] as CMlFrame);
+                        (record.Controls[0] as CMlLabel).SetText((cp + 1) ^ ".");
+                        (record.Controls[1] as CMlLabel).SetText(formatScoreCorrect(pos.time, False));
+                        (record.Controls[2] as CMlLabel).SetText(formatScoreCorrect(pos.time, True));
+                        (record.Controls[3] as CMlLabel).SetText(pos.nick);
+                        record.Show();
+                        i = i + 1;
+                    }
+                }
+            }
+        }
+
+        for(x, i, {config('cp-pos-tracker.show') - 1}){
+            (ranking.Controls[x] as CMlFrame).Hide();
+        }
+    }
+
+    Void remove(Text login){
+        if(positions.existskey(login)){
+            positions.removekey(login);
+        }
+    }
+
+    Void handleWayPoint(CTmMlPlayer player, Integer cp, Integer time){
+        declare login = player.User.Login;
+        declare nick = player.User.Name;
+
+        remove(login);
+        positions[login] = Position{ cp = cp, time = time, login = login, nick = nick };
+        updateView();
+    }
+
+    main(){
+        positions = Position[Text];
+
+        while(True){
+            yield;
+
+            foreach(event in RaceEvents){
+                if(event.Type == CTmRaceClientEvent::EType::Respawn){
+                    declare login = event.Player.User.Login;
+                    remove(login);
+                    updateView();
+                }
+                if(event.Type == CTmRaceClientEvent::EType::WayPoint){
+                    handleWayPoint(event.Player, event.CheckpointInLap, event.LapTime);
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>
