@@ -379,6 +379,7 @@
 
     main(){
         declare Text[Text][] CurrentLocals for LocalUser;
+        declare Text currentMap = Map.MapInfo.MapUid;
 
         rows = {config('locals.rows')};
         showTop = {config('locals.showtop')};
@@ -440,6 +441,12 @@
                 updateWidget();
                 updateWindow();
                 CurrentLocals = Text[Text][];
+            }
+
+            if(currentMap != Map.MapInfo.MapUid){
+                currentMap = Map.MapInfo.MapUid;
+                updateWidget();
+                updateWindow();
             }
 
             hidescript();

@@ -375,6 +375,7 @@
 
     main(){
         declare Text[Text][] CurrentDedis for LocalUser;
+        declare Text currentMap = Map.MapInfo.MapUid;
 
         rows = {config('dedimania.rows')};
         showTop = {config('dedimania.showtop')};
@@ -437,6 +438,12 @@
                 updateWidget();
                 updateWindow();
                 CurrentDedis = Text[Text][];
+            }
+
+            if(currentMap != Map.MapInfo.MapUid){
+                currentMap = Map.MapInfo.MapUid;
+                updateWidget();
+                updateWindow();
             }
 
             hidescript();
