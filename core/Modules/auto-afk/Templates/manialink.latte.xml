@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:AfkTracker" id="AfkTracker" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare maxMinutes = {config('auto-afk.minutes')};
+        declare ping = GameTime;
+
+        while(True){
+            yield;
+
+            wait(RaceEvents.count > 0);
+
+            foreach(event in RaceEvents){
+                if(event.Player == InputPlayer){
+                    ping = GameTime;
+                }
+            }
+
+            if((GameTime - ping) / 60000 >= maxMinutes){
+                TriggerPageAction("afk");
+            }
+        }
+    }
+
+    --></script>
+</manialink>
