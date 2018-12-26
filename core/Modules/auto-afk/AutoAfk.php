@@ -18,7 +18,7 @@ class AutoAfk
 
     public function __construct()
     {
-        KeyController::createBind('X', [self::class, 'reload']);
+        // KeyController::createBind('X', [self::class, 'reload']);
 
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
 
@@ -38,6 +38,7 @@ class AutoAfk
 
     public static function setAfk(Player $player)
     {
+        Server::forceSpectator($player->Login, 3);
         Server::forceSpectatorTarget($player->Login, "", 2);
         ChatController::message(onlinePlayers(), $player, ' was moved to spectators after ', secondary(config('auto-afk.minutes') . ' minutes'), ' of racing inactivity.');
     }

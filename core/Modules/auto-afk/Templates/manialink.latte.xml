@@ -7,6 +7,7 @@
     main(){
         declare maxMinutes = {config('auto-afk.minutes')};
         declare ping = GameTime;
+        declare send = False;
 
         while(True){
             yield;
@@ -15,12 +16,14 @@
 
             foreach(event in RaceEvents){
                 if(event.Player == InputPlayer){
+                    send = False;
                     ping = GameTime;
                 }
             }
 
-            if((GameTime - ping) / 60000 >= maxMinutes){
+            if((GameTime - ping) / 60000 >= maxMinutes && !send){
                 TriggerPageAction("afk");
+                send = True;
             }
         }
     }

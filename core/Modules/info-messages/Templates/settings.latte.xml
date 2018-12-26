@@ -1,3 +1,0 @@
-<frame>
-    <label pos="15 -2.5" z-index="0" size="30 5" text="Add info-message" halign="center" valign="center" focusareacolor1="{config('colors.ui.header')|noescape}2" focusareacolor2="{config('colors.ui.header')|noescape}a" scriptevents="1" textsize="1" action="infomessages.edit,-1"/>
-</frame>

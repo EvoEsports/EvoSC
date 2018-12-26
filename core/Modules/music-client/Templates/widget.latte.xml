@@ -309,8 +309,7 @@ Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
 }
 
 main() {
-    declare netwrite Text Upstream for UI;
-    Upstream = "hello";
+    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
 
     startLoading();
     musicEnabled = False;
@@ -318,7 +317,11 @@ main() {
 
     log("[ESC:music-client] Request music list");
     declare CHttpRequest getSongList = Http.CreateGet(url);
-    wait(getSongList.IsCompleted);
+
+    while(getSongList.IsCompleted != True){
+        yield;
+        progress.RelativeRotation = progress.RelativeRotation + 2.0;
+    }
 
     log("[ESC:music-client] Got music list, parsing list.");
     music.fromjson(getSongList.Result);
@@ -336,7 +339,6 @@ main() {
 
     player <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
-    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
     declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
     declare sortByArtist <=> (Page.MainFrame.GetFirstChild("sort-by-artist") as CMlQuad);
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);

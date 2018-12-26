@@ -1,5 +1,6 @@
 {
-  "pos"  : "-116 89",
-  "scale": 0.85,
-  "show" : 16
+  "pos"    : "-116 89",
+  "scale"  : 0.85,
+  "show"   : 16,
+  "enabled": true
 }

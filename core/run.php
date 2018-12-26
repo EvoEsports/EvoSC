@@ -19,7 +19,7 @@ class EscRun extends Command
         $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
 
         $dispatcher->addListener(\Symfony\Component\Console\ConsoleEvents::ERROR, function (\Symfony\Component\Console\Event\ConsoleErrorEvent $event) {
-            $output = $event->getOutput();
+            $output  = $event->getOutput();
             $command = $event->getCommand();
 
             $output->writeln(sprintf('Exception thrown while running <info>%s</info>', $command->getName()));
@@ -160,40 +160,44 @@ class EscRun extends Command
         }
 
         while (true) {
-            esc\Classes\Timer::startCycle();
-
-            /*
             try {
+                esc\Classes\Timer::startCycle();
+
+                /*
+                try {
+                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+                } catch (Exception $e) {
+                    Log::logAddLine('ERROR', $e->getMessage(), true);
+                    Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
+                }
+                */
+
                 \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+
+                $pause = esc\Classes\Timer::getNextCyclePause();
+
+                if (isDebug()) {
+                    $runTime = (($waitTime * 1000) - $pause) / 1000;
+
+                    $runTimes->push($runTime);
+
+                    $average = $runTimes->avg();
+
+                    if ($runTime < $min) {
+                        $min = $runTime;
+                    }
+
+                    if ($runTime > $max) {
+                        $max = $runTime;
+                    }
+
+                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
+                }
+
+                usleep($pause);
             } catch (Exception $e) {
-                Log::logAddLine('ERROR', $e->getMessage(), true);
-                Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
+                echo "Fatal exception: " . $e->getMessage() . "\n";
             }
-            */
-
-            \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-
-            $pause = esc\Classes\Timer::getNextCyclePause();
-
-            if (isDebug()) {
-                $runTime = (($waitTime * 1000) - $pause) / 1000;
-
-                $runTimes->push($runTime);
-
-                $average = $runTimes->avg();
-
-                if ($runTime < $min) {
-                    $min = $runTime;
-                }
-
-                if ($runTime > $max) {
-                    $max = $runTime;
-                }
-
-                \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
-            }
-
-            usleep($pause);
         }
     }
 }
