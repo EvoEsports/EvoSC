@@ -15,16 +15,18 @@ class Timer
     public $callback;
     public $runtime;
 
-    private function __construct(string $id, array $callback, int $runtime)
+    private function __construct(string $id, $callback, int $runtime)
     {
-        $this->id = $id;
+        $this->id       = $id;
         $this->callback = $callback;
-        $this->runtime = $runtime;
+        $this->runtime  = $runtime;
     }
 
     /**
      * Gets timer with id
+     *
      * @param string $id
+     *
      * @return Timer|null
      */
     public static function getTimer(string $id): ?Timer
@@ -33,6 +35,7 @@ class Timer
 
         if (!$timer) {
             Log::warning("Can not get non-existent timer: $id");
+
             return null;
         }
 
@@ -41,19 +44,23 @@ class Timer
 
     /**
      * Creates a new timer
-     * @param string $id
-     * @param string $callback
-     * @param string $delayTime
-     * @param bool $override
+     *
+     * @param string                $id
+     * @param string|array|callable $callback
+     * @param string                $delayTime
+     * @param bool                  $override
      */
-    public static function create(string $id, array $callback, string $delayTime, bool $override = false)
+    public static function create(string $id, $callback, string $delayTime, bool $override = false)
     {
-        if (!self::$timers) self::$timers = new Collection();
+        if (!self::$timers) {
+            self::$timers = new Collection();
+        }
 
         $timers = self::$timers;
 
         if ($timers->where('id', $id)->isNotEmpty()) {
             Log::warning("Timer with id: $id already exists, not setting.");
+
             return;
         }
 
@@ -62,12 +69,11 @@ class Timer
         $timer = new Timer($id, $callback, $runtime);
 
         $timers->push($timer);
-
-//        Log::info("Created timer $id");
     }
 
     /**
      * Delays a timer
+     *
      * @param string $id
      * @param string $timeString
      */
@@ -82,7 +88,9 @@ class Timer
 
     /**
      * Gets seconds left until the timer is executed
+     *
      * @param string $id
+     *
      * @return int
      */
     public static function secondsLeft(string $id): int
@@ -101,13 +109,20 @@ class Timer
      */
     private static function executeTimers()
     {
-        if (!self::$timers) return;
+        if (!self::$timers) {
+            return;
+        }
 
-        $toRun = self::$timers->where('runtime', '<', time());
+        $toRun        = self::$timers->where('runtime', '<', time());
         self::$timers = self::$timers->diff($toRun);
 
         foreach ($toRun as $timer) {
-            call_user_func($timer->callback);
+            if (gettype($timer->callback) == "object") {
+                $func = $timer->callback;
+                $func();
+            } else {
+                call_user_func($timer->callback);
+            }
         }
     }
 
@@ -121,6 +136,7 @@ class Timer
 
     /**
      * Calculate the sleep time
+     *
      * @return int
      */
     public static function getNextCyclePause(): int
@@ -140,7 +156,9 @@ class Timer
      * Converts time string to minutes
      * Example: 3h -> 180, 1d -> 1440, 1mo12h9m -> 43321
      * m = minutes, h = hours, d = days, w = weeks, mo = months
+     *
      * @param string $durationShort
+     *
      * @return int
      */
     public static function textTimeToMinutes(string $durationShort): int
@@ -169,7 +187,9 @@ class Timer
     /**
      * Converts time string to seconds
      * m = minutes, h = hours, d = days, w = weeks, mo = months
+     *
      * @param string $durationShort
+     *
      * @return int
      */
     public static function textTimeToSeconds(string $durationShort): int
@@ -203,10 +223,11 @@ class Timer
 
     /**
      * Creates a hash from the timer
+     *
      * @return string
      */
     public function __toString()
     {
-        return sprintf('%s.%s.%d', $this->id, $this->callback[0].$this->callback[1], $this->runtime);
+        return "timer:$this->id";
     }
 }

@@ -288,7 +288,6 @@ class Dedimania extends DedimaniaApi
             $dedi = $map->dedis()->wherePlayer($player->id)->first();
 
             if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
-                self::addNewTime($dedi);
                 self::sendUpdatedDedis($map);
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
             } else {

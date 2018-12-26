@@ -5,8 +5,10 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Script;
+use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Classes\Timer;
+use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\InfoMessage;
@@ -18,12 +20,45 @@ class InfoMessages
     {
         ChatCommand::add('messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', '//', 'messages');
 
+        ManiaLinkEvent::add('info.add', [self::class, 'add'], 'info_messages');
+        ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
+
         KeyController::createBind('X', [self::class, 'reload']);
+    }
+
+    public static function reloadInfoMessages()
+    {
+
+    }
+
+    public static function add(Player $player, $message, $pause)
+    {
+        $id = InfoMessage::insertGetId([
+            'text'  => $message,
+            'delay' => $pause,
+        ]);
+
+        self::reload($player);
+
+        Timer::create('info_message_' . $id, function () use ($message) {
+            ChatController::message(onlinePlayers(), $message);
+        }, '10s');
+    }
+
+    public static function update(Player $player, $id, $message, $pause)
+    {
+        InfoMessage::whereId($id)->update([
+            'text' => $message,
+            'delay'   => $pause,
+        ]);
+
+        self::reload($player);
     }
 
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
-        Template::show($player, 'info-messages.manialink');
+        $messages = InfoMessage::all();
+        Template::show($player, 'info-messages.manialink', compact('messages'));
     }
 }

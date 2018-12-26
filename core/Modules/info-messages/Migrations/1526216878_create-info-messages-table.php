@@ -18,7 +18,6 @@ class CreateInfoMessagesTable extends Migration
         $schemaBuilder->create('info-messages', function (Blueprint $table) {
             $table->increments('id');
             $table->string('text');
-            $table->string('color');
             $table->integer('delay');
         });
     }

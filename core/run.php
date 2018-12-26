@@ -15,21 +15,6 @@ class EscRun extends Command
         $this->setName('run')
              ->setDescription('Run Evo Server Controller')
              ->addOption('daemon', 'd', \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL, 'Run command as daemon.', null);
-
-        $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
-
-        $dispatcher->addListener(\Symfony\Component\Console\ConsoleEvents::ERROR, function (\Symfony\Component\Console\Event\ConsoleErrorEvent $event) {
-            $output  = $event->getOutput();
-            $command = $event->getCommand();
-
-            $output->writeln(sprintf('Exception thrown while running <info>%s</info>', $command->getName()));
-
-            // gets the current exit code (the exception code or the exit code set by a ConsoleEvents::TERMINATE event)
-            $exitCode = $event->getExitCode();
-
-            // changes the exception to another one
-            $event->setException(new \LogicException('Caught exception', $exitCode, $event->getError()));
-        });
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -147,56 +132,31 @@ class EscRun extends Command
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         \esc\Classes\Server::rpc()->disableServiceAnnounces(true);
 
-        $this->loop();
-    }
-
-    private function loop()
-    {
-        if (isDebug()) {
-            $runTimes = collect();
-            $min      = 10000;
-            $max      = 0;
-            $waitTime = config('server.controller-interval');
-        }
-
         while (true) {
             try {
                 esc\Classes\Timer::startCycle();
 
-                /*
                 try {
                     \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
                 } catch (Exception $e) {
                     Log::logAddLine('ERROR', $e->getMessage(), true);
                     Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
                 }
-                */
-
-                \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
 
                 $pause = esc\Classes\Timer::getNextCyclePause();
 
-                if (isDebug()) {
-                    $runTime = (($waitTime * 1000) - $pause) / 1000;
-
-                    $runTimes->push($runTime);
-
-                    $average = $runTimes->avg();
-
-                    if ($runTime < $min) {
-                        $min = $runTime;
-                    }
-
-                    if ($runTime > $max) {
-                        $max = $runTime;
-                    }
-
-                    \esc\Classes\Log::logAddLine('cycle', sprintf('Finished in %.2fms (Min: %.2fms, Max: %.2fms, Avg: %.2fms)', $runTime, $min, $max, $average));
-                }
-
                 usleep($pause);
-            } catch (Exception $e) {
-                echo "Fatal exception: " . $e->getMessage() . "\n";
+            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
+                Log::logAddLine('MPS', $e->getMessage());
+            } catch (Error $e) {
+                $errorClass = get_class($e);
+                $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
+                $output->writeln("<fg=white;bg=red;options=bold>" . $e->getMessage() . "</>");
+                $output->writeln("<error>===============================================================================</error>");
+                $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
+
+                Log::logAddLine('CYCLE-ERROR', 'EvoSC encountered an error: ' . $e->getMessage(), false);
+                Log::logAddLine('CYCLE-ERROR', $e->getTraceAsString(), false);
             }
         }
     }
