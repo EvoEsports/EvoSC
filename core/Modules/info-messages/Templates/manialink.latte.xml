@@ -1,18 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:InfoMessages" id="InfoMessages" version="3">
-    <frame id="settings" pos="-20 10">
-        <quad size="40 5" bgcolor="{config('colors.ui.header')}c" z-index="-1" />
-        <quad size="40 20" bgcolor="000c" z-index="-1" />
+    <frame id="settings" pos="-60 30">
+        <quad id="handle" size="115 5" z-index="5" />
+        <quad size="120 5" bgcolor="{config('colors.ui.header')}9" z-index="-1" />
+        <quad size="120 60" bgcolor="000c" z-index="-1" />
         <label textfont="RajdhaniMono" pos="1.5 -2.5" valign="center" textsize="0.5" textprefix="$s" text="Info Messages" />
-        <label textfont="RajdhaniMono" class="close" pos="37.5 -2.5" size="5 5" valign="center" halign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0001" />
+        <label textfont="RajdhaniMono" class="close" pos="117.5 -2.5" size="5 5" valign="center" halign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0001" />
+
+        <label class="create" pos="8 -8" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" />
+    </frame>
+
+    <frame id="edit" pos="-30 8" z-index="20000" hidden="1">
+        <quad size="60 16" bgcolor="000c" z-index="-1" />
+
+        <label text="Message:" textsize="0.5" pos="2 -2" size="58 4" />
+        <entry textsize="0.5" pos="2 -5" size="56 4" />
+
+        <label class="add" pos="8 -12" size="15 4" text="ADD" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0f06" focusareacolor2="0f0c" />
+        <label class="cancel" pos="23 -12" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="f006" focusareacolor2="f00c" />
     </frame>
 
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    Void createMessage(){
+        declare editFrame <=> (Page.MainFrame.GetFirstChild("edit") as CMlFrame);
+        editFrame.Show();
+        declare run = True;
+
+        while(run){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+                if(event.Control.HasClass("cancel") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    editFrame.Hide();
+                    run = False;
+                }
+            }
+        }
+    }
+
     main(){
-        log("");
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    (Page.MainFrame.GetFirstChild("settings") as CMlFrame).Hide();
+                }
+
+                if(event.Control.HasClass("create") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    createMessage();
+                }
+            }
+
+            maniaLinkDrag();
+        }
     }
 
     --></script>

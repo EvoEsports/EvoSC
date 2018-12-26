@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -12,6 +13,7 @@ use esc\Controllers\KeyController;
 use esc\Controllers\PlayerController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class AutoAfk
 {
@@ -38,8 +40,18 @@ class AutoAfk
 
     public static function setAfk(Player $player)
     {
-        Server::forceSpectator($player->Login, 3);
-        Server::forceSpectatorTarget($player->Login, "", 2);
+        try {
+            Server::forceSpectator($player->Login, 3);
+        } catch (Exception $e) {
+            Log::logAddLine('AutoAfk', $e->getMessage());
+        }
+
+        try {
+            Server::forceSpectatorTarget($player->Login, "", 2);
+        } catch (Exception $e) {
+            Log::logAddLine('AutoAfk', $e->getMessage());
+        }
+
         ChatController::message(onlinePlayers(), $player, ' was moved to spectators after ', secondary(config('auto-afk.minutes') . ' minutes'), ' of racing inactivity.');
     }
 }

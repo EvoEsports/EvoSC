@@ -108,7 +108,7 @@ class LocalRecords
                 self::sendUpdatedLocals($map);
             }
         } else {
-            if ($localCount < 100) {
+            if ($localCount < config('locals.limit')) {
                 $map->locals()->create([
                     'Player'      => $player->id,
                     'Map'         => $map->id,
