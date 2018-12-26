@@ -14,12 +14,20 @@ class Timer
     public $id;
     public $callback;
     public $runtime;
+    public $repeat;
+    public $delay;
 
-    private function __construct(string $id, $callback, int $runtime)
+    private function __construct(string $id, $callback, int $runtime, bool $repeat = false)
     {
         $this->id       = $id;
         $this->callback = $callback;
         $this->runtime  = $runtime;
+        $this->repeat   = $repeat;
+    }
+
+    public function setNewRuntimeDelay($delay)
+    {
+        $this->runtime = time() + self::textTimeToSeconds($delay);
     }
 
     /**
@@ -48,9 +56,9 @@ class Timer
      * @param string                $id
      * @param string|array|callable $callback
      * @param string                $delayTime
-     * @param bool                  $override
+     * @param bool                  $repeat
      */
-    public static function create(string $id, $callback, string $delayTime, bool $override = false)
+    public static function create(string $id, $callback, string $delayTime, bool $repeat = false)
     {
         if (!self::$timers) {
             self::$timers = new Collection();
@@ -66,7 +74,8 @@ class Timer
 
         $runtime = time() + self::textTimeToSeconds($delayTime);
 
-        $timer = new Timer($id, $callback, $runtime);
+        $timer        = new Timer($id, $callback, $runtime, $repeat);
+        $timer->delay = $delayTime;
 
         $timers->push($timer);
     }
@@ -114,7 +123,8 @@ class Timer
         }
 
         $toRun        = self::$timers->where('runtime', '<', time());
-        self::$timers = self::$timers->diff($toRun);
+        $toRemove     = $toRun->where('repeat', false);
+        self::$timers = self::$timers->diff($toRemove);
 
         foreach ($toRun as $timer) {
             if (gettype($timer->callback) == "object") {
@@ -122,6 +132,10 @@ class Timer
                 $func();
             } else {
                 call_user_func($timer->callback);
+            }
+
+            if ($timer->repeat) {
+                $timer->setNewRuntimeDelay($timer->delay);
             }
         }
     }

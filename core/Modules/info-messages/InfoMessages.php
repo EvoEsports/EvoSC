@@ -23,12 +23,13 @@ class InfoMessages
         ManiaLinkEvent::add('info.add', [self::class, 'add'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
 
+        foreach (InfoMessage::all() as $message) {
+            Timer::create('info_message_' . $message, function () use ($message) {
+                ChatController::message(onlinePlayers(), '_info', $message->text);
+            }, $message->delay . 'm', true);
+        }
+
         KeyController::createBind('X', [self::class, 'reload']);
-    }
-
-    public static function reloadInfoMessages()
-    {
-
     }
 
     public static function add(Player $player, $message, $pause)
@@ -41,15 +42,15 @@ class InfoMessages
         self::reload($player);
 
         Timer::create('info_message_' . $id, function () use ($message) {
-            ChatController::message(onlinePlayers(), $message);
-        }, '10s');
+            ChatController::message(onlinePlayers(), '_info', $message->text);
+        }, $message->delay . 'm', true);
     }
 
     public static function update(Player $player, $id, $message, $pause)
     {
         InfoMessage::whereId($id)->update([
-            'text' => $message,
-            'delay'   => $pause,
+            'text'  => $message,
+            'delay' => $pause,
         ]);
 
         self::reload($player);
