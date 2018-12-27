@@ -80,6 +80,8 @@ class EventController
 
     /**
      * @param $playerInfos
+     *
+     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
      */
     private static function mpPlayerInfoChanged($playerInfos)
     {
@@ -161,7 +163,7 @@ class EventController
             try {
                 $player = Player::findOrFail($login);
             } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerConnect', "Error: Player ($login) not found!");
+                Log::logAddLine('ERROR', "mpPlayerConnect: Player ($login) not found!");
             }
 
             try {
@@ -171,7 +173,7 @@ class EventController
                 createCrashReport($e);
             }
         } else {
-            throw new \Exception('Malformed callback');
+            throw new \Exception('Malformed callback in mpPlayerConnect');
         }
     }
 

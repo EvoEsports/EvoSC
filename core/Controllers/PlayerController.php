@@ -166,6 +166,9 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
+        if ($player->last_visit->diffInSeconds() < 10) {
+            return $player;
+        }
 
         $diffString = $player->last_visit->diffForHumans();
 
