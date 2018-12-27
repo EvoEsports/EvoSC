@@ -385,6 +385,7 @@
         headerColor = (Page.MainFrame.GetFirstChild("header-color") as CMlLabel).TextColor;
 
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare lastPlayersCount = 0;
 
         updateWidget();
         updateWindow();
@@ -444,6 +445,12 @@
 
             if(currentMap != Map.MapInfo.MapUid){
                 currentMap = Map.MapInfo.MapUid;
+                updateWidget();
+                updateWindow();
+            }
+
+            if(lastPlayersCount != Players.count){
+                lastPlayersCount = Players.count;
                 updateWidget();
                 updateWindow();
             }
