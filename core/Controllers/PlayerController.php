@@ -219,7 +219,7 @@ class PlayerController
         Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
 
         $diff = $player->last_visit->diffForHumans();
-        ChatController::message(onlinePlayers(), '_info', $player, ' left the server after ', secondary($diff), ' playtime.');
+        ChatController::message(onlinePlayers(), '_info', $player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.');
     }
 
     public static function getPlayerByServerId(int $id): ?Player

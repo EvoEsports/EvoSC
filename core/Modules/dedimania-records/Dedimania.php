@@ -153,15 +153,6 @@ class Dedimania extends DedimaniaApi
                 ];
             });
 
-            if ($map->mx_world_record) {
-                $data = $map->mx_world_record;
-                if ($data->ReplayTime < $dedisCollection->first()['score']) {
-                    ChatController::message(onlinePlayers(), '_info', 'World record is ', secondary(formatScore($data->ReplayTime)), ' by ', secondary($data->Username));
-                } else {
-                    ChatController::message(onlinePlayers(), '_info', 'World record is ', secondary(formatScore($dedisCollection->first()['score'])), ' by ', secondary($dedisCollection->first()['NickName']));
-                }
-            }
-
             $dedisJson = $dedisCollection->toJson();
 
             Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
