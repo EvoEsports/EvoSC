@@ -82,7 +82,7 @@
         declare Position[Integer][Integer] table = Position[Integer][Integer];
 
         for(i, 0, max){
-            table[i] = Position[Integer];
+            table[max - i] = Position[Integer];
         }
 
         foreach(pos in positions){
@@ -141,9 +141,11 @@
 
             foreach(event in RaceEvents){
                 if(event.Type == CTmRaceClientEvent::EType::Respawn){
-                    declare login = event.Player.User.Login;
-                    remove(login);
-                    updateView();
+                    if(event.Player.CurRace.Time == -1){
+                        declare login = event.Player.User.Login;
+                        remove(login);
+                        updateView();
+                    }
                 }
                 if(event.Type == CTmRaceClientEvent::EType::WayPoint){
                     handleWayPoint(event.Player, event.CheckpointInLap, event.LapTime);
