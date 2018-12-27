@@ -255,7 +255,7 @@ $$: Writes a dollarsign
                     break;
 
                 case 'warning':
-                    $icon       = "";
+                    $icon       = "";
                     $color      = config('colors.warning');
                     $groupColor = config('colors.warning');
                     array_shift($parts);

@@ -114,11 +114,11 @@ class MapController
 
             Log::info("Setting next map: " . $request->map);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
+            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
                 $request->issuer);
         } else {
             $nextMap = self::getNext();
-            ChatController::message(onlinePlayers(), '$fff', ' Upcoming map ', secondary($nextMap));
+            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($nextMap));
         }
     }
 

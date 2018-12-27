@@ -1,13 +1,14 @@
 {
-  "primary": "07A",
-  "secondary": "AEF",
+  "primary": "7a5",
+  "secondary": "eec",
   "chat": "FE9",
-  "info": "357",
-  "warning": "F52",
-  "local": "28F",
-  "dedi": "147",
+  "info": "5ad",
+  "warning": "f22",
+  "local": "6b4",
+  "dedi": "492",
   "ui": {
-    "background": "222",
-    "header": "07A"
+    "background": "111",
+    "header": "38c",
+    "primary": "38c"
   }
 }

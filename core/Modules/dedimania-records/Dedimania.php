@@ -141,7 +141,7 @@ class Dedimania extends DedimaniaApi
             $playerIds = $dedis->pluck('Player');
             $players   = Player::whereIn('id', $playerIds)->get();
 
-            $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
+            $dedisCollection = $dedis->map(function (Dedi $dedi) use ($players) {
                 $player = $players->where('id', $dedi->Player)->first();
 
                 return [
@@ -151,7 +151,18 @@ class Dedimania extends DedimaniaApi
                     'nick'  => $player->NickName,
                     'login' => $player->Login,
                 ];
-            })->toJson();
+            });
+
+            if ($map->mx_world_record) {
+                $data = $map->mx_world_record;
+                if ($data->ReplayTime < $dedisCollection->first()['score']) {
+                    ChatController::message(onlinePlayers(), '_info', 'World record is ', secondary(formatScore($data->ReplayTime)), ' by ', secondary($data->Username));
+                } else {
+                    ChatController::message(onlinePlayers(), '_info', 'World record is ', secondary(formatScore($dedisCollection->first()['score'])), ' by ', secondary($dedisCollection->first()['NickName']));
+                }
+            }
+
+            $dedisJson = $dedisCollection->toJson();
 
             Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
         }
