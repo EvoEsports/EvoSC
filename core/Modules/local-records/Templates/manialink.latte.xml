@@ -336,11 +336,15 @@
             start = start - empty + 1;
 
             for(i, start, end){
+                if(i < 0 || i >= records.count) continue;
+
                 recordsSelection.add(records[i]);
             }
         }
 
         declare onlinePlayers = getOnlinePlayers();
+
+        sleep(500);
 
         for(i, 0, recordsSelection.count - 1){
             declare record = recordsSelection[i];

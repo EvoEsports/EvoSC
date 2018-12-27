@@ -332,6 +332,8 @@
             start = start - empty + 1;
 
             for(i, start, end){
+                if(i < showTop || i >= records.count) continue;
+
                 recordsSelection.add(records[i]);
             }
         }

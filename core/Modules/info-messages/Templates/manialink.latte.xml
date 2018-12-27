@@ -9,13 +9,14 @@
 
         <label class="create" textfont="RajdhaniMono" pos="8 -8.5" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" />
 
-        <label text="Messages" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" pos="5.5 -12" />
-        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" pos="102 -12" />
+        <label text="Messages" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" pos="9 -12" />
+        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" halign="right" pos="118 -12" />
 
         {foreach $messages as $message}
-        <label class="edit" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" />
-        <label text="{$message->text}" textsize="0.5" pos="5.5 {$iterator->counter * -4 - 12}" textfont="RajdhaniMono" />
-        <label text="{$message->delay} minutes" textsize="0.5" pos="102 {$iterator->counter * -4 - 12}" textfont="RajdhaniMono" />
+        <label class="delete" data-id="{$message->id}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" />
+        <label class="edit" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="6.5 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}6" focusareacolor2="{config('colors.ui.header')}c" />
+        <label text="{$message->text}" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}" textfont="RajdhaniMono" />
+        <label text="{$message->delay} minutes" halign="right" textsize="0.5" pos="118 {$iterator->counter * -4 - 12}" textfont="RajdhaniMono" />
         {/foreach}
     </frame>
 
@@ -91,6 +92,11 @@
                     declare pause = event.Control.DataAttributeGet("pause");
                     declare id = event.Control.DataAttributeGet("id");
                     createMessage(message, pause, id);
+                }
+
+                if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare id = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("info.delete," ^ id);
                 }
             }
 

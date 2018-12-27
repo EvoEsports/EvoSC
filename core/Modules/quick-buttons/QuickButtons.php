@@ -21,7 +21,7 @@ class QuickButtons
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
 
-        KeyController::createBind('Q', [self::class, 'addOne'], 'time');
+        // KeyController::createBind('Q', [self::class, 'addOne'], 'time');
 
         self::addButton('', '+5 min', 'time.add,5', 'time');
         self::addButton('', '+10 min', 'time.add,10', 'time');

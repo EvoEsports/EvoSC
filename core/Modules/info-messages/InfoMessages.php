@@ -5,7 +5,6 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
@@ -16,34 +15,46 @@ use esc\Models\Player;
 
 class InfoMessages
 {
+    private static $startTime;
+
     public function __construct()
     {
-        ChatCommand::add('messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', '//', 'messages');
+        self::$startTime = time();
+
+        ChatCommand::add('messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', '//', 'info_messages');
 
         ManiaLinkEvent::add('info.add', [self::class, 'add'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
+        ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
 
-        foreach (InfoMessage::all() as $message) {
-            Timer::create('info_message_' . $message, function () use ($message) {
+        Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
+    }
+
+    private static function minutesSinceStart()
+    {
+        return (time() - self::$startTime) / 60;
+    }
+
+    public static function displayInfoMessages()
+    {
+        $minutesSinceStart = self::minutesSinceStart();
+        $messages          = InfoMessage::all();
+
+        foreach ($messages as $message) {
+            if ($minutesSinceStart % $message->delay == 0) {
                 ChatController::message(onlinePlayers(), '_info', $message->text);
-            }, $message->delay . 'm', true);
+            }
         }
-
-        KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function add(Player $player, $message, $pause)
     {
-        $id = InfoMessage::insertGetId([
+        InfoMessage::create([
             'text'  => $message,
             'delay' => $pause,
         ]);
 
         self::reload($player);
-
-        Timer::create('info_message_' . $id, function () use ($message) {
-            ChatController::message(onlinePlayers(), '_info', $message->text);
-        }, $message->delay . 'm', true);
     }
 
     public static function update(Player $player, $id, $message, $pause)
@@ -56,10 +67,10 @@ class InfoMessages
         self::reload($player);
     }
 
-    public static function reload(Player $player)
+    public static function delete(Player $player, $id)
     {
-        TemplateController::loadTemplates();
-        $messages = InfoMessage::all();
-        Template::show($player, 'info-messages.manialink', compact('messages'));
+        InfoMessage::whereId($id)->delete();
+
+        self::reload($player);
     }
 }

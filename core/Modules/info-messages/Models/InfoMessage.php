@@ -10,4 +10,6 @@ class InfoMessage extends Model
     protected $table = 'info-messages';
 
     public $timestamps = false;
+
+    protected $fillable = ['text', 'delay'];
 }

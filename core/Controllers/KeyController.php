@@ -24,7 +24,7 @@ class KeyController
 
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
 
-        self::createBind('Q', [self::class, 'reloadConfig']);
+        // self::createBind('Q', [self::class, 'reloadConfig']);
     }
 
     public static function reloadConfig(Player $player)

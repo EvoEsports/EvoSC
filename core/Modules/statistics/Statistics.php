@@ -30,7 +30,7 @@ class Statistics
 
         Hook::add('EndMatch', [Statistics::class, 'showScores']);
 
-        Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m');
+        Timer::create('update_playtimes', [Statistics::class, 'updatePlaytimes'], '1m', true);
     }
 
     public static function showScores(...$args)
@@ -125,8 +125,6 @@ class Statistics
         foreach (onlinePlayers() as $player) {
             $player->stats()->increment('Playtime');
         }
-
-        Timer::create('update-playtimes', [Statistics::class, 'updatePlaytimes'], '1m', true);
     }
 
     /**
