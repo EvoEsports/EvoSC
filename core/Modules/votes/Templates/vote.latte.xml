@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="Vote" version="3">
-    <frame id="widget" pos="{config('votes.pos')}" scale="{config('votes.scale')}">
+    <frame id="widget" pos="{config('votes.pos')}" scale="{config('votes.scale')}" z-index="50000">
         <quad pos="0 0" z-index="-2" size="50 16" bgcolor="{config('colors.ui.background')}c" />
         <label pos="2 -2" z-index="1" size="49 2.8" text=" {$vote->question}" textsize="1"/>
         <quad pos="0 0" z-index="0" size="50 6.5" bgcolor="{config('colors.ui.header')}c"/>
