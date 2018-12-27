@@ -344,8 +344,6 @@
 
         declare onlinePlayers = getOnlinePlayers();
 
-        sleep(500);
-
         for(i, 0, recordsSelection.count - 1){
             declare record = recordsSelection[i];
             if(i >= recordsFrame.Controls.count){
@@ -391,13 +389,11 @@
         headerColor = (Page.MainFrame.GetFirstChild("header-color") as CMlLabel).TextColor;
 
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare lastPlayerCount = 0;
 
         updateWidget();
         updateWindow();
         setupGraphs();
-
-        log("locals-count: " ^ records.count);
-        log("my-local: " ^ getMyRank());
 
         declare myRank = getMyRank();
         if(myRank != "-1"){
@@ -449,6 +445,12 @@
 
             if(currentMap != Map.MapInfo.MapUid){
                 currentMap = Map.MapInfo.MapUid;
+                updateWidget();
+                updateWindow();
+            }
+
+            if(lastPlayerCount != Players.count){
+                lastPlayerCount = Players.count;
                 updateWidget();
                 updateWindow();
             }

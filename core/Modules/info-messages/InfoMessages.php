@@ -47,30 +47,36 @@ class InfoMessages
         }
     }
 
-    public static function add(Player $player, $message, $pause)
+    public static function add(Player $player, $pause, $message)
     {
         InfoMessage::create([
             'text'  => $message,
             'delay' => $pause,
         ]);
 
-        self::reload($player);
+        self::showSettings($player);
     }
 
-    public static function update(Player $player, $id, $message, $pause)
+    public static function update(Player $player, $id, $pause, $message)
     {
         InfoMessage::whereId($id)->update([
             'text'  => $message,
             'delay' => $pause,
         ]);
 
-        self::reload($player);
+        self::showSettings($player);
     }
 
     public static function delete(Player $player, $id)
     {
         InfoMessage::whereId($id)->delete();
 
-        self::reload($player);
+        self::showSettings($player);
+    }
+
+    public static function showSettings(Player $player)
+    {
+        $messages = InfoMessage::all();
+        Template::show($player, 'info-messages.manialink', compact('messages'));
     }
 }

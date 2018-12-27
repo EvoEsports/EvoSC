@@ -24,7 +24,7 @@
         <quad size="60 23" bgcolor="000c" z-index="-1" />
 
         <label text="Message:" textsize="0.5" pos="2 -2" size="58 4" textfont="RajdhaniMono" />
-        <entry textsize="0.5" pos="2 -5" size="56 4" textfont="RajdhaniMono" />
+        <entry textsize="0.5" pos="2 -5" size="56 4" textfont="RajdhaniMono" textprefix="{config('colors.info')}" />
 
         <label text="Show every (minutes):" textsize="0.5" pos="2 -9" size="58 4" textfont="RajdhaniMono" />
         <entry textsize="0.5" pos="2 -12" size="56 4" textfont="RajdhaniMono" />
@@ -58,9 +58,9 @@
                 if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
                     editFrame.Hide();
                     if(id == "-1"){
-                        TriggerPageAction("info.add," ^ messageInput.Value ^ "," ^ pauseInput.Value);
+                        TriggerPageAction("info.add," ^ pauseInput.Value ^ "," ^ messageInput.Value);
                     }else{
-                        TriggerPageAction("info.update," ^ id ^ "," ^ messageInput.Value ^ "," ^ pauseInput.Value);
+                        TriggerPageAction("info.update," ^ id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
                     }
                     run = False;
                 }
