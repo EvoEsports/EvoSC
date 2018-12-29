@@ -430,6 +430,14 @@
                 }
 
                 if(event.Control.HasClass("record") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    if(event.Control.Parent.HasClass("window-record")){
+                        declare index = TL::ToInteger(event.Control.Parent.DataAttributeGet("id"));
+                        target = records[index];
+                        TriggerPageAction("profile," ^ target["login"]);
+                    }
+                }
+
+                if(event.Control.HasClass("record") && event.Type == CMlScriptEvent::Type::MouseClick){
                     if(!event.Control.Parent.HasClass("window-record")){
                         window.Show();
                     }

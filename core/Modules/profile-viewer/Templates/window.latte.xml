@@ -2,7 +2,7 @@
 <manialink name="ESC:Profile" id="Profile" version="3">
     <framemodel id="info">
         <label pos="0 0" textsize="0.1" text="Label" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
-        <label pos="0 -2" textsize="0.75" text="Value" textfont="RajdhaniMono" />
+        <label pos="0 -2" textsize="0.75" size="24 4" text="Value" textfont="RajdhaniMono" />
     </framemodel>
 
     <frame id="window" pos="-50 16" size="120 180" z-index="3">
