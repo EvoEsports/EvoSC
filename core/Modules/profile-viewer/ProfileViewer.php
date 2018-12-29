@@ -20,8 +20,6 @@ class ProfileViewer
 
     public static function showProfile(Player $player, string $targetLogin)
     {
-        TemplateController::loadTemplates();
-
         $target = Player::whereLogin($targetLogin)->first();
 
         if ($target) {
