@@ -101,6 +101,10 @@
         reset();
 
         foreach(player in Players){
+            if(player == Null) continue;
+            if(player.Score == Null) continue;
+            if(player.Score.BestLap == Null) continue;
+
             declare score = player.Score.BestLap.Time;
             if(score > 0){
                 scores[player.User.Name] = score;

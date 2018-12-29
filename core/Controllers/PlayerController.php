@@ -166,7 +166,7 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        if ($player->last_visit->diffInSeconds() < 10) {
+        if ($player->last_visit->diffInSeconds() < 30) {
             return $player;
         }
 
