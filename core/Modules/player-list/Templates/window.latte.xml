@@ -155,6 +155,14 @@ main() {
                 }
             }
 
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("warn")){
+                declare login = event.Control.Parent.Parent.DataAttributeGet("login");
+                declare reason = input("Enter a reason or leave empty");
+                if(reason != "-1"){
+                    TriggerPageAction("warn," ^ login ^ "," ^ reason);
+                }
+            }
+
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("ban")){
                 declare login = event.Control.Parent.Parent.DataAttributeGet("reason");
                 declare reason = input("Enter a reason or leave empty");
