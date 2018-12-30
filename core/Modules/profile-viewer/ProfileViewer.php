@@ -38,7 +38,7 @@ class ProfileViewer
                 'Playtime'     => round($target->stats->Playtime / 60, 0) . 'h',
                 'Finishes'     => $target->stats->Finishes,
                 'Wins'         => $target->stats->Wins,
-                'Donations'    => $target->stats->Donations,
+                'Donations'    => $target->stats->Donations . ' Planets',
             ]);
 
             $zonePath = $target->getOriginal('path');

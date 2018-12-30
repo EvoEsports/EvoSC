@@ -43,7 +43,7 @@ class RestClient
             $options['headers'] = [];
         }
 
-        $options['headers']['User-Agent'] = sprintf('EvoSC/%s (SERVER %s) PHP/7.2', getEscVersion());
+        $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.2', getEscVersion());
 
         return $options;
     }
