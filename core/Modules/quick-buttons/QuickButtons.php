@@ -18,6 +18,7 @@ class QuickButtons
     public function __construct()
     {
         Hook::add('PlayerConnect', [self::class, 'showButtons']);
+        Hook::add('GroupChanged', [self::class, 'showButtons']);
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
 

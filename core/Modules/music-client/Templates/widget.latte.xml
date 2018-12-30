@@ -154,12 +154,12 @@ Void setSong(Text[Text] song){
         return;
     }
 
-    log("[ESC:music-client] Set: " ^ url);
+    //log("[ESC:music-client] Set: " ^ url);
 
     declare audio <=> (Page.MainFrame.GetFirstChild("audio") as CMlMediaPlayer);
     startLoading();
     audio.Url = url;
-    sleep(40);
+    sleep(400);
     audio.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);

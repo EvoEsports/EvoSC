@@ -4,9 +4,11 @@ namespace esc\Modules;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\HookController;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\AccessRight;
@@ -30,7 +32,7 @@ class GroupManager
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
 
-        if(config('quick-buttons.enabled')){
+        if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
 
@@ -60,6 +62,7 @@ class GroupManager
 
         if ($groupNameExists) {
             ChatController::message($player, '_warning', 'Group name ', secondary($input), ' already taken.');
+
             return;
         }
 
@@ -92,7 +95,7 @@ class GroupManager
 
     public static function groupEdit(Player $player, string $groupId)
     {
-        $group = Group::find($groupId);
+        $group        = Group::find($groupId);
         $accessRights = AccessRight::all();
 
         Template::show($player, 'group-manager.edit', compact('group', 'accessRights'));
@@ -134,14 +137,14 @@ class GroupManager
 
         if ($member) {
             Player::whereLogin($memberLogin)->update(['Group' => 3]);
-            ChatController::message(onlinePlayers(),$player, ' removed ', $member, '\'s access rights.');
+            ChatController::message(onlinePlayers(), $player, ' removed ', $member, '\'s access rights.');
             self::groupMembers($player, $groupId);
         }
     }
 
     public static function groupMemberAddForm(Player $player, string $groupId)
     {
-        $players = onlinePlayers();
+        $players     = onlinePlayers();
         $playerCount = $players->count();
 
         Template::show($player, 'group-manager.add', compact('players', 'groupId', 'playerCount'));
@@ -150,7 +153,7 @@ class GroupManager
     public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)
     {
         $newMember = Player::find($playerLogin);
-        $group = Group::find($groupId);
+        $group     = Group::find($groupId);
 
         if ($newMember) {
             if ($newMember->group->id == 3) {
@@ -159,7 +162,10 @@ class GroupManager
                 ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
             }
 
-            Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
+            $player = Player::whereLogin($playerLogin)->get();
+
+            $player->update(['Group' => $group->id]);
+            Hook::fire('GroupChanged', $player);
         }
     }
 }

@@ -36,18 +36,6 @@ class GroupController
         }, $seed);
     }
 
-    public static function group(Player $player, $cmd, $action, ...$arguments)
-    {
-        switch ($action) {
-            case 'add':
-                self::groupAdd($player, $arguments);
-                break;
-
-            default:
-                ChatController::message($player, '_warning', 'Invalid action supplied. Valid actions are: add');
-        }
-    }
-
     public static function groupsShow(Player $player)
     {
         Template::hide($player, 'Group - Edit');
