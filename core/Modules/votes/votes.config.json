@@ -1,6 +1,7 @@
 {
-  "pos": "-160 -34",
-  "scale": 0.76,
-  "vote-duration": 30,
-  "enabled": true
+  "pos"     : "80 88",
+  "scale"   : 0.78,
+  "duration": 30,
+  "cooldown": 120,
+  "enabled" : true
 }

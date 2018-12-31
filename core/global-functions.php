@@ -13,15 +13,17 @@ function formatScore(int $score): string
 function serverName(): string
 {
     global $serverName;
+
     return $serverName;
 }
 
 function console(): \esc\Models\Player
 {
-    $player           = new \esc\Models\Player();
-    $player->Login    = serverName();
-    $player = serverName();
-    $player->Group    = \esc\Models\Group::find(1);
+    $player        = new \esc\Models\Player();
+    $player->Login = serverName();
+    $player        = serverName();
+    $player->Group = \esc\Models\Group::find(1);
+
     return $player;
 }
 
@@ -98,7 +100,7 @@ function baseDir(string $filename = ''): string
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
 {
-    if(!$withSpectators){
+    if (!$withSpectators) {
         return \esc\Models\Player::where('player_id', '>', 0)->whereSpectatorStatus(0)->get();
     }
 
@@ -108,6 +110,11 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
 function finishPlayers(): \Illuminate\Support\Collection
 {
     return esc\Models\Player::where('Score', '>', 0)->get();
+}
+
+function now(): \Carbon\Carbon
+{
+    return (new \Carbon\Carbon())->now();
 }
 
 function cutZeroes(string $formattedScore): string

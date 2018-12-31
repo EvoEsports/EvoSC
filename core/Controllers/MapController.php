@@ -244,9 +244,12 @@ class MapController
      *
      * @param Player $player
      */
-    public static function skip(Player $player)
+    public static function skip(Player $player = null)
     {
-        ChatController::message(onlinePlayers(), '_info', $player, ' skips map');
+        if ($player) {
+            ChatController::message(onlinePlayers(), '_info', $player, ' skips map');
+        }
+
         MapController::goToNextMap();
     }
 

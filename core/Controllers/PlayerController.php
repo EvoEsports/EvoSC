@@ -166,10 +166,6 @@ class PlayerController
      */
     public static function playerConnect(Player $player): Player
     {
-        if ($player->last_visit->diffInSeconds() < 30) {
-            return $player;
-        }
-
         $diffString = $player->last_visit->diffForHumans();
 
         ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
@@ -177,6 +173,7 @@ class PlayerController
 
         $player->update([
             'last_visit' => (new Carbon()),
+            'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
         return $player;
@@ -237,5 +234,10 @@ class PlayerController
     public static function hidePlayerlist()
     {
         Template::hideAll('players');
+    }
+
+    private static function getPlayerServerId(Player $player): int
+    {
+        return Server::rpc()->getPlayerInfo($player->Login)->playerId;
     }
 }

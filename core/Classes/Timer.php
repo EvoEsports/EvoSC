@@ -80,6 +80,11 @@ class Timer
         $timers->push($timer);
     }
 
+    public static function destroy(string $string)
+    {
+        self::$timers = self::$timers->where('id', '!=', $string);
+    }
+
     /**
      * Delays a timer
      *

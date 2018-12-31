@@ -320,6 +320,7 @@ main() {
 
     while(getSongList.IsCompleted != True){
         yield;
+        hidescript();
         progress.RelativeRotation = progress.RelativeRotation + 2.0;
     }
 

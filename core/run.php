@@ -117,14 +117,14 @@ class EscRun extends Command
         esc\Classes\Hook::fire('BeginMap', $map);
 
         //Set connected players online
-        $onlinePlayersLogins = collect(\esc\Classes\Server::rpc()->getPlayerList())->pluck('login');
-        $onlinePlayers       = esc\Models\Player::whereIn('Login', $onlinePlayersLogins)->get();
-        esc\Models\Player::whereNotIn('Login', $onlinePlayersLogins)->where('player_id', '>', 0)->update(['player_id' => 0]);
-        foreach ($onlinePlayers as $player) {
-            \esc\Classes\Hook::fire('PlayerConnect', $player);
+        \esc\Models\Player::where('player_id', '>', 0)->update(['player_id' => 0]);
+        $playerList = collect(\esc\Classes\Server::rpc()->getPlayerList());
 
-            if (isVeryVerbose()) {
-                Log::logAddLine('BOOT', 'Connecting player ' . $player, true);
+        foreach ($playerList as $maniaPlayer) {
+            $player = \esc\Models\Player::whereLogin($maniaPlayer->login)->first();
+
+            if ($player) {
+                \esc\Classes\Hook::fire('PlayerConnect', $player);
             }
         }
 
