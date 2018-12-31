@@ -13,6 +13,7 @@ use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
+use esc\Models\Group;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -33,10 +34,9 @@ class MapList
         Hook::add('MapPoolUpdated', [MapList::class, 'mapPoolUpdated']);
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
+        Hook::add('GroupChanged', [self::class, 'sendManialink']);
 
         ChatController::addCommand('list', [self::class, 'searchMap'], 'Search maps or open maplist');
-
-        // KeyController::createBind('X', [MapList::class, 'reload']);
     }
 
     /**
@@ -101,15 +101,16 @@ class MapList
 
     public static function queueDropMap(Player $player, $mapId)
     {
-        $map = Map::find($mapId);
+        $map       = Map::find($mapId);
         $queueItem = MapController::getQueue()->where('map', $map)->first();
 
         if (!$queueItem) {
             return;
         }
 
-        if($queueItem->issuer->Login != $player->Login){
+        if ($queueItem->issuer->Login != $player->Login) {
             ChatController::sendMessage($player, '_warning', 'You can not drop other players maps');
+
             return;
         }
 
@@ -148,8 +149,9 @@ class MapList
                 'name'         => $map->gbx->Name,
                 'author_login' => $map->author->Login,
                 'author_nick'  => $map->author->NickName,
-                'rating'       => $map->average_rating,
+                'r'            => $map->average_rating,
                 'uid'          => $map->gbx->MapUid,
+                'c'            => $map->cooldown,
             ];
         })->toJson();
     }
@@ -205,8 +207,9 @@ class MapList
     public static function sendManialink(Player $player)
     {
         self::sendUpdatedMaplist($player);
-        $favorites = self::getMapFavoritesJson($player);
-        Template::show($player, 'map-list.manialink', compact('favorites'));
+        $favorites      = self::getMapFavoritesJson($player);
+        $ignoreCooldown = $player->hasAccess('queue.recent');
+        Template::show($player, 'map-list.manialink', compact('favorites', 'ignoreCooldown'));
     }
 
     public static function queueMap(Player $player, $mapId)

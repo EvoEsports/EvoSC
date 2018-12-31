@@ -156,16 +156,14 @@ class GroupManager
         $group     = Group::find($groupId);
 
         if ($newMember) {
+            Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
+            Hook::fire('GroupChanged', $player);
+
             if ($newMember->group->id == 3) {
                 ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group));
             } else {
                 ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
             }
-
-            $player = Player::whereLogin($playerLogin)->get();
-
-            $player->update(['Group' => $group->id]);
-            Hook::fire('GroupChanged', $player);
         }
     }
 }

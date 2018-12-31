@@ -21,6 +21,7 @@ class Player extends Model
         'MaxRank',
         'Banned',
         'last_visit',
+        'Group'
     ];
     protected $primaryKey   = 'Login';
     public    $incrementing = false;

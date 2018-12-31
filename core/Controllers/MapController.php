@@ -127,9 +127,13 @@ class MapController
      */
     public static function beginMap(Map $map)
     {
+        Map::where('id', '!=', $map->id)->increment('cooldown');
+
         $map->increment('plays');
-        $map->increment('cooldown');
-        $map->update(['last_played' => Carbon::now()]);
+        $map->update([
+            'last_played' => Carbon::now(),
+            'cooldown'    => 0,
+        ]);
 
         self::loadMxDetails($map);
 
@@ -282,18 +286,24 @@ class MapController
                 ->isNotEmpty()) {
 
             //Player already has map in queue
-            ChatController::message($player, "You already have a map in queue", []);
+            ChatController::message($player, '_warning', "You already have a map in queue.");
+
+            return self::$queue;
+        }
+
+        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('queue.recent')) {
+            ChatController::message($player, '_info', 'Can not juke recently played tracks.');
 
             return self::$queue;
         }
 
         self::$queue->push(new MapQueueItem($player, $map, time()));
 
-        //Preload map -> faster map change
+        //Preload map => faster map change
         Server::chooseNextMap(self::getNext()->filename);
 
-        ChatController::message(onlinePlayers(), $player, ' juked map ', $map);
-        Log::info("$player juked map " . $map->gbx->Name);
+        ChatController::message(onlinePlayers(), '_info', $player, ' juked map ', $map);
+        Log::logAddLine('MapController', "$player juked map " . $map->gbx->Name);
         Hook::fire('QueueUpdated', self::$queue);
 
         return self::$queue;

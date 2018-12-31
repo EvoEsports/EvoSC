@@ -16,8 +16,6 @@ class CpPositionTracker
         if (config('cp-pos-tracker.enabled')) {
             Hook::add('PlayerConnect', [self::class, 'showManialink']);
         }
-
-        KeyController::createBind('X', [self::class, 'showManialink']);
     }
 
     public static function showManialink(Player $player)
