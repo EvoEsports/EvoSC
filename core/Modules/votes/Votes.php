@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
@@ -31,8 +32,7 @@ class Votes
         ChatController::addCommand('y', [self::class, 'voteYes'], 'Vote yes');
         ChatController::addCommand('n', [self::class, 'voteNo'], 'Vote no');
 
-        // Hook::add('EndMatch', [self::class, 'endMatch']);
-        // Hook::add('BeginMatch', [self::class, 'beginMatch']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
 
         KeyController::createBind('F5', [self::class, 'voteYes']);
         KeyController::createBind('F6', [self::class, 'voteNo']);
@@ -170,7 +170,13 @@ class Votes
     {
         Timer::destroy('vote.check_state');
         $action = self::$vote['action'];
-        $action(true);
+
+        try {
+            $action(true);
+        } catch (\Error $e) {
+            Log::logAddLine('Votes', $e->getMessage());
+        }
+
         self::$vote   = null;
         self::$voters = collect();
         ChatController::message(onlinePlayers(), '_info', $player, ' passes vote.');
@@ -182,11 +188,35 @@ class Votes
     {
         Timer::destroy('vote.check_state');
         $action = self::$vote['action'];
-        $action(false);
+
+        try {
+            $action(false);
+        } catch (\Error $e) {
+            Log::logAddLine('Votes', $e->getMessage());
+        }
+
         self::$vote   = null;
         self::$voters = collect();
         ChatController::message(onlinePlayers(), '_info', $player, ' cancels vote.');
         $voteStateJson = '{"yes":-1,"no":-1}';
         Template::showAll('votes.update-vote', compact('voteStateJson'));
+    }
+
+    public static function endMatch()
+    {
+        Timer::destroy('vote.check_state');
+        $action = self::$vote['action'];
+
+        try {
+            $action(false);
+        } catch (\Error $e) {
+            Log::logAddLine('Votes', $e->getMessage());
+        }
+
+        self::$vote    = null;
+        self::$voters  = collect();
+        $voteStateJson = '{"yes":-1,"no":-1}';
+        Template::showAll('votes.update-vote', compact('voteStateJson'));
+        ChatController::message(onlinePlayers(), '_info', 'Vote cancelled.');
     }
 }

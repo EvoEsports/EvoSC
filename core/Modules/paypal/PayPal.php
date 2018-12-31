@@ -4,7 +4,9 @@ namespace esc\Modules;
 
 
 use esc\Classes\Config;
+use esc\Classes\File;
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
@@ -17,6 +19,13 @@ class PayPal
         if (config('paypal.url')) {
             Hook::add('PlayerConnect', [PayPal::class, 'show']);
         }
+
+        ManiaLinkEvent::add('rickroll', [self::class, 'rickroll']);
+    }
+
+    public static function rickroll(Player $player)
+    {
+        File::appendLine(cacheDir('rickrolled.txt'), stripAll(now() . ' ' . $player->Login . ' - ' . $player));
     }
 
     public static function reload(Player $player)
