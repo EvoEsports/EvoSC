@@ -6,6 +6,7 @@
       "hidden": "160 7"
     },
     "cost": 100,
+    "time-limit": 30,
     "forceable": false
   },
 

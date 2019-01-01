@@ -168,8 +168,10 @@ class PlayerController
     {
         $diffString = $player->last_visit->diffForHumans();
 
-        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
-        Log::info($player . " joined the server.");
+        if ($player->player_id == 0) {
+            ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
+            Log::info($player . " joined the server.");
+        }
 
         $player->update([
             'last_visit' => (new Carbon()),

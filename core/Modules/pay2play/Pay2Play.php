@@ -37,14 +37,16 @@ class Pay2Play
     {
         if (config('pay2play.addtime.enabled')) {
 
+            /*
             if (config('votes.enabled')) {
                 if (Votes::addTimeFailed() && !config('pay2play.addtime.forceable')) {
                     ChatController::message($player,'_info', 'Can not force more playtime after a vote failed.');
                     return;
                 }
             }
+            */
 
-            if (MapController::getAddedTime() + 10 <= config('server.max-playtime')) {
+            if (MapController::getAddedTime() + 10 <= config('pay2play.addtime.time-limit')) {
                 PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
             } else {
                 ChatController::message($player, '_warning', 'Maximum playtime for this round reached');
