@@ -204,19 +204,21 @@ class Votes
 
     public static function endMatch()
     {
-        Timer::destroy('vote.check_state');
-        $action = self::$vote['action'];
+        if (self::$vote != null) {
+            Timer::destroy('vote.check_state');
+            $action = self::$vote['action'];
 
-        try {
-            $action(false);
-        } catch (\Error $e) {
-            Log::logAddLine('Votes', $e->getMessage());
+            try {
+                $action(false);
+            } catch (\Error $e) {
+                Log::logAddLine('Votes', $e->getMessage());
+            }
+
+            self::$vote    = null;
+            self::$voters  = collect();
+            $voteStateJson = '{"yes":-1,"no":-1}';
+            Template::showAll('votes.update-vote', compact('voteStateJson'));
+            ChatController::message(onlinePlayers(), '_info', 'Vote cancelled.');
         }
-
-        self::$vote    = null;
-        self::$voters  = collect();
-        $voteStateJson = '{"yes":-1,"no":-1}';
-        Template::showAll('votes.update-vote', compact('voteStateJson'));
-        ChatController::message(onlinePlayers(), '_info', 'Vote cancelled.');
     }
 }

@@ -37,7 +37,7 @@
 
         secondString = "" ^ seconds;
 
-        if(seconds < 10 && minutes > 0 && !cutZeroes){
+        if(seconds < 10 && !cutZeroes){
             secondString = "0" ^ seconds;
         }
 
