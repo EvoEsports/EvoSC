@@ -7,11 +7,12 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 
-class EventController
+class EventController implements ControllerInterface
 {
     /**
      * @param $executedCallbacks
@@ -312,5 +313,14 @@ class EventController
         } else {
             throw new \Exception('Malformed callback');
         }
+    }
+
+    /**
+     * Method called on boot.
+     *
+     * @return mixed
+     */
+    public static function init()
+    {
     }
 }

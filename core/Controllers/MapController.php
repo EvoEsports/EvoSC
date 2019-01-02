@@ -11,6 +11,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MapQueueItem;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\MatchSettingsManager;
@@ -20,7 +21,7 @@ use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 use mysql_xdevapi\Exception;
 
-class MapController
+class MapController implements ControllerInterface
 {
     private static $mapsPath;
     private static $currentMap;

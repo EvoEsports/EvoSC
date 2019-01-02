@@ -4,9 +4,10 @@ namespace esc\Controllers;
 
 
 use esc\Classes\Database;
+use esc\Interfaces\ControllerInterface;
 use Illuminate\Database\Schema\Blueprint;
 
-class AccessController
+class AccessController implements ControllerInterface
 {
     public static function init()
     {

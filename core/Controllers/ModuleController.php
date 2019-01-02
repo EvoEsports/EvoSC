@@ -7,11 +7,12 @@ use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use ReflectionMethod;
 
-class ModuleController
+class ModuleController implements ControllerInterface
 {
     private static $loadedModules;
 

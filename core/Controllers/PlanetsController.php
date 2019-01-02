@@ -7,10 +7,11 @@ use Carbon\Carbon;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Timer;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Bill;
 use esc\Models\Player;
 
-class PlanetsController
+class PlanetsController implements ControllerInterface
 {
     private static $openBills;
     private static $billStates;

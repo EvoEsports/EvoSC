@@ -9,12 +9,13 @@ use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Group;
 use esc\Models\Player;
 use Illuminate\Database\Schema\Blueprint;
 
-class GroupController
+class GroupController implements ControllerInterface
 {
     public static function init()
     {

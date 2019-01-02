@@ -11,6 +11,7 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,7 +19,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
-class PlayerController
+class PlayerController implements ControllerInterface
 {
     private static $fakePlayers;
 

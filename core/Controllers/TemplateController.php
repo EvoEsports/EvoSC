@@ -8,11 +8,12 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\Template;
+use esc\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
 
-class TemplateController
+class TemplateController implements ControllerInterface
 {
     private static $latte;
     private static $templates;

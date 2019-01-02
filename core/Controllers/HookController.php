@@ -5,9 +5,10 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Interfaces\ControllerInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class HookController
+class HookController implements ControllerInterface
 {
     private static $hooks;
 

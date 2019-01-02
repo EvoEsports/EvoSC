@@ -5,9 +5,10 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 
-class ModeScriptEventController
+class ModeScriptEventController implements ControllerInterface
 {
     public static function handleModeScriptCallbacks($modescriptCallbackArray)
     {
@@ -150,5 +151,14 @@ class ModeScriptEventController
     private static function cpArrayToString(array $cps)
     {
         return implode(',', $cps);
+    }
+
+    /**
+     * Method called on boot.
+     *
+     * @return mixed
+     */
+    public static function init()
+    {
     }
 }

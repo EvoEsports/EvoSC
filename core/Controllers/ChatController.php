@@ -8,6 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Module;
 use esc\Classes\Server;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Dedi;
 use esc\Models\Group;
 use esc\Models\LocalRecord;
@@ -17,7 +18,7 @@ use esc\Models\Song;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
-class ChatController
+class ChatController implements ControllerInterface
 {
     /* maniaplanet chat styling
 $i: italic
