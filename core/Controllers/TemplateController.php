@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\ManiaScriptLib;
 use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
@@ -34,12 +35,15 @@ class TemplateController implements ControllerInterface
     {
         self::$latte->addFilter('date', function ($str) {
             $date = new Carbon($str);
+
             return $date->format('Y-m-d');
 
         })->addFilter('score', function ($str) {
             return formatScore($str);
         })->addFilter('cfg', function ($str) {
             return config($str);
+        })->addFilter('mslib', function ($str) {
+            return ManiaScriptLib::get($str);
         });
     }
 
@@ -50,7 +54,8 @@ class TemplateController implements ControllerInterface
 
     /**
      * @param string $index
-     * @param $values
+     * @param        $values
+     *
      * @return string
      */
     public static function getTemplate(string $index, $values): string
