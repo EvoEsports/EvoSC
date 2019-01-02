@@ -4,8 +4,14 @@ namespace esc\Classes;
 
 
 use Maniaplanet\DedicatedServer\Connection;
-use Maniaplanet\DedicatedServer\Xmlrpc\GameModeException;
 
+/**
+ * Class Server
+ *
+ * @package esc\Classes
+ *
+ * @method static bool banAndBlackList(string $login, string $reason, bool $save) throws InvalidArgumentException
+ */
 class Server
 {
     private static $rpc;

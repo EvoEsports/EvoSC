@@ -23,10 +23,9 @@ class CreatePlayersTable extends Migration
             $table->string('path')->nullable();
             $table->integer('Score')->default(0);
             $table->integer('player_id')->default(0);
-            $table->integer('Afk')->default(0);
             $table->integer('spectator_status')->default(0);
             $table->integer('MaxRank')->default(15);
-            $table->boolean('Banned')->default(false);
+            $table->boolean('banned')->default(false);
             $table->text('user_settings')->nullable();
             $table->dateTime('last_visit')->nullable();
         });

@@ -4,8 +4,9 @@ namespace esc\Exceptions;
 
 
 use esc\Classes\Log;
+use Exception;
 
-class InvalidCallbackException extends \Exception
+class InvalidCallbackException extends Exception
 {
     /**
      * InvalidCallbackException constructor.
