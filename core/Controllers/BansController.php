@@ -32,6 +32,7 @@ class BansController implements ControllerInterface
     public static function ban(Player $player, Player $admin, string $reason = '')
     {
         Server::banAndBlackList($player->Login, $reason, true);
+        $player->update(['banned' => true]);
         ChatController::message(onlinePlayers(), '_warning', $admin, ' banned ', $player, ', reason: ', secondary($reason));
     }
 
@@ -44,6 +45,7 @@ class BansController implements ControllerInterface
     public static function unban(Player $player, Player $admin)
     {
         Server::unBan($player->Login);
+        $player->update(['banned' => false]);
         ChatController::message(onlinePlayers(), '_warning', $admin, ' unbanned ', $player);
     }
 

@@ -4,7 +4,6 @@ namespace esc\Models;
 
 
 use Carbon\Carbon;
-use esc\Modules\MxKarma\MxKarma;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
@@ -19,7 +18,7 @@ class Player extends Model
         'path',
         'spectator_status',
         'MaxRank',
-        'Banned',
+        'banned',
         'last_visit',
         'Group'
     ];
