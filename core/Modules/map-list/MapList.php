@@ -88,7 +88,7 @@ class MapList
      * @param Player $player
      * @param int    $mapId
      */
-    public static function favRemove(Player $player, int $mapId)
+    public static function favRemove(Player $player, string $mapId)
     {
         $player->favorites()->detach($mapId);
     }
