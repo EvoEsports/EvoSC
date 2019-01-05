@@ -9,6 +9,7 @@ use esc\Classes\Log;
 use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Dedi;
 use esc\Models\Group;
 use esc\Models\LocalRecord;
@@ -53,10 +54,10 @@ $$: Writes a dollarsign
 
         Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
-        ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//',
-            'player.mute');
-        ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//',
-            'player.mute');
+        AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
+
+        ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//', 'player_mute');
+        ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//', 'player_mute');
     }
 
     public static function getChatCommands(): Collection

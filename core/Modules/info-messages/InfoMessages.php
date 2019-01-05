@@ -8,8 +8,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
-use esc\Controllers\TemplateController;
 use esc\Models\InfoMessage;
 use esc\Models\Player;
 

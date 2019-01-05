@@ -1,10 +1,10 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Illuminate\Database\Capsule\Manager as Capsule;
 
 class ImportUaseco extends Command
 {

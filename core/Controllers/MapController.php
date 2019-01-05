@@ -12,9 +12,9 @@ use esc\Classes\MapQueueItem;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\MatchSettingsManager;
 use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -42,20 +42,31 @@ class MapController implements ControllerInterface
         Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
         Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
-        ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'skip');
-        ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'ban');
-        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map.add');
-        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map.replay');
+        ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'map_skip');
+        ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'matchsettings_load');
+        ChatController::addCommand('add', [MapController::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map_add');
+        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map_replay');
         ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
 
         ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map.skip');
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
         ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
 
+        AccessRight::createIfNonExistent('map_queue_recent', 'Queue recently played tracks.');
+        AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
+        AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
+        AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
+        AccessRight::createIfNonExistent('map_disable', 'Disable map.');
+        AccessRight::createIfNonExistent('map_replay', 'Force a replay.');
+        AccessRight::createIfNonExistent('map_reset', 'Reset round.');
+        AccessRight::createIfNonExistent('matchsettings_load', 'Load matchsettings.');
+        AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
+        AccessRight::createIfNonExistent('time', 'Change the countdown time.');
+
         if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map.skip');
-            QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map.replay');
-            QuickButtons::addButton('', 'Reset Round', 'map.reset', 'map.reset');
+            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+            QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
+            QuickButtons::addButton('', 'Reset Round', 'map.reset', 'map_reset');
         }
     }
 

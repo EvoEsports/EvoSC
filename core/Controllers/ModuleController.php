@@ -3,11 +3,11 @@
 namespace esc\Controllers;
 
 use esc\Classes\ChatCommand;
-use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use ReflectionMethod;
@@ -20,10 +20,12 @@ class ModuleController implements ControllerInterface
     {
         self::$loadedModules = new Collection();
 
-        ManiaLinkEvent::add('modules.close', [ModuleController::class, 'hideModules']);
-        ManiaLinkEvent::add('module.reload', [ModuleController::class, 'reloadModule']);
+        AccessRight::createIfNonExistent('module_reload', 'Reload a module.');
 
-        ChatCommand::add('modules', [ModuleController::class, 'showModules'], 'Display all loaded modules', '//', 'module.reload');
+        ManiaLinkEvent::add('modules.close', [ModuleController::class, 'hideModules']);
+        ManiaLinkEvent::add('module.reload', [ModuleController::class, 'reloadModule'], 'module_reload');
+
+        ChatCommand::add('modules', [ModuleController::class, 'showModules'], 'Display all loaded modules', '//', 'module_reload');
     }
 
     public static function reloadModule(Player $callee, string $moduleName)
@@ -45,17 +47,18 @@ class ModuleController implements ControllerInterface
     {
         if (!$player->isMasteradmin()) {
             ChatController::message($player, warning('Access denied'));
+
             return;
         }
 
         $modules = Template::toString('modules', ['modules' => self::getModules()]);
 
         Template::show($player, 'components.modal', [
-            'id' => 'ModulesReloader',
-            'title' => 'ModulesReloader $f00(by the love of god, do not touch!)',
-            'width' => 180,
-            'height' => 97,
-            'content' => $modules
+            'id'      => 'ModulesReloader',
+            'title'   => 'ModulesReloader $f00(by the love of god, do not touch!)',
+            'width'   => 180,
+            'height'  => 97,
+            'content' => $modules,
         ]);
     }
 
@@ -66,8 +69,8 @@ class ModuleController implements ControllerInterface
 
     public static function outputModuleInformation($module)
     {
-        $name = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        $author = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $name    = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $author  = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
         $version = str_pad($module->version ?? 'n/a', 12, ' ', STR_PAD_RIGHT);
 
         Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
@@ -78,7 +81,7 @@ class ModuleController implements ControllerInterface
         $moduleDirectories->each(function ($moduleDirectory) {
             $moduleJson = __DIR__ . '/../Modules/' . $moduleDirectory . '/module.json';
             if (file_exists($moduleJson)) {
-                $json = file_get_contents($moduleJson);
+                $json              = file_get_contents($moduleJson);
                 $moduleInformation = json_decode($json);
                 self::$loadedModules->push($moduleInformation);
             }

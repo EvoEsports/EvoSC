@@ -11,7 +11,6 @@ use esc\Classes\Timer;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 

@@ -4,18 +4,14 @@ namespace esc\Controllers;
 
 
 use Carbon\Carbon;
-use esc\Classes\Database;
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Player;
-use esc\Models\Stats;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Schema\Blueprint;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
@@ -29,15 +25,16 @@ class PlayerController implements ControllerInterface
         Hook::add('PlayerDisconnect', [PlayerController::class, 'playerDisconnect']);
         Hook::add('PlayerFinish', [PlayerController::class, 'playerFinish']);
 
-        self::$fakePlayers = collect([]);
-        ChatController::addCommand('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//',
-            'kick');
-        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'kick');
+        AccessRight::createIfNonExistent('player_kick', 'Kick players.');
+        AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
 
-        ChatController::addCommand('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players',
-            '##', 'ban');
-        ChatController::addCommand('disfake', [PlayerController::class, 'disconnectFakePlayers'],
-            'Disconnect all fake players', '##', 'ban');
+        self::$fakePlayers = collect([]);
+        ChatController::addCommand('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//', 'player_kick');
+
+        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+
+        ChatController::addCommand('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', '##', 'player_fake');
+        ChatController::addCommand('disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', '##', 'player_fake');
     }
 
     /**

@@ -2,14 +2,11 @@
 
 namespace esc\Modules;
 
-use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
-use esc\Controllers\TemplateController;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Player;

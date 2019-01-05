@@ -3,14 +3,9 @@
 namespace esc\Modules\LocalRecords;
 
 use esc\Classes\Config;
-use esc\Classes\Database;
-use esc\Classes\File;
 use esc\Classes\Hook;
-use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\HookController;
-use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\LocalRecord;

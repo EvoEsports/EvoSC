@@ -14,8 +14,6 @@ use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\InvalidMapException;
-use mysql_xdevapi\Exception;
 use stdClass;
 
 class MxKarma extends MXK

@@ -4,7 +4,6 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
-use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 

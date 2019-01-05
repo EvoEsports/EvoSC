@@ -4,10 +4,8 @@ namespace esc\Modules;
 
 
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MXK;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
 

@@ -2,23 +2,17 @@
 
 namespace esc\Modules\MapList;
 
-use Carbon\Carbon;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MapQueueItem;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
-use esc\Models\Dedi;
-use esc\Models\Group;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class MapList
 {
@@ -138,20 +132,30 @@ class MapList
     public static function sendUpdatedMaplist(Player $player)
     {
         $maps = self::getMapListJson();
+
+        if (strlen($maps) > 65000) {
+            Log::error('The map list json is too long! You have too many maps. Sorry, we are working on this.');
+
+            return;
+        }
+
         Template::show($player, 'map-list.update-map-list', compact('maps'));
     }
 
     private static function getMapListJson(): string
     {
+        //max length ~65762
+        //length 60088 is ok
+
         return Map::whereEnabled(true)->get()->map(function (Map $map) {
             return [
-                'id'           => (string)$map->id,
-                'name'         => $map->gbx->Name,
-                'author_login' => $map->author->Login,
-                'author_nick'  => $map->author->NickName,
-                'r'            => $map->average_rating,
-                'uid'          => $map->gbx->MapUid,
-                'c'            => $map->cooldown,
+                'id'    => (string)$map->id,
+                'name'  => $map->gbx->Name,
+                'login' => $map->author->Login,
+                'nick'  => $map->author->NickName,
+                'r'     => sprintf('%.1f', $map->average_rating),
+                'uid'   => $map->gbx->MapUid,
+                'c'     => $map->cooldown,
             ];
         })->toJson();
     }

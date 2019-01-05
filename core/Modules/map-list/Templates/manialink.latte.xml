@@ -234,7 +234,7 @@ Text[Text] findMapById(Text id){
 Void updateWidget(Text[Text] map){
     declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     (widget.Controls[0] as CMlLabel).SetText(map["name"]);
-    (widget.Controls[1] as CMlLabel).SetText(map["author_nick"]);
+    (widget.Controls[1] as CMlLabel).SetText(map["nick"]);
 }
 
 Void resizeWindow(){
@@ -343,7 +343,7 @@ Void updateView(Text[Text][] mapPool, Integer page){
         declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
         mapFrame.DataAttributeSet("map-id", map["id"]);
         (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
-        (mapFrame.Controls[2] as CMlLabel).SetText(map["author_nick"]);
+        (mapFrame.Controls[2] as CMlLabel).SetText(map["nick"]);
         (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
         (mapFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
 
@@ -493,7 +493,7 @@ Void search(){
 
     for(i, 0, maps.count - 1){
         declare map = maps[i];
-        declare searchString = map["name"]^map["author_nick"]^map["author_login"];
+        declare searchString = map["name"]^map["nick"]^map["login"];
         if(TL::Find(input.Value, searchString, False, False)){
             mapsFound.add(map);
         }
@@ -668,8 +668,14 @@ main() {
     declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare controlsVisible = False;
+    declare Text[Text][] Maps for LocalUser;
 
     rearrangeButtons();
+
+    while(Maps.count == 0){
+        yield;
+        hidescript();
+    }
 
     while(True){
         yield;
@@ -789,7 +795,6 @@ main() {
         }
 
         if(checkMapChanges()){
-            declare Text[Text][] Maps for LocalUser;
             maps = Maps;
 
             if(currentTab == 0){

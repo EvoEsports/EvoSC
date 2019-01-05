@@ -3,9 +3,7 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\Database;
 use esc\Interfaces\ControllerInterface;
-use Illuminate\Database\Schema\Blueprint;
 
 class AccessController implements ControllerInterface
 {

@@ -4,7 +4,6 @@ namespace esc\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class Map extends Model
 {

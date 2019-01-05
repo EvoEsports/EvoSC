@@ -11,7 +11,6 @@ use esc\Classes\Server;
 use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
-use function GuzzleHttp\debug_resource;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;

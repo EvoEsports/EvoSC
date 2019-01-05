@@ -8,7 +8,6 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Exceptions\InvalidCallbackException;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;

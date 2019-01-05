@@ -2,13 +2,10 @@
 
 namespace esc\Modules\PBRecords;
 
-use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Player;

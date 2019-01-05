@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 
 class BansController implements ControllerInterface
@@ -17,9 +18,11 @@ class BansController implements ControllerInterface
      */
     public static function init()
     {
-        ChatController::addCommand('ban', [PlayerController::class, 'banPlayer'], 'Ban player by nickname', '//', 'ban');
+        AccessRight::createIfNonExistent('player_ban', 'Ban and unban players.');
 
-        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'ban');
+        ChatController::addCommand('ban', [PlayerController::class, 'banPlayer'], 'Ban player by nickname', '//', 'player_ban');
+
+        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
 
     /**

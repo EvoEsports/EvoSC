@@ -3,7 +3,6 @@
 namespace esc\Classes;
 
 use esc\Models\Stats;
-use esc\Modules\Statistics;
 
 class StatisticWidget
 {

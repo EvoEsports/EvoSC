@@ -9,8 +9,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
-use esc\Controllers\PlayerController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;

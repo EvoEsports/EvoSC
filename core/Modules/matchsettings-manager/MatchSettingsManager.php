@@ -10,7 +10,6 @@ use esc\Classes\MatchSettings;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;

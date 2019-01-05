@@ -8,7 +8,6 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaScriptLib;
-use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 use Latte\Engine;
