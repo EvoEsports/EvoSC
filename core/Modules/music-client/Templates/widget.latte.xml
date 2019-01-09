@@ -314,24 +314,28 @@ main() {
 
     declare CHttpRequest getSongList = Http.CreateGet(url);
 
-    while(getSongList.IsCompleted != True){
+    while(!getSongList.IsCompleted){
         yield;
         hidescript();
         progress.RelativeRotation = progress.RelativeRotation + 2.0;
     }
 
-    music.fromjson(getSongList.Result);
+    if(getSongList.StatusCode != 200){
+        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
+        log("[ESC:music-client] Music disabled, can not read song list from server.");
+        return;
+    }
 
-    log("[ESC:music-client] Loaded " ^ music.count ^ " songs");
-
-        //(Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-        //return;
+    declare json = getSongList.Result;
+    music.fromjson(json);
 
     if(music.count == 0){
         (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
         log("[ESC:music-client] Music disabled");
         return;
     }
+
+    log("[ESC:music-client] Loaded " ^ music.count ^ " songs");
 
     player <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
