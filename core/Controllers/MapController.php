@@ -63,11 +63,18 @@ class MapController implements ControllerInterface
         AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfNonExistent('time', 'Change the countdown time.');
 
+        KeyController::createBind('Q', [self::class, 'addMinute'], 'time');
+
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
             QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
             QuickButtons::addButton('', 'Reset Round', 'map.reset', 'map_reset');
         }
+    }
+
+    public static function addMinute(Player $player)
+    {
+        self::addTime(1);
     }
 
     /**

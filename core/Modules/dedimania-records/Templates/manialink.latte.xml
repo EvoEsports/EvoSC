@@ -306,7 +306,12 @@
             declare end = records.count - 1;
             declare start = end - remaining + 1;
 
+            if(start < showTop){
+                start = showTop;
+            }
+
             for(i, start, end){
+
                 recordsSelection.add(records[i]);
             }
         }else{
@@ -330,6 +335,10 @@
 
             declare empty = start + firstHalfFilled + remain - end;
             start = start - empty + 1;
+
+            if(start < showTop){
+                start = showTop;
+            }
 
             for(i, start, end){
                 if(i < showTop || i >= records.count) continue;
