@@ -151,7 +151,15 @@ class GroupManager
     public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)
     {
         $newMember = Player::find($playerLogin);
-        $group     = Group::find($groupId);
+
+        if (!$newMember) {
+            $newMember = Player::create([
+                'NickName' => $playerLogin,
+                'Login'    => $playerLogin,
+            ]);
+        }
+
+        $group = Group::find($groupId);
 
         if ($newMember) {
             Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
