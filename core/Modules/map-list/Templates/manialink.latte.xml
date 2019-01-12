@@ -342,6 +342,7 @@ Void updateView(Text[Text][] mapPool, Integer page){
         declare Text[Text] map = mapPool[id];
         declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
         mapFrame.DataAttributeSet("map-id", map["id"]);
+        mapFrame.DataAttributeSet("map-uid", map["uid"]);
         (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
         (mapFrame.Controls[2] as CMlLabel).SetText(map["nick"]);
         (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
@@ -594,20 +595,20 @@ Integer confirm(Text question){
 }
 
 Void buttonPressed(CMlFrame mapFrame, CMlControl control){
-    declare mapId = mapFrame.DataAttributeGet("map-id");
+    declare mapUid = mapFrame.DataAttributeGet("map-uid");
 
     if(control.HasClass("juke")){
-        TriggerPageAction("map.queue," ^ mapId);
+        TriggerPageAction("map.queue," ^ mapUid);
         return;
     }
 
     if(control.HasClass("drop")){
-        TriggerPageAction("map.drop," ^ mapId);
+        TriggerPageAction("map.drop," ^ mapUid);
         return;
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapId);
+        TriggerPageAction("mx.details," ^ mapUid);
         return;
     }
 
@@ -619,7 +620,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
         }
 
         if(answer == 1){
-            TriggerPageAction("maplist.delete," ^ mapId);
+            TriggerPageAction("maplist.delete," ^ mapUid);
         }
     }
 }
@@ -842,6 +843,8 @@ main() {
             AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
         }
     }
+
+    //UI.UISequence == CUIConfig::EUISequence::Podium
 }
     --></script>
 </manialink>

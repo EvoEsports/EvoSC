@@ -93,9 +93,9 @@ class MapList
         $player->favorites()->detach($mapId);
     }
 
-    public static function queueDropMap(Player $player, $mapId)
+    public static function queueDropMap(Player $player, $mapUid)
     {
-        $map       = Map::find($mapId);
+        $map       = Map::whereUid($mapUid)->first();
         $queueItem = MapController::getQueue()->where('map', $map)->first();
 
         if (!$queueItem) {
@@ -160,9 +160,9 @@ class MapList
         })->toJson();
     }
 
-    public static function deleteMap(Player $player, $mapId)
+    public static function deleteMap(Player $player, $mapUid)
     {
-        $map = Map::find($mapId);
+        $map = Map::whereUid($mapUid)->first();
 
         if (!$map) {
             return;
@@ -171,9 +171,9 @@ class MapList
         MapController::disableMap($player, $map);
     }
 
-    public static function deleteMapPerm(Player $player, $mapId)
+    public static function deleteMapPerm(Player $player, $mapUid)
     {
-        $map = Map::find($mapId);
+        $map = Map::whereUid($mapUid)->first();
 
         if (!$map) {
             return;
@@ -216,9 +216,9 @@ class MapList
         Template::show($player, 'map-list.manialink', compact('favorites', 'ignoreCooldown'));
     }
 
-    public static function queueMap(Player $player, $mapId)
+    public static function queueMap(Player $player, $mapUid)
     {
-        $map = Map::whereId($mapId)->first();
+        $map = Map::whereUid($mapUid)->first();
 
         if ($map) {
             MapController::queueMap($player, $map);

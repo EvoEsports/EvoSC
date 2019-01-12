@@ -342,8 +342,8 @@ class MapController implements ControllerInterface
 
     private static function getGbxInformation($filename): string
     {
-        $cmd = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . config('server.base') . '/UserData/Maps/' . str_replace('\\',
-                DIRECTORY_SEPARATOR, $filename) . '"';
+        $absolute = Server::getMapsDirectory() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename);
+        $cmd = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $absolute . '"';
 
         return shell_exec($cmd);
     }
@@ -484,8 +484,8 @@ class MapController implements ControllerInterface
 
             $map = Map::getByMxId($mxId);
 
-            if ($map) {
-                ChatController::message($player, $map, ' already exists');
+            if ($map && File::exists(self::$mapsPath . $map->filename)) {
+                ChatController::message($player, '_warning', secondary($map), ' already exists');
                 continue;
             }
 
@@ -511,11 +511,11 @@ class MapController implements ControllerInterface
 
             $mapFolder = self::$mapsPath;
             $body      = $response->getBody();
-            var_dump("$mapFolder$filename");
+            $absolute  = "$mapFolder$filename";
 
-            file_put_contents("$mapFolder$filename", $body);
+            File::put($absolute, $body);
 
-            if (!file_exists("$mapFolder$filename")) {
+            if (!File::exists($absolute)) {
                 ChatController::message($player, '_warning', "Map download ($mxId) failed.");
                 continue;
             }
@@ -535,13 +535,22 @@ class MapController implements ControllerInterface
                 $authorId = $author->id;
             }
 
-            $map = Map::firstOrCreate([
-                'uid'      => $gbx->MapUid,
-                'author'   => $authorId,
-                'filename' => $filename,
-                'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                'enabled'  => 1,
-            ]);
+            if ($map) {
+                $map->update([
+                    'author'   => $authorId,
+                    'filename' => $filename,
+                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                    'enabled'  => 1,
+                ]);
+            } else {
+                $map = Map::firstOrCreate([
+                    'uid'      => $gbx->MapUid,
+                    'author'   => $authorId,
+                    'filename' => $filename,
+                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                    'enabled'  => 1,
+                ]);
+            }
 
             try {
                 Server::addMap($map->filename);
@@ -552,7 +561,7 @@ class MapController implements ControllerInterface
             }
 
 
-            ChatController::message(onlinePlayers(), 'New map added: ', $map);
+            ChatController::message(onlinePlayers(), '_info', 'New map added: ', $map);
         }
     }
 
