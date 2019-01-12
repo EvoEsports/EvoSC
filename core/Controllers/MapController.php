@@ -313,7 +313,7 @@ class MapController implements ControllerInterface
             return self::$queue;
         }
 
-        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('queue.recent')) {
+        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('map_queue_recent')) {
             ChatController::message($player, '_info', 'Can not juke recently played tracks.');
 
             return self::$queue;
