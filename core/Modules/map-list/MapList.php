@@ -188,13 +188,8 @@ class MapList
 
     public static function deleteMapPerm(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->first();
-
-        if (!$map) {
-            return;
-        }
-
-        MapController::deleteMap($player, $map);
+        //TODO: delete map permanently
+        self::deleteMap($player, $mapUid);
     }
 
     /**
