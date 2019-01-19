@@ -168,6 +168,10 @@
     }
 
     Void showDiff(){
+        if(base.count == 0 || target.count == 0){
+            return;
+        }
+
         declare score = TL::ToInteger(target["score"]);
         declare targetCpTimes = TL::Split(",", target["cps"]);
         declare targetCps = (Page.MainFrame.GetFirstChild("targetCps") as CMlFrame);
