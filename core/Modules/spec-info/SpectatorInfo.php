@@ -15,8 +15,8 @@ class SpectatorInfo
     {
         self::$specTargets = collect();
 
-        Hook::add('SpecStart', [self::class, 'specStart']);
-        Hook::add('SpecStop', [self::class, 'specStop']);
+        // Hook::add('SpecStart', [self::class, 'specStart']);
+        // Hook::add('SpecStop', [self::class, 'specStop']);
     }
 
     public static function specStart(Player $player, Player $target)

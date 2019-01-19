@@ -40,6 +40,8 @@ Void hide(CMlFrame widget){
 }
 
 main(){
+    wait(UI.UISequence == CUIConfig::EUISequence::Podium);
+
     declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
     declare currentMap = Map.MapInfo.MapUid;
 
@@ -52,7 +54,6 @@ main(){
         sleep(100);
     }
 
-    sleep(200);
     wait(UI.UISequence != CUIConfig::EUISequence::Podium);
 
     foreach(widget in mainFrame.Controls){
