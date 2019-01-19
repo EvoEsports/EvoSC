@@ -18,6 +18,7 @@ class CreateGroupsTable extends Migration
         $schemaBuilder->create('groups', function (Blueprint $table) {
             $table->increments('id');
             $table->string('Name')->unique();
+            $table->string('chat_prefix')->nullable();
             $table->boolean('Protected')->default(false);
         });
 

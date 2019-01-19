@@ -34,7 +34,6 @@ $t: Changes the text to capitals
 $$: Writes a dollarsign
      */
 
-    private static $pattern;
     private static $chatCommands;
     private static $chatCommandsCompiled;
     private static $mutedPlayers;
@@ -137,7 +136,13 @@ $$: Writes a dollarsign
             $nick = '$eee📷 ' . $nick;
         }
 
-        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
+        $prefix = $player->group->chat_prefix;
+
+        if($prefix){
+            $chatText = sprintf('%s $z$s%s$z$s: $%s$z$s%s', $prefix, $nick, config('colors.chat'), $text);
+        }else{
+            $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
+        }
 
         Server::call('ChatSendServerMessage', [$chatText]);
     }

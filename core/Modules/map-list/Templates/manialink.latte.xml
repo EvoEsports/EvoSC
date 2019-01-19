@@ -177,6 +177,7 @@
 
 declare Integer[] favorites;
 declare Text[Text][] maps;
+declare Text[Text][Integer] mapAuthors;
 declare Text[Text][] mapQueue;
 declare Text[Text][] currentMapPool;
 declare Integer lastMapsCount;
@@ -188,6 +189,12 @@ declare CMlFrame mapListFrame;
 declare Text currentMapUid;
 declare Integer cooldown;
 declare Text[Text] currentMap;
+
+Text[Text] getAuthor(Text id){
+    log(mapAuthors);
+
+    return mapAuthors[TL::ToInteger(id)];
+}
 
 Void updateCooldownValues(){
     for(i, 0, maps.count - 1){
@@ -233,8 +240,9 @@ Text[Text] findMapById(Text id){
 
 Void updateWidget(Text[Text] map){
     declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+    declare author = getAuthor(map["a"]);
     (widget.Controls[0] as CMlLabel).SetText(map["name"]);
-    (widget.Controls[1] as CMlLabel).SetText(map["nick"]);
+    (widget.Controls[1] as CMlLabel).SetText(author["nick"]);
 }
 
 Void resizeWindow(){
@@ -340,11 +348,13 @@ Void updateView(Text[Text][] mapPool, Integer page){
         }
 
         declare Text[Text] map = mapPool[id];
+        declare Text[Text] author = getAuthor(map["a"]);
+
         declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
         mapFrame.DataAttributeSet("map-id", map["id"]);
         mapFrame.DataAttributeSet("map-uid", map["uid"]);
         (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
-        (mapFrame.Controls[2] as CMlLabel).SetText(map["nick"]);
+        (mapFrame.Controls[2] as CMlLabel).SetText(author["nick"]);
         (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
         (mapFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
 
@@ -494,7 +504,8 @@ Void search(){
 
     for(i, 0, maps.count - 1){
         declare map = maps[i];
-        declare searchString = map["name"]^map["nick"]^map["login"];
+        declare Text[Text] author = getAuthor(map["a"]);
+        declare searchString = map["name"]^author["nick"]^author["login"];
         if(TL::Find(input.Value, searchString, False, False)){
             mapsFound.add(map);
         }
@@ -655,7 +666,7 @@ Void favAction(CMlScriptEvent event){
 
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
-{(new esc\Classes\HideScript())|noescape}
+{(new esc\Classes\HideScript("widget", true))|noescape}
 
 main() {
     lastMapQueueLength = 0;
@@ -670,6 +681,7 @@ main() {
     declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
     declare controlsVisible = False;
     declare Text[Text][] Maps for LocalUser;
+    declare Text[Text][Integer] MapAuthors for LocalUser;
 
     rearrangeButtons();
 
@@ -680,6 +692,17 @@ main() {
 
     while(True){
         yield;
+
+        if(checkMapChanges()){
+            maps = Maps;
+            mapAuthors = MapAuthors;
+
+            if(currentTab == 0){
+                currentMapPool = maps;
+            }
+
+            updateView(currentMapPool, currentPage);
+        }
 
         foreach(event in PendingEvents){
             if(event.Control == Null){
@@ -795,16 +818,6 @@ main() {
             }
         }
 
-        if(checkMapChanges()){
-            maps = Maps;
-
-            if(currentTab == 0){
-                currentMapPool = maps;
-            }
-
-            updateView(currentMapPool, currentPage);
-        }
-
         if(checkMapQueueChanged()){
             if(currentTab == 2){
                 currentMapPool = getMapQueuePool();
@@ -812,7 +825,7 @@ main() {
             }
         }
 
-        if(currentMapUid != Map.MapInfo.MapUid){
+        if(currentMapUid != Map.MapInfo.MapUid && maps.count > 0){
             currentMapUid = Map.MapInfo.MapUid;
             currentMap = findMapByUid(currentMapUid);
             updateCooldownValues();
@@ -843,8 +856,6 @@ main() {
             AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
         }
     }
-
-    //UI.UISequence == CUIConfig::EUISequence::Podium
 }
     --></script>
 </manialink>

@@ -33,6 +33,7 @@
     declare Real padding;
     declare Integer columns;
     declare CMlFrame records;
+    declare Record[Integer] cps;
 
     Text formatScoreCorrect(Integer score, Boolean cutZeroes){
         declare Text secondString;
@@ -104,8 +105,14 @@
         return record;
     }
 
+    Void reset(){
+        cps = Record[Integer];
+        foreach(control in records.Controls){
+            control.Hide();
+        }
+    }
+
     main() {
-        declare Record[Integer] cps;
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare currentMapId = "";
 
@@ -118,10 +125,12 @@
 
             if(Map.MapInfo.MapUid != currentMapId){
                 currentMapId = Map.MapInfo.MapUid;
-                cps = Record[Integer];
-                foreach(control in records.Controls){
-                    control.Hide();
-                }
+                reset();
+            }
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                reset();
+                sleep(2000);
             }
 
             foreach(event in RaceEvents){

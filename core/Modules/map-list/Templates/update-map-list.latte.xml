@@ -4,9 +4,12 @@
         <!--
         main(){
             declare Text[Text][] Maps for LocalUser;
+            declare Text[Text][Integer] MapAuthors for LocalUser;
             declare Text mapsJson = """{$maps|noescape}""";
+            declare Text mapAuthorsJson = """{$mapAuthors|noescape}""";
 
             Maps.fromjson(mapsJson);
+            MapAuthors.fromjson(mapAuthorsJson);
         }
         -->
     </script>

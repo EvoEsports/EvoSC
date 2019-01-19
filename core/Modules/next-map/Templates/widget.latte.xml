@@ -6,8 +6,7 @@
 
         <label pos="45 -5" valign="center" halign="center" textsize="0.4" size="6 6" text="NEXT" textcolor="ffff" textfont="RajdhaniMono"/>
 
-        <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.header')}" z-index="-3"/>
-        <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.background')}" opacity="0.5" z-index="-2"/>
+        <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.background')}9" z-index="-2"/>
         <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.header')}e" z-index="-1"/>
     </frame>
 

@@ -9,7 +9,7 @@ class Group extends Model
 {
     protected $table = 'groups';
 
-    protected $fillable = ['Name'];
+    protected $fillable = ['Name', 'chat_prefix'];
 
     public $timestamps = false;
 

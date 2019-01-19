@@ -213,6 +213,11 @@ class PlayerController implements ControllerInterface
             exit(0);
         }
 
+        $player->update([
+            'spectator_status' => 0,
+            'player_id'        => 0,
+        ]);
+
         Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
 
         $diff = $player->last_visit->diffForHumans();

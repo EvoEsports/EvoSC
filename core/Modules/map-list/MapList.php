@@ -25,7 +25,7 @@ class MapList
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
-        Hook::add('MapPoolUpdated', [MapList::class, 'mapPoolUpdated']);
+        Hook::add('MapPoolUpdated', [MapList::class, 'sendUpdatedMaplist']);
         Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
@@ -123,41 +123,56 @@ class MapList
         return Map::whereEnabled(true)->count();
     }
 
-    public static function mapPoolUpdated()
+    public static function sendUpdatedMaplist(Player $player = null)
     {
-        $maps = self::getMapListJson();
-        Template::showAll('map-list.update-map-list', compact('maps'));
-    }
+        $maps       = self::getMapList();
+        $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
-    public static function sendUpdatedMaplist(Player $player)
-    {
-        $maps = self::getMapListJson();
-
-        if (strlen($maps) > 65000) {
+        if (strlen($maps->toJson()) > 65000) {
             Log::error('The map list json is too long! You have too many maps. Sorry, we are working on this.');
 
             return;
         }
 
-        Template::show($player, 'map-list.update-map-list', compact('maps'));
+        if ($player) {
+            Template::show($player, 'map-list.update-map-list', [
+                'maps'       => $maps->toJson(),
+                'mapAuthors' => $mapAuthors->toJson(),
+            ]);
+        } else {
+            Template::showAll('map-list.update-map-list', [
+                'maps'       => $maps->toJson(),
+                'mapAuthors' => $mapAuthors->toJson(),
+            ]);
+        }
     }
 
-    private static function getMapListJson(): string
+    private static function getMapList(): Collection
     {
         //max length ~65762
         //length 60088 is ok
 
         return Map::whereEnabled(true)->get()->map(function (Map $map) {
             return [
-                'id'    => (string)$map->id,
-                'name'  => $map->gbx->Name,
-                'login' => $map->author->Login,
-                'nick'  => $map->author->NickName,
-                'r'     => sprintf('%.1f', $map->average_rating),
-                'uid'   => $map->gbx->MapUid,
-                'c'     => $map->cooldown,
+                'id'   => (string)$map->id,
+                'name' => $map->gbx->Name,
+                'a'    => $map->author->id,
+                'r'    => sprintf('%.1f', $map->average_rating),
+                'uid'  => $map->gbx->MapUid,
+                'c'    => $map->cooldown,
             ];
-        })->toJson();
+        });
+    }
+
+    private static function getMapAuthors($authorIds): Collection
+    {
+        return Player::whereIn('id', $authorIds)->get()->map(function (Player $player) {
+            return [
+                'nick'  => $player->NickName,
+                'login' => $player->Login,
+                'id'    => $player->id,
+            ];
+        });
     }
 
     public static function deleteMap(Player $player, $mapUid)

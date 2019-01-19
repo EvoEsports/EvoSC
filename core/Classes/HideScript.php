@@ -6,10 +6,12 @@ namespace esc\Classes;
 class HideScript
 {
     public $targetId;
+    public $hideOnPodium;
 
-    public function __construct($targetId = "widget")
+    public function __construct($targetId = "widget", $hideOnPodium = false)
     {
-        $this->targetId = $targetId;
+        $this->targetId     = $targetId;
+        $this->hideOnPodium = $hideOnPodium;
     }
 
     public function __toString()
@@ -43,15 +45,27 @@ Void hidescript(){
 
     declare Text visiblePos = "<frame pos=\'" ^ widget.DataAttributeGet("orig-x") ^ " " ^ widget.DataAttributeGet("orig-y") ^ "\' />";
     declare Text hiddenPos = "<frame pos=\'" ^ widget.DataAttributeGet("hidden-x") ^ " " ^ widget.DataAttributeGet("hidden-y") ^ "\' />";
+    
+    declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+    declare Boolean mapFinished = ' . ($this->hideOnPodium ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False") . ';
+    declare Boolean overHidespeed = speed >= hideSpeed;
+    
+    if(mapFinished){
+        if(!hidden){
+            widget.DataAttributeSet("hidden", "true");
+            AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }else{
+        if(overHidespeed && playerIsRacing && !hidden){
+            widget.DataAttributeSet("hidden", "true");
+            AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+        if((!overHidespeed || !playerIsRacing) && hidden){
+            widget.DataAttributeSet("hidden", "false");
+            AnimMgr.Add(widget, visiblePos, 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }
 
-    if(speed >= hideSpeed && InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running && !hidden){
-        widget.DataAttributeSet("hidden", "true");
-        AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-    }
-    if((speed < hideSpeed && hidden) || (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running && hidden)){
-        widget.DataAttributeSet("hidden", "false");
-        AnimMgr.Add(widget, visiblePos, 600, CAnimManager::EAnimManagerEasing::ExpInOut);
-    }
 }';
     }
 }
