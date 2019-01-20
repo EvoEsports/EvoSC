@@ -93,9 +93,9 @@ class MapController implements ControllerInterface
      */
     public static function addTime(int $minutes = 10)
     {
-        self::$addedTime += $minutes;
-        $totalNewTime    = (self::$timeLimit * 10 + self::$addedTime * 60);
-        self::updateRoundtime($totalNewTime);
+        $settings                = \esc\Classes\Server::getModeScriptSettings();
+        $settings['S_TimeLimit'] += $minutes * 60;
+        \esc\Classes\Server::setModeScriptSettings($settings);
     }
 
     public static function addTimeManually(Player $player, $cmd, int $amount)
