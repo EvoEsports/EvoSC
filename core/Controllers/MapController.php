@@ -31,7 +31,7 @@ class MapController implements ControllerInterface
 
     public static function init()
     {
-        self::$timeLimit = floor(Server::getTimeAttackLimit()['CurrentValue'] / 60000);
+        self::$timeLimit = 600;
 
         self::$queue    = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
