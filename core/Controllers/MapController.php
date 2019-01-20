@@ -94,7 +94,7 @@ class MapController implements ControllerInterface
     public static function addTime(int $minutes = 10)
     {
         self::$addedTime += $minutes;
-        $totalNewTime    = (self::$timeLimit + self::$addedTime);
+        $totalNewTime    = (self::$timeLimit * 10 + self::$addedTime * 60);
         self::updateRoundtime($totalNewTime);
     }
 
