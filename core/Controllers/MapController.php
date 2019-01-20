@@ -83,6 +83,7 @@ class MapController implements ControllerInterface
     public static function resetTime()
     {
         $settings = \esc\Classes\Server::getModeScriptSettings();
+        $settings['S_TimeLimit'] /= 60;
         \esc\Classes\Server::setModeScriptSettings($settings);
         self::$addedTime = 0;
     }
