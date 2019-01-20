@@ -82,8 +82,9 @@ class MapController implements ControllerInterface
      */
     public static function resetTime()
     {
+        $settings        = \esc\Classes\Server::getModeScriptSettings();
         self::$addedTime = 0;
-        self::updateRoundtime(self::$timeLimit * 60);
+        self::updateRoundtime($settings['S_TimeLimit'] * 60);
     }
 
     /**
@@ -343,7 +344,7 @@ class MapController implements ControllerInterface
     private static function getGbxInformation($filename): string
     {
         $absolute = Server::getMapsDirectory() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename);
-        $cmd = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $absolute . '"';
+        $cmd      = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $absolute . '"';
 
         return shell_exec($cmd);
     }
