@@ -31,7 +31,7 @@ class MapController implements ControllerInterface
 
     public static function init()
     {
-        self::$timeLimit = 600;
+        self::$timeLimit = 60;
 
         self::$queue    = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
@@ -83,8 +83,7 @@ class MapController implements ControllerInterface
     public static function resetTime()
     {
         self::$addedTime = 0;
-        echo "Timelimit is " . self::$timeLimit . "\n";
-        self::updateRoundtime(self::$timeLimit);
+        self::updateRoundtime(self::$timeLimit * 10);
     }
 
     /**
@@ -94,7 +93,7 @@ class MapController implements ControllerInterface
      */
     public static function addTime(int $minutes = 10)
     {
-        self::$addedTime = self::$addedTime + $minutes;
+        self::$addedTime += $minutes;
         $totalNewTime    = (self::$timeLimit + self::$addedTime) * 60;
         self::updateRoundtime($totalNewTime);
     }
