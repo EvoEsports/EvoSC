@@ -31,7 +31,7 @@ class MapController implements ControllerInterface
 
     public static function init()
     {
-        self::$timeLimit = floor(Server::rpc()->getTimeAttackLimit()['CurrentValue'] / 60000);
+        self::$timeLimit = floor(Server::getTimeAttackLimit()['CurrentValue'] / 60000);
 
         self::$queue    = new Collection();
         self::$mapsPath = Server::getMapsDirectory();
@@ -82,10 +82,9 @@ class MapController implements ControllerInterface
      */
     public static function resetTime()
     {
-        $settings = \esc\Classes\Server::getModeScriptSettings();
-        $settings['S_TimeLimit'] /= 60;
-        \esc\Classes\Server::setModeScriptSettings($settings);
         self::$addedTime = 0;
+        echo "Timelimit is " . self::$timeLimit . "\n";
+        self::updateRoundtime(self::$timeLimit);
     }
 
     /**
