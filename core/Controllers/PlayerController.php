@@ -172,7 +172,7 @@ class PlayerController implements ControllerInterface
         }
 
         $player->update([
-            'last_visit' => (new Carbon()),
+            'last_visit' => now(),
             'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
@@ -188,6 +188,7 @@ class PlayerController implements ControllerInterface
     public static function playerFinish(Player $player, $score)
     {
         if ($player->isSpectator()) {
+            //Leave spec when reset is pressed
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
 

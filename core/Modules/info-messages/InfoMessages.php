@@ -45,8 +45,10 @@ class InfoMessages
         }
     }
 
-    public static function add(Player $player, $pause, $message)
+    public static function add(Player $player, $pause, ...$messageParts)
     {
+        $message = implode(',', $messageParts);
+
         InfoMessage::create([
             'text'  => $message,
             'delay' => $pause,
@@ -55,8 +57,10 @@ class InfoMessages
         self::showSettings($player);
     }
 
-    public static function update(Player $player, $id, $pause, $message)
+    public static function update(Player $player, $id, $pause, ...$messageParts)
     {
+        $message = implode(',', $messageParts);
+
         InfoMessage::whereId($id)->update([
             'text'  => $message,
             'delay' => $pause,

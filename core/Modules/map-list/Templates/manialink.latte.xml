@@ -191,8 +191,6 @@ declare Integer cooldown;
 declare Text[Text] currentMap;
 
 Text[Text] getAuthor(Text id){
-    log(mapAuthors);
-
     return mapAuthors[TL::ToInteger(id)];
 }
 

@@ -13,8 +13,7 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
-             ->setDescription('Run Evo Server Controller')
-             ->addOption('daemon', 'd', \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL, 'Run command as daemon.', null);
+             ->setDescription('Run Evo Server Controller');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
