@@ -124,7 +124,7 @@ class MapController implements ControllerInterface
         $request = self::$queue->first();
 
         if ($request) {
-            $nextMapUid = Server::getNextMapInfo()->uId;
+            $nextMapUid = Server::rpc()->getNextMapInfo()->uId;
 
             if ($request->map->Uid != $nextMapUid) {
                 //Preloaded map does not match top of queue anymore
