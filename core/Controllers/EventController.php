@@ -91,7 +91,7 @@ class EventController implements ControllerInterface
             $nickname        = $playerInfo['NickName'];
             $playerId        = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
-            $countryPath     = Server::rpc()->getDetailedPlayerInfo($login)->path;
+            $countryPath     = Server::getDetailedPlayerInfo($login)->path;
 
             $player = Player::find($login);
 

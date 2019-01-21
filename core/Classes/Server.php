@@ -304,7 +304,7 @@ class Server
 
     public static function call(string $rpc_func, $args = null)
     {
-        self::rpc()->execute($rpc_func, $args);
+        self::execute($rpc_func, $args);
     }
 
     public static function __callStatic($name, $arguments)

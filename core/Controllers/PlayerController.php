@@ -102,9 +102,9 @@ class PlayerController implements ControllerInterface
         }
 
         try {
-            $kicked = Server::rpc()->kick($login, $reason);
+            $kicked = Server::kick($login, $reason);
         } catch (Exception $e) {
-            $kicked = Server::rpc()->disconnectFakePlayer($login);
+            $kicked = Server::disconnectFakePlayer($login);
         }
 
         if (!$kicked) {
@@ -166,15 +166,16 @@ class PlayerController implements ControllerInterface
     {
         $diffString = $player->last_visit->diffForHumans();
 
+        $player->update([
+            'last_visit'       => now(),
+            'player_id'        => PlayerController::getPlayerServerId($player),
+            'spectator_status' => 0,
+        ]);
+
         if ($player->player_id == 0) {
             ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
             Log::info($player . " joined the server.");
         }
-
-        $player->update([
-            'last_visit' => now(),
-            'player_id'  => PlayerController::getPlayerServerId($player),
-        ]);
 
         return $player;
     }
@@ -219,10 +220,10 @@ class PlayerController implements ControllerInterface
             'player_id'        => 0,
         ]);
 
-        Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
-
         $diff = $player->last_visit->diffForHumans();
         ChatController::message(onlinePlayers(), '_info', $player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.');
+
+        Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
     }
 
     public static function getPlayerByServerId(int $id): ?Player
@@ -244,6 +245,6 @@ class PlayerController implements ControllerInterface
 
     private static function getPlayerServerId(Player $player): int
     {
-        return Server::rpc()->getPlayerInfo($player->Login)->playerId;
+        return Server::getPlayerInfo($player->Login)->playerId;
     }
 }

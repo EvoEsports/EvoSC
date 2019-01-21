@@ -46,7 +46,7 @@ class EscRun extends Command
                 config('server.rpc.password')
             );
 
-            $serverName = \esc\Classes\Server::rpc()->getServerName();
+            $serverName = \esc\Classes\Server::getServerName();
 
             if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
                 \esc\Classes\Server::autoSaveValidationReplays(true);
@@ -115,21 +115,9 @@ class EscRun extends Command
         $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
         esc\Classes\Hook::fire('BeginMap', $map);
 
-        //Set connected players online
-        \esc\Models\Player::where('player_id', '>', 0)->update(['player_id' => 0]);
-        $playerList = collect(\esc\Classes\Server::rpc()->getPlayerList());
-
-        foreach ($playerList as $maniaPlayer) {
-            $player = \esc\Models\Player::whereLogin($maniaPlayer->login)->first();
-
-            if ($player) {
-                \esc\Classes\Hook::fire('PlayerConnect', $player);
-            }
-        }
-
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
-        \esc\Classes\Server::rpc()->disableServiceAnnounces(true);
+        \esc\Classes\Server::disableServiceAnnounces(true);
 
         while (true) {
             try {
