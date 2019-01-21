@@ -361,9 +361,6 @@ class MapController implements ControllerInterface
         //get array with the uids
         $enabledMapsuids = $maps->pluck('uId');
 
-        var_dump($enabledMapsuids);
-        die("finished");
-
         foreach ($maps as $mapInfo) {
             $mapFile = self::$mapsPath . $mapInfo->fileName;
 
