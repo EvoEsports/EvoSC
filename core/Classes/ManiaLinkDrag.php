@@ -18,10 +18,6 @@ class ManiaLinkDrag
 Void maniaLinkDrag(){
     declare frame <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
     
-    if(!frame.Visible){
-        return;
-    }
-    
     declare framePos = frame.AbsolutePosition_V3;
     declare frameSize = frame.Size;
     
