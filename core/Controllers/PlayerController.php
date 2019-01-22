@@ -166,15 +166,13 @@ class PlayerController implements ControllerInterface
     {
         $diffString = $player->last_visit->diffForHumans();
 
-        if ($player->player_id == 0) {
-            ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
-            Log::info($player . " joined the server.");
-        }
-
         $player->update([
             'last_visit' => now(),
             'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
+
+        ChatController::message(onlinePlayers(), '_info', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
+        Log::info($player . " joined the server.");
 
         return $player;
     }
