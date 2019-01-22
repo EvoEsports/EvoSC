@@ -117,16 +117,6 @@ $$: Writes a dollarsign
         Log::logAddLine($player, $text);
         $nick = $player->NickName;
 
-        $parts = explode(" ", $text);
-
-        foreach ($parts as $part) {
-            if (preg_match('/https?:\/\/(?:www\.)?youtube\.com\/.+/', $part, $matches)) {
-                $url  = $matches[0];
-                $info = '$l[' . $url . ']$f44 $ddd' . substr($url, -10) . '$z$s';
-                $text = str_replace($url, $info, $text);
-            }
-        }
-
         if (preg_match('/([$]+)$/', $text, $matches)) {
             //Escape dollar signs
             $text .= $matches[0];
@@ -136,12 +126,11 @@ $$: Writes a dollarsign
             $nick = '$eee📷 ' . $nick;
         }
 
-        $prefix = $player->group->chat_prefix;
+        $prefix   = $player->group->chat_prefix;
+        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
 
-        if($prefix){
-            $chatText = sprintf('%s $z$s%s$z$s: $%s$z$s%s', $prefix, $nick, config('colors.chat'), $text);
-        }else{
-            $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
+        if ($prefix) {
+            $chatText = $prefix . ' ' . $chatText;
         }
 
         Server::call('ChatSendServerMessage', [$chatText]);

@@ -95,6 +95,8 @@ class Votes
                 ChatController::message(onlinePlayers(), '_info', 'Vote to add time was not successful.');
             }
         });
+
+        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add time') ,' started.');
     }
 
     public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
@@ -128,6 +130,8 @@ class Votes
                 ChatController::message(onlinePlayers(), '_info', 'Vote to skip map was not successful.');
             }
         });
+
+        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('skip the map') ,' started.');
     }
 
     private static function getVoteState(): Collection
