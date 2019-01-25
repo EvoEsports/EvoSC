@@ -128,7 +128,7 @@ $$: Writes a dollarsign
 
         $prefix   = $player->group->chat_prefix;
         $color    = $player->group->color ?? config('colors.chat');
-        $chatText = sprintf('[$z$s%s$z$s$%s] $%s$z$s%s', $nick, $color, config('colors.chat'), $text);
+        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
 
         if ($prefix) {
             $chatText = '$' . $color . $prefix . ' ' . $chatText;
