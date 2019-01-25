@@ -171,7 +171,9 @@ class PlayerController implements ControllerInterface
             'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
-        ChatController::message(onlinePlayers(), '_info', '$', $player->group->color, ' $z$s', $player->group->Name, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
+        $color = $player->group->color ?? config('colors.info');
+        $group = '$' . $color . ' ' . $player->group->Name;
+        ChatController::message(onlinePlayers(), '_info', $group, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
 
         return $player;
     }
