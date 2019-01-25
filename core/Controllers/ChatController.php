@@ -127,10 +127,11 @@ $$: Writes a dollarsign
         }
 
         $prefix   = $player->group->chat_prefix;
-        $chatText = sprintf('$z$s%s$z$s: $%s$z$s%s', $nick, config('colors.chat'), $text);
+        $color    = $player->group->color;
+        $chatText = sprintf('$z$s%s$z$s$%s] $%s$z$s%s', $nick, $color, config('colors.chat'), $text);
 
         if ($prefix) {
-            $chatText = $prefix . ' ' . $chatText;
+            $chatText = '$' . $color . $prefix . ' [' . $chatText;
         }
 
         Server::call('ChatSendServerMessage', [$chatText]);
