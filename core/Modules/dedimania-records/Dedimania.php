@@ -258,7 +258,7 @@ class Dedimania extends DedimaniaApi
                 Log::logAddLine('Dedimania', $player . ' improved his/her record.', isVerbose());
 
                 //Player improved his record
-                if ($newRank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
+                if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
                     $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
                     $diff = $dedi->Score - $score;
                     $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
@@ -289,7 +289,7 @@ class Dedimania extends DedimaniaApi
 
             $dedi = $map->dedis()->wherePlayer($player->id)->first();
 
-            if ($dedi->Rank <= (isset($player->MaxRank) ? $player->MaxRank : self::$maxRank)) {
+            if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
                 self::sendUpdatedDedis($map);
                 ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
             } else {
