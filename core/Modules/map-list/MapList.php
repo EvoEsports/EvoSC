@@ -120,7 +120,7 @@ class MapList
      */
     public static function getMapsCount()
     {
-        return maps()->count();
+        return Map::whereEnabled(true)->count();
     }
 
     public static function sendUpdatedMaplist(Player $player = null)
@@ -152,7 +152,7 @@ class MapList
         //max length ~65762
         //length 60088 is ok
 
-        return maps()->get()->map(function (Map $map) {
+        return Map::whereEnabled(true)->get()->map(function (Map $map) {
             return [
                 'id'   => (string)$map->id,
                 'name' => $map->gbx->Name,
