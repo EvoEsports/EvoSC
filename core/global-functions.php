@@ -100,11 +100,22 @@ function baseDir(string $filename = ''): string
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
 {
-    if (!$withSpectators) {
-        return \esc\Models\Player::where('player_id', '>', 0)->whereSpectatorStatus(0)->get();
+    $playerList = \esc\Classes\Server::getPlayerList(500, 0);
+    $logins     = [];
+
+    foreach ($playerList as $player) {
+        array_push($logins, $player->login);
     }
 
-    return \esc\Models\Player::where('player_id', '>', 0)->get();
+    $disconnected = \esc\Models\Player::where('player_id', '>', 0)->get();
+    $connected    = \esc\Models\Player::whereIn('login', $logins)->get();
+
+    $disconnected->diff($connected)->update([
+        'player_id'        => 0,
+        'spectator_status' => 0,
+    ]);
+
+    return $connected;
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
@@ -151,8 +162,7 @@ function getEscVersion(): string
 
 function maps()
 {
-    return \esc\Models\Map::whereEnabled(true)
-                          ->get();
+    return \esc\Models\Map::whereEnabled(true)->get();
 }
 
 function matchSettings(string $filename = null)

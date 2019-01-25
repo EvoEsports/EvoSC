@@ -260,7 +260,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int appendPlaylistFromMatchSettings(string $string)
  * @method static int saveMatchSettings(string $string)
  * @method static int insertPlaylistFromMatchSettings(string $string)
- * @method static array getPlayerList(int $int, int $int, int $int)
+ * @method static array getPlayerList(int $int, int $int, int $int = null)
  * @method static object getPlayerInfo(string $string, int $int)
  * @method static object getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
