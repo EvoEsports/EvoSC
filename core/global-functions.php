@@ -107,15 +107,7 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
         array_push($logins, $player->login);
     }
 
-    $disconnected = \esc\Models\Player::where('player_id', '>', 0)->get();
-    $connected    = \esc\Models\Player::whereIn('login', $logins)->get();
-
-    $disconnected->diff($connected)->update([
-        'player_id'        => 0,
-        'spectator_status' => 0,
-    ]);
-
-    return $connected;
+    return \esc\Models\Player::whereIn('login', $logins)->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection
