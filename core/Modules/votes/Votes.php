@@ -18,6 +18,7 @@ class Votes
 {
     private static $vote;
     private static $voters;
+    private static $lastVote;
 
     public function __construct()
     {
@@ -87,6 +88,13 @@ class Votes
 
     public static function askMoreTime(Player $player)
     {
+        $diffInSeconds = self::$lastVote->diffInSeconds();
+        if ($diffInSeconds < config('votes.cooldown')) {
+            ChatController::message($player, '_warning', 'There already was a vote recently, please wait ', secondary(config('votes.cooldown') - $diffInSeconds), ' seconds before voting again.');
+
+            return;
+        }
+
         self::startVote($player, 'Add 10 minutes playtime?', function ($success) {
             if ($success) {
                 ChatController::message(onlinePlayers(), '_info', 'Vote to add time was successful.');
@@ -96,7 +104,9 @@ class Votes
             }
         });
 
-        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add time') ,' started.');
+        self::$lastVote = now();
+
+        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add time'), ' started.');
     }
 
     public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
@@ -122,6 +132,13 @@ class Votes
 
     public static function askSkip(Player $player)
     {
+        $diffInSeconds = self::$lastVote->diffInSeconds();
+        if ($diffInSeconds < config('votes.cooldown')) {
+            ChatController::message($player, '_warning', 'There already was a vote recently, please wait ', secondary(config('votes.cooldown') - $diffInSeconds), ' seconds before voting again.');
+
+            return;
+        }
+
         self::startVote($player, 'Skip map?', function (bool $success) {
             if ($success) {
                 ChatController::message(onlinePlayers(), '_info', 'Vote to skip map was successful.');
@@ -131,7 +148,9 @@ class Votes
             }
         });
 
-        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('skip the map') ,' started.');
+        self::$lastVote = now();
+
+        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('skip the map'), ' started.');
     }
 
     private static function getVoteState(): Collection

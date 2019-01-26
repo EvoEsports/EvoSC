@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
-    <frame id="widget" size="48 30" pos="{config('votes.pos')}" scale="{config('votes.scale')}" z-index="50000">
-        <quad pos="2 -4" z-index="1" size="46 0.5" bgcolor="3333"/>
-        <quad pos="2 -4" z-index="2" size="3 0.5" bgcolor="1f8c"/>
-        <quad pos="48 -4" z-index="2" size="3 0.5" halign="right" bgcolor="f33c"/>
+    <frame id="widget" size="50 30" pos="{config('votes.pos')}" scale="{config('votes.scale')}" z-index="50000">
+        <quad pos="2 -6" z-index="1" size="46 0.5" bgcolor="3333"/>
+        <quad pos="2 -6" z-index="2" size="3 0.5" bgcolor="1f8c"/>
+        <quad pos="48 -6" z-index="2" size="3 0.5" halign="right" bgcolor="f33c"/>
 
-        <label textfont="RajdhaniMono" pos="2 -1" z-index="1" size="25 2.8" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="1.2"/>
-        <label textfont="RajdhaniMono" pos="48 -1" z-index="1" size="25 2.8" halign="right" textprefix="$aaaF6 $fff" text="0 NO" valign="center" textsize="1.2"/>
+        <label textfont="RajdhaniMono" pos="2 -3" z-index="1" size="25 2.8" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="1.2"/>
+        <label textfont="RajdhaniMono" pos="48 -3" z-index="1" size="25 2.8" halign="right" textprefix="$aaaF6 $fff" text="0 NO" valign="center" textsize="1.2"/>
 
-        <label textfont="RajdhaniMono" pos="25 -1" z-index="1" size="49 2.8" halign="center" text="{config('votes.duration')}" valign="center" textsize="0.6" textcolor="fff8"/>
+        <label textfont="RajdhaniMono" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{config('votes.duration')}" valign="center" textsize="0.6" textcolor="fff8"/>
 
-        <label textfont="RajdhaniMono" pos="2 -6" z-index="1" size="47 50" textprefix="$s" autonewline="1" text="{$question}" textsize="2"/>
+        <label textfont="RajdhaniMono" pos="2 -8" z-index="1" size="47 50" textprefix="$s" autonewline="1" text="{$question}" textsize="1.5"/>
+
+        <quad pos="0 0" size="50 13" style="Bgs1" substyle="BgDialogBlur" z-index="-2" />
+        <quad pos="0 0" size="50 13" bgcolor="{config('colors.ui.header')}6" z-index="-1" />
 
         <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
-
-    {(new esc\Classes\HideScript())|noescape}
 
     main() {
         declare Integer[Text] VoteState for LocalUser = Integer[Text];
@@ -27,15 +28,13 @@
         declare yesLabel = (widget.Controls[3] as CMlLabel);
         declare noLabel = (widget.Controls[4] as CMlLabel);
         declare timeLeftLabel = (widget.Controls[5] as CMlLabel);
-        declare backgroundBarWidth = backgroundBar.Size[0];
+        declare Real backgroundBarWidth = backgroundBar.Size[0];
         declare Integer duration = {config('votes.duration')};
 
         declare startTime = GameTime;
 
         while(True){
             yield;
-
-            hidescript();
 
             if((GameTime - startTime) / 1000 > duration){
                 widget.Hide();
@@ -47,19 +46,22 @@
             if(VoteState.count > 0){
                 declare Integer yes = VoteState["yes"];
                 declare Integer no = VoteState["no"];
-                declare Integer total = yes + no;
 
                 if(yes == -1 && no == -1){
                     widget.Hide();
                     return;
                 }
 
+                declare Real total = (yes * 1.0) + (no * 1.0);
+
                 if(total == 0){
                     continue;
                 }
 
-                declare yesWidth = (yes / total) * backgroundBarWidth;
-                declare noWidth = (no / total) * backgroundBarWidth;
+                declare Real yesWidth = (yes / total) * backgroundBarWidth;
+                declare Real noWidth = (no / total) * backgroundBarWidth;
+
+                log("yes: " ^ (yes / total) ^ " no: " ^ (no / total) ^ " total: " ^ total);
 
                 yesBar.Size = <yesWidth, yesBar.Size[1]>;
                 noBar.Size = <noWidth, noBar.Size[1]>;

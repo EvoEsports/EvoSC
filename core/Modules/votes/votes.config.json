@@ -1,7 +1,7 @@
 {
-  "pos"     : "80 88",
-  "scale"   : 0.78,
-  "duration": 30,
+  "pos"     : "-24 80",
+  "scale"   : 0.8,
+  "duration": 25,
   "cooldown": 120,
   "enabled" : true
 }
