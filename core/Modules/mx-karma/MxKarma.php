@@ -164,6 +164,8 @@ class MxKarma extends MXK
      */
     public static function endMap(Map $map = null)
     {
+        return; //Disabled until error @ mx is resolved
+
         if (self::$updatedVotes->isEmpty()) {
             //No new votes
             return;
@@ -279,9 +281,11 @@ class MxKarma extends MXK
 
         $items = collect([]);
 
+        /* Disabled until error @ mx is resolved
         for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
             $items->push(self::$mapKarma->voteaverage);
         }
+        */
 
         $newRatings = $map->ratings()
                           ->whereIn('Player', self::$updatedVotes->toArray())

@@ -114,7 +114,7 @@ $$: Writes a dollarsign
             return;
         }
 
-        Log::logAddLine($player, $text);
+        Log::logAddLine("Chat", '[' . $player . '] ' . $text, true);
         $nick = $player->NickName;
 
         if (preg_match('/([$]+)$/', $text, $matches)) {
@@ -347,8 +347,6 @@ $$: Writes a dollarsign
 
         try {
             Server::chatSendServerMessage($message, $recipient->Login);
-
-            Log::logAddLine("Chat", "$recipient <- " . $message);
         } catch (\Exception $e) {
             Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
             Log::logAddLine('', $e->getTraceAsString(), false);
