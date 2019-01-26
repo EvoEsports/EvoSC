@@ -91,7 +91,8 @@ class Votes
     {
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown')) {
-            ChatController::message($player, '_warning', 'There already was a vote recently, please wait ', secondary(config('votes.cooldown') - $diffInSeconds), ' seconds before voting again.');
+            $waitTime = config('votes.cooldown') - $diffInSeconds;
+            ChatController::message($player, '_warning', 'There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.');
 
             return;
         }
@@ -135,7 +136,8 @@ class Votes
     {
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown')) {
-            ChatController::message($player, '_warning', 'There already was a vote recently, please wait ', secondary(config('votes.cooldown') - $diffInSeconds), ' seconds before voting again.');
+            $waitTime = config('votes.cooldown') - $diffInSeconds;
+            ChatController::message($player, '_warning', 'There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.');
 
             return;
         }

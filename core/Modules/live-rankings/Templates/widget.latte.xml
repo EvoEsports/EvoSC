@@ -25,9 +25,16 @@
 
     declare Integer[Text] scores;
 
-    Text formatScoreCorrect(Integer score, Boolean cutZeroes){
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
         declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
 
         declare Integer seconds = score / 1000;
         declare Integer minutes = seconds / 60;
@@ -37,7 +44,7 @@
 
         secondString = "" ^ seconds;
 
-        if(seconds < 10 && !cutZeroes){
+        if(seconds < 10 && minutes > 0){
             secondString = "0" ^ seconds;
         }
 
@@ -51,11 +58,11 @@
             msString = "" ^ ms;
         }
 
-        if(!cutZeroes){
-            return minutes ^ ":" ^ secondString ^ "." ^ msString;
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
         }
 
-        return secondString ^ "." ^ msString;
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
     Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
