@@ -22,7 +22,8 @@ class Votes
 
     public function __construct()
     {
-        self::$voters = collect();
+        self::$voters   = collect();
+        self::$lastVote = now()->subSeconds(config('votes.cooldown'));
 
         ChatController::addCommand('vote', [self::class, 'startVoteQuestion'], 'Start a custom vote', '//', 'vote_custom');
         ChatController::addCommand('res', [self::class, 'askMoreTime'], 'Ask for more time');
