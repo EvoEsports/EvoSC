@@ -30,7 +30,7 @@
 
             while(True){
                 yield;
-
+SendHideManialinkPage
                 foreach(event in PendingEvents){
                     if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
                         TriggerPageAction("rickroll");
