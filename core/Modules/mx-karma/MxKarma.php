@@ -57,6 +57,7 @@ class MxKarma extends MXK
         ChatController::addCommand('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', '');
         ChatController::addCommand('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', '');
         ChatController::addCommand('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', '');
+        ChatController::addCommand('-----', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', '');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
     }
@@ -155,6 +156,14 @@ class MxKarma extends MXK
     public static function voteMinusMinusMinus(Player $player)
     {
         self::vote($player, 0);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function voteMinusMinusMinusU(Player $player)
+    {
+        ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary('the worst a human being ever had to play'), '.');
     }
 
     /**
