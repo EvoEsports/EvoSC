@@ -165,6 +165,14 @@ $$: Writes a dollarsign
             })
             ->first();
 
+        if ($command->access != null) {
+            if (!$player->hasAccess($command->access)) {
+                ChatController::message($player, '_warning', 'Sorry, you\'re not allowed to do that.');
+
+                return false;
+            }
+        }
+
         //Add calling player to beginning of arguments list
         array_unshift($arguments, $player);
 
