@@ -165,7 +165,7 @@ $$: Writes a dollarsign
             })
             ->first();
 
-        if (!$player->hasAccess($command->access)) {
+        if (!$player->hasAccess($command->access) && $command->access) {
             ChatController::message($player, '_warning', 'Sorry, you\'re not allowed to do that.');
 
             return false;
