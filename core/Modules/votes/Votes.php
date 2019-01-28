@@ -97,7 +97,7 @@ class Votes
             return;
         }
 
-        self::startVote($player, 'Add 10 minutes playtime?', function ($success) {
+        self::startVote($player, 'Add 10 minutes?', function ($success) {
             if ($success) {
                 ChatController::message(onlinePlayers(), '_info', 'Vote to add time was successful.');
                 MapController::addTime(10);
@@ -108,7 +108,7 @@ class Votes
 
         self::$lastVote = now();
 
-        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add time'), ' started.');
+        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add 10 minutes'), ' started.');
     }
 
     public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)

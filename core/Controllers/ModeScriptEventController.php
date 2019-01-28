@@ -47,11 +47,11 @@ class ModeScriptEventController implements ControllerInterface
                 break;
 
             case 'Trackmania.Event.OnPlayerAdded':
-                //self::tmPlayerConnect($arguments);
+                self::tmPlayerConnect($arguments);
                 break;
 
             case 'Trackmania.Event.OnPlayerRemoved':
-                //self::tmPlayerLeave($arguments);
+                self::tmPlayerLeave($arguments);
                 break;
 
             default:
@@ -127,7 +127,7 @@ class ModeScriptEventController implements ControllerInterface
 
         //string Login, bool IsSpectator
         if (Player::whereLogin($playerData->login)->get()->isEmpty()) {
-            $player = Player::create(['Login' => $playerData->login]);
+            $player = Player::create(['Login' => $playerData->login, 'NickName' => $playerData->login]);
         } else {
             $player = Player::find($playerData->login);
         }
@@ -139,13 +139,16 @@ class ModeScriptEventController implements ControllerInterface
     {
         $playerData = json_decode($arguments[0]);
         $player     = Player::find($playerData->login);
+        $player->update(['player_id' => 0, 'spectator_status' => 0]);
 
-        Hook::fire('PlayerLeave', $player);
+        Hook::fire('PlayerDisconnect', $player);
     }
 
     /**
      * Convert cp array to comma separated string
+     *
      * @param array $cps
+     *
      * @return string
      */
     private static function cpArrayToString(array $cps)

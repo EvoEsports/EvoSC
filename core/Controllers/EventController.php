@@ -35,11 +35,11 @@ class EventController implements ControllerInterface
                     break;
 
                 case 'ManiaPlanet.PlayerConnect':
-                    self::mpPlayerConnect($arguments);
+                    //self::mpPlayerConnect($arguments);
                     break;
 
                 case 'ManiaPlanet.PlayerDisconnect':
-                    self::mpPlayerDisconnect($arguments);
+                    //self::mpPlayerDisconnect($arguments);
                     break;
 
                 case 'ManiaPlanet.PlayerChat':
