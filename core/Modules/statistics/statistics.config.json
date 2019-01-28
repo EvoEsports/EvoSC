@@ -1,32 +1,32 @@
 {
   "Visits": {
-    "pos"  : "-121 89",
-    "scale": 0.78,
+    "pos"  : "-119 89",
+    "scale": 0.7,
     "show" : 6
   },
   "Playtime": {
-    "pos"  : "-81 89",
-    "scale": 0.78,
+    "pos"  : "-79 89",
+    "scale": 0.7,
     "show" : 6
   },
   "Finishes": {
-    "pos"  : "-41 89",
-    "scale": 0.78,
+    "pos"  : "-39 89",
+    "scale": 0.7,
     "show" : 6
   },
   "Wins": {
-    "pos"  : "-1 89",
-    "scale": 0.78,
+    "pos"  : "1 89",
+    "scale": 0.7,
     "show" : 6
   },
   "Score": {
-    "pos"  : "39 89",
-    "scale": 0.78,
+    "pos"  : "41 89",
+    "scale": 0.7,
     "show" : 6
   },
   "Donations": {
-    "pos"  : "79 89",
-    "scale": 0.78,
+    "pos"  : "81 89",
+    "scale": 0.7,
     "show" : 6
   }
 }
