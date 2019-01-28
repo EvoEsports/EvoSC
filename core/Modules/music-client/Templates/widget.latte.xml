@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-widget" id="music-widget" version="3">
-    <frame id="widget" pos="{config('music.pos.visible')}" data-pos-visible="{config('music.pos.visible')}" data-pos-hidden="{config('music.pos.hidden')}" scale="{config('music.pos.scale') ?? 0.8|noescape}">
+    <frame id="widget" z-index="5000" pos="{config('music.pos.visible')}" data-pos-visible="{config('music.pos.visible')}" data-pos-hidden="{config('music.pos.hidden')}" scale="{config('music.pos.scale') ?? 0.8|noescape}">
         <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}9"/>
         <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff" textfont="RajdhaniMono"/>

@@ -7,7 +7,7 @@
         <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
     </framemodel>
 
-    <frame id="widget" pos="{config('ui.playerlist.pos')}" size="40 60" scale="{config('ui.playerlist.scale')}">
+    <frame id="widget" pos="{config('ui.playerlist.pos')}" size="40 60" scale="{config('ui.playerlist.scale')}" z-index="5000">
         <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.6" ScriptEvents="1"/>
         <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.9"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="RajdhaniMono" />

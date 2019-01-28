@@ -141,6 +141,9 @@ class ModeScriptEventController implements ControllerInterface
         $player     = Player::find($playerData->login);
         $player->update(['player_id' => 0, 'spectator_status' => 0]);
 
+        $diff = $player->last_visit->diffForHumans();
+        ChatController::message(onlinePlayers(), '_info', $player, ', from ', secondary($player->path) ,' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.');
+
         Hook::fire('PlayerDisconnect', $player);
     }
 
