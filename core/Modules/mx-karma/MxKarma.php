@@ -297,7 +297,6 @@ class MxKarma extends MXK
         */
 
         $newRatings = $map->ratings()
-                          ->whereIn('Player', self::$updatedVotes->toArray())
                           ->get();
 
         foreach ($newRatings as $rating) {
@@ -328,10 +327,12 @@ class MxKarma extends MXK
         $map    = MapController::getCurrentMap();
         $mapUid = $map->uid;
 
+        /*
         if (self::$currentMap != $mapUid) {
             self::$mapKarma   = self::call(MXK::getMapRating);
             self::$currentMap = $mapUid;
         }
+        */
 
         $average = self::getUpdatedVotesAverage();
 
