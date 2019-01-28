@@ -163,6 +163,37 @@ class MxKarma extends MXK
      */
     public static function voteMinusMinusMinusU(Player $player)
     {
+        if (!self::playerFinished($player)) {
+            //Prevent players from voting when they didnt finish
+            ChatController::message($player, 'You need to finish the track before you can vote.');
+
+            return;
+        }
+
+        $map = \esc\Controllers\MapController::getCurrentMap();
+
+        $karma = $map->ratings()
+                     ->wherePlayer($player->id)
+                     ->get()
+                     ->first();
+
+        if ($karma != null) {
+            if ($karma->Rating == 0) {
+                //Prevent spam
+                return;
+            }
+
+            $karma->update(['Rating' => 0]);
+        } else {
+            $karma = Karma::create([
+                'Player' => $player->id,
+                'Map'    => $map->id,
+                'Rating' => 0,
+            ]);
+        }
+
+        self::$updatedVotes->push($player->id);
+
         ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary('the worst a human being ever had to play'), '.');
     }
 
