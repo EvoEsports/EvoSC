@@ -76,7 +76,7 @@ class Statistics
                 array_push($scores, $score['time']);
             }
 
-            return (array_sum($scores) / count($scores)) / 1000;
+            return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
         })->sortBy('Score');
         $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
 
