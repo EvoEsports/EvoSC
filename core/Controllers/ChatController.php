@@ -220,6 +220,15 @@ $$: Writes a dollarsign
     }
 
     /**
+     * @param string $command
+     * @param string $alias
+     */
+    public static function addAlias(string $command, string $alias)
+    {
+        //TODO:
+    }
+
+    /**
      * @param \esc\Models\Player|\Illuminate\Support\Collection $recipient
      * @param mixed                                             ...$parts
      */

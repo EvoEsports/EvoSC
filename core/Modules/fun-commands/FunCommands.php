@@ -3,19 +3,38 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Hook;
+use esc\Classes\Server;
 use esc\Controllers\ChatController;
+use esc\Controllers\PlayerController;
 use esc\Models\Player;
 
 class FunCommands
 {
     public function __construct()
     {
-        ChatController::addCommand('gg', function(Player $player){
+        ChatController::addCommand('afk', function (Player $player) {
+            ChatController::playerChat($player, '$oAway from keyboard.');
+            Server::forceSpectator($player->Login, 2);
+        }, 'Go AFK.', '/');
+
+        ChatController::addCommand('afk', function (Player $player) {
+            ChatController::playerChat($player, '$oAway from keyboard.');
+            Server::forceSpectator($player->Login, 2);
+        }, 'Go AFK.', '');
+
+        ChatController::addCommand('gg', function (Player $player) {
             ChatController::playerChat($player, '$oGood Game');
         }, 'Say Good Game.', '/');
 
-        ChatController::addCommand('gga', function(Player $player){
+        ChatController::addCommand('gga', function (Player $player) {
             ChatController::playerChat($player, '$oGood Game All');
         }, 'Say Good Game All.', '/');
+
+        ChatController::addCommand('bootme', function (Player $player) {
+            ChatController::message(onlinePlayers(), '_info', $player, ' boots back to the real world!');
+            Server::kick($player->Login, 'cya');
+            Hook::fire('PlayerDisconnect', $player);
+        }, 'Boot yourself back to the real world.', '/');
     }
 }
