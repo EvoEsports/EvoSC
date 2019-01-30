@@ -15,12 +15,12 @@ class FunCommands
     {
         ChatController::addCommand('afk', function (Player $player) {
             ChatController::playerChat($player, '$oAway from keyboard.');
-            Server::forceSpectator($player->Login, 2);
+            Server::forceSpectator($player->Login, 3);
         }, 'Go AFK.', '/');
 
         ChatController::addCommand('afk', function (Player $player) {
             ChatController::playerChat($player, '$oAway from keyboard.');
-            Server::forceSpectator($player->Login, 2);
+            Server::forceSpectator($player->Login, 3);
         }, 'Go AFK.', '');
 
         ChatController::addCommand('gg', function (Player $player) {
