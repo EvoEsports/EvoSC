@@ -32,21 +32,14 @@ Void prepare(CMlFrame widget){
     declare Real x_orig = widget.RelativePosition_V3[0];
     declare Real y_orig = widget.RelativePosition_V3[1];
     widget.DataAttributeSet("target", "<frame pos='" ^ x_orig ^ " " ^ y_orig ^ "' />");
-    widget.DataAttributeSet("hidden", "<frame pos='" ^ x_orig ^ " " ^ (y_orig + show * 4 + 10) ^ "' />");
-    widget.RelativePosition_V3[1] = widget.RelativePosition_V3[1] + show * 4 + 10;
+    widget.RelativePosition_V3[1] = show * 4 + 100.0;
 }
 
 Void show(CMlFrame widget){
     AnimMgr.Add(widget, widget.DataAttributeGet("target"), 800, CAnimManager::EAnimManagerEasing::BackOut);
 }
 
-Void hide(CMlFrame widget){
-    AnimMgr.Add(widget, widget.DataAttributeGet("hidden"), 800, CAnimManager::EAnimManagerEasing::BackOut);
-}
-
 main(){
-    wait(UI.UISequence == CUIConfig::EUISequence::Podium);
-
     declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
     declare currentMap = Map.MapInfo.MapUid;
 
@@ -56,12 +49,12 @@ main(){
 
     foreach(widget in mainFrame.Controls){
         show((widget as CMlFrame));
-        sleep(100);
+        sleep(50);
     }
 
     wait(UI.UISequence != CUIConfig::EUISequence::Podium);
 
-    mainFrame.Hide();
+    //mainFrame.Hide();
 }
         -->
     </script>

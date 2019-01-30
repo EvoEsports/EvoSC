@@ -18,19 +18,27 @@ use esc\Models\Stats;
 class Statistics
 {
     /**
+     * @var \Illuminate\Support\Collection
+     */
+    private static $scores;
+
+    /**
      * Statistics constructor.
      */
     public function __construct()
     {
-        Hook::add('PlayerConnect', [Statistics::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [Statistics::class, 'playerFinish']);
-        Hook::add('PlayerRateMap', [Statistics::class, 'playerRateMap']);
-        Hook::add('PlayerLocal', [Statistics::class, 'playerLocal']);
-        Hook::add('EndMatch', [Statistics::class, 'endMatch']);
+        self::startMatch();
 
-        Hook::add('EndMatch', [Statistics::class, 'showScores']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
+        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
 
-        Timer::create('update_playtimes', [Statistics::class, 'updatePlaytimes'], '1m', true);
+        Hook::add('StartMatch', [self::class, 'startMatch']);
+        Hook::add('EndMatch', [self::class, 'showScores']);
+
+        Timer::create('update_playtimes', [self::class, 'updatePlaytimes'], '1m', true);
 
         KeyController::createBind('X', [self::class, 'reload']);
     }
@@ -59,6 +67,19 @@ class Statistics
 
         //Top Donators
         $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
+
+        //Round average
+        $averageScores = self::$scores->groupBy('nick')->map(function ($scoresArray) {
+            $scores = [];
+
+            foreach ($scoresArray as $score) {
+                array_push($scores, $score['time']);
+            }
+
+            return (array_sum($scores) / count($scores)) / 1000;
+        })->sortBy('Score');
+        $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
+
 
         Template::showAll('statistics.widgets', compact('statCollection'));
     }
@@ -100,6 +121,11 @@ class Statistics
             return;
         }
 
+        self::$scores->push([
+            'nick' => $player->NickName,
+            'time' => $score,
+        ]);
+
         $player->stats()->increment('Finishes');
     }
 
@@ -135,6 +161,14 @@ class Statistics
     }
 
     /**
+     * @param mixed ...$args
+     */
+    public static function startMatch(...$args)
+    {
+        self::$scores = collect();
+    }
+
+    /**
      * @param array ...$args
      */
     public static function endMatch(...$args)
@@ -149,7 +183,7 @@ class Statistics
 
         self::updatePlayerRanks();
 
-        if ($bestPlayer && $bestPlayer->Score != $secondBest->Score) {
+        if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
             $bestPlayer->stats()->increment('Wins');
             ChatController::message(onlinePlayers(), '_info', "\$fff🏆", 'Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
         }
