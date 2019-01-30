@@ -18,8 +18,6 @@ class CountDown
         //buggy
         return;
 
-        self::$timeLimit = MapController::getTimeLimit();
-
         Hook::add('PlayerConnect', [self::class, 'showCountdown']);
         Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
         Hook::add('BeginMap', [self::class, 'beginMap']);

@@ -27,7 +27,7 @@ class MapController implements ControllerInterface
     private static $currentMap;
     private static $queue;
     private static $addedTime = 0;
-    private static $timeLimit = 10;
+    private static $timeLimit;
 
     public static function init()
     {
@@ -570,7 +570,7 @@ class MapController implements ControllerInterface
      */
     public static function getTimeLimit(): int
     {
-        return self::$timeLimit;
+        return self::$timeLimit + self::$addedTime;
     }
 
     /**

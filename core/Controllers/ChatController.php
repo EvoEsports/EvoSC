@@ -197,7 +197,7 @@ $$: Writes a dollarsign
         return $command->compile();
     }
 
-    public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
+    public static function addCommand(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null, $hidden = false)
     {
         if (!self::$chatCommands) {
             self::$chatCommands         = collect();

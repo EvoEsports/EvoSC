@@ -2,11 +2,14 @@
 
 namespace esc\Modules;
 
+use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
+use esc\Controllers\TemplateController;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
@@ -28,6 +31,8 @@ class Statistics
         Hook::add('EndMatch', [Statistics::class, 'showScores']);
 
         Timer::create('update_playtimes', [Statistics::class, 'updatePlaytimes'], '1m', true);
+
+        KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function showScores(...$args)
@@ -50,14 +55,19 @@ class Statistics
         $statCollection->push(new StatisticWidget('Wins', " Top Winners"));
 
         //Top Ranks
-        $statCollection->push(new StatisticWidget('Score', " Top Ranks", '', ' Points'));
+        $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '', '.', null, true, false));
 
         //Top Donators
-        $statCollection->push(new StatisticWidget('Donations', " Top Donators"));
+        $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
 
-        foreach (onlinePlayers() as $player) {
-            Template::show($player, 'statistics.widgets', compact('statCollection'));
-        }
+        Template::showAll('statistics.widgets', compact('statCollection'));
+    }
+
+    public static function reload(Player $player)
+    {
+        Config::configReload();
+        TemplateController::loadTemplates();
+        self::showScores();
     }
 
     /**
@@ -131,6 +141,7 @@ class Statistics
     {
         $finishedPlayers = finishPlayers();
         $bestPlayer      = $finishedPlayers->sortBy('Score')->first();
+        $secondBest      = $finishedPlayers->sortBy('Score')->get(1);
 
         foreach ($finishedPlayers as $player) {
             self::calculatePlayerServerScore($player);
@@ -138,7 +149,7 @@ class Statistics
 
         self::updatePlayerRanks();
 
-        if ($bestPlayer) {
+        if ($bestPlayer && $bestPlayer->Score != $secondBest->Score) {
             $bestPlayer->stats()->increment('Wins');
             ChatController::message(onlinePlayers(), '_info', "\$fff🏆", 'Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
         }

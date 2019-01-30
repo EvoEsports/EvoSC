@@ -11,8 +11,9 @@ class StatisticWidget
     public $config;
     public $prefix;
     public $suffix;
+    public $nameLeft;
 
-    public function __construct(string $stat, string $title, string $prefix = '', string $suffix = '', $function = null, $sortAsc = false)
+    public function __construct(string $stat, string $title, string $prefix = '', string $suffix = '', $function = null, $sortAsc = false, $nameLeft = true)
     {
         $this->stat   = $stat;
         $this->title  = $title;
@@ -20,17 +21,19 @@ class StatisticWidget
 
         if ($sortAsc) {
             $this->records = Stats::orderBy($stat)->get();
-        }else{
+        } else {
             $this->records = Stats::orderByDesc($stat)->get();
         }
 
         //Get records as nickname => value
-        $this->records = $this->records->take($this->config->show)->pluck($stat, 'player');
+        $this->records = $this->records->where($stat, '>', 0)->take($this->config->show)->pluck($stat, 'player');
 
         //Get rid of zero value records
+        /*
         $this->records = $this->records->filter(function ($value) {
             return $value > 0;
         });
+        */
 
         if ($function) {
             //Execute function on values
@@ -39,5 +42,6 @@ class StatisticWidget
 
         $this->prefix = $prefix;
         $this->suffix = $suffix;
+        $this->nameLeft = $nameLeft;
     }
 }

@@ -58,6 +58,7 @@ class MxKarma extends MXK
         ChatController::addCommand('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', '');
         ChatController::addCommand('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', '');
         ChatController::addCommand('-----', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', '');
+        ChatController::addCommand('------', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', '');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
     }
@@ -204,8 +205,6 @@ class MxKarma extends MXK
      */
     public static function endMap(Map $map = null)
     {
-        return; //Disabled until error @ mx is resolved
-
         if (self::$updatedVotes->isEmpty()) {
             //No new votes
             return;
@@ -321,11 +320,10 @@ class MxKarma extends MXK
 
         $items = collect([]);
 
-        /* Disabled until error @ mx is resolved
         for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
             $items->push(self::$mapKarma->voteaverage);
         }
-        */
+
 
         $newRatings = $map->ratings()
                           ->get();
@@ -358,12 +356,10 @@ class MxKarma extends MXK
         $map    = MapController::getCurrentMap();
         $mapUid = $map->uid;
 
-        /*
         if (self::$currentMap != $mapUid) {
             self::$mapKarma   = self::call(MXK::getMapRating);
             self::$currentMap = $mapUid;
         }
-        */
 
         $average = self::getUpdatedVotesAverage();
 
@@ -493,10 +489,10 @@ class MxKarma extends MXK
                     'gamemode'  => self::getGameMode(),
                     'titleid'   => Server::getVersion()->titleId,
                     'mapuid'    => $map->Uid,
-                    'mapname'   => $map->Name,
-                    'mapauthor' => $map->Author,
+                    'mapname'   => $map->gbx->Name,
+                    'mapauthor' => $map->gbx->AuthorLogin,
                     'isimport'  => 'false',
-                    'maptime'   => MapController::getTimeLimit() * 60,
+                    'maptime'   => MapController::getTimeLimit() * 10,
                     'votes'     => $votes,
                 ];
 
