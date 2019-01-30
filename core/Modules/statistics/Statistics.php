@@ -75,7 +75,7 @@ class Statistics
             }
 
             return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
-        })->sortBy('Score');
+        })->sortBy('Score')->take(config('statistics.RoundAvg.show'));
         $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
 
 
@@ -173,6 +173,7 @@ class Statistics
         }
 
         self::updatePlayerRanks();
+        self::$scores = collect();
 
         if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
             $bestPlayer->stats()->increment('Wins');
