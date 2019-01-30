@@ -4,16 +4,16 @@
         {foreach $statCollection as $statisticWidget}
         <frame pos="{$statisticWidget->config->pos}" scale="{$statisticWidget->config->scale ?? 0.75}" data-show="{$statisticWidget->config->show ?? 6}">
             <quad pos="0 0" z-index="-1" size="50 {($statisticWidget->config->show ?? 6) * 4 + 8}" bgcolor="{background_color()|noescape}a" />
-            <label pos="2 -3" z-index="1" size="48 3" text="{$statisticWidget->title}" textsize=".8" valign="center"/>
+            <label pos="2 -3" z-index="1" size="48 3" text="{$statisticWidget->title}" textsize=".8" valign="center" textfont="RajdhaniMono"/>
             <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.header')}c"/>
             <frame pos="0 -5" size="50 {($statisticWidget->config->show ?? 6) * 5}">
                 {foreach $statisticWidget->records as $player => $stat}
                 {if $statisticWidget->nameLeft}
-                <label pos="1 {$iterator->counter * -4}" size="26 4" halign="left" valign="center" text="{$player}" textsize="1" />
-                <label pos="49 {$iterator->counter * -4}" size="22 4" halign="right" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}" textsize="1" />
+                <label pos="1 {$iterator->counter * -4}" size="26 4" halign="left" valign="center" text="{$player}" textsize="1" textfont="RajdhaniMono" />
+                <label pos="49 {$iterator->counter * -4}" size="22 4" halign="right" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}" textsize="1" textfont="RajdhaniMono" />
                 {else}
-                <label pos="49 {$iterator->counter * -4}" size="26 4" halign="right" valign="center" text="{$player}" textsize="1" />
-                <label pos="1 {$iterator->counter * -4}" size="22 4" halign="left" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}" textsize="1" />
+                <label pos="49 {$iterator->counter * -4}" size="26 4" halign="right" valign="center" text="{$player}" textsize="1" textfont="RajdhaniMono" />
+                <label pos="1 {$iterator->counter * -4}" size="22 4" halign="left" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}" textsize="1" textfont="RajdhaniMono" />
                 {/if}
                 {/foreach}
             </frame>
@@ -41,7 +41,6 @@ Void show(CMlFrame widget){
 
 main(){
     declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
-    declare currentMap = Map.MapInfo.MapUid;
 
     foreach(widget in mainFrame.Controls){
         prepare((widget as CMlFrame));
