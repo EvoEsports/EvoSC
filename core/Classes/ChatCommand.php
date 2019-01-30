@@ -14,7 +14,16 @@ class ChatCommand
     public $description;
     public $access;
 
-    public function __construct(string $trigger, string $command, array $callback, string $description = '', string $access = null)
+    /**
+     * ChatCommand constructor.
+     *
+     * @param string         $trigger
+     * @param string         $command
+     * @param array|\Closure $callback
+     * @param string         $description
+     * @param string|null    $access
+     */
+    public function __construct(string $trigger, string $command, $callback, string $description = '', string $access = null)
     {
         $this->trigger     = $trigger;
         $this->command     = $command;
@@ -44,7 +53,14 @@ class ChatCommand
 
     public function run(array $arguments)
     {
-        Log::logAddLine('ChatCommand', sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), false);
+        if ($this->callback instanceof \Closure) {
+            $callback = $this->callback;
+            $callback(...$arguments);
+
+            return;
+        }
+
+        Log::logAddLine('ChatCommand', sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), isVeryVerbose());
         call_user_func_array($this->callback, $arguments);
     }
 }
