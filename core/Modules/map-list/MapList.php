@@ -103,7 +103,7 @@ class MapList
         }
 
         if ($queueItem->issuer->Login != $player->Login) {
-            ChatController::sendMessage($player, '_warning', 'You can not drop other players maps');
+            ChatController::message($player, '_warning', 'You can not drop other players maps');
 
             return;
         }

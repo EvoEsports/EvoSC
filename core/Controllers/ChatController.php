@@ -234,27 +234,22 @@ $$: Writes a dollarsign
      */
     public static function message($recipients, ...$parts)
     {
+        $message = self::prepareMessage(...$parts);
+
         if ($recipients instanceof Player) {
-            self::sendMessage($recipients, ...$parts);
+            Server::chatSendServerMessage($message, $recipients->Login);
         } else {
-            $recipients->each(function (Player $player) use ($parts) {
-                ChatController::sendMessage($player, ...$parts);
-            });
+            if (onlinePlayers() == $recipients) {
+                Server::chatSendServerMessage($message);
+            }
+
+            $logins = $recipients->pluck('Login')->implode(',');
+            Server::chatSendServerMessage($message, $logins);
         }
     }
 
-    /**
-     * @param \esc\Models\Player|\Illuminate\Support\Collection $recipient
-     * @param mixed                                             ...$parts
-     */
-    public static function sendMessage(Player $recipient, ...$parts)
+    private static function prepareMessage(...$parts)
     {
-        if (!$recipient || !isset($recipient->Login) || $recipient->Login == null) {
-            Log::warning('Do not send message to non existent player');
-
-            return;
-        }
-
         $icon       = "";
         $color      = config('colors.primary');
         $groupColor = config('colors.primary');
@@ -370,13 +365,6 @@ $$: Writes a dollarsign
             $message = '$fff' . $icon . ' ' . $message;
         }
 
-        try {
-            Server::chatSendServerMessage($message, $recipient->Login);
-        } catch (\Exception $e) {
-            Log::logAddLine('ChatController', 'Failed to send message: ' . $e->getMessage());
-            Log::logAddLine('', $e->getTraceAsString(), false);
-
-            return;
-        }
+        return $message;
     }
 }
