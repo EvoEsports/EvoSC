@@ -241,6 +241,7 @@ $$: Writes a dollarsign
         } else {
             if (onlinePlayers() == $recipients) {
                 Server::chatSendServerMessage($message);
+                return;
             }
 
             $logins = $recipients->pluck('Login')->implode(',');
