@@ -206,7 +206,7 @@ class PlayerController implements ControllerInterface
      * @param Player|null $player
      * @param             $disconnectReason
      */
-    public static function playerDisconnect(Player $player = null, $disconnectReason)
+    public static function playerDisconnect(Player $player = null, $disconnectReason = '')
     {
         if ($player == null) {
             Log::info('SERVER SHUTTING DOWN');
