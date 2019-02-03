@@ -31,18 +31,22 @@ class Template
     public static function hideAll(string $index)
     {
         self::showAll('blank', [
-            'id' => $index
+            'id' => $index,
         ]);
     }
 
     /**
-     * @param Player $player
-     * @param string $index
+     * @param Player     $player
+     * @param string     $index
      * @param array|null $values
      */
     public static function show(Player $player, string $index, $values = null)
     {
         $data = [];
+
+        if (!onlinePlayers()->contains($player)) {
+            return;
+        }
 
         if ($values instanceof Collection) {
             foreach ($values as $key => $value) {
@@ -72,7 +76,7 @@ class Template
     public static function hide(Player $player, string $index)
     {
         self::show($player, 'blank', [
-            'id' => $index
+            'id' => $index,
         ]);
     }
 
@@ -88,6 +92,7 @@ class Template
         if ($scriptStartPos = strpos($template->template, '<script>')) {
             $script       = substr($template->template, $scriptStartPos);
             $scriptEndPos = strpos($script, '</script>') - 8;
+
             return substr($script, 8, $scriptEndPos);
         }
 

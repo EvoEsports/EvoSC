@@ -107,7 +107,7 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
         array_push($logins, $player->login);
     }
 
-    return \esc\Models\Player::whereIn('login', $logins)->get();
+    return \esc\Models\Player::whereIn('Login', $logins)->get();
 }
 
 function finishPlayers(): \Illuminate\Support\Collection

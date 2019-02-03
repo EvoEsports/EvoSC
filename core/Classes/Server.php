@@ -44,7 +44,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool sendNotice(string $string, string $string, int $int)
  * @method static bool sendNoticeToId(int $int, string $string, int $int, int $int)
  * @method static bool sendNoticeToLogin(string $string, string $string, string $string, int $int)
- * @method static bool sendDisplayManialinkPage(string $string, int $int, bool $boolean)
+ * @method static bool sendDisplayManialinkPage($recipient, $manialinks, $timeout = 0, $hideOnClick = false, $multicall = false)
  * @method static bool sendDisplayManialinkPageToId(int $int, string $string, int $int, bool $boolean)
  * @method static bool sendDisplayManialinkPageToLogin(string $string, string $string, int $int, bool $boolean)
  * @method static bool sendHideManialinkPage()
