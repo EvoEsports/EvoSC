@@ -643,11 +643,11 @@ Void favAction(CMlScriptEvent event){
 
         if(isFav){
             btn.SetText("");
-            TriggerPageAction("map.fav.add," ^ mapId);
+            TriggerPageAction("map.fav.remove," ^ mapId);
             favorites.remove(TL::ToInteger(mapId));
         }else{
             btn.SetText("");
-            TriggerPageAction("map.fav.remove," ^ mapId);
+            TriggerPageAction("map.fav.add," ^ mapId);
             favorites.add(TL::ToInteger(mapId));
         }
 
