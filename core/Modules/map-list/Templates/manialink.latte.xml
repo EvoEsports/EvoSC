@@ -126,11 +126,11 @@
             <quad pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}6" z-index="-2"/>
 
             <frame pos="1.7 -5">
-                <label class="map-control fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
+                <label class="map-control quick-fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
                        valign="center" ScriptEvents="1" focusareacolor1="0000"
                        focusareacolor2="{config('colors.ui.header')}9"/>
-                <label pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
-                <label textfont="RajdhaniMono" pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1"
+                <label id="fav-button" pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+                <label id="fav-text" textfont="RajdhaniMono" pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1"
                        halign="center" valign="center"/>
             </frame>
 
@@ -241,6 +241,14 @@ Void updateWidget(Text[Text] map){
     declare author = getAuthor(map["a"]);
     (widget.Controls[0] as CMlLabel).SetText(map["name"]);
     (widget.Controls[1] as CMlLabel).SetText(author["nick"]);
+
+    if(favorites.exists(TL::ToInteger(map["id"]))){
+        (Page.MainFrame.GetFirstChild("fav-button") as CMlLabel).SetText("");
+        (Page.MainFrame.GetFirstChild("fav-text") as CMlLabel).SetText("Remove");
+    }else{
+        (Page.MainFrame.GetFirstChild("fav-button") as CMlLabel).SetText("");
+        (Page.MainFrame.GetFirstChild("fav-text") as CMlLabel).SetText("Add");
+    }
 }
 
 Void resizeWindow(){
@@ -662,6 +670,33 @@ Void favAction(CMlScriptEvent event){
     }
 }
 
+Void quickFavAction(CMlScriptEvent event){
+    if(event.Type == CMlScriptEvent::Type::MouseClick){
+        declare mapId = TL::ToInteger(currentMap["id"] ^ "");
+
+        if(favorites.exists(mapId)){
+            TriggerPageAction("map.fav.remove," ^ mapId);
+            favorites.remove(mapId);
+            (Page.MainFrame.GetFirstChild("fav-button") as CMlLabel).SetText("");
+            (Page.MainFrame.GetFirstChild("fav-text") as CMlLabel).SetText("Add");
+        }else{
+            TriggerPageAction("map.fav.add," ^ mapId);
+            favorites.add(mapId);
+            (Page.MainFrame.GetFirstChild("fav-button") as CMlLabel).SetText("");
+            (Page.MainFrame.GetFirstChild("fav-text") as CMlLabel).SetText("Remove");
+        }
+
+        if(currentTab == 0 || currentTab == 2){
+            updateView(currentMapPool, currentPage);
+        }
+
+        if(currentTab == 1){
+            currentMapPool = getFavoritesPool();
+            updateView(currentMapPool, currentPage);
+        }
+    }
+}
+
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
 {(new esc\Classes\HideScript("widget", true))|noescape}
@@ -768,6 +803,11 @@ main() {
 
             if(event.Control.HasClass("fav")){
                 favAction(event);
+                continue;
+            }
+
+            if(event.Control.HasClass("quick-fav")){
+                quickFavAction(event);
                 continue;
             }
 
