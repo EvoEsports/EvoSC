@@ -468,7 +468,9 @@ class MapController implements ControllerInterface
     /**
      * Add map from MX
      *
-     * @param string[] ...$arguments
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     * @param string             ...$arguments
      */
     public static function addMap(Player $player, $cmd, string ...$arguments)
     {
@@ -492,7 +494,7 @@ class MapController implements ControllerInterface
             $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
 
             if ($response->getStatusCode() != 200) {
-                Log::error("ManiaExchange returned with non-success code [$response->getStatusCode()] " . $response->getReasonPhrase());
+                Log::error("ManiaExchange returned with non-success code [" . $response->getStatusCode() . "] " . $response->getReasonPhrase());
                 ChatController::message($player, "Can not reach mania exchange.");
 
                 return;
@@ -509,9 +511,14 @@ class MapController implements ControllerInterface
             $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
             $filename = str_replace('..', '.', $filename);
 
-            $mapFolder = self::$mapsPath;
-            $body      = $response->getBody();
-            $absolute  = "$mapFolder$filename";
+            $mapFolder = self::$mapsPath . 'MX/';
+
+            if (!is_dir($mapFolder)) {
+                mkdir($mapFolder);
+            }
+
+            $body     = $response->getBody();
+            $absolute = "$mapFolder$filename";
 
             File::put($absolute, $body);
 
