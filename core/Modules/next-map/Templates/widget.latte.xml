@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:next-map-widget" id="next-map-widget" version="3">
-    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}" data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8" size="50 10" z-index="5000">
+    <frame id="widget" pos="{config('map-list.pos.visible')}" data-pos-visible="{config('map-list.pos.visible')}" data-pos-hidden="{config('map-list.pos.hidden')}" scale="0.8" size="50 10" z-index="5000">
         <label pos="38 -2" z-index="1" size="36 3" text="{$map->gbx->Name}" halign="right" textcolor="eeee" textsize="1.4" textfont="RajdhaniMono"/>
         <label pos="38 -7" z-index="1" size="36 3" text="{$map->author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="RajdhaniMono"/>
 

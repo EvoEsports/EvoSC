@@ -108,8 +108,8 @@
         </frame>
     </frame>
 
-    <frame id="widget" pos="{config('ui.map.pos.visible')}" data-pos-visible="{config('ui.map.pos.visible')}"
-           data-pos-hidden="{config('ui.map.pos.hidden')}" scale="0.8" size="50 10">
+    <frame id="widget" pos="{config('map-list.pos.visible')}" data-pos-visible="{config('map-list.pos.visible')}"
+           data-pos-hidden="{config('map-list.pos.hidden')}" scale="0.8" size="50 10">
         <label pos="38 -2" z-index="1" size="36 3" text="Map name" halign="right" textcolor="eeee" textsize="1.4"
                textfont="RajdhaniMono"/>
         <label pos="38 -7" z-index="1" size="36 3" text="Author name" halign="right" textcolor="dddd" valign="center"

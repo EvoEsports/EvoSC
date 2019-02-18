@@ -8,6 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\AccessRight;
 use esc\Models\Group;
@@ -22,9 +23,11 @@ class GroupManager
         ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');
         ManiaLinkEvent::add('group.create', [self::class, 'groupCreate'], 'group');
         ManiaLinkEvent::add('group.delete', [self::class, 'groupDelete'], 'group');
-        ManiaLinkEvent::add('group.edit', [self::class, 'groupEdit'], 'group');
+        ManiaLinkEvent::add('group.edit_access', [self::class, 'groupEditAccess'], 'group');
+        ManiaLinkEvent::add('group.edit_group', [self::class, 'groupEdit'], 'group');
         ManiaLinkEvent::add('group.allow', [self::class, 'groupAllow'], 'group');
         ManiaLinkEvent::add('group.deny', [self::class, 'groupDeny'], 'group');
+        ManiaLinkEvent::add('group.update', [self::class, 'groupUpdate'], 'group');
         ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group');
         ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group');
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
@@ -34,15 +37,12 @@ class GroupManager
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
 
-        // KeyController::createBind('Y', [self::class, 'reload']);
+        KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
-
-        $group = Group::first();
-
         self::showOverview($player);
     }
 
@@ -74,6 +74,20 @@ class GroupManager
         }
     }
 
+    public static function groupUpdate(Player $player, string $groupId, string $prefix, string $color)
+    {
+        $group = Group::find($groupId);
+
+        if ($group) {
+            $group->update([
+                'chat_prefix' => $prefix,
+                'color'       => $color,
+            ]);
+
+            self::showOverview($player);
+        }
+    }
+
     public static function groupDelete(Player $player, string $groupId)
     {
         $group = Group::find($groupId);
@@ -91,12 +105,19 @@ class GroupManager
         }
     }
 
-    public static function groupEdit(Player $player, string $groupId)
+    public static function groupEditAccess(Player $player, string $groupId)
     {
         $group        = Group::find($groupId);
         $accessRights = AccessRight::all();
 
-        Template::show($player, 'group-manager.edit', compact('group', 'accessRights'));
+        Template::show($player, 'group-manager.edit_access', compact('group', 'accessRights'));
+    }
+
+    public static function groupEdit(Player $player, string $groupId)
+    {
+        $group = Group::find($groupId);
+
+        Template::show($player, 'group-manager.edit', compact('group'));
     }
 
     public static function groupAllow(Player $player, string $groupId, string $rightId)

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:GroupsManagerEditor" id="GroupsManager" version="3">
+
+    <frame id="overview" pos="-60 {ceil($accessRights->count()/2) * 3}">
+        <quad size="120 {ceil($accessRights->count()/2) * 6 + 2}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="120 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Edit: {$group->Name}'s access rights" z-index="1" textfont="RajdhaniMono" />
+        <label class="close" pos="117 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+
+        {foreach $accessRights as $right}
+        <frame pos="{$iterator->counter > ceil($accessRights->count() / 2) ? 62 : 2} {$iterator->counter * -6 - 4 + ($iterator->counter > ceil($accessRights->count() / 2) ? $accessRights->count() * 3 : 0)}">
+            <label pos="0.5 0.3" textsize="1" scale="1" text="" valign="center" textcolor="{config('colors.ui.header')}" z-index="1" hidden="{(!$group->hasAccess($right))}" textfont="RajdhaniMono" />
+            <label pos="0.5 0.3" textsize="1" scale="1" text="" valign="center" textcolor="{config('colors.ui.background')}" textfont="RajdhaniMono"  />
+            <label pos="5 1.5" textsize="1" text="{$right}" valign="center" textfont="RajdhaniMono" />
+            <label pos="5 -1" textsize="1" scale="0.7" text="{$right->description}" valign="center" textcolor="aaaf" textfont="RajdhaniMono" />
+            <label class="toggle" pos="-2 3" size="60 6" ScriptEvents="1" focusareacolor1="0000" data-id="{$right->id}" textfont="RajdhaniMono" />
+        </frame>
+        {/foreach}
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+        declare groupId = {$group->id};
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    TriggerPageAction("group.overview");
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("toggle")){
+                    declare rightId = event.Control.DataAttributeGet("id");
+                    declare checkbox <=> (event.Control.Parent.Controls[0] as CMlLabel);
+
+                    if(checkbox.Visible){
+                        TriggerPageAction("group.deny," ^ groupId ^ "," ^ rightId);
+                        checkbox.Hide();
+                    }else{
+                        TriggerPageAction("group.allow," ^ groupId ^ "," ^ rightId);
+                        checkbox.Show();
+                    }
+
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>

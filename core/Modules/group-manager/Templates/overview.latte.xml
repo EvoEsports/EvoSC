@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
 
-    <frame id="overview" pos="-60 {$groups->count() * 3 + 5}">
+    <frame id="overview" pos="-65 {$groups->count() * 3 + 5}" scale="1.1">
         <quad size="120 {$groups->count() * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
         <quad size="120 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
         <quad id="handle" size="115 6" z-index="5" />
@@ -11,31 +11,34 @@
         <frame pos="2 -1.5" z-index="2">
             {foreach $groups as $group}
             <frame pos="0 {$iterator->counter * -6 - 2}">
-                <label pos="0 0.25" size="24 4" valign="center" text="{$group->Name}" textsize="1" scale="0.9" textfont="RajdhaniMono" />
-                <label pos="0 -2" size="24 4" valign="center" text="{$group->player()->count() ?: 'No'} Members" textsize="1" scale="0.5" textcolor="fffc" textfont="RajdhaniMono" />
+                <label pos="5 0.25" size="24 4" valign="center" text="{$group->Name}" textprefix="${$group->color}" textsize="1" scale="0.9" textfont="RajdhaniMono" />
+                <label pos="5 -2" size="24 4" valign="center" text="{$group->player()->count() ?: 'No'} Members" textsize="1" scale="0.5" textcolor="fffc" textfont="RajdhaniMono" />
+                <label pos="2 -0.5" size="5 5" valign="center" halign="center" text="{$group->chat_prefix}" textsize="1" scale="1.1" textfont="RajdhaniMono" />
 
                 {if !$group->Protected}
                 <frame pos="93 -0.5" data-id="{$group->id}">
                     {if $group->player()->count() > 0}
-                    <label pos="-67 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-59 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
                     {/if}
-                    <label pos="-49 0" class="add" size="18 4" halign="center" valign="center" text=" Add Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
-                    <label pos="-30 0" class="add_login" size="18 4" halign="center" valign="center" text=" Add by Login" textsize="0.4" ScriptEvents="1" textfont="RajdhaniMono" />
-                    <label pos="-7 0" class="edit_group" size="26 4" halign="center" valign="center" text=" Edit Access Rights" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
-                    <label class="delete_group" pos="15.5 -0" size="17 4" halign="center" valign="center" text=" Delete" textsize="0.4" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-42 0" class="edit" size="16 4" halign="center" valign="center" text=" Edit Group" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-27.5 0" class="add" size="12 4" halign="center" valign="center" text=" Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-14 0" class="add_login" size="13 4" halign="center" valign="center" text=" By Login" textsize="0.4" ScriptEvents="1" textfont="RajdhaniMono" />
+                    <label pos="2 0" class="edit_access" size="17 4" halign="center" valign="center" text=" Edit Access" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label class="delete_group" pos="17.5 -0" size="12 4" halign="center" valign="center" text=" Delete" textsize="0.4" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" textfont="RajdhaniMono" />
                 </frame>
                 {else}
-                <frame pos="110 -0.5" data-id="{$group->id}">
+                <frame pos="106 -0.5" data-id="{$group->id}">
                     {if $group->id != 3 && $group->player()->count() > 0}
-                    <label pos="-66 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-59 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
                     {/if}
-                    <label pos="-48 0" class="add" size="18 4" halign="center" valign="center" text=" Add Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
-                    <label pos="-29 0" class="add_login" size="18 4" halign="center" valign="center" text=" Add by Login" textsize="0.4" ScriptEvents="1" textfont="RajdhaniMono" />
-                    <label pos="-6 0" class="edit_group" size="26 4" halign="center" valign="center" text=" Edit Access Rights" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-42 0" class="edit" size="16 4" halign="center" valign="center" text=" Edit Group" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-27.5 0" class="add" size="12 4" halign="center" valign="center" text=" Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
+                    <label pos="-14 0" class="add_login" size="13 4" halign="center" valign="center" text=" By Login" textsize="0.4" ScriptEvents="1" textfont="RajdhaniMono" />
+                    <label pos="2 0" class="edit_access" size="17 4" halign="center" valign="center" text=" Edit Access" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" textfont="RajdhaniMono" />
                 </frame>
                 {/if}
 
-                <quad pos="-2 2.5" size="110 6" bgcolor="{config('colors.ui.header')}" opacity="{$iterator->counter % 2 == 0 ? 0.05 : 0.12}" z-index="-1" />
+                <quad pos="-2 2.5" size="120 6" bgcolor="{$group->color}" opacity="0.1" z-index="-1" />
             </frame>
             {/foreach}
         </frame>
@@ -168,9 +171,14 @@
                     TriggerPageAction("group.members," ^ groupId);
                 }
 
-                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit_group")){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit_access")){
                     declare Text groupId = event.Control.DataAttributeGet("id");
-                    TriggerPageAction("group.edit," ^ groupId);
+                    TriggerPageAction("group.edit_access," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.edit_group," ^ groupId);
                 }
 
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("add")){

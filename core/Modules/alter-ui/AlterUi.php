@@ -9,10 +9,10 @@ class AlterUi
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [AlterUi::class, 'show']);
+        self::setUiProperties();
     }
 
-    public static function show(Player $player)
+    public static function setUiProperties()
     {
         $properties = '';
 
@@ -35,10 +35,6 @@ class AlterUi
         $properties .= sprintf('<multilap_info visible="0" />');
         $properties .= sprintf('<spectator_info visible="0" pos="0.0 0.0 0.0" />');
 
-        try {
-            \esc\Classes\Server::rpc()->triggerModeScriptEvent('Trackmania.UI.SetProperties', ["<ui_properties>$properties</ui_properties>"]);
-        } catch (\Maniaplanet\DedicatedServer\InvalidArgumentException $e) {
-            echo $e->getMessage();
-        }
+        \esc\Classes\Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', "<ui_properties>$properties</ui_properties>");
     }
 }
