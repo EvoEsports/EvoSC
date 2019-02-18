@@ -27,8 +27,6 @@ class Statistics
      */
     public function __construct()
     {
-        self::startMatch();
-
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
