@@ -35,7 +35,7 @@ class Statistics
         Hook::add('PlayerLocal', [self::class, 'playerLocal']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
-        Hook::add('StartMatch', [self::class, 'startMatch']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'showScores']);
 
         Timer::create('update_playtimes', [self::class, 'updatePlaytimes'], '1m', true);
@@ -77,7 +77,7 @@ class Statistics
             return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
         })->sortBy('Score')->take(config('statistics.RoundAvg.show'));
         $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
-
+        self::$scores = collect();
 
         Template::showAll('statistics.widgets', compact('statCollection'));
     }
@@ -154,7 +154,7 @@ class Statistics
     /**
      * @param mixed ...$args
      */
-    public static function startMatch(...$args)
+    public static function beginMap(...$args)
     {
         self::$scores = collect();
     }
