@@ -11,9 +11,15 @@ class AdminServ
     public function __construct()
     {
         Hook::add('AdminServ.Map.Added', [self::class, 'mapAdded']);
+        Hook::add('AdminServ.Map.Deleted', [self::class, 'mapDeleted']);
     }
 
     public static function mapAdded(...$arguments)
+    {
+        Log::logAddLine('AdminServ', json_encode($arguments));
+    }
+
+    public static function mapDeleted(...$arguments)
     {
         Log::logAddLine('AdminServ', json_encode($arguments));
     }
