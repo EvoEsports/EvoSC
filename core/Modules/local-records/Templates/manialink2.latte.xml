@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Locals-Records" id="Locals" version="3">
+    <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
+
+    <framemodel id="record" hidden="1">
+        <label z-index="2" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
+        <label z-index="2" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
+        <label z-index="3" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
+        <label z-index="2" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
+        <quad pos="-1 -0.2" size="45 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="1" hidden="1" valign="center" />
+        <quad class="record" pos="-1 -0.2" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('locals.pos')}" scale="{config('locals.scale')}" z-index="100">
+        <quad class="widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
+        <quad size="45 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records" textfont="RajdhaniMono"/>
+
+        <frame id="records" pos="1 -7">
+            {for $i=0; $i<config('locals.rows'); $i++}
+            <frameinstance modelid="record" pos="0 {$i * -3}"/>
+            {/for}
+        </frame>
+    </frame>
+
+    <frame id="window" pos="-90 60" hidden="0">
+        <quad id="handle" size="175 6" z-index="5" />
+        <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad id="bg" size="180 79" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="🏆 Local records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
+        <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
+
+        <frame pos="2 -9" z-index="2">
+            <frame id="window-records">
+                {for $i=0; $i<100; $i++}
+                <frameinstance class="window-record" modelid="record" pos="{floor($i/25) * 44} {($i%25) * -3}" id="record-login-{$i}" data-id="{$i}" hidden="0"/>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="pagination" pos="4 -86" scale="0.9" z-index="3">
+            <label id="page-info" pos="6 0" size="8 3.5" valign="center"
+                   halign="center" text="1/1" textsize="0.8"/>
+            <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
+            <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct Record {
+        Integer rank;
+        Integer[] cps;
+        Integer score;
+        Text name;
+        Text login;
+    }
+
+    declare Integer currentPage;
+    declare Integer maxPage;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateWindow(Record[] records){
+        //Update records
+        declare CMlFrame windowRecords <=> (Page.MainFrame.GetFirstChild("window-records") as CMlFrame);
+        declare Integer i = 0;
+        declare Integer skipped = 0;
+        declare Integer skip = 100 * currentPage;
+
+        foreach(record in records){
+            if(skipped < skip){
+                skipped = skipped + 1;
+                continue;
+            }
+
+            if(i >= windowRecords.Controls.count){
+                break;
+            }
+
+            declare recordFrame = (windowRecords.Controls[i] as CMlFrame);
+            (recordFrame.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
+            (recordFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
+            (recordFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
+            (recordFrame.Controls[3] as CMlLabel).SetText(record.name);
+            recordFrame.Show();
+
+            i = i + 1;
+        }
+
+        if(i < windowRecords.Controls.count){
+            for(x, i, windowRecords.Controls.count - 1){
+                (windowRecords.Controls[x] as CMlFrame).Hide();
+            }
+        }
+
+        //Set window size and enable pagination if needed
+        declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+        declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+        if(records.count > 100){
+            bgQuad.Size = <bgQuad.Size[0], 84.0>;
+            maxPage = ML::CeilingInteger(records.count / 100.0) - 1;
+            pageInfo.SetText((currentPage + 1) ^ "/" ^ (maxPage + 1));
+        }else{
+            bgQuad.Size = <bgQuad.Size[0], 79.0>;
+            maxPage = 0;
+        }
+    }
+
+    {(new esc\Classes\HideScript())|noescape}
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare Record[] LocalRecords for LocalUser;
+        declare Integer LastLocalRecordsUpdate for LocalUser = 0;
+        declare Integer lastUpdate = 0;
+
+        declare CMlFrame window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        currentPage = 0;
+        maxPage = 0;
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Show();
+                }
+
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                }
+
+                if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage = currentPage + 1;
+
+                    if(currentPage > maxPage){
+                        currentPage = 0;
+                    }
+
+                    updateWindow(LocalRecords);
+                }
+
+                if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage = currentPage - 1;
+
+                    if(currentPage < 0){
+                        currentPage = maxPage;
+                    }
+
+                    updateWindow(LocalRecords);
+                }
+            }
+
+            if(LastLocalRecordsUpdate != lastUpdate){
+                //update
+                lastUpdate = LastLocalRecordsUpdate;
+                updateWindow(LocalRecords);
+            }
+
+            maniaLinkDrag();
+        }
+    }
+
+    --></script>
+</manialink>

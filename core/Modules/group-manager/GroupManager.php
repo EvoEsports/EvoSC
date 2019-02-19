@@ -37,7 +37,7 @@ class GroupManager
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
 
-        KeyController::createBind('X', [self::class, 'reload']);
+        // KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

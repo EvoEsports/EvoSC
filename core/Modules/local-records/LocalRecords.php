@@ -6,6 +6,7 @@ use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
+use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\LocalRecord;
@@ -22,13 +23,71 @@ class LocalRecords
         Hook::add('PlayerFinish', [LocalRecords::class, 'playerFinish']);
         Hook::add('BeginMap', [LocalRecords::class, 'beginMap']);
         Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
+
+        KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
     {
-        Config::configReload();
         TemplateController::loadTemplates();
-        self::showManialink($player);
+        self::showManialink2($player);
+    }
+
+    public static function showManialink2(Player $player)
+    {
+        if ($player) {
+            $map = MapController::getCurrentMap();
+
+            if (!$map) {
+                return;
+            }
+
+            $locals    = $map->locals()->orderBy('Rank')->get();
+            $playerIds = $locals->pluck('Player');
+            $players   = Player::whereIn('id', $playerIds)->get();
+
+            var_dump($locals->count());
+
+            $localsJson = $locals->map(function (LocalRecord $local) use ($players) {
+                $player      = $players->where('id', $local->Player)->first();
+                $checkpoints = collect(explode(',', $local->Checkpoints));
+                $checkpoints = $checkpoints->map(function ($time) {
+                    return intval($time);
+                });
+
+                return [
+                    'rank'  => $local->Rank,
+                    'cps'   => $checkpoints,
+                    'score' => $local->Score,
+                    'name'  => $player->NickName,
+                    'login' => $player->Login,
+                ];
+            })->toJson();
+
+            Template::show($player, 'local-records.update', compact('localsJson'));
+            Template::show($player, 'local-records.manialink2');
+        }
+    }
+
+    public static function sendUpdatedLocals(Map $map)
+    {
+        $locals    = $map->locals()->orderBy('Rank')->get();
+        $playerIds = $locals->pluck('Player');
+        $players   = Player::whereIn('id', $playerIds)->get();
+
+        $localsJson = $locals->map(function (LocalRecord $local) use ($players) {
+            $player = $players->where('id', $local->Player)->first();
+
+            return [
+                'rank'  => $local->Rank,
+                'cps'   => $local->Checkpoints,
+                'score' => $local->Score,
+                'nick'  => $player->NickName,
+                'login' => $player->Login,
+            ];
+        })->toJson();
+
+        Template::showAll('local-records.update', compact('localsJson'));
     }
 
     public static function showManialink(Player $player)
@@ -117,27 +176,6 @@ class LocalRecords
                 self::sendUpdatedLocals($map);
             }
         }
-    }
-
-    public static function sendUpdatedLocals(Map $map)
-    {
-        $locals    = $map->locals()->orderBy('Rank')->get();
-        $playerIds = $locals->pluck('Player');
-        $players   = Player::whereIn('id', $playerIds)->get();
-
-        $localsJson = $locals->map(function (LocalRecord $local) use ($players) {
-            $player = $players->where('id', $local->Player)->first();
-
-            return [
-                'rank'  => $local->Rank,
-                'cps'   => $local->Checkpoints,
-                'score' => $local->Score,
-                'nick'  => $player->NickName,
-                'login' => $player->Login,
-            ];
-        })->toJson();
-
-        Template::showAll('local-records.update', compact('localsJson'));
     }
 
     /**

@@ -2,11 +2,21 @@
 <manialink name="ESC:Locals:push-new-local" id="push-new-local" version="3">
     <script>
         <!--
+        #Struct Record {
+            Integer rank;
+            Integer[] cps;
+            Integer score;
+            Text name;
+            Text login;
+        }
+
         main(){
-            declare Text[Text][] CurrentLocals for LocalUser;
+            declare Record[] LocalRecords for LocalUser;
+            declare Integer LastLocalRecordsUpdate for LocalUser;
             declare Text localsJson = """{$localsJson|noescape}""";
 
-            CurrentLocals.fromjson(localsJson);
+            LocalRecords.fromjson(localsJson);
+            LastLocalRecordsUpdate = GameTime;
         }
         -->
     </script>
