@@ -79,6 +79,11 @@ class LocalRecords
         })->toJson();
     }
 
+    public static function beginMap(Map $map)
+    {
+        self::sendUpdatedLocals($map);
+    }
+
     /**
      * Called @ PlayerFinish
      *
