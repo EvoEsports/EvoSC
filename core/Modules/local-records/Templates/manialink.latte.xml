@@ -336,6 +336,7 @@
         declare Record[] LocalRecords for LocalUser;
         declare Integer LastLocalRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
+        declare Integer playerCount = 0;
 
         declare CMlFrame window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare CMlFrame currentHoverFrame = Null;
@@ -413,6 +414,14 @@
                 updateWidget(LocalRecords);
             }
 
+            if(playerCount != Players.count){
+                sleep(150);
+                playerCount = Players.count;
+                updateWindow(LocalRecords);
+                updateWidget(LocalRecords);
+            }
+
+            hidescript();
             maniaLinkDrag();
         }
     }

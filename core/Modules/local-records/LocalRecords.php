@@ -30,7 +30,7 @@ class LocalRecords
     public static function reload(Player $player)
     {
         TemplateController::loadTemplates();
-        self::showManialink2($player);
+        self::showManialink($player);
     }
 
     public static function showManialink(Player $player)
