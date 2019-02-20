@@ -228,8 +228,10 @@
             recordFrame.DataAttributeSet("record", record.tojson());
 
             if(onlinePlayers.exists(record.login)){
+                (labels.Controls[0] as CMlLabel).TextColor = headerColor;
                 (labels.Controls[4] as CMlQuad).Show();
             }else{
+                (labels.Controls[0] as CMlLabel).TextColor = <1.0, 1.0, 1.0>;
                 (labels.Controls[4] as CMlQuad).Hide();
             }
 
