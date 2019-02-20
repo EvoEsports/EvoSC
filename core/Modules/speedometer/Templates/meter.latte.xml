@@ -38,7 +38,7 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
-        declare SpeedoSettingsTest settings for This;
+        declare persistent SpeedoSettingsTest settings;
 
         declare player <=> InputPlayer;
         declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);

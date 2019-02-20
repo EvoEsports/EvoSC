@@ -14,14 +14,6 @@ class Speedometer
     public function __construct()
     {
         Hook::add('PlayerConnect', [self::class, 'show']);
-
-        KeyController::createBind('X', [self::class, 'reload']);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::show($player);
     }
 
     public static function show(Player $player)
