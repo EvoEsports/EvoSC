@@ -95,6 +95,10 @@
             //Set cp time
             (frame.GetFirstChild("time") as CMlLabel).SetText(formatScore(time));
 
+            ig(cpId >= cps.count){
+                return;
+            }
+
             //Set difference and color
             declare diff = diff(cps[cpId], time);
             declare diffQuad = (frame.GetFirstChild("diffQuad") as CMlQuad);
