@@ -95,7 +95,7 @@
             //Set cp time
             (frame.GetFirstChild("time") as CMlLabel).SetText(formatScore(time));
 
-            ig(cpId >= cps.count){
+            if(cpId >= cps.count){
                 return;
             }
 
