@@ -408,6 +408,8 @@ main() {
 
                 if(event.Control.HasClass("skip") && event.Type == CMlScriptEvent::Type::MouseClick){
                     setSong(getRandomSong());
+                    sleep(10);
+                    setSong(getRandomSong());
                     continue;
                 }
 
@@ -444,7 +446,10 @@ main() {
                 }
 
                 if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    setSong(getSong(event.Control.DataAttributeGet("file")));
+                    declare Text[Text] song = getSong(event.Control.DataAttributeGet("file"));
+                    setSong(getRandomSong());
+                    sleep(10);
+                    setSong(song);
                     continue;
                 }
 
