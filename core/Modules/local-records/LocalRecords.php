@@ -4,6 +4,7 @@ namespace esc\Modules\LocalRecords;
 
 use esc\Classes\Config;
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
@@ -24,7 +25,9 @@ class LocalRecords
         Hook::add('BeginMap', [LocalRecords::class, 'beginMap']);
         Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
 
-        // KeyController::createBind('X', [self::class, 'reload']);
+        ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
+
+        KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
@@ -47,6 +50,14 @@ class LocalRecords
             Template::show($player, 'local-records.update', compact('localsJson'));
             Template::show($player, 'local-records.manialink');
         }
+    }
+
+    public static function delete(Player $player, string $localRank)
+    {
+        $map = MapController::getCurrentMap();
+        $local = $map->locals()->where('Rank', $localRank)->delete();
+        self::fixLocalRecordRanks($map);
+        self::sendUpdatedLocals($map);
     }
 
     public static function sendUpdatedLocals(Map $map)
