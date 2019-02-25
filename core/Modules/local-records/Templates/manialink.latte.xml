@@ -329,6 +329,18 @@
 
             filled = filled + 1;
         }
+
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare skipFilled = 0;
+
+        foreach(frame in recordsFrame.Controls){
+            if(skipFilled < filled){
+                skipFilled = skipFilled + 1;
+                continue;
+            }
+
+            frame.Hide();
+        }
     }
 
     {(new esc\Classes\HideScript())|noescape}
