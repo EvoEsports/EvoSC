@@ -9,6 +9,13 @@ class AlterUi
 {
     public function __construct()
     {
+        Hook::add('PlayerConnect', [self::class, 'connect']);
+
+        self::setUiProperties();
+    }
+
+    public static function connect(Player $player)
+    {
         self::setUiProperties();
     }
 

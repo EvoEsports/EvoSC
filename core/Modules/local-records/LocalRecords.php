@@ -55,7 +55,7 @@ class LocalRecords
     public static function delete(Player $player, string $localRank)
     {
         $map = MapController::getCurrentMap();
-        $local = $map->locals()->where('Rank', $localRank)->delete();
+        $map->locals()->where('Rank', $localRank)->delete();
         self::fixLocalRecordRanks($map);
         self::sendUpdatedLocals($map);
     }
