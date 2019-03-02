@@ -27,7 +27,7 @@ class LocalRecords
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
 
-        KeyController::createBind('X', [self::class, 'reload']);
+        //KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

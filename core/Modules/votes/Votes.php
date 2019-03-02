@@ -100,7 +100,7 @@ class Votes
         self::startVote($player, 'Add 10 minutes?', function ($success) {
             if ($success) {
                 ChatController::message(onlinePlayers(), '_info', 'Vote to add time was successful.');
-                MapController::addTime(10);
+                MapController::addTime(MapController::getTimeLimit());
             } else {
                 ChatController::message(onlinePlayers(), '_info', 'Vote to add time was not successful.');
             }

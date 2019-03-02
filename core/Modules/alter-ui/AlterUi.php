@@ -39,7 +39,7 @@ class AlterUi
  		<!-- Small scores table displayed at the end of race of the round based modes (Rounds, Cup, ...) on the right of the screen -->
  		<round_scores visible="true" pos="-158.5 40. 150." />
  		<!-- Race time left displayed at the bottom right of the screen -->
- 		<countdown visible="true" pos="154 0 5." />
+ 		<countdown visible="true" pos="155 0 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->
  		<go visible="true" />
  		<!-- Current race chrono displayed at the bottom center of the screen -->
