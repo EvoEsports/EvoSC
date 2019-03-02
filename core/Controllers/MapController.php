@@ -31,10 +31,9 @@ class MapController implements ControllerInterface
 
     public static function init()
     {
-        self::$timeLimit = 60;
-
-        self::$queue    = new Collection();
-        self::$mapsPath = Server::getMapsDirectory();
+        self::$mapsPath  = Server::getMapsDirectory();
+        self::$timeLimit = self::getTimeLimitFromMatchSettings();
+        self::$queue     = new Collection();
 
         self::loadMaps();
 
@@ -52,7 +51,7 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
         ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
 
-        AccessRight::createIfNonExistent('map_queue_recent', 'Queue recently played tracks.');
+        AccessRight::createIfNonExistent('map_queue_recent', 'Drop maps from queue.');
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
         AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
@@ -72,9 +71,21 @@ class MapController implements ControllerInterface
         }
     }
 
-    public static function addMinute(Player $player)
+    private static function getTimeLimitFromMatchSettings(): int
     {
-        self::addTime(1);
+        $file = config('server.default-matchsettings');
+
+        if ($file) {
+            $matchSettings = File::get(self::$mapsPath . 'MatchSettings/' . $file);
+            $xml           = new \SimpleXMLElement($matchSettings);
+            foreach ($xml->mode_script_settings->children() as $child) {
+                if ($child->attributes()['name'] == 'S_TimeLimit') {
+                    return intval($child->attributes()['value']);
+                }
+            }
+        }
+
+        return 600;
     }
 
     /**
@@ -83,34 +94,39 @@ class MapController implements ControllerInterface
     public static function resetTime()
     {
         self::$addedTime = 0;
-        self::updateRoundtime(self::$timeLimit * 10);
+        self::setTimelimit(self::$timeLimit);
     }
 
     /**
      * Add time to the counter
      *
-     * @param int $minutes
+     * @param int $seconds
      */
-    public static function addTime(int $minutes = 10)
+    public static function addTime(int $seconds = 600)
     {
-        $settings                = \esc\Classes\Server::getModeScriptSettings();
-        $settings['S_TimeLimit'] += $minutes * 60;
-        \esc\Classes\Server::setModeScriptSettings($settings);
+        self::$addedTime += $seconds;
+        $newTimeLimit    = self::$timeLimit + self::$addedTime;
+        self::setTimelimit($newTimeLimit);
+
+        Hook::fire('TimeLimitUpdated', $newTimeLimit);
     }
 
-    public static function addTimeManually(Player $player, $cmd, int $amount)
+    public static function addMinute(Player $player)
     {
-        self::addTime($amount);
+        self::addTime(60);
     }
 
-
-    private static function updateRoundtime(int $timeInSeconds)
+    public static function addTimeManually(Player $player, $cmd, float $amount)
     {
-        $settings                = \esc\Classes\Server::getModeScriptSettings();
-        $settings['S_TimeLimit'] = $timeInSeconds;
-        \esc\Classes\Server::setModeScriptSettings($settings);
+        self::addTime($amount * 60.0);
+        Log::logAddLine('MapController', $player . ' added ' . $amount . ' minutes');
+    }
 
-        Hook::fire('TimeLimitUpdated', $timeInSeconds);
+    public static function setTimelimit(int $seconds)
+    {
+        $settings                = Server::getModeScriptSettings();
+        $settings['S_TimeLimit'] = $seconds;
+        Server::setModeScriptSettings($settings);
     }
 
     /**
@@ -166,6 +182,7 @@ class MapController implements ControllerInterface
     public static function beginMatch()
     {
         self::resetTime();
+        self::addTime(1);
     }
 
     /**
