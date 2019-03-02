@@ -21,9 +21,9 @@ class AlterUi
  	-->
  	<ui_properties>
  		<!-- The map name and author displayed in the top right of the screen when viewing the scores table -->
- 		<map_info visible="true" pos="-160. 80. 150." />
+ 		<map_info visible="false" pos="-160. 80. 150." />
  		<!-- Information about live envent displayed in the top right of the screen -->
- 		<live_info visible="true" pos="-159. 84. 5." />
+ 		<live_info visible="false" pos="-159. 84. 5." />
  		<!-- Information about the spectated player displayed in the bottom of the screen -->
  		<spectator_info visible="true" pos="0. -68. 5." />
  		<!-- Only visible in solo modes, it hides the medal/ghost selection UI -->
@@ -35,25 +35,25 @@ class AlterUi
  		-->
  		<chat visible="true" offset="0. 0." linecount="7" />
  		<!-- Time of the players at the current checkpoint displayed at the bottom of the screen -->
- 		<checkpoint_list visible="true" pos="48. -52. 5." />
+ 		<checkpoint_list visible="false" pos="48. -52. 5." />
  		<!-- Small scores table displayed at the end of race of the round based modes (Rounds, Cup, ...) on the right of the screen -->
  		<round_scores visible="true" pos="-158.5 40. 150." />
  		<!-- Race time left displayed at the bottom right of the screen -->
- 		<countdown visible="true" pos="153. -7. 5." />
+ 		<countdown visible="true" pos="154 0 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->
  		<go visible="true" />
  		<!-- Current race chrono displayed at the bottom center of the screen -->
- 		<chrono visible="true" pos="0. -80. -5." />
+ 		<chrono visible="false" pos="0. -80. -5." />
  		<!-- Speed and distance raced displayed in the bottom right of the screen -->
- 		<speed_and_distance visible="true" pos="137. -69. 5." />
+ 		<speed_and_distance visible="false" pos="137. -69. 5." />
  		<!-- Previous and best times displayed at the bottom right of the screen -->
- 		<personal_best_and_rank visible="true" pos="157. -24. 5." />
+ 		<personal_best_and_rank visible="false" pos="157. -24. 5." />
  		<!-- Current position in the map ranking displayed at the bottom right of the screen -->
- 		<position visible="true" pos="150.5 -28. 5." />
+ 		<position visible="false" pos="150.5 -28. 5." />
  		<!-- Checkpoint time information displayed in the middle of the screen when crossing a checkpoint -->
  		<checkpoint_time visible="true" pos="0. 3. -10." />
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->
- 		<chat_avatar visible="true" />
+ 		<chat_avatar visible="false" />
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
  		<warmup visible="true" pos="153. 13. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
@@ -70,6 +70,6 @@ class AlterUi
  		<scorestable alt_visible="true" visible="true" />
  	</ui_properties>';
 
-        Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', $properties);
+        Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', [$properties]);
     }
 }
