@@ -247,7 +247,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static object getNextMapInfo()
  * @method static object getMapInfo(string $string)
  * @method static bool checkMapForCurrentServerParams(string $string)
- * @method static array getMapList(int $int, int $int)
+ * @method static array getMapList(int $int = null, int $int = null)
  * @method static bool addMap(string $string)
  * @method static int addMapList(array $array)
  * @method static bool removeMap(string $string)
