@@ -13,7 +13,6 @@ use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Contracts\Queue\Queue;
 
 class MxDownload
 {

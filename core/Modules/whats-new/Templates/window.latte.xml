@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:whats-new" id="whats-new" version="3">
+    <frame id="frame" pos="-80 45" hidden="1">
+    </frame>
+
+    <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+main() {
+    log({md5($changes)});
+}
+    --></script>
+</manialink>

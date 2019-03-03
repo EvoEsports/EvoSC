@@ -8,7 +8,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
 
@@ -17,17 +16,7 @@ class MxMapDetails
     public function __construct()
     {
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
-
-        // KeyController::createBind('Y', [self::class, 'reload']);
     }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        $mapId = Map::all()->random()->id . "";
-        self::showDetails($player, $mapId);
-    }
-
     public static function showDetails(Player $player, string $mapId)
     {
         $map = Map::find($mapId);
@@ -69,8 +58,6 @@ class MxMapDetails
 
     public static function loadMxDetails(Map $map, bool $overwrite = false)
     {
-        echo "Loading mx details\n";
-
         if ($map->mx_details != null && !$overwrite) {
             return;
         }
