@@ -7,6 +7,5 @@ logs/
 cache/
 crash-reports/*.json
 
-!config/
 config/*
 !config/default
