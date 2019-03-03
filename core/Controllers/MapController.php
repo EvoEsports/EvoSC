@@ -8,13 +8,13 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
+use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
@@ -159,7 +159,7 @@ class MapController implements ControllerInterface
             'cooldown'    => 0,
         ]);
 
-        self::loadMxDetails($map);
+        MxMapDetails::loadMxDetails($map);
 
         foreach (finishPlayers() as $player) {
             $player->setScore(0);
@@ -335,53 +335,6 @@ class MapController implements ControllerInterface
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
            ->update(['enabled' => true]);
-    }
-
-    public static function loadMxDetails(Map $map, bool $overwrite = false)
-    {
-        if ($map->mx_details != null && !$overwrite) {
-            return;
-        }
-
-        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
-
-        if ($result->getStatusCode() != 200) {
-            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());
-
-            return;
-        }
-
-        $data = $result->getBody()->getContents();
-
-        if ($data == '[]') {
-            Log::logAddLine('MapController', 'No MX information available for: ' . $map->gbx->Name);
-
-            return;
-        }
-
-        $map->update(['mx_details' => $data]);
-        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
-
-        $mxDetails = json_decode($data);
-
-        if (count($mxDetails) == 0) {
-            Log::logAddLine('MapController', 'Failed to fetch MX world record: mxDetails is empty.');
-
-            return;
-        }
-
-        $mxDetails = $mxDetails[0];
-
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $mxDetails->TrackID);
-
-        if ($result->getStatusCode() != 200) {
-            Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
-
-            return;
-        }
-        $map->update(['mx_world_record' => $result->getBody()->getContents()]);
-
-        Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->gbx->Name);
     }
 
     /**

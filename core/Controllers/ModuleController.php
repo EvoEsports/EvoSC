@@ -71,7 +71,7 @@ class ModuleController implements ControllerInterface
     {
         $name    = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
         $author  = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        $version = str_pad($module->version ?? 'n/a', 12, ' ', STR_PAD_RIGHT);
+        $version = str_pad(sprintf('%.1f', floatval($module->version)), 12, ' ', STR_PAD_RIGHT);
 
         Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
     }
@@ -113,8 +113,8 @@ class ModuleController implements ControllerInterface
 
         //Output loaded modules
         Log::getOutput()->writeln("");
-        self::outputModuleInformation(json_decode('{"name":"Name","version":"Version","author":"Author"}'));
-        self::outputModuleInformation(json_decode('{"name":"------------------------------","version":"------------","author":"------------------------------"}'));
+        Log::getOutput()->writeln('<fg=green>Name                          Version     Author</>');
+        Log::getOutput()->writeln('<fg=green>------------------------------------------------------------------------</>');
         self::$loadedModules->each([ModuleController::class, 'outputModuleInformation']);
         Log::getOutput()->writeln("");
 

@@ -3,7 +3,9 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\RestClient;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
@@ -45,9 +47,9 @@ class MxMapDetails
     private static function getRatingString($average): string
     {
         $starString = '';
-        $stars = $average / 20;
-        $full = floor($stars);
-        $left = $stars - $full;
+        $stars      = $average / 20;
+        $full       = floor($stars);
+        $left       = $stars - $full;
 
         for ($i = 0; $i < $full; $i++) {
             $starString .= '';
@@ -63,5 +65,50 @@ class MxMapDetails
         }
 
         return $starString;
+    }
+
+    public static function loadMxDetails(Map $map, bool $overwrite = false)
+    {
+        echo "Loading mx details\n";
+
+        if ($map->mx_details != null && !$overwrite) {
+            return;
+        }
+
+        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
+
+        if ($result->getStatusCode() != 200) {
+            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());
+
+            return;
+        }
+
+        $data = $result->getBody()->getContents();
+
+        if ($data == '[]') {
+            Log::logAddLine('MapController', 'No MX information available for: ' . $map->gbx->Name);
+
+            return;
+        }
+
+        $map->update(['mx_details' => $data]);
+        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
+
+        self::loadMxWordlRecord($map);
+    }
+
+    public static function loadMxWordlRecord(Map $map)
+    {
+        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
+
+        if ($result->getStatusCode() != 200) {
+            Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
+
+            return;
+        }
+
+        $map->update(['mx_world_record' => $result->getBody()->getContents()]);
+
+        Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->gbx->Name);
     }
 }

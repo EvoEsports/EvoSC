@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -13,41 +14,28 @@ use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Contracts\Queue\Queue;
 
-class MxDownload
+class AddMapTemp
 {
     public function __construct()
     {
-        ChatController::addCommand('add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map_add');
+        ChatCommand::add('add', [self::class, 'addMap'], 'Vote to play map from mx temporarily. Usage: /add <mx_id>');
     }
 
-    /**
-     * Add map from MX
-     *
-     * @param \esc\Models\Player $player
-     * @param                    $cmd
-     * @param string             ...$arguments
-     */
-    public static function addMap(Player $player, $cmd, string ...$arguments)
+    public static function addMap(Player $player, $cmd, $mxId)
     {
-        foreach ($arguments as $mxId) {
-            $mxId = (int)$mxId;
+        $mxId = (int)$mxId;
 
-            if ($mxId == 0) {
-                Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::message($player, "Requested map with invalid id: " . $mxId);
+        if ($mxId == 0) {
+            Log::warning("Requested map with invalid id: " . $mxId);
+            ChatController::message($player, '_warning', 'Requested map with invalid id: ', $mxId);
 
-                return;
-            }
+            return;
+        }
 
-            $map = Map::getByMxId($mxId);
+        $map = Map::getByMxId($mxId);
 
-            if ($map && File::exists(MapController::getMapsPath(), 'MX/' . $map->filename)) {
-                ChatController::message($player, '_warning', secondary($map), ' already exists');
-                continue;
-            }
-
+        if (!$map) {
             $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
 
             if ($response->getStatusCode() != 200) {
@@ -82,9 +70,9 @@ class MxDownload
 
             if (!File::exists($absolute)) {
                 ChatController::message($player, '_warning', "Map download ($mxId) failed.");
-                continue;
-            }
 
+                return;
+            }
 
             $gbxInfo = MapController::getGbxInformation($filename);
             $gbx     = json_decode($gbxInfo);
@@ -100,34 +88,33 @@ class MxDownload
                 $authorId = $author->id;
             }
 
-            if ($map) {
-                $map->update([
-                    'author'   => $authorId,
-                    'filename' => $filename,
-                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                    'enabled'  => 1,
-                ]);
-            } else {
-                $map = Map::firstOrCreate([
-                    'uid'      => $gbx->MapUid,
-                    'author'   => $authorId,
-                    'filename' => $filename,
-                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                    'enabled'  => 1,
-                ]);
-            }
+            Map::create([
+                'uid'      => $gbx->MapUid,
+                'author'   => $authorId,
+                'filename' => $filename,
+                'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
+                'enabled'  => 1,
+            ]);
 
-            try {
-                Server::addMap($map->filename);
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                QueueController::queueMap($player, $map);
-                Hook::fire('MapPoolUpdated');
-            } catch (\Exception $e) {
-                Log::warning("Map $map->filename already added.");
-            }
+            $map = Map::whereUid($gbx->MapUid)->first();
+            MxMapDetails::loadMxDetails($map, true);
+            Server::addMap($map->filename);
+        }
 
-
-            ChatController::message(onlinePlayers(), '_info', 'New map added: ', $map);
+        try {
+            Votes::startVote($player, 'Play ' . secondary($map) . '?', function ($success) use ($map, $player) {
+                if ($success) {
+                    QueueController::queueMap($player, $map);
+                    ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' was successful.');
+                    ChatController::message(onlinePlayers(), '_info', $map, ' was added to the queue.');
+                    Hook::fire('MapPoolUpdated');
+                    //TODO: Disable map after it was played
+                }else{
+                    ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' failed.');
+                }
+            });
+        } catch (\Exception $e) {
+            Log::warning($e->getMessage());
         }
     }
 }

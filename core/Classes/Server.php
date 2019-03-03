@@ -254,7 +254,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int removeMapList(array $array)
  * @method static bool insertMap(string $string)
  * @method static int insertMapList(array $array)
- * @method static bool chooseNextMap(string $string)
+ * @method static bool chooseNextMap(string $filename)
  * @method static int chooseNextMapList(array $array)
  * @method static int loadMatchSettings(string $string)
  * @method static int appendPlaylistFromMatchSettings(string $string)

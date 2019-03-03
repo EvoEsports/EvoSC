@@ -120,18 +120,6 @@ class Votes
         });
     }
 
-    public static function startCustomVote(Player $player, string $question, $action)
-    {
-        self::startVote($player, $question, function (bool $success) use ($question, $action) {
-            if ($success) {
-                ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($question), ' was successful.');
-                $action();
-            } else {
-                ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($question), ' was not successful.');
-            }
-        });
-    }
-
     public static function askSkip(Player $player)
     {
         $diffInSeconds = self::$lastVote->diffInSeconds();
