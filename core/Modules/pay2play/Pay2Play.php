@@ -44,6 +44,7 @@ class Pay2Play
             }
             */
 
+
             if (MapController::getAddedTime() + 10 <= config('pay2play.addtime.time-limit')) {
                 PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
             } else {
