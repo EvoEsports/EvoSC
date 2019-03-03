@@ -9,8 +9,10 @@ use esc\Classes\MapQueueItem;
 use esc\Classes\Template;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
+use esc\Controllers\QueueController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
+use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -20,17 +22,24 @@ class MapList
     {
         ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
         ManiaLinkEvent::add('maplist.delete-perm', [MapList::class, 'deleteMapPerm'], 'map.delete-perm');
-        ManiaLinkEvent::add('map.queue', [MapList::class, 'queueMap']);
-        ManiaLinkEvent::add('map.drop', [MapList::class, 'queueDropMap']);
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
         Hook::add('MapPoolUpdated', [MapList::class, 'sendUpdatedMaplist']);
-        Hook::add('QueueUpdated', [MapList::class, 'mapQueueUpdated']);
+        Hook::add('MapQueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
 
         ChatController::addCommand('list', [self::class, 'searchMap'], 'Search maps or open maplist');
+    }
+
+    public static function mapMapQueue(MapQueue $item)
+    {
+        return [
+            'queue_id' => $item->id,
+            'id'       => $item->map->id,
+            'by'       => $item->requesting_player,
+        ];
     }
 
     /**
@@ -40,15 +49,9 @@ class MapList
      */
     public static function playerConnect(Player $player)
     {
-        $mapQueue = self::getMapQueueJson();
+        $mapQueue = QueueController::getMapQueue()->map([self::class, 'mapMapQueue']);
         Template::show($player, 'map-list.update-map-queue', compact('mapQueue'));
         self::sendRecordsJson($player);
-        self::sendManialink($player);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
         self::sendManialink($player);
     }
 
@@ -91,26 +94,6 @@ class MapList
     public static function favRemove(Player $player, string $mapId)
     {
         $player->favorites()->detach($mapId);
-    }
-
-    public static function queueDropMap(Player $player, $mapUid)
-    {
-        $map       = Map::whereUid($mapUid)->first();
-        $queueItem = MapController::getQueue()->where('map', $map)->first();
-
-        if (!$queueItem) {
-            return;
-        }
-
-        if ($queueItem->issuer->Login != $player->Login) {
-            ChatController::message($player, '_warning', 'You can not drop other players maps');
-
-            return;
-        }
-
-        MapController::unqueueMap($map);
-        self::mapQueueUpdated();
-        ChatController::message(onlinePlayers(), $player, ' drops ', $map, ' from queue');
     }
 
     /**
@@ -195,22 +178,12 @@ class MapList
     /**
      * Send updated map queue to everyone
      *
-     * @param Collection $queue
+     * @param \Illuminate\Support\Collection $queueItems
      */
-    public static function mapQueueUpdated()
+    public static function mapQueueUpdated(Collection $queueItems)
     {
-        $mapQueue = self::getMapQueueJson();
+        $mapQueue = $queueItems->map([self::class, 'mapMapQueue']);
         Template::showAll('map-list.update-map-queue', compact('mapQueue'));
-    }
-
-    private static function getMapQueueJson(): string
-    {
-        return MapController::getQueue()->map(function (MapQueueItem $item) {
-            return [
-                'id' => '' . $item->map->id,
-                'by' => $item->issuer->Login,
-            ];
-        })->toJson();
     }
 
     /**
@@ -224,14 +197,5 @@ class MapList
         $favorites      = self::getMapFavoritesJson($player);
         $ignoreCooldown = $player->hasAccess('queue.recent');
         Template::show($player, 'map-list.manialink', compact('favorites', 'ignoreCooldown'));
-    }
-
-    public static function queueMap(Player $player, $mapUid)
-    {
-        $map = Map::whereUid($mapUid)->first();
-
-        if ($map) {
-            MapController::queueMap($player, $map);
-        }
     }
 }

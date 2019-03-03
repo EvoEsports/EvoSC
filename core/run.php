@@ -21,7 +21,7 @@ class EscRun extends Command
         global $escVersion;
         global $serverName;
 
-        $escVersion = '0.47.0';
+        $escVersion = '0.54.*';
 
         esc\Classes\Config::loadConfigFiles();
 
@@ -95,6 +95,7 @@ class EscRun extends Command
         \esc\Controllers\KeyController::init();
         esc\Controllers\GroupController::init();
         esc\Controllers\AccessController::init();
+        esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
         esc\Controllers\PlayerController::init();
         esc\Controllers\AfkController::init();

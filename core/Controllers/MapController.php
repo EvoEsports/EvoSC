@@ -8,16 +8,15 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MapQueueItem;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
+use esc\Models\MapQueue;
 use esc\Models\Player;
 use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 use mysql_xdevapi\Exception;
 
@@ -25,7 +24,6 @@ class MapController implements ControllerInterface
 {
     private static $mapsPath;
     private static $currentMap;
-    private static $queue;
     private static $addedTime = 0;
     private static $timeLimit;
 
@@ -33,7 +31,6 @@ class MapController implements ControllerInterface
     {
         self::$mapsPath  = Server::getMapsDirectory();
         self::$timeLimit = self::getTimeLimitFromMatchSettings();
-        self::$queue     = new Collection();
 
         self::loadMaps();
 
@@ -51,7 +48,6 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
         ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
 
-        AccessRight::createIfNonExistent('map_queue_recent', 'Drop maps from queue.');
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
         AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
@@ -137,22 +133,16 @@ class MapController implements ControllerInterface
      */
     public static function endMatch()
     {
-        $request = self::$queue->first();
+        $request = MapQueue::getFirst();
 
         if ($request) {
-            $nextMapUid = Server::rpc()->getNextMapInfo()->uId;
-
-            if ($request->map->Uid != $nextMapUid) {
-                //Preloaded map does not match top of queue anymore
-                $request = self::$queue->shift();
-            }
-
             Log::info("Setting next map: " . $request->map);
             Server::chooseNextMap($request->map->filename);
-            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($request->map), ' requested by ',
-                $request->issuer);
+            MapQueue::removeFirst();
+            Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
+            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($request->map), ' requested by ', $request->player);
         } else {
-            $nextMap = self::getNext();
+            $nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
             ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($nextMap));
         }
     }
@@ -197,16 +187,6 @@ class MapController implements ControllerInterface
         }
 
         return self::$currentMap;
-    }
-
-    /**
-     * Get all queued maps
-     *
-     * @return Collection
-     */
-    public static function getQueue(): Collection
-    {
-        return self::$queue->sortBy('timeRequested');
     }
 
     public static function deleteMap(Player $player, Map $map)
@@ -256,26 +236,6 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Gets the next played map
-     *
-     * @return Map
-     */
-    public static function getNext(): Map
-    {
-        $first = self::$queue->first();
-
-        if ($first) {
-            $map = self::$queue->first()->map;
-        } else {
-            $mapInfo = Server::getNextMapInfo();
-            $map     = Map::where('uid', $mapInfo->uId)
-                          ->first();
-        }
-
-        return $map;
-    }
-
-    /**
      * Admins skip method
      *
      * @param Player $player
@@ -297,64 +257,7 @@ class MapController implements ControllerInterface
     public static function forceReplay(Player $player)
     {
         $currentMap = self::getCurrentMap();
-
-        if (self::getQueue()
-                ->contains('map.uid', $currentMap->uid)) {
-            ChatController::message($player, 'Map is already being replayed');
-
-            return;
-        }
-
-        self::$queue->push(new MapQueueItem($player, $currentMap, 0));
-        ChatController::message(onlinePlayers(), '_info', $player, ' queued map ', $currentMap, ' for replay');
-    }
-
-    /**
-     * Adds a map to the queue
-     *
-     * @param \esc\Models\Player $player
-     * @param \esc\Models\Map    $map
-     * @param null               $arg
-     *
-     * @return null
-     */
-    public static function queueMap(Player $player, Map $map, $arg = null)
-    {
-        if (self::getQueue()
-                ->where('player', $player)
-                ->isNotEmpty()) {
-
-            //Player already has map in queue
-            ChatController::message($player, '_warning', "You already have a map in queue.");
-
-            return self::$queue;
-        }
-
-        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('map_queue_recent')) {
-            ChatController::message($player, '_info', 'Can not juke recently played tracks.');
-
-            return self::$queue;
-        }
-
-        self::$queue->push(new MapQueueItem($player, $map, time()));
-
-        //Preload map => faster map change
-        Server::chooseNextMap(self::getNext()->filename);
-
-        ChatController::message(onlinePlayers(), '_info', $player, ' juked map ', $map);
-        Log::logAddLine('MapController', "$player juked map " . $map->gbx->Name);
-        Hook::fire('QueueUpdated', self::$queue);
-
-        return self::$queue;
-    }
-
-    public static function unqueueMap(Map $map): Collection
-    {
-        self::$queue = self::getQueue()->reject(function (MapQueueItem $mqi) use ($map) {
-            return $mqi->map == $map;
-        })->values();
-
-        return self::$queue;
+        QueueController::queueMap($player, $currentMap);
     }
 
     private static function getGbxInformation($filename): string
