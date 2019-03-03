@@ -18,7 +18,7 @@ class CreateMapQueueTable extends Migration
         $schemaBuilder->create('map-queue', function (Blueprint $table) {
             $table->increments('id');
             $table->string('requesting_player');
-            $table->integer('map_id');
+            $table->string('map_uid');
             $table->timestamps();
         });
     }
