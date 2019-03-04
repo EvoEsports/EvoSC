@@ -211,9 +211,9 @@ class PlayerController implements ControllerInterface
             exit(0);
         }
 
-        Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
-
         $diff = $player->last_visit->diffForHumans();
+        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $diff.");
+
         infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')->sendAll();
 
         $player->update([
