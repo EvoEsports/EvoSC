@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:whats-new" id="whats-new" version="3">
-    <frame id="frame" pos="-80 45" hidden="1">
+    <frame id="frame" pos="-50 30" hidden="1">
+        <quad size="100 60" bgcolor="{config('colors.ui.background')}c" z-index="-1" />
+        <label pos="50 -5" text="Whats New in EvoSC {getEscVersion()}?" textsize="3" halign="center" textfont="RajdhaniMono" />
+        <quad pos="10 -11.5" size="80 0.25" bgcolor="fffe" z-index="0" />
+
+        {foreach $changes as $key => $change}
+        <label pos="50 {$key * -4 - 15}" text="{$change}" textsize="1" halign="center" textfont="RajdhaniMono" />
+        {/foreach}
+
+        <label class="close" pos="50 -55" size="16 4" text="Got it" textsize="1" halign="center" valign="center" textfont="RajdhaniMono" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}9" focusareacolor2="{config('colors.ui.header')}c" />
     </frame>
 
     <script><!--
@@ -8,7 +17,31 @@
 #Include "TextLib" as TL
 
 main() {
-    log({md5($changes)});
+    declare persistent Text EvoWhatsNewHash = "";
+    declare frame <=> (Page.MainFrame.GetFirstChild("frame") as CMlFrame);
+    declare Text hash = {md5(serialize($changes))};
+
+    if(EvoWhatsNewHash != ""){
+        if(EvoWhatsNewHash == hash){
+            return;
+        }
+    }
+
+    frame.Show();
+
+    while(True){
+        yield;
+
+        foreach(event in PendingEvents){
+            if(event.Control == Null) continue;
+
+            if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                EvoWhatsNewHash = hash;
+                frame.Hide();
+                return;
+            }
+        }
+    }
 }
     --></script>
 </manialink>

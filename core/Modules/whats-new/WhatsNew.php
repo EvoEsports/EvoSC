@@ -3,26 +3,25 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Hook;
 use esc\Classes\Template;
-use esc\Controllers\KeyController;
-use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class WhatsNew
 {
     public function __construct()
     {
-        KeyController::createBind('X', [self::class, 'reload']);
+        Hook::add('PlayerConnect', [self::class, 'showNews']);
     }
 
-    public static function reload(Player $player)
+    public static function showNews(Player $player)
     {
-        TemplateController::loadTemplates();
-
         $changes = [
-            'Customizable speedometer',
-            'Customizable roundtime',
+            'Customizable speedometer (size/position/label)',
+            'Customizable roundtime (size/position/label)',
             'Add map vote (/add <mx_id>)',
+            'Change UI hiding speed with button on the right',
+            'Skip music',
         ];
 
         Template::show($player, 'whats-new.window', compact('changes'));
