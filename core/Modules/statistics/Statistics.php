@@ -173,9 +173,13 @@ class Statistics
         self::updatePlayerRanks();
         self::$scores = collect();
 
-        if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
+        if ($bestPlayer) {
+            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
+                return;
+            }
+
             $bestPlayer->stats()->increment('Wins');
-            infoMessage('Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
+            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
                 ->setIcon('🏆')
                 ->sendAll();
         }

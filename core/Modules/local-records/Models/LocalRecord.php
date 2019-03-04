@@ -36,6 +36,6 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
 
     public function __toString()
     {
-        return secondary($this->Rank . '.$') . config('colors.local') . ' local record' . secondary(formatScore($this->Score));
+        return secondary($this->Rank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($this->Score));
     }
 }
