@@ -252,7 +252,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int addMapList(array $array)
  * @method static bool removeMap(string $string)
  * @method static int removeMapList(array $array)
- * @method static bool insertMap(string $string)
+ * @method static bool insertMap(string $filename)
  * @method static int insertMapList(array $array)
  * @method static bool chooseNextMap(string $filename)
  * @method static int chooseNextMapList(array $array)

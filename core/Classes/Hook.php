@@ -7,21 +7,22 @@ use esc\Controllers\HookController;
 
 class Hook
 {
-    private $name;
+    private $runOnce;
     private $event;
     private $function;
 
     /**
      * Hook constructor.
-     * @param string $event
-     * @param string $function
-     * @param string|null $name
+     *
+     * @param string         $event
+     * @param \Closure|array $function
+     * @param bool           $runOnce
      */
-    public function __construct(string $event, array $function, string $name = null)
+    public function __construct(string $event, $function, bool $runOnce = false)
     {
         $this->event    = $event;
         $this->function = $function;
-        $this->name     = $name;
+        $this->name     = $runOnce;
     }
 
     /**
@@ -30,11 +31,16 @@ class Hook
     public function execute(...$arguments)
     {
         try {
-            if(is_callable($this->function, false,$callableName)){
-                call_user_func($this->function, ...$arguments);
-                Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
-            }else{
-                throw new \Exception("Function call invalid, must use: [ClassName, ClassFunctionName]");
+            if (gettype($this->function) == "object") {
+                $func = $this->function;
+                $func(...$arguments);
+            } else {
+                if (is_callable($this->function, false, $callableName)) {
+                    call_user_func($this->function, ...$arguments);
+                    Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
+                } else {
+                    throw new \Exception("Function call invalid, must use: [ClassName, ClassFunctionName] or Closure");
+                }
             }
         } catch (\Exception $e) {
             Log::logAddLine('Hook', "Exception: " . $e->getMessage(), isVerbose());
@@ -42,6 +48,10 @@ class Hook
         } catch (\TypeError $e) {
             Log::logAddLine('Hook', "TypeError: " . $e->getMessage(), isVerbose());
             Log::logAddLine('Stack trace', $e->getTraceAsString(), isVerbose());
+        }
+
+        if ($this->runOnce) {
+            HookController::removeHook($this);
         }
     }
 
@@ -53,19 +63,26 @@ class Hook
         return $this->event;
     }
 
-    /**
-     * @param string $event
-     * @param $callback
-     */
-    public static function add(string $event, array $callback)
+    public function getFunction()
     {
-        HookController::add($event, $callback);
+        return $this->function;
+    }
+
+    /**
+     * @param string         $event
+     * @param \Closure|array $callback
+     * @param bool           $runOnce
+     */
+    public static function add(string $event, $callback, bool $runOnce = false)
+    {
+        HookController::add($event, $callback, $runOnce);
     }
 
     /**
      * Fire all registered hooks
+     *
      * @param string $hookName
-     * @param mixed ...$arguments
+     * @param mixed  ...$arguments
      */
     public static function fire(string $hookName, ...$arguments)
     {

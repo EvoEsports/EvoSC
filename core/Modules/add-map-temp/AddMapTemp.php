@@ -98,8 +98,9 @@ class AddMapTemp
 
             $map = Map::whereUid($gbx->MapUid)->first();
             MxMapDetails::loadMxDetails($map, true);
-            Server::addMap($map->filename);
         }
+
+        Server::insertMap($map->filename);
 
         try {
             Votes::startVote($player, 'Play ' . secondary($map) . '?', function ($success) use ($map, $player) {
@@ -108,8 +109,12 @@ class AddMapTemp
                     ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' was successful.');
                     ChatController::message(onlinePlayers(), '_info', $map, ' was added to the queue.');
                     Hook::fire('MapPoolUpdated');
-                    //TODO: Disable map after it was played
-                }else{
+
+                    Hook::add('BeginMatch', function () use ($map) {
+                        $map->update(['enabled' => 0]);
+                        Hook::fire('MapPoolUpdated');
+                    }, true);
+                } else {
                     ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' failed.');
                 }
             });
