@@ -63,7 +63,7 @@ class ChatMessage
         $message = '';
 
         foreach ($this->parts as $part) {
-            if (is_numeric($part)) {
+            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', $part)) {
                 $message .= secondary($part);
                 continue;
             }
@@ -74,11 +74,11 @@ class ChatMessage
             }
 
             if ($part instanceof Player) {
-                $message .= $part . '$z';
+                $message .= $part;
                 continue;
             }
 
-            $message .= $part;
+            $message .= '$z$s' . $part;
         }
 
         if ($this->icon) {

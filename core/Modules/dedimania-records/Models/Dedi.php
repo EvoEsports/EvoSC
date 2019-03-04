@@ -47,6 +47,6 @@ class Dedi extends Model
 
     public function __toString()
     {
-        return secondary($this->Rank . '. ' . formatScore($this->Score) . ' Local record');
+        return secondary($this->Rank . '.$') . config('colors.dedi') . ' dedimania record' . secondary(formatScore($this->Score));
     }
 }
