@@ -74,7 +74,7 @@ class ChatMessage
             }
 
             if ($part instanceof Player) {
-                $message .= $part;
+                $message .= $part . '$z$s';
                 continue;
             }
 
