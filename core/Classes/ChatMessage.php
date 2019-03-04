@@ -73,6 +73,11 @@ class ChatMessage
                 continue;
             }
 
+            if ($part instanceof Player) {
+                $message .= $part . '$z';
+                continue;
+            }
+
             $message .= $part;
         }
 

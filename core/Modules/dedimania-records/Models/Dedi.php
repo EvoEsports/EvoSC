@@ -44,4 +44,9 @@ class Dedi extends Model
 
         return null;
     }
+
+    public function __toString()
+    {
+        return secondary($this->Rank . '. ' . formatScore($this->Score) . ' Local record');
+    }
 }

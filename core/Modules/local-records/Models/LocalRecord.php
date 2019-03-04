@@ -33,4 +33,9 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
     {
         return formatScore($this->Score);
     }
+
+    public function __toString()
+    {
+        return secondary($this->Rank . '. ' . formatScore($this->Score) . ' Local record');
+    }
 }
