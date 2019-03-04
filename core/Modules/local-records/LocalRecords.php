@@ -131,9 +131,9 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
 
                 if ($oldRank == $local->Rank) {
-                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
+                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')')->sendAll();
                 } else {
-                    $chatMessage->setParts( $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
+                    $chatMessage->setParts( $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')')->sendAll();
                 }
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
@@ -148,13 +148,11 @@ class LocalRecords
                     'Rank'        => 999,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
-                $chatMessage->setParts($player, ' claimed the ', $local);
+                $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
             }
         }
-
-        $chatMessage->sendAll();
     }
 
     /**
