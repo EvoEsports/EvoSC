@@ -1,5 +1,10 @@
 <?php
 
+function chatMessage(...$message)
+{
+    return new \esc\Classes\ChatMessage(...$message);
+}
+
 function formatScore(int $score): string
 {
     $seconds = floor($score / 1000);
@@ -15,16 +20,6 @@ function serverName(): string
     global $serverName;
 
     return $serverName;
-}
-
-function console(): \esc\Models\Player
-{
-    $player        = new \esc\Models\Player();
-    $player->Login = serverName();
-    $player        = serverName();
-    $player->Group = \esc\Models\Group::find(1);
-
-    return $player;
 }
 
 function formatScoreNoMinutes(int $score): string
@@ -142,7 +137,7 @@ function warning(string $str = ""): string
 
 function info(string $str = ""): string
 {
-    return '$' . config('colors.warning') . $str;
+    return '$' . config('colors.info') . $str;
 }
 
 function getEscVersion(): string

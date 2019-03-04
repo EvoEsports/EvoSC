@@ -242,7 +242,7 @@ class MapController implements ControllerInterface
     public static function skip(Player $player = null)
     {
         if ($player) {
-            ChatController::message(onlinePlayers(), '_info', $player, ' skips map');
+            chatMessage($player, ' skips map')->setIsInfoMessage()->sendAll();
         }
 
         MapController::goToNextMap();

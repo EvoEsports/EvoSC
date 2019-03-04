@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use Carbon\Carbon;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -171,9 +170,9 @@ class PlayerController implements ControllerInterface
             'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
-        $color = $player->group->color ?? config('colors.info');
-        $group = '$' . $color . ' ' . $player->group->Name;
-        ChatController::message(onlinePlayers(), '_info', $group, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString));
+        chatMessage($player->group, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString))
+            ->setIcon('')
+            ->sendAll();
 
         return $player;
     }

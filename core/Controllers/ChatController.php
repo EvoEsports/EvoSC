@@ -4,6 +4,7 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\ChatMessage;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Module;
@@ -239,135 +240,58 @@ $$: Writes a dollarsign
         $message = self::prepareMessage(...$parts);
 
         if ($recipients instanceof Player) {
-            Server::chatSendServerMessage($message, $recipients->Login);
+            $message->send($recipients);
         } else {
-            if (onlinePlayers() == $recipients) {
-                Server::chatSendServerMessage($message);
-                return;
-            }
-
-            $logins = $recipients->pluck('Login')->implode(',');
-            Server::chatSendServerMessage($message, $logins);
+            $message->sendAll();
         }
     }
 
-    private static function prepareMessage(...$parts)
+    private static function prepareMessage(...$parts): ChatMessage
     {
-        $icon       = "";
-        $color      = config('colors.primary');
-        $groupColor = config('colors.primary');
+        $chatMessage = new ChatMessage();
 
         if (preg_match('/^_(\w+)$/', $parts[0], $matches)) {
             //set primary color of message
             switch ($matches[1]) {
                 case 'secondary':
-                    $icon       = "";
-                    $color      = config('colors.secondary');
-                    $groupColor = config('colors.secondary');
+                    $chatMessage->setColor(config('colors.secondary'));
                     array_shift($parts);
                     break;
 
                 case 'info':
-                    $icon       = "";
-                    $color      = config('colors.info');
-                    $groupColor = config('colors.info');
+                    $chatMessage->setIcon("");
+                    $chatMessage->setColor(config('colors.info'));
                     array_shift($parts);
                     break;
 
                 case 'warning':
-                    $icon       = "";
-                    $icon       = "";
-                    $color      = config('colors.warning');
-                    $groupColor = config('colors.warning');
+                    $chatMessage->setIcon("");
+                    $chatMessage->setColor(config('colors.warning'));
                     array_shift($parts);
                     break;
 
                 case 'local':
-                    $icon       = "";
-                    $color      = config('colors.local');
-                    $groupColor = config('colors.local');
+                    $chatMessage->setIcon("");
+                    $chatMessage->setColor(config('colors.local'));
                     array_shift($parts);
                     break;
 
                 case 'dedi':
-                    $icon       = "";
-                    $color      = config('colors.dedi');
-                    $groupColor = config('colors.dedi');
+                    $chatMessage->setIcon("");
+                    $chatMessage->setColor(config('colors.dedi'));
                     array_shift($parts);
                     break;
 
                 default:
                     if (preg_match('/[0-9a-f]{3}/', $matches[1])) {
-                        $color      = $matches[1];
-                        $groupColor = $matches[1];
+                        $chatMessage->setColor($matches[1]);
                         array_shift($parts);
                     }
             }
         }
 
-        $message = '$s';
+        $chatMessage->setParts(...$parts);
 
-        foreach ($parts as $key => $part) {
-            if ($part === null) {
-                continue;
-            }
-
-            if ($part instanceof Player) {
-                if ($key == 0) {
-                    $message .= '$s$' . $groupColor . ($part->group->Name) . ' ';
-                }
-                $message .= secondary($part->NickName);
-                continue;
-            }
-
-            if ($part instanceof Map) {
-                $message .= secondary($part->gbx->Name);
-                continue;
-            }
-
-            if ($part instanceof Group) {
-                $part = ucfirst($part->Name);
-            }
-
-            if ($part instanceof Module) {
-                $message .= secondary(stripAll($part->name));
-                continue;
-            }
-
-            if ($part instanceof Song) {
-                $message .= secondary($part->title);
-                continue;
-            }
-
-            if ($part instanceof LocalRecord) {
-                $message .= secondary($part->Rank) . '. $z$s$' . $color . 'local record $z$s' . secondary(formatScore($part->Score));
-                continue;
-            }
-
-            if ($part instanceof Dedi) {
-                $message .= secondary($part->Rank) . '. $z$s$' . $color . 'dedimania record $z$s' . secondary(formatScore($part->Score));
-                continue;
-            }
-
-            if (is_float($part) || is_int($part) || preg_match('/\-?\d+\./', $part)) {
-                $message .= secondary($part ?? "0");
-                continue;
-            }
-
-            if (!is_string($part)) {
-                echo "CLASS OF PART: ";
-                var_dump(get_class($part));
-                var_dump(LocalRecord::class);
-            }
-
-            $message .= '$z$s$' . $color . $part;
-
-        }
-
-        if (strlen($icon) > 0) {
-            $message = '$fff' . $icon . ' ' . $message;
-        }
-
-        return $message;
+        return $chatMessage;
     }
 }
