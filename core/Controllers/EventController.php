@@ -69,7 +69,7 @@ class EventController implements ControllerInterface
                     break;
 
                 case 'ManiaPlanet.Echo':
-                    Log::logAddLine('ManiaPlanet.Echo', json_encode($callback));
+                    Log::logAddLine('Echo', json_encode($callback));
                     break;
 
                 default:

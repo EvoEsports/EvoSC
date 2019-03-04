@@ -47,7 +47,7 @@ $$: Writes a dollarsign
             Server::call('ChatEnableManualRouting', [true, false]);
         } catch (FaultException $e) {
             $msg = $e->getMessage();
-            Log::getOutput()->writeln("<error>$msg There might already be a running instance.</error>");
+            Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
             exit(2);
         }
 
@@ -111,6 +111,8 @@ $$: Writes a dollarsign
 
         if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
             //Player is muted
+            self::message($player, '_warning', 'You are muted.');
+
             return;
         }
 

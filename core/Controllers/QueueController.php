@@ -5,13 +5,14 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class QueueController
+class QueueController implements ControllerInterface
 {
     public static function init()
     {
