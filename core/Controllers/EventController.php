@@ -25,9 +25,7 @@ class EventController implements ControllerInterface
             $name      = $callback[0];
             $arguments = $callback[1];
 
-            if (isVerbose()) {
-                Log::logAddLine('EventController', "Call $name", true);
-            }
+            Log::logAddLine('EventController', "$name", isVeryVerbose());
 
             switch ($name) {
                 case 'ManiaPlanet.PlayerInfoChanged':
@@ -68,6 +66,10 @@ class EventController implements ControllerInterface
 
                 case 'ManiaPlanet.ModeScriptCallbackArray':
                     ModeScriptEventController::handleModeScriptCallbacks($callback);
+                    break;
+
+                case 'ManiaPlanet.Echo':
+                    Log::logAddLine('ManiaPlanet.Echo', json_encode($callback));
                     break;
 
                 default:
