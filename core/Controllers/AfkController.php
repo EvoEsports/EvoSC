@@ -62,7 +62,9 @@ class AfkController
 
                 $player = Player::where('Login', $playerLogin)->first();
 
-                ChatController::message(onlinePlayers(), $player, ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.');
+                infoMessage($player, ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')
+                    ->setIcon('')
+                    ->sendAll();
             }
         });
     }
@@ -71,6 +73,7 @@ class AfkController
     {
         Server::forceSpectator($player->Login, 3);
 
-        ChatController::message(onlinePlayers(), $player, ' was forced to spectators by ', $admin);
+        infoMessage($player, ' was forced to spectators by ', $admin)
+            ->sendAll();
     }
 }

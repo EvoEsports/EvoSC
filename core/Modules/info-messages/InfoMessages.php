@@ -40,7 +40,7 @@ class InfoMessages
 
         foreach ($messages as $message) {
             if ($minutesSinceStart % $message->delay == 0) {
-                ChatController::message(onlinePlayers(), '_info', $message->text);
+                infoMessage($message->text)->sendAll();
             }
         }
     }

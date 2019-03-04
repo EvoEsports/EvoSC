@@ -5,6 +5,16 @@ function chatMessage(...$message)
     return new \esc\Classes\ChatMessage(...$message);
 }
 
+function infoMessage(...$message)
+{
+    return (new \esc\Classes\ChatMessage(...$message))->setIsInfoMessage();
+}
+
+function warningMessage(...$message)
+{
+    return (new \esc\Classes\ChatMessage(...$message))->setIsWarning();
+}
+
 function formatScore(int $score): string
 {
     $seconds = floor($score / 1000);

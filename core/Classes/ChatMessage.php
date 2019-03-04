@@ -36,6 +36,8 @@ class ChatMessage
     public function setIsInfoMessage(): ChatMessage
     {
         $this->isInfoMessage = true;
+        $this->color         = config('colors.info');
+        $this->icon          = '';
 
         return $this;
     }
@@ -43,35 +45,21 @@ class ChatMessage
     public function setIsWarning(): ChatMessage
     {
         $this->isWarning = true;
+        $this->color     = config('colors.warning');
+        $this->icon      = '';
 
         return $this;
     }
 
-    public function sendAll()
-    {
-        Server::chatSendServerMessage($this->getMessage());
-    }
-
-    public function send(Player $player)
-    {
-        Server::chatSendServerMessage($this->getMessage(), $player->Login);
-    }
-
-    public function setParts(...$parts)
+    public function setParts(...$parts): ChatMessage
     {
         $this->parts = $parts;
+
+        return $this;
     }
 
     public function getMessage(): string
     {
-        if ($this->isInfoMessage) {
-            $this->color = config('colors.info');
-        }
-
-        if ($this->isWarning) {
-            $this->color = config('colors.warning');
-        }
-
         $message = '';
 
         foreach ($this->parts as $part) {
@@ -89,9 +77,19 @@ class ChatMessage
         }
 
         if ($this->icon) {
-            return '$fff' . $this->icon . ' ' . $message;
+            return '$fff' . $this->icon . ' $z$s' . $message;
         }
 
         return $message;
+    }
+
+    public function sendAll()
+    {
+        Server::chatSendServerMessage($this->getMessage());
+    }
+
+    public function send(Player $player)
+    {
+        Server::chatSendServerMessage($this->getMessage(), $player->Login);
     }
 }

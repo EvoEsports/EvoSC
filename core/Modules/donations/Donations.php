@@ -36,7 +36,8 @@ class Donations
     {
         if ($amount < 1) {
             //Block donations with less then one planet
-            ChatController::message($player, '_warning', 'You can not donate less than 1 planet');
+            warningMessage('You can not donate less than 1 planet.')->send($player);
+
             return;
         }
 
@@ -46,7 +47,7 @@ class Donations
     public static function paySuccess(Player $player, $amount)
     {
         $player->stats()->increment('Donations', $amount);
-        ChatController::message(onlinePlayers(), '_info', $player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!');
+        infoMessage($player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!')->sendAll();
 
         Hook::fire('PlayerDonate', $player, $amount);
     }

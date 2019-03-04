@@ -105,7 +105,8 @@ $$: Writes a dollarsign
 
         if (preg_match('/^(\/|\/\/|##)/', $text)) {
             //Catch invalid chat commands
-            ChatController::message($player, warning('Invalid chat command entered'));
+            warningMessage('Invalid chat command entered.')
+                ->send($player);
 
             return;
         }
@@ -170,7 +171,7 @@ $$: Writes a dollarsign
 
         if ($command->access != null) {
             if (!$player->hasAccess($command->access)) {
-                ChatController::message($player, '_warning', 'Sorry, you\'re not allowed to do that.');
+                warningMessage('Sorry, you are not allowed to do that.')->send($player);
 
                 return false;
             }

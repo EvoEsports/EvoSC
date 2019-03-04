@@ -62,7 +62,7 @@ class PBRecords
             }
 
             $checkpoints = collect(explode(',', $target->Checkpoints));
-            $timesHash = md5($checkpoints->toJson());
+            $timesHash   = md5($checkpoints->toJson());
 
             Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString', 'timesHash'));
         }
@@ -71,7 +71,8 @@ class PBRecords
     public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
     {
         if (!$dediOrLocal) {
-            ChatController::message($player, info('You must specify ') . secondary('local') . info(' or ') . secondary('dedi') . info(' or ') . secondary('wr') . info(' as first and the id of the record as second'));
+            infoMessage('You must specify ', secondary('local'), ' or ', secondary('dedi'), ' or ', secondary('wr'), ' as first and the id of the record as second')
+                ->send($player);
 
             return;
         }
@@ -94,19 +95,19 @@ class PBRecords
                 break;
 
             default:
-                ChatController::message($player, 'You must specify "local" or "dedi" as first parameter');
+                infoMessage('You must specify "local" or "dedi" as first parameter.')->send($player);
                 $record = null;
                 break;
         }
 
         if (!$record) {
-            ChatController::message($player, 'Unknown record selected');
+            warningMessage('Unknown record selected.')->send($player);
 
             return;
         }
 
         if (!isset($record->Checkpoints)) {
-            ChatController::message($player, 'Record has no saved checkpoints');
+            warningMessage('Record has no saved checkpoints.')->send($player);
 
             return;
         }
@@ -114,13 +115,13 @@ class PBRecords
         if ($currentTarget != null) {
             $currentTarget->record = $record;
         } else {
-            $currentTarget = collect([]);
+            $currentTarget         = collect([]);
             $currentTarget->player = $player;
             $currentTarget->record = $record;
             self::$targets->push($currentTarget);
         }
 
-        ChatController::message($player, 'New checkpoints target: ', $record);
+        infoMessage('New checkpoints target: ', $record)->send($player);
 
         self::updateTarget($player);
     }
@@ -163,7 +164,7 @@ class PBRecords
 
         $dedi = $map->dedis()->orderByDesc('Score')->first();
 
-        if(!$dedi){
+        if (!$dedi) {
             return $map->locals()->orderByDesc('Score')->first();
         }
 

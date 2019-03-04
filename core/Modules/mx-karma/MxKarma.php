@@ -74,7 +74,7 @@ class MxKarma extends MXK
 
         if (!self::playerFinished($player)) {
             //Prevent players from voting when they didnt finish
-            ChatController::message($player, 'You need to finish the track before you can vote.');
+            warningMessage('You need to finish the track before you can vote.')->send($player);
 
             return;
         }
@@ -103,11 +103,13 @@ class MxKarma extends MXK
 
         self::$updatedVotes->push($player->id);
 
-        ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])));
+
+        infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
 
         foreach (onlinePlayers() as $player) {
             self::showWidget($player);
+            //TODO: use update script
         }
     }
 
@@ -166,7 +168,7 @@ class MxKarma extends MXK
     {
         if (!self::playerFinished($player)) {
             //Prevent players from voting when they didnt finish
-            ChatController::message($player, 'You need to finish the track before you can vote.');
+            warningMessage('You need to finish the track before you can vote.')->send($player);
 
             return;
         }
@@ -195,7 +197,7 @@ class MxKarma extends MXK
 
         self::$updatedVotes->push($player->id);
 
-        ChatController::message(onlinePlayers(), '_info', $player, ' rated this map ', secondary('the worst a human being ever had to play'), '.');
+        infoMessage($player, ' rated this map ', secondary('the worst a human being ever had to play'), '.')->sendAll();
     }
 
     /**

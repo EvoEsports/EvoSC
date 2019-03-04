@@ -17,9 +17,9 @@ class ManiaLinkEvent
 
     private function __construct(string $id, array $callback, string $access = null)
     {
-        $this->id = $id;
+        $this->id       = $id;
         $this->callback = $callback;
-        $this->access = $access;
+        $this->access   = $access;
     }
 
     private static function getManiaLinkEvents(): Collection
@@ -57,23 +57,27 @@ class ManiaLinkEvent
 
             if (!$event) {
                 Log::warning("Calling non-existent ManiaLinkEvent $action.");
+
                 return;
             }
         } else {
             Log::warning("Malformed ManiaLinkEvent $action.");
+
             return;
         }
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
-            ChatController::message($ply, '_warning', 'Access denied');
-            Log::logAddLine('Access', 'Player ' . stripAll($ply->NickName) . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::', $event->callback));
+            warningMessage('Access denied.')->send($ply);
+            Log::logAddLine('Access', 'Player ' . $ply . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::', $event->callback));
+
             return;
         }
 
         if (strlen($event->id) < strlen($action)) {
-            $arguments = explode(',', $action);
+            $arguments    = explode(',', $action);
             $arguments[0] = $ply;
             call_user_func_array($event->callback, $arguments);
+
             return;
         }
 

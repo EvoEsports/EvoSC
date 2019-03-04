@@ -9,7 +9,6 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Controllers\ChatController;
 use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
@@ -246,7 +245,7 @@ class Dedimania extends DedimaniaApi
             //Player has dedi on map
 
             if ($score == $dedi->Score) {
-                ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' equaled his/her ', $dedi);
+                chatMessage($player, ' equaled his/her ', secondary($dedi))->setIcon('')->setColor(config('colors.dedi'))->sendAll();
                 Log::logAddLine('Dedimania', $player . ' equaled his/her record.', isVerbose());
 
                 return;
@@ -264,9 +263,9 @@ class Dedimania extends DedimaniaApi
                     $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
 
                     if ($oldRank == $newRank) {
-                        ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')');
+                        chatMessage($player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
                     } else {
-                        ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')');
+                        chatMessage($player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
                     }
 
                     self::sendUpdatedDedis($map);
@@ -291,10 +290,9 @@ class Dedimania extends DedimaniaApi
 
             if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
                 self::sendUpdatedDedis($map);
-                ChatController::message(onlinePlayers(), '_dedi', 'Player ', $player, ' gained the ', $dedi);
+                chatMessage($player, ' gained the ', $dedi)->setIcon('')->setColor(config('colors.dedi'))->sendAll();
             } else {
                 $dedi->update(['New' => 0]);
-                Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
             }
         }
     }

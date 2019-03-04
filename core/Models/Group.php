@@ -35,6 +35,10 @@ class Group extends Model
 
     public function __toString()
     {
+        if ($this->color) {
+            return '$' . $this->color . $this->Name;
+        }
+
         return $this->Name;
     }
 }

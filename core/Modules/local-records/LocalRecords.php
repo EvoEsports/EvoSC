@@ -110,12 +110,15 @@ class LocalRecords
 
         $map = MapController::getCurrentMap();
 
-        $localCount = $map->locals()->count();
+        $localCount  = $map->locals()->count();
+        $chatMessage = chatMessage()
+            ->setIcon('')
+            ->setColor(config('colors.local'));
 
         $local = $map->locals()->wherePlayer($player->id)->first();
         if ($local != null) {
             if ($score == $local->Score) {
-                ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' equaled his/her ', $local);
+                $chatMessage->setParts($player, ' equaled his/her ', $local);
 
                 return;
             }
@@ -128,9 +131,9 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
 
                 if ($oldRank == $local->Rank) {
-                    ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
+                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (-' . formatScore($diff) . ')');
                 } else {
-                    ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
+                    $chatMessage->setParts( $player, ' gained the ', $local, ' (-' . formatScore($diff) . ')');
                 }
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
@@ -145,11 +148,13 @@ class LocalRecords
                     'Rank'        => 999,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
-                ChatController::message(onlinePlayers(), '_local', 'Player ', $player, ' claimed the ', $local);
+                $chatMessage->setParts($player, ' claimed the ', $local);
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
             }
         }
+
+        $chatMessage->sendAll();
     }
 
     /**

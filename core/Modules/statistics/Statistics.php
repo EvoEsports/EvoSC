@@ -175,7 +175,9 @@ class Statistics
 
         if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
             $bestPlayer->stats()->increment('Wins');
-            ChatController::message(onlinePlayers(), '_info', "\$fff🏆", 'Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins);
+            infoMessage('Player ', $bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
+                ->setIcon('🏆')
+                ->sendAll();
         }
     }
 
@@ -211,13 +213,17 @@ class Statistics
                 'Rank' => $counter++,
             ]);
 
+            $chatMessage = infoMessage();
+
             if ($stats->player->player_id) {
                 if ($stats->Rank && $stats->Rank > 0) {
-                    ChatController::message($stats->player, '_info', 'Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
+                    $chatMessage->setParts('Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
                 } else {
-                    ChatController::message($stats->player, '_info', 'You need at least one local record before receiving a rank.');
+                    $chatMessage->setParts('You need at least one local record before receiving a rank.');
                 }
             }
+
+            $chatMessage->send($stats->player);
         });
     }
 }

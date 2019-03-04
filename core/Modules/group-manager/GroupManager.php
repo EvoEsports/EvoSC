@@ -156,7 +156,7 @@ class GroupManager
 
         if ($member) {
             Player::whereLogin($memberLogin)->update(['Group' => 3]);
-            ChatController::message(onlinePlayers(), $player, ' removed ', $member, '\'s access rights.');
+            infoMessage($player, ' removed ', $member, '\'s access rights.')->sendAll();
             self::groupMembers($player, $groupId);
         }
     }
@@ -187,9 +187,9 @@ class GroupManager
             Hook::fire('GroupChanged', $player);
 
             if ($newMember->group->id == 3) {
-                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group));
+                infoMessage($player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group))->sendAll();
             } else {
-                ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group));
+                infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
             }
         }
     }

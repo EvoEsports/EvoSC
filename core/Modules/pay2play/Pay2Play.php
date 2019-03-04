@@ -34,16 +34,7 @@ class Pay2Play
     public static function addTime(Player $player)
     {
         if (config('pay2play.addtime.enabled')) {
-
-            /*
-            if (config('votes.enabled')) {
-                if (Votes::addTimeFailed() && !config('pay2play.addtime.forceable')) {
-                    ChatController::message($player,'_info', 'Can not force more playtime after a vote failed.');
-                    return;
-                }
-            }
-            */
-
+            /* TODO: Block force replay */
 
             if (MapController::getAddedTime() + 10 <= config('pay2play.addtime.time-limit')) {
                 PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
@@ -69,7 +60,7 @@ class Pay2Play
 
     public static function skipPaySuccess(Player $player, int $amount)
     {
-        ChatController::message(onlinePlayers(), '_info', $player, ' paid ', $amount, ' to skip map');
+        infoMessage($player, ' paid ', $amount, ' to skip map.')->sendAll();
         MapController::skip($player);
     }
 }

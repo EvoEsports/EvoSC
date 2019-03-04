@@ -22,10 +22,15 @@ use mysql_xdevapi\Exception;
 
 class MapController implements ControllerInterface
 {
-    private static $mapsPath;
+    /**
+     * @var Map
+     */
     private static $currentMap;
+
+    private static $mapsPath;
     private static $addedTime = 0;
     private static $timeLimit;
+
 
     public static function init()
     {
@@ -38,15 +43,6 @@ class MapController implements ControllerInterface
         Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
         Hook::add('EndMatch', [MapController::class, 'endMatch']);
 
-        ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'map_skip');
-        ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'matchsettings_load');
-        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map_replay');
-        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
-
-        ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map.skip');
-        ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map.replay');
-        ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map.reset');
-
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
         AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
@@ -56,6 +52,15 @@ class MapController implements ControllerInterface
         AccessRight::createIfNonExistent('matchsettings_load', 'Load matchsettings.');
         AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfNonExistent('time', 'Change the countdown time.');
+
+        ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'map_skip');
+        ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'matchsettings_load');
+        ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map_replay');
+        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
+
+        ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map_skip');
+        ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map_replay');
+        ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map_reset');
 
         KeyController::createBind('Q', [self::class, 'addMinute'], 'time');
 
@@ -132,18 +137,21 @@ class MapController implements ControllerInterface
      */
     public static function endMatch()
     {
-        $request = MapQueue::getFirst();
+        $request     = MapQueue::getFirst();
+        $chatMessage = infoMessage()->setIcon('')->setColor('38c');
 
         if ($request) {
             Log::info("Setting next map: " . $request->map);
             Server::chooseNextMap($request->map->filename);
             MapQueue::removeFirst();
             Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
-            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            $chatMessage->setParts('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
         } else {
             $nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
-            ChatController::message(onlinePlayers(), '_info', '$fff', ' Upcoming map ', secondary($nextMap));
+            $chatMessage->setParts('Upcoming map ', secondary($nextMap));
         }
+
+        $chatMessage->sendAll();
     }
 
     /*
@@ -181,10 +189,6 @@ class MapController implements ControllerInterface
      */
     public static function getCurrentMap(): ?Map
     {
-        if (!self::$currentMap) {
-            throw new Exception("Current map is null");
-        }
-
         return self::$currentMap;
     }
 
@@ -199,11 +203,12 @@ class MapController implements ControllerInterface
         $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
 
         if ($deleted) {
-            ChatController::message(onlinePlayers(), '_info', $player, ' removed map ', $map);
+            infoMessage($player, ' removed map ', $map)->sendAll();
+
             try {
                 $map->delete();
                 Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                ChatController::message(onlinePlayers(), '_info', $player, ' deleted map ', secondary($map), 'permanently.');
+                infoMessage($player, ' deleted map ', secondary($map), 'permanently.')->sendAll();
                 Hook::fire('MapPoolUpdated');
             } catch (\Exception $e) {
                 Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
@@ -222,7 +227,7 @@ class MapController implements ControllerInterface
         $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' disabled map ', secondary($map));
+        infoMessage($player->group, ' ', $player, ' disabled map ', secondary($map))->sendAll();
         Hook::fire('MapPoolUpdated');
     }
 
@@ -242,7 +247,7 @@ class MapController implements ControllerInterface
     public static function skip(Player $player = null)
     {
         if ($player) {
-            chatMessage($player, ' skips map')->setIsInfoMessage()->sendAll();
+            infoMessage($player, ' skips map')->sendAll();
         }
 
         MapController::goToNextMap();

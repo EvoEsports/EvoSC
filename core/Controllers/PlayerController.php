@@ -51,13 +51,13 @@ class PlayerController implements ControllerInterface
         });
 
         if ($players->count() == 0) {
-            ChatController::message($callee, 'No player found');
+            infoMessage('No player found.')->send($callee);
 
             return null;
         }
 
         if ($players->count() > 1) {
-            ChatController::message($callee, 'Found more than one person, please be more specific');
+            infoMessage('Found more than one person, please be more specific.')->send($callee);
 
             return null;
         }
@@ -84,8 +84,7 @@ class PlayerController implements ControllerInterface
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
-            ChatController::message(onlinePlayers(), $player, ' kicked ', $playerToBeKicked, '. Reason: ',
-                secondary($reason));
+            warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ', secondary($reason))->setIcon('')->sendAll();
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to kick player: ' . $e->getMessage(), true);
             Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
@@ -111,10 +110,10 @@ class PlayerController implements ControllerInterface
         }
 
         if (strlen($reason) > 0) {
-            ChatController::message(onlinePlayers(), '_info', $player, ' kicked ', secondary($toBeKicked),
-                secondary(' Reason: ' . $reason));
+            warningMessage($player, ' kicked ', secondary($toBeKicked),
+                secondary(' Reason: ' . $reason))->setIcon('')->sendAll();
         } else {
-            ChatController::message(onlinePlayers(), '_info', $player, ' kicked ', secondary($toBeKicked));
+            warningMessage($player, ' kicked ', secondary($toBeKicked))->setIcon('')->sendAll();
         }
     }
 
@@ -131,7 +130,7 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        ChatController::message(onlinePlayers(), 'Adding ', intval($n), ' fake players');
+        infoMessage('Adding ', intval($n), ' fake players');
 
         for ($i = 0; $i < intval($n); $i++) {
             $login = Server::connectFakePlayer();
@@ -212,15 +211,14 @@ class PlayerController implements ControllerInterface
             exit(0);
         }
 
-        $player->update([
-            'spectator_status' => 0,
-            'player_id'        => 0,
-        ]);
-
         Log::info(stripAll($player) . " [" . $player->Login . "] left the server [" . ($disconnectReason ?: 'disconnected') . "].");
 
         $diff = $player->last_visit->diffForHumans();
-        ChatController::message(onlinePlayers(), '_info', $player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.');
+        infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')->sendAll();
+
+        $player->update([
+            'last_visit' => now(),
+        ]);
     }
 
     public static function getPlayerByServerId(int $id): ?Player
