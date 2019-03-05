@@ -43,7 +43,7 @@ class ProfileViewer
 
             Template::show($player, 'profile-viewer.window', compact('values', 'zonePath'));
         } else {
-            ChatController::message($player, '_warning', 'Player with login ', secondary($targetLogin), ' not found.');
+            warningMessage('Player with login ', secondary($targetLogin), ' not found.')->send($player);
         }
     }
 }

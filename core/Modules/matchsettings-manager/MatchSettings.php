@@ -76,12 +76,12 @@ class MatchSettings
             $mapBranch = $this->xml->addChild('map');
             $mapBranch->addChild('file', $map->filename);
             $mapBranch->addChild('ident', $map->gbx->MapUid);
-            ChatController::message($player, '_info', 'Added map ', $map, ' to ', secondary($this->filename));
+            infoMessage('Added map ', $map, ' to ', secondary($this->filename))->send($player);
         } else {
             foreach ($this->xml->map as $mapNode) {
                 if ($mapNode->ident == $map->gbx->MapUid) {
                     unset($mapNode[0]);
-                    ChatController::message($player, '_info', 'Removed map ', $map, ' from ', secondary($this->filename));
+                    infoMessage('Removed map ', $map, ' from ', secondary($this->filename))->send($player);
                 }
             }
         }

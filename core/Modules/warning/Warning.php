@@ -19,7 +19,7 @@ class Warning
         $target = Player::whereLogin($targetLogin)->first();
 
         if ($target) {
-            ChatController::message($target, '_warning', "You have been warned by $player: ", secondary($message));
+            warningMessage("You have been warned by $player: ", secondary($message))->send($target);
         }
     }
 }

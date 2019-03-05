@@ -35,7 +35,7 @@ class MxDownload
 
             if ($mxId == 0) {
                 Log::warning("Requested map with invalid id: " . $mxId);
-                ChatController::message($player, "Requested map with invalid id: " . $mxId);
+                warningMessage("Requested map with invalid id: $mxId")->send($player);
 
                 return;
             }
@@ -43,7 +43,7 @@ class MxDownload
             $map = Map::getByMxId($mxId);
 
             if ($map && File::exists(MapController::getMapsPath(), 'MX/' . $map->filename)) {
-                ChatController::message($player, '_warning', secondary($map), ' already exists');
+                warningMessage(secondary($map), ' already exists')->send($player);
                 continue;
             }
 
@@ -51,7 +51,7 @@ class MxDownload
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [" . $response->getStatusCode() . "] " . $response->getReasonPhrase());
-                ChatController::message($player, "Can not reach mania exchange.");
+                warningMessage('Can not reach mania exchange.')->send($player);
 
                 return;
             }
@@ -80,7 +80,7 @@ class MxDownload
             File::put($absolute, $body);
 
             if (!File::exists($absolute)) {
-                ChatController::message($player, '_warning', "Map download ($mxId) failed.");
+                warningMessage("Map download ($mxId) failed.")->send($player);
                 continue;
             }
 
@@ -126,7 +126,7 @@ class MxDownload
             }
 
 
-            ChatController::message(onlinePlayers(), '_info', 'New map added: ', $map);
+            infoMessage('New map added: ', $map)->sendAll();
         }
     }
 }

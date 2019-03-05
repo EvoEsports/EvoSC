@@ -73,7 +73,7 @@ class Statistics
             }
 
             return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
-        })->sortBy('Score')->take(config('statistics.RoundAvg.show'));
+        })->sort()->take(config('statistics.RoundAvg.show'));
         $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
         self::$scores = collect();
 
@@ -162,9 +162,9 @@ class Statistics
      */
     public static function endMatch(...$args)
     {
-        $finishedPlayers = finishPlayers();
-        $bestPlayer      = $finishedPlayers->sortBy('Score')->first();
-        $secondBest      = $finishedPlayers->sortBy('Score')->get(1);
+        $finishedPlayers = finishPlayers()->sortBy('Score');
+        $bestPlayer      = $finishedPlayers->first();
+        $secondBest      = $finishedPlayers->get(1);
 
         foreach ($finishedPlayers as $player) {
             self::calculatePlayerServerScore($player);
@@ -173,11 +173,7 @@ class Statistics
         self::updatePlayerRanks();
         self::$scores = collect();
 
-        if ($bestPlayer) {
-            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
-                return;
-            }
-
+        if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
             $bestPlayer->stats()->increment('Wins');
             infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
                 ->setIcon('🏆')

@@ -404,7 +404,6 @@ class DedimaniaApi
                         //Request failed
 
                         Log::logAddLine('DedimaniaApi', 'Failed to update dedis.', true);
-                        \esc\Controllers\ChatController::message(onlinePlayers(), 'Updating dedis failed');
                     }
                 }
             }
@@ -461,7 +460,7 @@ class DedimaniaApi
             ]);
 
             if ($player->Banned) {
-                \esc\Controllers\ChatController::message($player, warning(' is banned from dedimania.'));
+                warningMessage($player, ' is banned from dedimania.')->sendAll();
             }
         }
 

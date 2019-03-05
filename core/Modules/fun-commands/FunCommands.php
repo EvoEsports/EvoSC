@@ -32,7 +32,7 @@ class FunCommands
         }, 'Say Good Game All.', '/');
 
         ChatController::addCommand('bootme', function (Player $player) {
-            ChatController::message(onlinePlayers(), '_info', $player, ' boots back to the real world!');
+            infoMessage($player, ' boots back to the real world!')->sendAll();
             Server::kick($player->Login, 'cya');
             Hook::fire('PlayerDisconnect', $player);
         }, 'Boot yourself back to the real world.', '/');

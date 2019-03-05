@@ -263,9 +263,9 @@ class Dedimania extends DedimaniaApi
                     $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
 
                     if ($oldRank == $newRank) {
-                        chatMessage($player, ' secured his/her ', $dedi, ' (-' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
+                        chatMessage($player, ' secured his/her ', $dedi, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
                     } else {
-                        chatMessage($player, ' gained the ', $dedi, ' (-' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
+                        chatMessage($player, ' gained the ', $dedi, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
                     }
 
                     self::sendUpdatedDedis($map);

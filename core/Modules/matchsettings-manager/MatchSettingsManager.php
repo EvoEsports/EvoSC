@@ -271,7 +271,7 @@ class MatchSettingsManager
         onlinePlayers()->each([MapList::class, 'sendManialink']);
 
         if (!$silent) {
-            ChatController::message(onlinePlayers(), $player, ' loads new settings ', secondary($matchSettingsFile));
+            infoMessage($player, ' loads new settings ', secondary($matchSettingsFile))->sendAll();
         }
         Log::logAddLine('MatchSettingsManager', "$player loads MatchSettings: $matchSettingsFile");
     }

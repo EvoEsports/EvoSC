@@ -28,7 +28,7 @@ class AddMapTemp
 
         if ($mxId == 0) {
             Log::warning("Requested map with invalid id: " . $mxId);
-            ChatController::message($player, '_warning', 'Requested map with invalid id: ', $mxId);
+            warningMessage('Requested map with invalid id: ', $mxId)->send($player);
 
             return;
         }
@@ -40,7 +40,7 @@ class AddMapTemp
 
             if ($response->getStatusCode() != 200) {
                 Log::error("ManiaExchange returned with non-success code [" . $response->getStatusCode() . "] " . $response->getReasonPhrase());
-                ChatController::message($player, "Can not reach mania exchange.");
+                warningMessage('Can not reach mania exchange.')->send($player);
 
                 return;
             }
@@ -69,7 +69,7 @@ class AddMapTemp
             File::put($absolute, $body);
 
             if (!File::exists($absolute)) {
-                ChatController::message($player, '_warning', "Map download ($mxId) failed.");
+                warningMessage("Map download ($mxId) failed.")->send($player);
 
                 return;
             }
@@ -106,8 +106,8 @@ class AddMapTemp
             Votes::startVote($player, 'Play ' . secondary($map) . '?', function ($success) use ($map, $player) {
                 if ($success) {
                     QueueController::queueMap($player, $map);
-                    ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' was successful.');
-                    ChatController::message(onlinePlayers(), '_info', $map, ' was added to the queue.');
+                    infoMessage('Vote to add ', secondary($map), ' was successful.')->sendAll();
+                    infoMessage($map, ' was added to the queue.')->sendAll();
                     Hook::fire('MapPoolUpdated');
 
                     Hook::add('BeginMatch', function () use ($map) {
@@ -115,7 +115,7 @@ class AddMapTemp
                         Hook::fire('MapPoolUpdated');
                     }, true);
                 } else {
-                    ChatController::message(onlinePlayers(), '_info', 'Vote to add ', secondary($map), ' failed.');
+                    infoMessage('Vote to add ', secondary($map), ' failed.')->sendAll();
                 }
             });
         } catch (\Exception $e) {

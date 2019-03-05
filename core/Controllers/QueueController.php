@@ -29,14 +29,14 @@ class QueueController implements ControllerInterface
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
         if (MapQueue::whereMapUid($map->uid)->count() > 0) {
-            ChatController::message($player, '_warning', 'The map ', secondary($map), ' is already in queue.');
+            warningMessage('The map ', secondary($map), ' is already in queue.')->send($player);
 
             return;
         }
 
         if (MapQueue::whereRequestingPlayer($player->Login)->count() > 0) {
             if (!$player->hasAccess('queue_multiple')) {
-                ChatController::message($player, '_warning', 'You are only allowed to queue one map at a time.');
+                warningMessage('You are only allowed to queue one map at a time.')->send($player);
 
                 return;
             }
@@ -47,10 +47,10 @@ class QueueController implements ControllerInterface
             'map_uid'           => $map->uid,
         ]);
 
-        if($replay){
-            ChatController::message(onlinePlayers(), '_info', $player, ' queued map ', secondary($map), ' for replay.');
-        }else{
-            ChatController::message(onlinePlayers(), '_info', $player, ' queued map ', secondary($map), '.');
+        if ($replay) {
+            infoMessage($player, ' queued map ', secondary($map), ' for replay.')->sendAll();
+        } else {
+            infoMessage($player, ' queued map ', secondary($map), '.')->sendAll();
         }
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
@@ -61,15 +61,15 @@ class QueueController implements ControllerInterface
         $queueItem = MapQueue::whereMapUid($mapUid)->first();
 
         if ($queueItem) {
-            if ($queueItem->requesting_player == $player->Login || $player->hasAccess('queue_drop')) {
-                ChatController::message(onlinePlayers(), '_info', $player, ' drops ', secondary($queueItem->map), ' from queue.');
-                MapQueue::whereMapUid($mapUid)->delete();
-                Hook::fire('MapQueueUpdated', self::getMapQueue());
+            if ($queueItem->requesting_player != $player->Login && !$player->hasAccess('queue_drop')) {
+                warningMessage('You can not drop others players maps.')->send($player);
 
                 return;
             }
 
-            ChatController::message(onlinePlayers(), '_warning', $player, 'You can not drop others players maps.');
+            infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
+            MapQueue::whereMapUid($mapUid)->delete();
+            Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
 
@@ -93,7 +93,7 @@ class QueueController implements ControllerInterface
 
         if (!$player->hasAccess('queue_keep') && $queryBuilder->count() > 0) {
             $queryBuilder->get()->filter(function (MapQueue $item) use ($player) {
-                ChatController::message(onlinePlayers(), '_info', 'Dropped ', secondary($item->map), ' from queue, because ', secondary($player), ' left.');
+                infoMessage('Dropped ', secondary($item->map), ' from queue, because ', secondary($player), ' left.')->sendAll();
                 MapQueue::whereMapUid($item->map_uid)->delete();
             });
 

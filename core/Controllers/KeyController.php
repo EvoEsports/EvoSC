@@ -29,7 +29,7 @@ class KeyController implements ControllerInterface
 
     public static function reloadConfig(Player $player)
     {
-        ChatController::message(onlinePlayers(), '_info', $player->group, ' ', $player, ' reloads config.');
+        infoMessage($player->group, ' ', $player, ' reloads config.')->sendAll();
         Config::loadConfigFiles();
         Hook::fire('ConfigUpdated');
     }

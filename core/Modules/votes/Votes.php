@@ -49,7 +49,7 @@ class Votes
     public static function startVote(Player $player, string $question, $action)
     {
         if (self::$vote != null) {
-            ChatController::message($player, '_warning', 'There is already a vot ein progress.');
+            warningMessage('There is already a vot ein progress.')->send($player);
 
             return;
         }
@@ -92,23 +92,23 @@ class Votes
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
-            ChatController::message($player, '_warning', 'There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.');
+            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.')->send($player);
 
             return;
         }
 
         self::startVote($player, 'Add 10 minutes?', function ($success) {
             if ($success) {
-                ChatController::message(onlinePlayers(), '_info', 'Vote to add time was successful.');
+                infoMessage('Vote to add time was successful.')->sendAll();
                 MapController::addTime(MapController::getTimeLimit());
             } else {
-                ChatController::message(onlinePlayers(), '_info', 'Vote to add time was not successful.');
+                infoMessage('Vote to add time was not successful.')->sendAll();
             }
         });
 
         self::$lastVote = now();
 
-        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('add 10 minutes'), ' started.');
+        infoMessage('A vote to ', secondary('add 10 minutes'), ' started.')->sendAll();
     }
 
     public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
@@ -116,7 +116,7 @@ class Votes
         $question = implode(' ', $questionArray);
 
         self::startVote($player, $question, function (bool $success) use ($question) {
-            ChatController::message(onlinePlayers(), '_info', 'Vote ', secondary($question), ' ended with ', secondary($success ? 'yes' : 'no'));
+            infoMessage('Vote ', secondary($question), ' ended with ', secondary($success ? 'yes' : 'no'))->sendAll();
         });
     }
 
@@ -125,23 +125,23 @@ class Votes
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
-            ChatController::message($player, '_warning', 'There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.');
+            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.')->send($player);
 
             return;
         }
 
         self::startVote($player, 'Skip map?', function (bool $success) {
             if ($success) {
-                ChatController::message(onlinePlayers(), '_info', 'Vote to skip map was successful.');
+                infoMessage('Vote to skip map was successful.')->sendAll();
                 MapController::skip();
             } else {
-                ChatController::message(onlinePlayers(), '_info', 'Vote to skip map was not successful.');
+                infoMessage('Vote to skip map was not successful.')->sendAll();
             }
         });
 
         self::$lastVote = now();
 
-        ChatController::message(onlinePlayers(), '_info', 'A vote to ', secondary('skip the map'), ' started.');
+        infoMessage('A vote to ', secondary('skip the map'), ' started.')->sendAll();
     }
 
     private static function getVoteState(): Collection
@@ -192,7 +192,7 @@ class Votes
 
         self::$vote   = null;
         self::$voters = collect();
-        ChatController::message(onlinePlayers(), '_info', $player, ' passes vote.');
+        infoMessage($player, ' passes vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
         Template::showAll('votes.update-vote', compact('voteStateJson'));
     }
@@ -210,7 +210,7 @@ class Votes
 
         self::$vote   = null;
         self::$voters = collect();
-        ChatController::message(onlinePlayers(), '_info', $player, ' cancels vote.');
+        infoMessage($player, ' cancels vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
         Template::showAll('votes.update-vote', compact('voteStateJson'));
     }
@@ -231,7 +231,7 @@ class Votes
             self::$voters  = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
             Template::showAll('votes.update-vote', compact('voteStateJson'));
-            ChatController::message(onlinePlayers(), '_info', 'Vote cancelled.');
+            infoMessage('Vote cancelled.')->sendAll();
         }
     }
 }

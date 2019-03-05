@@ -5,7 +5,6 @@ music/
 maps/
 logs/
 cache/
-crash-reports/*.json
 
 config/*
 !config/default

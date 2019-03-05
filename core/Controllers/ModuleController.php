@@ -34,7 +34,7 @@ class ModuleController implements ControllerInterface
 
         if ($module) {
             $module->load($callee);
-            ChatController::message(onlinePlayers(), '_info', $callee, ' reloads module ', $module);
+            infoMessage($callee, ' reloads module ', $module)->sendAll();
         }
     }
 
@@ -46,7 +46,7 @@ class ModuleController implements ControllerInterface
     public static function showModules(Player $player)
     {
         if (!$player->isMasteradmin()) {
-            ChatController::message($player, warning('Access denied'));
+            warningMessage('Access denied.')->send($player);
 
             return;
         }

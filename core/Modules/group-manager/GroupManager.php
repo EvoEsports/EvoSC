@@ -59,7 +59,7 @@ class GroupManager
         $groupNameExists = Group::whereName($input)->get()->isNotEmpty();
 
         if ($groupNameExists) {
-            ChatController::message($player, '_warning', 'Group name ', secondary($input), ' already taken.');
+            warningMessage('Group name ', secondary($input), ' already taken.')->send($player);
 
             return;
         }
@@ -67,10 +67,10 @@ class GroupManager
         $group = Group::create(['Name' => $input]);
 
         if ($group) {
-            ChatController::message($player, '_info', 'Created new group: ', secondary($input));
+            infoMessage('Created new group: ', secondary($input))->send($player);
             self::showOverview($player);
         } else {
-            ChatController::message($player, '_warning', 'Failed to create group: ', secondary($input));
+            warningMessage('Failed to create group: ', secondary($input))->send($player);
         }
     }
 
