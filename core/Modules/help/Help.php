@@ -16,19 +16,11 @@ class Help
     {
         ChatController::addCommand('help', [Help::class, 'showCommandsHelp'], 'Show this help');
 
-        ManiaLinkEvent::add('help', [Help::class, 'switchHelp']);
-
-        KeyController::createBind('X', [self::class, 'reload']);
+        ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
 
         if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Help', 'help,commands,1');
+            QuickButtons::addButton('', 'Help', 'help');
         }
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showCommandsHelp($player);
     }
 
     public static function showCommandsHelp(Player $player)
