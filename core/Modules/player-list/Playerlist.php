@@ -6,6 +6,7 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Controllers\KeyController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -21,7 +22,7 @@ class Playerlist
             QuickButtons::addButton('', 'PlayerList', 'players');
         }
 
-        // KeyController::createBind('Y', [self::class, 'reload']);
+        // KeyController::createBind('X', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)

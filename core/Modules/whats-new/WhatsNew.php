@@ -22,6 +22,9 @@ class WhatsNew
             'Add map vote (/add <mx_id>)',
             'Change UI hiding speed with button on the right',
             'Skip music',
+            '---',
+            'New chat commands overview, type /help',
+            'Click yes/no on widget to vote'
         ];
 
         Template::show($player, 'whats-new.window', compact('changes'));
