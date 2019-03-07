@@ -316,7 +316,7 @@
         declare toFill = max - showTop;
 
         if(myRank == -1){
-            skip = records.count - toFill;
+            skip = records.count - toFill - showTop;
         }else{
             skip = myRank - (max/2);
 

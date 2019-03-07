@@ -38,18 +38,16 @@ class LocalRecords
 
     public static function showManialink(Player $player)
     {
-        if ($player) {
-            $map = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
 
-            if (!$map) {
-                return;
-            }
-
-            $localsJson = self::getLocalsJson($map);
-
-            Template::show($player, 'local-records.update', compact('localsJson'));
-            Template::show($player, 'local-records.manialink');
+        if (!$map) {
+            return;
         }
+
+        $localsJson = self::getLocalsJson($map);
+
+        Template::show($player, 'local-records.update', compact('localsJson'));
+        Template::show($player, 'local-records.manialink');
     }
 
     public static function delete(Player $player, string $localRank)

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Dedimania:push-new-dedi" id="push-new-dedi" version="3">
+<manialink name="ESC:Locals:update-dedis" id="update-dedis" version="3">
     <script>
         <!--
+        #Struct Record {
+            Integer rank;
+            Integer[] cps;
+            Integer score;
+            Text name;
+            Text login;
+        }
+
         main(){
-            declare Text[Text][] CurrentDedis for LocalUser;
+            declare Record[] DediRecords for LocalUser;
+            declare Integer LastDediRecordsUpdate for LocalUser;
             declare Text dedisJson = """{$dedisJson|noescape}""";
 
-            CurrentDedis.fromjson(dedisJson);
+            DediRecords.fromjson(dedisJson);
+            LastDediRecordsUpdate = GameTime;
         }
         -->
     </script>

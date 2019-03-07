@@ -127,56 +127,46 @@ class Dedimania extends DedimaniaApi
 
     public static function showManialink(Player $player)
     {
-        if ($player) {
-            $map = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
 
-            if (!$map) {
-                return;
-            }
-
-            $dedis   = $map->dedis->sortBy('Rank');
-            $cpCount = (int)$map->gbx->CheckpointsPerLaps;
-
-            $playerIds = $dedis->pluck('Player');
-            $players   = Player::whereIn('id', $playerIds)->get();
-
-            $dedisCollection = $dedis->map(function (Dedi $dedi) use ($players) {
-                $player = $players->where('id', $dedi->Player)->first();
-
-                return [
-                    'rank'  => $dedi->Rank,
-                    'cps'   => $dedi->Checkpoints,
-                    'score' => $dedi->Score,
-                    'nick'  => $player->NickName,
-                    'login' => $player->Login,
-                ];
-            });
-
-            $dedisJson = $dedisCollection->toJson();
-
-            Template::show($player, 'dedimania-records.manialink', compact('dedisJson', 'cpCount'));
+        if (!$map) {
+            return;
         }
+
+        $dedisJson = self::getDedisJson($map);
+
+        Template::show($player, 'dedimania-records.update', compact('dedisJson'));
+        Template::show($player, 'dedimania-records.manialink');
     }
 
     public static function sendUpdatedDedis(Map $map)
+    {
+        $dedisJson = self::getDedisJson($map);
+
+        Template::showAll('dedimania-records.update', compact('dedisJson'));
+    }
+
+    private static function getDedisJson(Map $map)
     {
         $dedis     = $map->dedis()->orderBy('Rank')->get();
         $playerIds = $dedis->pluck('Player');
         $players   = Player::whereIn('id', $playerIds)->get();
 
-        $dedisJson = $dedis->map(function (Dedi $dedi) use ($players) {
-            $player = $players->where('id', $dedi->Player)->first();
+        return $dedis->map(function (Dedi $dedi) use ($players) {
+            $player      = $players->where('id', $dedi->Player)->first();
+            $checkpoints = collect(explode(',', $dedi->Checkpoints));
+            $checkpoints = $checkpoints->map(function ($time) {
+                return intval($time);
+            });
 
             return [
                 'rank'  => $dedi->Rank,
-                'cps'   => $dedi->Checkpoints,
+                'cps'   => $checkpoints,
                 'score' => $dedi->Score,
-                'nick'  => $player->NickName,
+                'name'  => $player->NickName,
                 'login' => $player->Login,
             ];
         })->toJson();
-
-        Template::showAll('dedimania-records.update', compact('dedisJson'));
     }
 
     private static function insertRecord(Map $map, $record)

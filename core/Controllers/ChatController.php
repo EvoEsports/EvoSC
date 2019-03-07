@@ -35,14 +35,31 @@ $t: Changes the text to capitals
 $$: Writes a dollarsign
      */
 
+    /**
+     * @var Collection
+     */
     private static $chatCommands;
-    private static $chatCommandsCompiled;
+
+    /**
+     * @var Collection
+     */
     private static $mutedPlayers;
+
+    /**
+     * @var Collection
+     */
+    private static $chatCommandsCompiled;
+
+    /**
+     * @var Collection
+     */
+    private static $aliases;
 
     public static function init()
     {
         self::$chatCommands = collect();
         self::$mutedPlayers = collect();
+        self::$aliases      = collect();
 
         try {
             Server::call('ChatEnableManualRouting', [true, false]);
@@ -113,7 +130,7 @@ $$: Writes a dollarsign
 
         if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
             //Player is muted
-            self::message($player, '_warning', 'You are muted.');
+            warningMessage('You are muted.')->send($player);
 
             return;
         }
@@ -229,6 +246,6 @@ $$: Writes a dollarsign
      */
     public static function addAlias(string $command, string $alias)
     {
-        //TODO:
+        //TODO: Add aliases
     }
 }
