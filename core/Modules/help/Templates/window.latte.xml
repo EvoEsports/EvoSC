@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Help" id="Help" version="3">
-    <frame id="help" pos="-60 38" scale="1.2">
+    <frame id="help" pos="-60 38" scale="1.1">
         <quad pos="0 0" size="120 5" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="-1"/>
         <quad id="handle" pos="0 0" size="115 5" z-index="5"/>
         <quad id="bg" pos="0 -5" size="120 77" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="-1"/>
@@ -10,8 +10,8 @@
         <frame id="commands">
             {for $i=0; $i<20; $i++}
             <frame pos="2 {$i * -3.5 - 8}">
-                <label size="20 3" textsize="0.2" text="cmd" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="left"/>
-                <label pos="20 0" size="80 3" textsize="0.2" text="description" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="left"/>
+                <label size="20 3" textsize="0.5" text="cmd" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="left"/>
+                <label pos="20 0" size="118 3" textsize="0.5" text="description" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="left"/>
             </frame>
             {/for}
         </frame>

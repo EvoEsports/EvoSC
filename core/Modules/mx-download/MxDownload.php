@@ -18,7 +18,7 @@ class MxDownload
 {
     public function __construct()
     {
-        ChatController::addCommand('add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add \<mxid\>', '//', 'map_add');
+        ChatController::addCommand('add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add <mx_id>', '//', 'map_add');
     }
 
     /**
