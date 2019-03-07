@@ -38,6 +38,9 @@ class Votes
         KeyController::createBind('F5', [self::class, 'voteYes']);
         KeyController::createBind('F6', [self::class, 'voteNo']);
 
+        ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
+        ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
+
         if (config('quick-buttons.enabled')) {
             ManiaLinkEvent::add('vote.approve', [self::class, 'approveVote'], 'vote_decide');
             ManiaLinkEvent::add('vote.decline', [self::class, 'declineVote'], 'vote_decide');
