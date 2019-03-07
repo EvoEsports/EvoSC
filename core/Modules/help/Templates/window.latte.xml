@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Help" id="Help" version="3">
-    <frame id="help" pos="-60 42.5" size="120 180">
+    <frame id="help" pos="-60 38" scale="1.2">
         <quad pos="0 0" size="120 5" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="-1"/>
         <quad id="handle" pos="0 0" size="115 5" z-index="5"/>
         <quad id="bg" pos="0 -5" size="120 77" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="-1"/>
@@ -21,7 +21,8 @@
             <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c"/>
             <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}c"/>
         </frame>
-        <label pos="117 -78.75" textsize="0.2" text="${config('colors.ui.header')|noescape}$z = Restricted access" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="right"/>
+
+        <label id="restricted" pos="117 -78.75" textsize="0.2" text="${config('colors.ui.header')|noescape}$z = Restricted access" textfont="RajdhaniMono" textprefix="$s" valign="center" halign="right" hidden="1"/>
     </frame>
 
     <script><!--
@@ -34,9 +35,20 @@
     Text access;
 }
 
+declare Boolean restrictedVisible;
 declare Integer currentPage;
 declare Integer maxPage;
 declare Command[] commands;
+
+Void showRestricted(){
+    if(restrictedVisible){
+        return;
+    }
+
+    declare restrictedLabel <=> (Page.MainFrame.GetFirstChild("restricted") as CMlLabel);
+    restrictedLabel.Show();
+    restrictedVisible = True;
+}
 
 Void updateView(){
     declare commandsFrame <=> (Page.MainFrame.GetFirstChild("commands") as CMlFrame);
@@ -58,6 +70,7 @@ Void updateView(){
 
         if(command.access != ""){
             (row.Controls[0] as CMlLabel).SetText((row.Controls[0] as CMlLabel).Value ^ " ${config('colors.ui.header')|noescape}");
+            showRestricted();
         }
 
         filled = filled + 1;
@@ -85,6 +98,7 @@ main() {
     declare commandsJson = """{$commands|noescape}""";
     commands.fromjson(commandsJson);
 
+    restrictedVisible = False;
     maxPage = ML::CeilingInteger(commands.count / 20.0);
     currentPage = 0;
     updateView();
