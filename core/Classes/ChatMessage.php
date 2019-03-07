@@ -10,8 +10,6 @@ class ChatMessage
     private $parts;
     private $color;
     private $icon;
-    private $isInfoMessage = false;
-    private $isWarning     = false;
 
     public function __construct(...$message)
     {
@@ -35,18 +33,16 @@ class ChatMessage
 
     public function setIsInfoMessage(): ChatMessage
     {
-        $this->isInfoMessage = true;
-        $this->color         = config('colors.info');
-        $this->icon          = '';
+        $this->color = config('colors.info');
+        $this->icon  = '';
 
         return $this;
     }
 
     public function setIsWarning(): ChatMessage
     {
-        $this->isWarning = true;
-        $this->color     = config('colors.warning');
-        $this->icon      = '';
+        $this->color = config('colors.warning');
+        $this->icon  = '';
 
         return $this;
     }
@@ -68,17 +64,12 @@ class ChatMessage
                 continue;
             }
 
-            if (is_string($part)) {
-                $message .= '$' . $this->color . $part;
-                continue;
-            }
-
             if ($part instanceof Player) {
-                $message .= $part . '$z$s';
+                $message .= secondary($part) . '$z$s';
                 continue;
             }
 
-            $message .= '$z$s' . $part;
+            $message .= '$z$s$' . $this->color . $part;
         }
 
         if ($this->icon) {

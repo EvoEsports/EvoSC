@@ -132,7 +132,7 @@ function cutZeroes(string $formattedScore): string
 
 function secondary(string $str = ""): string
 {
-    return '$' . config('colors.secondary') . $str;
+    return '$z$s$' . config('colors.secondary') . $str;
 }
 
 function primary(string $str = ""): string

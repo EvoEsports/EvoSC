@@ -138,20 +138,19 @@ class MapController implements ControllerInterface
     public static function endMatch()
     {
         $request     = MapQueue::getFirst();
-        $chatMessage = infoMessage()->setIcon('')->setColor('38c');
 
         if ($request) {
             Log::info("Setting next map: " . $request->map);
             Server::chooseNextMap($request->map->filename);
             MapQueue::removeFirst();
             Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
-            $chatMessage->setParts('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
         } else {
-            $nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
-            $chatMessage->setParts('Upcoming map ', secondary($nextMap));
+            $nextMap     = Map::where('uid', Server::getNextMapInfo()->uId)->first();
+            $chatMessage = chatMessage('Upcoming map ', secondary($nextMap));
         }
 
-        $chatMessage->sendAll();
+        $chatMessage->setIcon('')->sendAll();
     }
 
     /*
