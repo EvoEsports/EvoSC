@@ -26,7 +26,7 @@ class Help
     public static function showCommandsHelp(Player $player)
     {
         $commands = ChatController::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
-            return $command->hasAccess($player);
+            return $command->hasAccess($player) && !$command->hidden;
         })->map(function (ChatCommand $command) {
             return [
                 'trigger'     => $command->trigger,

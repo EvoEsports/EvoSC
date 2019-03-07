@@ -13,6 +13,7 @@ class ChatCommand
     public $callback;
     public $description;
     public $access;
+    public $hidden;
 
     /**
      * ChatCommand constructor.
@@ -23,13 +24,14 @@ class ChatCommand
      * @param string         $description
      * @param string|null    $access
      */
-    public function __construct(string $trigger, string $command, $callback, string $description = '', string $access = null)
+    public function __construct(string $trigger, string $command, $callback, string $description = '', string $access = null, bool $hidden = false)
     {
         $this->trigger     = $trigger;
         $this->command     = $command;
         $this->callback    = $callback;
         $this->description = $description;
         $this->access      = $access;
+        $this->hidden      = $hidden;
     }
 
     public function hasAccess(Player $player)
