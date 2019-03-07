@@ -56,7 +56,7 @@ class MapController implements ControllerInterface
         ChatController::addCommand('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'map_skip');
         ChatController::addCommand('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'matchsettings_load');
         ChatController::addCommand('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map_replay');
-        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Adds time (you can also substract)', '//', 'time');
+        ChatController::addCommand('addtime', [MapController::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', '//', 'time');
 
         ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map_replay');

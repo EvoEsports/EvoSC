@@ -122,6 +122,23 @@ class ModuleController implements ControllerInterface
         Log::logAddLine('Modules', 'Booting modules...');
 
         $moduleClasses->each(function ($module) {
+            $files    = scandir(coreDir('Modules/' . $module->dir));
+            $configId = null;
+            foreach ($files as $file) {
+                if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
+                    $configId = $matches[1];
+                }
+            }
+
+            if ($configId == null) {
+                Log::warning('Missing config: ' . $module->class);
+            } else {
+                $config = config($configId);
+                if (property_exists($config, 'enabled') && !$config->enabled) {
+                    return;
+                }
+            }
+
             if (method_exists($module->namespace, '__construct')) {
                 $reflectionMethod = new ReflectionMethod($module->namespace, '__construct');
 
