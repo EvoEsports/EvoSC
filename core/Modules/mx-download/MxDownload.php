@@ -21,13 +21,6 @@ class MxDownload
         ChatController::addCommand('add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add <mx_id>', '//', 'map_add');
     }
 
-    /**
-     * Add map from MX
-     *
-     * @param \esc\Models\Player $player
-     * @param                    $cmd
-     * @param string             ...$arguments
-     */
     public static function addMap(Player $player, $cmd, string ...$arguments)
     {
         foreach ($arguments as $mxId) {
@@ -43,7 +36,12 @@ class MxDownload
             $map = Map::getByMxId($mxId);
 
             if ($map && File::exists(MapController::getMapsPath(), 'MX/' . $map->filename)) {
-                warningMessage(secondary($map), ' already exists')->send($player);
+                infoMessage($player, ' added map: ', $map)->sendAll();
+                $map->update(['enabled' => true]);
+                Server::addMap($map->filename);
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+                QueueController::queueMap($player, $map);
+                Hook::fire('MapPoolUpdated');
                 continue;
             }
 

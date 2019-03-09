@@ -115,6 +115,23 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
     return \esc\Models\Player::whereIn('Login', $logins)->get();
 }
 
+function echoPlayers(): \Illuminate\Support\Collection
+{
+
+    $playerList = \esc\Classes\Server::getPlayerList(500, 0);
+    $logins     = [];
+
+    foreach ($playerList as $player) {
+        array_push($logins, $player->login);
+    }
+
+    $players = \esc\Models\Player::whereIn('Login', $logins)->get()->filter(function (\esc\Models\Player $player) {
+        return $player->hasAccess('admin_echoes');
+    });
+
+    return $players;
+}
+
 function finishPlayers(): \Illuminate\Support\Collection
 {
     return esc\Models\Player::where('Score', '>', 0)->get();

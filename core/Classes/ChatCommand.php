@@ -18,11 +18,12 @@ class ChatCommand
     /**
      * ChatCommand constructor.
      *
-     * @param string         $trigger
-     * @param string         $command
-     * @param array|\Closure $callback
-     * @param string         $description
-     * @param string|null    $access
+     * @param string      $trigger
+     * @param string      $command
+     * @param             $callback
+     * @param string      $description
+     * @param string|null $access
+     * @param bool        $hidden
      */
     public function __construct(string $trigger, string $command, $callback, string $description = '', string $access = null, bool $hidden = false)
     {

@@ -72,6 +72,7 @@ $$: Writes a dollarsign
         Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
 
         AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
+        AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
 
         ChatCommand::add('mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', '//', 'player_mute');
         ChatCommand::add('unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', '//', 'player_mute');

@@ -84,6 +84,13 @@ class ChatMessage
         Server::chatSendServerMessage($this->getMessage());
     }
 
+    public function sendAdmin()
+    {
+        $logins = echoPlayers()->pluck('Login');
+
+        Server::chatSendServerMessage($this->getMessage(), $logins);
+    }
+
     public function send(Player $player)
     {
         Server::chatSendServerMessage($this->getMessage(), $player->Login);

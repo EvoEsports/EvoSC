@@ -166,6 +166,7 @@ class MapList
             return;
         }
 
+        QueueController::dropMap($player, $map->uid);
         MapController::disableMap($player, $map);
     }
 
