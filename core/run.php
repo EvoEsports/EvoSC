@@ -92,7 +92,6 @@ class EscRun extends Command
         esc\Controllers\TemplateController::init();
         esc\Controllers\ChatController::init();
         esc\Classes\ManiaLinkEvent::init();
-        \esc\Controllers\KeyController::init();
         esc\Controllers\GroupController::init();
         esc\Controllers\AccessController::init();
         esc\Controllers\QueueController::init();

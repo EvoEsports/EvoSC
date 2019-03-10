@@ -9,7 +9,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\ChatController;
-use esc\Controllers\KeyController;
 use esc\Controllers\MapController;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
@@ -36,7 +35,7 @@ class Votes
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
         KeyBinds::add('vote_yes', 'Vote yes in a vote.', [self::class, 'voteYes'], 'F5');
-        KeyBinds::add('vote_no', 'Vote no in a vote.', [self::class, 'voteNo'], 'F5');
+        KeyBinds::add('vote_no', 'Vote no in a vote.', [self::class, 'voteNo'], 'F6');
 
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
