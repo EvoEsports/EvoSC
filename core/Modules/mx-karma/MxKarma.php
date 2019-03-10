@@ -355,7 +355,12 @@ class MxKarma extends MXK
      */
     public static function showWidget(Player $player)
     {
-        $map    = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
+
+        if (!$map) {
+            return;
+        }
+
         $mapUid = $map->uid;
 
         if (self::$currentMap != $mapUid) {

@@ -234,7 +234,7 @@ class Player extends Model
      */
     public function __toString()
     {
-        return $this->NickName;
+        return trim($this->NickName);
     }
 
     public function getLastVisitAttribute($date): Carbon

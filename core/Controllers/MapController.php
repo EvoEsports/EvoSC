@@ -14,6 +14,7 @@ use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
+use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
 use Illuminate\Support\Carbon;
@@ -62,7 +63,7 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map_reset');
 
-        KeyController::createBind('Q', [self::class, 'addMinute'], 'time');
+        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'Q', 'time');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
@@ -137,7 +138,7 @@ class MapController implements ControllerInterface
      */
     public static function endMatch()
     {
-        $request     = MapQueue::getFirst();
+        $request = MapQueue::getFirst();
 
         if ($request) {
             Log::info("Setting next map: " . $request->map);
@@ -182,12 +183,15 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Gets current map
-     *
-     * @return Map|null
+     * @return \esc\Models\Map|null
+     * @throws \Exception
      */
     public static function getCurrentMap(): ?Map
     {
+        if (!self::$currentMap) {
+            throw new \Exception('Current map is not set.');
+        }
+
         return self::$currentMap;
     }
 

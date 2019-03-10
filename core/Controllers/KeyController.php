@@ -10,6 +10,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
+use esc\Modules\KeyBinds;
 use Illuminate\Support\Collection;
 
 class KeyController implements ControllerInterface
@@ -23,29 +24,23 @@ class KeyController implements ControllerInterface
         Hook::add('PlayerConnect', [KeyController::class, 'playerConnect']);
 
         ManiaLinkEvent::add('keybind', [KeyController::class, 'executeBinds']);
-
-        // self::createBind('Q', [self::class, 'reloadConfig']);
-    }
-
-    public static function reloadConfig(Player $player)
-    {
-        infoMessage($player->group, ' ', $player, ' reloads config.')->sendAll();
-        Config::loadConfigFiles();
-        Hook::fire('ConfigUpdated');
     }
 
     /**
-     * @param string      $key
+     * @param string      $id
      * @param array       $callback
      * @param string|null $access
      */
-    public static function createBind(string $key, array $callback, string $access = null)
+    public static function createBind(string $id, array $callback, string $access = null)
     {
         $bind = collect([]);
 
-        $bind->key = $key;
+        $bind->id       = $id;
+        $bind->key      = $id;
         $bind->function = $callback;
-        $bind->access = $access;
+        $bind->access   = $access;
+
+        KeyBinds::add($id, 'description:' . $id, $callback, $id, $access);
 
         self::$binds->push($bind);
     }

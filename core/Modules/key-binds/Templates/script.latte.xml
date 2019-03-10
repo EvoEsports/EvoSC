@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:key-binds" id="key-binds" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    main(){
+        declare persistent Text[Text] CustomKeyBinds for This;
+        declare Text[Text][] keyBinds;
+        keyBinds.fromjson("""{$binds|noescape}""");
+
+        foreach(key => bind in keyBinds){
+            keyBinds[key]["key"] = TL::ToLowerCase(bind["default"]);
+
+            if(CustomKeyBinds.existskey(bind["id"])){
+                keyBinds[key]["key"] = TL::ToLowerCase(CustomKeyBinds[bind["id"]]);
+            }
+        }
+
+        while (True) {
+            yield;
+
+            foreach (event in PendingEvents) {
+                if(event.Type == CMlScriptEvent::Type::KeyPress){
+                    foreach(bind in keyBinds){
+                        if(TL::ToLowerCase(event.KeyName) == bind["key"]){
+                            TriggerPageAction("bound_key_pressed," ^ bind["id"]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>
