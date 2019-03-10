@@ -162,22 +162,31 @@ class Statistics
      */
     public static function endMatch(...$args)
     {
+        self::$scores    = collect();
         $finishedPlayers = finishPlayers()->sortBy('Score');
         $bestPlayer      = $finishedPlayers->first();
         $secondBest      = $finishedPlayers->get(1);
+
+        if (!$bestPlayer) {
+            return;
+        }
 
         foreach ($finishedPlayers as $player) {
             self::calculatePlayerServerScore($player);
         }
 
         self::updatePlayerRanks();
-        self::$scores = collect();
 
-        if ($bestPlayer && ($secondBest && $bestPlayer->Score != $secondBest->Score)) {
-            $bestPlayer->stats()->increment('Wins');
-            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
+        if ($bestPlayer && $bestPlayer->Score > 0) {
+            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
+                return;
+            }
+
+            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
                 ->setIcon('🏆')
                 ->sendAll();
+
+            $bestPlayer->stats()->increment('Wins');
         }
     }
 

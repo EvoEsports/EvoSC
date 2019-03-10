@@ -84,7 +84,7 @@ class EscRun extends Command
 
         esc\Classes\Log::info("Starting...");
 
-        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 100);
+        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 200);
 
         esc\Classes\Database::init();
         esc\Classes\RestClient::init(serverName());
