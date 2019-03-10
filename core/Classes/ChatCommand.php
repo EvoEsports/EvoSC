@@ -44,9 +44,16 @@ class ChatCommand
         return $player->hasAccess($this->access);
     }
 
-    public static function add(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null)
+    public static function add(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null): ChatCommand
     {
-        ChatController::addCommand($command, $callback, $description, $trigger, $access);
+        return ChatController::addCommand($command, $callback, $description, $trigger, $access);
+    }
+
+    public function addAlias(string $alias): ChatCommand
+    {
+        ChatController::addAlias($this, $alias);
+
+        return $this;
     }
 
     public function compile()

@@ -194,6 +194,8 @@ function getMapInfoFromFile(string $filename)
 
         return json_decode($process->getOutput());
     }
+
+    return null;
 }
 
 //color functions
@@ -228,6 +230,10 @@ function createCrashReport($e)
 
 function isVerbose(): bool
 {
+    if (isVeryVerbose()) {
+        return true;
+    }
+
     return false;
 }
 

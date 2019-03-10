@@ -11,7 +11,7 @@ class GearInfo
 {
     public function __construct()
     {
-        ChatController::addCommand('gear', [self::class, 'show'], 'Enable gear up/down indicator');
+        ChatCommand::add('gear', [self::class, 'show'], 'Enable gear up/down indicator');
     }
 
     public static function show(Player $player)

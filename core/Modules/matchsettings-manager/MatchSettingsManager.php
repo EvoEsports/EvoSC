@@ -26,7 +26,7 @@ class MatchSettingsManager
         self::$path    = Server::getMapsDirectory() . '/MatchSettings/';
         self::$objects = collect();
 
-        ChatController::addCommand('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
+        ChatCommand::add('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
 
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting'], 'ms.edit');
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings'], 'ms.edit');

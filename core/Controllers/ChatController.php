@@ -187,7 +187,7 @@ $$: Writes a dollarsign
             })
             ->first();
 
-        if ($command->access != null) {
+        if ($command && $command->access != null) {
             if (!$player->hasAccess($command->access)) {
                 warningMessage('Sorry, you are not allowed to do that.')->send($player);
 
@@ -220,12 +220,16 @@ $$: Writes a dollarsign
     }
 
     /**
-     * @param string         $command
-     * @param array|\Closure $callback
-     * @param string         $description
-     * @param string         $trigger
-     * @param string|null    $access
-     * @param bool           $hidden
+     * Register a chat command
+     *
+     * @param string      $command
+     * @param             $callback
+     * @param string      $description
+     * @param string      $trigger
+     * @param string|null $access
+     * @param bool        $hidden
+     *
+     * @return \esc\Classes\ChatCommand
      */
     public static function addCommand(string $command, $callback, string $description = '-', string $trigger = '/', string $access = null, $hidden = false)
     {
@@ -234,19 +238,23 @@ $$: Writes a dollarsign
             self::$chatCommandsCompiled = collect();
         }
 
-        $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access);
+        $chatCommand = new ChatCommand($trigger, $command, $callback, $description, $access, $hidden);
         self::$chatCommands->push($chatCommand);
         self::$chatCommandsCompiled = self::$chatCommands->map([self::class, 'compileChatCommand']);
 
-        Log::info("Chat command added: " . $chatCommand->compile(), false);
+        Log::info("Chat command added: " . $chatCommand->compile(), isVerbose());
+
+        return $chatCommand;
     }
 
     /**
-     * @param string $command
-     * @param string $alias
+     * Add chat command alias
+     *
+     * @param \esc\Classes\ChatCommand $command
+     * @param string                   $alias
      */
-    public static function addAlias(string $command, string $alias)
+    public static function addAlias(ChatCommand $command, string $alias)
     {
-        //TODO: Add aliases
+        self::$aliases->put($alias, $command);
     }
 }

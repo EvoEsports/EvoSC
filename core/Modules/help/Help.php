@@ -13,7 +13,7 @@ class Help
 {
     public function __construct()
     {
-        ChatController::addCommand('help', [Help::class, 'showCommandsHelp'], 'Show this help');
+        ChatCommand::add('help', [Help::class, 'showCommandsHelp'], 'Show this help');
 
         ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
 

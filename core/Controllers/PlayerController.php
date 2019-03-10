@@ -28,12 +28,12 @@ class PlayerController implements ControllerInterface
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
 
         self::$fakePlayers = collect([]);
-        ChatController::addCommand('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//', 'player_kick');
+        ChatCommand::add('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
 
-        ChatController::addCommand('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', '##', 'player_fake');
-        ChatController::addCommand('disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', '##', 'player_fake');
+        ChatCommand::add('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', '##', 'player_fake');
+        ChatCommand::add('disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', '##', 'player_fake');
     }
 
     /**
