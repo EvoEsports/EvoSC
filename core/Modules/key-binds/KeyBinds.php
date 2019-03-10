@@ -16,6 +16,9 @@ class KeyBinds
      */
     private static $binds;
 
+    /**
+     * KeyBinds constructor.
+     */
     public function __construct()
     {
         Hook::add('PlayerConnect', [self::class, 'sendScript']);

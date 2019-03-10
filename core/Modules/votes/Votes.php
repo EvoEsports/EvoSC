@@ -35,8 +35,8 @@ class Votes
 
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
-        KeyController::createBind('F5', [self::class, 'voteYes']);
-        KeyController::createBind('F6', [self::class, 'voteNo']);
+        KeyBinds::add('vote_yes', 'Vote yes in a vote.', [self::class, 'voteYes'], 'F5');
+        KeyBinds::add('vote_no', 'Vote no in a vote.', [self::class, 'voteNo'], 'F5');
 
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);

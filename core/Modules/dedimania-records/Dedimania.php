@@ -62,7 +62,7 @@ class Dedimania extends DedimaniaApi
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
 
-        KeyController::createBind('Y', [self::class, 'reload']);
+        // KeyController::createBind('Y', [self::class, 'reload']);
     }
 
     public static function reload(Player $player)
