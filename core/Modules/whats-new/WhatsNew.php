@@ -17,14 +17,10 @@ class WhatsNew
     public static function showNews(Player $player)
     {
         $changes = [
-            'Customizable speedometer (size/position/label)',
-            'Customizable roundtime (size/position/label)',
-            'Add map vote (/add <mx_id>)',
-            'Change UI hiding speed with button on the right',
-            'Skip music',
-            '---',
             'New chat commands overview, type /help',
-            'Click yes/no on widget to vote'
+            'Click yes/no on widget to vote',
+            '--------------------',
+            'Change key-binds, see "Keyboard setup" on the right.'
         ];
 
         Template::show($player, 'whats-new.window', compact('changes'));
