@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Template;
 use esc\Models\Player;
 
 class Help
@@ -21,19 +22,20 @@ class Help
 
     public static function showCommandsHelp(Player $player)
     {
-        /*
-        $commands = ChatController::getChatCommands()->filter(function (ChatCommand $command) use ($player) {
-            return $command->hasAccess($player) && !$command->hidden;
+        $commands = ChatCommand::getCommands()->filter(function (ChatCommand $command) use ($player) {
+            if ($command->access) {
+                return $player->hasAccess($command->access) && !$command->hidden;
+            }
+
+            return !$command->hidden;
         })->map(function (ChatCommand $command) {
             return [
-                'trigger'     => $command->trigger,
                 'command'     => $command->command,
                 'description' => $command->description,
                 'access'      => $command->access ?: '',
             ];
-        })->sortBy('trigger')->values()->toJson();
+        })->sortBy('command')->values()->toJson();
 
         Template::show($player, 'help.window', compact('commands'));
-        */
     }
 }

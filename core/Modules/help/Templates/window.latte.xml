@@ -29,7 +29,6 @@
 #Include "MathLib" as ML
 
 #Struct Command {
-    Text trigger;
     Text command;
     Text description;
     Text access;
@@ -65,7 +64,7 @@ Void updateView(){
         declare row = (commandsFrame.Controls[filled] as CMlFrame);
         row.Show();
 
-        (row.Controls[0] as CMlLabel).SetText(command.trigger ^ command.command);
+        (row.Controls[0] as CMlLabel).SetText(command.command);
         (row.Controls[1] as CMlLabel).SetText(command.description);
 
         if(command.access != ""){

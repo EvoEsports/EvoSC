@@ -4,6 +4,7 @@ namespace esc\Classes;
 
 
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class ChatCommand
 {
@@ -12,7 +13,6 @@ class ChatCommand
      */
     private static $commands;
 
-    public $trigger;
     public $command;
     public $callback;
     public $description;
@@ -64,6 +64,11 @@ class ChatCommand
     public static function get(string $command): ChatCommand
     {
         return self::$commands->get($command);
+    }
+
+    public static function getCommands(): Collection
+    {
+        return self::$commands;
     }
 
     public function execute(Player $player, string $text)
