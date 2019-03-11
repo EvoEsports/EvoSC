@@ -77,6 +77,12 @@ class KeyBinds
     public static function keyPressed(Player $player, string $id)
     {
         self::$binds->where('id', $id)->each(function ($bind) use ($player) {
+            if ($bind['access']) {
+                if (!$player->hasAccess($bind['access'])) {
+                    return;
+                }
+            }
+
             if (gettype($bind['callback']) == "object") {
                 $func = $bind['callback'];
                 $func($player);
