@@ -34,7 +34,7 @@ class Help
                 'description' => $command->description,
                 'access'      => $command->access ?: '',
             ];
-        })->sortBy('command')->values()->toJson();
+        })->sortBy('access')->values()->toJson();
 
         Template::show($player, 'help.window', compact('commands'));
     }

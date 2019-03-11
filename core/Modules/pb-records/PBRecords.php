@@ -22,7 +22,7 @@ class PBRecords
         Hook::add('PlayerLocal', [PBRecords::class, 'playerMadeRecord']);
         Hook::add('PlayerDedi', [PBRecords::class, 'playerMadeRecord']);
 
-        ChatCommand::add('/target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
+        ChatCommand::add('/target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget');
 
         self::$targets = collect([]);
     }

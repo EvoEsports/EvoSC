@@ -20,16 +20,16 @@ class FunCommands
 
         ChatCommand::add('/gg', function (Player $player) {
             ChatController::playerChat($player, '$oGood Game');
-        }, 'Say Good Game.', '/');
+        }, 'Say Good Game.');
 
         ChatCommand::add('/gga', function (Player $player) {
             ChatController::playerChat($player, '$oGood Game All');
-        }, 'Say Good Game All.', '/');
+        }, 'Say Good Game All.');
 
         ChatCommand::add('/bootme', function (Player $player) {
             infoMessage($player, ' boots back to the real world!')->sendAll();
             Server::kick($player->Login, 'cya');
             Hook::fire('PlayerDisconnect', $player);
-        }, 'Boot yourself back to the real world.', '/');
+        }, 'Boot yourself back to the real world.');
     }
 }
