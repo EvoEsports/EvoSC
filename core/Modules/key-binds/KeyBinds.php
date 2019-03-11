@@ -39,7 +39,7 @@ class KeyBinds
             }
 
             return true;
-        });
+        })->values();
 
         Template::show($player, 'key-binds.settings', compact('binds'));
     }
