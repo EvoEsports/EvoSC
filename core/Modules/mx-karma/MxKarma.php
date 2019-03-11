@@ -57,8 +57,8 @@ class MxKarma extends MXK
         ChatCommand::add('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', null, true);
         ChatCommand::add('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
         ChatCommand::add('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
-        ChatCommand::add('-----', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', null, true);
-        ChatCommand::add('------', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', null, true);
+        ChatCommand::add('------', [MxKarma::class, 'voteMinusMinusMinusU'], '', null, true)
+                   ->addAlias('-----');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
     }

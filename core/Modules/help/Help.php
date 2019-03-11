@@ -29,6 +29,7 @@ class Help
 
             return !$command->hidden;
         })->map(function (ChatCommand $command) {
+
             return [
                 'command'     => $command->command,
                 'description' => $command->description,

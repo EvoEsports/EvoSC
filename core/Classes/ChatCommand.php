@@ -51,7 +51,8 @@ class ChatCommand
 
     public function addAlias(string $alias): ChatCommand
     {
-        self::$commands->put($alias, $this);
+        $description = sprintf('%s (Alias for %s)', $this->description, $this->command);
+        ChatCommand::add($alias, $this->callback, $description, $this->access, $this->hidden);
 
         return $this;
     }

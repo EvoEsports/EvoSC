@@ -30,7 +30,8 @@ class MapList
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
 
-        ChatCommand::add('/list', [self::class, 'searchMap'], 'Search maps or open maplist');
+        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
+                   ->addAlias('/list');
     }
 
     public static function mapMapQueue(MapQueue $item)
