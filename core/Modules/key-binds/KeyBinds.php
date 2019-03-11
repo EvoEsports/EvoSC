@@ -7,6 +7,7 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class KeyBinds
@@ -23,7 +24,24 @@ class KeyBinds
     {
         Hook::add('PlayerConnect', [self::class, 'sendScript']);
 
+        ManiaLinkEvent::add('show_key_bind_settings', [self::class, 'showSettings']);
         ManiaLinkEvent::add('bound_key_pressed', [self::class, 'keyPressed']);
+        ManiaLinkEvent::add('update_keybinds', [self::class, 'sendScript']);
+
+        QuickButtons::addButton('⌨', 'Keyboard Setup', 'show_key_bind_settings');
+    }
+
+    public static function showSettings(Player $player)
+    {
+        $binds = self::$binds->filter(function ($bind) use ($player) {
+            if ($bind['access']) {
+                return $player->hasAccess($bind['access']);
+            }
+
+            return true;
+        });
+
+        Template::show($player, 'key-binds.settings', compact('binds'));
     }
 
     /**
