@@ -7,7 +7,6 @@ use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
 use esc\Controllers\TemplateController;
 use esc\Models\AccessRight;
 use esc\Models\Group;
@@ -17,7 +16,7 @@ class GroupManager
 {
     public function __construct()
     {
-        ChatCommand::add('groups', [self::class, 'showOverview'], 'Show groups manager', '//', 'group');
+        ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
 
         ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');
         ManiaLinkEvent::add('group.create', [self::class, 'groupCreate'], 'group');

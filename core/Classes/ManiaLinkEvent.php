@@ -3,7 +3,7 @@
 namespace esc\Classes;
 
 
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 

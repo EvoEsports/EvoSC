@@ -9,7 +9,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MatchSettings;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -26,7 +26,7 @@ class MatchSettingsManager
         self::$path    = Server::getMapsDirectory() . '/MatchSettings/';
         self::$objects = collect();
 
-        ChatCommand::add('ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', '//', 'ms.edit');
+        ChatCommand::add('//ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', 'ms.edit');
 
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting'], 'ms.edit');
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings'], 'ms.edit');

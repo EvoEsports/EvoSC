@@ -55,10 +55,10 @@ class MapController implements ControllerInterface
         AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfNonExistent('time', 'Change the countdown time.');
 
-        ChatCommand::add('skip', [MapController::class, 'skip'], 'Skips map instantly', '//', 'map_skip');
-        ChatCommand::add('settings', [MapController::class, 'settings'], 'Load match settings', '//', 'matchsettings_load');
-        ChatCommand::add('res', [MapController::class, 'forceReplay'], 'Queue map for replay', '//', 'map_replay');
-        ChatCommand::add('addtime', [MapController::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', '//', 'time');
+        ChatCommand::add('//skip', [MapController::class, 'skip'], 'Skips map instantly', 'map_skip');
+        ChatCommand::add('//settings', [MapController::class, 'settings'], 'Load match settings', 'matchsettings_load');
+        ChatCommand::add('//res', [MapController::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+        ChatCommand::add('//addtime', [MapController::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
         ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map_replay');

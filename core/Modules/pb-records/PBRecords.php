@@ -4,7 +4,7 @@ namespace esc\Modules\PBRecords;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
@@ -22,7 +22,7 @@ class PBRecords
         Hook::add('PlayerLocal', [PBRecords::class, 'playerMadeRecord']);
         Hook::add('PlayerDedi', [PBRecords::class, 'playerMadeRecord']);
 
-        ChatCommand::add('target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
+        ChatCommand::add('/target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget', '/');
 
         self::$targets = collect([]);
     }

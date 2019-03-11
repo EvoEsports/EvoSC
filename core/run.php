@@ -101,8 +101,6 @@ class EscRun extends Command
         esc\Controllers\ModuleController::init();
         \esc\Controllers\PlanetsController::init();
 
-        \esc\Controllers\ChatController::addCommand('setconfig', [\esc\Classes\Config::class, 'setChatCmd'], 'Sets config value', '//', 'config');
-
         if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting core finished.', true);
         }

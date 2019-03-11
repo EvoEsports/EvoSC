@@ -7,7 +7,7 @@ use esc\Classes\Log;
 use esc\Classes\MXK;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Models\Karma;
 use esc\Models\Map;
@@ -51,14 +51,14 @@ class MxKarma extends MXK
         Hook::add('BeginMap', [MxKarma::class, 'beginMap']);
         Hook::add('EndMap', [MxKarma::class, 'endMap']);
 
-        ChatCommand::add('+', [MxKarma::class, 'votePlus'], 'Rate the map ok', '');
-        ChatCommand::add('++', [MxKarma::class, 'votePlusPlus'], 'Rate the map good', '');
-        ChatCommand::add('+++', [MxKarma::class, 'votePlusPlusPlus'], 'Rate the map fantastic', '');
-        ChatCommand::add('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', '');
-        ChatCommand::add('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', '');
-        ChatCommand::add('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', '');
-        ChatCommand::add('-----', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', '', null, true);
-        ChatCommand::add('------', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', '', null, true);
+        ChatCommand::add('+', [MxKarma::class, 'votePlus'], 'Rate the map ok');
+        ChatCommand::add('++', [MxKarma::class, 'votePlusPlus'], 'Rate the map good');
+        ChatCommand::add('+++', [MxKarma::class, 'votePlusPlusPlus'], 'Rate the map fantastic');
+        ChatCommand::add('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable');
+        ChatCommand::add('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad');
+        ChatCommand::add('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash');
+        ChatCommand::add('-----', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', null, true);
+        ChatCommand::add('------', [MxKarma::class, 'voteMinusMinusMinusU'], 'Rate the map trash', null, true);
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
     }

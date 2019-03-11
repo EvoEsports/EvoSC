@@ -24,16 +24,16 @@ class Votes
         self::$voters   = collect();
         self::$lastVote = now()->subSeconds(config('votes.cooldown'));
 
-        ChatCommand::add('vote', [self::class, 'startVoteQuestion'], 'Start a custom vote', '//', 'vote_custom');
+        ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote', 'vote_custom');
 
-        ChatCommand::add('res', [self::class, 'askMoreTime'], 'Ask for more time');
-        ChatCommand::add('replay', [self::class, 'askMoreTime'], 'Ask for more time');
-        ChatCommand::add('skip', [self::class, 'askSkip'], 'Ask to skip map');
-        ChatCommand::add('y', [self::class, 'voteYes'], 'Vote yes');
-        ChatCommand::add('n', [self::class, 'voteNo'], 'Vote no');
-        ChatCommand::add('time', [self::class, 'askMoreTime'], 'Start a vote to add 10 minutes.')
-                   ->addAlias('replay')
-                   ->addAlias('res');
+        ChatCommand::add('/res', [self::class, 'askMoreTime'], 'Ask for more time');
+        ChatCommand::add('/replay', [self::class, 'askMoreTime'], 'Ask for more time');
+        ChatCommand::add('/skip', [self::class, 'askSkip'], 'Ask to skip map');
+        ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes');
+        ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no');
+        ChatCommand::add('/time', [self::class, 'askMoreTime'], 'Start a vote to add 10 minutes.')
+                   ->addAlias('/replay')
+                   ->addAlias('/res');
 
         Hook::add('EndMatch', [self::class, 'endMatch']);
 

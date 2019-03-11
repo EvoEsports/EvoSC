@@ -7,7 +7,7 @@ use esc\Classes\Hook;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\TemplateController;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;

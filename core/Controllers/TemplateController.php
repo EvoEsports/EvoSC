@@ -22,7 +22,7 @@ class TemplateController implements ControllerInterface
     {
         Log::logAddLine('TemplateController', 'Starting...');
 
-        ChatCommand::add('reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', '//', 'user.ban');
+        ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'user.ban');
 
         self::$templates = collect();
         self::$latte     = new Engine();

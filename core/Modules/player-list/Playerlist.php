@@ -13,7 +13,7 @@ class Playerlist
 {
     public function __construct()
     {
-        ChatCommand::add('players', [Playerlist::class, 'show'], 'Show the userlist');
+        ChatCommand::add('/players', [Playerlist::class, 'show'], 'Show the userlist');
 
         ManiaLinkEvent::add('players', [self::class, 'show']);
 

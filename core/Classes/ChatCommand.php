@@ -3,11 +3,15 @@
 namespace esc\Classes;
 
 
-use esc\Controllers\ChatController;
 use esc\Models\Player;
 
 class ChatCommand
 {
+    /**
+     * @var \Illuminate\Support\Collection
+     */
+    private static $commands;
+
     public $trigger;
     public $command;
     public $callback;
@@ -18,16 +22,14 @@ class ChatCommand
     /**
      * ChatCommand constructor.
      *
-     * @param string      $trigger
      * @param string      $command
      * @param             $callback
      * @param string      $description
      * @param string|null $access
      * @param bool        $hidden
      */
-    public function __construct(string $trigger, string $command, $callback, string $description = '', string $access = null, bool $hidden = false)
+    public function __construct(string $command, $callback, string $description = '', string $access = null, bool $hidden = false)
     {
-        $this->trigger     = $trigger;
         $this->command     = $command;
         $this->callback    = $callback;
         $this->description = $description;
@@ -35,34 +37,63 @@ class ChatCommand
         $this->hidden      = $hidden;
     }
 
-    public function hasAccess(Player $player)
+    public static function add(string $command, $callback, string $description = '-', string $access = null, bool $hidden = false): ChatCommand
     {
-        if ($this->access == null) {
-            return true;
+        if (!self::$commands) {
+            self::$commands = collect();
         }
 
-        return $player->hasAccess($this->access);
-    }
+        $chatCommand = new ChatCommand($command, $callback, $description, $access, $hidden);
+        self::$commands->put($command, $chatCommand);
 
-    public static function add(string $command, array $callback, string $description = '-', string $trigger = '/', string $access = null): ChatCommand
-    {
-        return ChatController::addCommand($command, $callback, $description, $trigger, $access);
+        return $chatCommand;
     }
 
     public function addAlias(string $alias): ChatCommand
     {
-        ChatController::addAlias($this, $alias);
+        self::$commands->put($alias, $this);
 
         return $this;
     }
 
-    public function compile()
+    public static function has(string $command): bool
     {
-        return $this->trigger . $this->command;
+        return self::$commands->has($command);
     }
 
-    public function run(array $arguments)
+    public static function get(string $command): ChatCommand
     {
+        return self::$commands->get($command);
+    }
+
+    public function execute(Player $player, string $text)
+    {
+        if ($this->access && !$player->hasAccess($this->access)) {
+            warningMessage('Sorry, you are not allowed to do that.')->send($player);
+
+            return;
+        }
+
+        //treat "this is a string" as single argument
+        if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
+            foreach ($matches[1] as $match) {
+                //Replace all spaces in quotes to ;:;
+                $new  = str_replace(' ', ';:;', $match);
+                $text = str_replace("\"$match\"", $new, $text);
+            }
+        }
+
+        //Split input string in arguments
+        $arguments = explode(' ', $text);
+
+        foreach ($arguments as $key => $argument) {
+            //Change ;:; back to spaces
+            $arguments[$key] = str_replace(';:;', ' ', $argument);
+        }
+
+        //Set calling player as first argument
+        array_unshift($arguments, $player);
+
         if ($this->callback instanceof \Closure) {
             $callback = $this->callback;
             $callback(...$arguments);

@@ -7,7 +7,6 @@ use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Controllers\ChatController;
 use esc\Models\InfoMessage;
 use esc\Models\Player;
 
@@ -19,7 +18,7 @@ class InfoMessages
     {
         self::$startTime = time();
 
-        ChatCommand::add('messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', '//', 'info_messages');
+        ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
 
         ManiaLinkEvent::add('info.add', [self::class, 'add'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');

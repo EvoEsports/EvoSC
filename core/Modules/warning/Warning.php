@@ -4,7 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\ManiaLinkEvent;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Models\Player;
 
 class Warning

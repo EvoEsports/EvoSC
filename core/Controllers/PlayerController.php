@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -28,12 +29,12 @@ class PlayerController implements ControllerInterface
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
 
         self::$fakePlayers = collect([]);
-        ChatCommand::add('kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', '//', 'player_kick');
+        ChatCommand::add('//kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
 
-        ChatCommand::add('fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', '##', 'player_fake');
-        ChatCommand::add('disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', '##', 'player_fake');
+        ChatCommand::add('##fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', 'player_fake');
+        ChatCommand::add('##disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', 'player_fake');
     }
 
     /**

@@ -5,7 +5,7 @@ namespace esc\Modules;
 
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Models\Map;
 use esc\Models\Player;
 

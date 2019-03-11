@@ -8,7 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Models\Map;
@@ -18,7 +18,7 @@ class MxDownload
 {
     public function __construct()
     {
-        ChatCommand::add('add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add <mx_id>', '//', 'map_add');
+        ChatCommand::add('//add', [self::class, 'addMap'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
     }
 
     public static function addMap(Player $player, $cmd, string ...$arguments)

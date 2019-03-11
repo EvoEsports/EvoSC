@@ -7,7 +7,7 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MapQueueItem;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
+use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Controllers\TemplateController;
@@ -30,7 +30,7 @@ class MapList
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
 
-        ChatCommand::add('list', [self::class, 'searchMap'], 'Search maps or open maplist');
+        ChatCommand::add('/list', [self::class, 'searchMap'], 'Search maps or open maplist');
     }
 
     public static function mapMapQueue(MapQueue $item)

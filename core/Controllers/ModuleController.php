@@ -25,7 +25,7 @@ class ModuleController implements ControllerInterface
         ManiaLinkEvent::add('modules.close', [ModuleController::class, 'hideModules']);
         ManiaLinkEvent::add('module.reload', [ModuleController::class, 'reloadModule'], 'module_reload');
 
-        ChatCommand::add('modules', [ModuleController::class, 'showModules'], 'Display all loaded modules', '//', 'module_reload');
+        ChatCommand::add('//modules', [ModuleController::class, 'showModules'], 'Display all loaded modules', 'module_reload');
     }
 
     public static function reloadModule(Player $callee, string $moduleName)

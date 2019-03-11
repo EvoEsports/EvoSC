@@ -7,7 +7,6 @@ use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\ChatController;
 use esc\Controllers\PlanetsController;
 use esc\Models\Player;
 
@@ -19,7 +18,7 @@ class Donations
 
         ManiaLinkEvent::add('donate', [Donations::class, 'donate']);
 
-        ChatCommand::add('donate', [Donations::class, 'donateCmd'], 'Donate planets to the server "/donate <amount>"');
+        ChatCommand::add('/donate', [Donations::class, 'donateCmd'], 'Donate planets to the server "/donate <amount>"');
     }
 
     public static function show(Player $player)

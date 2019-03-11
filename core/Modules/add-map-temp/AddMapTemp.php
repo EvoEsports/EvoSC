@@ -9,7 +9,6 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Models\Map;
@@ -19,7 +18,7 @@ class AddMapTemp
 {
     public function __construct()
     {
-        ChatCommand::add('add', [self::class, 'addMap'], 'Vote to play map from mx temporarily. Usage: /add <mx_id>');
+        ChatCommand::add('/add', [self::class, 'addMap'], 'Vote to play map from mx temporarily. Usage: /add <mx_id>');
     }
 
     public static function addMap(Player $player, $cmd, $mxId)
