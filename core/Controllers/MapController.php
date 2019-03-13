@@ -357,6 +357,14 @@ class MapController implements ControllerInterface
     /**
      * @return int
      */
+    public static function getOriginalTimeLimit(): int
+    {
+        return self::$timeLimit;
+    }
+
+    /**
+     * @return int
+     */
     public static function getAddedTime(): int
     {
         return self::$addedTime;
