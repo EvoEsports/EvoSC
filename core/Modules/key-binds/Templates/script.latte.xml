@@ -6,7 +6,7 @@
 
     main(){
         declare persistent Text[Text] CustomKeyBinds for This;
-        declare Text[Text][Integer] keyBinds;
+        declare Text[Text][] keyBinds;
         keyBinds.fromjson("""{$binds|noescape}""");
 
         foreach(key => bind in keyBinds){
