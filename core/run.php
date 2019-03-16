@@ -129,6 +129,8 @@ class EscRun extends Command
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         \esc\Classes\Server::disableServiceAnnounces(true);
 
+        $failedConnectionRequests = 0;
+
         while (true) {
             try {
                 esc\Classes\Timer::startCycle();
@@ -144,7 +146,15 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
+                Log::logAddLine('MPS', 'Connection problems.');
                 Log::logAddLine('MPS', $e->getMessage());
+                $failedConnectionRequests++;
+                if ($failedConnectionRequests > 20) {
+                    Log::logAddLine('MPS', sprintf('Connection failed after %d retires (%d seconds).', $failedConnectionRequests, $failedConnectionRequests * 5));
+
+                    return;
+                }
+                sleep($failedConnectionRequests * 5);
             } catch (Error $e) {
                 $errorClass = get_class($e);
                 $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
