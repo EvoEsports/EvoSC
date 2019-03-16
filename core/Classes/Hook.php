@@ -37,17 +37,16 @@ class Hook
             } else {
                 if (is_callable($this->function, false, $callableName)) {
                     call_user_func($this->function, ...$arguments);
-                    Log::logAddLine('Hook', "Execute: " . $this->function[0] . " " . $this->function[1], false);
+                    Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", false);
                 } else {
-                    throw new \Exception("Function call invalid, must use: [ClassName, ClassFunctionName] or Closure");
+                    Log::logAddLine('DEBUG', serialize($this->function));
+                    throw new \Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure");
                 }
             }
         } catch (\Exception $e) {
-            Log::logAddLine('Hook', "Exception: " . $e->getMessage(), isVerbose());
-            Log::logAddLine('Stack trace', $e->getTraceAsString(), isVerbose());
+            Log::logAddLine('Hook', "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         } catch (\TypeError $e) {
-            Log::logAddLine('Hook', "TypeError: " . $e->getMessage(), isVerbose());
-            Log::logAddLine('Stack trace', $e->getTraceAsString(), isVerbose());
+            Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }
 
         if ($this->runOnce) {

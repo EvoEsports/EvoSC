@@ -23,7 +23,7 @@ class AddedTimeInfo
         Template::showAll('added-time-info.meter', compact('addedMinutes'));
     }
 
-    public static function playerConnect(Player $player, $timeLimitInSeconds)
+    public static function playerConnect(Player $player)
     {
         $addedMinutes = floor(MapController::getAddedTime() / 60);
         Template::show($player, 'added-time-info.meter', compact('addedMinutes'));

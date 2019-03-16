@@ -149,7 +149,7 @@ class EscRun extends Command
                 Log::logAddLine('MPS', 'Connection problems.');
                 Log::logAddLine('MPS', $e->getMessage());
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 20) {
+                if ($failedConnectionRequests > 10) {
                     Log::logAddLine('MPS', sprintf('Connection failed after %d retires (%d seconds).', $failedConnectionRequests, $failedConnectionRequests * 5));
 
                     return;
