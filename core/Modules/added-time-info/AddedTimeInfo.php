@@ -13,7 +13,6 @@ class AddedTimeInfo
     public function __construct()
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
     }
 

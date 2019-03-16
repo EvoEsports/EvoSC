@@ -41,9 +41,9 @@ class MapController implements ControllerInterface
 
         self::loadMaps();
 
-        Hook::add('BeginMap', [MapController::class, 'beginMap']);
-        Hook::add('BeginMatch', [MapController::class, 'beginMatch']);
-        Hook::add('EndMatch', [MapController::class, 'endMatch']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
@@ -132,10 +132,7 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Hook: EndMatch
      *
-     * @param $rankings
-     * @param $winnerteam
      */
     public static function endMatch()
     {

@@ -14,15 +14,27 @@ class Hook
     /**
      * Hook constructor.
      *
-     * @param string         $event
-     * @param \Closure|array $function
-     * @param bool           $runOnce
+     * @param string $event
+     * @param        $function
+     * @param bool   $runOnce
+     *
+     * @throws \Exception
      */
     public function __construct(string $event, $function, bool $runOnce = false)
     {
-        $this->event    = $event;
-        $this->function = $function;
-        $this->runOnce  = $runOnce;
+        $this->event   = $event;
+        $this->runOnce = $runOnce;
+
+
+        if (gettype($function) == "object") {
+            $this->function = $function;
+        } else {
+            if (is_callable($function, false, $callableName)) {
+                $this->function = $function;
+            } else {
+                Log::warning(sprintf('Invalid hook: %s->%s', $function[0], $function[1]), true);
+            }
+        }
     }
 
     /**
@@ -92,7 +104,11 @@ class Hook
         }
 
         foreach ($hooks as $hook) {
-            $hook->execute(...$arguments);
+            try {
+                $hook->execute(...$arguments);
+            } catch (\Exception $e) {
+                Log::logAddLine('Hook:' . $hook->event, $e->getMessage() . "\n" . $e->getTraceAsString());
+            }
         }
     }
 }
