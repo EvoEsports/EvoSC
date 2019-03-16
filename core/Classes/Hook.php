@@ -22,7 +22,7 @@ class Hook
     {
         $this->event    = $event;
         $this->function = $function;
-        $this->name     = $runOnce;
+        $this->runOnce  = $runOnce;
     }
 
     /**
@@ -39,12 +39,12 @@ class Hook
                     call_user_func($this->function, ...$arguments);
                     Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", false);
                 } else {
-                    Log::logAddLine('DEBUG', serialize($this->function));
                     throw new \Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure");
                 }
             }
         } catch (\Exception $e) {
             Log::logAddLine('Hook', "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
+            Log::logAddLine('DEBUG', json_encode($this->function));
         } catch (\TypeError $e) {
             Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }

@@ -356,7 +356,7 @@ class DedimaniaApi
 
         $bestRecord = $sortedScores->first();
 
-        Log::logAddLine('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
+        // Log::logAddLine('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
 
         try {
             $VReplay = Server::getValidationReplay($bestRecord->player->Login);
