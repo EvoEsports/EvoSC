@@ -108,7 +108,6 @@ class LocalRecords
 
         $map = MapController::getCurrentMap();
 
-        $localCount  = $map->locals()->count();
         $chatMessage = chatMessage()
             ->setIcon('')
             ->setColor(config('colors.local'));
@@ -137,13 +136,26 @@ class LocalRecords
                 self::sendUpdatedLocals($map);
             }
         } else {
-            if ($localCount < config('locals.limit')) {
+            $localCount = $map->locals()->count();
+            if ($localCount > 0) {
+                $betterRank = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+
+                if ($betterRank) {
+                    $rank = $betterRank->Rank + 1;
+                } else {
+                    $rank = $localCount + 1;
+                }
+            } else {
+                $rank = 1;
+            }
+
+            if ($rank <= config('locals.limit')) {
                 $map->locals()->create([
                     'Player'      => $player->id,
                     'Map'         => $map->id,
                     'Score'       => $score,
                     'Checkpoints' => $checkpoints,
-                    'Rank'        => 999,
+                    'Rank'        => $rank,
                 ]);
                 $local = self::fixLocalRecordRanks($map, $player);
                 $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
