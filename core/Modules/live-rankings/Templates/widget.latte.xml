@@ -68,7 +68,7 @@
     Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
         declare index = position - 1;
 
-        if(index >= ranking.Controls){
+        if(index >= ranking.Controls.count){
             return;
         }
 
