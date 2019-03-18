@@ -111,12 +111,12 @@ class Dedimania extends DedimaniaApi
             }
         }
 
-        Log::logAddLine('Dedimania', "Loaded records for map $map");
-
         $dedisJson = self::getDedisJson($map);
 
         Template::showAll('dedimania-records.update', compact('dedisJson'));
         Template::showAll('dedimania-records.manialink');
+
+        Log::logAddLine('Dedimania', "Loaded records for map $map");
     }
 
     public static function endMatch()

@@ -88,9 +88,8 @@ class LocalRecords
         })->toJson();
     }
 
-    public static function beginMap()
+    public static function beginMap(Map $map)
     {
-        $map = MapController::getCurrentMap();
         self::sendUpdatedLocals($map);
     }
 
