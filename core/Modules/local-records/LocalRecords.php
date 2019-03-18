@@ -43,7 +43,7 @@ class LocalRecords
             return;
         }
 
-        $localsJson = self::getLocalsJson($map);
+        $localsJson = $map->locals()->orderByDesc('Rank')->take(config('locals.limit'));
 
         Template::show($player, 'local-records.update', compact('localsJson'));
         Template::show($player, 'local-records.manialink');
@@ -128,9 +128,9 @@ class LocalRecords
                 $local = self::fixLocalRecordRanks($map, $player);
 
                 if ($oldRank == $local->Rank) {
-                    $chatMessage->setParts($player, ' secured his/her ', $local, ' ('.$oldRank.'. -' . formatScore($diff) . ')')->sendAll();
+                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
                 } else {
-                    $chatMessage->setParts( $player, ' gained the ', $local, ' ('.$oldRank.'. -' . formatScore($diff) . ')')->sendAll();
+                    $chatMessage->setParts($player, ' gained the ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
                 }
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);

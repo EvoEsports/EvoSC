@@ -26,8 +26,7 @@ class CreateGroupsTable extends Migration
         $seed = [
             ['id' => 1, 'Name' => 'Masteradmin', 'Protected' => true],
             ['id' => 2, 'Name' => 'Admin', 'Protected' => true],
-            ['id' => 3, 'Name' => 'Moderator', 'Protected' => false],
-            ['id' => 4, 'Name' => 'Player', 'Protected' => true],
+            ['id' => 3, 'Name' => 'Player', 'Protected' => true],
         ];
 
         $schemaBuilder->getConnection()->table('groups')->insert($seed);
