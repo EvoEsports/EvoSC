@@ -54,7 +54,7 @@ class Dedimania extends DedimaniaApi
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMatch', [self::class, 'beginMap']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
         //Check if session is still valid each 5 seconds
@@ -114,8 +114,10 @@ class Dedimania extends DedimaniaApi
 
         Log::logAddLine('Dedimania', "Loaded records for map $map");
 
-        //Send manialink to online players
-        onlinePlayers()->each([self::class, 'showManialink']);
+        $dedisJson = self::getDedisJson($map);
+
+        Template::showAll('dedimania-records.update', compact('dedisJson'));
+        Template::showAll('dedimania-records.manialink');
     }
 
     public static function endMatch()
