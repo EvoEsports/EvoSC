@@ -21,7 +21,7 @@ class LocalRecords
     public function __construct()
     {
         Hook::add('PlayerFinish', [LocalRecords::class, 'playerFinish']);
-        Hook::add('BeginMatch', [LocalRecords::class, 'beginMatch']);
+        Hook::add('BeginMap', [LocalRecords::class, 'beginMatch']);
         Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
@@ -61,8 +61,8 @@ class LocalRecords
     public static function sendUpdatedLocals(Map $map)
     {
         $localsJson = self::getLocalsJson($map);
-
         Template::showAll('local-records.update', compact('localsJson'));
+        Template::showAll('local-records.manialink');
     }
 
     private static function getLocalsJson(Map $map)
@@ -88,7 +88,7 @@ class LocalRecords
         })->toJson();
     }
 
-    public static function beginMatch()
+    public static function beginMap()
     {
         $map = MapController::getCurrentMap();
         self::sendUpdatedLocals($map);
