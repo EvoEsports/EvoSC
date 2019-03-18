@@ -30,6 +30,7 @@ class Votes
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
         ChatCommand::add('/time', [self::class, 'askMoreTime'], 'Start a vote to add 10 minutes.')
                    ->addAlias('/replay')
+                   ->addAlias('/restart')
                    ->addAlias('/res');
 
         Hook::add('EndMatch', [self::class, 'endMatch']);

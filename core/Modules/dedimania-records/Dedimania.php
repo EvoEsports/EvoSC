@@ -54,7 +54,7 @@ class Dedimania extends DedimaniaApi
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
         //Check if session is still valid each 5 seconds
@@ -98,8 +98,9 @@ class Dedimania extends DedimaniaApi
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
+        $map = MapController::getCurrentMap();
         $records = self::getChallengeRecords($map);
         if ($records && $records->count() > 0) {
             //Wipe all dedis for current map
