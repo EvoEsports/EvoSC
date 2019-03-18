@@ -67,7 +67,7 @@ class LocalRecords
 
     private static function getLocalsJson(Map $map)
     {
-        $locals    = $map->locals()->orderBy('Rank')->get();
+        $locals    = $map->locals()->orderBy('Rank')->limit(config('locals.limit'))->get();
         $playerIds = $locals->pluck('Player');
         $players   = Player::whereIn('id', $playerIds)->get();
 
