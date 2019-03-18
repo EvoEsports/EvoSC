@@ -39,13 +39,14 @@ class ChatController implements ControllerInterface
             exit(2);
         }
 
-        Hook::add('PlayerChat', [ChatController::class, 'playerChat']);
+        Hook::add('PlayerChat', [self::class, 'playerChat']);
 
         AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
         AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
 
-        ChatCommand::add('//mute', [ChatController::class, 'mute'], 'Mutes a player by given nickname', 'player_mute');
-        ChatCommand::add('//unmute', [ChatController::class, 'unmute'], 'Unmute a player by given nickname', 'player_mute');
+        ChatCommand::add('//mute', [self::class, 'mute'], 'Mutes a player by given nickname', 'player_mute');
+        ChatCommand::add('//unmute', [self::class, 'unmute'], 'Unmute a player by given nickname', 'player_mute');
+        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 
     public static function mute(Player $player, $cmd, $nick)
@@ -77,7 +78,30 @@ class ChatController implements ControllerInterface
         });
     }
 
-    public static function playerChat(Player $player, $text)
+    public static function pm(Player $player, $cmd, $nick, ...$message)
+    {
+        $target = PlayerController::findPlayerByName($player, $nick);
+
+        if (!$target) {
+            //No target found
+            return;
+        }
+
+        if ($target == $player) {
+            warningMessage('Why are you talking to yourself? Do you need help?')->send($player);
+
+            return;
+        }
+
+        $prefix = sprintf(secondary('[PM->') . $player . secondary('] '));
+        $pm     = \chatMessage($prefix . implode(' ', $message))->setIcon('');
+
+        $pm->send($player);
+        $pm->send($target);
+    }
+
+    public
+    static function playerChat(Player $player, $text)
     {
         $parts = explode(' ', $text);
 

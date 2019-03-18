@@ -30,7 +30,6 @@ class Statistics
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
         Hook::add('PlayerLocal', [self::class, 'playerLocal']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'showScores']);
@@ -77,6 +76,30 @@ class Statistics
         self::$scores = collect();
 
         Template::showAll('statistics.widgets', compact('statCollection'));
+
+        $finishedPlayers = finishPlayers()->sortBy('Score');
+        $bestPlayer      = $finishedPlayers->first();
+        $secondBest      = $finishedPlayers->get(1);
+
+        if (!$bestPlayer) {
+            return;
+        }
+
+        foreach ($finishedPlayers as $player) {
+            // self::calculatePlayerServerScore($player);
+        }
+
+        if ($bestPlayer && $bestPlayer->Score > 0) {
+            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
+                return;
+            }
+
+            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
+                ->setIcon('🏆')
+                ->sendAll();
+
+            $bestPlayer->stats()->increment('Wins');
+        }
     }
 
     /**
@@ -154,39 +177,6 @@ class Statistics
     public static function beginMap(...$args)
     {
         self::$scores = collect();
-    }
-
-    /**
-     * @param array ...$args
-     */
-    public static function endMatch(...$args)
-    {
-        self::$scores    = collect();
-        $finishedPlayers = finishPlayers()->sortBy('Score');
-        $bestPlayer      = $finishedPlayers->first();
-        $secondBest      = $finishedPlayers->get(1);
-
-        if (!$bestPlayer) {
-            return;
-        }
-
-        foreach ($finishedPlayers as $player) {
-            self::calculatePlayerServerScore($player);
-        }
-
-        self::updatePlayerRanks();
-
-        if ($bestPlayer && $bestPlayer->Score > 0) {
-            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
-                return;
-            }
-
-            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
-                ->setIcon('🏆')
-                ->sendAll();
-
-            $bestPlayer->stats()->increment('Wins');
-        }
     }
 
     /**

@@ -68,8 +68,8 @@ class MxDownload
 
             $mapFolder = MapController::getMapsPath();
 
-            if (!is_dir($mapFolder)) {
-                mkdir($mapFolder);
+            if (!is_dir($mapFolder . 'MX')) {
+                mkdir($mapFolder . 'MX');
             }
 
             $body     = $response->getBody();

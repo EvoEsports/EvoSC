@@ -170,9 +170,16 @@ class PlayerController implements ControllerInterface
             'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
-        chatMessage($player->group, ' ', $player, ' from ', secondary($player->path), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString))
-            ->setIcon('')
-            ->sendAll();
+        if (!$player->stats) {
+            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString), '.')
+                ->setIcon('')
+                ->sendAll();
+
+        } else {
+            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
+                ->setIcon('')
+                ->sendAll();
+        }
 
         return $player;
     }

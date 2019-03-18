@@ -27,7 +27,7 @@ class KeyBinds
         ManiaLinkEvent::add('bound_key_pressed', [self::class, 'keyPressed']);
         ManiaLinkEvent::add('update_keybinds', [self::class, 'sendScript']);
 
-        QuickButtons::addButton('⌨', 'Keyboard Setup', 'show_key_bind_settings');
+        QuickButtons::addButton('', 'Keyboard Setup', 'show_key_bind_settings');
     }
 
     public static function showSettings(Player $player)
