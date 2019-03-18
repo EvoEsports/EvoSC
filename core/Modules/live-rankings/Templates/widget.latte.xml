@@ -66,6 +66,12 @@
     }
 
     Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
+        declare index = position - 1;
+
+        if(index >= ranking.Controls){
+            return;
+        }
+
         declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
         (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
         (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
@@ -87,6 +93,10 @@
             }
 
             i = i + 1;
+
+            if(i > 14){
+                return;
+            }
 
             updateLabels(ranking, i, name, score);
         }
