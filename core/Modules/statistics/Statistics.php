@@ -2,13 +2,12 @@
 
 namespace esc\Modules;
 
-use esc\Classes\Config;
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Classes\ChatCommand;
-use esc\Controllers\TemplateController;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
@@ -86,7 +85,20 @@ class Statistics
         }
 
         foreach ($finishedPlayers as $player) {
-            // self::calculatePlayerServerScore($player);
+            try {
+                $locals = $player->locals;
+                $score  = 0;
+
+                $locals->each(function (LocalRecord $local) use (&$score) {
+                    $score += (100 - $local->Rank);
+                });
+
+                $player->stats()->update([
+                    'Score' => $score,
+                ]);
+            } catch (\Exception $e) {
+                Log::logAddLine('Statistics', 'Failed to calculate player score for: ' . $player);
+            }
         }
 
         if ($bestPlayer && $bestPlayer->Score > 0) {
@@ -100,6 +112,8 @@ class Statistics
 
             $bestPlayer->stats()->increment('Wins');
         }
+
+        self::updatePlayerRanks();
     }
 
     /**
@@ -116,6 +130,8 @@ class Statistics
                 'Player' => $player->id,
                 'Visits' => 1,
             ]);
+
+            return;
         }
 
         $player->stats()->increment('Visits');
@@ -177,23 +193,6 @@ class Statistics
     public static function beginMap(...$args)
     {
         self::$scores = collect();
-    }
-
-    /**
-     * @param Player $player
-     */
-    private static function calculatePlayerServerScore(Player $player)
-    {
-        $locals = $player->locals;
-        $score  = 0;
-
-        $locals->each(function (LocalRecord $local) use (&$score) {
-            $score += (100 - $local->Rank);
-        });
-
-        $player->stats()->update([
-            'Score' => $score,
-        ]);
     }
 
     /**

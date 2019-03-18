@@ -56,7 +56,7 @@ class Hook
             }
         } catch (\Exception $e) {
             Log::logAddLine('Hook', "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
-            Log::logAddLine('DEBUG', json_encode($this->function));
+            Log::logAddLine('DEBUG', json_encode($this->function), isVeryVerbose());
         } catch (\TypeError $e) {
             Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }
