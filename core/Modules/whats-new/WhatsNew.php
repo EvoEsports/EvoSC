@@ -17,10 +17,9 @@ class WhatsNew
     public static function showNews(Player $player)
     {
         $changes = [
-            'New chat commands overview, type /help',
-            'Click yes/no on widget to vote',
-            '--------------------',
-            'Change key-binds, see "Keyboard setup" on the right.'
+            'Change key-binds, see "Keyboard setup" on the right.',
+            '----------------------------------------------------',
+            'Personal messages, usage: /pm <partial_nickname> message'
         ];
 
         Template::show($player, 'whats-new.window', compact('changes'));

@@ -55,6 +55,10 @@ class EscRun extends Command
                 \esc\Classes\Server::autoSaveReplays(true);
             }
 
+            //Disable all default ManiaPlanet votes
+            $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
+            \esc\Classes\Server::setCallVoteRatios([$voteRatio]);
+
             $output->writeln("Connection established.");
         } catch (\Exception $e) {
             $msg = $e->getMessage();
