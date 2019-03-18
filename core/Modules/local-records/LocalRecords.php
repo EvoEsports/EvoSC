@@ -43,7 +43,7 @@ class LocalRecords
             return;
         }
 
-        $localsJson = $map->locals()->orderByDesc('Rank')->take(config('locals.limit'));
+        $localsJson = self::getLocalsJson($map);
 
         Template::show($player, 'local-records.update', compact('localsJson'));
         Template::show($player, 'local-records.manialink');
@@ -55,6 +55,7 @@ class LocalRecords
         $map->locals()->where('Rank', $localRank)->delete();
         self::fixLocalRecordRanks($map);
         self::sendUpdatedLocals($map);
+        warningMessage($player, 'Deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
     }
 
     public static function sendUpdatedLocals(Map $map)
