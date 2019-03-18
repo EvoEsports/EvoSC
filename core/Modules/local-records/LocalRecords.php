@@ -25,14 +25,6 @@ class LocalRecords
         Hook::add('PlayerConnect', [LocalRecords::class, 'showManialink']);
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
-
-        //KeyController::createBind('X', [self::class, 'reload']);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showManialink($player);
     }
 
     public static function showManialink(Player $player)
@@ -62,7 +54,6 @@ class LocalRecords
     {
         $localsJson = self::getLocalsJson($map);
         Template::showAll('local-records.update', compact('localsJson'));
-        Template::showAll('local-records.manialink');
     }
 
     private static function getLocalsJson(Map $map)
@@ -93,12 +84,6 @@ class LocalRecords
         self::sendUpdatedLocals($map);
     }
 
-    /**
-     * Called @ PlayerFinish
-     *
-     * @param Player $player
-     * @param int    $score
-     */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 3000) {
