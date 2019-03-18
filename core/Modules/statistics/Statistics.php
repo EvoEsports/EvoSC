@@ -200,7 +200,7 @@ class Statistics
      */
     private static function updatePlayerRanks()
     {
-        $stats = Stats::where('Locals', '>', 0)->orderByDesc('Score')->get();
+        $stats = Stats::where('Locals', '>', 0)->orderByDesc('Score')->get(); //TODO: Use SQL
         $total = $stats->count();
 
         $counter = 1;

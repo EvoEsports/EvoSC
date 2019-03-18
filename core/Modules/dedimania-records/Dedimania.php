@@ -98,9 +98,8 @@ class Dedimania extends DedimaniaApi
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
     }
 
-    public static function beginMap()
+    public static function beginMap(Map $map)
     {
-        $map = MapController::getCurrentMap();
         $records = self::getChallengeRecords($map);
         if ($records && $records->count() > 0) {
             //Wipe all dedis for current map
