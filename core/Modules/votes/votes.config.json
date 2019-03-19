@@ -1,6 +1,6 @@
 {
-  "pos"     : "-24 80",
-  "scale"   : 0.8,
+  "pos"     : "-24 65",
+  "scale"   : 0.95,
   "duration": 25,
   "cooldown": 120,
   "enabled" : true

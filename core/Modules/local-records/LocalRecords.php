@@ -154,6 +154,7 @@ class LocalRecords
                 'Checkpoints' => $checkpoints,
                 'Rank'        => $rank,
             ]);
+            $local = $map->locals()->wherePlayer($player->id)->first();
             Hook::fire('PlayerLocal', $player, $local);
             $map->locals()->where('Rank', '>', $rank)->increment('Rank');
             self::sendUpdatedLocals($map);
