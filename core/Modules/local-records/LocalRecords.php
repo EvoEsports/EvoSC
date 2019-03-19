@@ -97,7 +97,7 @@ class LocalRecords
             ->setIcon('')
             ->setColor(config('colors.local'));
 
-        $local = $map->locals()->wherePlayer($player->id)->first();
+        $local      = $map->locals()->wherePlayer($player->id)->first();
         $localCount = $map->locals()->count();
 
         if ($localCount > 0) {
@@ -110,6 +110,10 @@ class LocalRecords
             }
         } else {
             $rank = 1;
+        }
+
+        if ($rank > config('locals.limit')) {
+            return;
         }
 
         if ($local != null) {
@@ -135,18 +139,16 @@ class LocalRecords
                 self::sendUpdatedLocals($map);
             }
         } else {
-            if ($rank <= config('locals.limit')) {
-                $map->locals()->create([
-                    'Player'      => $player->id,
-                    'Map'         => $map->id,
-                    'Score'       => $score,
-                    'Checkpoints' => $checkpoints,
-                    'Rank'        => $rank,
-                ]);
-                $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
-                Hook::fire('PlayerLocal', $player, $local);
-                self::sendUpdatedLocals($map);
-            }
+            $map->locals()->create([
+                'Player'      => $player->id,
+                'Map'         => $map->id,
+                'Score'       => $score,
+                'Checkpoints' => $checkpoints,
+                'Rank'        => $rank,
+            ]);
+            $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
+            Hook::fire('PlayerLocal', $player, $local);
+            self::sendUpdatedLocals($map);
         }
     }
 }

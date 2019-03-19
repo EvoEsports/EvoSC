@@ -260,30 +260,27 @@ class Dedimania extends DedimaniaApi
                     }
 
                     self::sendUpdatedDedis($map);
-                } else {
-                    Log::logAddLine('Dedimania', sprintf('%s does not get dedi %d, because player has no premium and server max rank is too low.', $player, $newRank), $player . ' finished with time ' . formatScore($score), isVerbose());
                 }
             }
         } else {
-            //Player does not have a dedi on map
-            $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
-
-            $map->dedis()->create([
-                'Player'      => $player->id,
-                'Map'         => $map->id,
-                'Score'       => $score,
-                'Rank'        => $newRank,
-                'Checkpoints' => $checkpoints,
-                'New'         => 1,
-            ]);
-
-            $dedi = $map->dedis()->wherePlayer($player->id)->first();
-
             if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
+
+                $map->dedis()->create([
+                    'Player'      => $player->id,
+                    'Map'         => $map->id,
+                    'Score'       => $score,
+                    'Rank'        => $newRank,
+                    'Checkpoints' => $checkpoints,
+                    'New'         => 1,
+                ]);
+
+                $dedi = $map->dedis()->wherePlayer($player->id)->first();
+
+                //Player does not have a dedi on map
+                $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
+
                 self::sendUpdatedDedis($map);
                 chatMessage($player, ' gained the ', $dedi)->setIcon('')->setColor(config('colors.dedi'))->sendAll();
-            } else {
-                $dedi->update(['New' => 0]);
             }
         }
     }
