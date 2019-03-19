@@ -213,7 +213,7 @@ class Statistics
      * @param Player      $player
      * @param LocalRecord $local
      */
-    public static function playerLocal(Player $player, LocalRecord $local)
+    public static function playerLocal(Player $player, $local = null)
     {
         $player->stats()->update([
             'Locals' => $player->locals->count(),
