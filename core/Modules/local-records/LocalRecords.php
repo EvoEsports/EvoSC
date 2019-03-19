@@ -132,6 +132,7 @@ class LocalRecords
 
                 $local->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'Rank' => $rank]);
                 Hook::fire('PlayerLocal', $player, $local);
+                $map->locals()->where('Rank', '>', $rank)->increment('Rank');
                 self::sendUpdatedLocals($map);
 
                 if ($oldRank == $local->Rank) {
@@ -142,7 +143,7 @@ class LocalRecords
 
                 if ($rank > $halfLimit) {
                     $chatMessage->send($player);
-                }else{
+                } else {
                     $chatMessage->sendAll();
                 }
             }
@@ -155,13 +156,14 @@ class LocalRecords
                 'Rank'        => $rank,
             ]);
             Hook::fire('PlayerLocal', $player, $local);
+            $map->locals()->where('Rank', '>', $rank)->increment('Rank');
             self::sendUpdatedLocals($map);
 
             $chatMessage->setParts($player, ' claimed the ', $local);
 
             if ($rank > $halfLimit) {
                 $chatMessage->send($player);
-            }else{
+            } else {
                 $chatMessage->sendAll();
             }
         }
