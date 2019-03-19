@@ -241,7 +241,7 @@ function isVerbose(): bool
 
 function isVeryVerbose(): bool
 {
-    return false;
+    return true;
 }
 
 function isDebug(): bool

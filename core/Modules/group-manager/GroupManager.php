@@ -182,7 +182,7 @@ class GroupManager
 
         if ($newMember) {
             Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
-            Hook::fire('GroupChanged', $player);
+            Hook::fire('GroupChanged', $newMember);
 
             if ($newMember->group->id == 3) {
                 infoMessage($player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group))->sendAll();

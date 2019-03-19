@@ -25,7 +25,7 @@ class EventController implements ControllerInterface
             $name      = $callback[0];
             $arguments = $callback[1];
 
-            Log::logAddLine('EventController', "$name", isVeryVerbose());
+            // Log::logAddLine('EventController', "$name", isVeryVerbose());
 
             switch ($name) {
                 case 'ManiaPlanet.PlayerInfoChanged':
@@ -93,7 +93,7 @@ class EventController implements ControllerInterface
             $nickname        = $playerInfo['NickName'];
             $playerId        = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
-            $countryPath     = Server::rpc()->getDetailedPlayerInfo($login)->path;
+            $countryPath     = Server::getDetailedPlayerInfo($login)->path;
 
             $player = Player::find($login);
 
@@ -101,9 +101,6 @@ class EventController implements ControllerInterface
                 Player::create(['Login' => $login]);
                 $player = Player::find($login);
             }
-
-            $specTargetId = $player->spectator_status->currentTargetId;
-            $wasSpectator = $specTargetId > 0;
 
             if ($player) {
                 $player->update([
@@ -113,7 +110,7 @@ class EventController implements ControllerInterface
                     'path'             => $countryPath,
                 ]);
 
-                Hook::fire('PlayerInfoChanged', $player);
+                // Hook::fire('PlayerInfoChanged', $player);
             } else {
                 $playerId = Player::insertGetId([
                     'Login'            => $login,
@@ -130,25 +127,7 @@ class EventController implements ControllerInterface
 
                 $player = Player::whereId($playerId)->first();
 
-                Hook::fire('PlayerInfoChanged', $player);
-            }
-
-            $targetId = $player->spectator_status->currentTargetId;
-
-            if ($targetId > 0) {
-                $target = Player::wherePlayerId($targetId)->first();
-
-                if ($target instanceof Player) {
-                    Hook::fire('SpecStart', $player, $target);
-                }
-            } else {
-                if ($wasSpectator) {
-                    $target = Player::wherePlayerId($specTargetId)->first();
-
-                    if ($target instanceof Player) {
-                        Hook::fire('SpecStop', $player, $target);
-                    }
-                }
+                // Hook::fire('PlayerInfoChanged', $player);
             }
         }
     }

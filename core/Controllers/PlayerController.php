@@ -12,6 +12,7 @@ use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
+use esc\Modules\Statistics;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
@@ -170,10 +171,6 @@ class PlayerController implements ControllerInterface
             chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
                 ->setIcon('')
                 ->sendAll();
-
-            if ($stats->Rank && $stats->Rank > 0) {
-
-            }
         } else {
             chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
                 ->setIcon('')
@@ -252,6 +249,6 @@ class PlayerController implements ControllerInterface
 
     private static function getPlayerServerId(Player $player): int
     {
-        return Server::rpc()->getPlayerInfo($player->Login)->playerId;
+        return Server::getPlayerInfo($player->Login)->playerId;
     }
 }

@@ -100,13 +100,19 @@ class ChatController implements ControllerInterface
         $pm->send($target);
     }
 
-    public
-    static function playerChat(Player $player, $text)
+    public static function playerChat(Player $player, $text)
     {
         $parts = explode(' ', $text);
 
         if (ChatCommand::has($parts[0])) {
             ChatCommand::get($parts[0])->execute($player, $text);
+
+            return;
+        }
+
+        if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
+            warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
+            warningMessage('We switched to a new server-controller, it is missing features you had before but we are working on it to give you the best user-experience.')->send($player);
 
             return;
         }

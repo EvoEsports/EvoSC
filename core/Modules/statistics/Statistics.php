@@ -21,10 +21,17 @@ class Statistics
     private static $scores;
 
     /**
+     * @var int
+     */
+    private static $totalRankedPlayers = 0;
+
+    /**
      * Statistics constructor.
      */
     public function __construct()
     {
+        self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
+
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
@@ -33,11 +40,14 @@ class Statistics
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'showScores']);
 
-        Timer::create('update_playtimes', [self::class, 'updatePlaytimes'], '1m', true);
+        Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
     }
 
     public static function showScores(...$args)
     {
+        /**
+         * Prepare widgets
+         */
         $statCollection = collect();
 
         //Top visitors
@@ -78,48 +88,73 @@ class Statistics
 
         Template::showAll('statistics.widgets', compact('statCollection'));
 
-        $finishedPlayers = finishPlayers()->sortBy('Score');
-        $bestPlayer      = $finishedPlayers->first();
-        $secondBest      = $finishedPlayers->get(1);
+        /**
+         * Calculate scores
+         */
+        $finishedPlayers          = finishPlayers()->sortBy('Score');
+        self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
 
-        $finishedPlayers->each('calculatePlayerScore');
+        Log::logAddLine('Statistics', sprintf('Calculating player scores for %d players.', self::$totalRankedPlayers), isVeryVerbose());
 
-        foreach ($finishedPlayers as $player) {
-            try {
-                $locals = $player->locals;
-                $score  = 0;
+        $finishedPlayers->each(function (Player $player) {
+            $score = $player->locals()->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
+            $player->stats()->update(['Score' => $score]);
+        });
 
-                $locals->each(function (LocalRecord $local) use (&$score) {
-                    $score += (100 - $local->Rank);
-                });
+        self::updatePlayerRanks();
 
-                $player->stats()->update([
-                    'Score' => $score,
-                ]);
-            } catch (\Exception $e) {
-                Log::logAddLine('Statistics', 'Failed to calculate player score for: ' . $player);
-            }
+        $bestPlayer = $finishedPlayers->first();
+        $secondBest = $finishedPlayers->get(1);
+
+        if ($secondBest && $secondBest->Score == 0) {
+            $secondBest = null;
         }
 
         if ($bestPlayer && $bestPlayer->Score > 0) {
-            if ($secondBest && $bestPlayer->Score == $secondBest->Score) {
-                return;
+            if (!$secondBest || $secondBest && $bestPlayer->Score != $secondBest->Score) {
+                infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
+                    ->setIcon('🏆')
+                    ->sendAll();
+
+                $bestPlayer->stats()->increment('Wins');
             }
-
-            infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
-                ->setIcon('🏆')
-                ->sendAll();
-
-            $bestPlayer->stats()->increment('Wins');
         }
-
-        self::updatePlayerRanks();
     }
 
-    private static function calculatePlayerScore(Player $player)
+    /**
+     * Set ranks for players
+     */
+    private static function updatePlayerRanks()
     {
-        $score = $player->locals()->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
-        $player->stats()->update(['Score' => $score]);
+        Log::logAddLine('Statistics', 'Updating player-ranks.', isVeryVerbose());
+        $start = time() + microtime(true);
+
+        Stats::where('Score', '>', 0)->orderByDesc('Score')->get()->map(function (Stats $stat, $rank) {
+            return [
+                'Player' => $stat->Player,
+                'Rank'   => $rank + 1,
+            ];
+        });
+
+        $end = time() + microtime(true);
+        Log::logAddLine('Statistics', sprintf('Updating player-ranks finished. Took %.3fs', $end - $start), isVeryVerbose());
+
+        onlinePlayers()->each(function (Player $player) {
+            self::showRank($player);
+        });
+    }
+
+    public static function showRank(Player $player)
+    {
+        $stats = $player->stats;
+
+        if ($stats && $stats->Rank && $stats->Rank > 0) {
+            infoMessage('Your server rank is ', secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
+
+            return;
+        }
+
+        infoMessage('You need at least one local record before receiving a rank.')->send($stats->player);
     }
 
     /**
@@ -131,16 +166,9 @@ class Statistics
             return;
         }
 
-        $start = time() + microtime(true);
+        self::showRank($player);
 
-        for ($i = 0; $i < 70; $i++) {
-            self::calculatePlayerScore($player);
-        }
-
-        $end = time() + microtime(true);
-        printf("Took %.3fs\n", $end - $start);
-
-        if ($player->stats === null) {
+        if (!$player->stats) {
             Stats::create([
                 'Player' => $player->id,
                 'Visits' => 1,
@@ -193,16 +221,12 @@ class Statistics
     }
 
     /**
-     * Increment playtimes each minute
+     * Increment play-times each minute
      */
-    public static function updatePlaytimes()
+    public static function updateConnectedPlayerPlaytimes()
     {
-        $start = time() + microtime(true);
-        foreach (onlinePlayers() as $player) {
-            $player->stats()->increment('Playtime');
-        }
-        $end = time() + microtime(true);
-        var_dump($end - $start);
+        $onlinePlayerIds = onlinePlayers()->pluck('id');
+        Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime');
     }
 
     /**
@@ -211,50 +235,5 @@ class Statistics
     public static function beginMap(...$args)
     {
         self::$scores = collect();
-    }
-
-    /**
-     * Set ranks for players
-     */
-    private static function updatePlayerRanks()
-    {
-        $stats = Stats::where('Locals', '>', 0)->orderByDesc('Score')->get(); //TODO: Use SQL
-        $total = $stats->count();
-
-        $counter = 1;
-
-        $stats->each(function (Stats $stats) use (&$counter, $total) {
-            $stats->update([
-                'Rank' => $counter++,
-            ]);
-
-            $chatMessage = infoMessage();
-
-            if ($stats->player->player_id) {
-                if ($stats->Rank && $stats->Rank > 0) {
-                    $chatMessage->setParts('Your server rank is ', secondary($stats->Rank . '/' . $total), ' (Score: ', $stats->Score, ')');
-                } else {
-                    $chatMessage->setParts('You need at least one local record before receiving a rank.');
-                }
-            }
-
-            $chatMessage->send($stats->player);
-        });
-    }
-
-    public static function showRank(Player $player)
-    {
-        $chatMessage = infoMessage();
-        $stats       = $player->stats;
-
-        if ($stats) {
-            if ($stats->Rank && $stats->Rank > 0) {
-                $chatMessage->setParts('Your server rank is ', secondary($stats->Rank . '.'), ' (Score: ', $stats->Score, ')');
-            } else {
-                $chatMessage->setParts('You need at least one local record before receiving a rank.');
-            }
-        }
-
-        $chatMessage->send($stats->player);
     }
 }
