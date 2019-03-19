@@ -134,9 +134,7 @@ function echoPlayers(): \Illuminate\Support\Collection
 
 function finishPlayers(): \Illuminate\Support\Collection
 {
-    return onlinePlayers()->filter(function (\esc\Models\Player $player) {
-        return $player->Score > 0;
-    });
+    return \esc\Models\Player::where('Score', '>', 0)->get();
 }
 
 function now(): \Carbon\Carbon
