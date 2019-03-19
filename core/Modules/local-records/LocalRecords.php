@@ -116,6 +116,8 @@ class LocalRecords
             return;
         }
 
+        $halfLimit = config('locals.limit') / 2;
+
         if ($local != null) {
             if ($score == $local->Score) {
                 $chatMessage->setParts($player, ' equaled his/her ', $local);
@@ -129,14 +131,20 @@ class LocalRecords
                 $diff = $local->Score - $score;
 
                 $local->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'Rank' => $rank]);
-
-                if ($oldRank == $local->Rank) {
-                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
-                } else {
-                    $chatMessage->setParts($player, ' gained the ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
-                }
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
+
+                if ($oldRank == $local->Rank) {
+                    $chatMessage->setParts($player, ' secured his/her ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                } else {
+                    $chatMessage->setParts($player, ' gained the ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                }
+
+                if ($rank > $halfLimit) {
+                    $chatMessage->send($player);
+                }else{
+                    $chatMessage->sendAll();
+                }
             }
         } else {
             $map->locals()->create([
@@ -146,9 +154,16 @@ class LocalRecords
                 'Checkpoints' => $checkpoints,
                 'Rank'        => $rank,
             ]);
-            $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
             Hook::fire('PlayerLocal', $player, $local);
             self::sendUpdatedLocals($map);
+
+            $chatMessage->setParts($player, ' claimed the ', $local);
+
+            if ($rank > $halfLimit) {
+                $chatMessage->send($player);
+            }else{
+                $chatMessage->sendAll();
+            }
         }
     }
 }
