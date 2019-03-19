@@ -93,7 +93,6 @@ class EventController implements ControllerInterface
             $nickname        = $playerInfo['NickName'];
             $playerId        = $playerInfo['PlayerId'];
             $spectatorStatus = $playerInfo['SpectatorStatus'];
-            $countryPath     = Server::getDetailedPlayerInfo($login)->path;
 
             $player = Player::find($login);
 
@@ -107,8 +106,11 @@ class EventController implements ControllerInterface
                     'NickName'         => $nickname,
                     'player_id'        => $playerId,
                     'spectator_status' => $spectatorStatus,
-                    'path'             => $countryPath,
                 ]);
+
+                if (!$player->path) {
+                    $player->update(['path' => Server::getDetailedPlayerInfo($login)->path]);
+                }
 
                 // Hook::fire('PlayerInfoChanged', $player);
             } else {
@@ -117,15 +119,13 @@ class EventController implements ControllerInterface
                     'NickName'         => $nickname,
                     'player_id'        => $playerId,
                     'spectator_status' => $spectatorStatus,
-                    'path'             => $countryPath,
+                    'path'             => Server::getDetailedPlayerInfo($login)->path,
                 ]);
 
                 Stats::create([
                     'Player' => $playerId,
                     'Visits' => 1,
                 ]);
-
-                $player = Player::whereId($playerId)->first();
 
                 // Hook::fire('PlayerInfoChanged', $player);
             }
