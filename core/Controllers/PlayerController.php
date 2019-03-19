@@ -223,7 +223,7 @@ class PlayerController implements ControllerInterface
         $diff = $player->last_visit->diffForHumans();
         Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $diff.");
 
-        infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')->sendAll();
+        infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')->setIcon('')->sendAll();
 
         $player->update([
             'last_visit' => now(),
