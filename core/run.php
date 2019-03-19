@@ -74,6 +74,20 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        global $_isVerbose;
+        global $_isVeryVerbose;
+        global $_isDebug;
+
+        if ($output->isVerbose()) {
+            $_isVerbose = true;
+        }
+        if ($output->isVeryVerbose()) {
+            $_isVeryVerbose = true;
+        }
+        if ($output->isDebug()) {
+            $_isDebug = true;
+        }
+
         \esc\Classes\Log::setOutput($output);
 
         $version = getEscVersion();

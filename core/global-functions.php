@@ -232,19 +232,24 @@ function createCrashReport($e)
 
 function isVerbose(): bool
 {
-    if (isVeryVerbose()) {
-        return true;
-    }
+    global $_isVerbose;
+    global $_isVeryVerbose;
+    global $_isDebug;
 
-    return false;
+    return ($_isVerbose || $_isVeryVerbose || $_isDebug);
 }
 
 function isVeryVerbose(): bool
 {
-    return true;
+    global $_isVeryVerbose;
+    global $_isDebug;
+
+    return ($_isVeryVerbose || $_isDebug);
 }
 
 function isDebug(): bool
 {
-    return false;
+    global $_isDebug;
+
+    return ($_isDebug);
 }
