@@ -60,6 +60,8 @@ class TemplateController implements ControllerInterface
     public static function getTemplate(string $index, $values): string
     {
         try {
+            Log::logAddLine('TemplateController', 'Rendering Template: ' . $index, isVerbose());
+
             return self::$latte->renderToString($index, $values);
         } catch (\Exception $e) {
             //Build parameter string

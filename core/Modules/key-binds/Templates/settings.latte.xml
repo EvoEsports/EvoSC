@@ -27,7 +27,7 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
-        declare persistent Text[Text] CustomKeyBinds for This;
+        declare Text[Text] CustomKeyBinds for LocalUser;
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare entries <=> (Page.MainFrame.GetFirstChild("entries") as CMlFrame);
 

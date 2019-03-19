@@ -46,7 +46,7 @@ class EscRun extends Command
                 config('server.rpc.password')
             );
 
-            $serverName = \esc\Classes\Server::rpc()->getServerName();
+            $serverName = \esc\Classes\Server::getServerName();
 
             if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
                 \esc\Classes\Server::autoSaveValidationReplays(true);

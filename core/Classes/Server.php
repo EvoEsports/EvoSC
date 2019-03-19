@@ -78,7 +78,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool writeFile(string $string, string $base64)
  * @method static bool tunnelSendDataToId(int $int, string $base64)
  * @method static bool tunnelSendDataToLogin(string $string, string $base64)
- * @method static bool echo(string $string, string $string)
+ * @method static bool echo (string $string, string $string)
  * @method static bool ignore(string $string)
  * @method static bool ignoreId(int $int)
  * @method static bool unIgnore(string $string)
@@ -291,7 +291,7 @@ class Server
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
 
-        self::call('SendHideManialinkPage');
+        // self::call('SendHideManialinkPage');
     }
 
     public static function rpc(): Connection
@@ -311,5 +311,7 @@ class Server
         } else {
             Log::error("Calling undefined rpc-method: $name");
         }
+
+        return null;
     }
 }
