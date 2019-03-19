@@ -286,7 +286,7 @@ class DedimaniaApi
      */
     static function setChallengeTimes(Map $map)
     {
-        $newTimes = $map->dedi()->where('New', 1)->get();
+        $newTimes = $map->dedis()->where('New', 1)->get();
 
         if ($newTimes->count() == 0) {
             //No new records
