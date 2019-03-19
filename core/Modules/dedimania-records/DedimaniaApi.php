@@ -362,9 +362,9 @@ class DedimaniaApi
             $VReplay = Server::getValidationReplay($bestRecord->player->Login);
         } catch (\Exception $e) {
             Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
-            Log::logAddLine('DedimaniaApi', $e->getTraceAsString());
+            Log::logAddLine('DedimaniaApi', $e->getTraceAsString(), isVerbose());
 
-            return;
+            $VReplay = '';
         }
 
         $VReplayChecks = $bestRecord->Checkpoints;
