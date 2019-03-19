@@ -91,8 +91,12 @@ class ChatMessage
         Server::chatSendServerMessage($this->getMessage(), $logins);
     }
 
-    public function send(Player $player)
+    public function send(Player $player = null)
     {
+        if (!$player) {
+            return;
+        }
+
         Server::chatSendServerMessage($this->getMessage(), $player->Login);
     }
 }
