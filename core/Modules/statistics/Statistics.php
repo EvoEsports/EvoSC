@@ -111,7 +111,7 @@ class Statistics
         }
 
         if ($bestPlayer && $bestPlayer->Score > 0) {
-            if (!$secondBest || $secondBest && $bestPlayer->Score != $secondBest->Score) {
+            if (!$secondBest || $secondBest && $bestPlayer->Score < $secondBest->Score) {
                 infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
                     ->setIcon('🏆')
                     ->sendAll();

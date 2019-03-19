@@ -21,13 +21,13 @@ class StatisticWidget
 
         if (!$collection) {
             if ($sortAsc) {
-                $this->records = Stats::orderBy($stat)->get();
+                $this->records = Stats::orderBy($stat)->limit($this->config->show)->get();
             } else {
-                $this->records = Stats::orderByDesc($stat)->get();
+                $this->records = Stats::orderByDesc($stat)->limit($this->config->show)->get();
             }
 
             //Get records as nickname => value
-            $this->records = $this->records->where($stat, '>', 0)->take($this->config->show)->pluck($stat, 'player');
+            $this->records = $this->records->where($stat, '>', 0)->pluck($stat, 'player');
         } else {
             $this->records = $collection;
         }
