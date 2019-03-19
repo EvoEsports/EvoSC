@@ -168,11 +168,11 @@ class PlayerController implements ControllerInterface
         $stats      = $player->stats;
 
         if ($stats) {
-            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
+            infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
                 ->setIcon('')
                 ->sendAll();
         } else {
-            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
+            infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
                 ->setIcon('')
                 ->sendAll();
         }

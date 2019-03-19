@@ -275,6 +275,8 @@ class DedimaniaApi
         if ($responseData) {
             return $responseData;
         }
+
+        return null;
     }
 
     /**
@@ -288,7 +290,7 @@ class DedimaniaApi
 
         if ($newTimes->count() == 0) {
             //No new records
-            Log::logAddLine('DedimaniaApi', 'No records made');
+            Log::logAddLine('DedimaniaApi', 'No records made.');
 
             return;
         }
