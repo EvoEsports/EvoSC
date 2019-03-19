@@ -164,22 +164,26 @@ class PlayerController implements ControllerInterface
     public static function playerConnect(Player $player): Player
     {
         $diffString = $player->last_visit->diffForHumans();
+        $stats      = $player->stats;
 
-        $player->update([
-            'last_visit' => now(),
-            'player_id'  => PlayerController::getPlayerServerId($player),
-        ]);
-
-        if (!$player->stats) {
-            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($player->stats->Visits), ' last visit ', secondary($diffString), '.')
+        if ($stats) {
+            chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
                 ->setIcon('')
                 ->sendAll();
 
+            if ($stats->Rank && $stats->Rank > 0) {
+
+            }
         } else {
             chatMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
                 ->setIcon('')
                 ->sendAll();
         }
+
+        $player->update([
+            'last_visit' => now(),
+            'player_id'  => PlayerController::getPlayerServerId($player),
+        ]);
 
         return $player;
     }

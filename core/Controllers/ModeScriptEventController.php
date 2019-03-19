@@ -55,7 +55,7 @@ class ModeScriptEventController implements ControllerInterface
                 break;
 
             default:
-                Log::logAddLine('ScriptCallback', "Calling unhandled $callback", isVeryVerbose());
+                // Log::logAddLine('ScriptCallback', "Calling unhandled $callback", isVeryVerbose());
                 break;
         }
 

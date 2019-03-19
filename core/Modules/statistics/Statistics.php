@@ -62,17 +62,19 @@ class Statistics
         $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
 
         //Round average
-        $averageScores = self::$scores->groupBy('nick')->map(function ($scoresArray) {
-            $scores = [];
+        if (self::$scores->count() > 0) {
+            $averageScores = self::$scores->groupBy('nick')->map(function ($scoresArray) {
+                $scores = [];
 
-            foreach ($scoresArray as $score) {
-                array_push($scores, $score['time']);
-            }
+                foreach ($scoresArray as $score) {
+                    array_push($scores, $score['time']);
+                }
 
-            return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
-        })->sort()->take(config('statistics.RoundAvg.show'));
-        $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
-        self::$scores = collect();
+                return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
+            })->sort()->take(config('statistics.RoundAvg.show'));
+            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
+            self::$scores = collect();
+        }
 
         Template::showAll('statistics.widgets', compact('statCollection'));
 
@@ -80,9 +82,7 @@ class Statistics
         $bestPlayer      = $finishedPlayers->first();
         $secondBest      = $finishedPlayers->get(1);
 
-        if (!$bestPlayer) {
-            return;
-        }
+        $finishedPlayers->each('calculatePlayerScore');
 
         foreach ($finishedPlayers as $player) {
             try {
@@ -116,6 +116,12 @@ class Statistics
         self::updatePlayerRanks();
     }
 
+    private static function calculatePlayerScore(Player $player)
+    {
+        $score = $player->locals()->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
+        $player->stats()->update(['Score' => $score]);
+    }
+
     /**
      * @param Player $player
      */
@@ -124,6 +130,15 @@ class Statistics
         if ($player->id == null) {
             return;
         }
+
+        $start = time() + microtime(true);
+
+        for ($i = 0; $i < 70; $i++) {
+            self::calculatePlayerScore($player);
+        }
+
+        $end = time() + microtime(true);
+        printf("Took %.3fs\n", $end - $start);
 
         if ($player->stats === null) {
             Stats::create([
@@ -182,9 +197,12 @@ class Statistics
      */
     public static function updatePlaytimes()
     {
+        $start = time() + microtime(true);
         foreach (onlinePlayers() as $player) {
             $player->stats()->increment('Playtime');
         }
+        $end = time() + microtime(true);
+        var_dump($end - $start);
     }
 
     /**
@@ -222,5 +240,21 @@ class Statistics
 
             $chatMessage->send($stats->player);
         });
+    }
+
+    public static function showRank(Player $player)
+    {
+        $chatMessage = infoMessage();
+        $stats       = $player->stats;
+
+        if ($stats) {
+            if ($stats->Rank && $stats->Rank > 0) {
+                $chatMessage->setParts('Your server rank is ', secondary($stats->Rank . '.'), ' (Score: ', $stats->Score, ')');
+            } else {
+                $chatMessage->setParts('You need at least one local record before receiving a rank.');
+            }
+        }
+
+        $chatMessage->send($stats->player);
     }
 }
