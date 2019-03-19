@@ -107,10 +107,7 @@ class MxKarma extends MXK
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
 
-        foreach (onlinePlayers() as $player) {
-            self::showWidget($player);
-            //TODO: use update script
-        }
+        self::showWidgetAll(); //TODO: Use update script
     }
 
     /**
@@ -306,10 +303,7 @@ class MxKarma extends MXK
     public static function beginMap()
     {
         self::$updatedVotes = new Collection();
-
-        foreach (onlinePlayers() as $player) {
-            self::showWidget($player);
-        }
+        self::showWidgetAll();
     }
 
     public static function getUpdatedVotesAverage()
@@ -392,6 +386,52 @@ class MxKarma extends MXK
         $myRating = $map->ratings()->where('Player', $player->id)->first();
         $myRating = $myRating ? $myRating->Rating : null;
         Template::show($player, 'mx-karma.mx-karma', compact('starString', 'finished', 'myRating'));
+    }
+
+    /**
+     * Display the widget
+     */
+    public static function showWidgetAll()
+    {
+        $map = MapController::getCurrentMap();
+
+        if (!$map) {
+            return;
+        }
+
+        $mapUid = $map->uid;
+
+        if (self::$currentMap != $mapUid) {
+            self::$mapKarma   = self::call(MXK::getMapRating);
+            self::$currentMap = $mapUid;
+        }
+
+        $average = self::getUpdatedVotesAverage();
+
+        $starString = '';
+        $stars      = $average / 20;
+        $full       = floor($stars);
+        $left       = $stars - $full;
+
+        for ($i = 0; $i < $full; $i++) {
+            $starString .= '';
+        }
+
+        if ($left >= 0.5) {
+            $starString .= '';
+            $full++;
+        }
+
+        for ($i = $full; $i < 5; $i++) {
+            $starString .= '';
+        }
+
+        onlinePlayers()->each(function (Player $player) use ($map) {
+            $finished = self::playerFinished($player);
+            $myRating = $map->ratings()->where('Player', $player->id)->first();
+            $myRating = $myRating ? $myRating->Rating : null;
+            Template::show($player, 'mx-karma.mx-karma', compact('starString', 'finished', 'myRating'));
+        });
     }
 
     public static function playerFinished(Player $player): bool

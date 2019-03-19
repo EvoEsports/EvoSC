@@ -45,7 +45,6 @@ class LocalRecords
     {
         $map = MapController::getCurrentMap();
         $map->locals()->where('Rank', $localRank)->delete();
-        self::fixLocalRecordRanks($map);
         self::sendUpdatedLocals($map);
         warningMessage($player, 'Deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
     }
@@ -99,6 +98,20 @@ class LocalRecords
             ->setColor(config('colors.local'));
 
         $local = $map->locals()->wherePlayer($player->id)->first();
+        $localCount = $map->locals()->count();
+
+        if ($localCount > 0) {
+            $betterRank = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+
+            if ($betterRank) {
+                $rank = $betterRank->Rank + 1;
+            } else {
+                $rank = $localCount + 1;
+            }
+        } else {
+            $rank = 1;
+        }
+
         if ($local != null) {
             if ($score == $local->Score) {
                 $chatMessage->setParts($player, ' equaled his/her ', $local);
@@ -110,8 +123,8 @@ class LocalRecords
 
             if ($score < $local->Score) {
                 $diff = $local->Score - $score;
-                $local->update(['Score' => $score, 'Checkpoints' => $checkpoints]);
-                $local = self::fixLocalRecordRanks($map, $player);
+
+                $local->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'Rank' => $rank]);
 
                 if ($oldRank == $local->Rank) {
                     $chatMessage->setParts($player, ' secured his/her ', $local, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
@@ -122,19 +135,6 @@ class LocalRecords
                 self::sendUpdatedLocals($map);
             }
         } else {
-            $localCount = $map->locals()->count();
-            if ($localCount > 0) {
-                $betterRank = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
-
-                if ($betterRank) {
-                    $rank = $betterRank->Rank + 1;
-                } else {
-                    $rank = $localCount + 1;
-                }
-            } else {
-                $rank = 1;
-            }
-
             if ($rank <= config('locals.limit')) {
                 $map->locals()->create([
                     'Player'      => $player->id,
@@ -143,35 +143,10 @@ class LocalRecords
                     'Checkpoints' => $checkpoints,
                     'Rank'        => $rank,
                 ]);
-                $local = self::fixLocalRecordRanks($map, $player);
                 $chatMessage->setParts($player, ' claimed the ', $local)->sendAll();
                 Hook::fire('PlayerLocal', $player, $local);
                 self::sendUpdatedLocals($map);
             }
         }
-    }
-
-    /**
-     * Fix local ranks
-     *
-     * @param Map         $map
-     * @param Player|null $player
-     *
-     * @return null
-     */
-    private static function fixLocalRecordRanks(Map $map, Player $player = null)
-    {
-        $locals = $map->locals()->orderBy('Score')->get();
-        $i      = 1;
-        foreach ($locals as $local) {
-            $local->update(['Rank' => $i]);
-            $i++;
-        }
-
-        if ($player) {
-            return $map->locals()->wherePlayer($player->id)->first();
-        }
-
-        return null;
     }
 }

@@ -133,6 +133,7 @@ class EscRun extends Command
         esc\Classes\Hook::fire('BeginMap', $map);
 
         //Set connected players online
+        /*
         $playerList = collect(\esc\Classes\Server::rpc()->getPlayerList());
 
         foreach ($playerList as $maniaPlayer) {
@@ -142,6 +143,7 @@ class EscRun extends Command
                 \esc\Classes\Hook::fire('PlayerConnect', $player);
             }
         }
+        */
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
