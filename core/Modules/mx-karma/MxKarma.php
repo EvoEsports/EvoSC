@@ -103,11 +103,10 @@ class MxKarma extends MXK
 
         self::$updatedVotes->push($player->id);
 
-
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
 
-        self::showWidgetAll(); //TODO: Use update script
+        // self::showWidgetAll(); //TODO: Use update script
     }
 
     /**
