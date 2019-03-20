@@ -172,12 +172,12 @@ class EscRun extends Command
                 Log::logAddLine('MPS', 'Connection problems.');
                 Log::logAddLine('MPS', $e->getMessage());
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 60) {
-                    Log::logAddLine('MPS', sprintf('Connection failed after %d connection-failures (%d seconds).', $failedConnectionRequests, $failedConnectionRequests));
+                if ($failedConnectionRequests > 500) {
+                    Log::logAddLine('MPS', sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
                 }
-                sleep($failedConnectionRequests);
+                sleep(5);
             } catch (Error $e) {
                 $errorClass = get_class($e);
                 $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
