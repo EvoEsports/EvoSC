@@ -53,7 +53,11 @@ class PBRecords
 
     public static function beginMap(Map $map)
     {
-        $defaultTarget = $map->locals()->orderByDesc('Score')->first();
+        if ($map->locals()->count() == 0) {
+            $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
+        } else {
+            $defaultTarget = $map->locals()->orderBy('Score')->limit(config('locals.limit') ?? 200)->get()->sortByDesc('Score')->first();
+        }
 
         if (!$defaultTarget) {
             self::$defaultTarget = null;
