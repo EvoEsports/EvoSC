@@ -139,9 +139,10 @@ class MxKarma extends MXK
                 $rating = self::playerCanVote($player) ? -1 : -2; // -1 = can vote, -2 = can't vote
             }
 
-            Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
-            //TODO: Use multicall
+            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true);
         });
+
+        Template::executeMulticall();
     }
 
     public static function showWidget(Player $player)
