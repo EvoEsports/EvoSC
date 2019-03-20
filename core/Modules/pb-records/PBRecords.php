@@ -67,7 +67,20 @@ class PBRecords
 
         self::$defaultTarget = $defaultTarget;
 
-        onlinePlayers()->each(function (Player $player) use ($map) {
+        $onlinePlayers = onlinePlayers();
+        $playerIds     = $onlinePlayers->pluck('id');
+        $locals        = $map->locals()->whereIn('Player', $playerIds)->get()->keyBy('Player');
+        $dedis         = $map->dedis()->whereIn('Player', $playerIds)->get()->keyBy('Player');
+
+        $onlinePlayers->each(function (Player $player) use ($map, $locals, $dedis) {
+            if ($locals->has($player->id)) {
+                self::$targets->put($player->id, $locals->get($player->id));
+            } else {
+                if ($dedis->has($player->id)) {
+                    self::$targets->put($player->id, $dedis->get($player->id));
+                }
+            }
+
             self::sendUpdatesTimes($map, $player);
         });
     }
