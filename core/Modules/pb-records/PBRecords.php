@@ -8,80 +8,119 @@ use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
+use esc\Models\Map;
 use esc\Models\Player;
 
 class PBRecords
 {
+    /**
+     * @var \Illuminate\Support\Collection
+     */
     private static $targets;
+
+    /**
+     * @var \Illuminate\Support\Collection
+     */
+    private static $defaultTarget;
 
     public function __construct()
     {
         Hook::add('PlayerConnect', [PBRecords::class, 'playerConnect']);
         Hook::add('EndMatch', [PBRecords::class, 'endMatch']);
-        Hook::add('BeginMatch', [PBRecords::class, 'beginMatch']);
+        Hook::add('BeginMap', [PBRecords::class, 'beginMap']);
         Hook::add('PlayerLocal', [PBRecords::class, 'playerMadeRecord']);
-        Hook::add('PlayerDedi', [PBRecords::class, 'playerMadeRecord']);
 
-        ChatCommand::add('/target', [PBRecords::class, 'setTarget'], 'Use /target local|dedi|wr #id to load CPs of record to bottom widget');
+        ChatCommand::add('/target', [PBRecords::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
 
-        self::$targets = collect([]);
+        self::$targets = collect();
     }
 
     public static function playerMadeRecord(Player $player, $record)
     {
-        self::playerConnect($player);
+        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
     }
 
     public static function playerConnect(Player $player)
     {
-        self::updateTarget($player);
+        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
         Template::show($player, 'pb-records.pb-cp-records');
     }
 
     public static function endMatch(...$args)
     {
-        self::$targets = collect([]);
+        self::$targets = collect();
     }
 
-    public static function beginMatch(...$args)
+    public static function beginMap(Map $map)
     {
-        onlinePlayers()->each([self::class, 'playerConnect']);
-    }
+        $defaultTarget = $map->locals()->orderByDesc('Score')->first();
 
-    public static function updateTarget(Player $player)
-    {
-        $target = self::getTarget($player);
+        if (!$defaultTarget) {
+            self::$defaultTarget = null;
 
-        if ($target) {
-            $targetString = 'unknown';
-
-            if ($target instanceof LocalRecord) {
-                $targetString = sprintf('%d. Local  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
-            } elseif ($target instanceof Dedi) {
-                $targetString = sprintf('%d. Dedi  %s$z  %s', $target->Rank, $target->player->NickName ?? $target->player->Login, formatScore($target->Score));
-            }
-
-            $checkpoints = collect(explode(',', $target->Checkpoints));
-            $timesHash   = md5($checkpoints->toJson());
-
-            Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString', 'timesHash'));
+            return;
         }
+
+        self::$defaultTarget = $defaultTarget;
+
+        onlinePlayers()->each(function (Player $player) use ($map) {
+            self::sendUpdatesTimes($map, $player);
+        });
     }
 
-    public static function setTarget(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
+    public static function sendUpdatesTimes(Map $map, Player $player)
+    {
+        $target = self::getTarget($map, $player);
+
+        if (!$target) {
+            $target = self::$defaultTarget;
+        }
+
+        if ($target instanceof LocalRecord) {
+            $targetString = sprintf('%d. Local  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+        } elseif ($target instanceof Dedi) {
+            $targetString = sprintf('%d. Dedi  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+        } else {
+            $targetString = 'unknown';
+        }
+
+        $checkpoints = $target->Checkpoints ?? '-1';
+
+        Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString'));
+    }
+
+    private static function getTarget(Map $map, Player $player)
+    {
+        if (self::$targets->has($player->id)) {
+            return self::$targets->get($player->id);
+        }
+
+        $local = $map->locals()->wherePlayer($player->id)->first();
+
+        if ($local) {
+            return $local;
+        }
+
+        return $map->dedis()->wherePlayer($player->id)->first();
+    }
+
+    public static function setTargetCommand(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
     {
         if (!$dediOrLocal) {
-            infoMessage('You must specify ', secondary('local'), ' or ', secondary('dedi'), ' or ', secondary('wr'), ' as first and the id of the record as second')
+            infoMessage('You must specify ', secondary('local'), ', ', secondary('dedi'), ', ', secondary('wr'), ', ', secondary('me'), ' as first and the id of the record as second parameter.')
                 ->send($player);
 
             return;
         }
 
-        $currentTarget = self::$targets->where('player', $player)->first();
-
         $map = MapController::getCurrentMap();
 
         switch ($dediOrLocal) {
+            case 'me':
+            case 'reset':
+                $record = self::getTarget(MapController::getCurrentMap(), $player);
+                break;
+
             case 'wr':
                 $record = $map->dedis()->whereRank(1)->first();
                 break;
@@ -95,7 +134,7 @@ class PBRecords
                 break;
 
             default:
-                infoMessage('You must specify "local" or "dedi" as first parameter.')->send($player);
+                infoMessage('You must specify "local", "dedi", "wr" or "me" as first parameter.')->send($player);
                 $record = null;
                 break;
         }
@@ -112,62 +151,10 @@ class PBRecords
             return;
         }
 
-        if ($currentTarget != null) {
-            $currentTarget->record = $record;
-        } else {
-            $currentTarget         = collect([]);
-            $currentTarget->player = $player;
-            $currentTarget->record = $record;
-            self::$targets->push($currentTarget);
-        }
+        self::$targets->put($player->id, $record);
 
         infoMessage('New checkpoints target: ', $record)->send($player);
 
-        self::updateTarget($player);
-    }
-
-    private static function getTarget(Player $player)
-    {
-        $target = self::$targets->where('player', $player);
-
-        if ($target->isNotEmpty()) {
-            return $target->first()->record;
-        }
-
-        $map = MapController::getCurrentMap();
-
-        $local = $map->locals()
-                     ->wherePlayer($player->id)
-                     ->get()
-                     ->first();
-
-        $dedi = $map->dedis()
-                    ->wherePlayer($player->id)
-                    ->get()
-                    ->first();
-
-        if ($local && $dedi) {
-            if ($dedi->Score <= $local->Score) {
-                return $dedi;
-            }
-
-            return $local;
-        }
-
-        if ($dedi) {
-            return $dedi;
-        }
-
-        if ($local) {
-            return $local;
-        }
-
-        $dedi = $map->dedis()->orderByDesc('Score')->first();
-
-        if (!$dedi) {
-            return $map->locals()->orderByDesc('Score')->first();
-        }
-
-        return $dedi;
+        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
     }
 }

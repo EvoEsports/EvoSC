@@ -12,6 +12,11 @@ class Template
     public $index;
     public $template;
 
+    /**
+     * @var Collection
+     */
+    public static $multicall;
+
     public function __construct(string $index, string $template)
     {
         $this->index    = $index;
@@ -36,11 +41,12 @@ class Template
     }
 
     /**
-     * @param Player     $player
-     * @param string     $index
-     * @param array|null $values
+     * @param \esc\Models\Player $player
+     * @param string             $index
+     * @param null               $values
+     * @param bool               $multicall
      */
-    public static function show(Player $player, string $index, $values = null)
+    public static function show(Player $player, string $index, $values = null, bool $multicall = false)
     {
         $data = [];
 
@@ -60,8 +66,27 @@ class Template
         $xml                 = TemplateController::getTemplate($index, $data);
 
         if ($xml != '') {
-            Server::sendDisplayManialinkPage($player->Login, $xml);
+            if ($multicall) {
+                if (!self::$multicall) {
+                    self::$multicall = collect();
+                }
+
+                self::$multicall->put($player->Login, $xml);
+            } else {
+                Server::sendDisplayManialinkPage($player->Login, $xml);
+            }
         }
+    }
+
+    public static function executeMulticall()
+    {
+        self::$multicall->each(function ($xml, $login) {
+            Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
+        });
+
+        Server::executeMulticall();
+
+        self::$multicall = collect();
     }
 
     public static function toString(string $index, array $values = null): string

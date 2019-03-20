@@ -3,17 +3,11 @@
     <script>
         <!--
         main(){
-            while(InputPlayer == Null){
-                sleep(10);
-            }
+            declare Text PbCheckpoints for LocalUser;
+            declare Text PbTargetString for LocalUser;
 
-            declare Integer[] Checkpoints for InputPlayer;
-            declare Text TargetString for InputPlayer;
-            declare Text TimesHash for InputPlayer;
-
-            Checkpoints = [{$checkpoints->count() > 0 ? $checkpoints->implode(',') : "-1"|noescape}];
-            TargetString = "{$targetString|noescape}";
-            TimesHash = "{$timesHash|noescape}";
+            PbCheckpoints = "{$checkpoints|noescape}";
+            PbTargetString = "{$targetString|noescape}";
         }
         -->
     </script>
