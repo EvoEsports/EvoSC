@@ -105,7 +105,7 @@ class EscRun extends Command
 
         esc\Classes\Log::info("Starting...");
 
-        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 200);
+        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 250);
 
         esc\Classes\Database::init();
         esc\Classes\RestClient::init(serverName());
@@ -172,12 +172,12 @@ class EscRun extends Command
                 Log::logAddLine('MPS', 'Connection problems.');
                 Log::logAddLine('MPS', $e->getMessage());
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 10) {
-                    Log::logAddLine('MPS', sprintf('Connection failed after %d retires (%d seconds).', $failedConnectionRequests, $failedConnectionRequests * 5));
+                if ($failedConnectionRequests > 60) {
+                    Log::logAddLine('MPS', sprintf('Connection failed after %d connection-failures (%d seconds).', $failedConnectionRequests, $failedConnectionRequests));
 
                     return;
                 }
-                sleep($failedConnectionRequests * 5);
+                sleep($failedConnectionRequests);
             } catch (Error $e) {
                 $errorClass = get_class($e);
                 $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
