@@ -165,14 +165,15 @@ class EscRun extends Command
                     Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
                 }
 
-                $pause = esc\Classes\Timer::getNextCyclePause();
+                $pause                    = esc\Classes\Timer::getNextCyclePause();
+                $failedConnectionRequests = 0;
 
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
                 Log::logAddLine('MPS', 'Connection problems.');
                 Log::logAddLine('MPS', $e->getMessage());
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 500) {
+                if ($failedConnectionRequests > 50) {
                     Log::logAddLine('MPS', sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
