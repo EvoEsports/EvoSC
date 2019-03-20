@@ -13,18 +13,37 @@ use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
-use Illuminate\Support\Collection;
 use stdClass;
 
 class MxKarma extends MXK
 {
-    private static $session;
     private static $apiKey;
-    private static $client;
-    private static $currentMap;
     private static $mapKarma;
+    private static $updatedVotesAverage;
 
+    /**
+     * @var stdClass
+     */
+    private static $session;
+
+    /**
+     * @var Client
+     */
+    private static $client;
+
+    /**
+     * @var Map
+     */
+    private static $currentMap;
+
+    /**
+     * @var array
+     */
     private static $ratings;
+
+    /**
+     * @var \Illuminate\Support\Collection
+     */
     private static $updatedVotes;
 
     public function __construct()
@@ -33,21 +52,16 @@ class MxKarma extends MXK
             return;
         }
 
-        MxKarma::setApiKey(config('mx-karma.key'));
-
-        $client = new Client([
+        self::$apiKey       = config('mx-karma.key');
+        self::$updatedVotes = collect([]);
+        self::$ratings      = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
+        self::$client       = new Client([
             'base_uri' => 'https://karma.mania-exchange.com/api2/',
         ]);
 
-        MxKarma::setClient($client);
-
         MxKarma::startSession();
 
-        self::$updatedVotes = collect([]);
-        self::$ratings      = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
-
         Hook::add('PlayerConnect', [MxKarma::class, 'showWidget']);
-        Hook::add('PlayerFinish', [MxKarma::class, 'playerFinish']);
         Hook::add('BeginMap', [MxKarma::class, 'beginMap']);
         Hook::add('EndMap', [MxKarma::class, 'endMap']);
 
@@ -57,143 +71,8 @@ class MxKarma extends MXK
         ChatCommand::add('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', null, true);
         ChatCommand::add('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
         ChatCommand::add('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
-        ChatCommand::add('------', [MxKarma::class, 'voteMinusMinusMinusU'], '', null, true)
-                   ->addAlias('-----');
 
         \esc\Classes\ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
-    }
-
-    /* +++ 100, ++ 80, + 60, - 40, -- 20, - 0*/
-    public static function vote(Player $player, int $rating)
-    {
-        if (!$player) {
-            Log::warning("Null player tries to vote");
-
-            return;
-        }
-
-        if (!self::playerFinished($player)) {
-            //Prevent players from voting when they didnt finish
-            warningMessage('You need to finish the track before you can vote.')->send($player);
-
-            return;
-        }
-
-        $map = \esc\Controllers\MapController::getCurrentMap();
-
-        $karma = $map->ratings()
-                     ->wherePlayer($player->id)
-                     ->get()
-                     ->first();
-
-        if ($karma != null) {
-            if ($karma->Rating == $rating) {
-                //Prevent spam
-                return;
-            }
-
-            $karma->update(['Rating' => $rating]);
-        } else {
-            $karma = Karma::create([
-                'Player' => $player->id,
-                'Map'    => $map->id,
-                'Rating' => $rating,
-            ]);
-        }
-
-        self::$updatedVotes->push($player->id);
-
-        infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
-        Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
-
-        // self::showWidgetAll(); //TODO: Use update script
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function votePlus(Player $player)
-    {
-        self::vote($player, 60);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function votePlusPlus(Player $player)
-    {
-        self::vote($player, 80);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function votePlusPlusPlus(Player $player)
-    {
-        self::vote($player, 100);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function voteMinus(Player $player)
-    {
-        self::vote($player, 40);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function voteMinusMinus(Player $player)
-    {
-        self::vote($player, 20);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function voteMinusMinusMinus(Player $player)
-    {
-        self::vote($player, 0);
-    }
-
-    /**
-     * @param Player $player
-     */
-    public static function voteMinusMinusMinusU(Player $player)
-    {
-        if (!self::playerFinished($player)) {
-            //Prevent players from voting when they didnt finish
-            warningMessage('You need to finish the track before you can vote.')->send($player);
-
-            return;
-        }
-
-        $map = \esc\Controllers\MapController::getCurrentMap();
-
-        $karma = $map->ratings()
-                     ->wherePlayer($player->id)
-                     ->get()
-                     ->first();
-
-        if ($karma != null) {
-            if ($karma->Rating == 0) {
-                //Prevent spam
-                return;
-            }
-
-            $karma->update(['Rating' => 0]);
-        } else {
-            $karma = Karma::create([
-                'Player' => $player->id,
-                'Map'    => $map->id,
-                'Rating' => 0,
-            ]);
-        }
-
-        self::$updatedVotes->push($player->id);
-
-        infoMessage($player, ' rated this map ', secondary('the worst a human being ever had to play'), '.')->sendAll();
     }
 
     /**
@@ -248,222 +127,117 @@ class MxKarma extends MXK
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public static function getApiKey()
+    public static function beginMap(Map $map)
     {
-        return self::$apiKey;
-    }
-
-    /**
-     * @param mixed $apiKey
-     */
-    public static function setApiKey($apiKey)
-    {
-        self::$apiKey = $apiKey;
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function getSession(): stdClass
-    {
-        return self::$session;
-    }
-
-    /**
-     * @param String $session
-     */
-    public static function setSession($session)
-    {
-        self::$session = $session;
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function getClient(): Client
-    {
-        return self::$client;
-    }
-
-    /**
-     * @param mixed $client
-     */
-    public static function setClient($client)
-    {
-        self::$client = $client;
-    }
-
-    /**
-     * Called on beginMap
-     */
-    public static function beginMap()
-    {
-        self::$updatedVotes = new Collection();
-        self::showWidgetAll();
-    }
-
-    public static function getUpdatedVotesAverage()
-    {
-        $map = MapController::getCurrentMap();
-
-        if (!$map) {
-            return 0.0;
-        }
-
-        $items = collect([]);
-
-        for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
-            $items->push(self::$mapKarma->voteaverage);
-        }
-
-
-        $newRatings = $map->ratings()
-                          ->get();
-
-        foreach ($newRatings as $rating) {
-            $items->push($rating->Rating);
-        }
-
-        return $items->average();
-    }
-
-    /**
-     * Unlock voting if player finished
-     *
-     * @param Player $player
-     * @param int    $score
-     */
-    public static function playerFinish(Player $player, int $score)
-    {
-        if ($score > 0) {
-            self::showWidget($player);
-        }
-    }
-
-    /**
-     * Display the widget
-     */
-    public static function showWidget(Player $player)
-    {
-        $map = MapController::getCurrentMap();
-
-        if (!$map) {
-            return;
-        }
+        self::$updatedVotes = collect();
 
         $mapUid = $map->uid;
 
-        if (self::$currentMap != $mapUid) {
-            self::$mapKarma   = self::call(MXK::getMapRating);
-            self::$currentMap = $mapUid;
+        try {
+            self::$mapKarma = self::call(MXK::getMapRating);
+        } catch (\Exception $e) {
+            Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
+            self::$mapKarma = 50.0;
         }
 
-        $average = self::getUpdatedVotesAverage();
+        self::$currentMap = $mapUid;
+        self::updateVotesAverage();
+        self::sendUpdatedKarma();
 
-        $starString = '';
-        $stars      = $average / 20;
-        $full       = floor($stars);
-        $left       = $stars - $full;
+        $playerIds = onlinePlayers()->pluck('id');
 
-        for ($i = 0; $i < $full; $i++) {
-            $starString .= '';
-        }
+        $ratings = $map->ratings()->whereIn('Player', $playerIds)->get()->pluck('Rating', 'Player');
 
-        if ($left >= 0.5) {
-            $starString .= '';
-            $full++;
-        }
+        onlinePlayers()->each(function (Player $player) use ($ratings) {
+            if ($ratings->has($player->id)) {
+                $rating = $ratings->get($player->id);
+            } else {
+                $rating = self::playerCanVote($player) ? -1 : -2; // -1 = can vote, -2 = can't vote
+            }
 
-        for ($i = $full; $i < 5; $i++) {
-            $starString .= '';
-        }
-
-        $finished = self::playerFinished($player);
-        $myRating = $map->ratings()->where('Player', $player->id)->first();
-        $myRating = $myRating ? $myRating->Rating : null;
-        Template::show($player, 'mx-karma.mx-karma', compact('starString', 'finished', 'myRating'));
-    }
-
-    /**
-     * Display the widget
-     */
-    public static function showWidgetAll()
-    {
-        $map = MapController::getCurrentMap();
-
-        if (!$map) {
-            return;
-        }
-
-        $mapUid = $map->uid;
-
-        if (self::$currentMap != $mapUid) {
-            self::$mapKarma   = self::call(MXK::getMapRating);
-            self::$currentMap = $mapUid;
-        }
-
-        $average = self::getUpdatedVotesAverage();
-
-        $starString = '';
-        $stars      = $average / 20;
-        $full       = floor($stars);
-        $left       = $stars - $full;
-
-        for ($i = 0; $i < $full; $i++) {
-            $starString .= '';
-        }
-
-        if ($left >= 0.5) {
-            $starString .= '';
-            $full++;
-        }
-
-        for ($i = $full; $i < 5; $i++) {
-            $starString .= '';
-        }
-
-        onlinePlayers()->each(function (Player $player) use ($map) {
-            $finished = self::playerFinished($player);
-            $myRating = $map->ratings()->where('Player', $player->id)->first();
-            $myRating = $myRating ? $myRating->Rating : null;
-            Template::show($player, 'mx-karma.mx-karma', compact('starString', 'finished', 'myRating'));
+            Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+            //TODO: Use multicall
         });
     }
 
-    public static function playerFinished(Player $player): bool
+    public static function showWidget(Player $player)
     {
-        $map = \esc\Controllers\MapController::getCurrentMap();
+        $rating = self::$updatedVotesAverage;
+        Template::show($player, 'mx-karma.mx-karma', compact('rating'));
+    }
+
+    public static function sendUpdatedKarma()
+    {
+        $map = MapController::getCurrentMap();
+
+        if (!$map) {
+            return;
+        }
+
+        $mapUid = $map->uid;
+
+        if (self::$currentMap != $mapUid) {
+            self::$mapKarma   = self::call(MXK::getMapRating);
+            self::$currentMap = $mapUid;
+        }
+
+        self::updateVotesAverage();
+
+        $average = self::$updatedVotesAverage;
+        Template::showAll('mx-karma.update-karma', compact('average'));
+    }
+
+    public static function playerCanVote(Player $player): bool
+    {
+        if ($player->Score > 0) {
+            return true;
+        }
+
+        $map = MapController::getCurrentMap();
 
         if (!$map) {
             return false;
         }
 
-        if ($player->Score > 0) {
-            return true;
-        }
-
         if ($map->ratings()
                 ->wherePlayer($player->id)
-                ->first() != null) {
+                ->count() == 1) {
             return true;
         }
 
         if ($map->locals()
                 ->wherePlayer($player->id)
-                ->first() != null) {
+                ->count() == 1) {
             return true;
         }
 
         if ($map->dedis()
                 ->wherePlayer($player->id)
-                ->first() != null) {
+                ->count() == 1) {
             return true;
         }
 
         return false;
+    }
+
+    public static function updateVotesAverage()
+    {
+        $map   = MapController::getCurrentMap();
+        $items = collect([]);
+
+        if ($map) {
+            for ($i = 0; $i < self::$mapKarma->votecount; $i++) {
+                $items->push(self::$mapKarma->voteaverage);
+            }
+        }
+
+        $newRatings = $map->ratings()->get();
+
+        foreach ($newRatings as $rating) {
+            $items->push($rating->Rating);
+        }
+
+        self::$updatedVotesAverage = $items->average();
     }
 
     /**
@@ -495,8 +269,8 @@ class MxKarma extends MXK
                 $requestMethod = 'GET';
 
                 $query = [
-                    'sessionKey'     => self::getSession()->sessionKey,
-                    'activationHash' => hash("sha512", (self::$apiKey . self::getSession()->sessionSeed)),
+                    'sessionKey'     => self::$session->sessionKey,
+                    'activationHash' => hash("sha512", (self::$apiKey . self::$session->sessionSeed)),
                 ];
 
                 $function = 'activateSession';
@@ -506,7 +280,7 @@ class MxKarma extends MXK
                 $requestMethod = 'POST';
 
                 $query = [
-                    'sessionKey' => self::getSession()->sessionKey,
+                    'sessionKey' => self::$session->sessionKey,
                 ];
 
                 $json = [
@@ -528,7 +302,7 @@ class MxKarma extends MXK
                 $requestMethod = 'POST';
 
                 $query = [
-                    'sessionKey' => self::getSession()->sessionKey,
+                    'sessionKey' => self::$session->sessionKey,
                 ];
 
                 $json = [
@@ -552,11 +326,11 @@ class MxKarma extends MXK
         }
 
         //Do the request to mx servers
-        $response = self::getClient()
-                        ->request($requestMethod, $function, [
-                            'query' => $query ?? null,
-                            'json'  => $json ?? null,
-                        ]);
+        $response = self::$client
+            ->request($requestMethod, $function, [
+                'query' => $query ?? null,
+                'json'  => $json ?? null,
+            ]);
 
         //Check if request was successful
         if ($response->getStatusCode() != 200) {
@@ -603,6 +377,8 @@ class MxKarma extends MXK
                 return "Cup";
             case 6:
                 return "Stunts";
+            default:
+                return "n/a";
         }
     }
 
@@ -616,7 +392,7 @@ class MxKarma extends MXK
         $auth = self::call(MXK::startSession);
 
         if ($auth) {
-            self::setSession($auth);
+            self::$session = $auth;
 
             $mxResponse = self::call(MXK::activateSession);
 
@@ -632,5 +408,100 @@ class MxKarma extends MXK
         }
 
         Log::info("MX Karma session created.");
+    }
+
+    /* +++ 100, ++ 80, + 60, - 40, -- 20, - 0*/
+    public static function vote(Player $player, int $rating)
+    {
+        if (!$player) {
+            Log::warning("Null player tries to vote");
+
+            return;
+        }
+
+        if (!self::playerCanVote($player)) {
+            //Prevent players from voting when they didnt finish
+            warningMessage('You need to finish the track before you can vote.')->send($player);
+
+            return;
+        }
+
+        $map = MapController::getCurrentMap();
+
+        $karma = $map->ratings()
+                     ->wherePlayer($player->id)
+                     ->get()
+                     ->first();
+
+        if ($karma != null) {
+            if ($karma->Rating == $rating) {
+                //Prevent spam
+                return;
+            }
+
+            $karma->update(['Rating' => $rating]);
+        } else {
+            $karma = Karma::create([
+                'Player' => $player->id,
+                'Map'    => $map->id,
+                'Rating' => $rating,
+            ]);
+        }
+
+        self::$updatedVotes->push($player->id);
+
+        infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
+        Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+
+        self::sendUpdatedKarma();
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function votePlus(Player $player)
+    {
+        self::vote($player, 60);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function votePlusPlus(Player $player)
+    {
+        self::vote($player, 80);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function votePlusPlusPlus(Player $player)
+    {
+        self::vote($player, 100);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function voteMinus(Player $player)
+    {
+        self::vote($player, 40);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function voteMinusMinus(Player $player)
+    {
+        self::vote($player, 20);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function voteMinusMinusMinus(Player $player)
+    {
+        self::vote($player, 0);
     }
 }

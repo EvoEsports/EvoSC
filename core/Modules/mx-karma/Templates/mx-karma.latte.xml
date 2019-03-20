@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MxKarma" id="MxKarma" version="3">
+<manialink name="ESC:MxKarma:MxKarmaWidget" id="MxKarmaWidget" version="3">
     <frame id="widget" pos="{config('mx-karma.pos')|noescape}" scale="{config('mx-karma.scale')}">
         <quad pos="0 0" z-index="-1" size="50 12" bgcolor="{config('colors.ui.background')|noescape}a"  hidden="0"/>
         <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.header')|noescape}c" hidden="1"/>
         <label textfont="RajdhaniMono" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".8" valign="center"/>
 
         <frame z-index="2" pos="0 -6">
-            <label pos="48  3" z-index="1" size="25 4" text="{$starString}" halign="right" valign="center" textcolor="ffff" textsize="1.1" textfont="RajdhaniMono"/>
+            <label id="star-string" pos="48  3" z-index="1" size="25 4" text="$666" halign="right" valign="center" textcolor="ffff" textsize="1.1" textfont="RajdhaniMono"/>
 
-            {if $finished}
-            <label pos="5  -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 100 ? '3c35' : '0000'}" focusareacolor2="3c35" text="+++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,100" textfont="RajdhaniMono" />
-            <label pos="13 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 80 ? '3c35' : '0000'}" focusareacolor2="3c35" text="++"     halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,80" textfont="RajdhaniMono" />
-            <label pos="21 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 60 ? '3c35' : '0000'}" focusareacolor2="3c35" text="+"    halign="center" valign="center" textcolor="9f9c" textsize="1" action="mxk.vote,60" textfont="RajdhaniMono" />
-            <label pos="29 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 40 ? 'c335' : '0000'}" focusareacolor2="c335" text="-"      halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,40" textfont="RajdhaniMono" />
-            <label pos="37 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 20 ? 'c335' : '0000'}" focusareacolor2="c335" text="--"     halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,20" textfont="RajdhaniMono" />
-            <label pos="45 -3.2" z-index="1" size="7 4" focusareacolor1="{$myRating && $myRating == 0 ? 'c335' : '0000'}" focusareacolor2="c335" text="---"    halign="center" valign="center" textcolor="f99c" textsize="1" action="mxk.vote,0" textfont="RajdhaniMono" />
-            {else}
-            <label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote"     halign="left" valign="center" textcolor="fffc" textsize="1" textfont="RajdhaniMono" />
-            {/if}
+            <frame id="buttons">
+                <frame pos="5  -3.2" id="100" data-id="100">
+                    <label              size="7 4" focusareacolor1="3c35" focusareacolor2="3c35" text="+++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="+++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+                <frame pos="13  -3.2" id="80" data-id="80">
+                    <label              size="7 4" focusareacolor1="3c35" focusareacolor2="3c35" text="++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+                <frame pos="21  -3.2" id="60" data-id="60">
+                    <label              size="7 4" focusareacolor1="3c35" focusareacolor2="3c35" text="+" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="3c35" text="+" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+                <frame pos="29  -3.2" id="40" data-id="40">
+                    <label              size="7 4" focusareacolor1="c335" focusareacolor2="c335" text="-" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="-" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+                <frame pos="37  -3.2" id="20" data-id="20">
+                    <label              size="7 4" focusareacolor1="c335" focusareacolor2="c335" text="--" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="--" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+                <frame pos="45  -3.2" id="0" data-id="0">
+                    <label              size="7 4" focusareacolor1="c335" focusareacolor2="c335" text="---" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                    <label class="vote" size="7 4" focusareacolor1="0000" focusareacolor2="c335" text="---" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="RajdhaniMono" ScriptEvents="1" />
+                </frame>
+            </frame>
+
+            <frame id="finish-notice">
+                <label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote" halign="left" valign="center" textcolor="fffc" textsize="1" textfont="RajdhaniMono" />
+            </frame>
         </frame>
     </frame>
 
@@ -25,12 +45,117 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
+Text getStarString(Real rating){
+    if(rating == -1.0){
+        return "$666";
+    }
+
+    declare Text starString = "";
+    declare Real stars = rating / 20.0;
+    declare Integer full = ML::FloorInteger(stars);
+    declare Real left = stars - full;
+
+    for(i, 0, full - 1){
+        starString = starString ^ "$fff";
+    }
+
+    if(left >= 0.5){
+        starString = starString ^ "$fff";
+        full = full + 1;
+    }
+
+    for(i, full + 1, 5){
+        starString = starString ^ "$666";
+    }
+
+    return starString;
+}
+
+Void updateKarma(Real average){
+    declare starStringLabel <=> (Page.MainFrame.GetFirstChild("star-string") as CMlLabel);
+    declare starString = getStarString(average);
+    starStringLabel.SetText(starString);
+}
+
+Void switchButton(CMlControl frameControl, Boolean enabled){
+    declare frame = (frameControl as CMlFrame);
+    declare label1 = (frame.Controls[0] as CMlLabel);
+    declare label2 = (frame.Controls[1] as CMlLabel);
+
+    if(enabled){
+        label1.Show();
+        label2.Hide();
+    }else{
+        label1.Hide();
+        label2.Show();
+    }
+}
+
+Void updateMyRating(Integer myRating){
+    declare buttonsFrame <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+    declare finishNotice <=> (Page.MainFrame.GetFirstChild("finish-notice") as CMlFrame);
+
+    if(myRating == -2){
+        buttonsFrame.Hide();
+        finishNotice.Show();
+    }else{
+        buttonsFrame.Show();
+        finishNotice.Hide();
+
+        foreach(frame in buttonsFrame.Controls){
+            switchButton(frame, False);
+        }
+
+        if(myRating != -1){
+            switchButton(Page.MainFrame.GetFirstChild("" ^ myRating), True);
+        }
+    }
+
+}
+
 {(new esc\Classes\HideScript())|noescape}
 
 main(){
+    declare Integer MxKarmaRating for LocalUser = -2;
+    declare Integer lastRating = -1;
+    declare Real MxKarmaAverage for LocalUser = 0.0;
+    declare Real lastKarma = 0.0;
+
+    MxKarmaAverage = {($rating ?: '-1.0')|noescape};
+    updateMyRating(MxKarmaRating);
+
     while(True){
-        hidescript();
         yield;
+
+        if(MxKarmaAverage != lastKarma){
+            lastKarma = MxKarmaAverage;
+            updateKarma(lastKarma);
+            log("New map karma: " ^ lastKarma);
+        }
+
+        if(MxKarmaRating != lastRating){
+            lastRating = MxKarmaRating;
+            updateMyRating(lastRating);
+        }
+
+        foreach(event in PendingEvents){
+            if(event.Control == Null) continue;
+
+            if(event.Control.HasClass("vote") && event.Type == CMlScriptEvent::Type::MouseClick){
+                declare rating = event.Control.Parent.DataAttributeGet("id");
+                TriggerPageAction("mxk.vote," ^ rating);
+            }
+        }
+
+        foreach(event in RaceEvents){
+            if(event.Player.User.Login == InputPlayer.User.Login && event.IsEndLap){
+                if(MxKarmaRating == -2){
+                    MxKarmaRating = -1;
+                }
+            }
+        }
+
+        hidescript();
     }
 }
     --></script>

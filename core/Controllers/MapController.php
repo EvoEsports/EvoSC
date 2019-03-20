@@ -182,12 +182,12 @@ class MapController implements ControllerInterface
 
     /**
      * @return \esc\Models\Map|null
-     * @throws \Exception
      */
     public static function getCurrentMap(): ?Map
     {
         if (!self::$currentMap) {
-            throw new \Exception('Current map is not set.');
+            Log::error('Current map is not set. Exiting...', true);
+            exit(2);
         }
 
         return self::$currentMap;
