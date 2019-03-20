@@ -15,7 +15,7 @@ class Template
     /**
      * @var Collection
      */
-    public static $multicall;
+    private static $multicall;
 
     public function __construct(string $index, string $template)
     {
@@ -70,8 +70,6 @@ class Template
                 if (!self::$multicall) {
                     self::$multicall = collect();
                 }
-
-                self::$multicall->put($player->Login, $xml);
             } else {
                 Server::sendDisplayManialinkPage($player->Login, $xml);
             }
@@ -80,6 +78,10 @@ class Template
 
     public static function executeMulticall()
     {
+        if (!self::$multicall) {
+            return;
+        }
+
         self::$multicall->each(function ($xml, $login) {
             Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
         });
