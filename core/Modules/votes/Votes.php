@@ -111,7 +111,7 @@ class Votes
 
         self::$lastVote = now();
 
-        infoMessage('A vote to ', secondary('add 10 minutes'), ' started. Use ', secondary('F5/F6'), ' or ', secondary('/y'), ', ', secondary('/n'), ' to vote.')->sendAll();
+        infoMessage($player, ' started a vote to ', secondary('add 10 minutes?'), '. Use ', secondary('F5/F6'), ' and ', secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
     }
 
     public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
@@ -144,7 +144,7 @@ class Votes
 
         self::$lastVote = now();
 
-        infoMessage('A vote to ', secondary('skip the map'), ' started. Use ', secondary('F5/F6'), ' or ', secondary('/y'), ', ', secondary('/n'), ' to vote.')->sendAll();
+        infoMessage($player, ' started a vote to ', secondary('skip the map'), '. Use ', secondary('F5/F6'), ' and ', secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
     }
 
     private static function getVoteState(): Collection
