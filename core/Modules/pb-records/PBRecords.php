@@ -37,6 +37,7 @@ class PBRecords
 
     public static function playerMadeRecord(Player $player, $record)
     {
+        self::$targets->put($player->id, $record);
         self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
     }
 
@@ -74,19 +75,27 @@ class PBRecords
 
     public static function beginMap(Map $map)
     {
-        if ($map->locals()->count() == 0) {
-            $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
+        if ($map->locals()->count() > 0) {
+            $defaultTarget = $map->locals()->where('Rank', '<=', config('locals.limit'))->orderByDesc('Score')->get()->first();
+            $targetString  = sprintf('%d. Local  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         } else {
-            $defaultTarget = $map->locals()->orderBy('Score')->limit(config('locals.limit') ?? 200)->get()->sortByDesc('Score')->first();
+            $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
+            $targetString  = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         }
 
-        if (!$defaultTarget) {
+        if ($defaultTarget) {
+            self::$defaultTarget = $defaultTarget;
+        } else {
             self::$defaultTarget = null;
+            $checkpoints         = '-1';
+            $targetString        = 'No records available.';
+            Template::showAll('pb-records.set-times', compact('checkpoints', 'targetString'));
 
             return;
         }
 
-        self::$defaultTarget = $defaultTarget;
+        $checkpoints = $defaultTarget->Checkpoints ?? '-1';
+        Template::showAll('pb-records.set-times', compact('checkpoints', 'targetString'));
 
         $onlinePlayers = onlinePlayers();
         $playerIds     = $onlinePlayers->pluck('id');
@@ -94,27 +103,23 @@ class PBRecords
         $dedis         = $map->dedis()->whereIn('Player', $playerIds)->get()->keyBy('Player');
 
         $onlinePlayers->each(function (Player $player) use ($map, $locals, $dedis, $defaultTarget) {
+            $target       = null;
+            $targetString = null;
+
             if ($locals->has($player->id)) {
-                $target = $locals->get($player->id);
-            } else {
-                if ($dedis->has($player->id)) {
-                    $target = $dedis->get($player->id);
-                } else {
-                    $target = $defaultTarget;
-                }
-            }
-
-            if ($target instanceof LocalRecord) {
+                $target       = $locals->get($player->id);
                 $targetString = sprintf('%d. Local  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
-            } elseif ($target instanceof Dedi) {
-                $targetString = sprintf('%d. Dedi  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
-            } else {
-                $targetString = 'unknown';
             }
 
-            $checkpoints = $target->Checkpoints ?? '-1';
+            if (!$target && $dedis->has($player->id)) {
+                $target       = $dedis->get($player->id);
+                $targetString = sprintf('%d. Dedi  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+            }
 
-            Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString'), true);
+            if ($targetString) {
+                $checkpoints = $target->Checkpoints ?? '-1';
+                Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString'), true);
+            }
         });
 
         Template::executeMulticall();

@@ -190,7 +190,8 @@
 
             declare Text PbCheckpoints for LocalUser;
             declare Text PbTargetString for LocalUser;
-            declare Text lastPbCps = "";
+            declare Integer PbUpdateTime for LocalUser;
+            declare Integer lastUpdateTime = 0;
 
             states = [
                 """<frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />""",
@@ -220,8 +221,8 @@
 
                 wait(InputPlayer != Null);
 
-                if(lastPbCps != PbCheckpoints){
-                    lastPbCps = PbCheckpoints;
+                if(lastUpdateTime != PbUpdateTime){
+                    lastUpdateTime = PbUpdateTime;
 
                     if(PbCheckpoints == "-1"){
                         boxesFrame.Hide();

@@ -70,6 +70,8 @@ class Template
                 if (!self::$multicall) {
                     self::$multicall = collect();
                 }
+
+                self::$multicall->put($player->Login, $xml);
             } else {
                 Server::sendDisplayManialinkPage($player->Login, $xml);
             }
