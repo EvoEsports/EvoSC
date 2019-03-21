@@ -22,20 +22,17 @@ class PlayerController implements ControllerInterface
 
     public static function init()
     {
-        Hook::add('PlayerConnect', [PlayerController::class, 'playerConnect']);
-        Hook::add('PlayerDisconnect', [PlayerController::class, 'playerDisconnect']);
-        Hook::add('PlayerFinish', [PlayerController::class, 'playerFinish']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
 
         self::$fakePlayers = collect([]);
-        ChatCommand::add('//kick', [PlayerController::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
-
-        ChatCommand::add('##fake', [PlayerController::class, 'connectFakePlayers'], 'Connect #n fake players', 'player_fake');
-        ChatCommand::add('##disfake', [PlayerController::class, 'disconnectFakePlayers'], 'Disconnect all fake players', 'player_fake');
     }
 
     /**
@@ -117,41 +114,6 @@ class PlayerController implements ControllerInterface
         } else {
             warningMessage($player, ' kicked ', secondary($toBeKicked))->setIcon('')->sendAll();
         }
-    }
-
-    /**
-     * Connect N fake players
-     *
-     * @param Player $player
-     * @param null   $cmd
-     * @param null   $n
-     */
-    public static function connectFakePlayers(Player $player, $cmd = null, $n = null)
-    {
-        if (!$cmd || !$n) {
-            return;
-        }
-
-        infoMessage('Adding ', intval($n), ' fake players');
-
-        for ($i = 0; $i < intval($n); $i++) {
-            $login = Server::connectFakePlayer();
-            self::$fakePlayers->push($login);
-        }
-    }
-
-    /**
-     * Disconnect all fake players
-     *
-     * @param Player $player
-     */
-    public static function disconnectFakePlayers(Player $player)
-    {
-        self::$fakePlayers->each(function ($login) {
-            Server::disconnectFakePlayer($login);
-        });
-
-        self::$fakePlayers = collect([]);
     }
 
     /**
