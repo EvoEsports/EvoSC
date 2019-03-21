@@ -88,16 +88,16 @@ class ChatController implements ControllerInterface
         }
 
         if ($target == $player) {
-            warningMessage('Why are you talking to yourself? Do you need help?')->send($player);
+            warningMessage('You can\'t PM yourself.')->send($player);
 
             return;
         }
 
-        $prefix = sprintf(secondary('[PM->') . $player . secondary('] '));
-        $pm     = \chatMessage($prefix . implode(' ', $message))->setIcon('');
+        $from = sprintf(secondary('[from:') . $player . secondary('] '));
+        $to   = sprintf(secondary('[to:') . $target . secondary('] '));
 
-        $pm->send($player);
-        $pm->send($target);
+        chatMessage($from . implode(' ', $message))->setIcon('')->send($target);
+        chatMessage($to . implode(' ', $message))->setIcon('')->send($player);
     }
 
     public static function playerChat(Player $player, $text)
