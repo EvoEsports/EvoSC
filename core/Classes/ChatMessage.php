@@ -86,6 +86,7 @@ class ChatMessage
 
     public function sendAdmin()
     {
+        $this->setIcon('$f33');
         $message = $this->getMessage();
 
         echoPlayers()->each(function (Player $player) use ($message) {
