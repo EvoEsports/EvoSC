@@ -115,11 +115,11 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
     return $_onlinePlayers;
 }
 
-function player(string $login): \esc\Models\Player
+function player(string $login): ?\esc\Models\Player
 {
     global $_onlinePlayers;
 
-    return $_onlinePlayers->get($login);
+    return $_onlinePlayers->get($login) ?: \esc\Models\Player::whereLogin($login)->first();
 }
 
 function echoPlayers(): \Illuminate\Support\Collection
