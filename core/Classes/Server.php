@@ -30,7 +30,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static array getCallVoteRatios()
  * @method static bool setCallVoteRatiosEx(bool $boolean, array $array)
  * @method static array getCallVoteRatiosEx()
- * @method static bool chatSendServerMessage(string $message, string $login = null)
+ * @method static bool chatSendServerMessage(string $message, string $login = null, bool $multicall = false)
  * @method static bool chatSend(string $string)
  * @method static bool chatSendToLanguage(array $array, string $string)
  * @method static bool chatSendToLogin(string $string, string $string)

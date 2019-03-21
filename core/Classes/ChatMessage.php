@@ -86,9 +86,13 @@ class ChatMessage
 
     public function sendAdmin()
     {
-        $logins = echoPlayers()->pluck('Login');
+        $message = $this->getMessage();
 
-        Server::chatSendServerMessage($this->getMessage(), $logins);
+        echoPlayers()->each(function (Player $player) use ($message) {
+            Server::chatSendServerMessage($message, $player->Login, true);
+        });
+
+        Server::executeMulticall();
     }
 
     public function send(Player $player = null)
