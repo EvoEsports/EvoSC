@@ -114,19 +114,21 @@ class PlayerController implements ControllerInterface
     {
         global $_onlinePlayers;
 
-        if (config('server.echoes.join')) {
-            $diffString = $player->last_visit->diffForHumans();
-            $stats      = $player->stats;
+        $diffString = $player->last_visit->diffForHumans();
+        $stats      = $player->stats;
 
-            if ($stats) {
-                infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
-                    ->setIcon('')
-                    ->sendAll();
-            } else {
-                infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
-                    ->setIcon('')
-                    ->sendAll();
-            }
+        if ($stats) {
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
+                ->setIcon('');
+        } else {
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
+                ->setIcon('');
+        }
+
+        if (config('server.echoes.leave')) {
+            $message->sendAll();
+        } else {
+            $message->sendAdmin();
         }
 
         $player->update([
@@ -140,12 +142,15 @@ class PlayerController implements ControllerInterface
     {
         global $_onlinePlayers;
 
-        if (config('server.echoes.leave')) {
-            $diff     = $player->last_visit->diffForHumans();
-            $playtime = substr($diff, 0, -4);
-            Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
+        $diff     = $player->last_visit->diffForHumans();
+        $playtime = substr($diff, 0, -4);
+        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
+        $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
-            infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('')->sendAll();
+        if (config('server.echoes.leave')) {
+            $message->sendAll();
+        } else {
+            $message->sendAdmin();
         }
 
         $player->update([
