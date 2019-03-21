@@ -50,10 +50,6 @@ class Template
     {
         $data = [];
 
-        if (!onlinePlayers()->contains($player)) {
-            return;
-        }
-
         if ($values instanceof Collection) {
             foreach ($values as $key => $value) {
                 $data[$key] = $value;

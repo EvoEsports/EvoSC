@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @var \Illuminate\Support\Collection
+ */
+global $_onlinePlayers;
+
 function chatMessage(...$message)
 {
     return new \esc\Classes\ChatMessage(...$message);
@@ -105,27 +110,21 @@ function baseDir(string $filename = ''): string
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
 {
-    $playerList = \esc\Classes\Server::getPlayerList(500, 0);
-    $logins     = [];
+    global $_onlinePlayers;
 
-    foreach ($playerList as $player) {
-        array_push($logins, $player->login);
-    }
+    return $_onlinePlayers;
+}
 
-    return \esc\Models\Player::whereIn('Login', $logins)->get();
+function player(string $login): \esc\Models\Player
+{
+    global $_onlinePlayers;
+
+    return $_onlinePlayers->get($login);
 }
 
 function echoPlayers(): \Illuminate\Support\Collection
 {
-
-    $playerList = \esc\Classes\Server::getPlayerList(500, 0);
-    $logins     = [];
-
-    foreach ($playerList as $player) {
-        array_push($logins, $player->login);
-    }
-
-    $players = \esc\Models\Player::whereIn('Login', $logins)->get()->filter(function (\esc\Models\Player $player) {
+    $players = onlinePlayers()->filter(function (\esc\Models\Player $player) {
         return $player->hasAccess('admin_echoes');
     });
 

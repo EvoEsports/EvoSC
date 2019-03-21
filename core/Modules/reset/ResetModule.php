@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
+use esc\Controllers\PlayerController;
 use esc\Models\Player;
 
 class ResetModule

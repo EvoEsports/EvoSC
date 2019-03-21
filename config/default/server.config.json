@@ -8,5 +8,9 @@
   },
   "default-matchsettings": "",
   "map-cooldown": 5,
-  "afk-timeout": 5
+  "afk-timeout": 5,
+  "echoes": {
+    "join": true,
+    "leave": true
+  }
 }

@@ -29,6 +29,7 @@ class MapList
         Hook::add('MapQueueUpdated', [MapList::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
                    ->addAlias('/list');
@@ -61,6 +62,15 @@ class MapList
         return $player->favorites->pluck('id')->toJson();
     }
 
+    public static function beginMap(Map $map)
+    {
+        $map->update([
+            'cooldown'    => 0,
+            'last_played' => now(),
+        ]);
+
+        self::sendUpdatedMaplist();
+    }
 
     public static function sendRecordsJson(Player $player)
     {

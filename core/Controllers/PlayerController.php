@@ -8,28 +8,21 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
-use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
-use esc\Modules\Statistics;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class PlayerController implements ControllerInterface
 {
-    private static $fakePlayers;
-
     public static function init()
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
-
-        self::$fakePlayers = collect([]);
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
@@ -48,6 +41,7 @@ class PlayerController implements ControllerInterface
         $players = onlinePlayers()->filter(function (Player $player) use ($nick) {
             return str_contains(stripStyle(stripColors(strtolower($player))), strtolower($nick));
         });
+
 
         if ($players->count() == 0) {
             infoMessage('No player found.')->send($callee);
@@ -116,35 +110,49 @@ class PlayerController implements ControllerInterface
         }
     }
 
-    /**
-     * Called on players connect
-     *
-     * @param Player $player
-     * @param bool   $surpressJoinMessage
-     *
-     * @return Player
-     */
-    public static function playerConnect(Player $player): Player
+    public static function playerConnect(Player $player)
     {
-        $diffString = $player->last_visit->diffForHumans();
-        $stats      = $player->stats;
+        global $_onlinePlayers;
 
-        if ($stats) {
-            infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
-                ->setIcon('')
-                ->sendAll();
-        } else {
-            infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined.')
-                ->setIcon('')
-                ->sendAll();
+        if (config('server.echoes.join')) {
+            $diffString = $player->last_visit->diffForHumans();
+            $stats      = $player->stats;
+
+            if ($stats) {
+                infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
+                    ->setIcon('')
+                    ->sendAll();
+            } else {
+                infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
+                    ->setIcon('')
+                    ->sendAll();
+            }
         }
 
         $player->update([
             'last_visit' => now(),
-            'player_id'  => PlayerController::getPlayerServerId($player),
         ]);
 
-        return $player;
+        $_onlinePlayers->put($player->Login, $player);
+    }
+
+    public static function playerDisconnect(Player $player)
+    {
+        global $_onlinePlayers;
+
+        if (config('server.echoes.leave')) {
+            $diff     = $player->last_visit->diffForHumans();
+            $playtime = substr($diff, 0, -4);
+            Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
+
+            infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('')->sendAll();
+        }
+
+        $player->update([
+            'last_visit' => now(),
+        ]);
+
+        $_onlinePlayers->forget($player->Login);
     }
 
     /**
@@ -167,50 +175,5 @@ class PlayerController implements ControllerInterface
             $player->setScore($score);
             Log::info($player . " finished with time ($score) " . $player->getTime());
         }
-    }
-
-    /**
-     * Called on player disconnect
-     *
-     * @param Player|null $player
-     * @param             $disconnectReason
-     */
-    public static function playerDisconnect(Player $player = null, $disconnectReason = '')
-    {
-        if ($player == null) {
-            Log::info('SERVER SHUTTING DOWN');
-            exit(0);
-        }
-
-        $diff = $player->last_visit->diffForHumans();
-        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $diff.");
-
-        infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')->setIcon('')->sendAll();
-
-        $player->update([
-            'last_visit' => now(),
-        ]);
-    }
-
-    public static function getPlayerByServerId(int $id): ?Player
-    {
-        try {
-            return Player::wherePlayerId($id)->first();
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    /**
-     * Hide liverankings
-     */
-    public static function hidePlayerlist()
-    {
-        Template::hideAll('players');
-    }
-
-    private static function getPlayerServerId(Player $player): int
-    {
-        return Server::getPlayerInfo($player->Login)->playerId;
     }
 }

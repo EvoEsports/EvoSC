@@ -23,11 +23,18 @@ class QueueController implements ControllerInterface
 
         AccessRight::createIfNonExistent('map_queue_recent', 'Drop maps from queue.');
         AccessRight::createIfNonExistent('queue_drop', 'Drop maps from queue.');
+        AccessRight::createIfNonExistent('queue_multiple', 'Queue more than one map.');
         AccessRight::createIfNonExistent('queue_keep', 'Keep maps in queue if player leaves.');
     }
 
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
+        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('map_queue_recent')) {
+            warningMessage('Can not queue recently played track. Please wait ' . secondary(config('server.map-cooldown') - $map->cooldown) . ' maps.')->send($player);
+
+            return;
+        }
+
         if (MapQueue::whereMapUid($map->uid)->count() > 0) {
             warningMessage('The map ', secondary($map), ' is already in queue.')->send($player);
 

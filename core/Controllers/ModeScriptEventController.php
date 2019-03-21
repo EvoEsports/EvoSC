@@ -5,11 +5,16 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 
 class ModeScriptEventController implements ControllerInterface
 {
+    public static function init()
+    {
+    }
+
     public static function handleModeScriptCallbacks($modescriptCallbackArray)
     {
         if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
@@ -70,7 +75,7 @@ class ModeScriptEventController implements ControllerInterface
     static function tmGiveUp($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = Player::find($playerLogin);
+        $player      = player($playerLogin);
 
         Hook::fire('PlayerFinish', $player, 0, "");
     }
@@ -79,7 +84,7 @@ class ModeScriptEventController implements ControllerInterface
     {
         $wayPoint = json_decode($arguments[0]);
 
-        $player = Player::find($wayPoint->login);
+        $player = player($wayPoint->login);
         $map    = MapController::getCurrentMap();
 
         $totalCps = $map->gbx->CheckpointsPerLaps;
@@ -105,14 +110,14 @@ class ModeScriptEventController implements ControllerInterface
     static function tmStartCountdown($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = Player::find($playerLogin);
+        $player      = player($playerLogin);
         Hook::fire('PlayerStartCountdown', $player);
     }
 
     static function tmStartLine($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = Player::find($playerLogin);
+        $player      = player($playerLogin);
         Hook::fire('PlayerStartLine', $player);
     }
 
@@ -138,15 +143,7 @@ class ModeScriptEventController implements ControllerInterface
     static function tmPlayerLeave($arguments)
     {
         $playerData = json_decode($arguments[0]);
-        $player     = Player::find($playerData->login);
-        $player->update(['player_id' => 0, 'spectator_status' => 0]);
-
-        /*
-        $diff = $player->last_visit->diffForHumans();
-        infoMessage($player, ' left the server after ', secondary(str_replace(' ago', '', $diff)), ' playtime.')
-            ->setIcon('')
-            ->sendAll();
-        */
+        $player     = player($playerData->login);
 
         Hook::fire('PlayerDisconnect', $player);
     }
@@ -161,14 +158,5 @@ class ModeScriptEventController implements ControllerInterface
     private static function cpArrayToString(array $cps)
     {
         return implode(',', $cps);
-    }
-
-    /**
-     * Method called on boot.
-     *
-     * @return mixed
-     */
-    public static function init()
-    {
     }
 }

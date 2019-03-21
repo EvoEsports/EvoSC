@@ -80,6 +80,7 @@ class EscRun extends Command
         global $_isVerbose;
         global $_isVeryVerbose;
         global $_isDebug;
+        global $_onlinePlayers;
 
         if ($output->isVerbose()) {
             $_isVerbose = true;
@@ -107,6 +108,8 @@ class EscRun extends Command
 
         \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 250);
 
+        $_onlinePlayers = collect();
+
         esc\Classes\Database::init();
         esc\Classes\RestClient::init(serverName());
         esc\Controllers\HookController::init();
@@ -121,6 +124,14 @@ class EscRun extends Command
         esc\Controllers\AfkController::init();
         esc\Controllers\ModuleController::init();
         \esc\Controllers\PlanetsController::init();
+
+        $logins = [];
+        foreach (\esc\Classes\Server::getPlayerList(500, 0) as $player) {
+            array_push($logins, $player->login);
+        }
+        \esc\Models\Player::whereIn('Login', $logins)->get()->each(function (\esc\Models\Player $player) use ($_onlinePlayers) {
+            $_onlinePlayers->put($player->Login, $player);
+        });
 
         if (isVerbose()) {
             Log::logAddLine('BOOT', 'Booting core finished.', true);

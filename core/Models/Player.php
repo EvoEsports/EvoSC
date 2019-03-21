@@ -68,18 +68,6 @@ class Player extends Model
     }
 
     /**
-     * Sets player offline
-     *
-     * @return Player
-     */
-    public function setOffline(): Player
-    {
-        $this->update(['player_id' => 0]);
-
-        return $this;
-    }
-
-    /**
      * Checks if player finished
      *
      * @return bool

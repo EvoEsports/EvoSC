@@ -613,6 +613,7 @@ Integer confirm(Text question){
 
 Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     declare mapUid = mapFrame.DataAttributeGet("map-uid");
+    declare mapId = mapFrame.DataAttributeGet("map-id");
 
     if(control.HasClass("juke")){
         TriggerPageAction("map.queue," ^ mapUid);
@@ -625,7 +626,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapUid);
+        TriggerPageAction("mx.details," ^ mapId);
         return;
     }
 

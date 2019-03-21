@@ -104,7 +104,6 @@ class EventController implements ControllerInterface
             if ($player) {
                 $player->update([
                     'NickName'         => $nickname,
-                    'player_id'        => $playerId,
                     'spectator_status' => $spectatorStatus,
                 ]);
 
@@ -117,7 +116,6 @@ class EventController implements ControllerInterface
                 $playerId = Player::insertGetId([
                     'Login'            => $login,
                     'NickName'         => $nickname,
-                    'player_id'        => $playerId,
                     'spectator_status' => $spectatorStatus,
                     'path'             => Server::getDetailedPlayerInfo($login)->path,
                 ]);
@@ -204,7 +202,6 @@ class EventController implements ControllerInterface
             }
 
             try {
-                Player::whereLogin($login)->update(['player_id' => 0]);
                 Hook::fire('PlayerDisconnect', $player, 0);
             } catch (\Exception $e) {
                 Log::logAddLine('PlayerDisconnect', "Error: " . $e->getMessage());
@@ -226,7 +223,7 @@ class EventController implements ControllerInterface
             $mapUid = $arguments[0]['UId'];
 
             try {
-                $map = Map::where('uid', $mapUid)->first();
+                $map = Map::whereUid($mapUid)->first();
             } catch (\Exception $e) {
                 Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
             }
