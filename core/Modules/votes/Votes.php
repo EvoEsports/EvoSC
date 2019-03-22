@@ -125,6 +125,13 @@ class Votes
 
     public static function askSkip(Player $player)
     {
+        $mapStartDiff = MapController::getMapStart()->diffInSeconds();
+        if ($mapStartDiff < 60) {
+            warningMessage('Please wait ', secondary((60 - $mapStartDiff) . ' seconds'), ' before asking to skip the map.')->send($player);
+
+            return;
+        }
+
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;

@@ -29,6 +29,11 @@ class MapController implements ControllerInterface
      */
     private static $currentMap;
 
+    /**
+     * @var Carbon
+     */
+    private static $mapStart;
+
     private static $mapsPath;
     private static $addedTime = 0;
     private static $timeLimit;
@@ -172,6 +177,7 @@ class MapController implements ControllerInterface
         }
 
         self::$currentMap = $map;
+        self::$mapStart   = now();
     }
 
     public static function beginMatch()
@@ -375,5 +381,10 @@ class MapController implements ControllerInterface
     public static function getMapsPath(): string
     {
         return self::$mapsPath;
+    }
+
+    public static function getMapStart(): Carbon
+    {
+        return self::$mapStart;
     }
 }
