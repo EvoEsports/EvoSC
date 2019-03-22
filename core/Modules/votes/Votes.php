@@ -92,8 +92,16 @@ class Votes
 
     public static function askMoreTime(Player $player)
     {
+        $mapStartDiff = MapController::getMapStart()->diffInSeconds();
+        $waitTime     = MapController::getTimeLimit() - 180;
+        if ($mapStartDiff < $waitTime) {
+            warningMessage('Please wait ', secondary(($waitTime - $mapStartDiff) . ' seconds'), ' before asking for more time.')->send($player);
+
+            return;
+        }
+
         $diffInSeconds = self::$lastVote->diffInSeconds();
-        if ($diffInSeconds < config('votes.cooldown')) {
+        if ($diffInSeconds < config('votes.cooldown') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
             warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.')->send($player);
 
@@ -133,7 +141,7 @@ class Votes
         }
 
         $diffInSeconds = self::$lastVote->diffInSeconds();
-        if ($diffInSeconds < config('votes.cooldown')) {
+        if ($diffInSeconds < config('votes.cooldown') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
             warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'), ' before voting again.')->send($player);
 
