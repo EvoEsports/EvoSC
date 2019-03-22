@@ -103,6 +103,7 @@ class MxDownload
                     'filename' => $filename,
                     'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
                     'enabled'  => 1,
+                    'cooldown' => config('server.map-cooldown'),
                 ]);
             } else {
                 $map = Map::firstOrCreate([
@@ -111,6 +112,7 @@ class MxDownload
                     'filename' => $filename,
                     'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
                     'enabled'  => 1,
+                    'cooldown' => config('server.map-cooldown'),
                 ]);
             }
 
