@@ -108,12 +108,10 @@ class KeyBinds
                 return null;
             }
 
-            return [
-                'id'          => $bind['id'],
-                'description' => $bind['description'],
-                'default'     => strtolower($bind['default']),
-            ];
-        })->filter()->toJson();
+            return sprintf('["id"=>"%s","description"=>"%s","default"=>"%s"]', $bind['id'], $bind['description'], strtolower($bind['default']));
+        })->filter()->implode(',');
+
+        $binds = "[$binds]";
 
         Template::show($player, 'key-binds.script', compact('binds'));
     }

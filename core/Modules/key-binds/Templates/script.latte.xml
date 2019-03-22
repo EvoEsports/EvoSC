@@ -6,8 +6,7 @@
 
     main(){
         declare Text[Text] CustomKeyBinds for LocalUser;
-        declare Text[Text][] keyBinds;
-        keyBinds.fromjson("""{$binds|noescape}""");
+        declare Text[Text][] keyBinds = {$binds|noescape};
 
         foreach(key => bind in keyBinds){
             keyBinds[key]["key"] = TL::ToLowerCase(bind["default"]);
