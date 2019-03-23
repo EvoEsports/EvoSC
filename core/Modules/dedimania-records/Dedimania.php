@@ -114,7 +114,6 @@ class Dedimania extends DedimaniaApi
         $dedisJson = self::getDedisJson($map);
 
         Template::showAll('dedimania-records.update', compact('dedisJson'));
-        Template::showAll('dedimania-records.manialink');
 
         Log::logAddLine('Dedimania', "Loaded records for map $map");
     }
@@ -129,11 +128,6 @@ class Dedimania extends DedimaniaApi
     public static function showManialink(Player $player)
     {
         $map = MapController::getCurrentMap();
-
-        if (!$map) {
-            return;
-        }
-
         $dedisJson = self::getDedisJson($map);
 
         Template::show($player, 'dedimania-records.update', compact('dedisJson'));

@@ -3,19 +3,19 @@
     <script>
         <!--
         #Struct Record {
-            Integer rank;
-            Integer[] cps;
-            Integer score;
-            Text name;
-            Text login;
+            Integer r;
+            Text c;
+            Integer s;
+            Text n;
+            Text l;
         }
 
         main(){
-            declare Record[] LocalRecords for LocalUser;
+            declare Record[] LocalRecords__ for LocalUser;
             declare Integer LastLocalRecordsUpdate for LocalUser;
             declare Text localsJson = """{$localsJson|noescape}""";
 
-            LocalRecords.fromjson(localsJson);
+            LocalRecords__.fromjson(localsJson);
             LastLocalRecordsUpdate = GameTime;
         }
         -->

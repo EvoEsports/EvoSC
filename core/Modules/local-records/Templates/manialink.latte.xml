@@ -105,11 +105,11 @@
     #Include "TextLib" as TL
 
     #Struct Record {
-        Integer rank;
-        Integer[] cps;
-        Integer score;
-        Text name;
-        Text login;
+        Integer r;
+        Text c;
+        Integer s;
+        Text n;
+        Text l;
     }
 
     declare Integer currentPage;
@@ -169,13 +169,16 @@
         record.fromjson(recordJson);
 
         declare detailsFrame <=> (Page.MainFrame.GetFirstChild("details-frame") as CMlFrame);
-        (detailsFrame.Controls[2] as CMlLabel).SetText(record.name);
-        (detailsFrame.Controls[3] as CMlLabel).SetText(record.rank ^ ". " ^ formatScoreCorrect(record.score, False));
+        (detailsFrame.Controls[2] as CMlLabel).SetText(record.n);
+        (detailsFrame.Controls[3] as CMlLabel).SetText(record.r ^ ". " ^ formatScoreCorrect(record.s, False));
 
         declare Integer i = 1;
         declare cpLabelsFrame = (detailsFrame.Controls[6] as CMlFrame);
-        foreach(cp in record.cps){
-            declare formatted = formatScoreCorrect(cp, True);
+
+        declare Text[] checkpoints = TL::Split(",", record.c);
+
+        foreach(cp in checkpoints){
+            declare formatted = formatScoreCorrect(TL::ToInteger(cp), True);
 
             if(i >= cpLabelsFrame.Controls.count){
                 break;
@@ -195,7 +198,7 @@
             }
         }
 
-        declare rank = record.rank;
+        declare rank = record.r;
         if(rank > 100){
             rank = rank - 100;
         }
@@ -234,14 +237,14 @@
 
             declare recordFrame = (windowRecords.Controls[i] as CMlFrame);
             declare labels = (recordFrame.Controls[2] as CMlFrame);
-            (labels.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
-            (labels.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
-            (labels.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
-            (labels.Controls[3] as CMlLabel).SetText(record.name);
+            (labels.Controls[0] as CMlLabel).SetText(record.r ^ ".");
+            (labels.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.s, False));
+            (labels.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.s, True));
+            (labels.Controls[3] as CMlLabel).SetText(record.n);
             recordFrame.Show();
             recordFrame.DataAttributeSet("record", record.tojson());
 
-            if(onlinePlayers.exists(record.login)){
+            if(onlinePlayers.exists(record.l)){
                 (labels.Controls[0] as CMlLabel).TextColor = headerColor;
                 (labels.Controls[4] as CMlQuad).Show();
             }else{
@@ -276,8 +279,8 @@
 
     Integer getMyRank(Record[] records){
         foreach(record in records){
-            if(record.login == LocalUser.Login){
-                return record.rank;
+            if(record.l == LocalUser.Login){
+                return record.r;
             }
         }
 
@@ -292,11 +295,11 @@
         }
 
         declare recordsFrame = (records.Controls[index] as CMlFrame);
-        (recordsFrame.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
-        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
-        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
-        (recordsFrame.Controls[3] as CMlLabel).SetText(record.name);
-        if(onlinePlayers.exists(record.login)){
+        (recordsFrame.Controls[0] as CMlLabel).SetText(record.r ^ ".");
+        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.s, False));
+        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.s, True));
+        (recordsFrame.Controls[3] as CMlLabel).SetText(record.n);
+        if(onlinePlayers.exists(record.l)){
             (recordsFrame.Controls[0] as CMlLabel).TextColor = headerColor;
             (recordsFrame.Controls[4] as CMlLabel).Show();
         }else{
@@ -392,7 +395,7 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
-        declare Record[] LocalRecords for LocalUser;
+        declare Record[] LocalRecords__ for LocalUser;
         declare Integer LastLocalRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
@@ -442,7 +445,7 @@
                     declare recordFrame = (event.Control.Parent.Parent as CMlFrame);
                     declare Record record;
                     record.fromjson(recordFrame.DataAttributeGet("record"));
-                    TriggerPageAction("profile," ^ record.login);
+                    TriggerPageAction("profile," ^ record.l);
                 }
 
                 if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -450,8 +453,8 @@
                     declare Record record;
                     record.fromjson(recordFrame.DataAttributeGet("record"));
 
-                    if(confirm("Do you really want to delete the " ^ record.rank ^ ". local?")){
-                        TriggerPageAction("local.delete," ^ record.rank);
+                    if(confirm("Do you really want to delete the " ^ record.r ^ ". local?")){
+                        TriggerPageAction("local.delete," ^ record.r);
                     }
                 }
 
@@ -462,7 +465,7 @@
                         currentPage = 0;
                     }
 
-                    updateWindow(LocalRecords);
+                    updateWindow(LocalRecords__);
                 }
 
                 if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -472,22 +475,22 @@
                         currentPage = maxPage;
                     }
 
-                    updateWindow(LocalRecords);
+                    updateWindow(LocalRecords__);
                 }
             }
 
             if(LastLocalRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastLocalRecordsUpdate;
-                updateWindow(LocalRecords);
-                updateWidget(LocalRecords);
+                updateWindow(LocalRecords__);
+                updateWidget(LocalRecords__);
             }
 
             if(playerCount != Players.count){
                 sleep(150);
                 playerCount = Players.count;
-                updateWindow(LocalRecords);
-                updateWidget(LocalRecords);
+                updateWindow(LocalRecords__);
+                updateWidget(LocalRecords__);
             }
 
             hidescript();
