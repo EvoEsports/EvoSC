@@ -145,7 +145,7 @@ class LocalRecords
 
             self::cacheLocals($map);
             self::sendUpdatedLocals();
-            Hook::fire('PlayerLocal', $newRecord);
+            Hook::fire('PlayerLocal', $player, $newRecord);
         } else {
             $nextBetterRecord = $map->locals()->where('Score', '<', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
@@ -174,7 +174,7 @@ class LocalRecords
 
             self::cacheLocals($map);
             self::sendUpdatedLocals();
-            Hook::fire('PlayerLocal', $newRecord);
+            Hook::fire('PlayerLocal', $player, $newRecord);
         }
     }
 }
