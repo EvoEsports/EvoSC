@@ -138,9 +138,9 @@ class LocalRecords
             }
 
             if ($newRank <= config('locals.echo-top')) {
-                $chatMessage->send($player);
-            } else {
                 $chatMessage->sendAll();
+            } else {
+                $chatMessage->send($player);
             }
 
             self::cacheLocals($map);
@@ -167,9 +167,9 @@ class LocalRecords
                 ->setColor(config('colors.local'));
 
             if ($newRank <= config('locals.echo-top')) {
-                $chatMessage->send($player);
-            } else {
                 $chatMessage->sendAll();
+            } else {
+                $chatMessage->send($player);
             }
 
             self::cacheLocals($map);
