@@ -11,6 +11,7 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
+use esc\Models\Stats;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
@@ -117,15 +118,21 @@ class PlayerController implements ControllerInterface
         $diffString = $player->last_visit->diffForHumans();
         $stats      = $player->stats;
 
+        if (!$player->path) {
+            $player->update(['path' => Server::getDetailedPlayerInfo($player->Login)->path]);
+        }
+
         if ($stats) {
             $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
                 ->setIcon('');
         } else {
             $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
                 ->setIcon('');
+
+            Stats::updateOrCreate(['Player' => $player->id], ['Visits' => 1]);
         }
 
-        if (config('server.echoes.leave')) {
+        if (config('server.echoes.join')) {
             $message->sendAll();
         } else {
             $message->sendAdmin();

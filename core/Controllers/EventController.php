@@ -83,50 +83,14 @@ class EventController implements ControllerInterface
 
     /**
      * @param $playerInfos
-     *
-     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
      */
     private static function mpPlayerInfoChanged($playerInfos)
     {
         foreach ($playerInfos as $playerInfo) {
-            $login           = $playerInfo['Login'];
-            $nickname        = $playerInfo['NickName'];
-            $playerId        = $playerInfo['PlayerId'];
-            $spectatorStatus = $playerInfo['SpectatorStatus'];
-
-            $player = Player::find($login);
-
-            if (!$player) {
-                Player::create(['Login' => $login]);
-                $player = Player::find($login);
-            }
-
-            if ($player) {
-                $player->update([
-                    'NickName'         => $nickname,
-                    'spectator_status' => $spectatorStatus,
-                ]);
-
-                if (!$player->path) {
-                    $player->update(['path' => Server::getDetailedPlayerInfo($login)->path]);
-                }
-
-                // Hook::fire('PlayerInfoChanged', $player);
-            } else {
-                $playerId = Player::insertGetId([
-                    'Login'            => $login,
-                    'NickName'         => $nickname,
-                    'spectator_status' => $spectatorStatus,
-                    'path'             => Server::getDetailedPlayerInfo($login)->path,
-                ]);
-
-                Stats::create([
-                    'Player' => $playerId,
-                    'Visits' => 1,
-                ]);
-
-                // Hook::fire('PlayerInfoChanged', $player);
-            }
+            Player::updateOrCreate(['Login' => $playerInfo['Login']], [
+                'NickName'         => $playerInfo['NickName'],
+                'spectator_status' => $playerInfo['SpectatorStatus'],
+            ]);
         }
     }
 
@@ -137,6 +101,7 @@ class EventController implements ControllerInterface
      */
     private static function mpPlayerConnect($playerInfo)
     {
+        /*
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
             $login = $playerInfo[0];
 
@@ -155,6 +120,7 @@ class EventController implements ControllerInterface
         } else {
             throw new \Exception('Malformed callback in mpPlayerConnect');
         }
+        */
     }
 
     /**
@@ -192,6 +158,7 @@ class EventController implements ControllerInterface
      */
     private static function mpPlayerDisconnect($arguments)
     {
+        /*
         if (count($arguments) == 2 && is_string($arguments[0])) {
             $login = $arguments[0];
 
@@ -210,6 +177,7 @@ class EventController implements ControllerInterface
         } else {
             throw new \Exception('Malformed callback');
         }
+        */
     }
 
     /**
