@@ -149,6 +149,11 @@ class LocalRecords
         } else {
             $nextBetterRecord = $map->locals()->where('Score', '<', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
+
+            if ($newRank > config('locals.limit')) {
+                return;
+            }
+
             $map->locals()->where('Rank', '>=', $newRank)->increment('Rank');
 
             $newRecord = $map->locals()->updateOrCreate(['Player' => $player->id], [
