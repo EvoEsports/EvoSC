@@ -33,11 +33,11 @@ class EventController implements ControllerInterface
                     break;
 
                 case 'ManiaPlanet.PlayerConnect':
-                    //self::mpPlayerConnect($arguments);
+                    self::mpPlayerConnect($arguments);
                     break;
 
                 case 'ManiaPlanet.PlayerDisconnect':
-                    //self::mpPlayerDisconnect($arguments);
+                    self::mpPlayerDisconnect($arguments);
                     break;
 
                 case 'ManiaPlanet.PlayerChat':
@@ -95,35 +95,6 @@ class EventController implements ControllerInterface
     }
 
     /**
-     * @param $playerInfo
-     *
-     * @throws \Exception
-     */
-    private static function mpPlayerConnect($playerInfo)
-    {
-        /*
-        if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
-            $login = $playerInfo[0];
-
-            try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('ERROR', "mpPlayerConnect: Player ($login) not found!");
-            }
-
-            try {
-                Hook::fire('PlayerConnect', $player);
-            } catch (\Exception $e) {
-                Log::logAddLine('PlayerConnect', "Error: " . $e->getMessage());
-                createCrashReport($e);
-            }
-        } else {
-            throw new \Exception('Malformed callback in mpPlayerConnect');
-        }
-        */
-    }
-
-    /**
      * @param $data
      *
      * @throws \Exception
@@ -144,10 +115,25 @@ class EventController implements ControllerInterface
                 Hook::fire('PlayerChat', $player, $text, false);
             } catch (\Exception $e) {
                 Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
-                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
+        }
+    }
+
+    /**
+     * @param $playerInfo
+     *
+     * @throws \Exception
+     */
+    private static function mpPlayerConnect($playerInfo)
+    {
+        if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
+            $player = Player::firstOrCreate(['Login' => $playerInfo[0]], ['NickName' => $playerInfo[0]]);
+
+            Hook::fire('PlayerConnect', $player);
+        } else {
+            throw new \Exception('Malformed callback in mpPlayerConnect');
         }
     }
 
@@ -158,26 +144,13 @@ class EventController implements ControllerInterface
      */
     private static function mpPlayerDisconnect($arguments)
     {
-        /*
         if (count($arguments) == 2 && is_string($arguments[0])) {
-            $login = $arguments[0];
+            $player = Player::find($arguments[0]);
 
-            try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerDisconnect', "Error: Player ($login) not found!");
-            }
-
-            try {
-                Hook::fire('PlayerDisconnect', $player, 0);
-            } catch (\Exception $e) {
-                Log::logAddLine('PlayerDisconnect', "Error: " . $e->getMessage());
-                createCrashReport($e);
-            }
+            Hook::fire('PlayerDisconnect', $player, 0);
         } else {
             throw new \Exception('Malformed callback');
         }
-        */
     }
 
     /**
@@ -200,7 +173,6 @@ class EventController implements ControllerInterface
                 Hook::fire('BeginMap', $map);
             } catch (\Exception $e) {
                 Log::logAddLine('Hook', "Error: " . $e->getMessage());
-                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -227,7 +199,6 @@ class EventController implements ControllerInterface
                 Hook::fire('EndMap', $map);
             } catch (\Exception $e) {
                 Log::logAddLine('Hook', "Error: " . $e->getMessage());
-                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -254,7 +225,6 @@ class EventController implements ControllerInterface
                 ManiaLinkEvent::call($player, $arguments[2]);
             } catch (\Exception $e) {
                 Log::logAddLine('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
-                createCrashReport($e);
             }
         } else {
             throw new \Exception('Malformed callback');

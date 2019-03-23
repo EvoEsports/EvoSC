@@ -121,7 +121,7 @@ main(){
     declare Real MxKarmaAverage for LocalUser = 0.0;
     declare Real lastKarma = 0.0;
 
-    MxKarmaAverage = {($rating ?: '-1.0')|noescape};
+    MxKarmaAverage = {($rating ?: -1)|noescape} * 1.0;
     updateMyRating(MxKarmaRating);
 
     while(True){

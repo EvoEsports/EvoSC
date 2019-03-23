@@ -208,25 +208,6 @@ function header_color()
     return config('colors.ui.header');
 }
 
-function createCrashReport($e)
-{
-    if (!($e instanceof \Exception)) {
-        return;
-    }
-
-    $crashReport = collect();
-    $crashReport->put('file', $e->getFile());
-    $crashReport->put('line', $e->getLine());
-    $crashReport->put('message', $e->getMessage() . "\n" . $e->getTraceAsString());
-
-    if (!is_dir(__DIR__ . '/../crash-reports')) {
-        mkdir(__DIR__ . '/../crash-reports');
-    }
-
-    $filename = sprintf(__DIR__ . '/../crash-reports/%s.json', date('Y-m-d_Hi', time()));
-    file_put_contents($filename, $crashReport->toJson());
-}
-
 function isVerbose(): bool
 {
     global $_isVerbose;

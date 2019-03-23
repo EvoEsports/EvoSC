@@ -8,6 +8,8 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
 
     protected $fillable = ['Player', 'Map', 'Score', 'Rank', 'Checkpoints'];
 
+    protected $primaryKey = 'id';
+
     public $timestamps = false;
 
     /**

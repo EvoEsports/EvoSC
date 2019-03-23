@@ -92,10 +92,6 @@ class LocalRecords
 
         $map = MapController::getCurrentMap();
 
-        $chatMessage = chatMessage()
-            ->setIcon('')
-            ->setColor(config('colors.local'));
-
         $local      = $map->locals()->wherePlayer($player->id)->first();
         $localCount = $map->locals()->count();
 
@@ -114,6 +110,10 @@ class LocalRecords
         if ($rank > config('locals.limit')) {
             return;
         }
+
+        $chatMessage = chatMessage()
+            ->setIcon('')
+            ->setColor(config('colors.local'));
 
         $halfLimit = config('locals.limit') / 2;
 

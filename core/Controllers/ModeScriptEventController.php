@@ -52,11 +52,11 @@ class ModeScriptEventController implements ControllerInterface
                 break;
 
             case 'Trackmania.Event.OnPlayerAdded':
-                self::tmPlayerConnect($arguments);
+                // self::tmPlayerConnect($arguments);
                 break;
 
             case 'Trackmania.Event.OnPlayerRemoved':
-                self::tmPlayerLeave($arguments);
+                // self::tmPlayerLeave($arguments);
                 break;
 
             default:

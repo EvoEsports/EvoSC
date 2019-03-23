@@ -77,7 +77,6 @@ class TemplateController implements ControllerInterface
 
             Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
             var_dump($e->getTraceAsString());
-            createCrashReport($e);
         }
 
         return '';
