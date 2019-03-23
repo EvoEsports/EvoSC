@@ -168,15 +168,6 @@ class Statistics
 
         self::showRank($player);
 
-        if (!$player->stats) {
-            Stats::create([
-                'Player' => $player->id,
-                'Visits' => 1,
-            ]);
-
-            return;
-        }
-
         $player->stats()->increment('Visits');
     }
 
