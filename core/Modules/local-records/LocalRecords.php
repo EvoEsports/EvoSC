@@ -119,22 +119,21 @@ class LocalRecords
                 return;
             }
 
+            $nextBetterRecord = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
+            $diff             = $oldRecord->Score - $score;
+
             $newRecord = $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => -1,
+                'Rank'        => $newRank,
             ]);
-
-            $nextBetterRecord = $map->locals()->where('Score', '<', $score)->orderByDesc('Score')->first();
-            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
-            $diff             = $oldRecord->Score - $score;
 
             if ($oldRank == $newRank) {
                 $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
                 $map->locals()->where('Rank', '>=', $newRank)->where('Rank', '<', $oldRank)->increment('Rank');
-                $newRecord->update(['Rank' => $newRank]);
             }
 
             if ($newRank <= config('locals.echo-top')) {
@@ -147,7 +146,7 @@ class LocalRecords
             self::sendUpdatedLocals();
             Hook::fire('PlayerLocal', $player, $newRecord);
         } else {
-            $nextBetterRecord = $map->locals()->where('Score', '<', $score)->orderByDesc('Score')->first();
+            $nextBetterRecord = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
 
             if ($newRank > config('locals.limit')) {

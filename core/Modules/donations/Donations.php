@@ -14,11 +14,11 @@ class Donations
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [Donations::class, 'show']);
+        Hook::add('PlayerConnect', [self::class, 'show']);
 
-        ManiaLinkEvent::add('donate', [Donations::class, 'donate']);
+        ManiaLinkEvent::add('donate', [self::class, 'donate']);
 
-        ChatCommand::add('/donate', [Donations::class, 'donateCmd'], 'Donate planets to the server "/donate <amount>"');
+        ChatCommand::add('/donate', [self::class, 'donateCmd'], 'Donate planets to the server "/donate <amount>"');
     }
 
     public static function show(Player $player)
@@ -47,7 +47,5 @@ class Donations
     {
         $player->stats()->increment('Donations', $amount);
         infoMessage($player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!')->sendAll();
-
-        Hook::fire('PlayerDonate', $player, $amount);
     }
 }

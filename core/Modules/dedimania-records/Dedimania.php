@@ -12,11 +12,23 @@ use esc\Classes\Timer;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
+use Illuminate\Database\Eloquent\Model;
 
 class Dedimania extends DedimaniaApi
 {
+    /**
+     * @var \Illuminate\Support\Collection
+     */
+    private static $dedis;
+
+    /**
+     * @var string
+     */
+    private static $dedisJson;
+
     public function __construct()
     {
         if (!config('dedimania.enabled')) {
@@ -53,21 +65,15 @@ class Dedimania extends DedimaniaApi
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        // Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('EndMap', [self::class, 'endMap']);
 
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
-
-        // KeyController::createBind('Y', [self::class, 'reload']);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showManialink($player);
     }
 
     public static function reportConnectedPlayers()
@@ -98,57 +104,76 @@ class Dedimania extends DedimaniaApi
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
     }
 
-    public static function beginMap(Map $map)
-    {
-        $records = self::getChallengeRecords($map);
-        if ($records && $records->count() > 0) {
-            //Wipe all dedis for current map
-            $map->dedis()->delete();
-
-            //Insert dedis
-            foreach ($records as $record) {
-                self::insertRecord($map, $record);
-            }
-        }
-
-        $dedisJson = self::getDedisJson($map);
-
-        Template::showAll('dedimania-records.update', compact('dedisJson'));
-
-        Log::logAddLine('Dedimania', "Loaded records for map $map");
-    }
-
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map);
+    }
+
+    public static function endMap(Map $map)
+    {
         $map->dedis()->update(['New' => 0]);
     }
 
     public static function showManialink(Player $player)
     {
-        $map = MapController::getCurrentMap();
-        $dedisJson = self::getDedisJson($map);
+        $dedisJson = self::$dedisJson;
 
         Template::show($player, 'dedimania-records.update', compact('dedisJson'));
         Template::show($player, 'dedimania-records.manialink');
     }
 
-    public static function sendUpdatedDedis(Map $map)
+    public static function sendUpdatedDedis()
     {
-        $dedisJson = self::getDedisJson($map);
+        $dedisJson = self::$dedisJson;
 
         Template::showAll('dedimania-records.update', compact('dedisJson'));
     }
 
-    private static function getDedisJson(Map $map)
+    private static function cacheDedis(Map $map)
     {
-        $dedis     = $map->dedis()->orderBy('Rank')->get();
-        $playerIds = $dedis->pluck('Player');
-        $players   = Player::whereIn('id', $playerIds)->get();
+        self::$dedis = $map->dedis()->orderBy('Score')->get()->keyBy('Player');
+    }
 
-        return $dedis->map(function (Dedi $dedi) use ($players) {
-            $player      = $players->where('id', $dedi->Player)->first();
+    public static function beginMap(Map $map)
+    {
+        $records = self::getChallengeRecords($map);
+
+        if ($records && $records->count() > 0) {
+            //Wipe all dedis for current map
+            $map->dedis()->where('New', 0)->delete();
+
+            $insert = $records->map(function ($record) use ($map) {
+                $player = Player::firstOrCreate(['Login' => $record->login], [
+                    'NickName' => $record->nickname,
+                    'MaxRank'  => $record->max_rank,
+                ]);
+
+                return [
+                    'Map'         => $map->id,
+                    'Player'      => $player->id,
+                    'Score'       => $record->score,
+                    'Rank'        => $record->rank,
+                    'Checkpoints' => $record->checkpoints,
+                ];
+            });
+
+            Dedi::insert($insert->toArray());
+            self::cacheDedis($map);
+        } else {
+            self::$dedis = collect();
+        }
+
+        self::cacheDedisJson();
+        $dedisJson = self::$dedisJson;
+        Template::showAll('dedimania-records.update', compact('dedisJson'));
+
+        Log::logAddLine('Dedimania', "Loaded records for map $map #" . $map->id);
+    }
+
+    private static function cacheDedisJson()
+    {
+        self::$dedisJson = self::$dedis->map(function (Dedi $dedi) {
             $checkpoints = collect(explode(',', $dedi->Checkpoints));
             $checkpoints = $checkpoints->map(function ($time) {
                 return intval($time);
@@ -158,139 +183,101 @@ class Dedimania extends DedimaniaApi
                 'rank'  => $dedi->Rank,
                 'cps'   => $checkpoints,
                 'score' => $dedi->Score,
-                'name'  => $player->NickName,
-                'login' => $player->Login,
+                'name'  => $dedi->player->NickName,
+                'login' => $dedi->player->Login,
             ];
         })->toJson();
     }
 
-    private static function insertRecord(Map $map, $record)
+    public static function playerLocal(Player $player, LocalRecord $record)
     {
-        $player = Player::find($record->login);
-
-        if (!(isset($record->login, $record->nickname, $record->max_rank, $record->checkpoints))) {
-            Log::logAddLine('Dedimania', 'Invalid record received.');
-
-            return;
-        }
-
-        if (!$player) {
-            //Player does not exist in database
-            Player::create([
-                'Login'    => $record->login,
-                'NickName' => $record->nickname,
-                'MaxRank'  => $record->max_rank,
-            ]);
-
-            $player = Player::find($record->login);
-        }
-
-        if ($player->NickName == $record->login) {
-            $player->update([
-                'NickName' => $record->nickname,
-            ]);
-        }
-
-        //Create the dedi
-        Dedi::create([
-            'Map'         => $map->id,
-            'Player'      => $player->id,
-            'Score'       => $record->score,
-            'Rank'        => $record->rank,
-            'Checkpoints' => $record->checkpoints,
-        ]);
+        self::playerFinish($player, $record->Score, $record->Checkpoints);
     }
 
-    /**
-     * called on playerFinish
-     *
-     * @param \esc\Models\Player $player
-     * @param int                $score
-     * @param string             $checkpoints
-     */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 8000) {
-            //ignore times under 8 seconds
+            //ignore times under 3 seconds
             return;
         }
 
-        $map     = MapController::getCurrentMap();
-        $dedi    = $map->dedis()->wherePlayer($player->id)->first();
-        $newRank = self::getRankForScore($map, $score);
+        $map = MapController::getCurrentMap();
 
-        if ($newRank == 1) {
-            //Ghost replay is needed for 1. dedi
-            self::saveGhostReplay($dedi);
-        }
+        if (self::$dedis->has($player->id)) {
+            $oldRecord = self::$dedis->get($player->id);
+            $oldRank   = $oldRecord->Rank;
 
-        Log::logAddLine('Dedimania', $player . ' finished with time ' . formatScore($score));
+            if ($oldRecord->Score < $score) {
+                return;
+            }
 
-        if ($dedi) {
-            //Player has dedi on map
+            $chatMessage = chatMessage()
+                ->setIcon('')
+                ->setColor(config('colors.dedi'));
 
-            if ($score == $dedi->Score) {
-                chatMessage($player, ' equaled his/her ', secondary($dedi))->setIcon('')->setColor(config('colors.dedi'))->sendAll();
-                Log::logAddLine('Dedimania', $player . ' equaled his/her record.', isVerbose());
+            if ($oldRecord->Score == $score) {
+                $chatMessage->setParts($player, ' equaled his/her ', $oldRecord)->sendAll();
 
                 return;
             }
 
-            $oldRank = $dedi->Rank;
+            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
+                'Score'       => $score,
+                'Checkpoints' => $checkpoints,
+                'Rank'        => -1,
+            ]);
 
-            if ($score < $dedi->Score) {
-                Log::logAddLine('Dedimania', $player . ' improved his/her record.', isVerbose());
+            $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
+            $diff             = $oldRecord->Score - $score;
 
-                //Player improved his record
-                if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
-                    $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
-                    $diff = $dedi->Score - $score;
-                    $dedi->update(['Score' => $score, 'Checkpoints' => $checkpoints, 'New' => 1, 'Rank' => $newRank]);
-
-                    if ($oldRank == $newRank) {
-                        chatMessage($player, ' secured his/her ', $dedi, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
-                    } else {
-                        chatMessage($player, ' gained the ', $dedi, ' (' . $oldRank . '. -' . formatScore($diff) . ')')->setIcon('')->setColor(config('colors.dedi'))->sendAll();
-                    }
-
-                    self::sendUpdatedDedis($map);
-                }
+            if ($newRank == 1) {
+                //Ghost replay is needed for 1. dedi
+                self::saveGhostReplay($newRecord);
             }
+
+            if ($oldRank == $newRank) {
+                $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+            } else {
+                $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $map->dedis()->where('Rank', '>=', $newRank)->where('Rank', '<', $oldRank)->increment('Rank');
+                $newRecord->update(['Rank' => $newRank]);
+            }
+
+            $chatMessage->sendAll();
+
+            self::cacheDedis($map);
+            self::sendUpdatedDedis();
+            Hook::fire('PlayerDedi', $player, $newRecord);
         } else {
-            if (($newRank <= self::$maxRank) || (isset($player->MaxRank) && $newRank <= $player->MaxRank)) {
+            $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
 
-                $map->dedis()->create([
-                    'Player'      => $player->id,
-                    'Map'         => $map->id,
-                    'Score'       => $score,
-                    'Rank'        => $newRank,
-                    'Checkpoints' => $checkpoints,
-                    'New'         => 1,
-                ]);
+            $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
 
-                $dedi = $map->dedis()->wherePlayer($player->id)->first();
+            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
+                'Score'       => $score,
+                'Checkpoints' => $checkpoints,
+                'Rank'        => $newRank,
+            ]);
 
-                //Player does not have a dedi on map
-                $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
-
-                self::sendUpdatedDedis($map);
-                chatMessage($player, ' gained the ', $dedi)->setIcon('')->setColor(config('colors.dedi'))->sendAll();
+            if ($newRank == 1) {
+                //Ghost replay is needed for 1. dedi
+                self::saveGhostReplay($newRecord);
             }
+
+            chatMessage($player, ' gained the ', $newRecord)
+                ->setIcon('')
+                ->setColor(config('colors.dedi'))
+                ->sendAll();
+
+            self::cacheDedis($map);
+            self::sendUpdatedDedis();
+            Hook::fire('PlayerDedi', $player, $newRecord);
         }
     }
 
-    private static function getRankForScore(Map $map, int $score): int
-    {
-        $betterOrEarlierEqualRecords = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->get()->first();
-
-        if (!$betterOrEarlierEqualRecords) {
-            return 1;
-        }
-
-        return $betterOrEarlierEqualRecords->Rank + 1;
-    }
-
-    private static function saveGhostReplay(Dedi $dedi)
+    private static function saveGhostReplay(Model $dedi)
     {
         $oldGhostReplay = $dedi->ghost_replay;
 

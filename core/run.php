@@ -146,19 +146,6 @@ class EscRun extends Command
         $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
         esc\Classes\Hook::fire('BeginMap', $map);
 
-        //Set connected players online
-        /*
-        $playerList = collect(\esc\Classes\Server::rpc()->getPlayerList());
-
-        foreach ($playerList as $maniaPlayer) {
-            $player = \esc\Models\Player::whereLogin($maniaPlayer->login)->first();
-
-            if ($player) {
-                \esc\Classes\Hook::fire('PlayerConnect', $player);
-            }
-        }
-        */
-
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         \esc\Classes\Server::disableServiceAnnounces(true);
@@ -181,7 +168,7 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
-                Log::logAddLine('MPS', 'Connection problems.');
+                Log::logAddLine('MPS', 'Connection problems. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::logAddLine('MPS', $e->getMessage());
                 $failedConnectionRequests++;
                 if ($failedConnectionRequests > 50) {

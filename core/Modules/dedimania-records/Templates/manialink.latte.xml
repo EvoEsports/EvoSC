@@ -208,7 +208,7 @@
         detailsFrame.Show();
     }
 
-    Void updateWindow(Record[] records){
+    Void updateWindow(Record[Integer] records){
         //Update records
         declare CMlFrame windowRecords <=> (Page.MainFrame.GetFirstChild("window-records") as CMlFrame);
         declare Integer i = 0;
@@ -269,7 +269,7 @@
         }
     }
 
-    Integer getMyRank(Record[] records){
+    Integer getMyRank(Record[Integer] records){
         foreach(record in records){
             if(record.login == LocalUser.Login){
                 return record.rank;
@@ -301,7 +301,7 @@
         recordsFrame.Show();
     }
 
-    Void updateWidget(Record[] records){
+    Void updateWidget(Record[Integer] records){
         declare myRank = getMyRank(records);
         declare filled = 0;
         declare skipped = 0;
@@ -387,7 +387,7 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
-        declare Record[] DediRecords for LocalUser;
+        declare Record[Integer] DediRecords_ for LocalUser;
         declare Integer LastDediRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
@@ -447,7 +447,7 @@
                         currentPage = 0;
                     }
 
-                    updateWindow(DediRecords);
+                    updateWindow(DediRecords_);
                 }
 
                 if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -457,22 +457,22 @@
                         currentPage = maxPage;
                     }
 
-                    updateWindow(DediRecords);
+                    updateWindow(DediRecords_);
                 }
             }
 
             if(LastDediRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastDediRecordsUpdate;
-                updateWindow(DediRecords);
-                updateWidget(DediRecords);
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
             }
 
             if(playerCount != Players.count){
                 sleep(150);
                 playerCount = Players.count;
-                updateWindow(DediRecords);
-                updateWidget(DediRecords);
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
             }
 
             hidescript();
