@@ -221,15 +221,15 @@ class Dedimania extends DedimaniaApi
                 return;
             }
 
-            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
-                'Score'       => $score,
-                'Checkpoints' => $checkpoints,
-                'Rank'        => -1,
-            ]);
-
             $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
             $diff             = $oldRecord->Score - $score;
+
+            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
+                'Score'       => $score,
+                'Checkpoints' => $checkpoints,
+                'Rank'        => $newRank,
+            ]);
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
@@ -241,7 +241,6 @@ class Dedimania extends DedimaniaApi
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
                 $map->dedis()->where('Rank', '>=', $newRank)->where('Rank', '<', $oldRank)->increment('Rank');
-                $newRecord->update(['Rank' => $newRank]);
             }
 
             $chatMessage->sendAll();
