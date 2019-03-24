@@ -247,7 +247,6 @@ class Dedimania extends DedimaniaApi
 
             self::cacheDedis($map);
             self::sendUpdatedDedis();
-            Hook::fire('PlayerDedi', $player, $newRecord);
         } else {
             $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
@@ -272,7 +271,6 @@ class Dedimania extends DedimaniaApi
 
             self::cacheDedis($map);
             self::sendUpdatedDedis();
-            Hook::fire('PlayerDedi', $player, $newRecord);
         }
     }
 
