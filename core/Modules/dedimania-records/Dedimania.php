@@ -251,6 +251,10 @@ class Dedimania extends DedimaniaApi
             $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
 
+            if ($newRank > 100 || ($newRank > self::$maxRank && $player->MaxRank < self::$maxRank)) {
+                return;
+            }
+
             $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
 
             $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
