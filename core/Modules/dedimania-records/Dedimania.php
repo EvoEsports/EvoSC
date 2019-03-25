@@ -112,7 +112,7 @@ class Dedimania extends DedimaniaApi
 
     public static function endMap(Map $map)
     {
-        $map->dedis()->update(['New' => 0]);
+        // $map->dedis()->update(['New' => 0]);
     }
 
     public static function showManialink(Player $player)
@@ -126,7 +126,6 @@ class Dedimania extends DedimaniaApi
     public static function sendUpdatedDedis()
     {
         $dedisJson = self::$dedisJson;
-
         Template::showAll('dedimania-records.update', compact('dedisJson'));
     }
 
@@ -165,8 +164,7 @@ class Dedimania extends DedimaniaApi
         }
 
         self::cacheDedisJson();
-        $dedisJson = self::$dedisJson;
-        Template::showAll('dedimania-records.update', compact('dedisJson'));
+        self::sendUpdatedDedis();
 
         Log::logAddLine('Dedimania', "Loaded records for map $map #" . $map->id);
     }
@@ -246,6 +244,7 @@ class Dedimania extends DedimaniaApi
             $chatMessage->sendAll();
 
             self::cacheDedis($map);
+            self::cacheDedisJson();
             self::sendUpdatedDedis();
         } else {
             $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
@@ -274,6 +273,7 @@ class Dedimania extends DedimaniaApi
                 ->sendAll();
 
             self::cacheDedis($map);
+            self::cacheDedisJson();
             self::sendUpdatedDedis();
         }
     }
