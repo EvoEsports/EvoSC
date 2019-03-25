@@ -118,8 +118,21 @@ class PlayerController implements ControllerInterface
         $diffString = $player->last_visit->diffForHumans();
         $stats      = $player->stats;
 
-        if (!$player->path) {
-            $player->update(['path' => Server::getDetailedPlayerInfo($player->Login)->path]);
+        try {
+            $details = Server::rpc()->getDetailedPlayerInfo($player->Login);
+            $player->update([
+                'path'     => $details->path,
+                'NickName' => $details->nickName,
+            ]);
+        } catch (InvalidArgumentException $e) {
+            try {
+                $details = Server::rpc()->getPlayerInfo($player->Login);
+                $player->update([
+                    'NickName' => $details->nickName,
+                ]);
+            } catch (InvalidArgumentException $e) {
+                Log::logAddLine('PlayerController', 'Failed to update details for player ' . $player);
+            }
         }
 
         if ($stats) {
