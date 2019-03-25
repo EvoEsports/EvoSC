@@ -29,7 +29,7 @@ class QueueController implements ControllerInterface
 
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
-        if ($map->cooldown < config('server.map-cooldown') && $player->hasAccess('map_queue_recent')) {
+        if ($map->cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
             warningMessage('Can not queue recently played track. Please wait ' . secondary(config('server.map-cooldown') - $map->cooldown) . ' maps.')->send($player);
 
             return;
