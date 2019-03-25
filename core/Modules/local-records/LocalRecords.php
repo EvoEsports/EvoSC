@@ -139,7 +139,6 @@ class LocalRecords
                 $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
-                $map->locals()->where('Rank', '>=', $newRank)->where('Rank', '<', $oldRank)->increment('Rank');
             }
 
             if ($newRank <= config('locals.echo-top')) {
@@ -162,7 +161,7 @@ class LocalRecords
             $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => 0,
+                'Rank'        => 1,
             ]);
 
             self::fixRanks($map);
