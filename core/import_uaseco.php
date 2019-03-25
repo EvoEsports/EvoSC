@@ -203,6 +203,7 @@ class ImportUaseco extends Command
             $existingRecord = $esc->table('local-records')->where('Player', $playerId)->first();
 
             if ($existingRecord && $existingRecord->Score <= $record->Score) {
+                $bar->advance();
                 continue;
             }
 
