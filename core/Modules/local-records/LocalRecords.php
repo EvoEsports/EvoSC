@@ -107,7 +107,7 @@ class LocalRecords
         $map = MapController::getCurrentMap();
 
         if (self::$records->has($player->id)) {
-            $oldRecord = self::$records->get($player->id);
+            $oldRecord = $map->locals()->wherePlayer($player->id)->first();
             $oldRank   = $oldRecord->Rank;
 
             if ($oldRecord->Score < $score) {
@@ -127,6 +127,7 @@ class LocalRecords
             $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
+                'Rank'        => -1,
             ]);
 
             self::fixRanks($map);
@@ -136,7 +137,7 @@ class LocalRecords
             $diff      = $oldRecord->Score - $score;
 
             if ($oldRank == $newRank) {
-                $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $chatMessage->setParts($player, ' secured his/her ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             }
@@ -161,7 +162,7 @@ class LocalRecords
             $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => 1,
+                'Rank'        => $newRank,
             ]);
 
             self::fixRanks($map);
