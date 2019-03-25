@@ -63,7 +63,7 @@ class LocalRecords
 
     public static function endMap(Map $map)
     {
-        $map->locals()->orderBy('Score')->skip(500)->delete();
+        // $map->locals()->orderBy('Score')->skip(500)->delete();
     }
 
     public static function beginMap(Map $map)
