@@ -186,26 +186,29 @@ class ImportUaseco extends Command
 
 
         //Import local records
+        $players = $esc->table('players')->get()->pluck('id', 'Login');
+        $maps    = $esc->table('maps')->get()->pluck('id', 'uid');
+
         $output->writeln('Importing local records');
         $rankCount = 1000;
         $records   = $uaseco->table('records')->get();
         $bar       = $this->getBar($output, $records->count());
         foreach ($records as $record) {
             $playerLogin = $uaseco->table('players')->where('PlayerId', $record->PlayerId)->first()->Login;
-            $player      = $esc->table('players')->whereLogin($playerLogin)->first();
+            $playerId    = $players->get($playerLogin);
 
             $mapUid = $uaseco->table('maps')->where('MapId', $record->MapId)->first()->Uid;
-            $map    = $esc->table('maps')->where('UId', $mapUid)->first();
+            $mapId  = $maps->get($mapUid);
 
-            $existingRecord = $esc->table('local-records')->where('Player', $player->id)->first();
+            $existingRecord = $esc->table('local-records')->where('Player', $playerId)->first();
 
             if ($existingRecord && $existingRecord->Score <= $record->Score) {
                 continue;
             }
 
-            $esc->table('local-records')->updateOrInsert(['Player' => $player->id],
+            $esc->table('local-records')->updateOrInsert(['Player' => $playerId],
                 [
-                    'Map'         => $map->id,
+                    'Map'         => $mapId,
                     'Score'       => $record->Score,
                     'Checkpoints' => $record->Checkpoints,
                     'Rank'        => $rankCount++,
