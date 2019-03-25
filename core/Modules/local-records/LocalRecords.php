@@ -68,16 +68,21 @@ class LocalRecords
 
     public static function beginMap(Map $map)
     {
-        $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->each(function (LocalRecord $record, $key) {
-            $record->update(['Rank' => $key + 1]);
-        });
+        self::fixRanks($map);
         self::cacheLocals($map);
         self::sendUpdatedLocals();
     }
 
+    private static function fixRanks(Map $map)
+    {
+        $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->each(function (LocalRecord $record, $key) {
+            $record->update(['Rank' => $key + 1]);
+        });
+    }
+
     private static function cacheLocals(Map $map)
     {
-        self::$records = $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get();
+        self::$records = $map->locals()->orderBy('Rank')->limit(config('locals.limit'))->get();
 
         self::$localsJson = self::$records->map(function (LocalRecord $local) {
             return [
@@ -119,15 +124,16 @@ class LocalRecords
                 return;
             }
 
-            $nextBetterRecord = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
-            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
-            $diff             = $oldRecord->Score - $score;
-
-            $newRecord = $map->locals()->updateOrCreate(['Player' => $player->id], [
+            $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => $newRank,
             ]);
+
+            self::fixRanks($map);
+
+            $newRecord = $map->locals()->wherePlayer($player->id)->first();
+            $newRank   = $newRecord->Rank;
+            $diff      = $oldRecord->Score - $score;
 
             if ($oldRank == $newRank) {
                 $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
@@ -153,13 +159,15 @@ class LocalRecords
                 return;
             }
 
-            $map->locals()->where('Rank', '>=', $newRank)->increment('Rank');
-
-            $newRecord = $map->locals()->updateOrCreate(['Player' => $player->id], [
+            $map->locals()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => $newRank,
+                'Rank'        => 0,
             ]);
+
+            self::fixRanks($map);
+
+            $newRecord = $map->locals()->wherePlayer($player->id)->first();
 
             $chatMessage = chatMessage($player, ' gained the ', $newRecord)
                 ->setIcon('')
