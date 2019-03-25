@@ -200,7 +200,7 @@ class ImportUaseco extends Command
             $mapUid = $uaseco->table('maps')->where('MapId', $record->MapId)->first()->Uid;
             $mapId  = $maps->get($mapUid);
 
-            $existingRecord = $esc->table('local-records')->where('Player', $playerId)->first();
+            $existingRecord = $esc->table('local-records')->where('Map', $mapId)->where('Player', $playerId)->first();
 
             if ($existingRecord && $existingRecord->Score <= $record->Score) {
                 $bar->advance();
