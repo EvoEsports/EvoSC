@@ -38,16 +38,16 @@ class PBRecords
     public static function playerMadeRecord(Player $player, $record)
     {
         self::$targets->put($player->id, $record);
-        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
+        self::sendUpdatedTimes(MapController::getCurrentMap(), $player);
     }
 
     public static function playerConnect(Player $player)
     {
-        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
+        self::sendUpdatedTimes(MapController::getCurrentMap(), $player);
         Template::show($player, 'pb-records.pb-cp-records');
     }
 
-    public static function sendUpdatesTimes(Map $map, Player $player)
+    public static function sendUpdatedTimes(Map $map, Player $player)
     {
         $target = self::getTarget($map, $player);
 
@@ -191,6 +191,6 @@ class PBRecords
 
         infoMessage('New checkpoints target: ', $record)->send($player);
 
-        self::sendUpdatesTimes(MapController::getCurrentMap(), $player);
+        self::sendUpdatedTimes(MapController::getCurrentMap(), $player);
     }
 }
