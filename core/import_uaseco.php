@@ -190,6 +190,22 @@ class ImportUaseco extends Command
         $maps    = $esc->table('maps')->get()->pluck('id', 'uid');
 
         $output->writeln('Importing local records');
+        $records = $uaseco->table('records')->groupBy('MapId');
+
+        $playerIdMap = collect();
+        $output->writeln('Importing local records: Preparing uaseco player mapping.');
+        $playerTable = $uaseco->table('records')->select('PlayerId')->distinct()->get();
+        $bar         = $this->getBar($output, $playerTable->count());
+        $playerTable->map(function ($uasecoPlayerId) use ($esc, $bar, &$playerIdMap) {
+            $evoscPlayerId = $esc->table('players')->where('Login', $uasecoPlayerId)->first()->id;
+            $playerIdMap->put($uasecoPlayerId, $evoscPlayerId);
+            $bar->advance();
+        });
+        $bar->finish();
+
+        var_dump($records);
+        die();
+
         $rankCount = 1000;
         $records   = $uaseco->table('records')->get();
         $bar       = $this->getBar($output, $records->count());
