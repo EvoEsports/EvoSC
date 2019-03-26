@@ -129,11 +129,10 @@ class Statistics
         Log::logAddLine('Statistics', 'Updating player-ranks.', isVeryVerbose());
         $start = time() + microtime(true);
 
-        Stats::where('Score', '>', 0)->orderByDesc('Score')->get()->map(function (Stats $stat, $rank) {
-            return [
-                'Player' => $stat->Player,
-                'Rank'   => $rank + 1,
-            ];
+        Stats::where('Score', '>', 0)->orderByDesc('Score')->get()->each(function (Stats $stat, $rank) {
+            $stat->update([
+                'Rank' => $rank + 1,
+            ]);
         });
 
         $end = time() + microtime(true);

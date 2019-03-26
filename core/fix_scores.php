@@ -56,5 +56,15 @@ class FixScores extends Command
 
         $bar->finish();
         $output->writeln("\nFinished fixing scores.");
+
+        $output->writeln("Finished ranks.");
+        $ranked = $evoSC->table('stats')->where('Score', '>', 0)->orderByDesc('Score')->get();
+        $bar    = new \Symfony\Component\Console\Helper\ProgressBar($output, $ranked->count());
+        $ranked->each(function ($stat, $key) use ($evoSC, $bar) {
+            $evoSC->table('stats')->where('Player', $stat->Player)->update(['Rank' => $key + 1]);
+            $bar->advance();
+        });
+        $bar->finish();
+        $output->writeln("\nFinished ranking players.");
     }
 }
