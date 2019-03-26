@@ -184,58 +184,66 @@ class ImportUaseco extends Command
         $output->writeln("\n");
         */
 
-
         //Import local records
-        $players = $esc->table('players')->get()->pluck('id', 'Login');
-        $maps    = $esc->table('maps')->get()->pluck('id', 'uid');
-
-        $output->writeln('Importing local records');
-        $records = $uaseco->table('records')->groupBy('MapId');
-
+        $output->writeln('Importing local records: Preparing records...');
         $playerIdMap = collect();
-        $output->writeln('Importing local records: Preparing uaseco player mapping.');
-        $playerTable = $uaseco->table('records')->select('PlayerId')->distinct()->get();
+
+        $output->writeln('Importing local records: Preparing UASECO player mapping...');
+        $uasecoMap   = $uaseco->table('players')->select(['PlayerId', 'Login'])->get()->pluck('Login', 'PlayerId');
+        $playerTable = $uaseco->table('records')->select('PlayerId')->distinct()->get()->pluck('PlayerId');
         $bar         = $this->getBar($output, $playerTable->count());
-        $playerTable->map(function ($uasecoPlayerId) use ($esc, $bar, &$playerIdMap) {
-            $evoscPlayerId = $esc->table('players')->where('Login', $uasecoPlayerId)->first()->id;
+        $playerTable->map(function ($uasecoPlayerId) use ($esc, $uasecoMap, $bar, &$playerIdMap) {
+            $playerLogin   = $uasecoMap->get($uasecoPlayerId);
+            $evoscPlayerId = $esc->table('players')->where('Login', $playerLogin)->select('id')->first()->id;
             $playerIdMap->put($uasecoPlayerId, $evoscPlayerId);
             $bar->advance();
         });
         $bar->finish();
-
-        var_dump($records);
-        die();
-
-        $rankCount = 1000;
-        $records   = $uaseco->table('records')->get();
-        $bar       = $this->getBar($output, $records->count());
-        foreach ($records as $record) {
-            $playerLogin = $uaseco->table('players')->where('PlayerId', $record->PlayerId)->first()->Login;
-            $playerId    = $players->get($playerLogin);
-
-            $mapUid = $uaseco->table('maps')->where('MapId', $record->MapId)->first()->Uid;
-            $mapId  = $maps->get($mapUid);
-
-            $existingRecord = $esc->table('local-records')->where('Map', $mapId)->where('Player', $playerId)->first();
-
-            if ($existingRecord && $existingRecord->Score <= $record->Score) {
-                $bar->advance();
-                continue;
-            }
-
-            $esc->table('local-records')->updateOrInsert(['Player' => $playerId],
-                [
-                    'Map'         => $mapId,
-                    'Score'       => $record->Score,
-                    'Checkpoints' => $record->Checkpoints,
-                    'Rank'        => $rankCount++,
-                ]);
-
-            $bar->advance();
-        }
-        $bar->finish();
         $output->writeln("\n");
 
+        $output->writeln('Importing local records: Starting import...');
+        $uasecoMapMap = $uaseco->table('maps')->select(['MapId', 'Uid'])->get()->pluck('Uid', 'MapId');
+        $bar          = $this->getBar($output, $uaseco->table('records')->count());
+        $uasecoMapMap->each(function ($uid, $uasecoMapId) use ($uaseco, $esc, $playerIdMap, $bar) {
+            $map   = $esc->table('maps')->where('uid', $uid)->first();
+            $mapId = $map->id;
+
+            $evoscRecords  = $esc->table('local-records')->where('Map', $mapId)->get()->keyBy('Player');
+            $uasecoRecords = $uaseco->table('records')->where('MapId', $uasecoMapId)->get();
+
+            $uasecoRecords->each(function ($record) use ($playerIdMap, $evoscRecords, $esc, $mapId, $bar) {
+                $evoscPlayerId = $playerIdMap->get($record->PlayerId);
+
+                if ($evoscRecords->has($evoscPlayerId)) {
+                    $existingRecord = $evoscRecords->get($evoscPlayerId);
+
+                    if ($existingRecord->Score <= $record->Score) {
+                        $bar->advance();
+
+                        return;
+                    }
+
+                    $esc->table('local-records')->where('Map', $mapId)->where('Player', $evoscPlayerId)->update([
+                        'Score'       => $record->Score,
+                        'Checkpoints' => $record->Checkpoints,
+                        'Rank'        => -1,
+                    ]);
+                } else {
+                    $esc->table('local-records')->insert([
+                        'Player'      => $evoscPlayerId,
+                        'Map'         => $mapId,
+                        'Score'       => $record->Score,
+                        'Checkpoints' => $record->Checkpoints,
+                        'Rank'        => -1,
+                    ]);
+                }
+
+                $bar->advance();
+            });
+        });
+
+        $bar->finish();
+        $output->writeln("\n");
 
         //Fix local records ranks
         $output->writeln('Fixing local records ranks');
