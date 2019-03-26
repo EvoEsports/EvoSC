@@ -45,7 +45,7 @@ class FixScores extends Command
         $bar = new \Symfony\Component\Console\Helper\ProgressBar($output, $players->count());
 
         $players->each(function ($player) use ($evoSC, $bar) {
-            $score = $evoSC->table('local-records')->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
+            $score = $evoSC->table('local-records')->where('Player', $player->id)->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
 
             $evoSC->table('stats')->where('Player', $player->id)->update([
                 'Score' => $score,
