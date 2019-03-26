@@ -39,11 +39,8 @@ class FixScores extends Command
 
         $evoSC = $escCapsule->getConnection();
 
-        $playerIds = $evoSC->table('stats')->get()->pluck('Player')->toArray();
-        $players   = $evoSC->table('players')->whereIn('id', $playerIds)->get();
-
-        $bar = new \Symfony\Component\Console\Helper\ProgressBar($output, $players->count());
-
+        $players = $evoSC->table('players')->get();
+        $bar     = new \Symfony\Component\Console\Helper\ProgressBar($output, $players->count());
         $players->each(function ($player) use ($evoSC, $bar) {
             $score = $evoSC->table('local-records')->where('Player', $player->id)->selectRaw('100 - Rank as rank_diff')->get()->sum('rank_diff');
 
