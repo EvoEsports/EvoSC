@@ -92,7 +92,7 @@ class TemplateController implements ControllerInterface
         Log::logAddLine('TemplateController', 'Loading templates...');
 
         //Get all template files in core directory
-        self::$templates = File::getFilesRecursively(coreDir(), '/(\.latte\.xml|\.script\.txt)$/')
+        self::$templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')
                                ->map(function (&$template) {
                                    $templateObject = collect();
 

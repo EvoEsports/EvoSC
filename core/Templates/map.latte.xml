@@ -1,7 +1,0 @@
-<label pos="38 -2" z-index="1" size="36 3" text="{$map->gbx->Name}" halign="right" textcolor="eeee" textsize="1.4"/>
-<label pos="38 -7" z-index="1" size="36 3" text="by {stripAll($map->author->NickName)}" halign="right" textcolor="dddd" valign="center" textsize="0.6"/>
-
-<label pos="45 -5" valign="center" halign="center" textsize="2" size="6 6" text="" textcolor="ffff"/>
-
-<quad pos="0 0" size="40 10" action="maplist.details,{$map->id}" />
-<quad pos="40 0" size="10 10" action="maplist.show" />

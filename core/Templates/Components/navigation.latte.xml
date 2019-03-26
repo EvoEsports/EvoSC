@@ -1,3 +1,0 @@
-{foreach $pages as $i => $page}
-<label pos="{$iterator->counter * 22 - 11} 0" z-index="0" size="20 5" textsize="1.2" textcolor="{$active == $page['name'] ? config('colors.ui.header') : 'EEEF' |noescape }" bgcolor="0000" valign="center" halign="center" text="{$page['name']}" action="{$page['action']}"/>
-{/foreach}

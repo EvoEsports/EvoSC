@@ -35,9 +35,12 @@ class Template
 
     public static function hideAll(string $index)
     {
-        self::showAll('blank', [
-            'id' => $index,
-        ]);
+        Server::sendDisplayManialinkPage('', sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>', $index));
+    }
+
+    public static function hide(Player $player, string $index)
+    {
+        Server::sendDisplayManialinkPage($player->Login, sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>', $index));
     }
 
     /**
@@ -96,13 +99,6 @@ class Template
         }
 
         return TemplateController::getTemplate($index, $values);
-    }
-
-    public static function hide(Player $player, string $index)
-    {
-        self::show($player, 'blank', [
-            'id' => $index,
-        ]);
     }
 
     public static function getScript(string $templateId)
