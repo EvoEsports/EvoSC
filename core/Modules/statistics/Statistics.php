@@ -96,8 +96,9 @@ class Statistics
 
         Log::logAddLine('Statistics', sprintf('Calculating player scores for %d players.', self::$totalRankedPlayers), isVeryVerbose());
 
-        $finishedPlayers->each(function (Player $player) {
-            $score = $player->locals()->selectRaw('200 - Rank as rank_diff')->get()->sum('rank_diff');
+        $limit = config('locals.limit');
+        $finishedPlayers->each(function (Player $player) use ($limit) {
+            $score = $player->locals()->where('Rank', '<', $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
             $player->stats()->update(['Score' => $score]);
         });
 
