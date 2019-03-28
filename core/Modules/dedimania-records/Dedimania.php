@@ -10,7 +10,6 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
@@ -65,8 +64,7 @@ class Dedimania extends DedimaniaApi
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        // Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
@@ -185,11 +183,6 @@ class Dedimania extends DedimaniaApi
                 'login' => $dedi->player->Login,
             ];
         })->toJson();
-    }
-
-    public static function playerLocal(Player $player, LocalRecord $record)
-    {
-        self::playerFinish($player, $record->Score, $record->Checkpoints);
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)
