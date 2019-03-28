@@ -26,7 +26,7 @@ class MxMapDetails
         }
 
         if (!$map->mx_details) {
-            MapController::loadMxDetails($map);
+            self::loadMxDetails($map);
         }
 
         $rating = self::getRatingString($map->mx_details->RatingVoteAverage);
