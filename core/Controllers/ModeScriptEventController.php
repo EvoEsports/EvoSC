@@ -20,6 +20,7 @@ class ModeScriptEventController implements ControllerInterface
         if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
             self::call($modescriptCallbackArray[1][0], $modescriptCallbackArray[1][1]);
         } else {
+            Log::logAddLine('ModeScriptEventController', 'Modescript callback is not ManiaPlanet.ModeScriptCallbackArray', isVerbose());
             var_dump($modescriptCallbackArray);
         }
     }
@@ -29,42 +30,46 @@ class ModeScriptEventController implements ControllerInterface
         switch ($callback) {
             case 'Trackmania.Scores':
                 self::tmScores($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.GiveUp':
                 self::tmGiveUp($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.WayPoint':
                 self::tmWayPoint($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.StartCountdown':
                 self::tmStartCountdown($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.StartLine':
                 self::tmStartLine($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.Stunt':
                 self::tmStunt($arguments);
-                break;
+
+                return;
 
             case 'Trackmania.Event.OnPlayerAdded':
                 // self::tmPlayerConnect($arguments);
-                break;
+                return;
 
             case 'Trackmania.Event.OnPlayerRemoved':
                 // self::tmPlayerLeave($arguments);
-                break;
+                return;
 
             default:
-                // Log::logAddLine('ScriptCallback', "Calling unhandled $callback", isVeryVerbose());
-                break;
+                Log::logAddLine('ModeScriptEventController', 'Calling unhandled ' . $callback, isVeryVerbose());
+                Hook::fire($callback, $arguments);
         }
-
-        Hook::fire($callback, $arguments);
     }
 
     static function tmScores($arguments)
