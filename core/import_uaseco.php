@@ -78,7 +78,6 @@ class ImportUaseco extends Command
         $uaseco = $uasecoCapsule->getConnection();
 
 
-        /*
         //Import players & stats
         $output->writeln('Importing players & stats');
         $uasecoPlayers = $uaseco->table('players')->get();
@@ -147,10 +146,15 @@ class ImportUaseco extends Command
             $authorLogin = $uaseco->table('authors')->where('AuthorId', $map->AuthorId)->first()->Login;
             $author      = $esc->table('players')->whereLogin($authorLogin)->first();
 
+            if ($esc->table('maps')->where('uid', $map->Uid)->exists()) {
+                //TODO: Handle multiple map versions
+                continue;
+            }
+
             $esc->table('maps')->insert([
                 'filename' => $map->Filename,
-                'author' => $author->id,
-                'uid' => $map->Uid,
+                'author'   => $author->id,
+                'uid'      => $map->Uid,
             ]);
 
             $bar->advance();
@@ -182,7 +186,6 @@ class ImportUaseco extends Command
         }
         $bar->finish();
         $output->writeln("\n");
-        */
 
         //Import local records
         $output->writeln('Importing local records: Preparing records...');

@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\MapList;
+namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
