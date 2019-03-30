@@ -5,10 +5,21 @@ namespace esc\Classes;
 
 use Illuminate\Support\Collection;
 
+/**
+ * Class Timer
+ *
+ * Set/delete timers.
+ *
+ * @package esc\Classes
+ */
 class Timer
 {
-    private static $interval = 100; //one tick each X milliseconds
+    private static $interval = 100; //one callback-fetch each X milliseconds
     private static $uStart;
+
+    /**
+     * @var Collection
+     */
     private static $timers;
 
     public $id;
@@ -17,6 +28,14 @@ class Timer
     public $repeat;
     public $delay;
 
+    /**
+     * Timer constructor.
+     *
+     * @param string $id
+     * @param        $callback
+     * @param int    $runtime
+     * @param bool   $repeat
+     */
     private function __construct(string $id, $callback, int $runtime, bool $repeat = false)
     {
         $this->id       = $id;
@@ -25,13 +44,8 @@ class Timer
         $this->repeat   = $repeat;
     }
 
-    public function setNewRuntimeDelay($delay)
-    {
-        $this->runtime = time() + self::textTimeToSeconds($delay);
-    }
-
     /**
-     * Gets timer with id
+     * Get timer by id.
      *
      * @param string $id
      *
@@ -51,7 +65,7 @@ class Timer
     }
 
     /**
-     * Creates a new timer
+     * Creates a new timer. Callback can be reference or closure.
      *
      * @param string                $id
      * @param string|array|callable $callback
@@ -80,6 +94,11 @@ class Timer
         $timers->push($timer);
     }
 
+    /**
+     * Remove a timer.
+     *
+     * @param string $string
+     */
     public static function destroy(string $string)
     {
         self::$timers = self::$timers->where('id', '!=', $string);
@@ -127,11 +146,10 @@ class Timer
             return;
         }
 
-        $toRun        = self::$timers->where('runtime', '<', time());
-        $toRemove     = $toRun->where('repeat', false);
-        self::$timers = self::$timers->diff($toRemove);
+        $toRun    = self::$timers->where('runtime', '<', time());
+        $toRemove = $toRun->where('repeat', false);
 
-        foreach ($toRun as $timer) {
+        self::$timers->diff($toRemove)->each(function (Timer $timer) {
             if (gettype($timer->callback) == "object") {
                 $func = $timer->callback;
                 $func();
@@ -142,7 +160,13 @@ class Timer
             if ($timer->repeat) {
                 $timer->setNewRuntimeDelay($timer->delay);
             }
-        }
+        });
+    }
+
+    //Set new trigger time
+    private function setNewRuntimeDelay($delay)
+    {
+        $this->runtime = time() + self::textTimeToSeconds($delay);
     }
 
     /**
@@ -154,7 +178,7 @@ class Timer
     }
 
     /**
-     * Calculate the sleep time
+     * Calculate the sleep time for the cycle.
      *
      * @return int
      */
@@ -222,17 +246,9 @@ class Timer
         return $seconds;
     }
 
-    public static function scoreToReadableTime(int $score): string
-    {
-        return formatScore($score);
-    }
-
-    public static function stop(string $id)
-    {
-        self::$timers = self::$timers->diff(self::$timers->where('id', $id));
-    }
-
     /**
+     * Set the fetch interval for the callbacks from the dedicated-server.
+     *
      * @param int $interval
      */
     public static function setInterval(int $interval): void
@@ -241,8 +257,6 @@ class Timer
     }
 
     /**
-     * Creates a hash from the timer
-     *
      * @return string
      */
     public function __toString()

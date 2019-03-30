@@ -2,18 +2,36 @@
 
 namespace esc\Classes;
 
-
+/**
+ * Class HideScript
+ *
+ * Automatic script for hiding UI elements while driving.
+ * Add {(new esc\Classes\HideScript())|noescape} to your manialink-script in your template.
+ * Make sure your manialink-frame has the id widget, else set it in the constructor like HideScript('your_frame_id').
+ * In your main-method you need to call hidescript(); in a endless while-loop, thats it.
+ *
+ * @package esc\Classes
+ */
 class HideScript
 {
     public $targetId;
     public $hideOnPodium;
 
+    /**
+     * HideScript constructor.
+     *
+     * @param string $targetId
+     * @param bool   $hideOnPodium
+     */
     public function __construct($targetId = "widget", $hideOnPodium = false)
     {
         $this->targetId     = $targetId;
         $this->hideOnPodium = $hideOnPodium;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return '

@@ -14,11 +14,18 @@ class Config
 
     private static $configs;
 
+    /**
+     * Get a config var. Example: To get the server-login from server.config.json you do get('server.login').
+     *
+     * @param string $pathString
+     *
+     * @return mixed|null
+     */
     public static function get(string $pathString)
     {
-        $path = collect(explode('.', $pathString));
+        $path     = collect(explode('.', $pathString));
         $configId = $path->shift();
-        $config = self::$configs->get($configId);
+        $config   = self::$configs->get($configId);
 
         if (!$config) {
             Log::error("Unknown config file: $configId");
@@ -44,23 +51,21 @@ class Config
      *
      * @param string $pathString
      * @param        $value
-     *
-     * @return null
      */
     public static function set(string $pathString, $value)
     {
-        $path = collect(explode('.', $pathString));
+        $path     = collect(explode('.', $pathString));
         $configId = $path->shift();
-        $config = self::$configs->get($configId);
+        $config   = self::$configs->get($configId);
 
         if (!$config) {
             Log::error("Unknown config file: $configId");
 
-            return null;
+            return;
         }
 
-        $config->data = self::updateData($config->data, $path, $value);
-        $configFile = configDir(basename($config->file));
+        $config->data = self::updateDataRecursively($config->data, $path, $value);
+        $configFile   = configDir(basename($config->file));
 
         if (!File::exists(configDir($configId . '.config.json'))) {
             //No custom settings file
@@ -72,36 +77,23 @@ class Config
         Hook::fire('ConfigUpdated', $config);
     }
 
-    public static function setChatCmd(Player $player, string $cmd, string $pathString, string $value)
-    {
-        self::set($pathString, $value);
-    }
-
-    /**
-     * Belongs to set
-     *
-     * @param                                $data
-     * @param \Illuminate\Support\Collection $path
-     * @param                                $value
-     *
-     * @return mixed
-     */
-    private static function updateData($data, Collection $path, $value)
+    //Helper for set method
+    private static function updateDataRecursively($data, Collection $path, $value)
     {
         $newPath = $path;
-        $node = $newPath->shift();
+        $node    = $newPath->shift();
 
         if ($path->count() == 1) {
             $data->{$node}->{$path->implode('')} = $value;
         } else {
-            $data->{$node} = self::updateData($data->{$node}, $newPath, $value);
+            $data->{$node} = self::updateDataRecursively($data->{$node}, $newPath, $value);
         }
 
         return $data;
     }
 
     /**
-     * Loads all configuration files in config dir
+     * Loads all configuration files in config directory.
      */
     public static function loadConfigFiles(...$args)
     {
@@ -116,6 +108,11 @@ class Config
         $configFolderFiles->each([self::class, 'loadConfigFile']);
     }
 
+    /**
+     * Load specific config file.
+     *
+     * @param string $filename
+     */
     public static function loadConfigFile(string $filename)
     {
         if (preg_match('/\/default\//', $filename)) {
@@ -125,14 +122,21 @@ class Config
 
         $data = file_get_contents($filename);
 
-        $config = new Config();
+        $config       = new Config();
         $config->data = json_decode($data);
-        $config->id = preg_replace('/\.config\.json/i', '', basename($filename));
+        $config->id   = preg_replace('/\.config\.json/i', '', basename($filename));
         $config->file = $filename;
 
         self::$configs->put($config->id, $config);
     }
 
+    /**
+     * Get all config files in given directory.
+     *
+     * @param $path
+     *
+     * @return \Illuminate\Support\Collection
+     */
     private static function getConfigFiles($path): Collection
     {
         $collection = collect();
@@ -145,7 +149,7 @@ class Config
 
             if (is_dir($fullFilePath)) {
                 //Recursively scan directories
-                $newPath = $fullFilePath . DIRECTORY_SEPARATOR;
+                $newPath    = $fullFilePath . DIRECTORY_SEPARATOR;
                 $collection = $collection->merge(self::getConfigFiles($newPath));
             } else {
                 if (preg_match('/\.config\.json/i', $file)) {
@@ -158,12 +162,17 @@ class Config
         return $collection;
     }
 
+    /**
+     * Reload config.
+     */
     public static function configReload()
     {
         self::loadConfigFiles();
     }
 
     /**
+     * Get all loaded configs.
+     *
      * @return array
      */
     public static function getConfigs(): array
@@ -172,6 +181,8 @@ class Config
     }
 
     /**
+     * Overwrite loaded configs.
+     *
      * @param array $configs
      */
     public static function setConfigs(array $configs): void

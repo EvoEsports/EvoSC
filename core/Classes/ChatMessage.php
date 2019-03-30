@@ -5,18 +5,39 @@ namespace esc\Classes;
 
 use esc\Models\Player;
 
+/**
+ * Class ChatMessage
+ *
+ * Create and send chat/info/warning messages.
+ *
+ * @package esc\Classes
+ */
 class ChatMessage
 {
     private $parts;
     private $color;
     private $icon;
 
+    /**
+     * ChatMessage constructor.
+     *
+     * Parts can be strings, numbers, player/group/map/local/etc-objects (most objects are formatted automatically).
+     *
+     * @param mixed ...$message
+     */
     public function __construct(...$message)
     {
         $this->color = config('colors.primary');
         $this->parts = $message;
     }
 
+    /**
+     * Set the primary color of the chat message.
+     *
+     * @param string $color
+     *
+     * @return \esc\Classes\ChatMessage
+     */
     public function setColor(string $color): ChatMessage
     {
         $this->color = $color;
@@ -24,6 +45,13 @@ class ChatMessage
         return $this;
     }
 
+    /**
+     * Set the icon of the chat-message, can contain color-code.
+     *
+     * @param string $icon
+     *
+     * @return \esc\Classes\ChatMessage
+     */
     public function setIcon(string $icon): ChatMessage
     {
         $this->icon = $icon;
@@ -31,6 +59,11 @@ class ChatMessage
         return $this;
     }
 
+    /**
+     * Set info-color and icon on chat-message.
+     *
+     * @return \esc\Classes\ChatMessage
+     */
     public function setIsInfoMessage(): ChatMessage
     {
         $this->color = config('colors.info');
@@ -39,6 +72,11 @@ class ChatMessage
         return $this;
     }
 
+    /**
+     * Set warning-color and icon on chat-message.
+     *
+     * @return \esc\Classes\ChatMessage
+     */
     public function setIsWarning(): ChatMessage
     {
         $this->color = config('colors.warning');
@@ -47,6 +85,13 @@ class ChatMessage
         return $this;
     }
 
+    /**
+     * Overwrite the chat-message content.
+     *
+     * @param mixed ...$parts
+     *
+     * @return \esc\Classes\ChatMessage
+     */
     public function setParts(...$parts): ChatMessage
     {
         $this->parts = $parts;
@@ -54,6 +99,11 @@ class ChatMessage
         return $this;
     }
 
+    /**
+     * Get the formatted message.
+     *
+     * @return string
+     */
     public function getMessage(): string
     {
         $message = '';
@@ -79,11 +129,17 @@ class ChatMessage
         return $message;
     }
 
+    /**
+     * Send the message to everyone.
+     */
     public function sendAll()
     {
         Server::chatSendServerMessage($this->getMessage());
     }
 
+    /**
+     * Send the message to everyone with the admin_echoes access-right.
+     */
     public function sendAdmin()
     {
         $this->setIcon('$666');
@@ -96,6 +152,11 @@ class ChatMessage
         Server::executeMulticall();
     }
 
+    /**
+     * Send the message to a specific player.
+     *
+     * @param \esc\Models\Player|null $player
+     */
     public function send(Player $player = null)
     {
         if (!$player) {

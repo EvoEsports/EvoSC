@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
-use esc\Classes\ManiaScriptLib;
 use esc\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 use Latte\Engine;
@@ -41,8 +40,6 @@ class TemplateController implements ControllerInterface
             return formatScore($str);
         })->addFilter('cfg', function ($str) {
             return config($str);
-        })->addFilter('mslib', function ($str) {
-            return ManiaScriptLib::get($str);
         });
     }
 

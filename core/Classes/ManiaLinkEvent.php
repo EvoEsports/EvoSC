@@ -3,18 +3,44 @@
 namespace esc\Classes;
 
 
-use esc\Classes\ChatCommand;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
+/**
+ * Class ManiaLinkEvent
+ *
+ * Handle actions send from ManiaScripts (clients).
+ *
+ * @package esc\Classes
+ */
 class ManiaLinkEvent
 {
+    /**
+     * @var Collection
+     */
     private static $maniaLinkEvents;
 
     public $id;
     public $callback;
     public $access;
 
+    /**
+     * Initialize ManiaLinkEvent
+     */
+    public static function init()
+    {
+        self::$maniaLinkEvents = new Collection();
+
+        Hook::add('PlayerManialinkPageAnswer', [self::class, 'call']);
+    }
+
+    /**
+     * ManiaLinkEvent constructor.
+     *
+     * @param string      $id
+     * @param array       $callback
+     * @param string|null $access
+     */
     private function __construct(string $id, array $callback, string $access = null)
     {
         $this->id       = $id;
@@ -22,18 +48,23 @@ class ManiaLinkEvent
         $this->access   = $access;
     }
 
+    /**
+     * Get all registered mania link events.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     private static function getManiaLinkEvents(): Collection
     {
         return self::$maniaLinkEvents;
     }
 
-    public static function init()
-    {
-        self::$maniaLinkEvents = new Collection();
-
-        Hook::add('PlayerManialinkPageAnswer', [\esc\Classes\ManiaLinkEvent::class, 'call']);
-    }
-
+    /**
+     * Add a manialink event. Callback must be of type [MyClass::class, 'methodToCall'].
+     *
+     * @param string      $id
+     * @param array       $callback
+     * @param string|null $access
+     */
     public static function add(string $id, array $callback, string $access = null)
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
@@ -48,6 +79,12 @@ class ManiaLinkEvent
         $maniaLinkEvents->push($event);
     }
 
+    /**
+     * Handle an ingoing mania-link event.
+     *
+     * @param \esc\Models\Player $ply
+     * @param string             $action
+     */
     public static function call(Player $ply, string $action)
     {
         Log::logAddLine('Mania Link Event', "$action", false);

@@ -2,16 +2,32 @@
 
 namespace esc\Classes;
 
-
+/**
+ * Class ManiaLinkDrag
+ *
+ * Helper script for dragging ManiaLinks (could need optimization).
+ * Add {(new esc\Classes\ManiaLinkDrag())|noescape} to your ManiaScript, make sure you have a quad in your header area with the id "handle", if not set your quad-id in the constructor.
+ * Call maniaLinkDrag(); in a loop.
+ *
+ * @package esc\Classes
+ */
 class ManiaLinkDrag
 {
     public $targetId;
 
+    /**
+     * ManiaLinkDrag constructor.
+     *
+     * @param string $targetId
+     */
     public function __construct($targetId = "handle")
     {
         $this->targetId = $targetId;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return '

@@ -4,26 +4,52 @@ namespace esc\Classes;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Log
+ *
+ * Logging and colored cli-output.
+ *
+ * @package esc\Classes
+ */
 class Log
 {
+    /**
+     * @var OutputInterface
+     */
     private static $output;
 
-    public static function setOutput(OutputInterface $output)
-    {
-        self::$output = $output;
-    }
-
+    /**
+     * Get the output-interface
+     *
+     * @return \Symfony\Component\Console\Output\OutputInterface|null
+     */
     public static function getOutput(): ?OutputInterface
     {
         return self::$output;
     }
 
+    /**
+     * Write a line to the cli.
+     *
+     * @param string $line
+     */
     public static function writeLn(string $line)
     {
         $output = self::getOutput();
         $output->writeln(stripAll($line));
     }
 
+    /**
+     * Add a log entry and output it to cli as default. You can use:
+     * - isVerbose() (-v)
+     * - isVeryVerbose() (-vv)
+     * - isDebug() (-vvv)
+     * to manage output to cli (all lines will be added to the log-file, independent from verbosity-level).
+     *
+     * @param string $prefix
+     * @param string $string
+     * @param bool   $echo
+     */
     public static function logAddLine(string $prefix, string $string, $echo = true)
     {
         $date    = date("Y-m-d", time());
@@ -78,41 +104,59 @@ class Log
         File::appendLine($logFile, $line);
     }
 
+    /**
+     * Log a info-message.
+     *
+     * @param      $message
+     * @param bool $echo
+     */
     public static function info($message, bool $echo = true)
     {
         self::logAddLine('Info', $message, $echo);
     }
 
+    /**
+     * Log a error-message.
+     *
+     * @param      $message
+     * @param bool $echo
+     */
     public static function error($message, bool $echo = true)
     {
         self::logAddLine("ERROR", $message, $echo);
-        self::debug($message);
     }
 
+    /**
+     * Log a warning-message
+     *
+     * @param      $message
+     * @param bool $echo
+     */
     public static function warning($message, bool $echo = true)
     {
         self::logAddLine('Warning', $message, $echo);
     }
 
-    public static function hook($message, $echo = false)
-    {
-        self::logAddLine('Hook', $message, $echo);
-    }
-
-    private static function debug($message, bool $echo = true)
-    {
-        self::logAddLine('Debug', $message, false);
-    }
-
-    public static function music($message, bool $echo = true)
-    {
-        self::logAddLine('Music-Server', $message, $echo);
-    }
-
+    /**
+     * Log a chat-message.
+     *
+     * @param $nick
+     * @param $message
+     */
     public static function chat($nick, $message)
     {
         $line = "$nick: ";
         $line .= $message;
         self::logAddLine(stripAll($line), true);
+    }
+
+    /**
+     * Do not use (internal function). Set the output interface.
+     *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
+    public static function setOutput(OutputInterface $output)
+    {
+        self::$output = $output;
     }
 }

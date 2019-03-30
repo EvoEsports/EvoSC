@@ -8,6 +8,8 @@ use Maniaplanet\DedicatedServer\Connection;
 /**
  * Class Server
  *
+ * XML-RPC helper class. See {@see https://doc.maniaplanet.com/dedicated-server/references/xml-rpc-methods} for a full list of all methods and their arguments.
+ *
  * @package esc\Classes
  *
  * @method static bool authenticate(string $string, string $string)
@@ -287,19 +289,42 @@ class Server
 {
     private static $rpc;
 
+    /**
+     * Initialize the connection to the maniaplanet-dedicated-server.
+     *
+     * @param $host
+     * @param $port
+     * @param $timeout
+     * @param $login
+     * @param $password
+     *
+     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     */
     public static function init($host, $port, $timeout, $login, $password)
     {
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
 
+        //Hide all previously send manialinks
         // self::call('SendHideManialinkPage');
     }
 
+    /**
+     * Get the rpc-connection-instance of the maniaplanet-package (Useful to get type-hints).
+     *
+     * @return \Maniaplanet\DedicatedServer\Connection
+     */
     public static function rpc(): Connection
     {
         return self::$rpc;
     }
 
+    /**
+     * Call an rpc-method.
+     *
+     * @param string $rpc_func
+     * @param null   $args
+     */
     public static function call(string $rpc_func, $args = null)
     {
         self::rpc()->execute($rpc_func, $args);

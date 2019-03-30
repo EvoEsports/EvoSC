@@ -5,9 +5,18 @@ namespace esc\Classes;
 
 use Illuminate\Support\Collection;
 
+/**
+ * Class File
+ *
+ * Create/delete/update/append files, read/create directories.
+ *
+ * @package esc\Classes
+ */
 class File
 {
     /**
+     * Get the contents of a file and optionally json decode them.
+     *
      * @param string|null $fileName
      * @param bool        $json_decode
      *
@@ -32,6 +41,14 @@ class File
         return null;
     }
 
+    /**
+     * Overwrite or create a file with the given content. Returns true if file exists.
+     *
+     * @param string $fileName
+     * @param string $content
+     *
+     * @return bool
+     */
     public static function put(string $fileName, string $content): bool
     {
         file_put_contents($fileName, $content);
@@ -39,6 +56,12 @@ class File
         return self::exists($fileName);
     }
 
+    /**
+     * Append a single line to a file.
+     *
+     * @param $fileName
+     * @param $line
+     */
     public static function appendLine($fileName, $line)
     {
         if (!file_exists($fileName)) {
@@ -48,6 +71,11 @@ class File
         file_put_contents($fileName, "\n" . $line, FILE_APPEND);
     }
 
+    /**
+     * Creates a directory
+     *
+     * @param string $name
+     */
     public static function createDirectory(string $name)
     {
         if (!is_dir($name)) {
@@ -56,6 +84,14 @@ class File
         }
     }
 
+    /**
+     * Gets all files in the directory, you can optionally filter them with a RegEx-pattern.
+     *
+     * @param string      $path
+     * @param string|null $filterPattern
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
         if ($filterPattern) {
@@ -67,6 +103,14 @@ class File
         return collect(scandir($path));
     }
 
+    /**
+     * Get all files in a directory recursively.
+     *
+     * @param string $baseDirectory
+     * @param string $filterPattern
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {
         $files = collect();
@@ -90,6 +134,13 @@ class File
         return $files;
     }
 
+    /**
+     * Delete a file.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
     public static function delete(string $path): bool
     {
         if (file_exists($path) && is_file($path)) {
@@ -102,6 +153,13 @@ class File
         return false;
     }
 
+    /**
+     * Check if a file exists.
+     *
+     * @param string $filename
+     *
+     * @return bool
+     */
     public static function exists(string $filename)
     {
         return file_exists($filename);

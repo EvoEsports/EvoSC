@@ -5,6 +5,23 @@ namespace esc\Classes;
 
 use esc\Controllers\HookController;
 
+/**
+ * Class Hook
+ *
+ * Hooks are responsible for all server & player-events. Events are transformed to hooks and hooks can also be called internally to pass data to other methods.
+ * Register a Hook like Hook::('event_name', callback [, runOnce]). A list of all hooks will follow.
+ *
+ * callback can either be a method reference like [MyClass::class, 'methodToCall'] or a closure function(){}.
+ *
+ * Example:
+ * Hook::add('PlayerConnect', [PlayerController::class, 'playerConnected']);
+ * or
+ * Hook::add('BeginMap', function(Map $map){
+ *     ... do stuff ...
+ * });
+ *
+ * @package esc\Classes
+ */
 class Hook
 {
     private $runOnce;
@@ -38,6 +55,9 @@ class Hook
     }
 
     /**
+     * Execute the hook with the given arguments.
+     * Warning: Calling a hook with the wrong number of arguments could result in an exception.
+     *
      * @param array ...$arguments
      */
     public function execute(...$arguments)
@@ -67,6 +87,8 @@ class Hook
     }
 
     /**
+     * Get the triggering event associated with the hook.
+     *
      * @return string
      */
     public function getEvent(): string
@@ -74,12 +96,19 @@ class Hook
         return $this->event;
     }
 
+    /**
+     * Get the hooks method called on execution.
+     *
+     * @return callable
+     */
     public function getFunction()
     {
         return $this->function;
     }
 
     /**
+     * Add a hook helper.
+     *
      * @param string         $event
      * @param \Closure|array $callback
      * @param bool           $runOnce
@@ -90,7 +119,7 @@ class Hook
     }
 
     /**
-     * Fire all registered hooks
+     * Fire all hooks for the given name and arguments.
      *
      * @param string $hookName
      * @param mixed  ...$arguments
