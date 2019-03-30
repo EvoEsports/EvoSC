@@ -76,7 +76,7 @@ class AfkController implements ControllerInterface
             if ($lastInteraction->diffInMinutes() >= config('server.afk-timeout') && !$data['is_afk']) {
                 $player = Player::whereLogin($playerLogin)->first();
 
-                if ($player->isSpectator()) {
+                if ($player->isSpectator() ?? false) {
                     return;
                 }
 
@@ -92,12 +92,10 @@ class AfkController implements ControllerInterface
         });
 
         if ($afkPlayers->count() > 1) {
-            $message = infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.');
+            infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
         } else {
-            $message = infoMessage($afkPlayers->first(), ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.');
+            infoMessage($afkPlayers->first(), ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
         }
-
-        $message->setIcon('')->sendAll();
     }
 
     /**
