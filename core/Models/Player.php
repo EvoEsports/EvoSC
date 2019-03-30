@@ -4,6 +4,7 @@ namespace esc\Models;
 
 
 use Carbon\Carbon;
+use esc\Modules\MxKarma;
 use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
