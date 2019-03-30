@@ -229,5 +229,5 @@ function isDebug(): bool
 {
     global $_isDebug;
 
-    return ($_isDebug);
+    return $_isDebug;
 }
