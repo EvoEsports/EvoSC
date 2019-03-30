@@ -218,6 +218,7 @@ class Dedimania extends DedimaniaApi
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
                 'Rank'        => -1,
+                'New'         => 1,
             ]);
 
             self::fixRanks($map);
@@ -254,6 +255,7 @@ class Dedimania extends DedimaniaApi
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
                 'Rank'        => $newRank,
+                'New'         => 1,
             ]);
 
             self::fixRanks($map);
