@@ -78,20 +78,20 @@ class Timer
             self::$timers = new Collection();
         }
 
-        $timers = self::$timers;
-
-        if ($timers->where('id', $id)->isNotEmpty()) {
+        /*
+        if (self::$timers->where('id', $id)->isNotEmpty()) {
             Log::warning("Timer with id: $id already exists, not setting.");
 
             return;
         }
+        */
 
         $runtime = time() + self::textTimeToSeconds($delayTime);
 
         $timer        = new Timer($id, $callback, $runtime, $repeat);
         $timer->delay = $delayTime;
 
-        $timers->push($timer);
+        self::$timers->push($timer);
     }
 
     /**
