@@ -11,7 +11,7 @@
   "afk-timeout": 8,
   "controller-interval": 100,
   "echoes": {
-    "join": false,
-    "leave": false
+    "join": true,
+    "leave": true
   }
 }
