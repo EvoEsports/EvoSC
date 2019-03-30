@@ -7,10 +7,11 @@
     "password": ""
   },
   "default-matchsettings": "",
-  "map-cooldown": 5,
-  "afk-timeout": 5,
+  "map-cooldown": 10,
+  "afk-timeout": 8,
+  "controller-interval": 100,
   "echoes": {
-    "join": true,
-    "leave": true
+    "join": false,
+    "leave": false
   }
 }
