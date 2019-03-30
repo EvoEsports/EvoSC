@@ -158,7 +158,8 @@ class Timer
             }
 
             if ($timer->repeat) {
-                $timer->setNewRuntimeDelay($timer->delay);
+                Log::logAddLine('Timer', 'Set new runtime delay for ' . $timer->id . ': ' . $timer->delay);
+                //$timer->setNewRuntimeDelay($timer->delay);
             }
         });
     }
