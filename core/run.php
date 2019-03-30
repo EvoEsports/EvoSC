@@ -84,15 +84,9 @@ class EscRun extends Command
         global $_isDebug;
         global $_onlinePlayers;
 
-        if ($output->isVerbose()) {
-            $_isVerbose = true;
-        }
-        if ($output->isVeryVerbose()) {
-            $_isVeryVerbose = true;
-        }
-        if ($output->isDebug()) {
-            $_isDebug = true;
-        }
+        $_isVerbose     = $output->isVerbose();
+        $_isVeryVerbose = $output->isVeryVerbose();
+        $_isDebug       = $output->isDebug();
 
         Log::setOutput($output);
 
