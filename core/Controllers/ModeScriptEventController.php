@@ -5,16 +5,28 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
-use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 
+/**
+ * Class ModeScriptEventController
+ *
+ * @package esc\Controllers
+ */
 class ModeScriptEventController implements ControllerInterface
 {
+    /**
+     * Initialize ModeScriptEventController
+     */
     public static function init()
     {
     }
 
+    /**
+     * Process mode-script-callbacks (send from mode-script, not dedicated -> callback list in docs does not apply).
+     *
+     * @param $modescriptCallbackArray
+     */
     public static function handleModeScriptCallbacks($modescriptCallbackArray)
     {
         if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
@@ -25,6 +37,7 @@ class ModeScriptEventController implements ControllerInterface
         }
     }
 
+    //Decide if the callback should be transformed and fire the hooks.
     private static function call($callback, $arguments)
     {
         switch ($callback) {
@@ -60,10 +73,12 @@ class ModeScriptEventController implements ControllerInterface
 
             case 'Trackmania.Event.OnPlayerAdded':
                 // self::tmPlayerConnect($arguments);
+                // Handled by {@see EventController}
                 return;
 
             case 'Trackmania.Event.OnPlayerRemoved':
                 // self::tmPlayerLeave($arguments);
+                // Handled by {@see EventController}
                 return;
 
             default:
@@ -72,11 +87,21 @@ class ModeScriptEventController implements ControllerInterface
         }
     }
 
+    /**
+     * Called on round end, when scores show.
+     *
+     * @param $arguments
+     */
     static function tmScores($arguments)
     {
         Hook::fire('ShowScores', $arguments);
     }
 
+    /**
+     * Called when a player resets his car.
+     *
+     * @param $arguments
+     */
     static function tmGiveUp($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
@@ -85,6 +110,11 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerFinish', $player, 0, "");
     }
 
+    /**
+     * Called when a player passes a checkpoint or the finish (last checkpoint).
+     *
+     * @param $arguments
+     */
     static function tmWayPoint($arguments)
     {
         $wayPoint = json_decode($arguments[0]);
@@ -107,11 +137,16 @@ class ModeScriptEventController implements ControllerInterface
             Hook::fire('PlayerFinish',
                 $player,
                 $wayPoint->laptime,
-                self::cpArrayToString($wayPoint->curlapcheckpoints)
+                implode(',', $wayPoint->curlapcheckpoints)
             );
         }
     }
 
+    /**
+     * Called when the countdown starts for a player.
+     *
+     * @param $arguments
+     */
     static function tmStartCountdown($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
@@ -119,6 +154,11 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerStartCountdown', $player);
     }
 
+    /**
+     * Called when the car of the players gets unfrozen.
+     *
+     * @param $arguments
+     */
     static function tmStartLine($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
@@ -126,11 +166,21 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerStartLine', $player);
     }
 
+    /**
+     * Disabled: Called when a player does a stunt.
+     *
+     * @param $arguments
+     */
     static function tmStunt($arguments)
     {
         //ignore stunts for now
     }
 
+    /**
+     * Called on player connect.
+     *
+     * @param $arguments
+     */
     static function tmPlayerConnect($arguments)
     {
         $playerData = json_decode($arguments[0]);
@@ -145,23 +195,16 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerConnect', $player);
     }
 
+    /**
+     * Called on player leave.
+     *
+     * @param $arguments
+     */
     static function tmPlayerLeave($arguments)
     {
         $playerData = json_decode($arguments[0]);
         $player     = player($playerData->login);
 
         Hook::fire('PlayerDisconnect', $player);
-    }
-
-    /**
-     * Convert cp array to comma separated string
-     *
-     * @param array $cps
-     *
-     * @return string
-     */
-    private static function cpArrayToString(array $cps)
-    {
-        return implode(',', $cps);
     }
 }

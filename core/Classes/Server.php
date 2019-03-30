@@ -88,7 +88,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool cleanIgnoreList()
  * @method static array getIgnoreList(int $int, int $int)
  * @method static int pay(string $string, int $int, string $string)
- * @method static int sendBill(string $string, int $int, string $string, string $string)
+ * @method static int sendBill(string $string, int $int, string $string, string $string = null)
  * @method static object getBillState(int $int)
  * @method static int getServerPlanets()
  * @method static object getSystemInfo()

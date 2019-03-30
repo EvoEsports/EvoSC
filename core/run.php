@@ -3,7 +3,9 @@
 require 'autoload.php';
 require 'global-functions.php';
 
+use esc\Classes\Server;
 use esc\Classes\Log;
+use esc\Classes\Timer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,21 +48,21 @@ class EscRun extends Command
                 config('server.rpc.password')
             );
 
-            $serverName = \esc\Classes\Server::getServerName();
+            $serverName = Server::getServerName();
 
-            if (!\esc\Classes\Server::isAutoSaveValidationReplaysEnabled()) {
-                \esc\Classes\Server::autoSaveValidationReplays(true);
+            if (!Server::isAutoSaveValidationReplaysEnabled()) {
+                Server::autoSaveValidationReplays(true);
             }
-            if (!\esc\Classes\Server::isAutoSaveReplaysEnabled()) {
-                \esc\Classes\Server::autoSaveReplays(true);
+            if (!Server::isAutoSaveReplaysEnabled()) {
+                Server::autoSaveReplays(true);
             }
 
             //Disable all default ManiaPlanet votes
             /*
             $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
-            \esc\Classes\Server::setCallVoteRatios([$voteRatio]);
+            Server::setCallVoteRatios([$voteRatio]);
             */
-            \esc\Classes\Server::setCallVoteTimeOut(0);
+            Server::setCallVoteTimeOut(0);
 
             $output->writeln("Connection established.");
         } catch (\Exception $e) {
@@ -92,7 +94,7 @@ class EscRun extends Command
             $_isDebug = true;
         }
 
-        \esc\Classes\Log::setOutput($output);
+        Log::setOutput($output);
 
         $version = getEscVersion();
         $motd    = "      ______           _____ ______
@@ -104,9 +106,9 @@ class EscRun extends Command
 
         $output->writeln("<fg=cyan;options=bold>$motd</>");
 
-        esc\Classes\Log::info("Starting...");
+        Log::info("Starting...");
 
-        \esc\Classes\Timer::setInterval(config('server.controller-interval') ?? 250);
+        Timer::setInterval(config('server.controller-interval') ?? 250);
 
         $_onlinePlayers = collect();
 
@@ -116,17 +118,15 @@ class EscRun extends Command
         esc\Controllers\TemplateController::init();
         esc\Controllers\ChatController::init();
         esc\Classes\ManiaLinkEvent::init();
-        esc\Controllers\GroupController::init();
-        esc\Controllers\AccessController::init();
         esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
         esc\Controllers\PlayerController::init();
         esc\Controllers\AfkController::init();
         esc\Controllers\ModuleController::init();
-        \esc\Controllers\PlanetsController::init();
+        esc\Controllers\PlanetsController::init();
 
         $logins = [];
-        foreach (\esc\Classes\Server::getPlayerList(500, 0) as $player) {
+        foreach (Server::getPlayerList(500, 0) as $player) {
             array_push($logins, $player->login);
         }
         \esc\Models\Player::whereIn('Login', $logins)->get()->each(function (\esc\Models\Player $player) use ($_onlinePlayers) {
@@ -147,7 +147,7 @@ class EscRun extends Command
         esc\Classes\Hook::fire('BeginMap', $map);
 
         //Set connected players online
-        $playerList = collect(\esc\Classes\Server::rpc()->getPlayerList());
+        $playerList = collect(Server::rpc()->getPlayerList());
 
         foreach ($playerList as $maniaPlayer) {
             \esc\Models\Player::firstOrCreate(['Login' => $maniaPlayer->login], [
@@ -156,11 +156,12 @@ class EscRun extends Command
         }
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
-        \esc\Classes\Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
-        \esc\Classes\Server::disableServiceAnnounces(true);
+        Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
+        Server::disableServiceAnnounces(true);
 
         $failedConnectionRequests = 0;
 
+        //cycle-loop
         while (true) {
             try {
                 esc\Classes\Timer::startCycle();
@@ -177,8 +178,9 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
-                Log::logAddLine('MPS', 'Connection problems. Failed attempts: ' . $failedConnectionRequests . '/50');
+                Log::logAddLine('MPS', 'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::logAddLine('MPS', $e->getMessage());
+
                 $failedConnectionRequests++;
                 if ($failedConnectionRequests > 50) {
                     Log::logAddLine('MPS', sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));

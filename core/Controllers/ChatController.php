@@ -13,6 +13,13 @@ use esc\Models\Player;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
+/**
+ * Class ChatController
+ *
+ * Handle chat-messages and commands.
+ *
+ * @package esc\Controllers
+ */
 class ChatController implements ControllerInterface
 {
     /**
@@ -20,6 +27,9 @@ class ChatController implements ControllerInterface
      */
     private static $mutedPlayers;
 
+    /**
+     * Initialize ChatController.
+     */
     public static function init()
     {
         self::$mutedPlayers = collect();
@@ -42,6 +52,13 @@ class ChatController implements ControllerInterface
         ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 
+    /**
+     * Chat-command: mute player.
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     * @param                    $nick
+     */
     public static function mute(Player $player, $cmd, $nick)
     {
         $target = PlayerController::findPlayerByName($player, $nick);
@@ -57,6 +74,13 @@ class ChatController implements ControllerInterface
         self::$mutedPlayers = self::$mutedPlayers->push($ply)->unique();
     }
 
+    /**
+     * Chat-command: unmute player.
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     * @param                    $nick
+     */
     public static function unmute(Player $player, $cmd, $nick)
     {
         $target = PlayerController::findPlayerByName($player, $nick);
@@ -71,6 +95,14 @@ class ChatController implements ControllerInterface
         });
     }
 
+    /**
+     * Chat-command: send pm to a player
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     * @param                    $nick
+     * @param mixed              ...$message
+     */
     public static function pm(Player $player, $cmd, $nick, ...$message)
     {
         $target = PlayerController::findPlayerByName($player, $nick);
@@ -93,6 +125,12 @@ class ChatController implements ControllerInterface
         chatMessage($to . implode(' ', $message))->setIcon('')->send($player);
     }
 
+    /**
+     * Process chat-message and detect commands.
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $text
+     */
     public static function playerChat(Player $player, $text)
     {
         $parts = explode(' ', $text);

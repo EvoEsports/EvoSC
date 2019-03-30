@@ -10,9 +10,20 @@ use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Bill;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
+/**
+ * Class PlanetsController
+ *
+ * Create planets payments.
+ *
+ * @package esc\Controllers
+ */
 class PlanetsController implements ControllerInterface
 {
+    /**
+     * @var Collection
+     */
     private static $openBills;
     private static $billStates;
 
@@ -24,6 +35,11 @@ class PlanetsController implements ControllerInterface
         Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
 
+    /**
+     * Check payment state.
+     *
+     * @param \esc\Models\Bill $bill
+     */
     public static function checkBill(Bill &$bill)
     {
         $billState = Server::getBillState($bill->id);
@@ -35,7 +51,7 @@ class PlanetsController implements ControllerInterface
                 break;
 
             case 5:
-                if($bill->failFunction){
+                if ($bill->failFunction) {
                     call_user_func($bill->failFunction, $bill->player);
                 }
                 $bill->expired = true;
@@ -48,6 +64,9 @@ class PlanetsController implements ControllerInterface
         }
     }
 
+    /**
+     * Check all payment states.
+     */
     public static function checkBills()
     {
         $bills = self::$openBills->where('expired', false);
@@ -55,12 +74,22 @@ class PlanetsController implements ControllerInterface
         Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
 
+    /**
+     * Create payment request.
+     *
+     * @param \esc\Models\Player $player
+     * @param int                $amount
+     * @param string             $label
+     * @param array              $successFunction
+     * @param array|null         $failFunction
+     */
     public static function createBill(Player $player, int $amount, string $label, array $successFunction, array $failFunction = null)
     {
         $billId = Server::sendBill($player->Login, $amount, $label);
 
         if (!$billId || !is_int($billId)) {
             Log::logAddLine('PlanetsController', 'Failed to create bill');
+
             return;
         }
 

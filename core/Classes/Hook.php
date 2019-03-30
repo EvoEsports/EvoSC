@@ -107,15 +107,20 @@ class Hook
     }
 
     /**
-     * Add a hook helper.
+     * Use Hook::add.
+     * Register a hook.
      *
-     * @param string         $event
-     * @param \Closure|array $callback
-     * @param bool           $runOnce
+     * @param string $event
+     * @param        $callback
+     * @param bool   $runOnce
      */
     public static function add(string $event, $callback, bool $runOnce = false)
     {
-        HookController::add($event, $callback, $runOnce);
+        try {
+            HookController::add($event, $callback, $runOnce);
+        } catch (\Exception $e) {
+            Log::logAddLine('!] Hook [!', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
+        }
     }
 
     /**

@@ -31,6 +31,9 @@ class GroupManager
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
 
+        AccessRight::createIfNonExistent('group_edit', 'Add/delete/update groups.');
+        AccessRight::createIfNonExistent('group_change', 'Change player group.');
+
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }

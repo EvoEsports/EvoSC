@@ -22,6 +22,11 @@ use esc\Modules\QuickButtons;
 use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 use mysql_xdevapi\Exception;
 
+/**
+ * Class MapController
+ *
+ * @package esc\Controllers
+ */
 class MapController implements ControllerInterface
 {
     /**
@@ -38,7 +43,9 @@ class MapController implements ControllerInterface
     private static $addedTime = 0;
     private static $timeLimit;
 
-
+    /**
+     * Initialize MapController
+     */
     public static function init()
     {
         self::$mapsPath  = Server::getMapsDirectory();
@@ -78,6 +85,11 @@ class MapController implements ControllerInterface
         }
     }
 
+    /**
+     * Load the time limit from the default match-settings.
+     *
+     * @return int
+     */
     private static function getTimeLimitFromMatchSettings(): int
     {
         $file = config('server.default-matchsettings');
@@ -118,17 +130,34 @@ class MapController implements ControllerInterface
         Hook::fire('TimeLimitUpdated', $newTimeLimit);
     }
 
+    /**
+     * Add one minute to the countdown.
+     *
+     * @param \esc\Models\Player $player
+     */
     public static function addMinute(Player $player)
     {
         self::addTime(60);
     }
 
+    /**
+     * Chat-command: Add time
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     * @param float              $amount
+     */
     public static function addTimeManually(Player $player, $cmd, float $amount)
     {
         self::addTime($amount * 60.0);
         Log::logAddLine('MapController', $player . ' added ' . $amount . ' minutes');
     }
 
+    /**
+     * Set a new timelimit in seconds.
+     *
+     * @param int $seconds
+     */
     public static function setTimelimit(int $seconds)
     {
         $settings                = Server::getModeScriptSettings();
@@ -136,8 +165,40 @@ class MapController implements ControllerInterface
         Server::setModeScriptSettings($settings);
     }
 
+    /*
+     * Hook: BeginMap
+     */
+    public static function beginMap(Map $map)
+    {
+        Map::where('id', '!=', $map->id)->increment('cooldown');
+
+        $map->increment('plays');
+        $map->update([
+            'last_played' => now(),
+            'cooldown'    => 0,
+        ]);
+
+        MxMapDetails::loadMxDetails($map);
+
+        foreach (finishPlayers() as $player) {
+            $player->setScore(0);
+        }
+
+        self::$currentMap = $map;
+        self::$mapStart   = now();
+    }
+
     /**
-     *
+     * Hook: BeginMatch
+     */
+    public static function beginMatch()
+    {
+        self::resetTime();
+        self::addTime(1);
+    }
+
+    /**
+     * Hook: EndMatch
      */
     public static function endMatch()
     {
@@ -157,39 +218,12 @@ class MapController implements ControllerInterface
         $chatMessage->setIcon('')->sendAll();
     }
 
-    /*
-     * Hook: BeginMap
-     */
-    public static function beginMap(Map $map)
-    {
-        Map::where('id', '!=', $map->id)->increment('cooldown');
-
-        $map->increment('plays');
-        $map->update([
-            'last_played' => Carbon::now(),
-            'cooldown'    => 0,
-        ]);
-
-        MxMapDetails::loadMxDetails($map);
-
-        foreach (finishPlayers() as $player) {
-            $player->setScore(0);
-        }
-
-        self::$currentMap = $map;
-        self::$mapStart   = now();
-    }
-
-    public static function beginMatch()
-    {
-        self::resetTime();
-        self::addTime(1);
-    }
-
     /**
-     * @return \esc\Models\Map|null
+     * Get the currently played map.
+     *
+     * @return Map
      */
-    public static function getCurrentMap(): ?Map
+    public static function getCurrentMap(): Map
     {
         if (!self::$currentMap) {
             Log::error('Current map is not set. Exiting...', true);
@@ -199,8 +233,16 @@ class MapController implements ControllerInterface
         return self::$currentMap;
     }
 
+    /**
+     * Remove a map
+     *
+     * @param \esc\Models\Player $player
+     * @param \esc\Models\Map    $map
+     */
     public static function deleteMap(Player $player, Map $map)
     {
+        return; //disabled
+
         try {
             Server::removeMap($map->filename);
         } catch (FileException $e) {
@@ -223,6 +265,12 @@ class MapController implements ControllerInterface
         }
     }
 
+    /**
+     * Disable a map and remove it from the current selection.
+     *
+     * @param \esc\Models\Player $player
+     * @param \esc\Models\Map    $map
+     */
     public static function disableMap(Player $player, Map $map)
     {
         try {
@@ -271,6 +319,13 @@ class MapController implements ControllerInterface
         QueueController::queueMap($player, $currentMap);
     }
 
+    /**
+     * Get gbx-information for a map by filename.
+     *
+     * @param $filename
+     *
+     * @return string
+     */
     public static function getGbxInformation($filename): string
     {
         $absolute = Server::getMapsDirectory() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename);
@@ -373,16 +428,31 @@ class MapController implements ControllerInterface
         return self::$addedTime;
     }
 
+    /**
+     * Reset the round.
+     *
+     * @param \esc\Models\Player $player
+     */
     public static function resetRound(Player $player)
     {
         Server::restartMap();
     }
 
+    /**
+     * Get the maps directory-path.
+     *
+     * @return string
+     */
     public static function getMapsPath(): string
     {
         return self::$mapsPath;
     }
 
+    /**
+     * Get the round-start-time.
+     *
+     * @return \Carbon\Carbon
+     */
     public static function getMapStart(): Carbon
     {
         return self::$mapStart;
