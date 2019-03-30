@@ -212,15 +212,17 @@ class Dedimania extends DedimaniaApi
                 return;
             }
 
-            $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
-            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : $oldRank;
-            $diff             = $oldRecord->Score - $score;
-
-            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
+            $map->dedis()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => $newRank,
+                'Rank'        => -1,
             ]);
+
+            self::fixRanks($map);
+
+            $newRecord = $map->dedis()->wherePlayer($player->id)->first();
+            $newRank   = $newRecord->Rank;
+            $diff      = $oldRecord->Score - $score;
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
@@ -231,7 +233,6 @@ class Dedimania extends DedimaniaApi
                 $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
-                $map->dedis()->where('Rank', '>=', $newRank)->where('Rank', '<', $oldRank)->increment('Rank');
             }
 
             $chatMessage->sendAll();
@@ -247,13 +248,16 @@ class Dedimania extends DedimaniaApi
                 return;
             }
 
-            $map->dedis()->where('Rank', '>=', $newRank)->increment('Rank');
-
-            $newRecord = $map->dedis()->updateOrCreate(['Player' => $player->id], [
+            $map->dedis()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
                 'Rank'        => $newRank,
             ]);
+
+            self::fixRanks($map);
+
+            $newRecord = $map->dedis()->wherePlayer($player->id)->first();
+            $newRank   = $newRecord->Rank;
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
@@ -269,6 +273,13 @@ class Dedimania extends DedimaniaApi
             self::cacheDedisJson();
             self::sendUpdatedDedis();
         }
+    }
+
+    private static function fixRanks(Map $map)
+    {
+        $map->dedis()->orderBy('Score')->get()->each(function (LocalRecord $record, $key) {
+            $record->update(['Rank' => $key + 1]);
+        });
     }
 
     private static function saveGhostReplay(Model $dedi)
