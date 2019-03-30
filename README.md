@@ -1,7 +1,9 @@
-![version:0.62.0](https://img.shields.io/badge/version-0.62.0-blue.svg?style=flat-square)
-![status:unreleased](https://img.shields.io/badge/Status-not_ready_for_production-red.svg?style=flat-square)
-
 # EvoSC
+
+[![Status](https://img.shields.io/badge/STATUS-Unstable-red.svg?style=for-the-badge&link=http://google.com/)](https://github.com/EvoTM/EvoSC/)
+[![GitHub](https://img.shields.io/github/license/EvoTM/EvoSC.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
+[![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
+[![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
 
 A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 support.
 
