@@ -22,6 +22,9 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 4. Run `php esc migrate` to create the database tables.
 5. Run EvoSC
 
+| ⚠ If the cache and log folder aren't created automatically, you need to create them and restart the controller. |
+| --- |
+
 ___
 
 # EvoSC CLI
