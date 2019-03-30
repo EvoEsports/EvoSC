@@ -44,6 +44,11 @@ class Timer
         $this->repeat   = $repeat;
     }
 
+    public function setNewRuntimeDelay($delay)
+    {
+        $this->runtime = time() + self::textTimeToSeconds($delay);
+    }
+
     /**
      * Get timer by id.
      *
@@ -78,20 +83,20 @@ class Timer
             self::$timers = new Collection();
         }
 
-        /*
-        if (self::$timers->where('id', $id)->isNotEmpty()) {
+        $timers = self::$timers;
+
+        if ($timers->where('id', $id)->isNotEmpty()) {
             Log::warning("Timer with id: $id already exists, not setting.");
 
             return;
         }
-        */
 
         $runtime = time() + self::textTimeToSeconds($delayTime);
 
         $timer        = new Timer($id, $callback, $runtime, $repeat);
         $timer->delay = $delayTime;
 
-        self::$timers->push($timer);
+        $timers->push($timer);
     }
 
     /**
@@ -146,10 +151,11 @@ class Timer
             return;
         }
 
-        $toRun    = self::$timers->where('runtime', '<', time());
-        $toRemove = $toRun->where('repeat', false);
+        $toRun        = self::$timers->where('runtime', '<', time());
+        $toRemove     = $toRun->where('repeat', false);
+        self::$timers = self::$timers->diff($toRemove);
 
-        self::$timers->diff($toRemove)->each(function (Timer $timer) {
+        foreach ($toRun as $timer) {
             if (gettype($timer->callback) == "object") {
                 $func = $timer->callback;
                 $func();
@@ -158,16 +164,9 @@ class Timer
             }
 
             if ($timer->repeat) {
-                Log::logAddLine('Timer', 'Set new runtime delay for ' . $timer->id . ': ' . $timer->delay);
-                //$timer->setNewRuntimeDelay($timer->delay);
+                $timer->setNewRuntimeDelay($timer->delay);
             }
-        });
-    }
-
-    //Set new trigger time
-    private function setNewRuntimeDelay($delay)
-    {
-        $this->runtime = time() + self::textTimeToSeconds($delay);
+        }
     }
 
     /**
