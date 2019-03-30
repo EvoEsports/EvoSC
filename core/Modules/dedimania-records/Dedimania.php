@@ -11,7 +11,6 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\MapController;
 use esc\Models\Dedi;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Model;
@@ -279,7 +278,7 @@ class Dedimania extends DedimaniaApi
 
     private static function fixRanks(Map $map)
     {
-        $map->dedis()->orderBy('Score')->get()->each(function (LocalRecord $record, $key) {
+        $map->dedis()->orderBy('Score')->get()->each(function (Dedi $record, $key) {
             $record->update(['Rank' => $key + 1]);
         });
     }
