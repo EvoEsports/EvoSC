@@ -8,6 +8,11 @@ use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 
+/**
+ * Class HookController
+ *
+ * @package esc\Controllers
+ */
 class HookController implements ControllerInterface
 {
     /**
@@ -49,11 +54,13 @@ class HookController implements ControllerInterface
     }
 
     /**
-     * Add a hook
+     * Add a new hook
      *
-     * @param string         $event
-     * @param \Closure|array $callback
-     * @param bool           $runOnce
+     * @param string $event
+     * @param        $callback
+     * @param bool   $runOnce
+     *
+     * @throws \Exception
      */
     public static function add(string $event, $callback, bool $runOnce = false)
     {
@@ -64,7 +71,7 @@ class HookController implements ControllerInterface
             self::getHooks()->push($hook);
             if (gettype($callback) == "object") {
                 Log::logAddLine('Hook', "Added $event (Closure)", isVeryVerbose());
-            }else{
+            } else {
                 Log::logAddLine('Hook', "Added " . $callback[0] . " -> " . $callback[1], isVeryVerbose());
             }
         }

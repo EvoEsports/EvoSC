@@ -12,11 +12,28 @@ use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
 
+/**
+ * Class TemplateController
+ *
+ * Handles loading and rendering templates.
+ *
+ * @package esc\Controllers
+ */
 class TemplateController implements ControllerInterface
 {
+    /**
+     * @var Engine
+     */
     private static $latte;
+
+    /**
+     * @var Collection
+     */
     private static $templates;
 
+    /**
+     * Initialize TemplateController
+     */
     public static function init()
     {
         Log::logAddLine('TemplateController', 'Starting...');
@@ -29,6 +46,7 @@ class TemplateController implements ControllerInterface
         self::loadTemplates();
     }
 
+    //Add template filters
     private static function addCustomFilters()
     {
         self::$latte->addFilter('date', function ($str) {
@@ -43,12 +61,19 @@ class TemplateController implements ControllerInterface
         });
     }
 
+    /**
+     * Get all loaded templates.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public static function getTemplates(): Collection
     {
         return self::$templates;
     }
 
     /**
+     * Render template with values
+     *
      * @param string $index
      * @param        $values
      *
@@ -79,11 +104,11 @@ class TemplateController implements ControllerInterface
         return '';
     }
 
-    public static function getBlankTemplate(string $index): string
-    {
-        return substr(self::$templates[$index], 0, strpos(self::$templates[$index], '<frame')) . '</manialink>';
-    }
-
+    /**
+     * Load templates from all modules.
+     *
+     * @param null $args
+     */
     public static function loadTemplates($args = null)
     {
         Log::logAddLine('TemplateController', 'Loading templates...');
@@ -112,6 +137,7 @@ class TemplateController implements ControllerInterface
         self::$latte->setLoader($stringLoader);
     }
 
+    //Convert filename to template id
     private static function getTemplateId($relativePath)
     {
         $id = '';

@@ -3,12 +3,20 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 
+/**
+ * Class BansController
+ *
+ * Ban/unban players.
+ *
+ * @package esc\Controllers
+ */
 class BansController implements ControllerInterface
 {
     /**

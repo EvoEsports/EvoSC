@@ -12,8 +12,18 @@ use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
+/**
+ * Class QueueController
+ * 
+ * The QueueController handles adding/removing maps to/from the queue.
+ *
+ * @package esc\Controllers
+ */
 class QueueController implements ControllerInterface
 {
+    /**
+     * Initialize QueueController
+     */
     public static function init()
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
@@ -27,6 +37,13 @@ class QueueController implements ControllerInterface
         AccessRight::createIfNonExistent('queue_keep', 'Keep maps in queue if player leaves.');
     }
 
+    /**
+     * Queue a map.
+     * 
+     * @param Player $player
+     * @param Map    $map
+     * @param bool               $replay
+     */
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
         if ($map->cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
@@ -63,6 +80,12 @@ class QueueController implements ControllerInterface
         Hook::fire('MapQueueUpdated', self::getMapQueue());
     }
 
+    /**
+     * Drop a map from queue.
+     * 
+     * @param Player $player
+     * @param                    $mapUid
+     */
     public static function dropMap(Player $player, $mapUid)
     {
         $queueItem = MapQueue::whereMapUid($mapUid)->first();
@@ -80,6 +103,12 @@ class QueueController implements ControllerInterface
         }
     }
 
+    /**
+     * ManiaLinkEvent: queue map
+     * 
+     * @param Player $player
+     * @param                    $mapUid
+     */
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
         $map = Map::whereUid($mapUid)->first();
@@ -89,11 +118,21 @@ class QueueController implements ControllerInterface
         }
     }
 
+    /**
+     * Get maps in queue sorted by adding time.
+     * 
+     * @return \Illuminate\Support\Collection
+     */
     public static function getMapQueue(): Collection
     {
         return MapQueue::orderBy('created_at')->get();
     }
 
+    /**
+     * Called on PlayerDisconnect
+     * 
+     * @param Player $player
+     */
     public static function playerDisconnect(Player $player)
     {
         $queryBuilder = MapQueue::whereRequestingPlayer($player->Login);

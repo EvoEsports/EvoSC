@@ -2,25 +2,38 @@
 
 namespace esc\Controllers;
 
-use esc\Classes\ChatCommand;
 use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use ReflectionMethod;
 
+/**
+ * Class ModuleController
+ *
+ * @package esc\Controllers
+ */
 class ModuleController implements ControllerInterface
 {
+    /**
+     * @var Collection
+     */
     private static $loadedModules;
 
+    /**
+     * Initialize ModuleController.
+     */
     public static function init()
     {
         self::$loadedModules = new Collection();
     }
 
+    /**
+     * [Bugging] reload a module
+     *
+     * @param \esc\Models\Player $callee
+     * @param string             $moduleName
+     */
     public static function reloadModule(Player $callee, string $moduleName)
     {
         $module = self::getModules()->where('name', $moduleName)->first();
@@ -31,16 +44,21 @@ class ModuleController implements ControllerInterface
         }
     }
 
+    /**
+     * Get all loaded modules.
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public static function getModules(): Collection
     {
         return self::$loadedModules;
     }
 
-    public static function hideModules(Player $callee)
-    {
-        Template::hide($callee, 'modules');
-    }
-
+    /**
+     * Print module information to the cli (used on boot).
+     *
+     * @param $module
+     */
     public static function outputModuleInformation($module)
     {
         $name    = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
@@ -50,6 +68,7 @@ class ModuleController implements ControllerInterface
         Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
     }
 
+    //Load the module information.
     private static function loadModulesInformation(Collection $moduleDirectories)
     {
         $moduleDirectories->each(function ($moduleDirectory) {
@@ -63,7 +82,7 @@ class ModuleController implements ControllerInterface
     }
 
     /**
-     * Start the modules
+     * Load all modules.
      */
     public static function bootModules()
     {

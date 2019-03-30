@@ -15,8 +15,16 @@ use esc\Models\Stats;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
+/**
+ * Class PlayerController
+ *
+ * @package esc\Controllers
+ */
 class PlayerController implements ControllerInterface
 {
+    /**
+     * Initialize PlayerController
+     */
     public static function init()
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -30,7 +38,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * Gets a player by name
+     * Gets a player by nickname or login.
      *
      * @param Player $callee
      * @param        $nick
@@ -40,18 +48,18 @@ class PlayerController implements ControllerInterface
     public static function findPlayerByName(Player $callee, $nick): ?Player
     {
         $players = onlinePlayers()->filter(function (Player $player) use ($nick) {
-            return str_contains(stripStyle(stripColors(strtolower($player))), strtolower($nick));
+            return strpos(stripStyle(stripColors(strtolower($player))), strtolower($nick)) !== false || $player->Login == $nick;
         });
 
 
         if ($players->count() == 0) {
-            infoMessage('No player found.')->send($callee);
+            warningMessage('No player found.')->send($callee);
 
             return null;
         }
 
         if ($players->count() > 1) {
-            infoMessage('Found more than one person, please be more specific.')->send($callee);
+            warningMessage('Found more than one person (' . $players->pluck('NickName')->implode(', ') . '), please be more specific or use login.')->send($callee);
 
             return null;
         }
@@ -60,7 +68,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * Kick a player
+     * Kick a player.
      *
      * @param Player $player
      * @param        $cmd
@@ -85,6 +93,15 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * ManiaLinkEvent: kick player
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $login
+     * @param string             $reason
+     *
+     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
         try {
@@ -111,6 +128,11 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * Called on PlayerConnect
+     *
+     * @param \esc\Models\Player $player
+     */
     public static function playerConnect(Player $player)
     {
         global $_onlinePlayers;
@@ -158,6 +180,11 @@ class PlayerController implements ControllerInterface
         $_onlinePlayers->put($player->Login, $player);
     }
 
+    /**
+     * Called on PlayerDisconnect
+     *
+     * @param \esc\Models\Player $player
+     */
     public static function playerDisconnect(Player $player)
     {
         global $_onlinePlayers;

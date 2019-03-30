@@ -10,10 +10,21 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Models\Stats;
 
+/**
+ * Class EventController
+ *
+ * @package esc\Controllers
+ */
 class EventController implements ControllerInterface
 {
+    /**
+     * Method called on controller-boot.
+     */
+    public static function init()
+    {
+    }
+
     /**
      * @param $executedCallbacks
      *
@@ -231,14 +242,5 @@ class EventController implements ControllerInterface
         } else {
             throw new \Exception('Malformed callback');
         }
-    }
-
-    /**
-     * Method called on boot.
-     *
-     * @return mixed
-     */
-    public static function init()
-    {
     }
 }

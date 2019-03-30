@@ -7,14 +7,25 @@ use esc\Classes\Hook;
 use esc\Classes\Server;
 use esc\Classes\Timer;
 use esc\Models\Player;
+use esc\Interfaces\ControllerInterface;
 
-class AfkController
+/**
+ * Class AfkController
+ *
+ * Automatically set afk-players to spectator.
+ *
+ * @package esc\Controllers
+ */
+class AfkController implements ControllerInterface
 {
     /**
      * @var \Illuminate\Support\Collection
      */
     private static $afkTracker;
 
+    /**
+     * Initialize
+     */
     public static function init()
     {
         self::$afkTracker = collect();
@@ -28,11 +39,22 @@ class AfkController
         Timer::create('checkAfkStatus', [self::class, 'checkAfkStatus'], '20s', true);
     }
 
+    /**
+     * Remove players from afk-tracker (when he leaves, or goes spec himself).
+     *
+     * @param Player $player
+     */
     public static function removePlayerFromTracker(Player $player)
     {
         self::$afkTracker->forget($player->Login);
     }
 
+    /**
+     * Update the last interaction.
+     *
+     * @param \esc\Models\Player $player
+     * @param mixed              ...$arguments
+     */
     public static function interaction(Player $player, ...$arguments)
     {
         self::$afkTracker->put($player->Login, [
@@ -41,9 +63,14 @@ class AfkController
         ]);
     }
 
+    /**
+     * Check the afk status for all players.
+     */
     public static function checkAfkStatus()
     {
-        self::$afkTracker->each(function (array $data, string $playerLogin) {
+        $afkPlayers = collect();
+
+        self::$afkTracker->each(function (array $data, string $playerLogin) use ($afkPlayers) {
             $lastInteraction = $data['last_interaction'];
 
             if ($lastInteraction->diffInMinutes() >= config('server.afk-timeout') && !$data['is_afk']) {
@@ -53,27 +80,36 @@ class AfkController
                     return;
                 }
 
+                $afkPlayers->push($player->NickName);
+
                 self::$afkTracker->put($playerLogin, [
                     'last_interaction' => $lastInteraction,
                     'is_afk'           => true,
                 ]);
 
                 Server::forceSpectator($playerLogin, 3);
-
-                $player = Player::where('Login', $playerLogin)->first();
-
-                infoMessage($player, ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')
-                    ->setIcon('')
-                    ->sendAll();
             }
         });
+
+        if ($afkPlayers->count() > 1) {
+            $message = infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.');
+        } else {
+            $message = infoMessage($afkPlayers->first(), ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.');
+        }
+
+        $message->setIcon('')->sendAll();
     }
 
-    public static function forceAfk(Player $player, Player $admin)
+    /**
+     * Force a player to spectator-mode.
+     *
+     * @param \esc\Models\Player $player
+     * @param \esc\Models\Player $admin
+     */
+    public static function forceToSpectators(Player $player, Player $admin)
     {
         Server::forceSpectator($player->Login, 3);
 
-        infoMessage($player, ' was forced to spectators by ', $admin)
-            ->sendAll();
+        infoMessage($player, ' was forced to spectators by ', $admin)->sendAll();
     }
 }
