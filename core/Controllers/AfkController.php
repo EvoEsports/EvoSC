@@ -91,10 +91,10 @@ class AfkController implements ControllerInterface
             }
         });
 
-        if ($afkPlayers->count() > 1) {
-            infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
-        } else {
+        if ($afkPlayers->count() == 1) {
             infoMessage($afkPlayers->first(), ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
+        } elseif ($afkPlayers->count() > 1) {
+            infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
         }
     }
 

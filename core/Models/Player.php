@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Player extends Model
 {
-    protected $table        = 'players';
-    protected $fillable     = [
+    protected $table = 'players';
+
+    protected $fillable = [
         'Login',
         'NickName',
         'Score',
@@ -21,12 +22,16 @@ class Player extends Model
         'MaxRank',
         'banned',
         'last_visit',
-        'Group'
+        'Group',
     ];
-    protected $primaryKey   = 'Login';
-    public    $incrementing = false;
-    public    $timestamps   = false;
-    protected $dates        = ['last_visit'];
+
+    protected $primaryKey = 'Login';
+
+    public $incrementing = false;
+
+    public $timestamps = false;
+
+    protected $dates = ['last_visit'];
 
     /**
      * Gets the players current time (formatted)
@@ -78,6 +83,13 @@ class Player extends Model
         return $this->Score > 0;
     }
 
+    /**
+     * Get player location with $player->path
+     *
+     * @param $path
+     *
+     * @return string
+     */
     public function getPathAttribute($path)
     {
         $parts = explode('|', $path);
@@ -94,7 +106,12 @@ class Player extends Model
     }
 
     /**
-     * Get players locals
+     * Get players locals.
+     *
+     * ->locals() = query builder
+     * ->locals = fetches all locals of that player and returns collection
+     *
+     * ->locals()->get() = ->locals
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -103,36 +120,73 @@ class Player extends Model
         return $this->hasMany(LocalRecord::class, 'Player', 'id');
     }
 
+    /**
+     * Get players dedis, like locals.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function dedis()
     {
         return $this->hasMany(Dedi::class, 'Player', 'id');
     }
 
+    /**
+     * Get players ratings, like locals.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function ratings()
     {
         return $this->hasMany(MxKarma::class, 'Player', 'id');
     }
 
+    /**
+     * Get the statistics of that player
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function stats()
     {
         return $this->hasOne(Stats::class, 'Player', 'id');
     }
 
+    /**
+     * Get the player group
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function group()
     {
         return $this->hasOne(Group::class, 'id', 'Group');
     }
 
+    /**
+     * Get the players favorite maps.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function favorites()
     {
         return $this->belongsToMany(Map::class, 'map-favorites');
     }
 
+    /**
+     * Get the players user settings.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function settings()
     {
         return $this->hasMany(UserSetting::class);
     }
 
+    /**
+     * Check if the player has a specific access-right.
+     *
+     * @param string $right
+     *
+     * @return bool
+     */
     public function hasAccess(string $right)
     {
         if (!$this->group) {
@@ -142,6 +196,13 @@ class Player extends Model
         return $this->group->hasAccess($right);
     }
 
+    /**
+     * Get spectator information about the player.
+     *
+     * @param $value
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function getSpectatorStatusAttribute($value)
     {
         $object                     = collect([]);
@@ -154,11 +215,22 @@ class Player extends Model
         return $object;
     }
 
+    /**
+     * Check if the player is in spectator-mode.
+     *
+     * @return bool
+     */
     public function isSpectator(): bool
     {
         return $this->spectator_status->spectator ?? false;
     }
 
+    /**
+     * Update a user-setting.
+     *
+     * @param $settingName
+     * @param $value
+     */
     public function setSetting($settingName, $value)
     {
         $setting = $this->settings()->whereName($settingName)->first();
@@ -185,6 +257,13 @@ class Player extends Model
         ]);
     }
 
+    /**
+     * Get a user-setting.
+     *
+     * @param $settingName
+     *
+     * @return mixed|null
+     */
     public function setting($settingName)
     {
         $setting = $this->settings()->whereName($settingName)->first();
@@ -196,26 +275,17 @@ class Player extends Model
         return null;
     }
 
-    public function isMasteradmin(): bool
+    /**
+     * Get last visit as Carbon object.
+     *
+     * @param $date
+     *
+     * @return \Carbon\Carbon
+     * @throws \Exception
+     */
+    public function getLastVisitAttribute($date): Carbon
     {
-        if (!$this->group) {
-            return false;
-        }
-
-        return $this->group->id == 1;
-    }
-
-    public function isAdmin(): bool
-    {
-        if ($this->isMasteradmin()) {
-            return true;
-        }
-
-        if (!$this->group) {
-            return false;
-        }
-
-        return strtolower($this->group->Name) == 'admin';
+        return new Carbon($date);
     }
 
     /**
@@ -224,10 +294,5 @@ class Player extends Model
     public function __toString()
     {
         return trim($this->NickName);
-    }
-
-    public function getLastVisitAttribute($date): Carbon
-    {
-        return new Carbon($date);
     }
 }
