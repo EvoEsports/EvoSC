@@ -5,6 +5,9 @@
 
 A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 support.
 
+| ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
+| --- |
+
 ### Requirements
 * PHP 7.2+
 * MySql or MariaDB Server
@@ -51,3 +54,4 @@ Each module must contain a base class in the `esc\Modules` namespace and a `modu
 }
 ```
 Modules can contain Templates, Classes, Models and Database-Migrations. The constructor of the base class is called on controller start, after all controllers have beeb started.
+Configs are in json format and are located at the base directory of your module. Name it as your-config-file.config.json, it will automatically be loaded on controller-start.
