@@ -29,7 +29,7 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 
 ___
 
-# EvoSC CLI
+## EvoSC CLI
 
 Get all available commands `php esc list`
 
@@ -42,7 +42,7 @@ Get all available commands `php esc list`
 
 ___
 
-# Basic Documentation
+## Basic Documentation
 * [Collections](https://laravel.com/docs/5.8/collections)
 * [Query Builder](https://laravel.com/docs/5.8/queries)
 * [Models](https://laravel.com/docs/5.7/eloquent-relationships)
