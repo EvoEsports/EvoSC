@@ -170,6 +170,9 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
+        self::$currentMap = $map;
+        self::$mapStart   = now();
+
         Map::where('id', '!=', $map->id)->increment('cooldown');
 
         $map->update([
@@ -183,9 +186,6 @@ class MapController implements ControllerInterface
         Player::where('Score', '>', 0)->update([
             'Score' => 0,
         ]);
-
-        self::$currentMap = $map;
-        self::$mapStart   = now();
     }
 
     /**
