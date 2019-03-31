@@ -25,12 +25,13 @@ class PBRecords
 
     public function __construct()
     {
-        Hook::add('PlayerConnect', [PBRecords::class, 'playerConnect']);
-        Hook::add('EndMatch', [PBRecords::class, 'endMatch']);
-        Hook::add('BeginMap', [PBRecords::class, 'beginMap']);
-        Hook::add('PlayerLocal', [PBRecords::class, 'playerMadeRecord']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerLocal', [self::class, 'playerMadeRecord']);
 
-        ChatCommand::add('/target', [PBRecords::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
+        ChatCommand::add('/target', [self::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
+        ChatCommand::add('/pb', [self::class, 'getPersonalBest'], 'Get your best time on this map.');
 
         self::$targets = collect();
     }
@@ -123,6 +124,39 @@ class PBRecords
         });
 
         Template::executeMulticall();
+    }
+
+    /**
+     * Chat-command: /pb (Display personal best)
+     *
+     * @param \esc\Models\Player $player
+     * @param                    $cmd
+     */
+    public static function getPersonalBest(Player $player, $cmd)
+    {
+        $map   = MapController::getCurrentMap();
+        $local = $map->locals()->wherePlayer($player->id)->first();
+        $dedi  = $map->dedis()->wherePlayer($player->id)->first();
+
+        $score = 0;
+
+        if ($local && !$dedi) {
+            $score = $local->Score;
+        }
+        if (!$local && $dedi) {
+            $score = $dedi->Score;
+        }
+        if ($local && $dedi) {
+            $score = $dedi->Score < $local->Score ? $dedi->Score : $local->Score;
+        }
+
+        if ($score == 0) {
+            infoMessage('You do not have a personal best on this track yet.')->send($player);
+
+            return;
+        }
+
+        infoMessage('Your personal best is ', secondary(formatScore($score)), '.')->send($player);
     }
 
     private static function getTarget(Map $map, Player $player)
