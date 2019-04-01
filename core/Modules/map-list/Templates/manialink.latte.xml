@@ -34,6 +34,29 @@
         </frame>
     </framemodel>
 
+    <framemodel id="QueueItem">
+        <quad valign="center" pos="-2 0" size="200 4.5" bgcolor="{header_color()|noescape}" opacity="0"/>
+        <label pos="1 0" valign="center" size="40 3" text="map name lol asdfasdasdsad asdfasdasdsad asdfasdas"
+               textcolor="ffff"
+               textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
+        <label pos="44 0" valign="center" size="30 3" text="map author name comes here map author" textcolor="ffff"
+               textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
+        <label pos="80 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6"
+               z-index="1" textfont="RajdhaniMono"/>
+        <label pos="88 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6"
+               z-index="1" textfont="RajdhaniMono"/>
+        <label pos="94 0" valign="center" size="24 3" text="requested by requested by requested by" textcolor="ffff"
+               textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
+
+        <frame id="queue-buttons" pos="120 0" z-index="5">
+            <label textfont="RajdhaniMono" class="btn drop" data-tab="2" size="11 3" text=" Drop" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"/>
+            <label textfont="RajdhaniMono" class="btn info" data-tab="012" size="10 3" text=" Info" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}9"/>
+        </frame>
+    </framemodel>
+
     <frame id="map-list-window" pos="-20 55" size="122 106" hidden="0" z-index="300" scale="1.1">
         <quad id="handle" pos="0 0" size="1 6" z-index="1"/>
         <quad pos="0 0" size="200 11" bgcolor="{header_color()|noescape}c"/>
@@ -60,7 +83,7 @@
                   halign="center" valign="center"/>
         </frame>
 
-        <frame pos="2 -13" z-index="2">
+        <frame id="maps-all" pos="2 -13" z-index="2">
             <frame scale="0.97" pos="0 -6">
                 <label pos="1  1" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}"
                        textfont="RajdhaniMono"/>
@@ -153,6 +176,29 @@
                 </frame>
             </frame>
         </frame>
+
+        <frame id="maps-queue" pos="2 -13" z-index="2" hidden="1">
+            <frame scale="0.97" pos="0 -2">
+                <label pos="1  1" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}"
+                       textfont="RajdhaniMono"/>
+                <label pos="44 1" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}"
+                       textfont="RajdhaniMono"/>
+                <label pos="80 1" textsize="1" text="Local" halign="center" scale="0.8"
+                       textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
+                <label pos="88 1" textsize="1" text="Dedi" halign="center" scale="0.8"
+                       textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
+                <label pos="94 1" textsize="1" text="Requested by" halign="left" scale="0.8"
+                       textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
+                <label pos="120 1" textsize="1" text="Actions" halign="left" scale="0.8"
+                       textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
+
+                <frame id="queue-list" pos="0 -3">
+                    {for $i = 0; $i<22; $i++}
+                    <frameinstance pos="0 {$i * -4 - 2}" modelid="QueueItem" hidden="1"/>
+                    {/for}
+                </frame>
+            </frame>
+        </frame>
     </frame>
 
     <frame id="widget" pos="{config('map-list.pos.visible')}" data-pos-visible="{config('map-list.pos.visible')}"
@@ -227,7 +273,6 @@
 declare Integer[] favorites;
 declare Text[Text][] maps;
 declare Text[Text][Integer] mapAuthors;
-declare Text[Text][] mapQueue;
 declare Text[Text][] currentMapPool;
 declare Integer lastMapsCount;
 declare Integer lastMapQueueLength;
@@ -238,6 +283,8 @@ declare CMlFrame mapListFrame;
 declare Text currentMapUid;
 declare Integer cooldown;
 declare Text[Text] currentMap;
+declare Boolean inSearch;
+declare Boolean userCanDrop;
 
 Text[Text] getAuthor(Text id){
     return mapAuthors[TL::ToInteger(id)];
@@ -315,13 +362,22 @@ Void resizeWindow(){
 }
 
 Void rearrangeButtons(){
-    declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare Text listId = "";
+    declare Text buttonsId = "";
+    if(currentTab == 2){
+        listId = "queue-list";
+        buttonsId = "queue-buttons";
+    }else{
+        listId = "map-list";
+        buttonsId = "buttons";
+    }
+    declare mapList <=> (Page.MainFrame.GetFirstChild(listId) as CMlFrame);
     declare Real padding;
 
     buttonsWidth = 0.0;
 
     foreach(control in mapList.Controls){
-        declare buttonsFrame = ((control as CMlFrame).GetFirstChild("buttons") as CMlFrame);
+        declare buttonsFrame = ((control as CMlFrame).GetFirstChild(buttonsId) as CMlFrame);
         padding = 0.0;
 
         foreach(button in buttonsFrame.Controls){
@@ -458,6 +514,57 @@ Void updateView(Text[Text][] mapPool, Integer page){
     pageInfo.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(mapPool.count / 20.0));
 }
 
+Void checkMapQueueChanged(){
+    declare Text[Text][] MapQueue for LocalUser;
+
+    if(MapQueue.count == lastMapQueueLength){
+        return;
+    }
+
+    declare queueListFrame <=> (Page.MainFrame.GetFirstChild("queue-list") as CMlFrame);
+    declare filled = 0;
+    for(i, 0, MapQueue.count - 1){
+        if(i >= queueListFrame.Controls.count - 1){
+            return;
+        }
+
+        declare queueItemFrame = (queueListFrame.Controls[i] as CMlFrame);
+        declare queueItem = MapQueue[i];
+
+        queueItemFrame.DataAttributeSet("map-id", queueItem["id"]);
+        queueItemFrame.DataAttributeSet("issuer", queueItem["by"]);
+        queueItemFrame.DataAttributeSet("id", queueItem["queue_id"]);
+
+        declare Text[Text] map = findMapById(queueItem["id"]);
+        declare Text[Text] author = getAuthor(map["a"]);
+
+        (queueItemFrame.Controls[1] as CMlLabel).SetText(map["name"]);
+        (queueItemFrame.Controls[2] as CMlLabel).SetText(author["nick"]);
+        (queueItemFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
+        (queueItemFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
+        (queueItemFrame.Controls[5] as CMlLabel).SetText(queueItem["nick"]);
+
+        declare buttons = (queueItemFrame.Controls[6] as CMlFrame);
+        if(!userCanDrop){
+            if(LocalUser.Login != queueItem["by"]){
+                (buttons.Controls[0] as CMlLabel).Hide();
+            }
+        }
+
+        queueItemFrame.Show();
+
+        filled += 1;
+    }
+
+    if(filled < queueListFrame.Controls.count - 1){
+        for(i, filled, queueListFrame.Controls.count - 1){
+            (queueListFrame.Controls[i] as CMlFrame).Hide();
+        }
+    }
+
+    lastMapQueueLength = MapQueue.count;
+}
+
 Text[Text][] getFavoritesPool(){
     declare Text[Text][] pool = Text[Text][];
     declare favsCount = favorites.count;
@@ -476,86 +583,38 @@ Text[Text][] getFavoritesPool(){
     return pool;
 }
 
-Text[Text][] getMapQueuePool(){
-    declare Text[Text][] pool = Text[Text][];
-    declare queueLength = mapQueue.count;
-    declare start = currentPage * 20;
-    declare end = start + 20;
-
-    if(end >= queueLength){
-        end = queueLength - 1;
-    }
-
-    for(i, start, end){
-        declare index = mapQueue[i]["id"];
-        pool.add(findMapById(index));
-    }
-
-    return pool;
-}
-
-Text getIssuerLogin(Text mapId){
-    foreach(item in mapQueue){
-        if(item["id"] == mapId){
-            return item["by"];
-        }
-    }
-
-    return "";
-}
-
-Void switchButtons(Text tab){
-    declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
-    Page.GetClassChildren("btn", mapList, True);
-    foreach(control in Page.GetClassChildren_Result){
-        control.Visible = TL::Find(tab, control.DataAttributeGet("tab"), False, False);
-
-        if(!control.Visible){
-            continue;
-        }
-
-        {if !$localPlayer->hasAccess('queue.drop') ?? false}
-        if(control.HasClass("drop") && currentTab == 2){
-            declare mapId = control.Parent.Parent.DataAttributeGet("map-id");
-            declare login = getIssuerLogin(mapId);
-            if(login != ""){
-                if(login != LocalUser.Login){
-                    control.Visible = False;
-                }
-            }
-        }
-        {/if}
-    }
-    rearrangeButtons();
-    resizeWindow();
-}
-
 Void tabButtonPressed(CMlControl control){
     declare activeBg <=> (Page.MainFrame.GetFirstChild("nav-active") as CMlQuad);
+    declare mapsAllFrame <=> (Page.MainFrame.GetFirstChild("maps-all") as CMlFrame);
+    declare mapsQueueFrame <=> (Page.MainFrame.GetFirstChild("maps-queue") as CMlFrame);
     declare btn <=> (control as CMlLabel);
     declare tab = btn.DataAttributeGet("tab");
     activeBg.RelativePosition_V3 = control.RelativePosition_V3;
 
     currentPage = 0;
     currentTab = TL::ToInteger(tab);
-    switchButtons(tab);
+    rearrangeButtons();
 
     if(tab == "0"){
         //Maps
         currentMapPool = maps;
         updateView(currentMapPool, currentPage);
+        mapsAllFrame.Show();
+        mapsQueueFrame.Hide();
     }
 
     if(tab == "1"){
         //Favorites
         currentMapPool = getFavoritesPool();
         updateView(currentMapPool, currentPage);
+        mapsAllFrame.Show();
+        mapsQueueFrame.Hide();
     }
 
     if(tab == "2"){
         //Juked maps
-        currentMapPool = getMapQueuePool();
-        updateView(currentMapPool, currentPage);
+        mapsAllFrame.Hide();
+        mapsQueueFrame.Show();
     }
 }
 
@@ -706,18 +765,6 @@ Boolean checkMapChanges(){
     declare Text[Text][] Maps for LocalUser;
     if(Maps.count != lastMapsCount){
         lastMapsCount = Maps.count;
-        return True;
-    }
-
-    return False;
-}
-
-Boolean checkMapQueueChanged(){
-    declare Text[Text][] MapQueue for LocalUser;
-
-    if(MapQueue.count != lastMapQueueLength){
-        mapQueue = MapQueue;
-        lastMapQueueLength = MapQueue.count;
         return True;
     }
 
@@ -878,10 +925,12 @@ Void quickFavAction(CMlScriptEvent event){
 {(new esc\Classes\HideScript("widget", true))|noescape}
 
 main() {
+    inSearch = False;
     lastMapQueueLength = 0;
     lastMapsCount = 0;
     currentPage = 0;
     currentTab = 0;
+    userCanDrop = {($localPlayer->hasAccess('queue_drop') ? 'True' : 'False')|noescape};
     favorites = {$favorites|noescape};
     cooldown = {config('server.map-cooldown')};
 
@@ -1049,13 +1098,6 @@ main() {
             }
         }
 
-        if(checkMapQueueChanged()){
-            if(currentTab == 2){
-                currentMapPool = getMapQueuePool();
-                updateView(currentMapPool, currentPage);
-            }
-        }
-
         if(currentMapUid != Map.MapInfo.MapUid && maps.count > 0){
             currentMapUid = Map.MapInfo.MapUid;
             currentMap = findMapByUid(currentMapUid);
@@ -1065,10 +1107,9 @@ main() {
             updateWidget(currentMap);
         }
 
+        checkMapQueueChanged();
         checkMapSearchQuery();
-
         maniaLinkDrag();
-
         hidescript();
 
         declare x_min = widget.RelativePosition_V3[0];

@@ -42,6 +42,7 @@ class MapList
             'queue_id' => $item->id,
             'id'       => $item->map->id,
             'by'       => $item->requesting_player,
+            'nick'     => player($item->requesting_player)->NickName,
         ];
     }
 

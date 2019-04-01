@@ -1,5 +1,6 @@
 {
-  "name": "Map list",
-  "author": "brakerb",
-  "version": "3.0"
+  "name"       : "Map list",
+  "author"     : "brakerb",
+  "description": "A modern map-list and current map widget.",
+  "version"    : "3.1"
 }
