@@ -531,12 +531,13 @@ Void checkMapQueueChanged(){
         declare queueItemFrame = (queueListFrame.Controls[i] as CMlFrame);
         declare queueItem = MapQueue[i];
 
-        queueItemFrame.DataAttributeSet("map-id", queueItem["id"]);
-        queueItemFrame.DataAttributeSet("issuer", queueItem["by"]);
-        queueItemFrame.DataAttributeSet("id", queueItem["queue_id"]);
-
         declare Text[Text] map = findMapById(queueItem["id"]);
         declare Text[Text] author = getAuthor(map["a"]);
+
+        queueItemFrame.DataAttributeSet("map-id", map["id"]);
+        queueItemFrame.DataAttributeSet("map-uid", map["uid"]);
+        queueItemFrame.DataAttributeSet("issuer", queueItem["by"]);
+        queueItemFrame.DataAttributeSet("id", queueItem["queue_id"]);
 
         (queueItemFrame.Controls[1] as CMlLabel).SetText(map["name"]);
         (queueItemFrame.Controls[2] as CMlLabel).SetText(author["nick"]);
@@ -834,21 +835,18 @@ Integer confirm(Text question){
 }
 
 Void buttonPressed(CMlFrame mapFrame, CMlControl control){
-    declare mapUid = mapFrame.DataAttributeGet("map-uid");
-    declare mapId = mapFrame.DataAttributeGet("map-id");
-
     if(control.HasClass("juke")){
-        TriggerPageAction("map.queue," ^ mapUid);
+        TriggerPageAction("map.queue," ^ mapFrame.DataAttributeGet("map-uid"));
         return;
     }
 
     if(control.HasClass("drop")){
-        TriggerPageAction("map.drop," ^ mapUid);
+        TriggerPageAction("map.drop," ^ mapFrame.DataAttributeGet("map-uid"));
         return;
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapId);
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-id"));
         return;
     }
 
@@ -860,7 +858,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
         }
 
         if(answer == 1){
-            TriggerPageAction("maplist.delete," ^ mapUid);
+            TriggerPageAction("maplist.delete," ^ mapFrame.DataAttributeGet("map-uid"));
         }
     }
 }

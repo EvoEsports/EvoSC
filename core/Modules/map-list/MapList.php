@@ -32,8 +32,6 @@ class MapList
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
                    ->addAlias('/list');
-
-        KeyBinds::add('reload_map_list', 'Reloads maplist', [self::class, 'reload'], 'X');
     }
 
     public static function mapMapQueue(MapQueue $item)
@@ -44,12 +42,6 @@ class MapList
             'by'       => $item->requesting_player,
             'nick'     => player($item->requesting_player)->NickName,
         ];
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::playerConnect($player);
     }
 
     /**
