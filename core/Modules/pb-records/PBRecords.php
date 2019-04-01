@@ -138,25 +138,25 @@ class PBRecords
         $local = $map->locals()->wherePlayer($player->id)->first();
         $dedi  = $map->dedis()->wherePlayer($player->id)->first();
 
-        $score = 0;
+        $record = null;
 
         if ($local && !$dedi) {
-            $score = $local->Score;
+            $record = $local;
         }
         if (!$local && $dedi) {
-            $score = $dedi->Score;
+            $record = $dedi;
         }
         if ($local && $dedi) {
-            $score = $dedi->Score < $local->Score ? $dedi->Score : $local->Score;
+            $record = $dedi->Score < $local->Score ? $dedi : $local;
         }
 
-        if ($score == 0) {
+        if (!$record) {
             infoMessage('You do not have a personal best on this track yet.')->send($player);
 
             return;
         }
 
-        infoMessage('Your personal best is ', secondary(formatScore($score)), '.')->send($player);
+        infoMessage('Your personal best is ', $record)->send($player);
     }
 
     private static function getTarget(Map $map, Player $player)

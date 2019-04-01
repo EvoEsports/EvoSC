@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Maps:main" id="esc_maps" version="3">
-    <frame id="map-list-window" pos="-75.5 45" size="122 101" hidden="1" z-index="300">
+    <framemodel id="Map">
+        <quad valign="center" pos="-2 0" size="200 4.5" bgcolor="{header_color()|noescape}" opacity="0"/>
+        <label pos="1 0" valign="center" size="40 3" text="map name lol asdfasdasdsad" textcolor="ffff"
+               textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
+        <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="ffff"
+               textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
+        <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6"
+               z-index="1" textfont="RajdhaniMono"/>
+        <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6"
+               z-index="1" textfont="RajdhaniMono"/>
+        <label class="fav" pos="115.5 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6"
+               z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" textfont="RajdhaniMono"/>
+        <label pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textcolor="ffff" textsize="0.6"
+               z-index="1" textfont="RajdhaniMono"/>
+
+        <frame id="buttons" pos="120 0" z-index="5">
+            <label textfont="RajdhaniMono" class="btn juke" data-tab="01" size="11 3" text=" Juke" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}9"/>
+            <label textfont="RajdhaniMono" class="btn info" data-tab="012" size="10 3" text=" Info" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}9"/>
+            <label textfont="RajdhaniMono" class="btn drop" data-tab="2" size="11 3" text=" Drop" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"
+                   hidden="1"/>
+            {if $localPlayer->hasAccess('map.delete')}
+            <label textfont="RajdhaniMono" class="btn delete" data-tab="01" size="4 3" text="" textsize="0.3"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"/>
+            {/if}
+        </frame>
+    </framemodel>
+
+    <frame id="map-list-window" pos="-20 55" size="122 106" hidden="0" z-index="300" scale="1.1">
         <quad id="handle" pos="0 0" size="1 6" z-index="1"/>
         <quad pos="0 0" size="200 11" bgcolor="{header_color()|noescape}c"/>
         <quad pos="0 -10.5" size="200 0.5" bgcolor="{header_color()|noescape}f" z-index="2"/>
@@ -26,62 +58,75 @@
                   halign="center" valign="center"/>
         </frame>
 
-        <framemodel id="Map">
-            <quad valign="center" pos="-2 0" size="200 4.5" bgcolor="{header_color()|noescape}" opacity="0"/>
-            <label pos="1 0" valign="center" size="40 3" text="map name lol asdfasdasdsad" textcolor="ffff"
-                   textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
-            <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="ffff"
-                   textsize="0.6" z-index="1" textfont="RajdhaniMono"/>
-            <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="ffff" textsize="0.6"
-                   z-index="1" textfont="RajdhaniMono"/>
-            <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="ffff" textsize="0.6"
-                   z-index="1" textfont="RajdhaniMono"/>
-            <label class="fav" pos="115.5 0" valign="center" size="3 3" text="" textcolor="ffff" textsize="0.6"
-                   z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" textfont="RajdhaniMono"/>
-            <label pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textcolor="ffff" textsize="0.6"
-                   z-index="1" textfont="RajdhaniMono"/>
-
-            <frame id="buttons" pos="120 0" z-index="5">
-                <label textfont="RajdhaniMono" class="btn juke" data-tab="01" size="11 3" text=" Juke" textsize="0.3"
-                       valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                       focusareacolor2="{config('colors.ui.header')}9"/>
-                <label textfont="RajdhaniMono" class="btn info" data-tab="012" size="10 3" text=" Info" textsize="0.3"
-                       valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                       focusareacolor2="{config('colors.ui.header')}9"/>
-                <label textfont="RajdhaniMono" class="btn drop" data-tab="2" size="11 3" text=" Drop" textsize="0.3"
-                       valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"
-                       hidden="1"/>
-                {if $localPlayer->hasAccess('map.delete')}
-                <label textfont="RajdhaniMono" class="btn delete" data-tab="01" size="4 3" text="" textsize="0.3"
-                       valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"/>
-                {/if}
-            </frame>
-        </framemodel>
-
         <frame pos="2 -13" z-index="2">
             <frame scale="0.97" pos="0 -6">
-                <label pos="1  6" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}"
+                <label pos="1  1" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.header')}"
                        textfont="RajdhaniMono"/>
-                <label pos="52 6" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}"
+                <label pos="52 1" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.header')}"
                        textfont="RajdhaniMono"/>
-                <label pos="88 6" textsize="1" text="Local" halign="center" scale="0.8"
+                <label pos="88 1" textsize="1" text="Local" halign="center" scale="0.8"
                        textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
-                <label pos="96 6" textsize="1" text="Dedi" halign="center" scale="0.8"
+                <label pos="96 1" textsize="1" text="Dedi" halign="center" scale="0.8"
                        textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
-                <label pos="106 6" textsize="1" text="Karma" halign="center" scale="0.8"
+                <label pos="106 1" textsize="1" text="Karma" halign="center" scale="0.8"
                        textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
-                <label pos="117 6" textsize="1" text="Favorite" halign="center" scale="0.8"
+                <label pos="117 1" textsize="1" text="Favorite" halign="center" scale="0.8"
                        textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono"/>
 
-                <frame id="map-list" pos="0 2">
-                    {for $i = 0; $i
-                    <
-                    20; $i++}
+                <frame id="sorting-controls" pos="-1 5.25">
+                    <quad valign="center" pos="-1" size="200 6" bgcolor="0006" z-index="-1"/>
+                    <label pos="2 0" textsize="1" text="Sort/Filter:" scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center"/>
+
+                    <label class="filter-btn" data-sort="all" pos="20" size="13 4" textsize="0.7" text="Show All"
+                           scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+                    <label class="filter-btn" data-sort="nofinish" pos="31.8" size="15 4" textsize="0.7"
+                           text="No Finish" scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+
+                    <label pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}3"/>
+                    <label class="filter-btn" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8"
+                           textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+                    <label class="filter-btn" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+
+                    <label pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}3"/>
+                    <label class="filter-btn" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+                    <label class="filter-btn" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="fff"
+                           textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.header')}3"
+                           focusareacolor2="{config('colors.ui.header')}c"/>
+                </frame>
+
+                <frame id="map-list" pos="0 -3">
+                    {for $i = 0; $i<20; $i++}
                     <frameinstance pos="0 {$i * -4 - 2}" modelid="Map" hidden="0"/>
                     {/for}
                 </frame>
 
-                <frame id="pagination" pos="2 -81.5" scale="0.9">
+                <frame id="pagination" pos="2 -86.5" scale="0.9">
                     <entry id="page-input" class="page-input" pos="6 0" size="8 3.5" valign="center" halign="center"
                            text="1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1"
                            hidden="1"/>
@@ -96,7 +141,7 @@
                            focusareacolor2="{config('colors.ui.header')}c"/>
                 </frame>
 
-                <frame id="search-frame" pos="124 -81.5" scale="0.9">
+                <frame id="search-frame" pos="124 -86.5" scale="0.9">
                     <label textfont="RajdhaniMono" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍"/>
                     <entry textfont="RajdhaniMono" id="search-input" class="search-input" pos="26.5 0" size="25 3.5"
                            halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
@@ -129,8 +174,10 @@
                 <label class="map-control quick-fav" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
                        valign="center" ScriptEvents="1" focusareacolor1="0000"
                        focusareacolor2="{config('colors.ui.header')}9"/>
-                <label id="fav-button" pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
-                <label id="fav-text" textfont="RajdhaniMono" pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add" z-index="1"
+                <label id="fav-button" pos="0 1.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center"
+                       valign="center"/>
+                <label id="fav-text" textfont="RajdhaniMono" pos="0 -2" textsize="1" scale="0.8" size="10 10" text="Add"
+                       z-index="1"
                        halign="center" valign="center"/>
             </frame>
 
@@ -260,7 +307,7 @@ Void resizeWindow(){
     mapListFrame.Size = <width, mapListFrame.Size[1]>;
     header.Size = <width, header.Size[1]>;
     handle.Size = <width - 6.0, handle.Size[1]>;
-    mapListFrame.RelativePosition_V3 = <width / -2.0, mapListFrame.RelativePosition_V3[1]>;
+    mapListFrame.RelativePosition_V3 = <(width*mapListFrame.Scale) / -2.0, mapListFrame.RelativePosition_V3[1]>;
     searchFrame.RelativePosition_V3 = <width - 26.0, searchFrame.RelativePosition_V3[1]>;
     closeButton.RelativePosition_V3 = <width - 3.0, closeButton.RelativePosition_V3[1]>;
 }
@@ -292,6 +339,22 @@ Void rearrangeButtons(){
     }
 
     resizeWindow();
+}
+
+Boolean hasRecord(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+
+    if(Locals.existskey(mapId)){
+        return True;
+    }
+
+    declare Integer[Text] Dedis for LocalUser;
+
+    if(Dedis.existskey(mapId)){
+        return True;
+    }
+
+    return False;
 }
 
 Text getLocal(Text mapId){
@@ -500,20 +563,45 @@ Void search(){
     declare Text[Text][] mapsFound = Text[Text][];
     declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
     declare clearSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
+    declare search = TL::Trim(input.Value);
 
-    if(input.Value == ""){
-        currentMapPool = maps;
-        updateView(maps, 0);
-        clearSearch.Hide();
-        return;
+    if(search == "all"){
+        search = "";
     }
 
-    for(i, 0, maps.count - 1){
-        declare map = maps[i];
-        declare Text[Text] author = getAuthor(map["a"]);
-        declare searchString = map["name"]^author["nick"]^author["login"];
-        if(TL::Find(input.Value, searchString, False, False)){
-            mapsFound.add(map);
+    switch(search){
+        case "":{
+            currentMapPool = maps;
+            updateView(maps, 0);
+            clearSearch.Hide();
+            return;
+        }
+
+        case "nofinish":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasRecord(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "best":{
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                log(findMapById(mapId)["name"] ^ " -> " ^ local);
+            }
+        }
+
+        default: {
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                declare Text[Text] author = getAuthor(map["a"]);
+                declare searchString = map["name"]^author["nick"]^author["login"];
+                if(TL::Find(input.Value, searchString, False, False)){
+                    mapsFound.add(map);
+                }
+            }
         }
     }
 
@@ -550,11 +638,7 @@ Void checkMapSearchQuery(){
     if(MapSearchQuery != ""){
         declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
 
-        if(MapSearchQuery == " "){
-            MapSearchQuery = "";
-        }
-
-        input.SetText(MapSearchQuery, True);
+        input.SetText(TL::Trim(MapSearchQuery), True);
         mapListFrame.Show();
         MapSearchQuery = "";
     }
@@ -731,6 +815,10 @@ main() {
             maps = Maps;
             mapAuthors = MapAuthors;
 
+            foreach(map in Maps){
+                declare mapId = map["id"];
+            }
+
             if(currentTab == 0){
                 currentMapPool = maps;
             }
@@ -834,6 +922,13 @@ main() {
                 }
                 updateView(currentMapPool, currentPage);
                 continue;
+            }
+
+            if(event.Control.HasClass("filter-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+                declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+
+                input.SetText(event.Control.DataAttributeGet("sort"), True);
+                mapListFrame.Show();
             }
 
             if(event.Control.HasClass("btn")){

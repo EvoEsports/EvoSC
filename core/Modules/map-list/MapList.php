@@ -81,8 +81,8 @@ class MapList
 
     public static function sendRecordsJson(Player $player)
     {
-        $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
-        $dedis  = $player->dedis()->pluck('Rank', 'Map')->toJson();
+        $locals = $player->locals()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $dedis  = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
