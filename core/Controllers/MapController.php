@@ -170,22 +170,22 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
+        self::$currentMap = $map;
+        self::$mapStart   = now();
+
         Map::where('id', '!=', $map->id)->increment('cooldown');
 
-        $map->increment('plays');
         $map->update([
             'last_played' => now(),
             'cooldown'    => 0,
+            'plays'       => $map->plays + 1,
         ]);
 
         MxMapDetails::loadMxDetails($map);
 
-        foreach (finishPlayers() as $player) {
-            $player->setScore(0);
-        }
-
-        self::$currentMap = $map;
-        self::$mapStart   = now();
+        Player::where('Score', '>', 0)->update([
+            'Score' => 0,
+        ]);
     }
 
     /**

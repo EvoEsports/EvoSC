@@ -68,11 +68,13 @@ class Log
                 case 'Module':
                 case 'Modules':
                 case 'Hook':
+                case 'Keybinds':
                     self::writeLn("<fg=blue>$line</>");
                     break;
 
                 case 'i':
                 case 'Info':
+                case 'BOOT':
                     self::writeLn("<info>$line</info>");
                     break;
 
@@ -81,7 +83,8 @@ class Log
                     break;
 
                 case 'Dedimania':
-                    self::writeLn($line);
+                case 'DedimaniaApi':
+                    self::writeLn("<fg=green>$line</>");
                     break;
 
                 case 'ERROR':

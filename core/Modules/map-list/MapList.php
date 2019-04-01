@@ -9,6 +9,7 @@ use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
+use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
@@ -39,6 +40,7 @@ class MapList
             'queue_id' => $item->id,
             'id'       => $item->map->id,
             'by'       => $item->requesting_player,
+            'nick'     => player($item->requesting_player)->NickName,
         ];
     }
 
@@ -72,8 +74,8 @@ class MapList
 
     public static function sendRecordsJson(Player $player)
     {
-        $locals = $player->locals()->pluck('Rank', 'Map')->toJson();
-        $dedis  = $player->dedis()->pluck('Rank', 'Map')->toJson();
+        $locals = $player->locals()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $dedis  = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
