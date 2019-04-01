@@ -57,7 +57,7 @@
         </frame>
     </framemodel>
 
-    <frame id="map-list-window" pos="-20 55" size="122 106" hidden="0" z-index="300" scale="1.1">
+    <frame id="map-list-window" pos="-20 55" size="122 106" hidden="1" z-index="300" scale="1.1">
         <quad id="handle" pos="0 0" size="1 6" z-index="1"/>
         <quad pos="0 0" size="200 11" bgcolor="{header_color()|noescape}c"/>
         <quad pos="0 -10.5" size="200 0.5" bgcolor="{header_color()|noescape}f" z-index="2"/>
