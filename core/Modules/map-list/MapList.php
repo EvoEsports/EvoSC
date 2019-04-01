@@ -9,6 +9,7 @@ use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
+use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
@@ -31,6 +32,8 @@ class MapList
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
                    ->addAlias('/list');
+
+        KeyBinds::add('reload_map_list', 'Reloads maplist', [self::class, 'reload'], 'X');
     }
 
     public static function mapMapQueue(MapQueue $item)
@@ -40,6 +43,12 @@ class MapList
             'id'       => $item->map->id,
             'by'       => $item->requesting_player,
         ];
+    }
+
+    public static function reload(Player $player)
+    {
+        TemplateController::loadTemplates();
+        self::playerConnect($player);
     }
 
     /**

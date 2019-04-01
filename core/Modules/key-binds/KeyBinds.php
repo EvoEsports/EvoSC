@@ -87,8 +87,8 @@ class KeyBinds
                 $func($player);
             } else {
                 if (is_callable($bind['callback'], false, $callableName)) {
+                    Log::logAddLine('KeyBinds', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1], isVeryVerbose());
                     call_user_func($bind['callback'], $player);
-                    Log::logAddLine('Hook', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1], isVeryVerbose());
                 } else {
                     throw new \Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
                 }
