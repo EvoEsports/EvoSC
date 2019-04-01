@@ -343,20 +343,18 @@ Void rearrangeButtons(){
     resizeWindow();
 }
 
-Boolean hasRecord(Text mapId){
+Boolean hasLocal(Text mapId){
     declare Integer[Text] Locals for LocalUser;
+    return Locals.existskey(mapId);
+}
 
-    if(Locals.existskey(mapId)){
-        return True;
-    }
-
+Boolean hasDedi(Text mapId){
     declare Integer[Text] Dedis for LocalUser;
+    return Dedis.existskey(mapId);
+}
 
-    if(Dedis.existskey(mapId)){
-        return True;
-    }
-
-    return False;
+Boolean hasRecord(Text mapId){
+    return (hasLocal(mapId) || hasDedi(mapId));
 }
 
 Text getLocal(Text mapId){
@@ -595,9 +593,94 @@ Void search(){
         }
 
         case "best":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, currentMapPool.count - 1){
+                declare map = currentMapPool[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
             declare Integer[Text] Locals for LocalUser;
             foreach(mapId => local in Locals){
-                log(findMapById(mapId)["name"] ^ " -> " ^ local);
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, currentMapPool.count - 1){
+                declare map = currentMapPool[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] localsAsc = Text[];
+
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                localsAsc.add(mapId);
+            }
+
+            declare Text[] localsDesc = localsAsc;
+
+            for(i, 0, localsAsc.count - 1){
+                localsDesc[localsAsc.count - i - 1] = localsAsc[i];
+            }
+
+            foreach(mapId in localsDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "best_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, currentMapPool.count - 1){
+                declare map = currentMapPool[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, currentMapPool.count - 1){
+                declare map = currentMapPool[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] dedisAsc = Text[];
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                dedisAsc.add(mapId);
+            }
+
+            declare Text[] dedisDesc = dedisAsc;
+
+            for(i, 0, dedisAsc.count - 1){
+                dedisDesc[dedisAsc.count - i - 1] = dedisAsc[i];
+            }
+
+            foreach(mapId in dedisDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
             }
         }
 
