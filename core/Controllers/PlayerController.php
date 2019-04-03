@@ -224,8 +224,8 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        if ($score > 0 && ($player->Score == 0 || $score < $player->Score)) {
-            $player->setScore($score);
+        if ($score > 0) {
+            $player->update(['Score' => $score]);
             Log::info($player . " finished with time ($score) " . $player->getTime());
         }
     }
