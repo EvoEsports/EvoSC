@@ -27,6 +27,7 @@ class PlayerController implements ControllerInterface
      */
     public static function init()
     {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 

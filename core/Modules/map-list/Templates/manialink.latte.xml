@@ -108,7 +108,7 @@
                            textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
                            focusareacolor1="{config('colors.ui.header')}3"
                            focusareacolor2="{config('colors.ui.header')}c"/>
-                    <label class="filter-btn" data-sort="nofinish" pos="31.8" size="15 4" textsize="0.7"
+                    <label class="filter-btn" data-sort="nofinish" pos="32" size="15 4" textsize="0.7"
                            text="No Finish" scale="0.8" textcolor="fff"
                            textfont="RajdhaniMono" valign="center" halign="center" ScriptEvents="1"
                            focusareacolor1="{config('colors.ui.header')}3"
