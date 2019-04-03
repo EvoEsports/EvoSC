@@ -38,8 +38,19 @@ class MxDownload
             if ($map && File::exists(MapController::getMapsPath(), 'MX/' . $map->filename)) {
                 infoMessage($player, ' added map: ', $map)->sendAll();
                 $map->update(['enabled' => true]);
-                Server::addMap($map->filename);
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+
+                try {
+                    Server::addMap($map->filename);
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                }
+
+                try {
+                    Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
+                }
+
                 QueueController::queueMap($player, $map);
                 Hook::fire('MapPoolUpdated');
                 continue;
@@ -117,8 +128,18 @@ class MxDownload
             }
 
             try {
-                Server::addMap($map->filename);
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+                try {
+                    Server::addMap($map->filename);
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                }
+
+                try {
+                    Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
+                }
+
                 QueueController::queueMap($player, $map);
                 Hook::fire('MapPoolUpdated');
             } catch (\Exception $e) {

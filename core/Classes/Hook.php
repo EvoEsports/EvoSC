@@ -75,8 +75,11 @@ class Hook
                 }
             }
         } catch (\Exception $e) {
-            Log::logAddLine('Hook', "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
-            Log::logAddLine('DEBUG', json_encode($this->function), isVeryVerbose());
+            $message = $e->getMessage();
+            if ($message != "Login unknown.") {
+                Log::logAddLine('Hook', "Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
+                Log::logAddLine('DEBUG', json_encode($this->function), isDebug());
+            }
         } catch (\TypeError $e) {
             Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }

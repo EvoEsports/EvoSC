@@ -68,13 +68,7 @@
 
             wait(player != Null);
 
-            speed = ML::NearestInteger(player.Speed * 3.6);
-
-            if(speed < 0){
-                speed = -speed;
-            }
-
-            speedLabel.SetText("" ^ speed);
+            speedLabel.SetText("" ^ InputPlayer.DisplaySpeed);
 
             if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
                 speedometer.Hide();
