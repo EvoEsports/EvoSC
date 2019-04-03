@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:test-script" id="test-script" version="3">
+    <frame>
+        <label id="test" textsize="1" />
+    </frame>
+
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
 main(){
-    wait(InputPlayer != Null);
+    declare label <=> (Page.MainFrame.GetFirstChild("test") as CMlLabel);
 
-    while(True){
-        sleep(100);
 
-    }
 }
     --></script>
 </manialink>
