@@ -44,7 +44,6 @@ Void hidescript(){
 
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
     declare Boolean hidden = widget.DataAttributeGet("hidden") == "true";
-    declare Real speed = InputPlayer.DisplaySpeed;
 
     if(widget.DataAttributeGet("orig-x") == ""){
         widget.DataAttributeSet("orig-x", TL::ToText(widget.RelativePosition_V3[0]));
@@ -66,7 +65,7 @@ Void hidescript(){
     
     declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
     declare Boolean mapFinished = ' . ($this->hideOnPodium ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False") . ';
-    declare Boolean overHidespeed = speed >= hideSpeed;
+    declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
     
     if(mapFinished){
         if(!hidden){
