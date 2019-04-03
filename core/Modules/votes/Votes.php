@@ -22,7 +22,8 @@ class Votes
     public function __construct()
     {
         self::$voters   = collect();
-        self::$lastVote = now()->subSeconds(config('votes.cooldown'));
+        self::$lastVote = now();
+        self::$lastVote->subSeconds(config('votes.cooldown'));
 
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');

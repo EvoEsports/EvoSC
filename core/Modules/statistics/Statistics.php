@@ -105,21 +105,31 @@ class Statistics
         self::updatePlayerRanks();
 
         $bestPlayer = $finishedPlayers->first();
-        $secondBest = $finishedPlayers->get(1);
 
-        if ($secondBest && $secondBest->Score == 0) {
-            $secondBest = null;
+        if (!$bestPlayer || $bestPlayer->Score == 0) {
+            //No winner
+
+            return;
         }
 
-        if ($bestPlayer && $bestPlayer->Score > 0) {
-            if (!$secondBest || $secondBest && $bestPlayer->Score < $secondBest->Score) {
-                infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins + 1)
-                    ->setIcon('🏆')
-                    ->sendAll();
+        if ($finishedPlayers->count() > 1) {
+            $secondBest = $finishedPlayers->get(1);
+            if ($secondBest->Score > 0 && $secondBest->Score == $bestPlayer->Score) {
+                //Draw
 
-                $bestPlayer->stats()->increment('Wins');
+                return;
             }
         }
+
+        try {
+            $bestPlayer->stats()->increment('Wins');
+        } catch (\Exception $e) {
+            Log::logAddLine('Statistics', 'Failed to increment win count of ' . $bestPlayer);
+        }
+
+        infoMessage($bestPlayer, ' wins this round. Total wins: ', $bestPlayer->stats->Wins)
+            ->setIcon('🏆')
+            ->sendAll();
     }
 
     /**
@@ -140,7 +150,11 @@ class Statistics
         Log::logAddLine('Statistics', sprintf('Updating player-ranks finished. Took %.3fs', $end - $start), isVeryVerbose());
 
         onlinePlayers()->each(function (Player $player) {
-            self::showRank($player);
+            try {
+                self::showRank($player);
+            } catch (\Exception $e) {
+                Log::logAddLine('Statistics', 'Failed to show rank for player ' . $player);
+            }
         });
     }
 
@@ -150,11 +164,9 @@ class Statistics
 
         if ($stats && $stats->Rank && $stats->Rank > 0) {
             infoMessage('Your server rank is ', secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
-
-            return;
+        } else {
+            infoMessage('You need at least one local record before receiving a rank.')->send($stats->player);
         }
-
-        infoMessage('You need at least one local record before receiving a rank.')->send($stats->player);
     }
 
     /**
