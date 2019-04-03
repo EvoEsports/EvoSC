@@ -91,7 +91,7 @@ class Statistics
         /**
          * Calculate scores
          */
-        $finishedPlayers          = finishPlayers()->sortBy('Score');
+        $finishedPlayers          = Player::where('Score', '>', 0)->orderBy('Score')->get();
         self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
 
         Log::logAddLine('Statistics', sprintf('Calculating player scores for %d players.', self::$totalRankedPlayers), isVeryVerbose());
@@ -104,25 +104,26 @@ class Statistics
 
         self::updatePlayerRanks();
 
-        $bestPlayer = $finishedPlayers->first();
+        Player::where('Score', '>', 0)->update(['Score' => 0]);
 
-        if (!$bestPlayer || $bestPlayer->Score == 0) {
+        if ($finishedPlayers->count() == 0) {
             //No winner
 
             return;
         }
 
         if ($finishedPlayers->count() > 1) {
-            $secondBest = $finishedPlayers->get(1);
-            if ($secondBest->Score > 0 && $secondBest->Score == $bestPlayer->Score) {
+            if ($finishedPlayers->get(0)->Score == $finishedPlayers->get(1)->Score) {
                 //Draw
 
                 return;
             }
         }
 
+        $bestPlayer = $finishedPlayers->first();
+
         try {
-            $bestPlayer->stats()->increment('Wins');
+            Stats::where('Player', $bestPlayer->id)->increment('Wins');
         } catch (\Exception $e) {
             Log::logAddLine('Statistics', 'Failed to increment win count of ' . $bestPlayer);
         }
