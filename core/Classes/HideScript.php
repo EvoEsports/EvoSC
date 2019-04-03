@@ -44,7 +44,7 @@ Void hidescript(){
 
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
     declare Boolean hidden = widget.DataAttributeGet("hidden") == "true";
-    declare Real speed = ML::Abs(InputPlayer.Speed * 3.6);
+    declare Real speed = InputPlayer.DisplaySpeed;
 
     if(widget.DataAttributeGet("orig-x") == ""){
         widget.DataAttributeSet("orig-x", TL::ToText(widget.RelativePosition_V3[0]));
