@@ -115,6 +115,7 @@ class EscRun extends Command
         esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
         esc\Controllers\PlayerController::init();
+        esc\Controllers\BansController::init();
         esc\Controllers\AfkController::init();
         esc\Controllers\ModuleController::init();
         esc\Controllers\PlanetsController::init();

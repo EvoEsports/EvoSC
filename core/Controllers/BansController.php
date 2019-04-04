@@ -28,7 +28,7 @@ class BansController implements ControllerInterface
     {
         AccessRight::createIfNonExistent('player_ban', 'Ban and unban players.');
 
-        ChatCommand::add('//ban', [self::class, 'banPlayer'], 'Ban player by nickname', 'player_ban');
+        ChatCommand::add('//ban', [self::class, 'banPlayer'], 'Ban player by nickname.', 'player_ban');
 
         ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
@@ -69,13 +69,7 @@ class BansController implements ControllerInterface
      */
     public static function banPlayerEvent(Player $admin, $cmd, $login, $reason = '')
     {
-        $toBeBanned = Player::find($login);
-
-        if (!$toBeBanned) {
-            return;
-        }
-
-        self::ban($toBeBanned, $admin, $reason);
+        self::ban(player($login), $admin, $reason);
     }
 
     /**
