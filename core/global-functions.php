@@ -75,32 +75,32 @@ function config(string $id, $default = null)
 
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
 }
 
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
 function ghost(string $filename = ''): string
 {
-    return \esc\Classes\Server::GameDataDirectory() . DIRECTORY_SEPARATOR . 'Replays' . DIRECTORY_SEPARATOR . 'Ghosts' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename) . '.Replay.Gbx';
+    return \esc\Classes\Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 function coreDir(string $filename = ''): string
 {
-    return __DIR__ . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
 }
 
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
 }
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
