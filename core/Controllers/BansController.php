@@ -43,8 +43,8 @@ class BansController implements ControllerInterface
     public static function ban(Player $player, Player $admin, string $reason = '')
     {
         Server::banAndBlackList($player->Login, $reason, true);
-        $player->update(['banned' => true]);
         warningMessage($admin, ' banned ', $player, ', reason: ', secondary($reason))->sendAll();
+        $player->update(['banned' => 1]);
     }
 
     /**
@@ -56,8 +56,8 @@ class BansController implements ControllerInterface
     public static function unban(Player $player, Player $admin)
     {
         Server::unBan($player->Login);
-        $player->update(['banned' => false]);
         infoMessage($admin, ' unbanned ', $player)->sendAll();
+        $player->update(['banned' => 0]);
     }
 
     /**
