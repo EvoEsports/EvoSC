@@ -11,7 +11,6 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\MapController;
 use esc\Models\Dedi;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Model;

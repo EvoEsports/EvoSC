@@ -46,7 +46,7 @@ class MxDownload
                 }
 
                 try {
-                    Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings
+                    Server::saveMatchSettings('MatchSettings ' . DIRECTORY_SEPARATOR . config('server.default-matchsettings')); //TODO: Save to current matchsettings
                 } catch (\Exception $e) {
                     Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
                 }
