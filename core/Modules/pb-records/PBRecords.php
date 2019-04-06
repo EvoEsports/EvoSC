@@ -78,13 +78,12 @@ class PBRecords
     {
         if ($map->locals()->count() > 0) {
             $defaultTarget = $map->locals()->where('Rank', '<=', config('locals.limit'))->orderByDesc('Score')->get()->first();
-            $targetString  = sprintf('%d. Local  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         } else {
             $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
-            $targetString  = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         }
 
         if ($defaultTarget) {
+            $targetString        = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
             self::$defaultTarget = $defaultTarget;
         } else {
             self::$defaultTarget = null;
