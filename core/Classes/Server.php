@@ -284,6 +284,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool startServerLan()
  * @method static bool startServerInternet()
  * @method static void executeMulticall()
+ * @method static array executeCallbacks()
  */
 class Server
 {

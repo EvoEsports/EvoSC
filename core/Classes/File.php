@@ -168,6 +168,27 @@ class File
     {
         $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
 
-        return file_exists($filename);
+        return is_file($filename) && file_exists($filename);
+    }
+
+    /**
+     * Check if a directory exists.
+     *
+     * @param string $filename
+     *
+     * @return bool
+     */
+    public static function dirExists(string $filename)
+    {
+        $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
+
+        return is_dir($filename);
+    }
+
+    public static function makeDir(string $dir)
+    {
+        $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+
+        mkdir($dir);
     }
 }

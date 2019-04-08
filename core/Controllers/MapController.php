@@ -59,7 +59,7 @@ class MapController implements ControllerInterface
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
-        AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
+        AccessRight::createIfNonExistent('map_delete', 'Delete map (and all records) permanently.');
         AccessRight::createIfNonExistent('map_disable', 'Disable map.');
         AccessRight::createIfNonExistent('map_replay', 'Force a replay.');
         AccessRight::createIfNonExistent('map_reset', 'Reset round.');
@@ -241,27 +241,33 @@ class MapController implements ControllerInterface
      */
     public static function deleteMap(Player $player, Map $map)
     {
-        return; //disabled
-
         try {
             Server::removeMap($map->filename);
-        } catch (FileException $e) {
-            Log::error($e);
+        } catch (\Exception $e) {
+            Log::logAddLine('MapController', 'Delete map: ' . $e->getMessage());
         }
 
-        $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
+        $map->locals()->delete();
+        $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
-            infoMessage($player, ' removed map ', $map)->sendAll();
-
             try {
                 $map->delete();
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                infoMessage($player, ' deleted map ', secondary($map), 'permanently.')->sendAll();
-                Hook::fire('MapPoolUpdated');
             } catch (\Exception $e) {
-                Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
+                Log::logAddLine('MapController', 'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
+
+            try {
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+            } catch (\Exception $e) {
+                Log::logAddLine('MapController', 'Failed to save match-settings: ' . $e->getMessage());
+            }
+
+            Hook::fire('MapPoolUpdated');
+
+            warningMessage($player, ' deleted map ', $map)->sendAll();
+        } else {
+            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
         }
     }
 
@@ -275,14 +281,14 @@ class MapController implements ControllerInterface
     {
         try {
             Server::removeMap($map->filename);
-        } catch (FileException $e) {
+            infoMessage($player->group, ' ', $player, ' disabled map ', secondary($map))->sendAll();
+        } catch (\Exception $e) {
             Log::error($e);
         }
 
         $map->update(['enabled' => false]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        infoMessage($player->group, ' ', $player, ' disabled map ', secondary($map))->sendAll();
         Hook::fire('MapPoolUpdated');
     }
 
@@ -328,10 +334,7 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename): string
     {
-        $absolute = Server::getMapsDirectory() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename);
-        $cmd      = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $absolute . '"';
-
-        return shell_exec($cmd);
+        return shell_exec(Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $filename . '"');
     }
 
     /**
@@ -356,15 +359,11 @@ class MapController implements ControllerInterface
             }
 
             $map = Map::where('uid', $mapInfo->uId)
-                      ->get()
                       ->first();
 
             if (!$map) {
-                //Map does not exist, create it
-                $author = Player::where('Login', $mapInfo->author)->first();
-
-                if ($author) {
-                    $authorId = $author->id;
+                if (Player::where('Login', $mapInfo->author)->exists()) {
+                    $authorId = Player::where('Login', $mapInfo->author)->first()->id;
                 } else {
                     $authorId = Player::insertGetId([
                         'Login'    => $mapInfo->author,
@@ -372,9 +371,8 @@ class MapController implements ControllerInterface
                     ]);
                 }
 
-                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
-
-                $map = Map::updateOrCreate([
+                $gbxInfo = self::getGbxInformation(self::$mapsPath . $mapInfo->fileName);
+                $map     = Map::updateOrCreate([
                     'author'   => $authorId,
                     'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
                     'filename' => $mapInfo->fileName,
@@ -382,15 +380,25 @@ class MapController implements ControllerInterface
                 ]);
             }
 
+            if (!$map->checksum) {
+                $map->update([
+                    'checksum' => md5_file($mapFile),
+                ]);
+            }
+
             if (!$map->gbx) {
-                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
+                $gbxInfo = self::getGbxInformation(self::$mapsPath . $mapInfo->fileName);
                 $map->update([
                     'gbx' => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
                     'uid' => json_decode($gbxInfo)->MapUid,
                 ]);
             }
 
-            echo ".";
+            if (isVerbose()) {
+                printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->gbx->Name));
+            } else {
+                echo ".";
+            }
         }
 
         echo "\n";

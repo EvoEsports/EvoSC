@@ -147,6 +147,12 @@ class Dedimania extends DedimaniaApi
                     'MaxRank'  => $record->max_rank,
                 ]);
 
+                if (!$player->id) {
+                    Log::logAddLine('Dedimania', 'Unknown player "' . $record->login . '".');
+
+                    return null;
+                }
+
                 return [
                     'Map'         => $map->id,
                     'Player'      => $player->id,
@@ -154,7 +160,7 @@ class Dedimania extends DedimaniaApi
                     'Rank'        => $record->rank,
                     'Checkpoints' => $record->checkpoints,
                 ];
-            });
+            })->filter();
 
             Dedi::insert($insert->toArray());
             self::cacheDedis($map);

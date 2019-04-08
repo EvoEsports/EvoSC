@@ -787,7 +787,7 @@ Void checkMapSearchQuery(){
 Integer confirm(Text question){
     declare confirmDialogFrame <=> (Page.MainFrame.GetFirstChild("delete-dialog") as CMlFrame);
     declare permLabel <=> (confirmDialogFrame.Controls[3] as CMlLabel);
-    declare Integer answer = 0;
+    declare Integer answer = 1;
     declare Boolean decided = False;
 
     //show confirm dialog
@@ -806,7 +806,7 @@ Integer confirm(Text question){
                 if(set){
                     label.DataAttributeSet("set", "0");
                     label.SetText(" Delete permanently and from all MatchSettings");
-                    answer = 0;
+                    answer = 1;
                 }else{
                     label.DataAttributeSet("set", "1");
                     label.SetText(" Delete permanently and from all MatchSettings");
@@ -814,9 +814,6 @@ Integer confirm(Text question){
                 }
             }
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
-                if(answer == 0){
-                    answer = 1;
-                }
                 decided = True;
             }
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
@@ -831,7 +828,7 @@ Integer confirm(Text question){
     permLabel.SetText(" Delete permanently and from all MatchSettings");
     permLabel.DataAttributeSet("set", "0");
 
-    return answer; // 0 = cancel, 1 = delete from current matchsettings, 2 = delete file + from all matchsettings
+    return answer; // 0 = cancel, 1 = delete from current matchsettings, 2 = delete file and all records
 }
 
 Void buttonPressed(CMlFrame mapFrame, CMlControl control){
@@ -853,11 +850,11 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     if(control.HasClass("delete")){
         declare answer = confirm("Disable map?");
 
-        if(answer == 0){
-            return;
+        if(answer == 1){
+            TriggerPageAction("maplist.disable," ^ mapFrame.DataAttributeGet("map-uid"));
         }
 
-        if(answer == 1){
+        if(answer == 2){
             TriggerPageAction("maplist.delete," ^ mapFrame.DataAttributeGet("map-uid"));
         }
     }
@@ -950,18 +947,13 @@ main() {
         yield;
 
         if(checkMapChanges()){
-            maps = Maps;
             mapAuthors = MapAuthors;
-
-            foreach(map in Maps){
-                declare mapId = map["id"];
-            }
+            maps = Maps;
 
             if(currentTab == 0){
                 currentMapPool = maps;
+                updateView(currentMapPool, currentPage);
             }
-
-            updateView(currentMapPool, currentPage);
         }
 
         foreach(event in PendingEvents){

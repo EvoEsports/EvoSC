@@ -19,8 +19,8 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMap'], 'map.delete');
-        ManiaLinkEvent::add('maplist.delete-perm', [MapList::class, 'deleteMapPerm'], 'map.delete-perm');
+        ManiaLinkEvent::add('maplist.disable', [MapList::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMapPermEvent'], 'map_delete');
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
@@ -169,7 +169,7 @@ class MapList
         });
     }
 
-    public static function deleteMap(Player $player, $mapUid)
+    public static function disableMapEvent(Player $player, $mapUid)
     {
         $map = Map::whereUid($mapUid)->first();
 
@@ -181,10 +181,16 @@ class MapList
         MapController::disableMap($player, $map);
     }
 
-    public static function deleteMapPerm(Player $player, $mapUid)
+    public static function deleteMapPermEvent(Player $player, $mapUid)
     {
-        //TODO: delete map permanently
-        self::deleteMap($player, $mapUid);
+        $map = Map::whereUid($mapUid)->first();
+
+        if (!$map) {
+            return;
+        }
+
+        QueueController::dropMap($player, $map->uid);
+        MapController::deleteMap($player, $map);
     }
 
     /**

@@ -8,8 +8,8 @@
             declare Text mapsJson = """{$maps|noescape}""";
             declare Text mapAuthorsJson = """{$mapAuthors|noescape}""";
 
-            Maps.fromjson(mapsJson);
             MapAuthors.fromjson(mapAuthorsJson);
+            Maps.fromjson(mapsJson);
         }
         -->
     </script>

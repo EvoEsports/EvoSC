@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use esc\Models\Map;
 use esc\Models\Player;
 
 /**
@@ -114,7 +115,7 @@ class ChatMessage
                 continue;
             }
 
-            if ($part instanceof Player) {
+            if ($part instanceof Player || $part instanceof Map) {
                 $message .= secondary($part) . '$z$s';
                 continue;
             }
