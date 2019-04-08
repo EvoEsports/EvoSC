@@ -358,10 +358,13 @@ class MapController implements ControllerInterface
                 continue;
             }
 
-            $map = Map::where('uid', $mapInfo->uId)
-                      ->first();
+            $map = Map::whereUid($mapInfo->uId)->first();
 
             if (!$map) {
+                if (Map::whereFilename($mapInfo->fileName)->exists()) {
+                    Map::whereFilename($mapInfo->fileName)->delete();
+                }
+
                 if (Player::where('Login', $mapInfo->author)->exists()) {
                     $authorId = Player::where('Login', $mapInfo->author)->first()->id;
                 } else {

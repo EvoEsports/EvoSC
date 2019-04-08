@@ -96,7 +96,7 @@ class MxDownload
                         $message = infoMessage($player, ' enabled map ', $map);
                     }
                 } else {
-                    // $existingMap->locals()->delete();
+                    // $existingMap->locals()->delete(); TODO: Remove automatically
 
                     $map->update([
                         'filename' => $filename,
