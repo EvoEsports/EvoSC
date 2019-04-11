@@ -281,7 +281,7 @@ class MapController implements ControllerInterface
     {
         try {
             Server::removeMap($map->filename);
-            infoMessage($player->group, ' ', $player, ' disabled map ', secondary($map))->sendAll();
+            infoMessage($player, ' disabled map ', secondary($map))->sendAll();
         } catch (\Exception $e) {
             Log::error($e);
         }

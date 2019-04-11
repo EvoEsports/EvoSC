@@ -473,6 +473,12 @@ Void updateView(Text[Text][] mapPool, Integer page){
         }
 
         declare Text[Text] map = mapPool[id];
+
+        if(!map.existskey("a")){
+            log("[Maps] Null author for map " ^ map["id"]);
+            continue;
+        }
+
         declare Text[Text] author = getAuthor(map["a"]);
 
         declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
@@ -532,6 +538,12 @@ Void checkMapQueueChanged(){
         declare queueItem = MapQueue[i];
 
         declare Text[Text] map = findMapById(queueItem["id"]);
+
+        if(!map.existskey("a")){
+            log("[Maps] Null author for map " ^ map["id"]);
+            continue;
+        }
+
         declare Text[Text] author = getAuthor(map["a"]);
 
         queueItemFrame.DataAttributeSet("map-id", map["id"]);
@@ -747,6 +759,12 @@ Void search(){
         default: {
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
+
+                if(!map.existskey("a")){
+                    log("[Maps] Null author for map " ^ map["id"]);
+                    continue;
+                }
+
                 declare Text[Text] author = getAuthor(map["a"]);
                 declare searchString = map["name"]^author["nick"]^author["login"];
                 if(TL::Find(input.Value, searchString, False, False)){
