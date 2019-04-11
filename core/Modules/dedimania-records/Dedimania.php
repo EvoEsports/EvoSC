@@ -147,7 +147,7 @@ class Dedimania extends DedimaniaApi
                     'MaxRank'  => $record->max_rank,
                 ]);
 
-                $player = Player::find($record->login);
+                $player = player($record->login);
 
                 if (!$player->id) {
                     Log::logAddLine('Dedimania', 'Unknown player "' . $record->login . '".');

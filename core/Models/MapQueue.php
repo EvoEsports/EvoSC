@@ -3,6 +3,8 @@
 namespace esc\Models;
 
 
+use esc\Classes\Hook;
+use esc\Controllers\QueueController;
 use Illuminate\Database\Eloquent\Model;
 
 class MapQueue extends Model
@@ -32,5 +34,6 @@ class MapQueue extends Model
     public static function removeFirst()
     {
         self::orderBy('created_at')->first()->delete();
+        Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
     }
 }

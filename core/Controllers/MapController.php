@@ -175,6 +175,14 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
+        if (self::$nextMap && self::$nextMap->uid != $map->uid) {
+            Log::logAddLine('ERROR', sprintf('Expected map %s, got %s', self::$nextMap->uid, $map->uid));
+            exit(3);
+        }
+
+        QueueController::dropMapSilent($map->uid);
+
+        self::$nextMap    = null;
         self::$currentMap = $map;
         self::$mapStart   = now();
 
@@ -188,9 +196,12 @@ class MapController implements ControllerInterface
 
         MxMapDetails::loadMxDetails($map);
 
+        //TODO: move to player controller
         Player::where('Score', '>', 0)->update([
             'Score' => 0,
         ]);
+
+        QueueController::preCacheNextMap();
     }
 
     /**
@@ -199,7 +210,7 @@ class MapController implements ControllerInterface
     public static function beginMatch()
     {
         self::resetTime();
-        self::addTime(1);
+        self::addTime(0);
     }
 
     /**
@@ -209,14 +220,12 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
+        $nextMap       = Map::where('uid', Server::getNextMapInfo()->uId)->first();
+        self::$nextMap = $nextMap;
+
         if ($request) {
-            Log::info("Setting next map: " . $request->map);
-            Server::chooseNextMap($request->map->filename);
-            MapQueue::removeFirst();
-            Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
             $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
         } else {
-            $nextMap     = Map::where('uid', Server::getNextMapInfo()->uId)->first();
             $chatMessage = chatMessage('Upcoming map ', secondary($nextMap));
         }
 
