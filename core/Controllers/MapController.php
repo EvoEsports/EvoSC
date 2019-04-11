@@ -35,6 +35,11 @@ class MapController implements ControllerInterface
     private static $currentMap;
 
     /**
+     * @var Map
+     */
+    private static $nextMap;
+
+    /**
      * @var Carbon
      */
     private static $mapStart;
