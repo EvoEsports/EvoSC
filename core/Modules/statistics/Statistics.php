@@ -56,7 +56,7 @@ class Statistics
         //Most played
         $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($min) {
             //Get playtime as hours
-            return round($min / 60, 1);
+            return round($min / (60 * 5), 1);
         }));
 
         //Most finishes
@@ -166,7 +166,7 @@ class Statistics
         if ($stats && $stats->Rank && $stats->Rank > 0) {
             infoMessage('Your server rank is ', secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
         } else {
-            infoMessage('You need at least one local record before receiving a rank.')->send($stats->player);
+            infoMessage('You need at least one local record before receiving a rank.')->send($player);
         }
     }
 
