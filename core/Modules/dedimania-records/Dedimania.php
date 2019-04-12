@@ -142,22 +142,14 @@ class Dedimania extends DedimaniaApi
             $map->dedis()->where('New', 0)->delete();
 
             $insert = $records->map(function ($record) use ($map) {
-                Player::firstOrCreate(['Login' => $record->login], [
+                $player = Player::firstOrCreate(['Login' => $record->login], [
                     'NickName' => $record->nickname,
                     'MaxRank'  => $record->max_rank,
                 ]);
 
-                $player = player($record->login);
-
-                if (!$player->id) {
-                    Log::logAddLine('Dedimania', 'Unknown player "' . $record->login . '".');
-
-                    return null;
-                }
-
                 return [
                     'Map'         => $map->id,
-                    'Player'      => $player->id,
+                    'Player'      => $player->id ?? player($record->login)->id,
                     'Score'       => $record->score,
                     'Rank'        => $record->rank,
                     'Checkpoints' => $record->checkpoints,
