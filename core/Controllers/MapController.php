@@ -218,13 +218,17 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        $nextMap       = Map::where('uid', Server::getNextMapInfo()->uId)->first();
-        self::$nextMap = $nextMap;
+        self::$nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
 
         if ($request) {
-            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            if ($request->map->uid != self::$nextMap->uid) {
+                Server::chooseNextMap($request->map->filename);
+            }
+
+            $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            self::$nextMap = $request->map;
         } else {
-            $chatMessage = chatMessage('Upcoming map ', secondary($nextMap));
+            $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
 
         $chatMessage->setIcon('')->sendAll();
