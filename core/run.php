@@ -6,6 +6,7 @@ require 'global-functions.php';
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
+use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -122,6 +123,7 @@ class EscRun extends Command
         esc\Controllers\AfkController::init();
         esc\Controllers\ModuleController::init();
         esc\Controllers\PlanetsController::init();
+        esc\Controllers\CountdownController::init();
 
         $logins = [];
         foreach (Server::getPlayerList(500, 0) as $player) {

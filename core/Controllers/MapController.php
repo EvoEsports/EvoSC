@@ -5,7 +5,6 @@ namespace esc\Controllers;
 
 use Carbon\Carbon;
 use esc\Classes\ChatCommand;
-use esc\Classes\Config;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -19,7 +18,6 @@ use esc\Models\Player;
 use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
-use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
 use mysql_xdevapi\Exception;
 
 /**
