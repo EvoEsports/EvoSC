@@ -289,7 +289,7 @@ Text[Text][] arraySortDesc(Text[Text][] array, Integer column){
 Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
     foreach(control in (quad.Parent.Parent.Controls[0] as CMlFrame).Controls){
         if(control.HasClass("arrow")){
-            (control as CMlLabel).Opaity = 0.2;
+            (control as CMlLabel).Opacity = 0.2;
         }
     }
     foreach(control in (quad.Parent.Parent.Controls[1] as CMlFrame).Controls){
