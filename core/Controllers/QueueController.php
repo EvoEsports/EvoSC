@@ -110,9 +110,7 @@ class QueueController implements ControllerInterface
 
     public static function dropMapSilent($mapUid)
     {
-        $queueItem = MapQueue::whereMapUid($mapUid)->first();
-
-        if ($queueItem) {
+        if (MapQueue::whereMapUid($mapUid)->exists()) {
             MapQueue::whereMapUid($mapUid)->delete();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
@@ -154,7 +152,7 @@ class QueueController implements ControllerInterface
             if ($player->hasAccess('queue_keep')) {
                 //Keep maps of players with queue_keep right
 
-                return;
+                // return; disabled
             }
 
             $queueItems = MapQueue::where('requesting_player', $player->Login)->get();

@@ -174,6 +174,7 @@ class MapController implements ControllerInterface
     public static function beginMap(Map $map)
     {
         if (self::$nextMap && self::$nextMap->uid != $map->uid) {
+            QueueController::dropMapSilent(self::$nextMap->uid);
             Log::logAddLine('ERROR', sprintf('Expected map %s, got %s', self::$nextMap->uid, $map->uid));
             exit(3);
         }
