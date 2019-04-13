@@ -150,12 +150,18 @@ class QueueController implements ControllerInterface
      */
     public static function playerDisconnect(Player $player)
     {
-        $queryBuilder = MapQueue::whereRequestingPlayer($player->Login);
+        if (MapQueue::where('requesting_player', $player->Login)->exists()) {
+            if ($player->hasAccess('queue_keep')) {
+                //Keep maps of players with queue_keep right
 
-        if (!$player->hasAccess('queue_keep') && $queryBuilder->count() > 0) {
-            $queryBuilder->get()->filter(function (MapQueue $item) use ($player) {
-                infoMessage('Dropped ', secondary($item->map), ' from queue, because ', secondary($player), ' left.')->sendAll();
-                MapQueue::whereMapUid($item->map_uid)->delete();
+                return;
+            }
+
+            $queueItems = MapQueue::where('requesting_player', $player->Login)->get();
+
+            $queueItems->each(function (MapQueue $queueItem) use ($player) {
+                MapQueue::whereMapUid($queueItem->map_uid)->delete();
+                infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player), ' left.')->sendAll();
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
