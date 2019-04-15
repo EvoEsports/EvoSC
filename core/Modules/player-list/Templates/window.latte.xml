@@ -107,7 +107,14 @@ Void updateList(Integer playerCount){
         }
     }
 
-    pageInfoLabel.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(Players.count / 20.0));
+    if(i < 20){
+        for(x, i, 20){
+            declare row <=> (content.Controls[x] as CMlFrame);
+            row.Hide();
+        }
+    }
+
+    pageInfoLabel.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(playerCount / 20.0));
 }
 
 Void setupAlternatingRowBackground(){
