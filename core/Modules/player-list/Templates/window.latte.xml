@@ -87,6 +87,7 @@ Void updateList(Integer playerCount){
         row.DataAttributeSet("login", player.User.Login);
         (row.Controls[1] as CMlLabel).SetText(player.User.Name);
         (row.Controls[2] as CMlLabel).SetText(player.User.Login);
+        row.Show();
 
         if(player.Score != Null){
             declare Integer score = player.Score.BestLap.Score;
