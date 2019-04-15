@@ -62,12 +62,16 @@ declare Integer page;
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
 Void updateList(Integer playerCount){
+    declare sizeMultiplier = playerCount;
+    if(sizeMultiplier > 20){
+        sizeMultiplier = 20;
+    }
     declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
     declare pageInfoLabel <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
-    bg.Size = <playerlist.Size[0], playerCount * 5.0 + 5.0>;
-    content.Size = <bg.Size[0], playerCount * 5.0>;
+    bg.Size = <playerlist.Size[0], sizeMultiplier * 5.0 + 5.0>;
+    content.Size = <bg.Size[0], sizeMultiplier * 5.0>;
     playerlist.RelativePosition_V3 = <-(bg.Size[0]/2), (bg.Size[1]/2) + 2.5>;
-    pagination.RelativePosition_V3 = <4.0, playerCount * -5.0 - 7.5>;
+    pagination.RelativePosition_V3 = <4.0, sizeMultiplier * -5.0 - 7.5>;
 
     declare i = 0;
     declare skipped = 0;
