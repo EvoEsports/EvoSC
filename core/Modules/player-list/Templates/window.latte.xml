@@ -107,8 +107,8 @@ Void updateList(Integer playerCount){
         }
     }
 
-    if(i < 20){
-        for(x, i, 20){
+    if(i < 19){
+        for(x, i, 19){
             declare row <=> (content.Controls[x] as CMlFrame);
             row.Hide();
         }
