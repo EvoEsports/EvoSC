@@ -61,6 +61,46 @@ declare Integer page;
 
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
+Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+    declare Text secondString;
+    declare Text msString;
+    declare Integer score;
+
+    score = scoreIn;
+
+    if(score < 0){
+        score = -score;
+    }
+
+    declare Integer seconds = score / 1000;
+    declare Integer minutes = seconds / 60;
+    declare Integer ms = score - (seconds * 1000);
+
+    seconds = seconds - (minutes * 60);
+
+    secondString = "" ^ seconds;
+
+    if(seconds < 10 && minutes > 0){
+        secondString = "0" ^ seconds;
+    }
+
+    if(ms == 0){
+        msString = "000";
+    }else if(ms > 0 && ms < 10){
+        msString = "00" ^ ms;
+    }else if(ms >= 10 && ms < 100){
+        msString = "0" ^ ms;
+    }else{
+        msString = "" ^ ms;
+    }
+
+    if(cutZeroes && minutes == 0){
+        return secondString ^ "." ^ msString;
+    }
+
+    return minutes ^ ":" ^ secondString ^ "." ^ msString;
+}
+
 Void updateList(Integer playerCount){
     declare sizeMultiplier = playerCount;
     if(sizeMultiplier > 20){
@@ -91,13 +131,10 @@ Void updateList(Integer playerCount){
 
         if(player.Score != Null){
             declare Integer score = player.Score.BestLap.Score;
-            if(score > 0){
-                (row.Controls[3] as CMlLabel).Opacity = 1.0;
-            }else{
-                (row.Controls[3] as CMlLabel).Opacity = 0.5;
-            }
-            (row.Controls[3] as CMlLabel).SetText(TL::TimeToText(score, True));
+            (row.Controls[3] as CMlLabel).Opacity = 1.0;
+            (row.Controls[3] as CMlLabel).SetText(formatScoreCorrect(score, True));
         }else{
+            (row.Controls[3] as CMlLabel).Opacity = 0.5;
             (row.Controls[3] as CMlLabel).SetText("0:00.00");
         }
 
