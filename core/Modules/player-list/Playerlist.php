@@ -13,7 +13,7 @@ class Playerlist
 {
     public function __construct()
     {
-        ChatCommand::add('/players', [Playerlist::class, 'show'], 'Show the userlist');
+        ChatCommand::add('/players', [Playerlist::class, 'show'], 'Show the player-list.');
 
         ManiaLinkEvent::add('players', [self::class, 'show']);
 
@@ -24,7 +24,6 @@ class Playerlist
 
     public static function show(Player $player)
     {
-        $players = onlinePlayers();
-        Template::show($player, 'player-list.window', compact('players'));
+        Template::show($player, 'player-list.window');
     }
 }

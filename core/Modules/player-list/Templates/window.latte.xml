@@ -23,9 +23,20 @@
         <label class="close" pos="117.5 -2.5" size="5 5" textsize="0.2" text="❌" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
 
         <frame id="content" size="120 80" pos="0 -5" z-index="5">
-            {for $i=1; $i<=30; $i++}
+            {for $i=1; $i<=20; $i++}
             <frameinstance modelid="row" pos="0 {$i * -5 + 2.5}"></frameinstance>
             {/for}
+        </frame>
+
+        <frame id="pagination" pos="4 -86.5" scale="0.9" z-index="3">
+            <label id="page-info" pos="6 0" size="8 3.5" valign="center"
+                   halign="center" text="1/1" textsize="0.8"/>
+            <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
+            <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
         </frame>
     </frame>
 
@@ -46,20 +57,29 @@
 declare CMlFrame playerlist;
 declare CMlFrame content;
 declare CMlQuad bg;
+declare Integer page;
 
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
-Void playerCountChanged(Integer playerCount){
-    bg.Size = <playerlist.Size[0], playerCount * 5.0>;
+Void updateList(Integer playerCount){
+    declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlFrame);
+    declare pageInfoLabel <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    bg.Size = <playerlist.Size[0], playerCount * 5.0 + 5.0>;
     content.Size = <bg.Size[0], playerCount * 5.0>;
     playerlist.RelativePosition_V3 = <-(bg.Size[0]/2), (bg.Size[1]/2) + 2.5>;
+    pagination.RelativePosition_V3 = <4.0, playerCount * -5.0 - 7.5>;
 
-    foreach(key => player in Players){
-        if(key >= content.Controls.count){
-            return;
+    declare i = 0;
+    declare skipped = 0;
+    declare toSkip = ML::FloorInteger(playerCount / 20.0) * 20;
+
+    foreach(player in Players){
+        if(skipped < toSkip){
+            skipped += 1;
+            continue;
         }
 
-        declare row <=> (content.Controls[key] as CMlFrame);
+        declare row <=> (content.Controls[i] as CMlFrame);
         row.DataAttributeSet("login", player.User.Login);
         (row.Controls[1] as CMlLabel).SetText(player.User.Name);
         (row.Controls[2] as CMlLabel).SetText(player.User.Login);
@@ -73,7 +93,15 @@ Void playerCountChanged(Integer playerCount){
             }
             (row.Controls[3] as CMlLabel).SetText(TL::TimeToText(score, True));
         }
+
+        i += 1;
+
+        if(i >= content.Controls.count){
+            return;
+        }
     }
+
+    pageInfoLabel.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(Players.count / 20.0));
 }
 
 Void setupAlternatingRowBackground(){
@@ -105,6 +133,8 @@ Text input(Text text){
     while(!decided){
         yield;
 
+        maniaLinkDrag();
+
         foreach(event in PendingEvents){
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
                 input = (inputDialogFrame.Controls[3] as CMlEntry).Value;
@@ -131,19 +161,36 @@ main() {
 
     setupAlternatingRowBackground();
 
-    declare Integer playerCount = -1;
+    declare playerCount = -1;
+    page = 0;
 
     while(True){
         yield;
 
         if(playerCount != Players.count){
             playerCount = Players.count;
-            playerCountChanged(playerCount);
+            updateList(playerCount);
         }
 
         foreach(event in PendingEvents){
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
                 playerlist.Hide();
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous-page")){
+                page -= 1;
+                if(page < 0){
+                    page = ML::FloorInteger(Players.count / 20.0);
+                }
+                updateList(playerCount);
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next-page")){
+                page += 1;
+                if(page > (Players.count / 20)){
+                    page = 0;
+                }
+                updateList(playerCount);
             }
 
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("profile")){
