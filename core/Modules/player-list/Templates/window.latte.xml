@@ -75,7 +75,7 @@ Void updateList(Integer playerCount){
 
     declare i = 0;
     declare skipped = 0;
-    declare toSkip = ML::FloorInteger(playerCount / 20.0) * 20;
+    declare toSkip = page * 20;
 
     foreach(player in Players){
         if(skipped < toSkip){
@@ -96,6 +96,8 @@ Void updateList(Integer playerCount){
                 (row.Controls[3] as CMlLabel).Opacity = 0.5;
             }
             (row.Controls[3] as CMlLabel).SetText(TL::TimeToText(score, True));
+        }else{
+            (row.Controls[3] as CMlLabel).SetText("0:00.00");
         }
 
         i += 1;
