@@ -178,8 +178,6 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
-        QueueController::dropMapSilent($map->uid);
-
         self::$nextMap    = null;
         self::$currentMap = $map;
         self::$mapStart   = now();
@@ -221,8 +219,11 @@ class MapController implements ControllerInterface
         self::$nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
 
         if ($request) {
-            if ($request->map->uid != self::$nextMap->uid) {
-                Server::chooseNextMap($request->map->filename);
+            QueueController::dropMapSilent($request->map->uid);
+            $chosen = Server::chooseNextMap($request->map->filename);
+
+            if (!$chosen) {
+                Log::logAddLine('MapController', 'Failed to chooseNextMap ' . $request->map->filename);
             }
 
             $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
