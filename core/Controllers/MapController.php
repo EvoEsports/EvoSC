@@ -219,6 +219,14 @@ class MapController implements ControllerInterface
         self::$nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
 
         if ($request) {
+            if (!collect(Server::getMapList())->contains('fileName', $request->map->filename)) {
+                try {
+                    Server::addMap($request->map->filename);
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                }
+            }
+
             QueueController::dropMapSilent($request->map->uid);
             $chosen = Server::chooseNextMap($request->map->filename);
 
