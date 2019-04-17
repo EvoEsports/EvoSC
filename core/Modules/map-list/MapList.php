@@ -64,11 +64,6 @@ class MapList
 
     public static function beginMap(Map $map)
     {
-        $map->update([
-            'cooldown'    => 0,
-            'last_played' => now(),
-        ]);
-
         self::sendUpdatedMaplist();
     }
 
@@ -146,7 +141,11 @@ class MapList
         //max length ~65762
         //length 60088 is ok
 
-        return Map::whereEnabled(true)->get()->map(function (Map $map) {
+        return Map::whereEnabled(1)->get()->map(function (Map $map) {
+            if (!$map->id || !$map->gbx->MapUid) {
+                return null;
+            }
+
             return [
                 'id'   => (string)$map->id,
                 'name' => $map->gbx->Name,
@@ -155,7 +154,7 @@ class MapList
                 'uid'  => $map->gbx->MapUid,
                 'c'    => $map->cooldown,
             ];
-        });
+        })->filter();
     }
 
     private static function getMapAuthors($authorIds): Collection

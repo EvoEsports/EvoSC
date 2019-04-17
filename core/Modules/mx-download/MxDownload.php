@@ -9,9 +9,14 @@ use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\ChatCommand;
+use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
+use esc\Models\Dedi;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
+use esc\Models\MapFavorite;
+use esc\Models\MapQueue;
 use esc\Models\Player;
 
 class MxDownload
@@ -30,134 +35,164 @@ class MxDownload
                 Log::warning("Requested map with invalid id: " . $mxId);
                 warningMessage("Requested map with invalid id: $mxId")->send($player);
 
-                return;
-            }
-
-            $response = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
-
-            if ($response->getStatusCode() != 200) {
-                Log::error("ManiaExchange returned with non-success code [" . $response->getStatusCode() . "] " . $response->getReasonPhrase());
-                warningMessage('Can not reach mania exchange.')->send($player);
-
-                return;
-            }
-
-            if ($response->getHeader('Content-Type')[0] != 'application/x-gbx') {
-                Log::warning('Not a valid GBX.');
-
-                return;
-            }
-
-            $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $response->getHeader('content-disposition')[0]);
-            $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
-            $filename = str_replace('..', '.', $filename);
-            $filename = 'MX/' . $filename;
-
-            $mapFolder = MapController::getMapsPath();
-
-            if (!File::dirExists($mapFolder . 'MX')) {
-                File::makeDir($mapFolder . 'MX');
-            }
-
-            $body     = $response->getBody();
-            $absolute = $mapFolder . $filename;
-            $tempFile = $mapFolder . '_download.Gbx';
-
-            File::delete($tempFile);
-            File::put($tempFile, $body);
-
-            if (!File::exists($tempFile)) {
-                warningMessage("Map download ($mxId) failed.")->send($player);
                 continue;
             }
 
-            $checksum = md5_file($tempFile);
-            $gbxInfo  = MapController::getGbxInformation($tempFile);
-            $gbx      = json_decode($gbxInfo);
-            $mapUid   = $gbx->MapUid;
-            $map      = Map::whereUid($mapUid)->first();
+            $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
-            if ($map) {
-                $compareToChecksum = $map->checksum ?: md5_file($mapFolder . $map->filename);
+            if ($infoResponse->getStatusCode() != 200) {
+                Log::error("ManiaExchange request failed (" . $infoResponse->getStatusCode() . ") " . $infoResponse->getReasonPhrase());
+                warningMessage('Can not reach mania exchange.')->send($player);
 
-                if ($compareToChecksum == $checksum) {
-                    File::delete($tempFile);
+                continue;
+            }
 
-                    if ($map->enabled) {
-                        warningMessage('The map ', $map, ' is already in the selection up to date with MX.')->send($player);
+            $body = $infoResponse->getBody()->getContents();
+            $info = json_decode($body);
 
-                        return;
-                    } else {
-                        $map->update([
-                            'enabled'  => true,
-                            'cooldown' => config('server.map-cooldown'),
-                        ]);
+            if (!$info) {
+                Log::error('Failed to get info for mx id: ' . $mxId);
+                warningMessage('Failed to get info from ManiaExchange for mx id ', secondary($mxId))->send($player);
 
-                        $message = infoMessage($player, ' enabled map ', $map);
-                    }
+                continue;
+            }
+
+            $info = $info[0];
+
+            if ($info && Map::whereUid($info->TrackUID)->exists()) {
+                //Map already exists
+                $map = Map::whereUid($info->TrackUID)->first();
+
+                if (!$map->enabled) {
+                    $map->update([
+                        'enabled'  => 1,
+                        'cooldown' => 999,
+                    ]);
+                    infoMessage($player, ' enabled ', $map)->sendAll();
+                    Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
                 } else {
-                    // $existingMap->locals()->delete(); TODO: Remove automatically
+                    warningMessage('Map ', $map, ' already exists and is enabled.')->send($player);
+                }
+
+                $filename = $map->filename;
+            } else {
+                //Map does not exist
+                $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
+
+                if ($download->getStatusCode() != 200) {
+                    Log::error("ManiaExchange request failed (" . $infoResponse->getStatusCode() . ") " . $infoResponse->getReasonPhrase());
+                    warningMessage('Can not reach mania exchange.')->send($player);
+
+                    continue;
+                }
+
+                if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
+                    Log::warning('Not a valid GBX.');
+
+                    continue;
+                }
+
+                $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
+                $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
+                $filename = str_replace('..', '.', $filename);
+                $filename = 'MX/' . $filename;
+
+                $mapFolder = MapController::getMapsPath();
+
+                if (!File::dirExists($mapFolder . 'MX')) {
+                    File::makeDir($mapFolder . 'MX');
+                }
+
+                $body     = $download->getBody();
+                $absolute = $mapFolder . $filename;
+                $tempFile = $mapFolder . 'MX/_download.Gbx';
+
+                Log::logAddLine('MxDownload', 'Deleting existing download file.');
+                File::delete($tempFile);
+                File::put($tempFile, $body);
+
+                if (!File::exists($tempFile)) {
+                    warningMessage('Adding map ' . secondary($info->Name) . ' failed.')->send($player);
+                    continue;
+                }
+
+                Log::logAddLine('MxDownload', 'Creating temp-file finished.');
+
+                $gbxInfo = MapController::getGbxInformation($tempFile);
+                $gbx     = json_decode($gbxInfo);
+                $uid     = $gbx->MapUid;
+
+                if (Map::whereFilename($filename)->exists()) {
+                    //Map was updated
+                    $map = Map::whereFilename($filename)->first();
+
+                    LocalRecord::whereMap($map->id)->delete();
+                    Dedi::whereMap($map->id)->delete();
+                    MapFavorite::whereMapId($map->id)->delete();
+                    MapQueue::whereMapUid($map->uid)->delete();
 
                     $map->update([
-                        'filename' => $filename,
-                        'cooldown' => config('server.map-cooldown'),
-                        'checksum' => $checksum,
-                        'enabled'  => true,
+                        'gbx'             => $gbxInfo,
+                        'uid'             => $uid,
+                        'cooldown'        => 999,
+                        'enabled'         => 1,
+                        'mx_details'      => null,
+                        'mx_world_record' => null,
                     ]);
 
+                    Log::logAddLine('MxDownload', 'Delete old map version of ' . $map->filename);
                     File::delete($absolute);
-                    rename($tempFile, $absolute);
 
-                    $message = infoMessage($player, ' updated map ', $map, ' to the latest version.');
-                }
-            } else {
-                if (Player::whereLogin($gbx->AuthorLogin)->exists()) {
-                    $authorId = Player::whereLogin($gbx->AuthorLogin)->first()->id;
+                    infoMessage($player, ' updated map ', $map, ' to the latest version.')->sendAll();
+                    Log::logAddLine('MxDownload', $player . ' updated map ' . $map);
                 } else {
-                    $authorId = Player::insertGetId([
-                        'Login'    => $gbx->AuthorLogin,
-                        'NickName' => $gbx->AuthorLogin,
-                    ]);
+                    if (Player::where('Login', $gbx->AuthorLogin)->exists()) {
+                        $authorId = Player::find($gbx->AuthorLogin)->id;
+                    } else {
+                        $authorId = Player::insertGetId([
+                            'Login'    => $gbx->AuthorLogin,
+                            'NickName' => $gbx->AuthorLogin,
+                        ]);
+                    }
+
+                    $map           = new Map();
+                    $map->gbx      = $gbxInfo;
+                    $map->uid      = $uid;
+                    $map->filename = $filename;
+                    $map->author   = $authorId;
+                    $map->cooldown = 999;
+                    $map->enabled  = 1;
+                    $map->save();
+
+                    infoMessage($player, ' added new map ', $map)->sendAll();
+
+                    Log::logAddLine('MxDownload', $player . ' added new map ' . $gbx->Name);
                 }
 
-                File::delete($absolute);
                 rename($tempFile, $absolute);
-
-                $map = Map::create([
-                    'uid'      => $mapUid,
-                    'author'   => $authorId,
-                    'filename' => $filename,
-                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                    'enabled'  => true,
-                    'cooldown' => config('server.map-cooldown'),
-                    'checksum' => $checksum,
-                ]);
-
-                $message = infoMessage($player, ' added new map ', $map);
             }
 
+            //Send updated map-list
             Hook::fire('MapPoolUpdated');
 
-            try {
-                Server::addMap($filename);
-            } catch (\Exception $e) {
-                Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+            //Add the map to the selection
+            if (!collect(Server::getMapList())->contains('fileName', $filename)) {
+                try {
+                    Server::addMap($filename);
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
 
-                return;
+                    continue;
+                }
             }
 
+            //Queue the newly added map
+            QueueController::queueMap($player, $map);
+
             try {
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings and don't write wrong timelimit or manually write to the xml
             } catch (\Exception $e) {
                 Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
-            }
-
-            if (isset($map)) {
-                QueueController::queueMap($player, $map);
-            }
-
-            if (isset($message)) {
-                $message->sendAll();
             }
         }
     }

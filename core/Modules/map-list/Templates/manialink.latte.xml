@@ -274,7 +274,6 @@ declare Integer[] favorites;
 declare Text[Text][] maps;
 declare Text[Text][Integer] mapAuthors;
 declare Text[Text][] currentMapPool;
-declare Integer lastMapsCount;
 declare Integer lastMapQueueLength;
 declare Integer currentPage;
 declare Integer currentTab;
@@ -300,6 +299,12 @@ Void updateCooldownValues(){
 }
 
 Void resetCooldown(Text[Text] map){
+    if(!map.existskey("uid")){
+        log("[Maps] Reset cooldown Error");
+        log(map);
+        return;
+    }
+
     for(i, 0, maps.count - 1){
         if(maps[i]["uid"] == map["uid"]){
             maps[i]["c"] = "0";
@@ -314,6 +319,11 @@ Void resetCooldown(Text[Text] map){
 
 Text[Text] findMapByUid(Text Uid){
     foreach(map in maps){
+        if(!map.existskey("uid")){
+            log("[Maps] findMapById Error " ^ Uid);
+            return Text[Text];
+        }
+
         if(map["uid"] == Uid){
             return map;
         }
@@ -324,6 +334,11 @@ Text[Text] findMapByUid(Text Uid){
 
 Text[Text] findMapById(Text id){
     foreach(map in maps){
+        if(!map.existskey("id")){
+            log("[Maps] findMapById Error " ^ id);
+            return Text[Text];
+        }
+
         if(map["id"] == id){
             return map;
         }
@@ -333,6 +348,12 @@ Text[Text] findMapById(Text id){
 }
 
 Void updateWidget(Text[Text] map){
+    if(!map.existskey("a")){
+        log("[Maps] update Widget Error");
+        log(map);
+        return;
+    }
+
     declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare author = getAuthor(map["a"]);
     (widget.Controls[0] as CMlLabel).SetText(map["name"]);
@@ -474,8 +495,9 @@ Void updateView(Text[Text][] mapPool, Integer page){
 
         declare Text[Text] map = mapPool[id];
 
-        if(!map.existskey("a")){
-            log("[Maps] Null author for map " ^ map["id"]);
+        if(!map.existskey("a") || !map.existskey("id")){
+            log("[Maps] Update view Error");
+            log(map);
             continue;
         }
 
@@ -539,8 +561,9 @@ Void checkMapQueueChanged(){
 
         declare Text[Text] map = findMapById(queueItem["id"]);
 
-        if(!map.existskey("a")){
-            log("[Maps] Null author for map " ^ map["id"]);
+        if(!map.existskey("a") || !map.existskey("id")){
+            log("[Maps] Check maps queue Error");
+            log(map);
             continue;
         }
 
@@ -780,16 +803,6 @@ Void search(){
     clearSearch.Show();
 }
 
-Boolean checkMapChanges(){
-    declare Text[Text][] Maps for LocalUser;
-    if(Maps.count != lastMapsCount){
-        lastMapsCount = Maps.count;
-        return True;
-    }
-
-    return False;
-}
-
 Void checkMapSearchQuery(){
     declare Text MapSearchQuery for LocalUser;
     if(MapSearchQuery != ""){
@@ -940,7 +953,6 @@ Void quickFavAction(CMlScriptEvent event){
 main() {
     inSearch = False;
     lastMapQueueLength = 0;
-    lastMapsCount = 0;
     currentPage = 0;
     currentTab = 0;
     userCanDrop = {($localPlayer->hasAccess('queue_drop') ? 'True' : 'False')|noescape};
@@ -953,6 +965,8 @@ main() {
     declare controlsVisible = False;
     declare Text[Text][] Maps for LocalUser;
     declare Text[Text][Integer] MapAuthors for LocalUser;
+    declare Integer MapUpdateTime for LocalUser = 0;
+    declare lastMapUpdate = 0;
 
     rearrangeButtons();
 
@@ -964,7 +978,8 @@ main() {
     while(True){
         yield;
 
-        if(checkMapChanges()){
+        if(MapUpdateTime != 0 && lastMapUpdate != MapUpdateTime){
+            lastMapUpdate = MapUpdateTime;
             mapAuthors = MapAuthors;
             maps = Maps;
 
@@ -972,6 +987,9 @@ main() {
                 currentMapPool = maps;
                 updateView(currentMapPool, currentPage);
             }
+
+            log("[EvoSC:update-map-list] Loaded " ^ MapAuthors.count ^ " authors.");
+            log("[EvoSC:update-map-list] Loaded " ^ Maps.count ^ " maps.");
         }
 
         foreach(event in PendingEvents){
@@ -985,6 +1003,9 @@ main() {
             }
 
             if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(!currentMap.existskey("id")){
+                    return;
+                }
                 TriggerPageAction("mx.details," ^ currentMap["id"]);
                 continue;
             }

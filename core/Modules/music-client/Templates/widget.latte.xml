@@ -149,7 +149,7 @@ Void setSong(Text[Text] song){
     declare url = getUrl(song);
 
     if(!Http.IsValidUrl(url)){
-        log("[ESC:music-client] Invalid URL: " ^ url);
+        log("[EvoSC:music-client] Invalid URL: " ^ url);
         return;
     }
 
@@ -322,7 +322,7 @@ main() {
 
     if(getSongList.StatusCode != 200){
         (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-        log("[ESC:music-client] Music disabled, can not read song list from server.");
+        log("[EvoSC:music-client] Music disabled, can not read song list from server.");
         return;
     }
 
@@ -331,11 +331,11 @@ main() {
 
     if(music.count == 0){
         (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-        log("[ESC:music-client] Music disabled");
+        log("[EvoSC:music-client] Music disabled");
         return;
     }
 
-    log("[ESC:music-client] Loaded " ^ music.count ^ " songs");
+    log("[EvoSC:music-client] Loaded " ^ music.count ^ " songs");
 
     player <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
     paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
