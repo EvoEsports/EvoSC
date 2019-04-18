@@ -94,7 +94,15 @@ class ModeScriptEventController implements ControllerInterface
      */
     static function tmScores($arguments)
     {
-        Hook::fire('ShowScores', $arguments);
+        if (count($arguments) == 1) {
+            $scores = json_decode($arguments[0]);
+
+            if ($scores->section == 'EndMap') {
+                $players = collect($scores->players);
+                $winnerLogin = $scores->winnerplayer;
+                Hook::fire('ShowScores', $players, $winnerLogin);
+            }
+        }
     }
 
     /**
