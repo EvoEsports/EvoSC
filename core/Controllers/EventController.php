@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -116,16 +117,20 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text  = $data[2];
 
-            try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerChat', "Error: Player ($login) not found!");
+            $parts = explode(' ', $text);
+
+            if (ChatCommand::has($parts[0])) {
+                ChatCommand::get($parts[0])->execute(player($login), $text);
+
+                return;
             }
 
-            try {
-                Hook::fire('PlayerChat', $player, $text, false);
-            } catch (\Exception $e) {
-                Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+            if (ChatController::getRoutingEnabled()) {
+                try {
+                    Hook::fire('PlayerChat', player($login), $text, false);
+                } catch (\Exception $e) {
+                    Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+                }
             }
         } else {
             throw new \Exception('Malformed callback');

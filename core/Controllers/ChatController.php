@@ -27,22 +27,31 @@ class ChatController implements ControllerInterface
      */
     private static $mutedPlayers;
 
+    private static $routingEnabled;
+
     /**
      * Initialize ChatController.
      */
     public static function init()
     {
-        self::$mutedPlayers = collect();
+        self::$mutedPlayers   = collect();
+        self::$routingEnabled = config('server.enable-chat-routing') ?? false;
 
-        try {
-            Server::call('ChatEnableManualRouting', [true, false]);
-        } catch (FaultException $e) {
-            $msg = $e->getMessage();
-            Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
-            exit(2);
+        if (self::$routingEnabled) {
+            Log::logAddLine('ChatController', 'Enabling manual chat routing.');
+
+            try {
+                Server::call('ChatEnableManualRouting', [true, false]);
+            } catch (FaultException $e) {
+                $msg = $e->getMessage();
+                Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
+                exit(2);
+            }
+
+            Hook::add('PlayerChat', [self::class, 'playerChat']);
+        } else {
+            Server::call('ChatEnableManualRouting', [false, false]);
         }
-
-        Hook::add('PlayerChat', [self::class, 'playerChat']);
 
         AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
         AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
@@ -112,7 +121,7 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        if ($target == $player) {
+        if ($target->id == $player->id) {
             warningMessage('You can\'t PM yourself.')->send($player);
 
             return;
@@ -133,14 +142,6 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        $parts = explode(' ', $text);
-
-        if (ChatCommand::has($parts[0])) {
-            ChatCommand::get($parts[0])->execute($player, $text);
-
-            return;
-        }
-
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
             warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
             warningMessage('We switched to a new server-controller, it is missing features you had before but we are working on it to give you the best user-experience.')->send($player);
@@ -176,5 +177,13 @@ class ChatController implements ControllerInterface
         }
 
         Server::call('ChatSendServerMessage', [$chatText]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getRoutingEnabled()
+    {
+        return self::$routingEnabled;
     }
 }
