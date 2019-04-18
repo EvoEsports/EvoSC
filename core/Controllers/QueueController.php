@@ -29,6 +29,7 @@ class QueueController implements ControllerInterface
     public static function init()
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
         ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
@@ -82,6 +83,11 @@ class QueueController implements ControllerInterface
         }
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
+    }
+
+    public static function beginMap(Map $map)
+    {
+        self::dropMapSilent($map->uid);
     }
 
     /**

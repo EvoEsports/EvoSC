@@ -196,8 +196,6 @@ class MapController implements ControllerInterface
         Player::where('Score', '>', 0)->update([
             'Score' => 0,
         ]);
-
-        QueueController::preCacheNextMap();
     }
 
     /**
