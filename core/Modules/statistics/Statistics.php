@@ -122,9 +122,11 @@ class Statistics
         Database::getConnection()->statement('SET @rank=0');
         Database::getConnection()->statement('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
+        Log::logAddLine('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
+
         $players->each(function ($player) {
             try {
-                self::showRank(player($player->login));
+                self::showRank(Player::findOrFail($player->login));
             } catch (\Exception $e) {
                 Log::logAddLine('Statistics', 'Failed to show rank for player ' . $player);
             }
