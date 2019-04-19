@@ -193,6 +193,8 @@ class EventController implements ControllerInterface
                 Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
             }
 
+            MapController::setCurrentMap($map);
+
             try {
                 Hook::fire('BeginMap', $map);
             } catch (\Exception $e) {

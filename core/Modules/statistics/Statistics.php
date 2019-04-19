@@ -8,7 +8,6 @@ use esc\Classes\Log;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Classes\ChatCommand;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Player;
@@ -124,13 +123,17 @@ class Statistics
 
         Log::logAddLine('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
 
-        $players->each(function ($player) {
-            try {
-                self::showRank(Player::findOrFail($player->login));
-            } catch (\Exception $e) {
-                Log::logAddLine('Statistics', 'Failed to show rank for player ' . $player);
+        try {
+            foreach ($players as $player) {
+                try {
+                    self::showRank(Player::findOrFail($player->login));
+                } catch (\Exception $e) {
+                    Log::logAddLine('Statistics', 'Failed to show rank for player ' . $player);
+                }
             }
-        });
+        } catch (\Exception $e) {
+            Log::logAddLine('Statistics', 'Failed to show ranks.');
+        }
     }
 
     public static function showRank(Player $player)
