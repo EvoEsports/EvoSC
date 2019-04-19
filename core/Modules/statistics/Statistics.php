@@ -123,17 +123,17 @@ class Statistics
 
         Log::logAddLine('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
 
-        return;
+        $playerIds    = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
+        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->keys())->get()->keyBy('Player');
 
-        var_dump($players->pluck('login')->toArray());
+        $playerScores->each(function ($score) use ($playerIds) {
+            $login = $playerIds->get($score->Player);
+            infoMessage('Your server rank is ', secondary($score->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $score->Score . ')'))->send($login);
+        });
 
-        $playerIds    = $players->whereIn('Login', $players->pluck('login')->toArray())->pluck('id');
-
-        var_dump($playerIds->toArray());
-
-        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->toArray())->get();
-
-        var_dump($playerScores);
+        $players->pluck('login')->diff($playerIds->values())->each(function ($player) {
+            infoMessage('You need at least one local record before receiving a rank.')->send($player->login);
+        });
     }
 
     public static function showRank(Player $player)

@@ -156,14 +156,20 @@ class ChatMessage
     /**
      * Send the message to a specific player.
      *
-     * @param \esc\Models\Player|null $player
+     * @param \esc\Models\Player|null|string $player
      */
-    public function send(Player $player = null)
+    public function send($player = null)
     {
         if (!$player) {
             return;
         }
 
-        Server::chatSendServerMessage($this->getMessage(), $player->Login);
+        if ($player instanceof Player) {
+            Server::chatSendServerMessage($this->getMessage(), $player->Login);
+        } else {
+            if (is_string($player)) {
+                Server::chatSendServerMessage($this->getMessage(), $player);
+            }
+        }
     }
 }
