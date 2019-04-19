@@ -515,4 +515,12 @@ class MapController implements ControllerInterface
     {
         return self::$mapStart;
     }
+
+    /**
+     * @param \esc\Models\Map $currentMap
+     */
+    public static function setCurrentMap(\esc\Models\Map $currentMap): void
+    {
+        self::$currentMap = $currentMap;
+    }
 }

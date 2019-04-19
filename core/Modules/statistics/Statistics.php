@@ -123,17 +123,17 @@ class Statistics
 
         Log::logAddLine('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
 
-        try {
-            foreach ($players as $player) {
-                try {
-                    self::showRank(Player::findOrFail($player->login));
-                } catch (\Exception $e) {
-                    Log::logAddLine('Statistics', 'Failed to show rank for player ' . $player);
-                }
-            }
-        } catch (\Exception $e) {
-            Log::logAddLine('Statistics', 'Failed to show ranks.');
-        }
+        return;
+
+        var_dump($players->pluck('login')->toArray());
+
+        $playerIds    = $players->whereIn('Login', $players->pluck('login')->toArray())->pluck('id');
+
+        var_dump($playerIds->toArray());
+
+        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->toArray())->get();
+
+        var_dump($playerScores);
     }
 
     public static function showRank(Player $player)
