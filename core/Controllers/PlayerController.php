@@ -175,9 +175,8 @@ class PlayerController implements ControllerInterface
             $message->sendAdmin();
         }
 
-        $player->update([
-            'last_visit' => now(),
-        ]);
+        $player->last_visit = now();
+        $player->save();
 
         $_onlinePlayers->put($player->Login, $player);
     }
@@ -226,7 +225,8 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            $player->update(['Score' => $score]);
+            $player->Score = $score;
+            $player->save();
             Log::info($player . " finished with time ($score) " . $player->getTime());
         }
     }

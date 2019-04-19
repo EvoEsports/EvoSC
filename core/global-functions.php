@@ -118,7 +118,7 @@ function player(string $login, bool $addToOnlineIfOffline = false): ?\esc\Models
         return $_onlinePlayers->get($login);
     }
 
-    $player = \esc\Models\Player::whereLogin($login)->first();
+    $player = \esc\Models\Player::find($login);
 
     if ($addToOnlineIfOffline) {
         $_onlinePlayers->put($player->Login, $player);

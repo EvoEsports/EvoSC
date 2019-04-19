@@ -98,9 +98,10 @@ class ModeScriptEventController implements ControllerInterface
             $scores = json_decode($arguments[0]);
 
             if ($scores->section == 'EndMap') {
-                $players = collect($scores->players);
-                $winnerLogin = $scores->winnerplayer;
-                Hook::fire('ShowScores', $players, $winnerLogin);
+                if($scores->winnerplayer != ''){
+                    Hook::fire('AnnounceWinner', player($scores->winnerplayer));
+                }
+                Hook::fire('ShowScores', collect($scores->players));
             }
         }
     }

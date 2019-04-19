@@ -2,6 +2,7 @@
 
 namespace esc\Modules;
 
+use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\StatisticWidget;
@@ -40,11 +41,12 @@ class Statistics
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('ShowScores', [self::class, 'showScores']);
+        Hook::add('AnnounceWinner', [self::class, 'announceWinner']);
 
         Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
     }
 
-    public static function showScores(Collection $players, string $winnerLogin)
+    public static function showScores(Collection $players)
     {
         /**
          * Prepare widgets
@@ -97,34 +99,15 @@ class Statistics
 
         $limit = config('locals.limit');
         $players->each(function ($player_) use ($limit) {
-            $player = player($player_->login, true);
-            $score  = $player->locals()->where('Rank', '<', $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
-            $player->stats()->update(['Score' => $score]);
+            $player      = player($player_->login, true);
+            $localsCount = $player->locals()->where('Rank', '<', $limit)->count();
+            $rankSum     = $player->locals()->where('Rank', '<', $limit)->select('Rank')->get()->sum('Rank');
+            $player->stats()->update(['Score' => $limit * $localsCount - $rankSum]);
         });
 
         self::$totalRankedPlayers = $players->count();
-        Log::logAddLine('Statistics', sprintf('Calculating player scores for %d players.', self::$totalRankedPlayers), isVeryVerbose());
-
         self::updatePlayerRanks($players);
         Player::where('Score', '>', 0)->update(['Score' => 0]);
-
-        if ($winnerLogin) {
-            Log::logAddLine('Statistics', 'Winner: ' . $winnerLogin);
-
-            $winner = player($winnerLogin);
-
-            try {
-                $winner->stats()->increment('Wins');
-            } catch (\Exception $e) {
-                Log::logAddLine('Statistics', 'Failed to increment win count of ' . $winner);
-            }
-
-            infoMessage($winner, ' wins this round. Total wins: ', $winner->stats->Wins)
-                ->setIcon('🏆')
-                ->sendAll();
-        } else {
-            Log::logAddLine('Statistics', 'No winner. (' . $winnerLogin . ')');
-        }
     }
 
     /**
@@ -135,16 +118,9 @@ class Statistics
     private static function updatePlayerRanks(Collection $players)
     {
         Log::logAddLine('Statistics', 'Updating player-ranks.', isVeryVerbose());
-        $start = time() + microtime(true);
 
-        Stats::where('Score', '>', 0)->orderByDesc('Score')->get()->each(function (Stats $stat, $rank) {
-            $stat->update([
-                'Rank' => $rank + 1,
-            ]);
-        });
-
-        $end = time() + microtime(true);
-        Log::logAddLine('Statistics', sprintf('Updating player-ranks finished. Took %.3fs', $end - $start), isVeryVerbose());
+        Database::getConnection()->statement('SET @rank=0');
+        Database::getConnection()->statement('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
         $players->each(function ($player) {
             try {
@@ -164,6 +140,26 @@ class Statistics
         } else {
             infoMessage('You need at least one local record before receiving a rank.')->send($player);
         }
+    }
+
+    /**
+     * Announce the winner of the round and increment his win count
+     *
+     * @param \esc\Models\Player $player
+     */
+    public static function announceWinner(Player $player)
+    {
+        Log::logAddLine('Statistics', 'Winner: ' . $player);
+
+        try {
+            $player->stats()->increment('Wins');
+        } catch (\Exception $e) {
+            Log::logAddLine('Statistics', 'Failed to increment win count of ' . $player);
+        }
+
+        infoMessage($player, ' wins this round. Total wins: ', $player->stats->Wins)
+            ->setIcon('🏆')
+            ->sendAll();
     }
 
     /**

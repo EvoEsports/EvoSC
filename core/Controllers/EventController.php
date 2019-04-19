@@ -98,11 +98,17 @@ class EventController implements ControllerInterface
      */
     private static function mpPlayerInfoChanged($playerInfos)
     {
+        global $_onlinePlayers;
+
         foreach ($playerInfos as $playerInfo) {
-            Player::updateOrCreate(['Login' => $playerInfo['Login']], [
+            $player = Player::updateOrCreate(['Login' => $playerInfo['Login']], [
                 'NickName'         => $playerInfo['NickName'],
                 'spectator_status' => $playerInfo['SpectatorStatus'],
             ]);
+
+            if (!onlinePlayers()->contains($player->Login)) {
+                $_onlinePlayers->put($player->Login, $player);
+            }
         }
     }
 
