@@ -81,6 +81,8 @@ class QueueController implements ControllerInterface
         }
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
+
+        self::preCacheNextMap();
     }
 
     public static function beginMap(Map $map)
@@ -108,6 +110,8 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             MapQueue::whereMapUid($mapUid)->delete();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
+
+            self::preCacheNextMap();
         }
     }
 
@@ -167,6 +171,24 @@ class QueueController implements ControllerInterface
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
+        }
+    }
+
+    public static function preCacheNextMap()
+    {
+        if (MapQueue::count() > 0) {
+            $firstQueueItem = MapQueue::orderBy('created_at')->first();
+
+            if (!$firstQueueItem) {
+                return;
+            }
+
+            $firstMapInQueue = $firstQueueItem->map;
+
+            if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
+                Log::logAddLine('QueueController', sprintf('Pre-caching map %s [%s]', $firstMapInQueue->gbx->Name, $firstMapInQueue->uid));
+                Server::chooseNextMap($firstMapInQueue->filename);
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ use esc\Models\MapQueue;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
+use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
 
 /**
@@ -214,7 +215,8 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        self::$nextMap = Map::where('uid', Server::getNextMapInfo()->uId)->first();
+        $mapUid = Server::getNextMapInfo()->uId;
+        self::$nextMap = Map::where('uid', $mapUid)->first();
 
         if ($request) {
             if (!collect(Server::getMapList())->contains('fileName', $request->map->filename)) {
@@ -237,6 +239,8 @@ class MapController implements ControllerInterface
         } else {
             $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
+
+        NextMap::showNextMap(self::$nextMap);
 
         $chatMessage->setIcon('')->sendAll();
     }
