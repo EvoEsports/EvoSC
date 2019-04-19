@@ -74,8 +74,6 @@ class QueueController implements ControllerInterface
             'map_uid'           => $map->uid,
         ]);
 
-        self::preCacheNextMap();
-
         if ($replay) {
             infoMessage($player, ' queued map ', secondary($map), ' for replay.')->sendAll();
         } else {
@@ -110,7 +108,6 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             MapQueue::whereMapUid($mapUid)->delete();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
-            self::preCacheNextMap();
         }
     }
 
@@ -158,7 +155,7 @@ class QueueController implements ControllerInterface
             if ($player->hasAccess('queue_keep')) {
                 //Keep maps of players with queue_keep right
 
-                // return; disabled
+                return;
             }
 
             $queueItems = MapQueue::where('requesting_player', $player->Login)->get();
@@ -170,22 +167,6 @@ class QueueController implements ControllerInterface
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
-        }
-    }
-
-    public static function preCacheNextMap()
-    {
-        $firstQueueItem = MapQueue::orderBy('created_at')->first();
-
-        if (!$firstQueueItem) {
-            return;
-        }
-
-        $firstMapInQueue = $firstQueueItem->map;
-
-        if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
-            Log::logAddLine('QueueController', sprintf('Pre-caching map %s [%s]', $firstMapInQueue->gbx->Name, $firstMapInQueue->uid));
-            Server::chooseNextMap($firstMapInQueue->filename);
         }
     }
 }
