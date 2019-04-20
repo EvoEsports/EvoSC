@@ -35,8 +35,7 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
             $classFile->namespace = $matches[1] . '\\' . $classFile->class;
         } else {
             //Abort execution when class wasn't loaded correctly
-            echo "Class without namespace found: $classFile->file \n";
-            exit(0);
+            \esc\Classes\Log::logAddLine('autoload', "Class without namespace found: $classFile->file");
         }
 
         return $classFile;

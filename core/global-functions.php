@@ -83,7 +83,7 @@ function logDir(string $filename = ''): string
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
-function ghost(string $filename = ''): string
+function ghost(string $filename = ''): stringex
 {
     return \esc\Classes\Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
