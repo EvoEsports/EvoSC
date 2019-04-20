@@ -25,22 +25,20 @@ class HookController implements ControllerInterface
      */
     public static function init()
     {
-        self::$hooks = new Collection();
+        self::$hooks = collect();
     }
 
     /**
      * Get all hooks, or all by name
      *
-     * @param string|null $hook
+     * @param string|null $eventName
      *
      * @return Collection|null
      */
-    static function getHooks(string $hook = null): ?Collection
+    static function getHooks(string $eventName = null): ?Collection
     {
-        if ($hook) {
-            return self::$hooks->filter(function (Hook $value, $key) use ($hook) {
-                return $value->getEvent() == $hook;
-            });
+        if ($eventName) {
+            return self::$hooks->get($eventName);
         }
 
         return self::$hooks;
@@ -59,20 +57,28 @@ class HookController implements ControllerInterface
      * @param string $event
      * @param        $callback
      * @param bool   $runOnce
+     * @param int    $priority
      *
      * @throws \Exception
      */
-    public static function add(string $event, $callback, bool $runOnce = false)
+    public static function add(string $event, $callback, bool $runOnce = false, int $priority = 0)
     {
-        $hooks = self::getHooks();
-        $hook  = new Hook($event, $callback, $runOnce);
+        $hooks = self::$hooks;
+        $hook  = new Hook($event, $callback, $runOnce, $priority);
 
         if ($hooks) {
-            self::getHooks()->push($hook);
+            if (!$hooks->has($event)) {
+                $hooks->put($event, collect());
+            }
+
+            $hookGroup = $hooks->get($event);
+            $hookGroup->push($hook);
+            $hooks->put($event, $hookGroup->sortBy('priority'));
+
             if (gettype($callback) == "object") {
                 Log::logAddLine('Hook', "Added $event (Closure)", isVeryVerbose());
             } else {
-                Log::logAddLine('Hook', "Added " . $callback[0] . " -> " . $callback[1], isVeryVerbose());
+                Log::logAddLine('Hook', "Added " . $callback[0] . "::" . $callback[1], isVeryVerbose());
             }
         }
     }
