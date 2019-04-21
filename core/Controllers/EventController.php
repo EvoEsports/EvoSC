@@ -157,7 +157,6 @@ class EventController implements ControllerInterface
                 'path' => $details->path
             ]);
 
-
             Hook::fire('PlayerConnect', $player);
         } else {
             throw new \Exception('Malformed callback in mpPlayerConnect');

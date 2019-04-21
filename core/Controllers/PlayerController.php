@@ -43,7 +43,7 @@ class PlayerController implements ControllerInterface
         })->keyBy('Login');
 
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect'], Hook::PRIORITY_LOWEST);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect'], Hook::PRIORITY_HIGH);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect'], Hook::PRIORITY_HIGHEST);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
@@ -75,6 +75,8 @@ class PlayerController implements ControllerInterface
             ]);
         }
 
+        Log::logAddLine('PlayerController', $message->getMessage());
+
         if (config('server.echoes.join')) {
             $message->sendAll();
         } else {
@@ -96,7 +98,7 @@ class PlayerController implements ControllerInterface
     {
         $diff     = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
+        Log::logAddLine('PlayerController', $player . " [" . $player->Login . "] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {
