@@ -10,10 +10,10 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
+use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 /**
@@ -24,12 +24,26 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 class PlayerController implements ControllerInterface
 {
     /**
+     * @var \Illuminate\Support\Collection
+     */
+    private static $players;
+
+    /**
      * Initialize PlayerController
      */
     public static function init()
     {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        //Add already connected players to the playerlist
+        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+            $player = Player::firstOrCreate(['Login' => $playerInfo->login], [
+                'NickName' => $playerInfo->nickName,
+            ]);
+
+            return $player;
+        })->keyBy('Login');
+
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect'], Hook::PRIORITY_LOWEST);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect'], Hook::PRIORITY_HIGH);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
@@ -37,6 +51,65 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+    }
+
+    /**
+     * Called on PlayerConnect
+     *
+     * @param \esc\Models\Player $player
+     */
+    public static function playerConnect(Player $player)
+    {
+        $diffString = $player->last_visit->diffForHumans();
+        $stats      = $player->stats;
+
+        if ($stats) {
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, rank: ', secondary($stats->Rank), ' last visit ', secondary($diffString), '.')
+                ->setIcon('');
+        } else {
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
+                ->setIcon('');
+
+            Stats::updateOrCreate(['Player' => $player->id], [
+                'Visits' => 1,
+            ]);
+        }
+
+        if (config('server.echoes.join')) {
+            $message->sendAll();
+        } else {
+            $message->sendAdmin();
+        }
+
+        $player->last_visit = now();
+        $player->save();
+
+        self::$players->put($player->Login, $player);
+    }
+
+    /**
+     * Called on PlayerDisconnect
+     *
+     * @param \esc\Models\Player $player
+     */
+    public static function playerDisconnect(Player $player)
+    {
+        $diff     = $player->last_visit->diffForHumans();
+        $playtime = substr($diff, 0, -4);
+        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
+        $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
+
+        if (config('server.echoes.leave')) {
+            $message->sendAll();
+        } else {
+            $message->sendAdmin();
+        }
+
+        $player->update([
+            'last_visit' => now(),
+        ]);
+
+        self::$players = self::$players->forget($player->Login);
     }
 
     /**
@@ -131,84 +204,6 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * Called on PlayerConnect
-     *
-     * @param \esc\Models\Player $player
-     */
-    public static function playerConnect(Player $player)
-    {
-        global $_onlinePlayers;
-
-        $diffString = $player->last_visit->diffForHumans();
-        $stats      = $player->stats;
-
-        try {
-            $details = Server::rpc()->getDetailedPlayerInfo($player->Login);
-            $player->update([
-                'path'     => $details->path,
-                'NickName' => $details->nickName,
-            ]);
-        } catch (InvalidArgumentException $e) {
-            try {
-                $details = Server::rpc()->getPlayerInfo($player->Login);
-                $player->update([
-                    'NickName' => $details->nickName,
-                ]);
-            } catch (InvalidArgumentException $e) {
-                Log::logAddLine('PlayerController', 'Failed to update details for player ' . $player);
-            }
-        }
-
-        if ($stats) {
-            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, visits: ', secondary($stats->Visits), ' last visit ', secondary($diffString), '.')
-                ->setIcon('');
-        } else {
-            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
-                ->setIcon('');
-
-            Stats::updateOrCreate(['Player' => $player->id], ['Visits' => 1]);
-        }
-
-        if (config('server.echoes.join')) {
-            $message->sendAll();
-        } else {
-            $message->sendAdmin();
-        }
-
-        $player->last_visit = now();
-        $player->save();
-
-        $_onlinePlayers->put($player->Login, $player);
-    }
-
-    /**
-     * Called on PlayerDisconnect
-     *
-     * @param \esc\Models\Player $player
-     */
-    public static function playerDisconnect(Player $player)
-    {
-        global $_onlinePlayers;
-
-        $diff     = $player->last_visit->diffForHumans();
-        $playtime = substr($diff, 0, -4);
-        Log::info(stripAll($player) . " [" . $player->Login . "] left the server after $playtime.");
-        $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
-
-        if (config('server.echoes.leave')) {
-            $message->sendAll();
-        } else {
-            $message->sendAdmin();
-        }
-
-        $player->update([
-            'last_visit' => now(),
-        ]);
-
-        $_onlinePlayers->forget($player->Login);
-    }
-
-    /**
      * Called on players finish
      *
      * @param Player $player
@@ -229,5 +224,28 @@ class PlayerController implements ControllerInterface
             $player->save();
             Log::info($player . " finished with time ($score) " . $player->getTime());
         }
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getPlayers(): \Illuminate\Support\Collection
+    {
+        return self::$players;
+    }
+
+    public static function hasPlayer(string $login)
+    {
+        return self::$players->has($login);
+    }
+
+    public static function getPlayer(string $login): Player
+    {
+        return self::$players->get($login);
+    }
+
+    public static function addPlayer(Player $player)
+    {
+        return self::$players->put($player->Login, $player);
     }
 }

@@ -151,8 +151,11 @@ class EventController implements ControllerInterface
     private static function mpPlayerConnect($playerInfo)
     {
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
-            $details = Server::getPlayerInfo($playerInfo[0]);
-            $player  = Player::updateOrCreate(['Login' => $playerInfo[0]], ['NickName' => $details->nickName]);
+            $details = Server::getDetailedPlayerInfo($playerInfo[0]);
+            $player  = Player::updateOrCreate(['Login' => $playerInfo[0]], [
+                'NickName' => $details->nickName,
+                'path' => $details->path
+            ]);
 
 
             Hook::fire('PlayerConnect', $player);
