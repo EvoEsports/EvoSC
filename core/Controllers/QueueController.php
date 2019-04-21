@@ -4,7 +4,9 @@ namespace esc\Controllers;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
@@ -14,7 +16,7 @@ use Illuminate\Support\Collection;
 
 /**
  * Class QueueController
- * 
+ *
  * The QueueController handles adding/removing maps to/from the queue.
  *
  * @package esc\Controllers
@@ -27,6 +29,7 @@ class QueueController implements ControllerInterface
     public static function init()
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
         ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
@@ -39,10 +42,10 @@ class QueueController implements ControllerInterface
 
     /**
      * Queue a map.
-     * 
+     *
      * @param Player $player
      * @param Map    $map
-     * @param bool               $replay
+     * @param bool   $replay
      */
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
@@ -78,12 +81,19 @@ class QueueController implements ControllerInterface
         }
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
+
+        self::preCacheNextMap();
+    }
+
+    public static function beginMap(Map $map)
+    {
+        self::dropMapSilent($map->uid);
     }
 
     /**
      * Drop a map from queue.
-     * 
-     * @param Player $player
+     *
+     * @param Player             $player
      * @param                    $mapUid
      */
     public static function dropMap(Player $player, $mapUid)
@@ -100,13 +110,23 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             MapQueue::whereMapUid($mapUid)->delete();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
+
+            self::preCacheNextMap();
+        }
+    }
+
+    public static function dropMapSilent($mapUid)
+    {
+        if (MapQueue::whereMapUid($mapUid)->exists()) {
+            MapQueue::whereMapUid($mapUid)->delete();
+            Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
 
     /**
      * ManiaLinkEvent: queue map
-     * 
-     * @param Player $player
+     *
+     * @param Player             $player
      * @param                    $mapUid
      */
     public static function manialinkQueueMap(Player $player, $mapUid)
@@ -120,7 +140,7 @@ class QueueController implements ControllerInterface
 
     /**
      * Get maps in queue sorted by adding time.
-     * 
+     *
      * @return \Illuminate\Support\Collection
      */
     public static function getMapQueue(): Collection
@@ -130,20 +150,45 @@ class QueueController implements ControllerInterface
 
     /**
      * Called on PlayerDisconnect
-     * 
+     *
      * @param Player $player
      */
     public static function playerDisconnect(Player $player)
     {
-        $queryBuilder = MapQueue::whereRequestingPlayer($player->Login);
+        if (MapQueue::where('requesting_player', $player->Login)->exists()) {
+            if ($player->hasAccess('queue_keep')) {
+                //Keep maps of players with queue_keep right
 
-        if (!$player->hasAccess('queue_keep') && $queryBuilder->count() > 0) {
-            $queryBuilder->get()->filter(function (MapQueue $item) use ($player) {
-                infoMessage('Dropped ', secondary($item->map), ' from queue, because ', secondary($player), ' left.')->sendAll();
-                MapQueue::whereMapUid($item->map_uid)->delete();
+                return;
+            }
+
+            $queueItems = MapQueue::where('requesting_player', $player->Login)->get();
+
+            $queueItems->each(function (MapQueue $queueItem) use ($player) {
+                MapQueue::whereMapUid($queueItem->map_uid)->delete();
+                infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player), ' left.')->sendAll();
+                Log::logAddLine('QueueController', 'Dropped map ' . $queueItem->map . ' from queue, because ' . $player . ' left.');
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
+        }
+    }
+
+    public static function preCacheNextMap()
+    {
+        if (MapQueue::count() > 0) {
+            $firstQueueItem = MapQueue::orderBy('created_at')->first();
+
+            if (!$firstQueueItem) {
+                return;
+            }
+
+            $firstMapInQueue = $firstQueueItem->map;
+
+            if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
+                Log::logAddLine('QueueController', sprintf('Pre-caching map %s [%s]', $firstMapInQueue->gbx->Name, $firstMapInQueue->uid));
+                Server::chooseNextMap($firstMapInQueue->filename);
+            }
         }
     }
 }

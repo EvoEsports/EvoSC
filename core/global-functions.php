@@ -75,37 +75,32 @@ function config(string $id, $default = null)
 
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . '/../cache/' . $filename;
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
 }
 
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . '/../logs/' . $filename;
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
-function ghost(string $filename = ''): string
+function ghost(string $filename = ''): stringex
 {
-    return \esc\Classes\Server::GameDataDirectory() . '/Replays/Ghosts/' . $filename . '.Replay.Gbx';
-}
-
-function musicDir(string $filename = ''): string
-{
-    return __DIR__ . '/../music/' . $filename;
+    return \esc\Classes\Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 function coreDir(string $filename = ''): string
 {
-    return __DIR__ . '/' . $filename;
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . '/../config/' . $filename;
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
 }
 
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . '/../' . $filename;
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
 }
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
@@ -115,11 +110,25 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
     return $_onlinePlayers;
 }
 
-function player(string $login): ?\esc\Models\Player
+function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\Player
 {
-    global $_onlinePlayers;
+    if (\esc\Controllers\PlayerController::hasPlayer($login)) {
+        return esc\Controllers\PlayerController::getPlayer($login);
+    }
 
-    return $_onlinePlayers->get($login) ?: \esc\Models\Player::whereLogin($login)->first();
+    $player = \esc\Models\Player::find($login);
+
+    if (!$player || !isset($player->Login)) {
+        \esc\Classes\Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
+
+        return null;
+    }
+
+    if ($addToOnlineIfOffline) {
+        \esc\Controllers\PlayerController::addPlayer($player);
+    }
+
+    return $player;
 }
 
 function echoPlayers(): \Illuminate\Support\Collection

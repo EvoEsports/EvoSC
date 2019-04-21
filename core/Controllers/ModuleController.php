@@ -72,7 +72,7 @@ class ModuleController implements ControllerInterface
     private static function loadModulesInformation(Collection $moduleDirectories)
     {
         $moduleDirectories->each(function ($moduleDirectory) {
-            $moduleJson = __DIR__ . '/../Modules/' . $moduleDirectory . '/module.json';
+            $moduleJson = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/' . $moduleDirectory . '/module.json');
             if (file_exists($moduleJson)) {
                 $json              = file_get_contents($moduleJson);
                 $moduleInformation = json_decode($json);
@@ -115,7 +115,7 @@ class ModuleController implements ControllerInterface
         Log::logAddLine('Modules', 'Booting modules...');
 
         $moduleClasses->each(function ($module) {
-            $files    = scandir(coreDir('Modules/' . $module->dir));
+            $files    = scandir(coreDir('Modules' . DIRECTORY_SEPARATOR . $module->dir));
             $configId = null;
             foreach ($files as $file) {
                 if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {

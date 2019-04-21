@@ -5,13 +5,16 @@ namespace esc\Modules;
 
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\ChatCommand;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 
 class Warning
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn');
+        AccessRight::createIfNonExistent('warn_player', 'Warn a player.');
+
+        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn_player');
     }
 
     public static function warnPlayer(Player $player, string $targetLogin, string $message)

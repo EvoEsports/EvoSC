@@ -30,7 +30,7 @@ class LocalRecords
      */
     public function __construct()
     {
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish'], false);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);

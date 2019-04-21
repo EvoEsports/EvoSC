@@ -103,6 +103,7 @@ class Migrate extends Command
         $connection = $capsule->getConnection();
 
         $schemaBuilder = $connection->getSchemaBuilder();
+        $schemaBuilder::defaultStringLength(191);
 
         if (!$schemaBuilder->hasTable('migrations')) {
             $output->writeln('Creating migrations table');

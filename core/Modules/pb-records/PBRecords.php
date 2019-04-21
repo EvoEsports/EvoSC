@@ -28,7 +28,7 @@ class PBRecords
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('PlayerLocal', [self::class, 'playerMadeRecord']);
+        Hook::add('PlayerLocal', [self::class, 'playerMadeLocal']);
 
         ChatCommand::add('/target', [self::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
         ChatCommand::add('/pb', [self::class, 'getPersonalBest'], 'Get your best time on this map.');
@@ -36,8 +36,14 @@ class PBRecords
         self::$targets = collect();
     }
 
-    public static function playerMadeRecord(Player $player, $record)
+    public static function playerMadeLocal(Player $player, $record)
     {
+        if (self::$targets->has($player->id) && self::$targets->get($player->id)->Score <= $record->Score) {
+            //Keep better target until the player beats it.
+
+            return;
+        }
+
         self::$targets->put($player->id, $record);
         self::sendUpdatedTimes(MapController::getCurrentMap(), $player);
     }
@@ -78,13 +84,12 @@ class PBRecords
     {
         if ($map->locals()->count() > 0) {
             $defaultTarget = $map->locals()->where('Rank', '<=', config('locals.limit'))->orderByDesc('Score')->get()->first();
-            $targetString  = sprintf('%d. Local  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         } else {
             $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
-            $targetString  = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
         }
 
         if ($defaultTarget) {
+            $targetString        = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
             self::$defaultTarget = $defaultTarget;
         } else {
             self::$defaultTarget = null;

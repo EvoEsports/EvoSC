@@ -28,7 +28,7 @@ class BansController implements ControllerInterface
     {
         AccessRight::createIfNonExistent('player_ban', 'Ban and unban players.');
 
-        ChatCommand::add('//ban', [PlayerController::class, 'banPlayer'], 'Ban player by nickname', 'player_ban');
+        ChatCommand::add('//ban', [self::class, 'banPlayer'], 'Ban player by nickname.', 'player_ban');
 
         ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
@@ -43,8 +43,8 @@ class BansController implements ControllerInterface
     public static function ban(Player $player, Player $admin, string $reason = '')
     {
         Server::banAndBlackList($player->Login, $reason, true);
-        $player->update(['banned' => true]);
         warningMessage($admin, ' banned ', $player, ', reason: ', secondary($reason))->sendAll();
+        $player->update(['banned' => 1]);
     }
 
     /**
@@ -56,8 +56,8 @@ class BansController implements ControllerInterface
     public static function unban(Player $player, Player $admin)
     {
         Server::unBan($player->Login);
-        $player->update(['banned' => false]);
         infoMessage($admin, ' unbanned ', $player)->sendAll();
+        $player->update(['banned' => 0]);
     }
 
     /**
@@ -67,15 +67,9 @@ class BansController implements ControllerInterface
      * @param                    $login
      * @param string             $reason
      */
-    public static function banPlayerEvent(Player $admin, $login, $reason = '')
+    public static function banPlayerEvent(Player $admin, $cmd, $login, $reason = '')
     {
-        $toBeBanned = Player::find($login);
-
-        if (!$toBeBanned) {
-            return;
-        }
-
-        self::ban($toBeBanned, $admin, $reason);
+        self::ban(player($login), $admin, $reason);
     }
 
     /**

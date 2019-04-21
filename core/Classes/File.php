@@ -24,11 +24,7 @@ class File
      */
     public static function get(string $fileName = null, bool $json_decode = false)
     {
-        if (!$fileName) {
-            Log::error("Could not load file $fileName");
-
-            return null;
-        }
+        $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
 
         if (file_exists($fileName)) {
             if ($json_decode) {
@@ -36,6 +32,8 @@ class File
             }
 
             return file_get_contents($fileName);
+        } else {
+            Log::error("Could not load file $fileName");
         }
 
         return null;
@@ -51,6 +49,8 @@ class File
      */
     public static function put(string $fileName, string $content): bool
     {
+        $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
+
         file_put_contents($fileName, $content);
 
         return self::exists($fileName);
@@ -64,6 +64,8 @@ class File
      */
     public static function appendLine($fileName, $line)
     {
+        $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
+
         if (!file_exists($fileName)) {
             file_put_contents($fileName, $line);
         }
@@ -143,6 +145,8 @@ class File
      */
     public static function delete(string $path): bool
     {
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         if (file_exists($path) && is_file($path)) {
             unlink($path);
             Log::logAddLine('File', 'Deleted file: ' . $path);
@@ -162,6 +166,29 @@ class File
      */
     public static function exists(string $filename)
     {
-        return file_exists($filename);
+        $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
+
+        return is_file($filename) && file_exists($filename);
+    }
+
+    /**
+     * Check if a directory exists.
+     *
+     * @param string $filename
+     *
+     * @return bool
+     */
+    public static function dirExists(string $filename)
+    {
+        $filename = str_replace('/', DIRECTORY_SEPARATOR, $filename);
+
+        return is_dir($filename);
+    }
+
+    public static function makeDir(string $dir)
+    {
+        $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+
+        mkdir($dir);
     }
 }

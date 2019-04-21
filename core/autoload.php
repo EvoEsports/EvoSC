@@ -7,7 +7,7 @@ function getClassesInDirectory(&$classes, $path)
     return collect(scandir($path))->filter(function ($string) {
         return substr($string, 0, 1) != '.';
     })->each(function ($classFile) use ($classes, $path) {
-        $file = $path . '/' . $classFile;
+        $file = $path . DIRECTORY_SEPARATOR . $classFile;
 
         if (is_dir($file)) {
             //Get classes from subdirs
@@ -35,8 +35,7 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
             $classFile->namespace = $matches[1] . '\\' . $classFile->class;
         } else {
             //Abort execution when class wasn't loaded correctly
-            echo "Class without namespace found: $classFile->file \n";
-            exit(0);
+            \esc\Classes\Log::logAddLine('autoload', "Class without namespace found: $classFile->file");
         }
 
         return $classFile;
@@ -49,10 +48,10 @@ function buildClassMap()
 {
     global $classes;
 
-    $dirs = ['Interfaces', 'Classes', 'Controllers', 'Models', 'Modules', '../Migrations'];
+    $dirs = ['Interfaces', 'Classes', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations'];
 
     foreach ($dirs as $dir) {
-        getClassesInDirectory($classes, __DIR__ . '/' . $dir);
+        getClassesInDirectory($classes, __DIR__ . DIRECTORY_SEPARATOR . $dir);
     }
 
     $classes = getNameSpaces($classes);
@@ -60,6 +59,7 @@ function buildClassMap()
 
 /**
  * @param $className
+ *
  * @throws Exception
  */
 function esc_class_loader($className)
@@ -82,6 +82,7 @@ function esc_class_loader($className)
 function classes(): \Illuminate\Support\Collection
 {
     global $classes;
+
     return $classes;
 }
 

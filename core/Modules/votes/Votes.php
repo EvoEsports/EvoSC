@@ -93,13 +93,13 @@ class Votes
 
     public static function askMoreTime(Player $player)
     {
-        $mapStartDiff = MapController::getMapStart()->diffInSeconds();
-        $waitTime     = MapController::getTimeLimit() - 180;
-        if ($mapStartDiff < $waitTime) {
-            warningMessage('Please wait ', secondary(($waitTime - $mapStartDiff) . ' seconds'), ' before asking for more time.')->send($player);
-
-            return;
-        }
+        // $mapStartDiff = MapController::getMapStart()->diffInSeconds();
+        // $waitTime     = MapController::getTimeLimit() - 180;
+        // if ($mapStartDiff < $waitTime) {
+        //     warningMessage('Please wait ', secondary(($waitTime - $mapStartDiff) . ' seconds'), ' before asking for more time.')->send($player);
+        //
+        //     return;
+        // }
 
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown') && !$player->hasAccess('vote_always')) {

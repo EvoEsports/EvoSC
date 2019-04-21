@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -97,11 +98,18 @@ class EventController implements ControllerInterface
      */
     private static function mpPlayerInfoChanged($playerInfos)
     {
+        global $_onlinePlayers;
+
         foreach ($playerInfos as $playerInfo) {
-            Player::updateOrCreate(['Login' => $playerInfo['Login']], [
+            $player = Player::updateOrCreate(['Login' => $playerInfo['Login']], [
                 'NickName'         => $playerInfo['NickName'],
                 'spectator_status' => $playerInfo['SpectatorStatus'],
             ]);
+
+
+            if (PlayerController::hasPlayer($player->Login)) {
+                PlayerController::addPlayer($player);
+            }
         }
     }
 
@@ -116,16 +124,20 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text  = $data[2];
 
-            try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerChat', "Error: Player ($login) not found!");
+            $parts = explode(' ', $text);
+
+            if (ChatCommand::has($parts[0])) {
+                ChatCommand::get($parts[0])->execute(player($login), $text);
+
+                return;
             }
 
-            try {
-                Hook::fire('PlayerChat', $player, $text, false);
-            } catch (\Exception $e) {
-                Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+            if (ChatController::getRoutingEnabled()) {
+                try {
+                    Hook::fire('PlayerChat', player($login), $text, false);
+                } catch (\Exception $e) {
+                    Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+                }
             }
         } else {
             throw new \Exception('Malformed callback');
@@ -140,9 +152,11 @@ class EventController implements ControllerInterface
     private static function mpPlayerConnect($playerInfo)
     {
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
-            $details = Server::getPlayerInfo($playerInfo[0]);
-            $player  = Player::updateOrCreate(['Login' => $playerInfo[0]], ['NickName' => $details->nickName]);
-
+            $details = Server::getDetailedPlayerInfo($playerInfo[0]);
+            $player  = Player::updateOrCreate(['Login' => $playerInfo[0]], [
+                'NickName' => $details->nickName,
+                'path'     => $details->path,
+            ]);
 
             Hook::fire('PlayerConnect', $player);
         } else {
@@ -158,9 +172,7 @@ class EventController implements ControllerInterface
     private static function mpPlayerDisconnect($arguments)
     {
         if (count($arguments) == 2 && is_string($arguments[0])) {
-            $player = Player::find($arguments[0]);
-
-            Hook::fire('PlayerDisconnect', $player, 0);
+            Hook::fire('PlayerDisconnect', player($arguments[0]), 0);
         } else {
             throw new \Exception('Malformed callback');
         }
@@ -181,6 +193,8 @@ class EventController implements ControllerInterface
             } catch (\Exception $e) {
                 Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
             }
+
+            MapController::setCurrentMap($map);
 
             try {
                 Hook::fire('BeginMap', $map);
@@ -226,16 +240,8 @@ class EventController implements ControllerInterface
     private static function mpPlayerManialinkPageAnswer($arguments)
     {
         if (count($arguments) == 4 && is_string($arguments[1]) && is_string($arguments[2])) {
-            $login = $arguments[1];
-
             try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerManialinkPageAnswer', "Error: Player ($login) not found!");
-            }
-
-            try {
-                ManiaLinkEvent::call($player, $arguments[2]);
+                ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
             } catch (\Exception $e) {
                 Log::logAddLine('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
             }

@@ -64,6 +64,9 @@ class ChatCommand
         $chatCommand = new ChatCommand($command, $callback, $description, $access, $hidden);
         self::$commands->put($command, $chatCommand);
 
+        // if(!config('enable-chat-routing')){
+        // }
+
         return $chatCommand;
     }
 

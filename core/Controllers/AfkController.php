@@ -73,7 +73,11 @@ class AfkController implements ControllerInterface
         self::$afkTracker->each(function (array $data, string $playerLogin) use ($afkPlayers) {
             $lastInteraction = $data['last_interaction'];
 
-            if ($lastInteraction->diffInMinutes() >= config('server.afk-timeout') && !$data['is_afk']) {
+            if ($data['is_afk']) {
+                return;
+            }
+
+            if ($lastInteraction->diffInMinutes() >= config('server.afk-timeout')) {
                 $player = Player::whereLogin($playerLogin)->first();
 
                 if ($player->isSpectator() ?? false) {

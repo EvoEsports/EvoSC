@@ -260,8 +260,8 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int saveMatchSettings(string $string)
  * @method static int insertPlaylistFromMatchSettings(string $string)
  * @method static array getPlayerList(int $int, int $int, int $int = null)
- * @method static object getPlayerInfo(string $string, int $int = null)
- * @method static object getDetailedPlayerInfo(string $string)
+ * @method static \Maniaplanet\DedicatedServer\Structures\PlayerInfo getPlayerInfo(string $string, int $int = null)
+ * @method static \Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
  * @method static array getCurrentRanking(int $int, int $int)
  * @method static array getCurrentRankingForLogin(string $string)
@@ -284,6 +284,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool startServerLan()
  * @method static bool startServerInternet()
  * @method static void executeMulticall()
+ * @method static array executeCallbacks()
  */
 class Server
 {

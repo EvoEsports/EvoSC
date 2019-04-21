@@ -6,6 +6,11 @@ require 'global-functions.php';
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
+use esc\Controllers\AfkController;
+use esc\Controllers\CountdownController;
+use esc\Controllers\EventController;
+use esc\Models\Map;
+use esc\Models\Player;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -114,16 +119,18 @@ class EscRun extends Command
         esc\Classes\ManiaLinkEvent::init();
         esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
+        // esc\Controllers\AfkController::init();
         esc\Controllers\PlayerController::init();
-        esc\Controllers\AfkController::init();
+        esc\Controllers\BansController::init();
         esc\Controllers\ModuleController::init();
         esc\Controllers\PlanetsController::init();
+        esc\Controllers\CountdownController::init();
 
         $logins = [];
         foreach (Server::getPlayerList(500, 0) as $player) {
             array_push($logins, $player->login);
         }
-        \esc\Models\Player::whereIn('Login', $logins)->get()->each(function (\esc\Models\Player $player) use ($_onlinePlayers) {
+        Player::whereIn('Login', $logins)->get()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
         });
 
@@ -137,14 +144,14 @@ class EscRun extends Command
             Log::logAddLine('BOOT', 'Booting modules finished.', true);
         }
 
-        $map = \esc\Models\Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
+        $map = Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
         esc\Classes\Hook::fire('BeginMap', $map);
 
         //Set connected players online
         $playerList = collect(Server::rpc()->getPlayerList());
 
         foreach ($playerList as $maniaPlayer) {
-            \esc\Models\Player::firstOrCreate(['Login' => $maniaPlayer->login], [
+            Player::firstOrCreate(['Login' => $maniaPlayer->login], [
                 'NickName' => $maniaPlayer->nickName,
             ]);
         }
@@ -160,18 +167,13 @@ class EscRun extends Command
             try {
                 esc\Classes\Timer::startCycle();
 
-                try {
-                    \esc\Controllers\EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
-                } catch (Exception $e) {
-                    Log::logAddLine('ERROR', $e->getMessage(), true);
-                    Log::logAddLine('ERROR', $e->getTraceAsString(), isVerbose());
-                }
+                EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
 
                 $pause                    = esc\Classes\Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
 
                 usleep($pause);
-            } catch (\Maniaplanet\DedicatedServer\Xmlrpc\Exception $e) {
+            } catch (\Exception $e) {
                 Log::logAddLine('MPS', 'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::logAddLine('MPS', $e->getMessage());
 

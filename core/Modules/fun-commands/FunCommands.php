@@ -29,7 +29,6 @@ class FunCommands
         ChatCommand::add('/bootme', function (Player $player) {
             infoMessage($player, ' boots back to the real world!')->sendAll();
             Server::kick($player->Login, 'cya');
-            Hook::fire('PlayerDisconnect', $player);
         }, 'Boot yourself back to the real world.');
     }
 }

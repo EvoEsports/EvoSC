@@ -24,9 +24,16 @@ use esc\Controllers\HookController;
  */
 class Hook
 {
+    const PRIORITY_HIGHEST = 2;
+    const PRIORITY_HIGH = 1;
+    const PRIORITY_DEFAULT = 0;
+    const PRIORITY_LOW = -1;
+    const PRIORITY_LOWEST = -2;
+
     private $runOnce;
     private $event;
     private $function;
+    private $priority;
 
     /**
      * Hook constructor.
@@ -37,11 +44,11 @@ class Hook
      *
      * @throws \Exception
      */
-    public function __construct(string $event, $function, bool $runOnce = false)
+    public function __construct(string $event, $function, bool $runOnce = false, int $priority = 0)
     {
-        $this->event   = $event;
-        $this->runOnce = $runOnce;
-
+        $this->event    = $event;
+        $this->runOnce  = $runOnce;
+        $this->priority = $priority;
 
         if (gettype($function) == "object") {
             $this->function = $function;
@@ -117,10 +124,10 @@ class Hook
      * @param        $callback
      * @param bool   $runOnce
      */
-    public static function add(string $event, $callback, bool $runOnce = false)
+    public static function add(string $event, $callback, bool $runOnce = false, int $priority = 0)
     {
         try {
-            HookController::add($event, $callback, $runOnce);
+            HookController::add($event, $callback, $runOnce, $priority);
         } catch (\Exception $e) {
             Log::logAddLine('!] Hook [!', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
         }
@@ -136,7 +143,7 @@ class Hook
     {
         $hooks = HookController::getHooks($hookName);
 
-        if ($hooks->isEmpty()) {
+        if (!$hooks) {
             return;
         }
 

@@ -12,14 +12,11 @@ class NextMap
 {
     public function __construct()
     {
-        Hook::add('EndMatch', [self::class, 'showNextMap']);
+        // Hook::add('EndMatch', [self::class, 'showNextMap']);
     }
 
-    public static function showNextMap()
+    public static function showNextMap(Map $map)
     {
-        $mapUid = Server::getNextMapInfo()->uId;
-        $map = Map::whereUid($mapUid)->first();
-
         if ($map) {
             Template::showAll('next-map.widget', compact('map'));
         }

@@ -149,12 +149,12 @@ class Dedimania extends DedimaniaApi
 
                 return [
                     'Map'         => $map->id,
-                    'Player'      => $player->id,
+                    'Player'      => $player->id ?? player($record->login)->id,
                     'Score'       => $record->score,
                     'Rank'        => $record->rank,
                     'Checkpoints' => $record->checkpoints,
                 ];
-            });
+            })->filter();
 
             Dedi::insert($insert->toArray());
             self::cacheDedis($map);

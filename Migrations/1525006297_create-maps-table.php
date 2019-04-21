@@ -26,7 +26,7 @@ class CreateMapsTable extends Migration
             $table->integer('plays')->default(0);
             $table->integer('cooldown')->default(0);
             $table->dateTime('last_played')->nullable();
-            $table->boolean('enabled')->default(false);
+            $table->boolean('enabled')->default(0);
         });
     }
 

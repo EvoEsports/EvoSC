@@ -10,6 +10,7 @@
   "map-cooldown": 10,
   "afk-timeout": 8,
   "controller-interval": 100,
+  "enable-chat-routing": true,
   "echoes": {
     "join": true,
     "leave": true

@@ -5,7 +5,6 @@ namespace esc\Controllers;
 
 use Carbon\Carbon;
 use esc\Classes\ChatCommand;
-use esc\Classes\Config;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -13,14 +12,16 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
+use esc\Models\Dedi;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
+use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
+use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
-use Maniaplanet\DedicatedServer\Xmlrpc\FileException;
-use mysql_xdevapi\Exception;
 
 /**
  * Class MapController
@@ -35,6 +36,11 @@ class MapController implements ControllerInterface
     private static $currentMap;
 
     /**
+     * @var Map
+     */
+    private static $nextMap;
+
+    /**
      * @var Carbon
      */
     private static $mapStart;
@@ -42,14 +48,16 @@ class MapController implements ControllerInterface
     private static $mapsPath;
     private static $addedTime = 0;
     private static $timeLimit;
+    private static $originalTimeLimit;
 
     /**
      * Initialize MapController
      */
     public static function init()
     {
-        self::$mapsPath  = Server::getMapsDirectory();
-        self::$timeLimit = self::getTimeLimitFromMatchSettings();
+        self::$mapsPath          = Server::getMapsDirectory();
+        self::$timeLimit         = self::getTimeLimitFromMatchSettings();
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
 
         self::loadMaps();
 
@@ -59,7 +67,7 @@ class MapController implements ControllerInterface
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
-        AccessRight::createIfNonExistent('map_delete', 'Delete map permanently.');
+        AccessRight::createIfNonExistent('map_delete', 'Delete map (and all records) permanently.');
         AccessRight::createIfNonExistent('map_disable', 'Disable map.');
         AccessRight::createIfNonExistent('map_replay', 'Force a replay.');
         AccessRight::createIfNonExistent('map_reset', 'Reset round.');
@@ -113,6 +121,7 @@ class MapController implements ControllerInterface
     public static function resetTime()
     {
         self::$addedTime = 0;
+        self::$timeLimit = self::getTimeLimitFromMatchSettings();
         self::setTimelimit(self::$timeLimit);
     }
 
@@ -170,6 +179,7 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
+        self::$nextMap    = null;
         self::$currentMap = $map;
         self::$mapStart   = now();
 
@@ -183,6 +193,7 @@ class MapController implements ControllerInterface
 
         MxMapDetails::loadMxDetails($map);
 
+        //TODO: move to player controller
         Player::where('Score', '>', 0)->update([
             'Score' => 0,
         ]);
@@ -194,7 +205,7 @@ class MapController implements ControllerInterface
     public static function beginMatch()
     {
         self::resetTime();
-        self::addTime(1);
+        self::addTime(0);
     }
 
     /**
@@ -204,16 +215,32 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
+        $mapUid = Server::getNextMapInfo()->uId;
+        self::$nextMap = Map::where('uid', $mapUid)->first();
+
         if ($request) {
-            Log::info("Setting next map: " . $request->map);
-            Server::chooseNextMap($request->map->filename);
-            MapQueue::removeFirst();
-            Hook::fire('MapQueueUpdated', QueueController::getMapQueue());
-            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            if (!collect(Server::getMapList())->contains('fileName', $request->map->filename)) {
+                try {
+                    Server::addMap($request->map->filename);
+                } catch (\Exception $e) {
+                    Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                }
+            }
+
+            QueueController::dropMapSilent($request->map->uid);
+            $chosen = Server::chooseNextMap($request->map->filename);
+
+            if (!$chosen) {
+                Log::logAddLine('MapController', 'Failed to chooseNextMap ' . $request->map->filename);
+            }
+
+            $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            self::$nextMap = $request->map;
         } else {
-            $nextMap     = Map::where('uid', Server::getNextMapInfo()->uId)->first();
-            $chatMessage = chatMessage('Upcoming map ', secondary($nextMap));
+            $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
+
+        NextMap::showNextMap(self::$nextMap);
 
         $chatMessage->setIcon('')->sendAll();
     }
@@ -241,27 +268,36 @@ class MapController implements ControllerInterface
      */
     public static function deleteMap(Player $player, Map $map)
     {
-        return; //disabled
-
         try {
             Server::removeMap($map->filename);
-        } catch (FileException $e) {
-            Log::error($e);
+        } catch (\Exception $e) {
+            Log::logAddLine('MapController', 'Delete map: ' . $e->getMessage());
         }
 
-        $deleted = File::delete(Config::get('server.maps') . '/' . $map->filename);
+        $map->locals()->delete();
+        $map->dedis()->delete();
+        MapFavorite::whereMapId($map->id)->delete();
+        $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
-            infoMessage($player, ' removed map ', $map)->sendAll();
-
             try {
                 $map->delete();
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-                infoMessage($player, ' deleted map ', secondary($map), 'permanently.')->sendAll();
-                Hook::fire('MapPoolUpdated');
+                Log::logAddLine('MapController', $player . ' deleted map ' . $map->filename);
             } catch (\Exception $e) {
-                Log::logAddLine('MapController', 'Failed to deleted map: ' . $e->getMessage());
+                Log::logAddLine('MapController', 'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
+
+            try {
+                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+            } catch (\Exception $e) {
+                Log::logAddLine('MapController', 'Failed to save match-settings: ' . $e->getMessage());
+            }
+
+            Hook::fire('MapPoolUpdated');
+
+            warningMessage($player, ' deleted map ', $map)->sendAll();
+        } else {
+            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
         }
     }
 
@@ -275,14 +311,15 @@ class MapController implements ControllerInterface
     {
         try {
             Server::removeMap($map->filename);
-        } catch (FileException $e) {
+            infoMessage($player, ' disabled map ', secondary($map))->sendAll();
+            Log::logAddLine('MapController', $player . ' disabled map ' . $map->filename);
+        } catch (\Exception $e) {
             Log::error($e);
         }
 
-        $map->update(['enabled' => false]);
+        $map->update(['enabled' => 0]);
         Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
 
-        infoMessage($player->group, ' ', $player, ' disabled map ', secondary($map))->sendAll();
         Hook::fire('MapPoolUpdated');
     }
 
@@ -328,10 +365,7 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename): string
     {
-        $absolute = Server::getMapsDirectory() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $filename);
-        $cmd      = Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $absolute . '"';
-
-        return shell_exec($cmd);
+        return shell_exec(Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $filename . '"');
     }
 
     /**
@@ -344,56 +378,80 @@ class MapController implements ControllerInterface
         //Get loaded matchsettings maps
         $maps = collect(Server::getMapList());
 
-        //get array with the uids
-        $enabledMapsuids = $maps->pluck('uId');
-
         foreach ($maps as $mapInfo) {
-            $mapFile = self::$mapsPath . $mapInfo->fileName;
+            $filename = $mapInfo->fileName;
+            $uid      = $mapInfo->uId;
+            $mapFile  = self::$mapsPath . $filename;
 
             if (!File::exists($mapFile)) {
-                throw new Exception("File $mapFile not found.");
+                Log::error("File $mapFile not found.");
+
+                if (Map::whereFilename($filename)->exists()) {
+                    Map::whereFilename($filename)->update(['enabled' => 0]);
+                }
+
                 continue;
             }
 
-            $map = Map::where('uid', $mapInfo->uId)
-                      ->get()
-                      ->first();
+            if (Map::whereFilename($filename)->exists()) {
+                $map = Map::whereFilename($filename)->first();
 
-            if (!$map) {
-                //Map does not exist, create it
-                $author = Player::where('Login', $mapInfo->author)->first();
+                if ($map->uid != $uid) {
+                    Log::logAddLine('MapController', 'UID changed for map: ' . $map, isVerbose());
 
-                if ($author) {
-                    $authorId = $author->id;
-                } else {
-                    $authorId = Player::insertGetId([
-                        'Login'    => $mapInfo->author,
-                        'NickName' => $mapInfo->author,
+                    LocalRecord::whereMap($map->id)->delete();
+                    Dedi::whereMap($map->id)->delete();
+                    MapFavorite::whereMapId($map->id)->delete();
+                    MapQueue::whereMapUid($map->uid)->delete();
+
+                    $map->update([
+                        'gbx'             => self::getGbxInformation($mapFile),
+                        'uid'             => $uid,
+                        'mx_details'      => null,
+                        'mx_world_record' => null,
                     ]);
                 }
+            } else {
+                if (Map::whereUid($uid)->exists()) {
+                    $map = Map::whereUid($uid)->first();
 
-                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
+                    Log::logAddLine('MapController', "Filename changed for map: $map (" . $map->filename . " -> $filename)", isVerbose());
 
-                $map = Map::updateOrCreate([
-                    'author'   => $authorId,
-                    'gbx'      => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                    'filename' => $mapInfo->fileName,
-                    'uid'      => json_decode($gbxInfo)->MapUid,
-                ]);
+                    $map->update([
+                        'filename' => $filename,
+                    ]);
+                } else {
+                    if (Player::where('Login', $mapInfo->author)->exists()) {
+                        $authorId = Player::find($mapInfo->author)->id;
+                    } else {
+                        $authorId = Player::insertGetId([
+                            'Login'    => $mapInfo->author,
+                            'NickName' => $mapInfo->author,
+                        ]);
+                    }
+
+                    $map = Map::create([
+                        'author'   => $authorId,
+                        'filename' => $mapInfo->fileName,
+                        'gbx'      => self::getGbxInformation($mapFile),
+                        'uid'      => $uid,
+                    ]);
+                }
             }
 
-            if (!$map->gbx) {
-                $gbxInfo = self::getGbxInformation($mapInfo->fileName);
-                $map->update([
-                    'gbx' => preg_replace("(\n|[ ]{2,})", '', $gbxInfo),
-                    'uid' => json_decode($gbxInfo)->MapUid,
-                ]);
-            }
+            $map->update(['enabled' => 1]);
 
-            echo ".";
+            if (isVerbose()) {
+                printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->gbx->Name));
+            } else {
+                echo ".";
+            }
         }
 
         echo "\n";
+
+        //get array with the uids
+        $enabledMapsuids = $maps->pluck('uId');
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
@@ -417,7 +475,7 @@ class MapController implements ControllerInterface
      */
     public static function getOriginalTimeLimit(): int
     {
-        return self::$timeLimit;
+        return self::$originalTimeLimit;
     }
 
     /**
@@ -456,5 +514,13 @@ class MapController implements ControllerInterface
     public static function getMapStart(): Carbon
     {
         return self::$mapStart;
+    }
+
+    /**
+     * @param \esc\Models\Map $currentMap
+     */
+    public static function setCurrentMap(\esc\Models\Map $currentMap): void
+    {
+        self::$currentMap = $currentMap;
     }
 }
