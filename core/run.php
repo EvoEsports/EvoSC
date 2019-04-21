@@ -6,6 +6,7 @@ require 'global-functions.php';
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
+use esc\Controllers\AfkController;
 use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
 use esc\Models\Map;
@@ -118,9 +119,9 @@ class EscRun extends Command
         esc\Classes\ManiaLinkEvent::init();
         esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
+        esc\Controllers\AfkController::init();
         esc\Controllers\PlayerController::init();
         esc\Controllers\BansController::init();
-        esc\Controllers\AfkController::init();
         esc\Controllers\ModuleController::init();
         esc\Controllers\PlanetsController::init();
         esc\Controllers\CountdownController::init();
