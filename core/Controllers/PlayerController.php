@@ -87,6 +87,8 @@ class PlayerController implements ControllerInterface
         $player->save();
 
         self::$players->put($player->Login, $player);
+
+        var_dump(self::$players);
     }
 
     /**

@@ -110,7 +110,7 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
     return $_onlinePlayers;
 }
 
-function player(string $login, bool $addToOnlineIfOffline = false): ?\esc\Models\Player
+function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\Player
 {
     if (\esc\Controllers\PlayerController::hasPlayer($login)) {
         return esc\Controllers\PlayerController::getPlayer($login);

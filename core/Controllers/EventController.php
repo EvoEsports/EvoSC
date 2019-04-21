@@ -106,8 +106,9 @@ class EventController implements ControllerInterface
                 'spectator_status' => $playerInfo['SpectatorStatus'],
             ]);
 
-            if (!onlinePlayers()->contains($player->Login)) {
-                $_onlinePlayers->put($player->Login, $player);
+
+            if (PlayerController::hasPlayer($player->Login)) {
+                PlayerController::addPlayer($player);
             }
         }
     }
@@ -154,7 +155,7 @@ class EventController implements ControllerInterface
             $details = Server::getDetailedPlayerInfo($playerInfo[0]);
             $player  = Player::updateOrCreate(['Login' => $playerInfo[0]], [
                 'NickName' => $details->nickName,
-                'path' => $details->path
+                'path'     => $details->path,
             ]);
 
             Hook::fire('PlayerConnect', $player);
@@ -171,9 +172,7 @@ class EventController implements ControllerInterface
     private static function mpPlayerDisconnect($arguments)
     {
         if (count($arguments) == 2 && is_string($arguments[0])) {
-            $player = Player::find($arguments[0]);
-
-            Hook::fire('PlayerDisconnect', $player, 0);
+            Hook::fire('PlayerDisconnect', player($arguments[0]), 0);
         } else {
             throw new \Exception('Malformed callback');
         }
@@ -241,16 +240,8 @@ class EventController implements ControllerInterface
     private static function mpPlayerManialinkPageAnswer($arguments)
     {
         if (count($arguments) == 4 && is_string($arguments[1]) && is_string($arguments[2])) {
-            $login = $arguments[1];
-
             try {
-                $player = Player::findOrFail($login);
-            } catch (\Exception $e) {
-                Log::logAddLine('mpPlayerManialinkPageAnswer', "Error: Player ($login) not found!");
-            }
-
-            try {
-                ManiaLinkEvent::call($player, $arguments[2]);
+                ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
             } catch (\Exception $e) {
                 Log::logAddLine('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
             }

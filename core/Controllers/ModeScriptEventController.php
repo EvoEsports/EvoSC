@@ -33,7 +33,7 @@ class ModeScriptEventController implements ControllerInterface
             self::call($modescriptCallbackArray[1][0], $modescriptCallbackArray[1][1]);
         } else {
             Log::logAddLine('ModeScriptEventController', 'Modescript callback is not ManiaPlanet.ModeScriptCallbackArray', isVerbose());
-            var_dump($modescriptCallbackArray);
+            Log::logAddLine('ModeScriptEventController', serialize($modescriptCallbackArray), isVeryVerbose());
         }
     }
 
@@ -114,9 +114,8 @@ class ModeScriptEventController implements ControllerInterface
     static function tmGiveUp($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = player($playerLogin);
 
-        Hook::fire('PlayerFinish', $player, 0, "");
+        Hook::fire('PlayerFinish', player($playerLogin), 0, "");
     }
 
     /**
@@ -159,8 +158,7 @@ class ModeScriptEventController implements ControllerInterface
     static function tmStartCountdown($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = player($playerLogin);
-        Hook::fire('PlayerStartCountdown', $player);
+        Hook::fire('PlayerStartCountdown', player($playerLogin));
     }
 
     /**
@@ -171,8 +169,7 @@ class ModeScriptEventController implements ControllerInterface
     static function tmStartLine($arguments)
     {
         $playerLogin = json_decode($arguments[0])->login;
-        $player      = player($playerLogin);
-        Hook::fire('PlayerStartLine', $player);
+        Hook::fire('PlayerStartLine', player($playerLogin));
     }
 
     /**
