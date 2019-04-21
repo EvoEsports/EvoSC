@@ -119,7 +119,7 @@ class EscRun extends Command
         esc\Classes\ManiaLinkEvent::init();
         esc\Controllers\QueueController::init();
         esc\Controllers\MapController::init();
-        esc\Controllers\AfkController::init();
+        // esc\Controllers\AfkController::init();
         esc\Controllers\PlayerController::init();
         esc\Controllers\BansController::init();
         esc\Controllers\ModuleController::init();

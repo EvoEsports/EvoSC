@@ -39,8 +39,6 @@ class PlayerController implements ControllerInterface
                 'NickName' => $playerInfo->nickName,
             ]);
 
-            AfkController::interaction($player);
-
             return $player;
         })->keyBy('Login');
 
