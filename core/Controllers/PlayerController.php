@@ -42,8 +42,8 @@ class PlayerController implements ControllerInterface
             return $player;
         })->keyBy('Login');
 
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect'], Hook::PRIORITY_LOWEST);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect'], Hook::PRIORITY_HIGHEST);
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
@@ -87,8 +87,6 @@ class PlayerController implements ControllerInterface
         $player->save();
 
         self::$players->put($player->Login, $player);
-
-        var_dump(self::$players);
     }
 
     /**
