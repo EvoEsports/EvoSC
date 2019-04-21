@@ -120,6 +120,12 @@ function player(string $login, bool $addToOnlineIfOffline = false): ?\esc\Models
 
     $player = \esc\Models\Player::find($login);
 
+    if (!$player || !isset($player->Login)) {
+        \esc\Classes\Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
+
+        return null;
+    }
+
     if ($addToOnlineIfOffline) {
         $_onlinePlayers->put($player->Login, $player);
     }
