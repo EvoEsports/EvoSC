@@ -112,7 +112,7 @@ class Votes
         self::startVote($player, 'Add 10 minutes?', function ($success) {
             if ($success) {
                 infoMessage('Vote to add time was successful.')->sendAll();
-                MapController::addTime(MapController::getOriginalTimeLimit());
+                MapController::addTime(MapController::getOriginalTimeLimit() * config('votes.time-multiplier'));
             } else {
                 infoMessage('Vote to add time was not successful.')->sendAll();
             }
