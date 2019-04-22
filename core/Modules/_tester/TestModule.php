@@ -19,6 +19,6 @@ class TestModule
 
     public static function testStuff(Player $player)
     {
-        Log::logAddLine('test', json_encode(Server::getDetailedPlayerInfo($player->Login)));
+        Log::logAddLine('test', var_dump(Server::getDetailedPlayerInfo($player->Login)));
     }
 }
