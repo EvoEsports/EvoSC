@@ -10,7 +10,7 @@
             <label class="warn" pos="0 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Warn" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
             <label class="kick" pos="13 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Kick" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
             <label class="ban" pos="26 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Ban" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
-            <label class="ban" pos="39 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Mute" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
+            <label class="mute" pos="39 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Mute" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
         </frame>
     </framemodel>
 
@@ -195,7 +195,7 @@ main() {
             }
 
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("profile")){
-                declare login = event.Control.Parent.DataAttributeGet("login");
+                declare login = event.Control.Parent.Parent.DataAttributeGet("login");
                 TriggerPageAction("profile," ^ login);
             }
 
@@ -213,6 +213,11 @@ main() {
                 if(reason != "-1"){
                     TriggerPageAction("warn," ^ login ^ "," ^ reason);
                 }
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("mute")){
+                declare login = event.Control.Parent.Parent.DataAttributeGet("login");
+                TriggerPageAction("mute," ^ login);
             }
 
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("ban")){

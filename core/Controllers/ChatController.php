@@ -56,7 +56,7 @@ class ChatController implements ControllerInterface
         AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
         AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
 
-        ChatCommand::add('//mute', [self::class, 'mute'], 'Mutes a player by given nickname', 'player_mute');
+        ChatCommand::add('//mute', [self::class, 'muteCmd'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'unmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
@@ -64,23 +64,32 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: mute player.
      *
-     * @param \esc\Models\Player $player
+     * @param \esc\Models\Player $admin
      * @param                    $cmd
      * @param                    $nick
      */
-    public static function mute(Player $player, $cmd, $nick)
+    public static function muteCmd(Player $admin, $cmd, $nick)
     {
-        $target = PlayerController::findPlayerByName($player, $nick);
+        $target = PlayerController::findPlayerByName($admin, $nick);
 
         if (!$target) {
             //No target found
             return;
         }
 
-        $ply     = collect();
-        $ply->id = $target->id;
+        self::mute($admin, $target);
+    }
 
-        self::$mutedPlayers = self::$mutedPlayers->push($ply)->unique();
+    /**
+     * Mute a player
+     *
+     * @param \esc\Models\Player $admin
+     * @param \esc\Models\Player $target
+     */
+    public static function mute(Player $admin, Player $target)
+    {
+        Server::ignore($target->Login);
+        infoMessage($admin, ' muted ', $target)->sendAll();
     }
 
     /**
@@ -99,9 +108,8 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        self::$mutedPlayers = self::$mutedPlayers->filter(function ($player) use ($target) {
-            return $player->id != $target->id;
-        });
+        Server::unIgnore($target->Login);
+        infoMessage($player, ' unmuted ', $target)->sendAll();
     }
 
     /**
