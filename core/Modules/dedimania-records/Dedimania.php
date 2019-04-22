@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -280,9 +281,8 @@ class Dedimania extends DedimaniaApi
 
     private static function fixRanks(Map $map)
     {
-        $map->dedis()->orderBy('Score')->get()->each(function (Dedi $record, $key) {
-            $record->update(['Rank' => $key + 1]);
-        });
+        Database::getConnection()->statement('SET @rank=0');
+        Database::getConnection()->statement('UPDATE `dedi-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $map->id . ' ORDER BY `Score`');
     }
 
     private static function saveGhostReplay(Model $dedi)

@@ -3,6 +3,7 @@
 namespace esc\Modules\LocalRecords;
 
 use esc\Classes\Config;
+use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
@@ -75,9 +76,8 @@ class LocalRecords
 
     private static function fixRanks(Map $map)
     {
-        $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->each(function (LocalRecord $record, $key) {
-            $record->update(['Rank' => $key + 1]);
-        });
+        Database::getConnection()->statement('SET @rank=0');
+        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $map->id . ' ORDER BY `Score`');
     }
 
     private static function cacheLocals(Map $map)
