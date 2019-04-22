@@ -216,7 +216,7 @@ main() {
             }
 
             if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("ban")){
-                declare login = event.Control.Parent.Parent.DataAttributeGet("reason");
+                declare login = event.Control.Parent.Parent.DataAttributeGet("login");
                 declare reason = input("Enter a reason or leave empty");
                 if(reason != "-1"){
                     declare length = input("Enter Length. Empty = perm. (12h = 12hours, 1d6h = 1day+6hours, m=min, mo=months, ...)");
