@@ -92,7 +92,7 @@ class Map extends Model
 
     public function __toString()
     {
-        return $this->gbx->Name;
+        return $this->gbx->Name ?? $this->uid;
     }
 
     public static function getByUid(string $mapUid): ?Map

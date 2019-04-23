@@ -17,7 +17,7 @@ class Playerlist
         ChatCommand::add('/players', [Playerlist::class, 'show'], 'Show the player-list.');
 
         ManiaLinkEvent::add('players', [self::class, 'show']);
-        ManiaLinkEvent::add('mute', [self::class, 'mute']);
+        ManiaLinkEvent::add('mute', [self::class, 'mute'], 'player_mute');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'PlayerList', 'players');
