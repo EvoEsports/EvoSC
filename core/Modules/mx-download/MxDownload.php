@@ -156,7 +156,7 @@ class MxDownload
                     }
 
                     $map           = new Map();
-                    $map->gbx      = $gbxInfo;
+                    $map->gbx      = $gbx;
                     $map->uid      = $uid;
                     $map->filename = $filename;
                     $map->author   = $authorId;
