@@ -35,7 +35,7 @@ class ChatController implements ControllerInterface
     public static function init()
     {
         self::$mutedPlayers   = collect();
-        self::$routingEnabled = config('server.enable-chat-routing') ?? false;
+        self::$routingEnabled = config('server')->{'enable-chat-routing'} ?? true;
 
         if (self::$routingEnabled) {
             Log::logAddLine('ChatController', 'Enabling manual chat routing.');
