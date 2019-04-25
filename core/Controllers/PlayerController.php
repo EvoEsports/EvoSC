@@ -77,7 +77,7 @@ class PlayerController implements ControllerInterface
 
         Log::logAddLine('PlayerController', $message->getMessage());
 
-        if (config('server.echoes.join')) {
+        if (config('server.echoes.join') || $player->hasAccess('admin_echoes')) {
             $message->sendAll();
         } else {
             $message->sendAdmin();
