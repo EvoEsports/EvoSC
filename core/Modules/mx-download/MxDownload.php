@@ -121,7 +121,14 @@ class MxDownload
 
                 $gbxInfo = MapController::getGbxInformation($tempFile);
                 $gbx     = json_decode($gbxInfo);
-                $uid     = $gbx->MapUid;
+
+                if (!$gbx) {
+                    Log::logAddLine('MxDownload', 'Failed to get gbx information from ' . $tempFile);
+
+                    continue;
+                }
+
+                $uid = $gbx->MapUid;
 
                 if (Map::whereFilename($filename)->exists()) {
                     //Map was updated
