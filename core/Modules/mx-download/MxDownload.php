@@ -11,6 +11,7 @@ use esc\Classes\Server;
 use esc\Classes\ChatCommand;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
+use esc\Controllers\MatchSettingsController;
 use esc\Controllers\QueueController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
@@ -156,13 +157,13 @@ class MxDownload
                     }
 
                     $map           = new Map();
-                    $map->gbx      = $gbx;
+                    $map->gbx      = $gbxInfo;
                     $map->uid      = $uid;
                     $map->filename = $filename;
                     $map->author   = $authorId;
                     $map->cooldown = 999;
                     $map->enabled  = 1;
-                    $map->save();
+                    $map->saveOrFail();
 
                     infoMessage($player, ' added new map ', $map)->sendAll();
 
@@ -189,11 +190,12 @@ class MxDownload
             //Queue the newly added map
             QueueController::queueMap($player, $map);
 
-            try {
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings and don't write wrong timelimit or manually write to the xml
-            } catch (\Exception $e) {
-                Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
+            //Save the map to the matchsettings
+            if (MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
+                MatchSettingsController::removeByFilenameFromCurrentMatchSettings($filename);
             }
+
+            MatchSettingsController::addMapToCurrentMatchSettings($map);
         }
     }
 }

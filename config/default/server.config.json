@@ -7,6 +7,7 @@
     "password": ""
   },
   "default-matchsettings": "",
+  "matchsettings-directory": "MatchSettings",
   "map-cooldown": 10,
   "afk-timeout": 8,
   "controller-interval": 100,
