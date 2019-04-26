@@ -62,7 +62,7 @@ class MxDownload
                 continue;
             }
 
-            if ($info && Map::whereUid($info->TrackUID)->exists()) {
+            if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
 
