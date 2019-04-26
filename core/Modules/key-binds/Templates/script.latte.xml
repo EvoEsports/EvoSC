@@ -5,7 +5,7 @@
     #Include "TextLib" as TL
 
     main(){
-        declare Text[Text] CustomKeyBinds for LocalUser;
+        declare persistent Text[Text] CustomKeyBinds for LocalUser;
         declare Text[Text][] keyBinds = {$binds|noescape};
 
         foreach(key => bind in keyBinds){
