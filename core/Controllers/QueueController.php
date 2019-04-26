@@ -12,6 +12,7 @@ use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
+use esc\Modules\MxMapDetails;
 use Illuminate\Support\Collection;
 
 /**
@@ -67,6 +68,10 @@ class QueueController implements ControllerInterface
 
                 return;
             }
+        }
+
+        if (!$map->mx_details) {
+            MxMapDetails::loadMxDetails($map);
         }
 
         MapQueue::create([
