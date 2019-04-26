@@ -62,8 +62,6 @@ class MxDownload
                 continue;
             }
 
-            $info = $info[0];
-
             if ($info && Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
@@ -85,7 +83,7 @@ class MxDownload
                 $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
 
                 if ($download->getStatusCode() != 200) {
-                    Log::error("ManiaExchange request failed (" . $infoResponse->getStatusCode() . ") " . $infoResponse->getReasonPhrase());
+                    Log::error("ManiaExchange request failed (" . $download->getStatusCode() . ") " . $download->getReasonPhrase());
                     warningMessage('Can not reach mania exchange.')->send($player);
 
                     continue;
