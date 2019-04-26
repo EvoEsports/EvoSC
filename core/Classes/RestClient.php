@@ -57,7 +57,7 @@ class RestClient
      */
     public static function get(string $url, array $options = null): Response
     {
-        Log::logAddLine('RestClient', 'Requesting GET: ' . $url);
+        Log::logAddLine('RestClient', 'Requesting GET: ' . $url, isDebug());
 
         return self::$client->request('GET', $url, self::addUserAgent($options));
     }
@@ -73,7 +73,7 @@ class RestClient
      */
     public static function post(string $url, array $options = null): Response
     {
-        Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options));
+        Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options), isDebug());
 
         return self::$client->request('POST', $url, self::addUserAgent($options));
     }

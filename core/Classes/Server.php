@@ -320,6 +320,11 @@ class Server
         return self::$rpc;
     }
 
+    public static function isFilenameInSelection(string $filename): bool
+    {
+        return collect(Server::getMapList())->contains('fileName', $filename);
+    }
+
     /**
      * Call an rpc-method.
      *

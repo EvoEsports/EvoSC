@@ -117,18 +117,18 @@ class MxDownload
                     continue;
                 }
 
-                Log::logAddLine('MxDownload', 'Creating temp-file finished.');
+                Log::logAddLine('MxDownload', "Downloaded $filename as $tempFile.");
 
                 $gbxInfo = MapController::getGbxInformation($tempFile);
                 $gbx     = json_decode($gbxInfo);
 
-                if (!$gbx) {
+                $uid = $gbx->MapUid;
+
+                if (!$uid) {
                     Log::logAddLine('MxDownload', 'Failed to get gbx information from ' . $tempFile);
 
                     continue;
                 }
-
-                $uid = $gbx->MapUid;
 
                 if (Map::whereFilename($filename)->exists()) {
                     //Map was updated
@@ -184,11 +184,12 @@ class MxDownload
             Hook::fire('MapPoolUpdated');
 
             //Add the map to the selection
-            if (!collect(Server::getMapList())->contains('fileName', $filename)) {
+            if (!Server::isFilenameInSelection($filename)) {
                 try {
                     Server::addMap($filename);
                 } catch (\Exception $e) {
                     Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                    $map->update(['enabled' => false]);
 
                     continue;
                 }

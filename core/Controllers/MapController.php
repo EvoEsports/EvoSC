@@ -220,7 +220,7 @@ class MapController implements ControllerInterface
         self::$nextMap = Map::where('uid', $mapUid)->first();
 
         if ($request) {
-            if (!collect(Server::getMapList())->contains('fileName', $request->map->filename)) {
+            if (!Server::isFilenameInSelection($request->map->filename)) {
                 try {
                     Server::addMap($request->map->filename);
                 } catch (\Exception $e) {
@@ -269,7 +269,7 @@ class MapController implements ControllerInterface
      */
     public static function deleteMap(Player $player, Map $map)
     {
-        if (collect(Server::getMapList())->contains('fileName', $map->filename)) {
+        if (Server::isFilenameInSelection($map->filename)) {
             try {
                 Server::removeMap($map->filename);
             } catch (\Exception $e) {
@@ -308,7 +308,7 @@ class MapController implements ControllerInterface
      */
     public static function disableMap(Player $player, Map $map)
     {
-        if (collect(Server::getMapList())->contains('fileName', $map->filename)) {
+        if (Server::isFilenameInSelection($map->filename)) {
             try {
                 Server::removeMap($map->filename);
             } catch (\Exception $e) {
@@ -455,13 +455,14 @@ class MapController implements ControllerInterface
         //get array with the uids
         $enabledMapsuids = $maps->pluck('uId');
 
-        //Disable maps
-        Map::whereNotIn('uid', $enabledMapsuids)
-           ->update(['enabled' => false]);
-
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
            ->update(['enabled' => true]);
+
+        //Disable maps
+        Map::whereNotIn('uid', $enabledMapsuids)
+           ->orWhere('gbx', null)
+           ->update(['enabled' => false]);
     }
 
     /**
