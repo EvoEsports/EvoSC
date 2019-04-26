@@ -87,16 +87,22 @@ class MxDownload
                     continue;
                 }
 
+                Log::logAddLine('MxDownload', 'Request finished.', isVeryVerbose());
+
                 if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
                     Log::warning('Not a valid GBX.');
 
                     continue;
                 }
 
+                Log::logAddLine('MxDownload', 'File is gbx.', isVeryVerbose());
+
                 $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
                 $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
                 $filename = str_replace('..', '.', $filename);
                 $filename = 'MX/' . $filename;
+
+                Log::logAddLine('MxDownload', "Save map as $filename", isVeryVerbose());
 
                 $mapFolder = MapController::getMapsPath();
 
