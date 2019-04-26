@@ -127,6 +127,10 @@ class ChatMessage
             return '$fff' . $this->icon . ' $z$s' . $message;
         }
 
+        if (substr($message, -1) != '.') {
+            $message .= '$z$s$' . $this->color . '.';
+        }
+
         return $message;
     }
 
