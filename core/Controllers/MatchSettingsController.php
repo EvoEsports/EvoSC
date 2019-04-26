@@ -80,7 +80,7 @@ class MatchSettingsController
 
         foreach ($settings->map as $mapInfo) {
             if ($mapInfo->ident == $uid) {
-                Log::logAddLine('MatchSettingsController', "Removing map by filename ($filename) from $matchSettings.");
+                Log::logAddLine('MatchSettingsController', "Removing map by uid ($uid) from $matchSettings.");
                 unset($mapInfo[0]);
                 break;
             }
