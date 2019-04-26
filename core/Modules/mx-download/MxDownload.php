@@ -48,6 +48,8 @@ class MxDownload
                 continue;
             }
 
+            Log::logAddLine('MxDownload', 'Received: ' . $infoResponse->getBody()->getContents());
+
             $body = $infoResponse->getBody()->getContents();
             $info = json_decode($body);
 
