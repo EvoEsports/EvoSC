@@ -19,7 +19,7 @@ class MatchSettingsController
 
     public static function init()
     {
-        self::$currentMatchSettingsFile = config('server.default-matchsettings');
+        self::$currentMatchSettingsFile = config('server.default-matchsettings') ?? 'MatchSettings';
 
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
             Log::error('MatchSettings "' . self::getPath(self::$currentMatchSettingsFile) . '" not found.');
