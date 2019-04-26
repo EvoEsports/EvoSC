@@ -39,6 +39,7 @@ class MxDownload
                 continue;
             }
 
+            /*
             $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
             if ($infoResponse->getStatusCode() != 200) {
@@ -49,8 +50,9 @@ class MxDownload
             }
 
             Log::logAddLine('MxDownload', 'Received: ' . $infoResponse->getBody()->getContents());
+            */
 
-            $body = $infoResponse->getBody()->getContents();
+            $body = file_get_contents('https://api.mania-exchange.com/tm/maps/' . $mxId);
             $info = json_decode($body);
 
             if (!$info) {
