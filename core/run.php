@@ -118,6 +118,7 @@ class EscRun extends Command
         esc\Controllers\ChatController::init();
         esc\Classes\ManiaLinkEvent::init();
         esc\Controllers\QueueController::init();
+        esc\Controllers\MatchSettingsController::init();
         esc\Controllers\MapController::init();
         // esc\Controllers\AfkController::init();
         esc\Controllers\PlayerController::init();

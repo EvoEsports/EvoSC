@@ -22,6 +22,7 @@ use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
 use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
+use Illuminate\Support\Collection;
 
 /**
  * Class MapController
@@ -215,11 +216,11 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        $mapUid = Server::getNextMapInfo()->uId;
+        $mapUid        = Server::getNextMapInfo()->uId;
         self::$nextMap = Map::where('uid', $mapUid)->first();
 
         if ($request) {
-            if (!collect(Server::getMapList())->contains('fileName', $request->map->filename)) {
+            if (!Server::isFilenameInSelection($request->map->filename)) {
                 try {
                     Server::addMap($request->map->filename);
                 } catch (\Exception $e) {
@@ -268,10 +269,12 @@ class MapController implements ControllerInterface
      */
     public static function deleteMap(Player $player, Map $map)
     {
-        try {
-            Server::removeMap($map->filename);
-        } catch (\Exception $e) {
-            Log::logAddLine('MapController', 'Delete map: ' . $e->getMessage());
+        if (Server::isFilenameInSelection($map->filename)) {
+            try {
+                Server::removeMap($map->filename);
+            } catch (\Exception $e) {
+                Log::error($e);
+            }
         }
 
         $map->locals()->delete();
@@ -287,11 +290,7 @@ class MapController implements ControllerInterface
                 Log::logAddLine('MapController', 'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
 
-            try {
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
-            } catch (\Exception $e) {
-                Log::logAddLine('MapController', 'Failed to save match-settings: ' . $e->getMessage());
-            }
+            MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
             Hook::fire('MapPoolUpdated');
 
@@ -309,16 +308,19 @@ class MapController implements ControllerInterface
      */
     public static function disableMap(Player $player, Map $map)
     {
-        try {
-            Server::removeMap($map->filename);
-            infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-            Log::logAddLine('MapController', $player . ' disabled map ' . $map->filename);
-        } catch (\Exception $e) {
-            Log::error($e);
+        if (Server::isFilenameInSelection($map->filename)) {
+            try {
+                Server::removeMap($map->filename);
+            } catch (\Exception $e) {
+                Log::error($e);
+            }
         }
 
+        infoMessage($player, ' disabled map ', secondary($map))->sendAll();
+        Log::logAddLine('MapController', $player . ' disabled map ' . $map->filename);
+
         $map->update(['enabled' => 0]);
-        Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings'));
+        MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
         Hook::fire('MapPoolUpdated');
     }
@@ -376,11 +378,11 @@ class MapController implements ControllerInterface
         Log::logAddLine('MapController', 'Loading maps...');
 
         //Get loaded matchsettings maps
-        $maps = collect(Server::getMapList());
+        $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
 
         foreach ($maps as $mapInfo) {
-            $filename = $mapInfo->fileName;
-            $uid      = $mapInfo->uId;
+            $filename = $mapInfo->file;
+            $uid      = $mapInfo->ident;
             $mapFile  = self::$mapsPath . $filename;
 
             if (!File::exists($mapFile)) {
@@ -453,13 +455,14 @@ class MapController implements ControllerInterface
         //get array with the uids
         $enabledMapsuids = $maps->pluck('uId');
 
-        //Disable maps
-        Map::whereNotIn('uid', $enabledMapsuids)
-           ->update(['enabled' => false]);
-
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
            ->update(['enabled' => true]);
+
+        //Disable maps
+        Map::whereNotIn('uid', $enabledMapsuids)
+           ->orWhere('gbx', null)
+           ->update(['enabled' => false]);
     }
 
     /**

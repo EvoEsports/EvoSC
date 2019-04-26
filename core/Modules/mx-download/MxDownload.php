@@ -11,6 +11,7 @@ use esc\Classes\Server;
 use esc\Classes\ChatCommand;
 use esc\Controllers\ChatController;
 use esc\Controllers\MapController;
+use esc\Controllers\MatchSettingsController;
 use esc\Controllers\QueueController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
@@ -38,6 +39,7 @@ class MxDownload
                 continue;
             }
 
+            /*
             $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
             if ($infoResponse->getStatusCode() != 200) {
@@ -47,7 +49,10 @@ class MxDownload
                 continue;
             }
 
-            $body = $infoResponse->getBody()->getContents();
+            Log::logAddLine('MxDownload', 'Received: ' . $infoResponse->getBody()->getContents());
+            */
+
+            $body = file_get_contents('https://api.mania-exchange.com/tm/maps/' . $mxId);
             $info = json_decode($body);
 
             if (!$info) {
@@ -57,9 +62,7 @@ class MxDownload
                 continue;
             }
 
-            $info = $info[0];
-
-            if ($info && Map::whereUid($info->TrackUID)->exists()) {
+            if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
 
@@ -80,11 +83,13 @@ class MxDownload
                 $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
 
                 if ($download->getStatusCode() != 200) {
-                    Log::error("ManiaExchange request failed (" . $infoResponse->getStatusCode() . ") " . $infoResponse->getReasonPhrase());
+                    Log::error("ManiaExchange request failed (" . $download->getStatusCode() . ") " . $download->getReasonPhrase());
                     warningMessage('Can not reach mania exchange.')->send($player);
 
                     continue;
                 }
+
+                Log::logAddLine('MxDownload', 'Request finished.', isVeryVerbose());
 
                 if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
                     Log::warning('Not a valid GBX.');
@@ -92,10 +97,14 @@ class MxDownload
                     continue;
                 }
 
+                Log::logAddLine('MxDownload', 'File is gbx.', isVeryVerbose());
+
                 $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
                 $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
                 $filename = str_replace('..', '.', $filename);
                 $filename = 'MX/' . $filename;
+
+                Log::logAddLine('MxDownload', "Save map as $filename", isVeryVerbose());
 
                 $mapFolder = MapController::getMapsPath();
 
@@ -116,11 +125,18 @@ class MxDownload
                     continue;
                 }
 
-                Log::logAddLine('MxDownload', 'Creating temp-file finished.');
+                Log::logAddLine('MxDownload', "Downloaded $filename as $tempFile.");
 
                 $gbxInfo = MapController::getGbxInformation($tempFile);
                 $gbx     = json_decode($gbxInfo);
-                $uid     = $gbx->MapUid;
+
+                $uid = $gbx->MapUid;
+
+                if (!$uid) {
+                    Log::logAddLine('MxDownload', 'Failed to get gbx information from ' . $tempFile);
+
+                    continue;
+                }
 
                 if (Map::whereFilename($filename)->exists()) {
                     //Map was updated
@@ -162,7 +178,7 @@ class MxDownload
                     $map->author   = $authorId;
                     $map->cooldown = 999;
                     $map->enabled  = 1;
-                    $map->save();
+                    $map->saveOrFail();
 
                     infoMessage($player, ' added new map ', $map)->sendAll();
 
@@ -176,11 +192,12 @@ class MxDownload
             Hook::fire('MapPoolUpdated');
 
             //Add the map to the selection
-            if (!collect(Server::getMapList())->contains('fileName', $filename)) {
+            if (!Server::isFilenameInSelection($filename)) {
                 try {
                     Server::addMap($filename);
                 } catch (\Exception $e) {
                     Log::logAddLine('MxDownload', 'Adding map to selection failed: ' . $e->getMessage());
+                    $map->update(['enabled' => false]);
 
                     continue;
                 }
@@ -189,11 +206,12 @@ class MxDownload
             //Queue the newly added map
             QueueController::queueMap($player, $map);
 
-            try {
-                Server::saveMatchSettings('MatchSettings/' . config('server.default-matchsettings')); //TODO: Save to current matchsettings and don't write wrong timelimit or manually write to the xml
-            } catch (\Exception $e) {
-                Log::logAddLine('MxDownload', 'Saving match-settings failed: ' . $e->getMessage());
+            //Save the map to the matchsettings
+            if (MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
+                MatchSettingsController::removeByFilenameFromCurrentMatchSettings($filename);
             }
+
+            MatchSettingsController::addMapToCurrentMatchSettings($map);
         }
     }
 }

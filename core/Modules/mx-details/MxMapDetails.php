@@ -17,6 +17,7 @@ class MxMapDetails
     {
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
     }
+
     public static function showDetails(Player $player, string $mapId)
     {
         $map = Map::find($mapId);
@@ -56,21 +57,19 @@ class MxMapDetails
         return $starString;
     }
 
-    public static function loadMxDetails(Map $map, bool $overwrite = false)
+    public static function loadMxDetails(Map $map)
     {
-        if ($map->mx_details != null && !$overwrite) {
-            return;
-        }
-
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
 
         if ($result->getStatusCode() != 200) {
-            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase());
+            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase(), isVerbose());
 
             return;
         }
 
         $data = $result->getBody()->getContents();
+
+        Log::logAddLine('MxMapDetails', 'Received: ' . $data, isVeryVerbose());
 
         if ($data == '[]') {
             Log::logAddLine('MapController', 'No MX information available for: ' . $map->gbx->Name);

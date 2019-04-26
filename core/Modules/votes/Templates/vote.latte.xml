@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
-    <frame id="widget" size="50 30" pos="{config('votes.pos')}" scale="{config('votes.scale')}" z-index="50000">
+    <frame id="widget" size="50 30" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
         <quad pos="2 -6" z-index="1" size="46 0.5" bgcolor="3333"/>
         <quad pos="2 -6" z-index="2" size="3 0.5" bgcolor="1f8c"/>
         <quad pos="48 -6" z-index="2" size="3 0.5" halign="right" bgcolor="f33c"/>
@@ -10,14 +10,19 @@
 
         <label textfont="RajdhaniMono" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{config('votes.duration')}" valign="center" textsize="0.6" textcolor="fff8"/>
 
-        <label textfont="RajdhaniMono" pos="2 -8" z-index="1" size="47 50" textprefix="$s" autonewline="1" text="{$question}" textsize="1.5"/>
+        <label id="question" textfont="RajdhaniMono" pos="25 -8.5" z-index="1" size="49 5" textprefix="$s" autonewline="1" text="{$question}" halign="center" textsize="1.25"/>
 
-        <quad pos="0 0" size="50 13" style="Bgs1" substyle="BgDialogBlur" z-index="-2" />
-        <quad pos="0 0" size="50 13" bgcolor="{config('colors.ui.header')}6" z-index="-1" />
+        <quad id="bg1" pos="0 0" size="50 13" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
+        <quad id="bg2" pos="0 0" size="50 13" bgcolor="{config('colors.ui.header')}" opacity="0.65" z-index="-2" />
 
         <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
+
+    Void hideWidget(CMlFrame widget){
+        declare targetScale = """ <frame scale="0" /> """;
+        AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticIn);
+    }
 
     main() {
         declare Integer[Text] VoteState for LocalUser = Integer[Text];
@@ -30,6 +35,19 @@
         declare timeLeftLabel = (widget.Controls[5] as CMlLabel);
         declare Real backgroundBarWidth = backgroundBar.Size[0];
         declare Integer duration = {config('votes.duration')};
+        declare bg1 <=> (Page.MainFrame.GetFirstChild("bg1") as CMlQuad);
+        declare bg2 <=> (Page.MainFrame.GetFirstChild("bg2") as CMlQuad);
+        declare questionLabel <=> (Page.MainFrame.GetFirstChild("question") as CMlLabel);
+
+        if(TL::Length(questionLabel.Value) > 32){
+            bg1.Size = <50.0, bg1.Size[1] + 3.0>;
+            bg2.Size = <50.0, bg2.Size[1] + 3.0>;
+        }
+
+        widget.RelativePosition_V3 = <(widget.Size[0]*widget.RelativeScale)/-2.0, widget.RelativePosition_V3[1]>;
+        declare targetPos = (widget.Size[0]/-2.0) ^ " " ^ widget.RelativePosition_V3[1];
+        declare targetScale = """ <frame pos='""" ^ targetPos ^ """' scale="{config('votes.scale')|noescape}" /> """;
+        AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
 
         declare startTime = GameTime;
 
@@ -37,7 +55,7 @@
             yield;
 
             if((GameTime - startTime) / 1000 > duration){
-                widget.Hide();
+                hideWidget(widget);
                 return;
             }
 
@@ -69,7 +87,7 @@
                 declare Integer no = VoteState["no"];
 
                 if(yes == -1 && no == -1){
-                    widget.Hide();
+                    hideWidget(widget);
                     return;
                 }
 

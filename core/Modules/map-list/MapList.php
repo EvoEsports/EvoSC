@@ -199,7 +199,7 @@ class MapList
      */
     public static function mapQueueUpdated(Collection $queueItems)
     {
-        $mapQueue = $queueItems->map([self::class, 'mapMapQueue']);
+        $mapQueue = $queueItems->map([self::class, 'mapMapQueue'])->filter();
         Template::showAll('map-list.update-map-queue', compact('mapQueue'));
     }
 

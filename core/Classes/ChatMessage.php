@@ -110,13 +110,13 @@ class ChatMessage
         $message = '';
 
         foreach ($this->parts as $part) {
-            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', $part)) {
-                $message .= secondary($part);
+            if ($part instanceof Player || $part instanceof Map) {
+                $message .= secondary($part) . '$z$s';
                 continue;
             }
 
-            if ($part instanceof Player || $part instanceof Map) {
-                $message .= secondary($part) . '$z$s';
+            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', $part)) {
+                $message .= secondary($part);
                 continue;
             }
 
@@ -125,6 +125,10 @@ class ChatMessage
 
         if ($this->icon) {
             return '$fff' . $this->icon . ' $z$s' . $message;
+        }
+
+        if (substr($message, -1) != '.') {
+            $message .= '$z$s$' . $this->color . '.';
         }
 
         return $message;
