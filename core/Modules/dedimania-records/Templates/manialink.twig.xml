@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Dedimania" id="Dedimania" version="3">
+    <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
+
+    <framemodel id="record">
+        <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
+        <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
+        <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
+        <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
+        <quad pos="-1 -0.2" size="45 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+    </framemodel>
+
+    <framemodel id="window-record">
+        <quad class="record" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
+
+        <frame z-index="10" pos="0 0" hidden="1">
+            <label class="record-button profile" z-index="1" pos="21.5 0" size="43 3" text=" Profile" textsize="0.2" halign="center" valign="center" textfont="RajdhaniMono" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}9" focusareacolor2="{config('colors.ui.header')}c" />
+        </frame>
+
+        <frame z-index="0">
+            <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
+            <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
+            <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
+            <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
+            <quad pos="-1 -0.2" size="44 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+        </frame>
+    </framemodel>
+
+    <frame id="widget" pos="{config('dedimania.pos')}" scale="{config('dedimania.scale')}" z-index="100">
+        <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
+        <quad size="45 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textfont="RajdhaniMono"/>
+
+        <frame id="records" pos="1 -7">
+            {for $i=0; $i<config('dedimania.rows'); $i++}
+            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            {/for}
+        </frame>
+    </frame>
+
+    <frame id="window" pos="-90 40" hidden="1">
+        <quad id="handle" size="175 6" z-index="5" />
+        <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad id="bg" size="180 79" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="🏆 Dedimania records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
+        <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
+
+        <frame pos="2 -9" z-index="2">
+            <frame id="window-records">
+                {for $i=0; $i<100; $i++}
+                <frameinstance class="window-record" modelid="window-record" pos="{floor($i/25) * 44} {($i%25) * -3}"/>
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="details-frame" z-index="10" pos="0 -6" size="44 77" hidden="1">
+            <quad z-index="-2" size="200 200" bgcolor="{config('colors.ui.header')}1" />
+            <quad z-index="-1" size="200 200" bgcolor="{config('colors.ui.background')}" opacity="0.95" />
+            <label text="Name" pos="2 -3" size="40" textsize="1.4" textfont="RajdhaniMono" />
+            <label text="Score" pos="2 -7" textsize="1.2" textfont="RajdhaniMono" />
+
+            <label text="Checkpoints" pos="2 -14" textsize="0.7" textfont="RajdhaniMono" />
+            <quad pos="2 -17" size="40 0.1" bgcolor="fff6" />
+            <frame pos="2 -18.5" scale="0.95">
+                {for $i=0; $i<20; $i++}
+                <label halign="right" text="{$i + 1}." pos="3.5 {$i * -3}" textsize="0.6" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
+                <label halign="left" text="timetimetimetime" size="16 3" pos="4.5 {$i * -3}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
+                {/for}
+                {for $i=0; $i<20; $i++}
+                <label halign="right" text="{$i + 21}." pos="25 {$i * -3}" textsize="0.6" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
+                <label halign="left" text="timetimetimetime" size="16 3" pos="26 {$i * -3}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
+                {/for}
+            </frame>
+        </frame>
+
+        <frame id="pagination" pos="4 -86.5" scale="0.9" z-index="3">
+            <label id="page-info" pos="6 0" size="8 3.5" valign="center"
+                   halign="center" text="1/1" textsize="0.8"/>
+            <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
+            <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                   focusareacolor2="{config('colors.ui.header')}c"/>
+        </frame>
+    </frame>
+
+    <frame id="confirm-dialog" pos="-40 9" z-index="10" hidden="1">
+        <quad size="80 18" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
+
+        <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
+        <label class="cancel" pos="48 -13" z-index="0" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct Record {
+        Integer rank;
+        Integer[] cps;
+        Integer score;
+        Text name;
+        Text login;
+    }
+
+    declare Integer currentPage;
+    declare Integer maxPage;
+    declare Vec3 headerColor;
+
+    Text[] getOnlinePlayers(){
+        declare Text[] onlinePlayers = Text[];
+        foreach(player in Players){
+            onlinePlayers.add(player.User.Login);
+        }
+        return onlinePlayers;
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void fillDetails(Text recordJson){
+        declare Record record;
+        record.fromjson(recordJson);
+
+        declare detailsFrame <=> (Page.MainFrame.GetFirstChild("details-frame") as CMlFrame);
+        (detailsFrame.Controls[2] as CMlLabel).SetText(record.name);
+        (detailsFrame.Controls[3] as CMlLabel).SetText(record.rank ^ ". " ^ formatScoreCorrect(record.score, False));
+
+        declare Integer i = 1;
+        declare cpLabelsFrame = (detailsFrame.Controls[6] as CMlFrame);
+        foreach(cp in record.cps){
+            declare formatted = formatScoreCorrect(cp, True);
+
+            if(i >= cpLabelsFrame.Controls.count){
+                break;
+            }
+
+            (cpLabelsFrame.Controls[i] as CMlLabel).SetText(formatted);
+            (cpLabelsFrame.Controls[i] as CMlLabel).Show();
+            (cpLabelsFrame.Controls[i - 1] as CMlLabel).Show();
+
+            i = i + 2;
+        }
+
+        if(i < cpLabelsFrame.Controls.count){
+            for(x, i, cpLabelsFrame.Controls.count  - 1){
+                (cpLabelsFrame.Controls[x] as CMlLabel).Hide();
+                (cpLabelsFrame.Controls[x - 1] as CMlLabel).Hide();
+            }
+        }
+
+        declare rank = record.rank;
+        if(rank > 100){
+            rank = rank - 100;
+        }
+
+        if((rank > 0 && rank <= 25)){
+            detailsFrame.RelativePosition_V3 = <45.0, -6.0>;
+        }
+        if((rank > 25 && rank <= 50) || (rank > 75)){
+            detailsFrame.RelativePosition_V3 = <89.0, -6.0>;
+        }
+        if(rank > 50 && rank <= 75){
+            detailsFrame.RelativePosition_V3 = <133.0, -6.0>;
+        }
+
+        detailsFrame.Show();
+    }
+
+    Void updateWindow(Record[Integer] records){
+        //Update records
+        declare CMlFrame windowRecords <=> (Page.MainFrame.GetFirstChild("window-records") as CMlFrame);
+        declare Integer i = 0;
+        declare Integer skipped = 0;
+        declare Integer skip = 100 * currentPage;
+
+        declare Text[] onlinePlayers = getOnlinePlayers();
+
+        foreach(record in records){
+            if(skipped < skip){
+                skipped = skipped + 1;
+                continue;
+            }
+
+            if(i >= windowRecords.Controls.count){
+                break;
+            }
+
+            declare recordFrame = (windowRecords.Controls[i] as CMlFrame);
+            declare labels = (recordFrame.Controls[2] as CMlFrame);
+            (labels.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
+            (labels.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
+            (labels.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
+            (labels.Controls[3] as CMlLabel).SetText(record.name);
+            recordFrame.Show();
+            recordFrame.DataAttributeSet("record", record.tojson());
+
+            if(onlinePlayers.exists(record.login)){
+                (labels.Controls[0] as CMlLabel).TextColor = headerColor;
+                (labels.Controls[4] as CMlQuad).Show();
+            }else{
+                (labels.Controls[0] as CMlLabel).TextColor = <1.0, 1.0, 1.0>;
+                (labels.Controls[4] as CMlQuad).Hide();
+            }
+
+            i = i + 1;
+        }
+
+        if(i < windowRecords.Controls.count){
+            for(x, i, windowRecords.Controls.count - 1){
+                (windowRecords.Controls[x] as CMlFrame).Hide();
+            }
+        }
+
+        //Set window size and enable pagination if needed
+        declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+        declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+        declare pagination <=> (Page.MainFrame.GetFirstChild("pagination") as CMlLabel);
+        if(records.count > 100){
+            bgQuad.Size = <bgQuad.Size[0], 84.0>;
+            maxPage = ML::CeilingInteger(records.count / 100.0) - 1;
+            pageInfo.SetText((currentPage + 1) ^ "/" ^ (maxPage + 1));
+            pagination.Show();
+        }else{
+            bgQuad.Size = <bgQuad.Size[0], 79.0>;
+            maxPage = 0;
+            pagination.Hide();
+        }
+    }
+
+    Integer getMyRank(Record[Integer] records){
+        foreach(record in records){
+            if(record.login == LocalUser.Login){
+                return record.rank;
+            }
+        }
+
+        return -1;
+    }
+
+    Void fillRecord(Integer index, Record record, Text[] onlinePlayers){
+        declare records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        if(index >= records.Controls.count){
+            return;
+        }
+
+        declare recordsFrame = (records.Controls[index] as CMlFrame);
+        (recordsFrame.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
+        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
+        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
+        (recordsFrame.Controls[3] as CMlLabel).SetText(record.name);
+        if(onlinePlayers.exists(record.login)){
+            (recordsFrame.Controls[0] as CMlLabel).TextColor = headerColor;
+            (recordsFrame.Controls[4] as CMlLabel).Show();
+        }else{
+            (recordsFrame.Controls[0] as CMlLabel).TextColor = <1.0, 1.0, 1.0>;
+            (recordsFrame.Controls[4] as CMlLabel).Hide();
+        }
+        recordsFrame.Show();
+    }
+
+    Void updateWidget(Record[Integer] records){
+        declare myRank = getMyRank(records);
+        declare filled = 0;
+        declare skipped = 0;
+        declare skip = 0;
+        declare showTop = {config('dedimania.showtop')};
+        declare max = {config('dedimania.rows')};
+        declare toFill = max - showTop;
+
+        if(myRank == -1){
+            skip = records.count - toFill - showTop;
+        }else{
+            skip = myRank - (max/2);
+
+            if(myRank + (max/2) > records.count){
+                skip = skip + records.count - (myRank + (max/2));
+            }
+        }
+
+        declare Text[] onlinePlayers = getOnlinePlayers();
+
+        foreach(record in records){
+            if(filled < showTop){
+                fillRecord(filled, record, onlinePlayers);
+                filled = filled + 1;
+                continue;
+            }
+
+            if(skipped < skip){
+                skipped = skipped + 1;
+                continue;
+            }
+
+            fillRecord(filled, record, onlinePlayers);
+
+            filled = filled + 1;
+        }
+
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare skipFilled = 0;
+
+        foreach(frame in recordsFrame.Controls){
+            if(skipFilled < filled){
+                skipFilled = skipFilled + 1;
+                continue;
+            }
+
+            frame.Hide();
+        }
+    }
+
+    Boolean confirm(Text question){
+        declare confirmDialogFrame <=> (Page.MainFrame.GetFirstChild("confirm-dialog") as CMlFrame);
+        declare Boolean answer = False;
+        declare Boolean decided = False;
+
+        //show confirm dialog
+        confirmDialogFrame.Show();
+
+        //Set question text
+        (confirmDialogFrame.Controls[2] as CMlLabel).SetText(question);
+
+        while(!decided){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
+                    answer = True;
+                    decided = True;
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+                    decided = True;
+                }
+            }
+        }
+
+        //hide confirm dialog
+        confirmDialogFrame.Hide();
+
+        return answer;
+    }
+
+    {(new esc\Classes\HideScript())|noescape}
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare Record[Integer] DediRecords_ for LocalUser;
+        declare Integer LastDediRecordsUpdate for LocalUser = 0;
+        declare Integer lastUpdate = 0;
+        declare Integer playerCount = 0;
+
+        declare CMlFrame window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare CMlFrame currentHoverFrame = Null;
+
+        currentPage = 0;
+        maxPage = 0;
+
+        headerColor = TL::ToColor("{config('colors.ui.header')|noescape}");
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Show();
+                }
+
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                }
+
+                if(event.Control.HasClass("record-button") && event.Type == CMlScriptEvent::Type::MouseOut){
+                    declare actionFrame = (event.Control.Parent as CMlFrame);
+                    actionFrame.Hide();
+                    (actionFrame.Parent.Controls[2] as CMlFrame).Show();
+                    (Page.MainFrame.GetFirstChild("details-frame") as CMlFrame).Hide();
+                }
+
+                if(event.Control.HasClass("record") && event.Type == CMlScriptEvent::Type::MouseOver){
+                    if(currentHoverFrame != Null){
+                        (currentHoverFrame.Parent.Controls[1] as CMlFrame).Hide();
+                        (currentHoverFrame.Parent.Controls[2] as CMlFrame).Show();
+                    }
+
+                    currentHoverFrame = (event.Control as CMlFrame);
+                    (currentHoverFrame.Parent.Controls[1] as CMlFrame).Show();
+                    (currentHoverFrame.Parent.Controls[2] as CMlFrame).Hide();
+                    fillDetails(currentHoverFrame.Parent.DataAttributeGet("record"));
+                }
+
+                if(event.Control.HasClass("profile") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare recordFrame = (event.Control.Parent.Parent as CMlFrame);
+                    declare Record record;
+                    record.fromjson(recordFrame.DataAttributeGet("record"));
+                    TriggerPageAction("profile," ^ record.login);
+                }
+
+                if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage = currentPage + 1;
+
+                    if(currentPage > maxPage){
+                        currentPage = 0;
+                    }
+
+                    updateWindow(DediRecords_);
+                }
+
+                if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage = currentPage - 1;
+
+                    if(currentPage < 0){
+                        currentPage = maxPage;
+                    }
+
+                    updateWindow(DediRecords_);
+                }
+            }
+
+            if(LastDediRecordsUpdate != lastUpdate){
+                //update
+                lastUpdate = LastDediRecordsUpdate;
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
+            }
+
+            if(playerCount != Players.count){
+                sleep(150);
+                playerCount = Players.count;
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
+            }
+
+            hidescript();
+            maniaLinkDrag();
+        }
+    }
+
+    --></script>
+</manialink>

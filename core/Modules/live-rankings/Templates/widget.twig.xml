@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Liverankings" id="Liverankings" version="3">
+    <framemodel id="record">
+        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="RajdhaniMono" />
+        <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
+    </framemodel>
+
+    <frame id="widget" pos="{config('live-rankings.pos')}" size="40 60" scale="{config('live-rankings.scale')}" z-index="5000">
+        <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.6" ScriptEvents="1"/>
+        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.9"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="RajdhaniMono" />
+
+        <frame id="ranking" pos="1 -7">
+            {for $i=0; $i < config('live-rankings.show'); $i++}
+            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Integer[Text] scores;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
+        declare index = position - 1;
+
+        if(index >= ranking.Controls.count){
+            return;
+        }
+
+        declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
+        (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
+        (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
+        (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+        (frame.Controls[3] as CMlLabel).SetText(name);
+        frame.Show();
+    }
+
+    Void updateList(){
+        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        declare Integer max = {config('live-rankings.show')};
+        declare Integer i = 0;
+
+        scores = scores.sort();
+
+        foreach(name => score in scores){
+            if(i > max){
+                return;
+            }
+
+            i = i + 1;
+
+            if(i > 14){
+                return;
+            }
+
+            updateLabels(ranking, i, name, score);
+        }
+    }
+
+    Void reset(){
+        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        foreach(control in ranking.Controls){
+            control.Hide();
+        }
+        scores = Integer[Text];
+    }
+
+    {(new esc\Classes\HideScript())|noescape}
+
+    main(){
+        declare Text currentMapUid = Map.MapInfo.MapUid;
+
+        reset();
+
+        foreach(player in Players){
+            if(player == Null) continue;
+            if(player.Score == Null) continue;
+            if(player.Score.BestLap == Null) continue;
+
+            declare score = player.Score.BestLap.Time;
+            if(score > 0){
+                scores[player.User.Name] = score;
+            }
+        }
+
+        updateList();
+
+        while(True){
+            yield;
+
+            foreach(event in RaceEvents){
+                if(event.IsEndLap == True){
+                    if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
+                        scores[event.Player.Name] = event.LapTime;
+                        updateList();
+                    }
+                    break;
+                }
+            }
+
+            if(currentMapUid != Map.MapInfo.MapUid){
+                currentMapUid = Map.MapInfo.MapUid;
+                reset();
+            }
+
+            hidescript();
+        }
+    }
+
+    --></script>
+</manialink>

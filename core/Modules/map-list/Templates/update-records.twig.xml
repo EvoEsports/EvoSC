@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-records" id="update-records" version="3">
+    <script>
+        <!--
+        main(){
+            declare Integer[Text] Locals for LocalUser;
+            declare Integer[Text] Dedis for LocalUser;
+
+            declare Text localsJson = """{$locals|noescape}""";
+            declare Text dedisJson = """{$dedis|noescape}""";
+
+            Locals.fromjson(localsJson);
+            Dedis.fromjson(dedisJson);
+        }
+        -->
+    </script>
+</manialink>

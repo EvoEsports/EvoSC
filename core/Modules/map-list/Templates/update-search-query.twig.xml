@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Maps:update-search-query" id="update-search-query" version="3">
+    <script>
+        <!--
+        main(){
+            declare Text MapSearchQuery for LocalUser;
+            MapSearchQuery = {$query == "" ? " " : $query};
+        }
+        -->
+    </script>
+</manialink>

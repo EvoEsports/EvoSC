@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MSM:ModeScriptSettings" id="MatchSettingsManager:Editor" version="3">
+
+    <frame id="window" pos="-80 60">
+        <quad size="160 120" pos="0 0" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
+        <quad size="160 12" bgcolor="{config('colors.ui.header')}" opacity="0.7" z-index="0" />
+        <quad size="160 0.5" pos="0 -12" bgcolor="{config('colors.ui.header')}" opacity="1" z-index="1" />
+        <label pos="2 -3.5" valign="center" textsize="1.4" text="MatchSettings-Manager - Edit: {$ms->filename}" z-index="1" />
+        <label class="close" pos="157 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+
+        <frame pos="0 -9.5" z-index="2">
+            <label class="gameinfo" pos="8 0" size="14 5" textsize="0.5" text="GameInfo" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
+            <label class="filter" pos="23 0" size="14 5" textsize="0.5" text="Filter" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
+            <label class="mss" pos="45 0" size="28 5" textsize="0.5" text="ModeScript-Settings" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}f" focusareacolor2="{config('colors.ui.header')}f" />
+            <label class="maps" pos="65 0" size="10 5" textsize="0.5" text="Maps" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}5" />
+        </frame>
+
+        <frame id="mode-script-settings" pos="2 -14" z-index="5">
+            {foreach $modeScriptSettings as $col => $settings}
+            {foreach $settings as $setting}
+            <frame pos="{$col * 80} {$iterator->counter * -6 + 4.5}">
+                <entry default="{$setting['name']}" hidden="1" />
+                <entry default="{$setting['type']}" hidden="1" />
+                <label pos="0 0"  size="60 4" valign="center" textsize="1.0" scale="0.8" text="{$setting['name']}" />
+
+                <label pos="-2 3" size="80 6" z-index="-5" focusareacolor1="222c" focusareacolor2="333e" ScriptEvents="1" />
+
+                {if $setting['type'] == 'real' || $setting['type'] == 'text'}
+                <entry class="entry" pos="61 0" size="30 4" valign="center" halign="center" ScriptEvents="1" default="{$setting['value']}" textsize="1" focusareacolor1="0003" focusareacolor2="6663" />
+                {/if}
+                {if $setting['type'] == 'integer'}
+                <label class="int down" pos="48 0" size="4 4" valign="center" halign="center" ScriptEvents="1" text="" textsize="0.7" focusareacolor1="0000" focusareacolor2="0000" />
+                <entry class="entry entry-integer" pos="61 0" size="20 4" valign="center" halign="center" ScriptEvents="1" default="{$setting['value']}" textsize="1" focusareacolor1="0003" focusareacolor2="6663" />
+                <label class="int up" pos="74 0" size="4 4" valign="center" halign="center" ScriptEvents="1" text="" textsize="0.7" focusareacolor1="0000" focusareacolor2="0000" />
+                {/if}
+                {if $setting['type'] == 'boolean'}
+                <label pos="57" valign="center" halign="right" textsize="1" scale="0.6" text="OFF" />
+                <label pos="65" valign="center" halign="left" textsize="1" scale="0.6" text="ON" />
+                <label class="switch" pos="61 0" size="5 4" valign="center" halign="center" textsize="2.2" text="{$setting['value'] == '1' ? '' : ''}" data-enabled="{$setting['value']}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+                {/if}
+            </frame>
+            {/foreach}
+            {/foreach}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text xmlRef;
+
+    Void windowSetSize(CMlFrame window, Real width, Real height){
+        declare quad = (window.Controls[0] as CMlQuad);
+        quad.Size = <width, height>;
+        window.RelativePosition_V3 = <-width/2.0, height/2.0>;
+    }
+
+    Void handleEntry(CMlControl control){
+        declare CMlEntry entry <=> (control as CMlEntry);
+        declare name = (control.Parent.Controls[0] as CMlEntry).Value;
+        declare type = (control.Parent.Controls[1] as CMlEntry).Value;
+        TriggerPageAction("msm.update," ^ xmlRef ^ ",mss," ^ name ^ "," ^ type ^ "," ^ entry.Value);
+    }
+
+    Void handleSwitch(CMlControl control){
+        declare CMlLabel switcher <=> (control as CMlLabel);
+        declare Boolean enabled = control.DataAttributeGet("enabled") == "1";
+        declare name = (control.Parent.Controls[0] as CMlEntry).Value;
+
+        if(enabled){
+            switcher.SetText("");
+            control.DataAttributeSet("enabled", "0");
+            TriggerPageAction("msm.update," ^ xmlRef ^ ",mss," ^ name ^ ",boolean,0");
+        }else{
+            switcher.SetText("");
+            control.DataAttributeSet("enabled", "1");
+            TriggerPageAction("msm.update," ^ xmlRef ^ ",mss," ^ name ^ ",boolean,1");
+        }
+    }
+
+    CMlEntry getEntryInteger(CMlControl control){
+        foreach(control in control.Parent.Controls){
+            if(control.HasClass("entry-integer")){
+                return (control as CMlEntry);
+            }
+        }
+
+        return Null;
+    }
+
+    Void handleInt(CMlControl control){
+        declare Boolean up = control.HasClass("up");
+        declare entry = getEntryInteger(control);
+        declare Integer value = TL::ToInteger(entry.Value);
+
+        if(up){
+            entry.SetText(TL::ToText(value + 1), True);
+        }else{
+            entry.SetText(TL::ToText(value - 1), True);
+        }
+    }
+
+    main(){
+        xmlRef = {$ms->id};
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        //windowSetSize(window, 160.0, {count($ms->xml->mode_script_settings->setting) * 3 + (count($ms->xml->mode_script_settings->setting)%2!=0 ? 3 : 0) + 12.5});
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    window.Hide();
+                    TriggerPageAction("msm.overview");
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("switch")){
+                    handleSwitch(event.Control);
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("save")){
+                    TriggerPageAction("msm.save," ^ xmlRef);
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("int")){
+                    handleInt(event.Control);
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::EntrySubmit){
+                    handleEntry(event.Control);
+                    continue;
+                }
+
+                //gameinfo tab clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("gameinfo")){
+                    TriggerPageAction("msm.edit_gameinfo," ^ xmlRef);
+                    continue;
+                }
+
+                //filter tab clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("filter")){
+                    TriggerPageAction("msm.edit_filter," ^ xmlRef);
+                    continue;
+                }
+
+                //maps clicked
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("maps")){
+                    TriggerPageAction("msm.edit_maps," ^ xmlRef);
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>

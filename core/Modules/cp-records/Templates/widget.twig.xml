@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:best-cps" id="best-cps" version="3">
+    <framemodel id="record">
+        <quad pos="0 -0.25" size="42 4" valign="center" bgcolor="{config('colors.ui.background')}9" z-index="-2"/>
+        <label pos="3" size="5" valign="center" halign="center" textsize="0.8" text="" textfont="RajdhaniMono" z-index="5" />
+        <label pos="18" valign="center" halign="right" textsize="0.75" text="" opacity="0.5" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" z-index="4" />
+        <label pos="18" valign="center" halign="right" textsize="0.75" text="" textfont="RajdhaniMono" z-index="5" />
+        <label pos="30.5" size="21" valign="center" halign="center" textsize="0.8" text="" textfont="RajdhaniMono" z-index="5" />
+        <quad pos="0 -0.25" size="19 4" valign="center" bgcolor="{config('colors.ui.background')}4" z-index="-1"/>
+        <quad pos="0 -0.25" size="6 4" valign="center" bgcolor="{config('colors.ui.background')}4" z-index="-1"/>
+        <quad pos="6 -0.25" size="0.3 4" valign="center" bgcolor="{config('colors.ui.header')}f" z-index="1"/>
+        <quad pos="0 -0.25" size="42 4" valign="center" bgcolor="{config('colors.ui.header')}f" opacity="0" z-index="2"/>
+    </framemodel>
+
+    <frame id="widget" pos="{config('cp-records.pos')}" scale="{config('cp-records.scale')}">
+        <frame id="records">
+            {for $i=0; $i<100; $i++}
+            <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct Record{
+        Integer index;
+        Integer time;
+        Text name;
+    }
+
+    declare Real padding;
+    declare Integer columns;
+    declare CMlFrame records;
+    declare Record[Integer] cps;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Vec2 getRecordPosition(Integer index){
+        declare position = Vec2;
+        position[0] = (index % columns) * (42.0 + padding);
+        position[1] = ML::FloorInteger(index / columns * 1.0) * - (4.0 + padding);
+        return position;
+    }
+
+    Void updateWidget(Record record){
+        if(!records.Controls.existskey(record.index)) return;
+
+        declare frame = (records.Controls[record.index] as CMlFrame);
+        declare indexLabel = (frame.Controls[1] as CMlLabel);
+        declare timeLabel = (frame.Controls[2] as CMlLabel);
+        declare timeLabel2 = (frame.Controls[3] as CMlLabel);
+        declare nameLabel = (frame.Controls[4] as CMlLabel);
+        declare flashQuad = (frame.Controls[8] as CMlQuad);
+
+        indexLabel.SetText(TL::ToText(record.index + 1));
+        timeLabel.SetText(formatScoreCorrect(record.time, False));
+        timeLabel2.SetText(formatScoreCorrect(record.time, True));
+        nameLabel.SetText(record.name);
+
+        flashQuad.Opacity = 1.0;
+        AnimMgr.Add(flashQuad, """ <quad opacity="0" /> """, 1200, CAnimManager::EAnimManagerEasing::QuartOut);
+
+        frame.RelativePosition_V3 = getRecordPosition(record.index);
+        frame.Show();
+    }
+
+    Record newRecord(Integer id, Integer time, Text name){
+        declare Record record;
+        record.index = id;
+        record.time = time;
+        record.name = name;
+        return record;
+    }
+
+    Void reset(){
+        cps = Record[Integer];
+        foreach(control in records.Controls){
+            control.Hide();
+        }
+    }
+
+    main() {
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare currentMapId = "";
+
+        columns = {config('cp-records.columns')};
+        padding = 0.5;
+        records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        while(True){
+            yield;
+
+            if(Map.MapInfo.MapUid != currentMapId){
+                currentMapId = Map.MapInfo.MapUid;
+                reset();
+            }
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                reset();
+                sleep(2000);
+            }
+
+            foreach(event in RaceEvents){
+                if(event.Type == CTmRaceClientEvent::EType::WayPoint){
+                    if(event.IsEndLap){
+                        continue;
+                    }
+
+                    declare index = event.CheckpointInLap;
+                    declare time = event.LapTime;
+
+                    if(cps.existskey(index)){
+                        if(time < cps[index].time){
+                            declare name = event.Player.User.Name;
+                            cps[index] = newRecord(index, time, name);
+                            updateWidget(cps[index]);
+                        }
+                    }else{
+                        declare name = event.Player.User.Name;
+                        cps[index] = newRecord(index, time, name);
+                        updateWidget(cps[index]);
+                    }
+                }
+            }
+        }
+    }
+--></script>
+</manialink>
