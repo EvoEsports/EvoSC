@@ -61,9 +61,9 @@ class MxKarma extends MXK
 
         MxKarma::startSession();
 
-        Hook::add('PlayerConnect', [MxKarma::class, 'showWidget']);
-        Hook::add('BeginMap', [MxKarma::class, 'beginMap']);
-        Hook::add('EndMap', [MxKarma::class, 'endMap']);
+        Hook::add('PlayerConnect', [self::class, 'showWidget']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMap', [self::class, 'endMap']);
 
         ChatCommand::add('+', [MxKarma::class, 'votePlus'], 'Rate the map ok', null, true);
         ChatCommand::add('++', [MxKarma::class, 'votePlusPlus'], 'Rate the map good', null, true);

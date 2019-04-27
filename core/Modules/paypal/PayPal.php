@@ -16,7 +16,7 @@ class PayPal
     public function __construct()
     {
         if (config('paypal.url')) {
-            Hook::add('PlayerConnect', [PayPal::class, 'show']);
+            Hook::add('PlayerConnect', [self::class, 'show']);
         }
 
         ManiaLinkEvent::add('rickroll', [self::class, 'rickroll']);

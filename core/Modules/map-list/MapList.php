@@ -24,9 +24,9 @@ class MapList
         ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
 
-        Hook::add('MapPoolUpdated', [MapList::class, 'sendUpdatedMaplist']);
-        Hook::add('MapQueueUpdated', [MapList::class, 'mapQueueUpdated']);
-        Hook::add('PlayerConnect', [MapList::class, 'playerConnect']);
+        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
+        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'sendManialink']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 

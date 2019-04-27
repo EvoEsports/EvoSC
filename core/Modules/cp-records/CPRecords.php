@@ -10,7 +10,7 @@ class CPRecords
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [CPRecords::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
     }
 
     public static function playerConnect(Player $player)

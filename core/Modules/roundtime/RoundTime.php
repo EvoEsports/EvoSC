@@ -11,7 +11,7 @@ class RoundTime
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [RoundTime::class, 'show']);
+        Hook::add('PlayerConnect', [self::class, 'show']);
     }
 
     public static function show(Player $player)
