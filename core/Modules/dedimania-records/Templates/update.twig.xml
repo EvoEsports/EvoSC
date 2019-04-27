@@ -13,7 +13,7 @@
         main(){
             declare Record[Integer] DediRecords_ for LocalUser;
             declare Integer LastDediRecordsUpdate for LocalUser;
-            declare Text dedisJson = """{$dedisJson|noescape}""";
+            declare Text dedisJson = """{{  dedisJson }}""";
 
             DediRecords_.fromjson(dedisJson);
             LastDediRecordsUpdate = GameTime;

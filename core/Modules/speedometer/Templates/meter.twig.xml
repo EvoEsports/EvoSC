@@ -3,20 +3,20 @@
     <frame id="speedometer" z-index="100">
         <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="RajdhaniMono"/>
         <label id="label" pos="0.5 -1.5" text="Km/H" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="RajdhaniMono"/>
-        <label class="action" pos="-12.5 2.5" size="22.5 6.5" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}c" ScriptEvents="1" />
+        <label class="action" pos="-12.5 2.5" size="22.5 6.5" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}c" ScriptEvents="1" />
         <label z-index="5" id="wrench" pos="-9 0.5" text="" halign="right" valign="center" textsize="0.5" textprefix="$s" textfont="RajdhaniMono" hidden="1"/>
     </frame>
 
     <frame id="settings" pos="-20 7" hidden="1">
         <quad id="handle" z-index="5" size="35 5" />
-        <quad z-index="-1" size="40 5" bgcolor="{config('colors.ui.header')}c" />
-        <quad z-index="-1" size="40 14" pos="0 -5" bgcolor="{config('colors.ui.background')}c" />
+        <quad z-index="-1" size="40 5" bgcolor="{{ config('colors.ui.header') }}c" />
+        <quad z-index="-1" size="40 14" pos="0 -5" bgcolor="{{ config('colors.ui.background') }}c" />
         <label class="close" pos="37.5 -2.5" size="5 5" halign="center" valign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
         <label pos="1 -2.5" size="30 5" halign="left" valign="center" textsize="0.3" text=" Speedometer Settings" textfont="RajdhaniMono" />
 
         <label pos="2 -7.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Show label" textfont="RajdhaniMono" />
-        <label id="label-disabled" class="label-disabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}3" textfont="RajdhaniMono" textcolor="9999" />
-        <label id="label-enabled" class="label-enabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}3" textfont="RajdhaniMono" textcolor="{config('colors.ui.header')}f" />
+        <label id="label-disabled" class="label-disabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}3" textfont="RajdhaniMono" textcolor="9999" />
+        <label id="label-enabled" class="label-enabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}3" textfont="RajdhaniMono" textcolor="{{ config('colors.ui.header') }}f" />
 
         <label pos="2 -11.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Scale" textfont="RajdhaniMono" />
         <entry id="entry-scale" class="entry" pos="14 -10.5" size="15 3" textsize="0.5" />
@@ -35,7 +35,7 @@
         Real scale;
     }
 
-    {(new esc\Classes\ManiaLinkDrag())|noescape}
+    {{ (new esc\Classes\ManiaLinkDrag()) }}
 
     main(){
         declare persistent SpeedoSettingsTest settings;

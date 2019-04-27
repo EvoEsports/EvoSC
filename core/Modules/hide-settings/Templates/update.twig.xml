@@ -3,7 +3,7 @@
     <script><!--
 main() {
     declare Integer hideSpeed for LocalUser = 1;
-    hideSpeed = {$speed|noescape};
+    hideSpeed = {{  speed }};
 }
 --></script>
 </manialink>

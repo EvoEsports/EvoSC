@@ -7,12 +7,12 @@
         <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
     </framemodel>
 
-    <frame id="widget" pos="{config('cp-pos-tracker.pos')}" size="40 60" scale="{config('cp-pos-tracker.scale')}">
+    <frame id="widget" pos="{{ config('cp-pos-tracker.pos') }}" size="40 60" scale="{{ config('cp-pos-tracker.scale') }}">
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="RajdhaniMono" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('cp-pos-tracker.show'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            <frameinstance modelid="record" pos="0 {{  i * -3 }}" hidden="1"/>
             {/for}
         </frame>
     </frame>
@@ -100,7 +100,7 @@
         foreach(cp => group in table){
             if(group.count > 0){
                 foreach(pos in group){
-                    if(i < {config('cp-pos-tracker.show')}){
+                    if(i < {{ config('cp-pos-tracker.show') }}){
                         declare record = (ranking.Controls[i] as CMlFrame);
                         (record.Controls[0] as CMlLabel).SetText((cp + 1) ^ ".");
                         (record.Controls[1] as CMlLabel).SetText(formatScoreCorrect(pos.time, False));
@@ -113,7 +113,7 @@
             }
         }
 
-        for(x, i, {config('cp-pos-tracker.show') - 1}){
+        for(x, i, {{ config('cp-pos-tracker.show') - 1 }}){
             (ranking.Controls[x] as CMlFrame).Hide();
         }
     }
@@ -129,7 +129,7 @@
         declare nick = player.User.Name;
 
         remove(login);
-        positions[login] = Position{ cp = cp, time = time, login = login, nick = nick };
+        positions[login] = Position{{  cp = cp, time = time, login = login, nick = nick  }};
         updateView();
     }
 

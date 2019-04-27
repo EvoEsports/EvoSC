@@ -4,11 +4,11 @@
     <framemodel id="button">
         <label valign="center" halign="center" textsize="0.75" text="" textcolor="eeee" />
         <label valign="center" size="23 2" textsize="1" text="button-text button-text" hidden="1" textcolor="eeee" scale="0.75" textfont="RajdhaniMono" />
-        <quad size="5.5 4" bgcolor="{config('colors.ui.background')}6" />
-        <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}e" />
+        <quad size="5.5 4" bgcolor="{{ config('colors.ui.background') }}6" />
+        <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}e" />
     </framemodel>
 
-    <frame id="cp" pos="{config('quick-buttons.pos')}" ScriptEvents="1" scale="0.9">
+    <frame id="cp" pos="{{ config('quick-buttons.pos') }}" ScriptEvents="1" scale="0.9">
         {for $i=0; $i<20; $i++}
         <frameinstance modelid="button" />
         {/for}
@@ -80,7 +80,7 @@
         setupFrameInstances(cp, alignLeft);
 
         declare Text[][] buttons = [
-        {$buttons|noescape}
+        {{  buttons }}
         ];
 
         fillButtons(cp, buttons);

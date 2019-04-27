@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:paypal-widget" id="paypal-widget" version="3">
-    <frame pos="{config('paypal.pos.visible')|noescape}" id="widget">
-        <quad id="background" pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" ScriptEvents="1" />
+    <frame pos="{{ config('paypal.pos.visible') }}" id="widget">
+        <quad id="background" pos="0 0" size="8 10" bgcolor="{{ config('colors.ui.background') }}" opacity="0.6" z-index="-1" ScriptEvents="1" />
 
         <frame z-index="2">
             <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://i.imgur.com/Lm0arwo.png" imagefocus="" />
@@ -18,8 +18,8 @@
         }
 
         main() {
-            declare Text visiblePos = "<frame pos='{config('paypal.pos.visible')|noescape}' />";
-            declare Text hiddenPos = "<frame pos='{config('paypal.pos.hidden')|noescape}' />";
+            declare Text visiblePos = "<frame pos='{{ config('paypal.pos.visible') }}' />";
+            declare Text hiddenPos = "<frame pos='{{ config('paypal.pos.hidden') }}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
             declare background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
             declare Boolean hidden = False;
@@ -34,13 +34,13 @@
                 foreach(event in PendingEvents){
                     if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
                         TriggerPageAction("rickroll");
-                        OpenLink("{config('paypal.url')|noescape}", ::LinkType::ExternalBrowser);
+                        OpenLink("{{ config('paypal.url') }}", ::LinkType::ExternalBrowser);
                     }
                     if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOver){
                         AnimMgr.Add(background, """<quad opacity="0.95" bgcolor="038" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                     if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOut){
-                        AnimMgr.Add(background, """<quad opacity="0.75" bgcolor="{config('colors.ui.background')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(background, """<quad opacity="0.75" bgcolor="{{ config('colors.ui.background') }}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                 }
 

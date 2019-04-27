@@ -6,8 +6,8 @@
             declare Text[Text][] Maps for LocalUser;
             declare Text[Text][Integer] MapAuthors for LocalUser;
             declare Integer MapUpdateTime for LocalUser = 0;
-            declare Text mapsJson = """{$maps|noescape}""";
-            declare Text mapAuthorsJson = """{$mapAuthors|noescape}""";
+            declare Text mapsJson = """{{  maps }}""";
+            declare Text mapAuthorsJson = """{{  mapAuthors }}""";
 
             MapAuthors.fromjson(mapAuthorsJson);
             Maps.fromjson(mapsJson);

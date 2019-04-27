@@ -13,7 +13,7 @@
         main(){
             declare Record[] LocalRecords__ for LocalUser;
             declare Integer LastLocalRecordsUpdate for LocalUser;
-            declare Text localsJson = """{$localsJson|noescape}""";
+            declare Text localsJson = """{{  localsJson }}""";
 
             LocalRecords__.fromjson(localsJson);
             LastLocalRecordsUpdate = GameTime;

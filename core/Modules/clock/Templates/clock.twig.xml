@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:clock-widget" id="clock-widget" version="3">
-    <frame pos="{config('clock.pos.visible')}" id="widget">
-        <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" />
+    <frame pos="{{ config('clock.pos.visible') }}" id="widget">
+        <quad id="bg" pos="0 0" size="8 10" bgcolor="{{ config('colors.ui.background') }}" opacity="0.6" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
         <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" textfont="RajdhaniMono" />
 
         <frame pos="-0.1 -0.05">
             <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
             <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
-            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{config('colors.ui.header')|noescape}F"/></frame>
+            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{{ config('colors.ui.header') }}F"/></frame>
         </frame>
     </frame>
 
@@ -25,8 +25,8 @@
             declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
             declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
             declare pointerSeconds <=> (Page.MainFrame.GetFirstChild("pointerSeconds") as CMlQuad);
-            declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
-            declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
+            declare Text visiblePos = "<frame pos='{{ config('clock.pos.visible') }}' />";
+            declare Text hiddenPos = "<frame pos='{{ config('clock.pos.hidden') }}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
             declare Boolean hidden = False;
             declare Boolean isLapRace = Map.TMObjective_IsLapRace;

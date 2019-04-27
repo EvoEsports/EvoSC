@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Dedimania" id="Dedimania" version="3">
-    <label id="header-color" textcolor="{config('colors.ui.header')|noescape}" />
+    <label id="header-color" textcolor="{{ config('colors.ui.header') }}" />
 
     <framemodel id="record">
         <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="RajdhaniMono"/>
         <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
         <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
         <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
-        <quad pos="-1 -0.2" size="45 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+        <quad pos="-1 -0.2" size="45 3" bgcolor="{{ config('colors.ui.header') }}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
     </framemodel>
 
     <framemodel id="window-record">
         <quad class="record" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
 
         <frame z-index="10" pos="0 0" hidden="1">
-            <label class="record-button profile" z-index="1" pos="21.5 0" size="43 3" text=" Profile" textsize="0.2" halign="center" valign="center" textfont="RajdhaniMono" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}9" focusareacolor2="{config('colors.ui.header')}c" />
+            <label class="record-button profile" z-index="1" pos="21.5 0" size="43 3" text=" Profile" textsize="0.2" halign="center" valign="center" textfont="RajdhaniMono" ScriptEvents="1" focusareacolor1="{{ config('colors.ui.header') }}9" focusareacolor2="{{ config('colors.ui.header') }}c" />
         </frame>
 
         <frame z-index="0">
@@ -22,41 +22,41 @@
             <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="RajdhaniMono"/>
             <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="RajdhaniMono"/>
             <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="RajdhaniMono"/>
-            <quad pos="-1 -0.2" size="44 3" bgcolor="{config('colors.ui.header')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+            <quad pos="-1 -0.2" size="44 3" bgcolor="{{ config('colors.ui.header') }}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
         </frame>
     </framemodel>
 
-    <frame id="widget" pos="{config('dedimania.pos')}" scale="{config('dedimania.scale')}" z-index="100">
-        <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.background')}" opacity="0.8" ScriptEvents="1"/>
-        <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.background')}" opacity="0.6"/>
-        <quad size="45 5" bgcolor="{config('colors.ui.header')}" opacity="0.8"/>
+    <frame id="widget" pos="{{ config('dedimania.pos') }}" scale="{{ config('dedimania.scale') }}" z-index="100">
+        <quad class="widget" z-index="-1" size="45 {{ config('dedimania.rows') * 3 + 6.5 }}" bgcolor="{{ config('colors.ui.background') }}" opacity="0.8" ScriptEvents="1"/>
+        <quad z-index="-2" pos="0 -5" size="45 {{ config('dedimania.showtop') * 3 + 0.7 }}" bgcolor="{{ config('colors.ui.background') }}" opacity="0.6"/>
+        <quad size="45 5" bgcolor="{{ config('colors.ui.header') }}" opacity="0.8"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textfont="RajdhaniMono"/>
 
         <frame id="records" pos="1 -7">
             {for $i=0; $i<config('dedimania.rows'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            <frameinstance modelid="record" pos="0 {{  i * -3 }}" hidden="1"/>
             {/for}
         </frame>
     </frame>
 
     <frame id="window" pos="-90 40" hidden="1">
         <quad id="handle" size="175 6" z-index="5" />
-        <quad size="180 6" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
-        <quad id="bg" size="180 79" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="0" />
+        <quad size="180 6" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9" z-index="0" />
+        <quad id="bg" size="180 79" pos="0 -6" bgcolor="{{ config('colors.ui.background') }}" opacity="0.9" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="🏆 Dedimania records" z-index="1" textprefix="$s" textfont="RajdhaniMono" />
         <label class="close" pos="177 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="0003" ScriptEvents="1" textfont="RajdhaniMono" />
 
         <frame pos="2 -9" z-index="2">
             <frame id="window-records">
                 {for $i=0; $i<100; $i++}
-                <frameinstance class="window-record" modelid="window-record" pos="{floor($i/25) * 44} {($i%25) * -3}"/>
+                <frameinstance class="window-record" modelid="window-record" pos="{{  floor(i/25) * 44 }} {{  (i%25) * -3 }}"/>
                 {/for}
             </frame>
         </frame>
 
         <frame id="details-frame" z-index="10" pos="0 -6" size="44 77" hidden="1">
-            <quad z-index="-2" size="200 200" bgcolor="{config('colors.ui.header')}1" />
-            <quad z-index="-1" size="200 200" bgcolor="{config('colors.ui.background')}" opacity="0.95" />
+            <quad z-index="-2" size="200 200" bgcolor="{{ config('colors.ui.header') }}1" />
+            <quad z-index="-1" size="200 200" bgcolor="{{ config('colors.ui.background') }}" opacity="0.95" />
             <label text="Name" pos="2 -3" size="40" textsize="1.4" textfont="RajdhaniMono" />
             <label text="Score" pos="2 -7" textsize="1.2" textfont="RajdhaniMono" />
 
@@ -64,12 +64,12 @@
             <quad pos="2 -17" size="40 0.1" bgcolor="fff6" />
             <frame pos="2 -18.5" scale="0.95">
                 {for $i=0; $i<20; $i++}
-                <label halign="right" text="{$i + 1}." pos="3.5 {$i * -3}" textsize="0.6" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
-                <label halign="left" text="timetimetimetime" size="16 3" pos="4.5 {$i * -3}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
+                <label halign="right" text="{{  i + 1 }}." pos="3.5 {{  i * -3 }}" textsize="0.6" textcolor="{{ config('colors.ui.header') }}" textfont="RajdhaniMono" />
+                <label halign="left" text="timetimetimetime" size="16 3" pos="4.5 {{  i * -3 }}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
                 {/for}
                 {for $i=0; $i<20; $i++}
-                <label halign="right" text="{$i + 21}." pos="25 {$i * -3}" textsize="0.6" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
-                <label halign="left" text="timetimetimetime" size="16 3" pos="26 {$i * -3}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
+                <label halign="right" text="{{  i + 21 }}." pos="25 {{  i * -3 }}" textsize="0.6" textcolor="{{ config('colors.ui.header') }}" textfont="RajdhaniMono" />
+                <label halign="left" text="timetimetimetime" size="16 3" pos="26 {{  i * -3 }}" textcolor="fffd" textsize="0.6" textfont="RajdhaniMono" />
                 {/for}
             </frame>
         </frame>
@@ -78,17 +78,17 @@
             <label id="page-info" pos="6 0" size="8 3.5" valign="center"
                    halign="center" text="1/1" textsize="0.8"/>
             <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
-                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                   focusareacolor2="{config('colors.ui.header')}c"/>
+                   textsize="1" ScriptEvents="1" focusareacolor1="{{ config('colors.ui.header') }}3"
+                   focusareacolor2="{{ config('colors.ui.header') }}c"/>
             <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
-                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                   focusareacolor2="{config('colors.ui.header')}c"/>
+                   textsize="1" ScriptEvents="1" focusareacolor1="{{ config('colors.ui.header') }}3"
+                   focusareacolor2="{{ config('colors.ui.header') }}c"/>
         </frame>
     </frame>
 
     <frame id="confirm-dialog" pos="-40 9" z-index="10" hidden="1">
-        <quad size="80 18" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" />
-        <quad size="80 2" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad size="80 18" bgcolor="{{ config('colors.ui.background') }}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9" z-index="0" />
         <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
 
         <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
@@ -306,8 +306,8 @@
         declare filled = 0;
         declare skipped = 0;
         declare skip = 0;
-        declare showTop = {config('dedimania.showtop')};
-        declare max = {config('dedimania.rows')};
+        declare showTop = {{ config('dedimania.showtop') }};
+        declare max = {{ config('dedimania.rows') }};
         declare toFill = max - showTop;
 
         if(myRank == -1){
@@ -383,8 +383,8 @@
         return answer;
     }
 
-    {(new esc\Classes\HideScript())|noescape}
-    {(new esc\Classes\ManiaLinkDrag())|noescape}
+    {{ (new esc\Classes\HideScript()) }}
+    {{ (new esc\Classes\ManiaLinkDrag()) }}
 
     main(){
         declare Record[Integer] DediRecords_ for LocalUser;
@@ -398,7 +398,7 @@
         currentPage = 0;
         maxPage = 0;
 
-        headerColor = TL::ToColor("{config('colors.ui.header')|noescape}");
+        headerColor = TL::ToColor("{{ config('colors.ui.header') }}");
 
         while(True){
             yield;

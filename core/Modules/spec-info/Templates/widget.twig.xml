@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:spec-info.widget" id="spec-info.widget" version="3">
-    <frame pos="{config('spec-info.pos')}" scale="0.8" z-index="-20">
-        {foreach $spectators as $key => $spectator}
-        <frame pos="0 {$key * -4}">
-            <label pos="-7 0" text="{stripAll($spectator->NickName)|noescape}" textsize="0.9" halign="right" valign="center" />
+    <frame pos="{{ config('spec-info.pos') }}" scale="0.8" z-index="-20">
+        {% for key, spectator in spectators %}
+        <frame pos="0 {{  key * -4 }}">
+            <label pos="-7 0" text="{{   stripAll(spectator.NickName) }}" textsize="0.9" halign="right" valign="center" />
             <label pos="-2 0" text="" textsize="1" halign="right" valign="center" />
         </frame>
-        {/foreach}
+        {% endfor %}
     </frame>
 </manialink>

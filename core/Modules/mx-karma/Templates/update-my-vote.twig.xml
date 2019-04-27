@@ -3,7 +3,7 @@
     <script><!--
 main(){
     declare Integer MxKarmaRating for LocalUser;
-    MxKarmaRating = {$rating};
+    MxKarmaRating = {{  rating }};
 }
     --></script>
 </manialink>

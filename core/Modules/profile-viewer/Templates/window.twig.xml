@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Profile" id="Profile" version="3">
     <framemodel id="info">
-        <label pos="0 0" textsize="0.1" text="Label" textcolor="{config('colors.ui.header')}" textfont="RajdhaniMono" />
+        <label pos="0 0" textsize="0.1" text="Label" textcolor="{{ config('colors.ui.header') }}" textfont="RajdhaniMono" />
         <label pos="0 -2" textsize="0.75" size="24 4" text="Value" textfont="RajdhaniMono" />
     </framemodel>
 
     <frame id="window" pos="-50 16" size="120 180" z-index="3">
-        <quad pos="0 0" size="200 5" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="-1" />
+        <quad pos="0 0" size="200 5" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9" z-index="-1" />
         <quad id="handle" pos="0 0" size="200 5" z-index="5" />
-        <quad id="bg" pos="0 -5" size="200 33" bgcolor="{config('colors.ui.background')}" opacity="0.95" z-index="-1" />
+        <quad id="bg" pos="0 -5" size="200 33" bgcolor="{{ config('colors.ui.background') }}" opacity="0.95" z-index="-1" />
         <label textfont="RajdhaniMono" pos="2 -2.5" textsize="0.8" text=" Player Profile" textprefix="$s" valign="center" />
         <label id="close" class="close" pos="97.5 -2.5" size="5 5" textsize="0.2" text="❌" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
 
-        <quad pos="12 -7" z-index="10" halign="center" size="11 11" image="file://Avatars/{$values['Login']|noescape}/default" />
-        <quad pos="12 -19.5" z-index="10" halign="center" size="5 4" image="file://ZoneFlags/Path/{$zonePath|noescape}" />
+        <quad pos="12 -7" z-index="10" halign="center" size="11 11" image="file://Avatars/{{  values['Login'] }}/default" />
+        <quad pos="12 -19.5" z-index="10" halign="center" size="5 4" image="file://ZoneFlags/Path/{{  zonePath }}" />
 
         <frame id="content" size="125 80" pos="24 -7" z-index="5">
             {for $i=0; $i<count($values); $i++}
-            <frameinstance modelid="info" pos="{floor($i / 5) * 25} {$i * -6 + floor($i / 5) * 30}"></frameinstance>
+            <frameinstance modelid="info" pos="{{  floor(i / 5) * 25 }} {{  i * -6 + floor($i / 5) * 30 }}"></frameinstance>
             {/for}
         </frame>
     </frame>
@@ -26,7 +26,7 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-{(new esc\Classes\ManiaLinkDrag())|noescape}
+{{ (new esc\Classes\ManiaLinkDrag()) }}
 
 main() {
     declare Text[Text] values;
@@ -36,7 +36,7 @@ main() {
     declare handle <=> (Page.MainFrame.GetFirstChild("handle") as CMlFrame);
     declare i = 0;
 
-    values.fromjson("""{$values->toJson()|noescape}""");
+    values.fromjson("""{{   values.toJson() }}""");
 
     foreach(label => value in values){
         declare info = (content.Controls[i] as CMlFrame);
@@ -45,7 +45,7 @@ main() {
         i = i + 1;
     }
 
-    declare width = {floor(count($values) / 5) * 25 + 50}.0;
+    declare width = {{  floor(count(values) / 5) * 25 + 50 }}.0;
     window.Size = <width, window.Size[1]>;
     window.RelativePosition_V3 = <width / -2.0, window.RelativePosition_V3[1]>;
     handle.Size = <width - 30.0, handle.Size[1]>;

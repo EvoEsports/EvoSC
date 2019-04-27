@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:donations-widget" id="donations-widget" version="3">
-    <frame id="main-frame" pos="{config('donations.pos.visible')}" size="50 5" scale="0.8">
-        <quad size="50 5" z-index="0" bgcolor="{background_color()|noescape}9" id="bg-quad" ScriptEvents="1" />
+    <frame id="main-frame" pos="{{ config('donations.pos.visible') }}" size="50 5" scale="0.8">
+        <quad size="50 5" z-index="0" bgcolor="{{ background_color() }}9" id="bg-quad" ScriptEvents="1" />
 
         <frame id="content-frame" pos="0 -7.55" z-index="1">
             <label pos="25 5" halign="center" valign="center" textsize="1" textcolor="ffff" text="Donate planets" textfont="RajdhaniMono"/>
             <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="1" textcolor="ffff" text="12000 Planets" z-index="3" textfont="RajdhaniMono"/>
-            <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 5" bgcolor="{config('colors.ui.header')|noescape}9" />
+            <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 5" bgcolor="{{ config('colors.ui.header') }}9" />
         </frame>
     </frame>
 
@@ -15,15 +15,15 @@
         #Include "MathLib" as ML
         #Include "TextLib" as TL
 
-        {(new esc\Classes\HideScript('main-frame'))|noescape}
+        {{ (new esc\Classes\HideScript('main-frame')) }}
 
         Void anim(CMlFrame frame, Text targetPos){
             AnimMgr.Add(frame, targetPos, 200, CAnimManager::EAnimManagerEasing::CubicInOut);
         }
 
         main(){
-            declare Text visible = "<frame pos='{config('donations.pos.visible')|noescape}' />";
-            declare Text hidden = "<frame pos='{config('donations.pos.hidden')|noescape}' />";
+            declare Text visible = "<frame pos='{{ config('donations.pos.visible') }}' />";
+            declare Text hidden = "<frame pos='{{ config('donations.pos.hidden') }}' />";
             declare Boolean isHidden = False;
 
             declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg-quad") as CMlQuad);
@@ -34,7 +34,7 @@
 
             declare Boolean barVisible = False;
             declare Integer amount = 0;
-            declare Real xOffset = {sprintf('%.1f', floatval(explode(' ', config('donations.pos.visible'))[0]))|noescape};
+            declare Real xOffset = {{ sprintf('%.1f', floatval(explode(' ', config('donations.pos.visible'))[0])) }};
 
             while(True){
                 yield;

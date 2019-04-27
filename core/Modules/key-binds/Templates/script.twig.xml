@@ -6,7 +6,7 @@
 
     main(){
         declare persistent Text[Text] CustomKeyBinds for LocalUser;
-        declare Text[Text][] keyBinds = {$binds|noescape};
+        declare Text[Text][] keyBinds = {{  binds }};
 
         foreach(key => bind in keyBinds){
             keyBinds[key]["key"] = TL::ToLowerCase(bind["default"]);

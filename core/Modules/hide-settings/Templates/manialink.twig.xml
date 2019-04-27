@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:HideSettings" id="HideSettings" version="3">
     <frame id="settings" pos="-20 10">
-        <quad size="40 5" bgcolor="{config('colors.ui.header')}c" z-index="-1" />
+        <quad size="40 5" bgcolor="{{ config('colors.ui.header') }}c" z-index="-1" />
         <quad size="40 20" bgcolor="000c" z-index="-1" />
         <label textfont="RajdhaniMono" pos="1.5 -2.5" valign="center" textsize="0.5" textprefix="$s" text="UI Autohide config" />
         <label textfont="RajdhaniMono" class="close" pos="37.5 -2.5" size="5 5" valign="center" halign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0001" />
 
         <label textfont="RajdhaniMono" id="speed" pos="20 -8" textsize="0.2" textprefix="Speed: " text="1.0" halign="center" valign="center" />
         <quad class="bar" pos="2 -10" size="36 2" bgcolor="000c" ScriptEvents="1" />
-        <quad id="currentBar" pos="2 -10" size="0 2" bgcolor="{config('colors.ui.header')}6" z-index="1" />
-        <quad id="hoverBar" pos="2 -10" size="0 2" bgcolor="{config('colors.ui.header')}a" z-index="2" />
+        <quad id="currentBar" pos="2 -10" size="0 2" bgcolor="{{ config('colors.ui.header') }}6" z-index="1" />
+        <quad id="hoverBar" pos="2 -10" size="0 2" bgcolor="{{ config('colors.ui.header') }}a" z-index="2" />
 
-        <label textfont="RajdhaniMono" class="save" pos="20 -16" scale="0.8" size="20 5" text="Save" textsize="1" valign="center" halign="center" focusareacolor1="{config('colors.ui.header')}9" focusareacolor2="{config('colors.ui.header')}c" ScriptEvents="1" />
+        <label textfont="RajdhaniMono" class="save" pos="20 -16" scale="0.8" size="20 5" text="Save" textsize="1" valign="center" halign="center" focusareacolor1="{{ config('colors.ui.header') }}9" focusareacolor2="{{ config('colors.ui.header') }}c" ScriptEvents="1" />
     </frame>
 
     <script><!--
@@ -24,7 +24,7 @@
     }
 
     main(){
-        declare savedSpeed = {$speed|noescape};
+        declare savedSpeed = {{  speed }};
         declare speed = 0;
         declare settings = (Page.MainFrame.GetFirstChild("settings") as CMlFrame);
         declare currentBar = (Page.MainFrame.GetFirstChild("currentBar") as CMlQuad);

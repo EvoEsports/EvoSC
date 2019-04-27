@@ -4,26 +4,26 @@
         <quad pos="0 0" size="120 5" valign="center" bgcolor="000" z-index="-1" opacity="0.9" />
         <label pos="2 0" size="26 5" valign="center" textsize="0.75" text="-- nickname --" />
         <label pos="29 0" size="14 5" valign="center" textsize="0.75" text="-- login --" />
-        <label class="profile" pos="51 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Profile" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}a" />
+        <label class="profile" pos="51 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Profile" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}a" />
 
         <frame class="admin-buttons" pos="64 0">
-            <label class="warn" pos="0 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Warn" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
-            <label class="kick" pos="13 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Kick" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
-            <label class="ban" pos="26 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Ban" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
-            <label class="mute" pos="39 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Mute" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.warning')}a" />
+            <label class="warn" pos="0 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Warn" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.warning') }}a" />
+            <label class="kick" pos="13 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Kick" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.warning') }}a" />
+            <label class="ban" pos="26 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Ban" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.warning') }}a" />
+            <label class="mute" pos="39 0" size="12 3.5" valign="center" halign="center" textsize="0.5" text=" Mute" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.warning') }}a" />
         </frame>
     </framemodel>
 
     <frame id="playerlist" pos="-60 42.5" size="120 180">
-        <quad pos="0 0" size="120 5" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="-1" />
+        <quad pos="0 0" size="120 5" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9" z-index="-1" />
         <quad id="handle" pos="0 0" size="115 5" z-index="5" />
-        <quad id="bg" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.8" z-index="-1" />
+        <quad id="bg" pos="0 -5" bgcolor="{{ config('colors.ui.background') }}" opacity="0.8" z-index="-1" />
         <label pos="2 -2.5" textsize="0.8" text="👥 Player List" textprefix="$s" valign="center" />
         <label class="close" pos="117.5 -2.5" size="5 5" textsize="0.2" text="❌" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
 
         <frame id="content" size="120 80" pos="0 -5" z-index="5">
             {for $i=1; $i<=20; $i++}
-            <frameinstance modelid="row" pos="0 {$i * -5 + 2.5}"></frameinstance>
+            <frameinstance modelid="row" pos="0 {{  i * -5 + 2.5 }}"></frameinstance>
             {/for}
         </frame>
 
@@ -31,19 +31,19 @@
             <label id="page-info" pos="6 0" size="8 3.5" valign="center"
                    halign="center" text="1/1" textsize="0.8"/>
             <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
-                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                   focusareacolor2="{config('colors.ui.header')}c"/>
+                   textsize="1" ScriptEvents="1" focusareacolor1="{{ config('colors.ui.header') }}3"
+                   focusareacolor2="{{ config('colors.ui.header') }}c"/>
             <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
-                   textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
-                   focusareacolor2="{config('colors.ui.header')}c"/>
+                   textsize="1" ScriptEvents="1" focusareacolor1="{{ config('colors.ui.header') }}3"
+                   focusareacolor2="{{ config('colors.ui.header') }}c"/>
         </frame>
     </frame>
 
     <frame id="input-dialog" pos="-40 11" z-index="10" hidden="1">
-        <quad size="80 22" bgcolor="{config('colors.ui.background')}" opacity="0.9" z-index="-1" />
-        <quad size="80 2" bgcolor="{config('colors.ui.header')}" opacity="0.9" z-index="0" />
+        <quad size="80 22" bgcolor="{{ config('colors.ui.background') }}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9" z-index="0" />
         <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
-        <entry pos="40 -11" size="60 4" valign="center" halign="center" textsize="1" focusareacolor1="{config('colors.ui.header')}1" focusareacolor2="{config('colors.ui.header')}3" />
+        <entry pos="40 -11" size="60 4" valign="center" halign="center" textsize="1" focusareacolor1="{{ config('colors.ui.header') }}1" focusareacolor2="{{ config('colors.ui.header') }}3" />
 
         <label class="confirm" pos="32 -17" z-index="0" size="15 5" text="Confirm" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
         <label class="cancel" pos="48 -17" z-index="0" size="15 5" text="Cancel" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
@@ -58,7 +58,7 @@ declare CMlFrame content;
 declare CMlQuad bg;
 declare Integer page;
 
-{(new esc\Classes\ManiaLinkDrag())|noescape}
+{{ (new esc\Classes\ManiaLinkDrag()) }}
 
 Void updateList(Integer playerCount){
     declare sizeMultiplier = playerCount;

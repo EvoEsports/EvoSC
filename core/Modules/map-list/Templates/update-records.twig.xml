@@ -6,8 +6,8 @@
             declare Integer[Text] Locals for LocalUser;
             declare Integer[Text] Dedis for LocalUser;
 
-            declare Text localsJson = """{$locals|noescape}""";
-            declare Text dedisJson = """{$dedis|noescape}""";
+            declare Text localsJson = """{{  locals }}""";
+            declare Text dedisJson = """{{  dedis }}""";
 
             Locals.fromjson(localsJson);
             Dedis.fromjson(dedisJson);

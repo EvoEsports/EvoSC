@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MxKarma:MxKarmaWidget" id="MxKarmaWidget" version="3">
-    <frame id="widget" pos="{config('mx-karma.pos')|noescape}" scale="{config('mx-karma.scale')}">
-        <quad pos="0 0" z-index="-1" size="50 12" bgcolor="{config('colors.ui.background')|noescape}a"  hidden="0"/>
-        <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.header')|noescape}c" hidden="1"/>
+    <frame id="widget" pos="{{ config('mx-karma.pos') }}" scale="{{ config('mx-karma.scale') }}">
+        <quad pos="0 0" z-index="-1" size="50 12" bgcolor="{{ config('colors.ui.background') }}a"  hidden="0"/>
+        <quad pos="0 0" z-index="0" size="50 6" bgcolor="{{ config('colors.ui.header') }}c" hidden="1"/>
         <label textfont="RajdhaniMono" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".8" valign="center"/>
 
         <frame z-index="2" pos="0 -6">
@@ -113,7 +113,7 @@ Void updateMyRating(Integer myRating){
 
 }
 
-{(new esc\Classes\HideScript())|noescape}
+{{ (new esc\Classes\HideScript()) }}
 
 main(){
     declare Integer MxKarmaRating for LocalUser = -2;
@@ -121,7 +121,7 @@ main(){
     declare Real MxKarmaAverage for LocalUser = 0.0;
     declare Real lastKarma = 0.0;
 
-    MxKarmaAverage = {($rating ?: -1)|noescape} * 1.0;
+    MxKarmaAverage = {{  (rating ?: -1) }} * 1.0;
     updateMyRating(MxKarmaRating);
 
     while(True){

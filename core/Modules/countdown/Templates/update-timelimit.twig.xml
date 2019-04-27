@@ -9,8 +9,8 @@
         declare Text TL_Hash for InputPlayer;
         declare Integer TL_Limit for InputPlayer;
 
-        TL_Hash = {uniqid()};
-        TL_Limit = {$timeLimit};
+        TL_Hash = {{ uniqid() }};
+        TL_Limit = {{  timeLimit }};
     }
 
     --></script>

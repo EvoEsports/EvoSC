@@ -7,14 +7,14 @@
         <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
     </framemodel>
 
-    <frame id="widget" pos="{config('live-rankings.pos')}" size="40 60" scale="{config('live-rankings.scale')}" z-index="5000">
-        <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.6" ScriptEvents="1"/>
-        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.9"/>
+    <frame id="widget" pos="{{ config('live-rankings.pos') }}" size="40 60" scale="{{ config('live-rankings.scale') }}" z-index="5000">
+        <quad class="widget" z-index="-5" size="40 {{ config('live-rankings.show') * 3 + 1 }}" pos="0 -5" bgcolor="{{ config('colors.ui.background') }}" opacity="0.6" ScriptEvents="1"/>
+        <quad size="40 5" bgcolor="{{ config('colors.ui.header') }}" opacity="0.9"/>
         <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="RajdhaniMono" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('live-rankings.show'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            <frameinstance modelid="record" pos="0 {{  i * -3 }}" hidden="1"/>
             {/for}
         </frame>
     </frame>
@@ -82,7 +82,7 @@
 
     Void updateList(){
         declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
-        declare Integer max = {config('live-rankings.show')};
+        declare Integer max = {{ config('live-rankings.show') }};
         declare Integer i = 0;
 
         scores = scores.sort();
@@ -110,7 +110,7 @@
         scores = Integer[Text];
     }
 
-    {(new esc\Classes\HideScript())|noescape}
+    {{ (new esc\Classes\HideScript()) }}
 
     main(){
         declare Text currentMapUid = Map.MapInfo.MapUid;

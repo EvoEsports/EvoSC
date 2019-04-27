@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
-    <frame id="widget" size="50 30" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
+    <frame id="widget" size="50 30" pos="{{ config('votes.pos') }}" scale="{{ config('votes.scale') * 0.5 }}" z-index="50000">
         <quad pos="2 -6" z-index="1" size="46 0.5" bgcolor="3333"/>
         <quad pos="2 -6" z-index="2" size="3 0.5" bgcolor="1f8c"/>
         <quad pos="48 -6" z-index="2" size="3 0.5" halign="right" bgcolor="f33c"/>
 
-        <label class="yes" textfont="RajdhaniMono" pos="2 -3" z-index="1" size="16 2.8" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9"/>
-        <label class="no" textfont="RajdhaniMono" pos="48 -3" z-index="1" size="16 2.8" halign="right" textprefix="F6 $fff" text="0 NO" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9"/>
+        <label class="yes" textfont="RajdhaniMono" pos="2 -3" z-index="1" size="16 2.8" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}9"/>
+        <label class="no" textfont="RajdhaniMono" pos="48 -3" z-index="1" size="16 2.8" halign="right" textprefix="F6 $fff" text="0 NO" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{{ config('colors.ui.header') }}9"/>
 
-        <label textfont="RajdhaniMono" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{config('votes.duration')}" valign="center" textsize="0.6" textcolor="fff8"/>
+        <label textfont="RajdhaniMono" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{{ config('votes.duration') }}" valign="center" textsize="0.6" textcolor="fff8"/>
 
-        <label id="question" textfont="RajdhaniMono" pos="25 -8.5" z-index="1" size="49 5" textprefix="$s" autonewline="1" text="{$question}" halign="center" textsize="1.25"/>
+        <label id="question" textfont="RajdhaniMono" pos="25 -8.5" z-index="1" size="49 5" textprefix="$s" autonewline="1" text="{{  question }}" halign="center" textsize="1.25"/>
 
         <quad id="bg1" pos="0 0" size="50 13" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
-        <quad id="bg2" pos="0 0" size="50 13" bgcolor="{config('colors.ui.header')}" opacity="0.65" z-index="-2" />
+        <quad id="bg2" pos="0 0" size="50 13" bgcolor="{{ config('colors.ui.header') }}" opacity="0.65" z-index="-2" />
 
         <script><!--
     #Include "MathLib" as ML
@@ -34,7 +34,7 @@
         declare noLabel = (widget.Controls[4] as CMlLabel);
         declare timeLeftLabel = (widget.Controls[5] as CMlLabel);
         declare Real backgroundBarWidth = backgroundBar.Size[0];
-        declare Integer duration = {config('votes.duration')};
+        declare Integer duration = {{ config('votes.duration') }};
         declare bg1 <=> (Page.MainFrame.GetFirstChild("bg1") as CMlQuad);
         declare bg2 <=> (Page.MainFrame.GetFirstChild("bg2") as CMlQuad);
         declare questionLabel <=> (Page.MainFrame.GetFirstChild("question") as CMlLabel);
@@ -46,7 +46,7 @@
 
         widget.RelativePosition_V3 = <(widget.Size[0]*widget.RelativeScale)/-2.0, widget.RelativePosition_V3[1]>;
         declare targetPos = (widget.Size[0]/-2.0) ^ " " ^ widget.RelativePosition_V3[1];
-        declare targetScale = """ <frame pos='""" ^ targetPos ^ """' scale="{config('votes.scale')|noescape}" /> """;
+        declare targetScale = """ <frame pos='""" ^ targetPos ^ """' scale="{{ config('votes.scale') }}" /> """;
         AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
 
         declare startTime = GameTime;

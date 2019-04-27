@@ -4,7 +4,7 @@
         <!--
         main(){
             declare Text[Text][] MapQueue for LocalUser;
-            declare Text mapQueueJson = """{$mapQueue|noescape}""";
+            declare Text mapQueueJson = """{{  mapQueue }}""";
 
             MapQueue.fromjson(mapQueueJson);
         }
