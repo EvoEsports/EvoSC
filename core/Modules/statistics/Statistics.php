@@ -104,7 +104,7 @@ class Statistics
             $player->stats()->update(['Score' => $limit * $localsCount - $rankSum]);
         });
 
-        self::$totalRankedPlayers = $players->count();
+        self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
         self::updatePlayerRanks($players);
         Player::where('Score', '>', 0)->update(['Score' => 0]);
     }
