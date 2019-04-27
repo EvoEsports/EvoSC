@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:added-time-info" id="added-time-info" version="3">
-    <frame id="widget" pos="158.5 -14.25" z-index="100" hidden="{{  addedMinutes == 0 ? '1' : '0' }}">
-        <label z-index="5" text="{{  (addedMinutes > 0 ? '+' : '') }}{{  addedMinutes }} min." halign="right" valign="center" textsize="2" scale="0.8" textprefix="$s" textfont="RajdhaniMono"/>
-    </frame>
-</manialink>

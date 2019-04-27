@@ -187,7 +187,7 @@ class Player extends Model
      *
      * @return bool
      */
-    public function hasAccess(string $right)
+    public function hasAccess(string $right): bool
     {
         if (!$this->group) {
             return false;

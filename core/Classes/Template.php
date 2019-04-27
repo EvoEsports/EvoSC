@@ -4,6 +4,7 @@ namespace esc\Classes;
 
 
 use esc\Controllers\TemplateController;
+use esc\Controllers\TemplateControllerTwig;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 

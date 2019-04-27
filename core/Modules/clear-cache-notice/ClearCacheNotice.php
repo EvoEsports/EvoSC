@@ -18,7 +18,6 @@ class ClearCacheNotice
 
     public function showNotice(Player $player)
     {
-        TemplateController::loadTemplates();
         Template::show($player, 'clear-cache-notice.window');
     }
 }

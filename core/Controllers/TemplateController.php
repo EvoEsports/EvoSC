@@ -40,9 +40,6 @@ class TemplateController implements ControllerInterface
 
         ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'user.ban');
 
-        self::$templates = collect();
-        self::$latte     = new Engine();
-        self::addCustomFilters();
         self::loadTemplates();
     }
 
@@ -112,6 +109,10 @@ class TemplateController implements ControllerInterface
     public static function loadTemplates($args = null)
     {
         Log::logAddLine('TemplateController', 'Loading templates...');
+
+        self::$templates = collect();
+        self::$latte     = new Engine();
+        self::addCustomFilters();
 
         //Get all template files in core directory
         self::$templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')

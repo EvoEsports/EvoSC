@@ -82,6 +82,8 @@ class Migrate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->writeln('Executing migrations...');
+
         $config = json_decode(file_get_contents('config/database.config.json'));
 
         $capsule = new Capsule();

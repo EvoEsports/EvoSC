@@ -6,14 +6,15 @@ use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use esc\Modules\KeyBinds;
 
 class MusicClient
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
-        // KeyController::createBind('X', [self::class, 'reload']);
+        KeyBinds::add('reload_music_client', 'Reload music client.', [self::class, 'reload'], 'F2', 'ms');
     }
 
     /**

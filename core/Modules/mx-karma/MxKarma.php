@@ -129,7 +129,6 @@ class MxKarma extends MXK
         self::sendUpdatedKarma();
 
         $playerIds = onlinePlayers()->pluck('id');
-
         $ratings = $map->ratings()->whereIn('Player', $playerIds)->get()->pluck('Rating', 'Player');
 
         onlinePlayers()->each(function (Player $player) use ($ratings) {

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:hide-script-settings" id="hide-script-settings" version="3">
-    <script><!--
-main() {
-    declare Integer hideSpeed for LocalUser = 1;
-    hideSpeed = {{  speed }};
-}
---></script>
-</manialink>
