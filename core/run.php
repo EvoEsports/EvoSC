@@ -94,7 +94,7 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->migrate($input, $output);
+        // $this->migrate($input, $output);
 
         global $_isVerbose;
         global $_isVeryVerbose;
