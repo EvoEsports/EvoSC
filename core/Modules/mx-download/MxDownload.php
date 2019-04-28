@@ -73,6 +73,7 @@ class MxDownload
                     $map->update([
                         'enabled'  => 1,
                         'cooldown' => 999,
+                        'gbx'      => MapController::getGbxInformation($map->filename),
                     ]);
                     infoMessage($player, ' enabled ', $map)->sendAll();
                     Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
