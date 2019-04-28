@@ -63,18 +63,17 @@ class MxDownload
 
             $info = $info[0];
 
-            //129638
+            //101269
 
             if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
 
                 if (!$map->enabled) {
-                    $map->update([
-                        'enabled'  => 1,
-                        'cooldown' => 999,
-                        'gbx'      => MapController::getGbxInformation($map->filename),
-                    ]);
+                    $map->enabled  = true;
+                    $map->cooldown = 999;
+                    $map->gbx      = MapController::getGbxInformation($map->filename);
+                    $map->save();
                     infoMessage($player, ' enabled ', $map)->sendAll();
                     Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
                 } else {
