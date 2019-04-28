@@ -414,10 +414,10 @@ class MapController implements ControllerInterface
                     ]);
                 }
             } else {
-                if (Map::whereUid($uid)->count() > 0) {
+                if (Map::whereUid($uid)->exists()) {
                     $map = Map::whereUid($uid)->first();
 
-                    Log::logAddLine('MapController', "Filename changed for map: $map (" . $map->filename . " -> $filename)", isVerbose());
+                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)", isVerbose());
 
                     $map->update([
                         'filename' => $filename,

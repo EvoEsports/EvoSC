@@ -39,7 +39,6 @@ class MxDownload
                 continue;
             }
 
-            /*
             $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
             if ($infoResponse->getStatusCode() != 200) {
@@ -49,18 +48,20 @@ class MxDownload
                 continue;
             }
 
-            Log::logAddLine('MxDownload', 'Received: ' . $infoResponse->getBody()->getContents());
-            */
+            $detailsBody = $infoResponse->getBody()->getContents();
 
-            $body = file_get_contents('https://api.mania-exchange.com/tm/maps/' . $mxId);
-            $info = json_decode($body);
+            Log::logAddLine('MxDownload', 'Received: ' . $detailsBody);
 
-            if (!$info) {
+            $info = json_decode($detailsBody);
+
+            if (!$info || isset($info->StatusCode)) {
                 Log::error('Failed to get info for mx id: ' . $mxId);
                 warningMessage('Failed to get info from ManiaExchange for mx id ', secondary($mxId))->send($player);
 
                 continue;
             }
+
+            $info = $info[0];
 
             if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
@@ -68,8 +69,9 @@ class MxDownload
 
                 if (!$map->enabled) {
                     $map->update([
-                        'enabled'  => 1,
-                        'cooldown' => 999,
+                        'enabled'    => 1,
+                        'cooldown'   => 999,
+                        'mx_details' => json_encode($info),
                     ]);
                     infoMessage($player, ' enabled ', $map)->sendAll();
                     Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
@@ -152,7 +154,7 @@ class MxDownload
                         'uid'             => $uid,
                         'cooldown'        => 999,
                         'enabled'         => 1,
-                        'mx_details'      => null,
+                        'mx_details'      => json_encode($info),
                         'mx_world_record' => null,
                     ]);
 
@@ -171,13 +173,14 @@ class MxDownload
                         ]);
                     }
 
-                    $map           = new Map();
-                    $map->gbx      = $gbxInfo;
-                    $map->uid      = $uid;
-                    $map->filename = $filename;
-                    $map->author   = $authorId;
-                    $map->cooldown = 999;
-                    $map->enabled  = 1;
+                    $map             = new Map();
+                    $map->gbx        = $gbxInfo;
+                    $map->uid        = $uid;
+                    $map->filename   = $filename;
+                    $map->author     = $authorId;
+                    $map->mx_details = json_encode($info);
+                    $map->cooldown   = 999;
+                    $map->enabled    = 1;
                     $map->saveOrFail();
 
                     infoMessage($player, ' added new map ', $map)->sendAll();
@@ -188,8 +191,12 @@ class MxDownload
                 rename($tempFile, $absolute);
             }
 
-            //Send updated map-list
-            Hook::fire('MapPoolUpdated');
+            if (!$map->gbx) {
+                Log::logAddLine('MxDownload', 'Loading GBX-Info for map ' . $map->filename, isVerbose());
+                $map->update([
+                    'gbx' => MapController::getGbxInformation($map->filename),
+                ]);
+            }
 
             //Add the map to the selection
             if (!Server::isFilenameInSelection($filename)) {
@@ -207,11 +214,12 @@ class MxDownload
             QueueController::queueMap($player, $map);
 
             //Save the map to the matchsettings
-            if (MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
-                MatchSettingsController::removeByFilenameFromCurrentMatchSettings($filename);
+            if (!MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
+                MatchSettingsController::addMapToCurrentMatchSettings($map);
             }
 
-            MatchSettingsController::addMapToCurrentMatchSettings($map);
+            //Send updated map-list
+            Hook::fire('MapPoolUpdated');
         }
     }
 }
