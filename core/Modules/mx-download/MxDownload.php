@@ -71,7 +71,7 @@ class MxDownload
 
                 if (!File::exists(MapController::getMapsPath() . $map->filename)) {
                     $map->update([
-                        'uid'     => null,
+                        'uid'     => '__' . $map->uid,
                         'enalbed' => false,
                     ]);
                     self::addMap($player, 're-add', "$mxId");
