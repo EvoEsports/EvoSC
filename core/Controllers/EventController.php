@@ -189,7 +189,7 @@ class EventController implements ControllerInterface
             $mapUid = $arguments[0]['UId'];
 
             try {
-                $map = Map::whereUid($mapUid)->first();
+                $map = Map::whereUid($mapUid)->last();
             } catch (\Exception $e) {
                 Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
             }

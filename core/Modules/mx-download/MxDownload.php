@@ -69,6 +69,11 @@ class MxDownload
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
 
+                if (!File::exists(MapController::getMapsPath() . $map->filename)) {
+                    self::addMap($player, 're-add', "$mxId");
+                    continue;
+                }
+
                 if (!$map->enabled) {
                     $map->enabled  = true;
                     $map->cooldown = 999;
@@ -141,7 +146,19 @@ class MxDownload
                     continue;
                 }
 
-                if (Map::whereFilename($filename)->exists()) {
+                if (Map::whereUid($uid)->exists()) {
+                    //Map was updated
+                    $map = Map::whereUid($uid)->last();
+
+                    $map->update([
+                        'cooldown' => 999,
+                        'enabled'  => 1,
+                        'filename' => $filename,
+                    ]);
+
+                    infoMessage($player, ' enabled ', $map)->sendAll();
+                    Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
+                } elseif (Map::whereFilename($filename)->exists()) {
                     //Map was updated
                     $map = Map::whereFilename($filename)->first();
 
