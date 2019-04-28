@@ -50,7 +50,7 @@ class MxDownload
 
             $detailsBody = $infoResponse->getBody()->getContents();
 
-            Log::logAddLine('MxDownload', 'Received: ' . $detailsBody);
+            Log::logAddLine('MxDownload', 'Received details: ' . $detailsBody, isVeryVerbose());
 
             $info = json_decode($detailsBody);
 
@@ -63,15 +63,18 @@ class MxDownload
 
             $info = $info[0];
 
+            //129638
+            var_dump($info);
+            var_dump(Map::whereUid($info->TrackUID)->exists());
+
             if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists
                 $map = Map::whereUid($info->TrackUID)->first();
 
                 if (!$map->enabled) {
                     $map->update([
-                        'enabled'    => 1,
-                        'cooldown'   => 999,
-                        'mx_details' => $detailsBody,
+                        'enabled'  => 1,
+                        'cooldown' => 999,
                     ]);
                     infoMessage($player, ' enabled ', $map)->sendAll();
                     Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
@@ -154,7 +157,6 @@ class MxDownload
                         'uid'             => $uid,
                         'cooldown'        => 999,
                         'enabled'         => 1,
-                        'mx_details'      => $detailsBody,
                         'mx_world_record' => null,
                     ]);
 
@@ -173,14 +175,13 @@ class MxDownload
                         ]);
                     }
 
-                    $map             = new Map();
-                    $map->gbx        = $gbxInfo;
-                    $map->uid        = $uid;
-                    $map->filename   = $filename;
-                    $map->author     = $authorId;
-                    $map->mx_details = $detailsBody;
-                    $map->cooldown   = 999;
-                    $map->enabled    = 1;
+                    $map           = new Map();
+                    $map->gbx      = $gbxInfo;
+                    $map->uid      = $uid;
+                    $map->filename = $filename;
+                    $map->author   = $authorId;
+                    $map->cooldown = 999;
+                    $map->enabled  = 1;
                     $map->saveOrFail();
 
                     infoMessage($player, ' added new map ', $map)->sendAll();
@@ -190,6 +191,10 @@ class MxDownload
 
                 rename($tempFile, $absolute);
             }
+
+            $map->update([
+                'mx_details' => $detailsBody,
+            ]);
 
             if (!$map->gbx) {
                 Log::logAddLine('MxDownload', 'Loading GBX-Info for map ' . $map->filename, isVerbose());
