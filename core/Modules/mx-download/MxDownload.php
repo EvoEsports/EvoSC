@@ -71,7 +71,7 @@ class MxDownload
                     $map->update([
                         'enabled'    => 1,
                         'cooldown'   => 999,
-                        'mx_details' => json_encode($info),
+                        'mx_details' => $detailsBody,
                     ]);
                     infoMessage($player, ' enabled ', $map)->sendAll();
                     Log::logAddLine('MxDownload', $player . ' enabled map ' . $map);
@@ -154,7 +154,7 @@ class MxDownload
                         'uid'             => $uid,
                         'cooldown'        => 999,
                         'enabled'         => 1,
-                        'mx_details'      => json_encode($info),
+                        'mx_details'      => $detailsBody,
                         'mx_world_record' => null,
                     ]);
 
@@ -178,7 +178,7 @@ class MxDownload
                     $map->uid        = $uid;
                     $map->filename   = $filename;
                     $map->author     = $authorId;
-                    $map->mx_details = json_encode($info);
+                    $map->mx_details = $detailsBody;
                     $map->cooldown   = 999;
                     $map->enabled    = 1;
                     $map->saveOrFail();
