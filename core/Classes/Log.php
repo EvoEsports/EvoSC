@@ -60,7 +60,42 @@ class Log
             $prefix = 'i';
         }
 
-        $line = sprintf("[%s] [%s] %s", $time, $prefix, $string);
+        list($childClass, $caller) = debug_backtrace(false, 2);
+        $callingClass = $caller['class'] . $caller['type'] . $caller['function'];
+
+        if (isVerbose()) {
+            $callingClass .= '(';
+
+            foreach ($caller['args'] as $key => $arg) {
+                $add = '<fg=yellow>';
+
+                if (is_array($arg)) {
+                    $add .= 'Array';
+                } else {
+                    if (is_object($arg)) {
+                        $add .= get_class($arg);
+                    } else {
+                        $add .= '"' . $arg . '"';
+                    }
+                }
+
+                $callingClass .= $add . '</>';
+
+                if ($key + 1 < count($caller['args'])) {
+                    $callingClass .= ', ';
+                }
+            }
+
+            $callingClass .= ')';
+        } else {
+            $callingClass .= '(...)';
+        }
+
+        if (isDebug()) {
+            $callingClass .= "\nData: " . json_encode($caller['args']);
+        }
+
+        $line = sprintf("[%s] %s: %s", $time, $callingClass, $string);
         $line = stripAll($line);
 
         if ($echo == true || isVeryVerbose()) {
