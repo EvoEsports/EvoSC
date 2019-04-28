@@ -184,7 +184,7 @@ class MapController implements ControllerInterface
         self::$currentMap = $map;
         self::$mapStart   = now();
 
-        Map::where('id', '!=', $map->id)->increment('cooldown');
+        Map::where('id', '!=', $map->id)->where('cooldown', '<=', config('server.map-cooldown'))->increment('cooldown');
 
         $map->update([
             'last_played' => now(),
