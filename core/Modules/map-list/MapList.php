@@ -170,7 +170,7 @@ class MapList
 
     public static function disableMapEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->last();
+        $map = Map::whereUid($mapUid)->get()->last();
 
         if (!$map) {
             return;
@@ -182,7 +182,7 @@ class MapList
 
     public static function deleteMapPermEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->last();
+        $map = Map::whereUid($mapUid)->get()->last();
 
         if (!$map) {
             return;

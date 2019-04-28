@@ -152,7 +152,7 @@ class MxDownload
 
                 if (Map::whereUid($uid)->exists()) {
                     //Map was updated
-                    $map = Map::whereUid($uid)->last();
+                    $map = Map::whereUid($uid)->get()->last();
 
                     $map->update([
                         'cooldown' => 999,
