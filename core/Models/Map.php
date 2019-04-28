@@ -94,14 +94,14 @@ class Map extends Model
 
     public function __toString()
     {
-        try {
-            return $this->gbx->Name;
-        } catch (\Exception $e) {
+        $gbx = $this->gbx;
+
+        if (!$gbx) {
             Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
             $this->gbx = MapController::getGbxInformation($this->filename);
-
-            return $this->gbx->Name;
         }
+
+        return $this->gbx->Name;
     }
 
     public static function getByUid(string $mapUid): ?Map
