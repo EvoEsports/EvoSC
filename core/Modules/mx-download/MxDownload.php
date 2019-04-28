@@ -64,8 +64,6 @@ class MxDownload
             $info = $info[0];
 
             //129638
-            var_dump($info);
-            var_dump(Map::whereUid($info->TrackUID)->exists());
 
             if (Map::whereUid($info->TrackUID)->exists()) {
                 //Map already exists

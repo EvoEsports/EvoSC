@@ -98,10 +98,14 @@ class Map extends Model
 
         if (!$gbx) {
             Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
-            $this->gbx = MapController::getGbxInformation($this->filename);
+            $gbx       = MapController::getGbxInformation($this->filename);
+            $this->gbx = $gbx;
+            $this->save();
+
+            $gbx = json_decode($gbx);
         }
 
-        return $this->gbx->Name;
+        return $gbx->Name;
     }
 
     public static function getByUid(string $mapUid): ?Map
