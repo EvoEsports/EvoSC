@@ -70,6 +70,7 @@
                         TriggerPageAction("info.add," ^ pauseInput.Value ^ "," ^ messageInput.Value);
                     }else{
                         TriggerPageAction("info.update," ^ id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
+                        log("info.update," ^ id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
                     }
                     run = False;
                 }
