@@ -10,6 +10,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\MapController;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -45,6 +46,8 @@ class Votes
             self::$voteLimit = 1;
             Log::error('Failed to get config "votes.vote-limit". Setting limit to 1.');
         }
+
+        AccessRight::createIfNonExistent('vote_custom', 'Create a custom vote. Enter question after command.');
 
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
