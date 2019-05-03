@@ -1,8 +1,9 @@
 {
-  "pos"            : "-25 65",
-  "scale"          : 0.95,
-  "duration"       : 25,
-  "cooldown"       : 120,
+  "pos": "-25 65",
+  "scale": 0.95,
+  "duration": 25,
+  "cooldown": 120,
   "time-multiplier": 1.0,
-  "enabled"        : true
+  "enabled": true,
+  "vote-limit": 2
 }
