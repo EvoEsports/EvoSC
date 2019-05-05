@@ -369,7 +369,7 @@ class MapController implements ControllerInterface
     {
         Log::logAddLine('MapController', 'Get GBX information for ' . $filename);
 
-        return shell_exec(Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $filename . '"');
+        return shell_exec(Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="UserData/Maps/' . $filename . '"');
     }
 
     /**
