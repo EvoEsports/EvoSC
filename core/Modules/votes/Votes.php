@@ -104,7 +104,7 @@ class Votes
             return;
         }
 
-        if (now()->diffInSeconds(self::$vote['start_time']) > self::$vote['duration'] || self::$voters->count() == onlinePlayers()->count()) {
+        if (now()->diffInSeconds(self::$vote['start_time']) > self::$vote['duration']) {
             Timer::destroy('vote.check_state');
             $action = self::$vote['action'];
             $voteState = self::getVoteState();
