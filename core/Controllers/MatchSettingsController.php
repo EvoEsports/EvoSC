@@ -4,10 +4,13 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
+use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Models\Map;
+use esc\Models\Player;
 use Illuminate\Support\Collection;
 
 class MatchSettingsController
@@ -20,6 +23,8 @@ class MatchSettingsController
     public static function init()
     {
         self::$currentMatchSettingsFile = config('server.default-matchsettings') ?? 'MatchSettings';
+
+        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.', 'map_add');
 
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
             Log::error('MatchSettings "' . self::getPath(self::$currentMatchSettingsFile) . '" not found.');
@@ -70,6 +75,47 @@ class MatchSettingsController
             $settings->asXML($file);
         } catch (\Exception $e) {
             Log::logAddLine('MatchSettingsController', "Failed to add map ($map) to $matchSettings.");
+        }
+    }
+
+    public static function shuffleCurrentMapListCommand(Player $player)
+    {
+        infoMessage('The map-list gets shuffled after the map finished.')->send($player);
+
+        Hook::add('Maniaplanet.EndMap_Start', function () use ($player) {
+            MatchSettingsController::shuffleCurrentMapList();
+            infoMessage($player, ' shuffled the map-list.')->sendAll();
+            Server::loadMatchSettings(MatchSettingsController::getPath(MatchSettingsController::$currentMatchSettingsFile));
+        }, true);
+    }
+
+    public static function shuffleCurrentMapList()
+    {
+        $maps     = collect();
+        $file     = self::getPath(self::$currentMatchSettingsFile);
+        $settings = new \SimpleXMLElement(File::get($file));
+
+        foreach ($settings->map as $mapInfo) {
+            $maps->push([
+                'file'  => (string)$mapInfo->file,
+                'ident' => (string)$mapInfo->ident,
+            ]);
+        }
+
+        unset($settings->map);
+        unset($settings->startindex);
+        $settings->addChild('startindex', 0);
+
+        $maps->shuffle()->each(function ($map) use ($settings) {
+            $mapNode = $settings->addChild('map');
+            $mapNode->addChild('file', $map['file']);
+            $mapNode->addChild('ident', $map['ident']);
+        });
+
+        try {
+            $settings->asXML($file);
+        } catch (\Exception $e) {
+            Log::logAddLine('MatchSettingsController', "Failed to shuffle map-list.");
         }
     }
 
