@@ -127,7 +127,7 @@ class MxMap
 
         $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
         $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
-        $filename = preg_replace('/[^a-z0-9\-\_\#\ ]/i', '', $filename);
+        $filename = preg_replace('/[^a-z0-9\-\_\#\ \.]/i', '', $filename);
         $filename = preg_replace('/\ /i', '_', $filename);
 
         File::put(MapController::getMapsPath($filename), $download->getBody());
