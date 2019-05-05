@@ -31,7 +31,7 @@ class Votes
      */
     private static $lastVote;
 
-    private static $votesThisRound;
+    private static $timeVotesThisRound;
     private static $voteLimit;
 
     public function __construct()
@@ -39,8 +39,8 @@ class Votes
         self::$voters = collect();
         self::$lastVote = now();
         self::$lastVote->subSeconds(config('votes.cooldown'));
-        self::$votesThisRound = 0;
-        self::$voteLimit = config('votes.vote-limit');
+        self::$timeVotesThisRound = 0;
+        self::$voteLimit          = config('votes.vote-limit');
 
         if (!self::$voteLimit) {
             self::$voteLimit = 1;
@@ -126,7 +126,7 @@ class Votes
         //     return;
         // }
 
-        if (self::$votesThisRound >= self::$voteLimit) {
+        if (self::$timeVotesThisRound >= self::$voteLimit) {
             warningMessage('The maximum timelimit is already rechaded, sorry.')->send($player);
 
             return;
@@ -147,13 +147,13 @@ class Votes
             if ($success) {
                 infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
                 MapController::addTime($secondsToAdd);
+                self::$timeVotesThisRound++;
             } else {
                 infoMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
             }
         });
 
         self::$lastVote = now();
-        self::$votesThisRound++;
 
         infoMessage($player, ' started a vote to ', secondary('add 10 minutes?'), '. Use ', secondary('F5/F6'), ' and ',
             secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
@@ -299,6 +299,6 @@ class Votes
 
     public static function beginMatch()
     {
-        self::$votesThisRound = 0;
+        self::$timeVotesThisRound = 0;
     }
 }
