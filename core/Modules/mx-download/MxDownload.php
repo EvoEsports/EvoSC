@@ -64,7 +64,14 @@ class MxDownload
                     $mxMap->loadMxDetails();
                     $mxMap->moveTo('MX');
 
-                    $map             = new Map();
+                    if (Map::whereFilename($mxMap->getFilename())->exists()) {
+                        $map = Map::whereFilename($mxMap->getFilename())->first();
+                        $map->locals()->delete();
+                        $map->ratings()->delete();
+                    } else {
+                        $map = new Map();
+                    }
+
                     $map->uid        = $mxMap->uid;
                     $map->author     = self::getAuthorId($mxMap->gbx->AuthorLogin);
                     $map->gbx        = $mxMap->gbxString;
