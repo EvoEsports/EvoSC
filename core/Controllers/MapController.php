@@ -502,12 +502,18 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Get the maps directory-path.
+     * Get the maps directory-path, optionally add the filename at the end.
+     *
+     * @param string|null $fileName
      *
      * @return string
      */
-    public static function getMapsPath(): string
+    public static function getMapsPath(string $fileName = null): string
     {
+        if ($fileName) {
+            return self::$mapsPath . $fileName;
+        }
+
         return self::$mapsPath;
     }
 
