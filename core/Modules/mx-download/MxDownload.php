@@ -65,11 +65,13 @@ class MxDownload
                     $mxMap->moveTo('MX');
 
                     $map             = new Map();
-                    $map->filename   = $mxMap->getFilename();
-                    $map->gbx        = $mxMap->gbxString;
                     $map->uid        = $mxMap->uid;
-                    $map->mx_details = $mxMap->mxDetails;
                     $map->author     = self::getAuthorId($mxMap->gbx->AuthorLogin);
+                    $map->gbx        = $mxMap->gbxString;
+                    $map->mx_details = $mxMap->mxDetails;
+                    $map->filename   = $mxMap->getFilename();
+                    $map->enabled    = true;
+                    $map->cooldown   = 999;
                     $map->saveOrFail();
                 }
 
@@ -102,7 +104,7 @@ class MxDownload
                     //Queue the newly added map
                     QueueController::queueMap($player, $map);
                 } else {
-                    warningMessage("Failed to add map $mxId.")->send($player);
+                    warningMessage("Failed to add map $mxId")->send($player);
                 }
             } catch (\Exception $e) {
                 Log::logAddLine('MxDownload', $e->getMessage());
