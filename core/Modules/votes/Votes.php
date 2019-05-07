@@ -127,7 +127,7 @@ class Votes
         // }
 
         if (self::$timeVotesThisRound >= self::$voteLimit) {
-            warningMessage('The maximum timelimit is already rechaded, sorry.')->send($player);
+            warningMessage('The maximum timelimit is already reached, sorry.')->send($player);
 
             return;
         }

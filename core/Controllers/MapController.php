@@ -371,7 +371,7 @@ class MapController implements ControllerInterface
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
         $cmd     = "$mps /parsegbx=$mapFile";
 
-        Log::logAddLine('MapController', 'Get GBX information for ' . $filename . ' -> ' . $cmd);
+        Log::logAddLine('MapController', 'Get GBX information: ' . $cmd);
 
         return shell_exec($cmd);
     }

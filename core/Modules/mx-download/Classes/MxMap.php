@@ -130,7 +130,13 @@ class MxMap
         $filename = preg_replace('/[^a-z0-9\-\_\#\ \.]/i', '', $filename);
         $filename = preg_replace('/\ /i', '_', $filename);
 
-        File::put(MapController::getMapsPath($filename), $download->getBody());
+        Log::logAddLine('MxMap', 'Saving new map as ' . MapController::getMapsPath($filename), isVerbose());
+
+        File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
+
+        if(!File::exists(MapController::getMapsPath($filename))){
+            throw new \Exception('Map download failed, map does not exist.');
+        }
 
         $mxMap            = new MxMap();
         $mxMap->filename  = $filename;
