@@ -27,7 +27,7 @@ class PBRecords
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'beginMap']);
         Hook::add('PlayerLocal', [self::class, 'playerMadeLocal']);
 
         ChatCommand::add('/target', [self::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
@@ -80,8 +80,10 @@ class PBRecords
         self::$targets = collect();
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
+        $map = MapController::getCurrentMap();
+
         if ($map->locals()->count() > 0) {
             $defaultTarget = $map->locals()->where('Rank', '<=', config('locals.limit'))->orderByDesc('Score')->get()->first();
         } else {
