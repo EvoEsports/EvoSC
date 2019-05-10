@@ -413,7 +413,7 @@ class MapController implements ControllerInterface
                     MapQueue::whereMapUid($map->uid)->delete();
 
                     $map->update([
-                        'gbx'             => self::getGbxInformation($mapFile),
+                        'gbx'             => self::getGbxInformation($filename),
                         'uid'             => $uid,
                         'mx_details'      => null,
                         'mx_world_record' => null,
@@ -441,7 +441,7 @@ class MapController implements ControllerInterface
                     $map = Map::create([
                         'author'   => $authorId,
                         'filename' => $mapInfo->fileName,
-                        'gbx'      => self::getGbxInformation($mapFile),
+                        'gbx'      => self::getGbxInformation($filename),
                         'uid'      => $uid,
                     ]);
                 }
