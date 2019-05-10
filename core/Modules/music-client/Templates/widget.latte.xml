@@ -1,93 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-widget" id="music-widget" version="3">
-    <frame id="widget" z-index="5000" pos="{config('music.pos.visible')}" data-pos-visible="{config('music.pos.visible')}" data-pos-hidden="{config('music.pos.hidden')}" scale="{config('music.pos.scale') ?? 0.8|noescape}">
+    <frame id="widget" z-index="5000" pos="{config('music.pos.visible')}"
+           data-pos-visible="{config('music.pos.visible')}" data-pos-hidden="{config('music.pos.hidden')}"
+           scale="{config('music.pos.scale') ?? 0.8|noescape}">
         <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{background_color()|noescape}9"/>
         <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{header_color()|noescape}e"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="ffff" textfont="RajdhaniMono"/>
-        <audio id="music" music="1" hidden="0" volume="1.0" />
+        <audio id="music" music="1" hidden="0" volume="1.0"/>
 
         <frame id="main-frame" z-index="1" size="50 10">
             <frame id="content" pos="38 -2.5" hidden="1">
-                <label id="title" pos="0 0" z-index="1" size="36 3" text="" halign="right" textcolor="fffe" textsize="1.3" textfont="RajdhaniMono" />
-                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="" halign="right" textcolor="fffc" textsize="0.4" textfont="RajdhaniMono" />
+                <label id="title" pos="0 0" z-index="1" size="36 3" text="" halign="right" textcolor="fffe"
+                       textsize="1.3" textfont="RajdhaniMono"/>
+                <label id="artist" pos="0 -4" z-index="1" size="36 3" text="" halign="right" textcolor="fffc"
+                       textsize="0.4" textfont="RajdhaniMono"/>
             </frame>
 
             <frame id="loading" pos="10 -5">
                 <frame id="progress" pos="0 -0.25" scale="0.5">
-                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe" textsize="4" textfont="RajdhaniMono"/>
+                    <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe"
+                           textsize="4" textfont="RajdhaniMono"/>
                 </frame>
-                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe" textsize="1" textfont="RajdhaniMono"/>
+                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe"
+                       textsize="1" textfont="RajdhaniMono"/>
             </frame>
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
-                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6" z-index="-1" />
-                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}6" z-index="-2" />
+                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{background_color()|noescape}6"
+                      z-index="-1"/>
+                <quad class="music-control" pos="-5 0" size="40 10" bgcolor="{config('colors.ui.header')}6"
+                      z-index="-2"/>
 
-                <label class="skip" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
-                <label class="music-list" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.header')}9" />
+                <label class="skip" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
+                       valign="center" ScriptEvents="1" focusareacolor1="0000"
+                       focusareacolor2="{config('colors.ui.header')}9"/>
+                <label class="music-list" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
+                       valign="center" ScriptEvents="1" focusareacolor1="0000"
+                       focusareacolor2="{config('colors.ui.header')}9"/>
 
-                <label pos="1.7 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
-                <label pos="15 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center" />
+                <label pos="1.7 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+                <label pos="15 -3.5" textsize="1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
 
-                <label pos="1.7 -7" textsize="1" scale="0.8" size="10 10" text="Skip" z-index="1" halign="center" valign="center" />
-                <label pos="15 -7" textsize="1" scale="0.8" size="10 10" text="Music" z-index="1" halign="center" valign="center" />
+                <label pos="1.7 -7" textsize="1" scale="0.8" size="10 10" text="Skip" z-index="1" halign="center"
+                       valign="center"/>
+                <label pos="15 -7" textsize="1" scale="0.8" size="10 10" text="Music" z-index="1" halign="center"
+                       valign="center"/>
             </frame>
         </frame>
     </frame>
 
     <framemodel id="Song">
-        <label pos="0 0" size="78 3" text="Title" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
-        <label pos="80 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
-        <label pos="148 0" size="9 3" text="Length" textsize="1" textcolor="ffff" textfont="RajdhaniMono" />
-        <quad pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1" />
+        <label pos="0 0" size="78 3" text="Title" textsize="0.7" textcolor="ffff" textfont="RajdhaniMono"/>
+        <label pos="80 0" size="58 3" text="Artist" textsize="0.7" textcolor="ffff" textfont="RajdhaniMono"/>
+        <label pos="148 0" size="9 3" text="Length" textsize="0.7" textcolor="ffff" textfont="RajdhaniMono"/>
+        <quad class="song" pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1"/>
     </framemodel>
 
-    <frame id="music-container" pos="-80 45" hidden="1">
+    <frame id="music-container" pos="-80 45" hidden="0">
         <frame id="list">
-            <quad pos="0 2.5" size="160 6" bgcolor="{header_color()|noescape}" />
-            <quad pos="0 -2.5" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.5" />
-            <quad pos="0 -2.5" size="160 95" style="Bgs1" substyle="BgDialogBlur" />
-            <label pos="1.5 0.5" size="20 3" text="Music" textsize="1.2" z-index="2" textcolor="ffff" />
-            <quad id="close" pos="157 0.5" size="4 4" halign="center" ScriptEvents="1" />
-            <label pos="157 0.5" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" textcolor="ffff" />
+            <quad id="handle" pos="0 0" size="160 5" z-index="10"/>
+            <quad pos="0 0" size="160 5" bgcolor="{header_color()|noescape}c"/>
+            <quad pos="0 0" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.75"/>
+            <quad pos="0 0" size="160 95" style="Bgs1" substyle="BgDialogBlur"/>
+            <label pos="1.5 -2.5" size="20 5" text="♫ Music" valign="center" textsize="1" z-index="2" textcolor="ffff"
+                   textfont="RajdhaniMono"/>
+            <label pos="157.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" valign="center" halign="center"
+                   textcolor="ffff"/>
 
-            <frame pos="2 -6" z-index="2">
-                <frame pos="0 0">
-                    <quad id="sort-by-title" pos="0 0" size="30 3" bgcolor="0000" ScriptEvents="1" />
-                    <label pos="3 0" size="78 3" text="Title" textsize="1" textcolor="ffff" />
-                    <label class="arrow" pos="0 0.5" text="⏶" textsize="0.7" textcolor="ffff" opacity="0.2" />
-                    <label class="arrow" pos="0 -0.5" text="⏷" textsize="0.7" textcolor="ffff" opacity="0.2" />
-                </frame>
-
-                <frame pos="80 0">
-                    <quad id="sort-by-artist" pos="0 0" size="30 3" bgcolor="0000" ScriptEvents="1" />
-                    <label pos="3 0" size="58 3" text="Artist" textsize="1" textcolor="ffff" />
-                    <label class="arrow" pos="0 0.5" text="⏶" textsize="0.7" textcolor="ffff" opacity="0.2" />
-                    <label class="arrow" pos="0 -0.5" text="⏷" textsize="0.7" textcolor="ffff" opacity="0.2" />
-                </frame>
-
-                <label pos="148 0" size="9 3" text="Length" textsize="1" textcolor="ffff" />
+            <frame pos="2 -6.5" z-index="2">
+                <label pos="0 0" size="78 3" text="Title" textsize="0.8" textcolor="{config('colors.ui.header')}f"
+                       textfont="RajdhaniMono"/>
+                <label pos="80 0" size="58 3" text="Artist" textsize="0.8" textcolor="{config('colors.ui.header')}f"
+                       textfont="RajdhaniMono"/>
+                <label pos="148 0" size="9 3" text="Length" textsize="0.8" textcolor="{config('colors.ui.header')}f"
+                       textfont="RajdhaniMono"/>
             </frame>
 
-            <frame id="song-list" z-index="5" pos="2 -11" size="156 80">
-                <frame id="song-list-container" pos="0 0">
-                    {for $i = 0; $i < 500; $i++}
-                    <frameinstance modelid="Song" class="row" pos="0 {$i * -4}" ScriptEvents="1" hidden="1" />
-                    {/for}
-                </frame>
-            </frame>
-
-            <frame pos="2 -94" z-index="2">
-                <quad id="pagination-box" pos="2 0" size="3.5 3.5" bgcolor="{config('colors.ui.header')|noescape}" valign="center" halign="center" z-index="-1" />
-
-                {for $i = 0; $i < 25; $i++}
-                <label class="page" pos="{$i * 4 + 2} 0" text="{$i + 1}" size="3.5 3.5" textsize="1" valign="center" halign="center" ScriptEvents="1" />
+            <frame id="song-list" z-index="5" pos="2 -10.5" size="156 80">
+                {for $i = 0; $i<20; $i++}
+                <frameinstance modelid="Song" class="row" pos="0 {$i * -3.9}" ScriptEvents="1" hidden="0"/>
                 {/for}
             </frame>
 
-            <frame pos="118 -94" z-index="3">
-                <label pos="-1 0" text="Search:" textsize="1" halign="right" valign="center"/>
-                <entry id="search" pos="0 0" size="40 3" default="" textsize="1" valign="center" ScriptEvents="1" />
+            <frame id="pagination" pos="4 -91" scale="0.9" z-index="3">
+                <label id="page-info" pos="6 0" size="8 3.5" valign="center"
+                       halign="center" text="1/1" textsize="0.8"/>
+                <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+                       textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                       focusareacolor2="{config('colors.ui.header')}c"/>
+                <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+                       textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3"
+                       focusareacolor2="{config('colors.ui.header')}c"/>
+            </frame>
+
+            <frame id="search-frame" pos="131 -91" scale="0.9" z-index="5">
+                <label textfont="RajdhaniMono" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍"/>
+                <entry textfont="RajdhaniMono" id="search-input" class="search-input" pos="26.5 0" size="25 3.5"
+                       halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
+                <label textfont="RajdhaniMono" id="clear-search" class="clear-search" pos="0 0" size="3.5 3.5"
+                       halign="center" valign="center" textsize="0.25" text="" focusareacolor1="f003"
+                       focusareacolor2="f009" ScriptEvents="1" hidden="1"/>
             </frame>
         </frame>
     </frame>
@@ -95,17 +107,28 @@
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+#Include "ColorLib" as CL
 
-declare Text[Text][] music;
-declare Text[Text][] curSongPool;
-declare CMlMediaPlayer player;
-declare CMlQuad paginationBox;
+#Struct Song {
+    Text title;
+    Text artist;
+    Text album;
+    Text file;
+    Text length;
+}
+
+declare Song[] music;
+declare Song[] currentSelection;
 declare CMlFrame progress;
-declare Text url;
+declare Text baserUrl;
 declare Boolean musicEnabled;
 declare Boolean loading;
+declare Integer totalPages;
+declare Integer page;
+declare Vec3 hoverColor;
 
 {(new esc\Classes\HideScript())|noescape}
+{(new esc\Classes\ManiaLinkDrag())|noescape}
 
 Void startLoading(){
     declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
@@ -123,196 +146,107 @@ Void stopLoading(){
     loading = False;
 }
 
-Text[Text] getSong(Text filename){
-    foreach(song in music){
-        if(song["file"] == filename){
-            return song;
-        }
-    }
-
-    return Text[Text];
-}
-
-Text[Text] getRandomSong(){
-    if(music.count > 0){
-        return music[ML::Rand(0, music.count - 1)];
-    }
-
-    return Text[Text];
-}
-
-Text getUrl(Text[Text] song){
-    return url ^ "?song=" ^ TL::URLEncode(song["file"]);
-}
-
-Void setSong(Text[Text] song){
-    declare url = getUrl(song);
-
-    if(!Http.IsValidUrl(url)){
-        log("[EvoSC:music-client] Invalid URL: " ^ url);
-        return;
-    }
+Void playSong(Song song){
+    declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
+    declare url = baserUrl ^ "?song=" ^ TL::URLEncode(song.file);
 
     startLoading();
 
-    declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    audio.IsInitPlay = True;
-    audio.Url = url;
+    {if isVerbose()}
+    log("[EvoSC:music-client] Playing '" ^ song.title ^ "' by " ^ song.artist ^ " (" ^ song.length ^ ")");
+    {/if}
 
-    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song["title"]);
-    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song["artist"]);
+    audio.Url = url;
+    sleep(100);
+    audio.Url = url;
+    audio.Play();
+
+    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song.title);
+    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song.artist);
+
     stopLoading();
 }
 
-Void updatePagination(Integer songsVisible){
-    declare pages = ML::CeilingInteger(songsVisible / 20.0);
-
-    for(i, 1, pages){
-        paginationBox.Parent.Controls[i].Visible = True;
-    }
-    for(i, pages + 1, 25){
-        paginationBox.Parent.Controls[i].Visible = False;
-    }
+Void playRandomSong(){
+    playSong(music[ML::Rand(0, music.count - 1)]);
 }
 
-Void populateList(Text[Text][] songs){
+Void updateList(){
     declare songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
-    declare lastKey = 0;
+    declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
 
-    foreach(key => song in songs){
-        declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[key] as CMlFrame);
+    declare skipped = 0;
+    declare toSkip = 20 * page;
+    declare i = 0;
 
-        frame.Visible = True;
+    foreach(song in currentSelection){
+        if(skipped < toSkip){
+            skipped += 1;
+            continue;
+        }
 
-        (frame.Controls[0] as CMlLabel).SetText(song["title"]);
-        (frame.Controls[1] as CMlLabel).SetText(song["artist"]);
-        (frame.Controls[2] as CMlLabel).SetText(song["length"]);
-        frame.Controls[3].DataAttributeSet("file", song["file"]);
+        if(i >= songList.Controls.count){
+            break;
+        }
 
-        lastKey = key;
+        declare songFrame <=> (songList.Controls[i] as CMlFrame);
+        (songFrame.Controls[0] as CMlLabel).SetText(song.title);
+        (songFrame.Controls[1] as CMlLabel).SetText(song.artist);
+        (songFrame.Controls[2] as CMlLabel).SetText(song.length);
+        songFrame.Controls[3].DataAttributeSet("song", song.tojson());
+        songFrame.Show();
+
+        i += 1;
     }
 
-    updatePagination(songs.count);
-
-    if(lastKey + 1 < music.count){
-        for(i, lastKey + 1, music.count - 1){
-            declare frame <=> ((songList.Controls[0] as CMlFrame).Controls[i] as CMlFrame);
-
-            (frame.Controls[0] as CMlLabel).SetText("");
-            (frame.Controls[1] as CMlLabel).SetText("");
-            (frame.Controls[2] as CMlLabel).SetText("");
+    if(i < 19){
+        for(x, i, 19){
+            (songList.Controls[x] as CMlFrame).Hide();
         }
     }
+
+    pageInfo.SetText((page + 1) ^ "/" ^ totalPages);
 }
 
-Void setRowColor(CMlControl frame, Text color){
-    AnimMgr.Add(frame.Parent.Controls[0], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
-    AnimMgr.Add(frame.Parent.Controls[1], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
-    AnimMgr.Add(frame.Parent.Controls[2], "<quad textcolor='" ^ color ^ "f' />", 10, CAnimManager::EAnimManagerEasing::CubicInOut);
-}
+Void search(Text part){
+    declare search = TL::Trim(part);
 
-Text getContainerTarget(Integer page){
-    declare pos = page * 80.0;
-    declare target = "<frame pos='0 " ^ pos ^ "' />";
-    return target;
-}
-
-Text slug(Text string){
-    declare Text out = TL::ToLowerCase(string);
-    out = TL::Replace(out, " ", "");
-    return out;
-}
-
-Void searchSong(Text search){
-    if(TL::Length(search) == 0){
-        curSongPool = music;
-        populateList(music);
+    if(search == ""){
+        currentSelection = music;
+        totalPages = ML::CeilingInteger(music.count / 20.0);
+        page = 0;
+        updateList();
+        (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel).Hide();
+        (Page.MainFrame.GetFirstChild("search-input") as CMlEntry).SetText("", False);
         return;
     }
 
-    declare Text[Text][] songsFound;
-    declare searchStringLength = TL::Length(search);
+    declare Song[] selection = Song[];
 
     foreach(song in music){
-        declare searchText = song["title"] ^ song["artist"] ^ song["album"];
-        if(TL::Find(search, searchText, False, False)){
-            songsFound.add(song);
-            break;
+        if(TL::Find(search, song.title^song.artist, False, False)){
+            selection.add(song);
         }
     }
 
-    curSongPool = songsFound;
-    populateList(songsFound);
-
-    AnimMgr.Add((Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame), getContainerTarget(0), 200, CAnimManager::EAnimManagerEasing::CubicInOut);
-    AnimMgr.Add(paginationBox, "<quad pos='2 0' />", 200, CAnimManager::EAnimManagerEasing::CubicInOut);
+    currentSelection = selection;
+    totalPages = ML::CeilingInteger(selection.count / 20.0);
+    page = 0;
+    updateList();
+    (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel).Show();
 }
 
-Text columnToKey(Integer column){
-    switch(column){
-        case 0: return "artist";
-        case 1: return "title";
-    }
-
-    return "" ^ column;
+Void setColors(CMlControl songFrameControl, Vec3 color){
+    declare songFrame <=> (songFrameControl as CMlFrame);
+    (songFrame.Controls[0] as CMlLabel).TextColor = color;
+    (songFrame.Controls[1] as CMlLabel).TextColor = color;
+    (songFrame.Controls[2] as CMlLabel).TextColor = color;
 }
 
-Text[Text][] arraySort(Text[Text][] array, Integer column){
-    declare Text[Integer] SortedColumn;
-    declare key = columnToKey(column);
-
-    foreach (I => Data in array) {
-        SortedColumn[I] = Data[key];
-    }
-
-    SortedColumn = SortedColumn.sort();
-    declare Text[Text][] SortedArray;
-
-    foreach (I => Data in SortedColumn) {
-        SortedArray.add(array[I]);
-    }
-
-    return SortedArray;
-}
-
-Text[Text][] arraySortDesc(Text[Text][] array, Integer column){
-    declare Text[Text][] SortedArrayDesc;
-    declare Text[Text][] SortedArray = arraySort(array, column);
-
-    for(i, 1, SortedArray.count){
-        SortedArrayDesc.add(SortedArray[SortedArray.count - i]);
-    }
-
-    return SortedArrayDesc;
-}
-
-Void updateArrows(CMlControl quad, Integer sortDirection, Integer column){
-    foreach(control in (quad.Parent.Parent.Controls[0] as CMlFrame).Controls){
-        if(control.HasClass("arrow")){
-            (control as CMlLabel).Opacity = 0.2;
-        }
-    }
-    foreach(control in (quad.Parent.Parent.Controls[1] as CMlFrame).Controls){
-        if(control.HasClass("arrow")){
-            (control as CMlLabel).Opacity = 0.2;
-        }
-    }
-
-    if(sortDirection == 1){
-        (quad.Parent.Controls[3] as CMlLabel).Opacity = 1.0;
-    }else{
-        (quad.Parent.Controls[2] as CMlLabel).Opacity = 1.0;
-    }
-}
-
-main() {
-    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
-
+Void loadMusicLibrary(){
     startLoading();
-    musicEnabled = False;
-    url = "{config('music.url')|noescape}";
 
-    declare CHttpRequest getSongList = Http.CreateGet(url);
+    declare CHttpRequest getSongList = Http.CreateGet(baserUrl);
 
     while(!getSongList.IsCompleted){
         yield;
@@ -335,60 +269,49 @@ main() {
         return;
     }
 
+    {if isVerbose()}
     log("[EvoSC:music-client] Loaded " ^ music.count ^ " songs");
+    {/if}
 
-    player <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    paginationBox <=> (Page.MainFrame.GetFirstChild("pagination-box") as CMlQuad);
-    declare sortByTitle <=> (Page.MainFrame.GetFirstChild("sort-by-title") as CMlQuad);
-    declare sortByArtist <=> (Page.MainFrame.GetFirstChild("sort-by-artist") as CMlQuad);
+    stopLoading();
+}
+
+main() {
+    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
+
+    hoverColor = CL::HexToRgb({config('colors.ui.header')});
+    musicEnabled = False;
+    baserUrl = "{config('music.url')|noescape}";
+
+    loadMusicLibrary();
+
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);
     declare CMlFrame songList <=> (Page.MainFrame.GetFirstChild("song-list") as CMlFrame);
-    declare CMlFrame songListContainer <=> (Page.MainFrame.GetFirstChild("song-list-container") as CMlFrame);
     declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
     declare CMlQuad mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlQuad);
-    declare CMlEntry search <=> (Page.MainFrame.GetFirstChild("search") as CMlEntry);
-    declare CMlQuad background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
-    declare CMlQuad backgroundIcon <=> (Page.MainFrame.GetFirstChild("icon-background") as CMlQuad);
-    declare CMlFrame musicContainer <=> (Page.MainFrame.GetFirstChild("music-container") as CMlFrame);
-    declare Text visible = "<frame pos='" ^ widget.DataAttributeGet("pos-visible") ^ "' />";
-    declare Text hidden = "<frame pos='" ^ widget.DataAttributeGet("pos-hidden") ^ "' />";
-    declare Boolean isHidden = False;
-    declare Vec3 startPos;
-    declare Integer sortDirection = 1;
+    declare CMlEntry search <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
 
-    stopLoading();
-
-    player.Volume = 1.0;
-
-    curSongPool = music;
-    populateList(arraySort(curSongPool, 1));
-    AnimMgr.Add(widget, visible, 1, CAnimManager::EAnimManagerEasing::ExpInOut);
+    totalPages = ML::CeilingInteger(music.count / 20.0);
+    page = 0;
+    currentSelection = music;
+    updateList();
+    playRandomSong();
 
     declare controlsVisible = False;
     declare musicPlaying = True;
-
-    sleep(5);
+    declare x_min = widget.RelativePosition_V3[0];
+    declare x_max = widget.RelativePosition_V3[0] + (mainFrame.Size[0] * widget.RelativeScale);
+    declare y_min = widget.RelativePosition_V3[1];
+    declare y_max = widget.RelativePosition_V3[1] - (mainFrame.Size[1] * widget.RelativeScale);
 
     while(True){
         yield;
 
-        hidescript();
-
         if(InputPlayer != Null){
-            if(startPos != MapStartLinePos){
-                startPos = MapStartLinePos;
-                setSong(getRandomSong());
-            }
-
             if(loading){
                 progress.RelativeRotation = progress.RelativeRotation + 2.0;
             }
-
-            declare x_min = widget.RelativePosition_V3[0];
-            declare x_max = widget.RelativePosition_V3[0] + (mainFrame.Size[0] * widget.RelativeScale);
-            declare y_min = widget.RelativePosition_V3[1];
-            declare y_max = widget.RelativePosition_V3[1] - (mainFrame.Size[1] * widget.RelativeScale);
             declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
             declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
 
@@ -406,80 +329,74 @@ main() {
                     continue;
                 }
 
+                if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    page += 1;
+                    if(page >= totalPages){
+                        page = 0;
+                    }
+                    updateList();
+                    continue;
+                }
+
                 if(event.Control.HasClass("skip") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    setSong(getRandomSong());
-                    sleep(10);
-                    setSong(getRandomSong());
+                    playRandomSong();
+                    continue;
+                }
+
+                if(event.Control.HasClass("clear-search") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    search("");
+                    continue;
+                }
+
+                if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    page -= 1;
+                    if(page < 0){
+                        page = totalPages - 1;
+                    }
+                    updateList();
                     continue;
                 }
 
                 if(event.Control.HasClass("music-list") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    musicContainer.Show();
+                    Page.MainFrame.GetFirstChild("music-container").Show();
+                    continue;
+                }
+
+                if(event.Control.HasClass("song")){
+                    if(event.Type == CMlScriptEvent::Type::MouseOver){
+                        setColors(event.Control.Parent, hoverColor);
+                    }
+                    if(event.Type == CMlScriptEvent::Type::MouseClick){
+                        setColors(event.Control.Parent, <1.0, 1.0, 1.0>);
+                        declare Song song;
+                        song.fromjson(event.Control.DataAttributeGet("song"));
+                        playSong(song);
+                        continue;
+                    }
+                    if(event.Type == CMlScriptEvent::Type::MouseOut){
+                        setColors(event.Control.Parent, <1.0, 1.0, 1.0>);
+                    }
+
                     continue;
                 }
 
                 if(event.Control == search){
-                    searchSong(search.Value);
-                    continue;
-                }
-
-                if(event.Control == sortByTitle && event.Type == CMlScriptEvent::Type::MouseClick){
-                    if(sortDirection == 1){
-                        populateList(arraySort(curSongPool, 1));
-                    }else{
-                        populateList(arraySortDesc(curSongPool, 1));
-                    }
-
-                    sortDirection = -sortDirection;
-                    updateArrows(event.Control, sortDirection, 1);
-                }
-
-                if(event.Control == sortByArtist && event.Type == CMlScriptEvent::Type::MouseClick){
-                    if(sortDirection == 1){
-                        populateList(arraySort(curSongPool, 0));
-                    }else{
-                        populateList(arraySortDesc(curSongPool, 0));
-                    }
-
-                    sortDirection = -sortDirection;
-                    updateArrows(event.Control, sortDirection, 0);
-                }
-
-                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare Text[Text] song = getSong(event.Control.DataAttributeGet("file"));
-                    setSong(getRandomSong());
-                    sleep(10);
-                    setSong(song);
-                    continue;
-                }
-
-                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseOver){
-                    setRowColor(event.Control, {config('colors.ui.header')});
-                    continue;
-                }
-
-                if(event.Control.DataAttributeExists("file") && event.Type == CMlScriptEvent::Type::MouseOut){
-                    setRowColor(event.Control, "fff");
-                    continue;
-                }
-
-                if(event.Control.HasClass("page") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare page = TL::ToInteger((event.Control as CMlLabel).Value) - 1;
-                    AnimMgr.Add(songListContainer, getContainerTarget(page), 400, CAnimManager::EAnimManagerEasing::CubicInOut);
-                    AnimMgr.Add(paginationBox, "<quad pos='" ^ event.Control.RelativePosition_V3[0] ^ " 0' />", 400, CAnimManager::EAnimManagerEasing::CubicInOut);
+                    search(search.Value);
                     continue;
                 }
 
                 if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
-                    musicContainer.Hide();
+                    Page.MainFrame.GetFirstChild("music-container").Hide();
                     continue;
                 }
 
                 if(event.Control == mainFrame && event.Type == CMlScriptEvent::Type::MouseClick){
-                    musicContainer.Show();
+                    Page.MainFrame.GetFirstChild("music-container").Show();
                     continue;
                 }
             }
+
+            maniaLinkDrag();
         }
     }
 }
