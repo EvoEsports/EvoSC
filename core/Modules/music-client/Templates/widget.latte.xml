@@ -56,7 +56,7 @@
         <quad class="song" pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1"/>
     </framemodel>
 
-    <frame id="music-container" pos="-80 45" hidden="0">
+    <frame id="music-container" pos="-80 45" hidden="1">
         <frame id="list">
             <quad id="handle" pos="0 0" size="160 5" z-index="10"/>
             <quad pos="0 0" size="160 5" bgcolor="{header_color()|noescape}c"/>
@@ -64,8 +64,7 @@
             <quad pos="0 0" size="160 95" style="Bgs1" substyle="BgDialogBlur"/>
             <label pos="1.5 -2.5" size="20 5" text="♫ Music" valign="center" textsize="1" z-index="2" textcolor="ffff"
                    textfont="RajdhaniMono"/>
-            <label pos="157.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" valign="center" halign="center"
-                   textcolor="ffff"/>
+            <label class="close" pos="157.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="fff3" ScriptEvents="1"/>
 
             <frame pos="2 -6.5" z-index="2">
                 <label pos="0 0" size="78 3" text="Title" textsize="0.8" textcolor="{config('colors.ui.header')}f"
@@ -329,6 +328,11 @@ main() {
                     continue;
                 }
 
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    Page.MainFrame.GetFirstChild("music-container").Hide();
+                    continue;
+                }
+
                 if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
                     page += 1;
                     if(page >= totalPages){
@@ -382,11 +386,6 @@ main() {
 
                 if(event.Control == search){
                     search(search.Value);
-                    continue;
-                }
-
-                if(event.Control == close && event.Type == CMlScriptEvent::Type::MouseClick){
-                    Page.MainFrame.GetFirstChild("music-container").Hide();
                     continue;
                 }
 
