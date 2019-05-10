@@ -81,7 +81,7 @@ class MatchSettingsController
 
     public static function shuffleCurrentMapListCommand(Player $player)
     {
-        infoMessage('The map-list gets shuffled after the map finished.')->send($player);
+        infoMessage('The map-list gets shuffled after the map finished.')->sendAdmin();
 
         Hook::add('Maniaplanet.EndMap_Start', function () use ($player) {
             MatchSettingsController::shuffleCurrentMapList();
