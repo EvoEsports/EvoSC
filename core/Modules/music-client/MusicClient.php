@@ -35,7 +35,7 @@ class MusicClient
         Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
         $song = json_encode(self::$song);
 
-        if($song != null){
+        if($song != 'null'){
             Template::showAll('music-client.start-song', compact('song'));
         }
     }
@@ -50,7 +50,7 @@ class MusicClient
         Template::show($player, 'music-client.music-client');
         $song = json_encode(self::$song);
 
-        if($song != null) {
+        if($song != 'null') {
             Template::showAll('music-client.start-song', compact('song'));
         }
     }
