@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:start-song" id="start-song" version="3">
+    <script><!--
+#Struct Song {
+    Text title;
+    Text artist;
+    Text album;
+    Text file;
+    Text length;
+}
+
+main() {
+    declare Song StartSong for This;
+    StartSong.fromjson("""{$song|noescape}""");
+}
+    --></script>
+</manialink>
