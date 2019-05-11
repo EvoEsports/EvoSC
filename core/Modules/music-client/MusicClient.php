@@ -16,8 +16,6 @@ class MusicClient
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
         ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
-
-        KeyBinds::add('reload_music_client', 'Reload music client.', [self::class, 'reload'], 'F2', 'ms');
     }
 
     /**
@@ -28,12 +26,6 @@ class MusicClient
     public static function playerConnect(Player $player)
     {
         Template::show($player, 'music-client.music-client');
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::playerConnect($player);
     }
 
     public static function searchMusic(Player $player, $cmd, ...$arguments)

@@ -17,6 +17,12 @@
         "color": "38c",
         "text" : "fff"
       },
+      "btn"   : {
+        "primary": "38c",
+        "default": "555",
+        "warning": "e90",
+        "danger" : "e33"
+      },
       "text"  : {
         "primary"  : "fff",
         "highlight": "38c",
