@@ -1,7 +1,5 @@
 {
-  "server": "http://5.230.142.8/tm/music/?token=f5ff311da6d2d549ea0b3dd1",
-  "url": "http://5.230.142.8/tm/music/",
-  "token": "f5ff311da6d2d549ea0b3dd1",
+  "url": "",
   "pos": {
     "visible": "120 80",
     "hidden": "160 80"
