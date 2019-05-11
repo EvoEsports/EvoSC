@@ -206,17 +206,6 @@ function getMapInfoFromFile(string $filename)
     return null;
 }
 
-//color functions
-function background_color()
-{
-    return config('colors.ui.background');
-}
-
-function header_color()
-{
-    return config('colors.ui.header');
-}
-
 function isVerbose(): bool
 {
     global $_isVerbose;
@@ -239,4 +228,9 @@ function isDebug(): bool
     global $_isDebug;
 
     return $_isDebug;
+}
+
+function isWindows(): bool
+{
+    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 }

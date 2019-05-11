@@ -2,17 +2,17 @@
 <manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
     <framemodel id="cp_diff">
         <quad id="timeQuad" z-index="-2" pos="-4 0" size="15 5" bgcolor="0006" halign="right" valign="center"/>
-        <label id="time" z-index="1" pos="-5 0" size="13 4" text="" textsize="1.5" halign="right" textcolor="ffff" valign="center" textfont="RajdhaniMono" textprefix="$s"/>
+        <label id="time" z-index="1" pos="-5 0" size="13 4" text="" textsize="1.5" halign="right" textcolor="{config('colors.ui.widget.text.primary')|noescape}" valign="center" textfont="{config('colors.ui.font')|noescape}" textprefix="$s"/>
 
         <quad id="cpidQuad" z-index="-1" size="8 5" bgcolor="0009" halign="center"  valign="center"/>
-        <label id="cpid" pos="0 0" text="" textsize="1.5" halign="center" textcolor="ffff" valign="center" textfont="RajdhaniMono" textprefix="$s"/>
+        <label id="cpid" pos="0 0" text="" textsize="1.5" halign="center" textcolor="{config('colors.ui.widget.text.primary')|noescape}" valign="center" textfont="{config('colors.ui.font')|noescape}" textprefix="$s"/>
 
         <quad id="diffQuad" z-index="-2" pos="4 0" size="15 5" bgcolor="f006" halign="left" valign="center"/>
-        <label id="diff" z-index="1" pos="5 0" size="13 4" text="" textsize="1.5" halign="left" textcolor="ffff"  valign="center" textfont="RajdhaniMono" textprefix="$s"/>
+        <label id="diff" z-index="1" pos="5 0" size="13 4" text="" textsize="1.5" halign="left" textcolor="{config('colors.ui.widget.text.primary')|noescape}"  valign="center" textfont="{config('colors.ui.font')|noescape}" textprefix="$s"/>
     </framemodel>
 
     <frame pos="0 -60" scale="0.8">
-        <label id="targetLabel" pos="0 -15" text="Loading..." textcolor="ffff" halign="center" textsize="0.5" textfont="RajdhaniMono" />
+        <label id="targetLabel" pos="0 -15" text="Loading..." textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="boxes">
             <frameinstance modelid="cp_diff" pos="0 5" scale="0.9" />
@@ -263,7 +263,7 @@
                     targetHidden = True;
                 }
                 if(speed < 10.0 && targetHidden){
-                    AnimMgr.Add(targetLabel, """<label textcolor="ffff" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
+                    AnimMgr.Add(targetLabel, """<label textcolor="{config('colors.ui.widget.text.primary')|noescape}" />""", 500, CAnimManager::EAnimManagerEasing::QuadIn);
                     targetHidden = False;
                 }
             }

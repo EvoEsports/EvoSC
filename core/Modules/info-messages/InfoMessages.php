@@ -7,6 +7,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Models\AccessRight;
 use esc\Models\InfoMessage;
 use esc\Models\Player;
 
@@ -17,6 +18,8 @@ class InfoMessages
     public function __construct()
     {
         self::$startTime = time();
+
+        AccessRight::createIfNonExistent('info_messages', 'Add/edit/remove reccuring info-messages.');
 
         ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
 

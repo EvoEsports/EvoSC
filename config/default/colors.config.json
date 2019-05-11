@@ -1,14 +1,50 @@
 {
-  "primary": "6ce",
+  "primary"  : "6ce",
   "secondary": "eee",
-  "chat": "FF0",
-  "info": "5ad",
-  "warning": "f22",
-  "local": "3d4",
-  "dedi": "4b2",
-  "ui": {
-    "background": "111",
-    "header": "38c",
-    "primary": "38c"
+  "chat"     : "FF0",
+  "info"     : "5ad",
+  "warning"  : "f22",
+  "local"    : "3d4",
+  "dedi"     : "4b2",
+  "ui"       : {
+    "font"  : "RajdhaniMono",
+    "window": {
+      "bg"    : {
+        "color"  : "111",
+        "opacity": 0.8
+      },
+      "header": {
+        "color": "38c",
+        "text" : "fff"
+      },
+      "btn"   : {
+        "primary": "38c",
+        "default": "555",
+        "warning": "e90",
+        "danger" : "e33"
+      },
+      "text"  : {
+        "primary"  : "fff",
+        "highlight": "38c",
+        "warning"  : "fc0",
+        "danger"   : "f00"
+      }
+    },
+    "widget": {
+      "bg"    : {
+        "color"  : "111",
+        "opacity": 0.8
+      },
+      "header": {
+        "color": "38c",
+        "text" : "fff"
+      },
+      "text"  : {
+        "primary"  : "fff",
+        "highlight": "38c",
+        "warning"  : "fc0",
+        "danger"   : "f00"
+      }
+    }
   }
 }

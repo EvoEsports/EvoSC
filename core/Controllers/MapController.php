@@ -76,14 +76,14 @@ class MapController implements ControllerInterface
         AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfNonExistent('time', 'Change the countdown time.');
 
-        ChatCommand::add('//skip', [MapController::class, 'skip'], 'Skips map instantly', 'map_skip');
-        ChatCommand::add('//settings', [MapController::class, 'settings'], 'Load match settings', 'matchsettings_load');
-        ChatCommand::add('//res', [MapController::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-        ChatCommand::add('//addtime', [MapController::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
+        ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
+        ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
+        ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
-        ManiaLinkEvent::add('map.skip', [MapController::class, 'skip'], 'map_skip');
-        ManiaLinkEvent::add('map.replay', [MapController::class, 'forceReplay'], 'map_replay');
-        ManiaLinkEvent::add('map.reset', [MapController::class, 'resetRound'], 'map_reset');
+        ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
+        ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
+        ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
 
         KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'Q', 'time');
 
@@ -184,7 +184,7 @@ class MapController implements ControllerInterface
         self::$currentMap = $map;
         self::$mapStart   = now();
 
-        Map::where('id', '!=', $map->id)->increment('cooldown');
+        Map::where('id', '!=', $map->id)->where('cooldown', '<=', config('server.map-cooldown'))->increment('cooldown');
 
         $map->update([
             'last_played' => now(),
@@ -367,7 +367,13 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename): string
     {
-        return shell_exec(Server::GameDataDirectory() . '/../ManiaPlanetServer /parsegbx="' . $filename . '"');
+        $mps     = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
+        $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
+        $cmd     = "$mps /parsegbx=$mapFile";
+
+        Log::logAddLine('MapController', 'Get GBX information: ' . $cmd);
+
+        return shell_exec($cmd);
     }
 
     /**
@@ -407,7 +413,7 @@ class MapController implements ControllerInterface
                     MapQueue::whereMapUid($map->uid)->delete();
 
                     $map->update([
-                        'gbx'             => self::getGbxInformation($mapFile),
+                        'gbx'             => self::getGbxInformation($filename),
                         'uid'             => $uid,
                         'mx_details'      => null,
                         'mx_world_record' => null,
@@ -417,7 +423,7 @@ class MapController implements ControllerInterface
                 if (Map::whereUid($uid)->exists()) {
                     $map = Map::whereUid($uid)->first();
 
-                    Log::logAddLine('MapController', "Filename changed for map: $map (" . $map->filename . " -> $filename)", isVerbose());
+                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)", isVerbose());
 
                     $map->update([
                         'filename' => $filename,
@@ -435,7 +441,7 @@ class MapController implements ControllerInterface
                     $map = Map::create([
                         'author'   => $authorId,
                         'filename' => $mapInfo->fileName,
-                        'gbx'      => self::getGbxInformation($mapFile),
+                        'gbx'      => self::getGbxInformation($filename),
                         'uid'      => $uid,
                     ]);
                 }
@@ -500,12 +506,18 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Get the maps directory-path.
+     * Get the maps directory-path, optionally add the filename at the end.
+     *
+     * @param string|null $fileName
      *
      * @return string
      */
-    public static function getMapsPath(): string
+    public static function getMapsPath(string $fileName = null): string
     {
+        if ($fileName) {
+            return self::$mapsPath . $fileName;
+        }
+
         return self::$mapsPath;
     }
 

@@ -37,6 +37,9 @@ class ModeScriptEventController implements ControllerInterface
         }
     }
 
+    //Maniaplanet.StartMap_Start
+    //Maniaplanet.EndMap_Start
+
     //Decide if the callback should be transformed and fire the hooks.
     private static function call($callback, $arguments)
     {
@@ -68,6 +71,12 @@ class ModeScriptEventController implements ControllerInterface
 
             case 'Trackmania.Event.Stunt':
                 self::tmStunt($arguments);
+
+                return;
+
+            case 'Maniaplanet.StartMap_Start':
+            case 'Maniaplanet.EndMap_Start':
+                Hook::fire($callback);
 
                 return;
 

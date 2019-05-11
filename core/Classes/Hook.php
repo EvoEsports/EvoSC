@@ -76,9 +76,9 @@ class Hook
             } else {
                 if (is_callable($this->function, false, $callableName)) {
                     call_user_func($this->function, ...$arguments);
-                    // Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isVeryVerbose());
+                    // Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
                 } else {
-                    throw new \Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure");
+                    throw new \Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
                 }
             }
         } catch (\Exception $e) {

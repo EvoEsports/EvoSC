@@ -191,4 +191,12 @@ class File
 
         mkdir($dir);
     }
+
+    public static function rename(string $sourceFile, string $targetFile)
+    {
+        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
+        $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
+
+        rename($sourceFile, $targetFile);
+    }
 }

@@ -2,18 +2,20 @@
 
 namespace esc\Modules\MusicClient;
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use esc\Modules\KeyBinds;
 
 class MusicClient
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [MusicClient::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
-        // KeyController::createBind('X', [self::class, 'reload']);
+        ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
     }
 
     /**
@@ -23,12 +25,12 @@ class MusicClient
      */
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'music-client.widget');
+        Template::show($player, 'music-client.music-client');
     }
 
-    public static function reload(Player $player)
+    public static function searchMusic(Player $player, $cmd, ...$arguments)
     {
-        TemplateController::loadTemplates();
-        self::playerConnect($player);
+        $query = implode(' ', $arguments);
+        Template::show($player, 'music-client.search-command', compact('query'));
     }
 }

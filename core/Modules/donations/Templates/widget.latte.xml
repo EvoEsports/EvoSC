@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:donations-widget" id="donations-widget" version="3">
     <frame id="main-frame" pos="{config('donations.pos.visible')}" size="50 5" scale="0.8">
-        <quad size="50 5" z-index="0" bgcolor="{background_color()|noescape}9" id="bg-quad" ScriptEvents="1" />
+        <quad size="50 5" z-index="0" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" id="bg-quad" ScriptEvents="1" />
 
         <frame id="content-frame" pos="0 -7.55" z-index="1">
-            <label pos="25 5" halign="center" valign="center" textsize="1" textcolor="ffff" text="Donate planets" textfont="RajdhaniMono"/>
-            <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="1" textcolor="ffff" text="12000 Planets" z-index="3" textfont="RajdhaniMono"/>
-            <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 5" bgcolor="{config('colors.ui.header')|noescape}9" />
+            <label pos="25 5" halign="center" valign="center" textsize="1" textcolor="{config('colors.ui.widget.text.primary')}" text="Donate planets" textfont="{config('colors.ui.font')|noescape}"/>
+            <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="1" textcolor="{config('colors.ui.widget.text.primary')}" text="12000 Planets" z-index="3" textfont="{config('colors.ui.font')|noescape}"/>
+            <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 5" bgcolor="{config('colors.ui.widget.header.color')|noescape}9" />
         </frame>
     </frame>
 

@@ -82,8 +82,20 @@ class EscRun extends Command
         file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
     }
 
+    private function migrate(InputInterface $input, OutputInterface $output)
+    {
+        try {
+            $this->getApplication()->find('migrate')->run($input, $output);
+        } catch (Exception $e) {
+            Log::error('Failed to migrate.');
+            exit(5);
+        }
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // $this->migrate($input, $output);
+
         global $_isVerbose;
         global $_isVeryVerbose;
         global $_isDebug;

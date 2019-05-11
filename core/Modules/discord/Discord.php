@@ -12,7 +12,7 @@ class Discord
     public function __construct()
     {
         if(config('discord.url')){
-            Hook::add('PlayerConnect', [Discord::class, 'show']);
+            Hook::add('PlayerConnect', [self::class, 'show']);
         }
     }
 

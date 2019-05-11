@@ -1,0 +1,6 @@
+{
+  "require": {
+    "nass600/get-id3"  : "^1.0",
+    "tightenco/collect": "^5.6"
+  }
+}

@@ -20,10 +20,10 @@ class Pay2Play
         self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
         self::$priceSkip    = config('pay2play.skip.cost') ?? 5000;
 
-        Hook::add('PlayerConnect', [Pay2Play::class, 'showWidget']);
+        Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
-        ManiaLinkEvent::add('addtime', [Pay2Play::class, 'addTime']);
-        ManiaLinkEvent::add('skip', [Pay2Play::class, 'skip']);
+        ManiaLinkEvent::add('addtime', [self::class, 'addTime']);
+        ManiaLinkEvent::add('skip', [self::class, 'skip']);
     }
 
     public static function showWidget(Player $player)
@@ -42,7 +42,7 @@ class Pay2Play
                 return;
             }
 
-            PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [Pay2Play::class, 'addTimePaySuccess']);
+            PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [self::class, 'addTimePaySuccess']);
         }
     }
 
@@ -56,7 +56,7 @@ class Pay2Play
     public static function skip(Player $player)
     {
         if (config('pay2play.skip.enabled')) {
-            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', [Pay2Play::class, 'skipPaySuccess']);
+            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', [self::class, 'skipPaySuccess']);
         }
     }
 

@@ -3,6 +3,8 @@
 namespace esc\Models;
 
 
+use esc\Classes\Log;
+use esc\Controllers\MapController;
 use Illuminate\Database\Eloquent\Model;
 
 class Map extends Model
@@ -92,7 +94,18 @@ class Map extends Model
 
     public function __toString()
     {
-        return $this->gbx->Name;
+        $gbx = $this->gbx;
+
+        if (!$gbx) {
+            Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
+            $gbx       = MapController::getGbxInformation($this->filename);
+            $this->gbx = $gbx;
+            $this->save();
+
+            $gbx = json_decode($gbx);
+        }
+
+        return $gbx->Name;
     }
 
     public static function getByUid(string $mapUid): ?Map

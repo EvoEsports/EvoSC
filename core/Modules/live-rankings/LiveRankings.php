@@ -11,7 +11,7 @@ class LiveRankings
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [LiveRankings::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         // KeyController::createBind('Y', [self::class, 'reload']);
     }
 

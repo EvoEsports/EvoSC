@@ -136,7 +136,7 @@ class QueueController implements ControllerInterface
      */
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->first();
+        $map = Map::whereUid($mapUid)->get()->last();
 
         if ($map) {
             QueueController::queueMap($player, $map);
