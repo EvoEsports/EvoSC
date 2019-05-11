@@ -117,7 +117,7 @@
 declare Song[] music;
 declare Song[] currentSelection;
 declare CMlFrame progress;
-declare Text baserUrl;
+declare Text baseUrl;
 declare Boolean musicEnabled;
 declare Boolean loading;
 declare Integer totalPages;
@@ -146,7 +146,7 @@ Void stopLoading(){
 
 Void playSong(Song song){
     declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    declare url = baserUrl ^ "?song=" ^ TL::URLEncode(song.file);
+    declare url = baseUrl ^ "?song=" ^ TL::URLEncode(song.file);
 
     startLoading();
 
@@ -154,9 +154,10 @@ Void playSong(Song song){
     log("[EvoSC:music-client] Playing '" ^ song.title ^ "' by " ^ song.artist ^ " (" ^ song.length ^ ")");
     {/if}
 
+    audio.StopAndRewind();
+    sleep(50);
     audio.Url = url;
-    sleep(100);
-    audio.Url = url;
+    sleep(50);
     audio.Play();
 
     (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song.title);
@@ -244,7 +245,7 @@ Void setColors(CMlControl songFrameControl, Vec3 color){
 Void loadMusicLibrary(){
     startLoading();
 
-    declare CHttpRequest getSongList = Http.CreateGet(baserUrl);
+    declare CHttpRequest getSongList = Http.CreateGet(baseUrl);
 
     while(!getSongList.IsCompleted){
         yield;
@@ -271,6 +272,8 @@ Void loadMusicLibrary(){
     log("[EvoSC:music-client] Loaded " ^ music.count ^ " songs");
     {/if}
 
+    musicEnabled = True;
+
     stopLoading();
 }
 
@@ -280,9 +283,11 @@ main() {
 
     hoverColor = TL::ToColor({config('colors.ui.window.header.color')});
     musicEnabled = False;
-    baserUrl = "{config('music.url')|noescape}";
+    baseUrl = "{config('music.url')|noescape}";
 
-    loadMusicLibrary();
+    if(baseUrl != ""){
+        loadMusicLibrary();
+    }
 
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);
@@ -312,12 +317,12 @@ main() {
             SearchSong = "";
         }
 
-        if(Map.Id != currentMap){
-            playRandomSong();
-            currentMap = Map.Id;
-        }
+        if(InputPlayer != Null && musicEnabled){
+            if(Map.Id != currentMap){
+                playRandomSong();
+                currentMap = Map.Id;
+            }
 
-        if(InputPlayer != Null){
             if(loading){
                 progress.RelativeRotation = progress.RelativeRotation + 2.0;
             }
@@ -404,10 +409,10 @@ main() {
                     continue;
                 }
             }
-
-            maniaLinkDrag();
-            hidescript();
         }
+
+        maniaLinkDrag();
+        hidescript();
     }
 }
     --></script>
