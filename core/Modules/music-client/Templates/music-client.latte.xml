@@ -280,6 +280,7 @@ Void loadMusicLibrary(){
 main() {
     declare Text SearchSong for This = "";
     progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
+    (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer).IsInitPlay = True;
 
     hoverColor = TL::ToColor({config('colors.ui.window.header.color')});
     musicEnabled = False;
