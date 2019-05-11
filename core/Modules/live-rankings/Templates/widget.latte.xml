@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Liverankings" id="Liverankings" version="3">
     <framemodel id="record">
-        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="RajdhaniMono" />
-        <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="RajdhaniMono" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="RajdhaniMono" />
-        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
     </framemodel>
 
     <frame id="widget" pos="{config('live-rankings.pos')}" size="40 60" scale="{config('live-rankings.scale')}" z-index="5000">
-        <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.background')}" opacity="0.6" ScriptEvents="1"/>
-        <quad size="40 5" bgcolor="{config('colors.ui.header')}" opacity="0.9"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="RajdhaniMono" />
+        <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
+        <quad size="40 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.9"/>
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('live-rankings.show'); $i++}

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:clock-widget" id="clock-widget" version="3">
     <frame pos="{config('clock.pos.visible')}" id="widget">
-        <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.background')}" opacity="0.6" z-index="-1" />
+        <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
         <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
-        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" textfont="RajdhaniMono" />
+        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame pos="-0.1 -0.05">
             <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
             <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
-            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{config('colors.ui.header')|noescape}F"/></frame>
+            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{config('colors.ui.window.header.color')|noescape}F"/></frame>
         </frame>
     </frame>
 

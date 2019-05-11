@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:CpPositionTracker" id="CpPositionTracker" version="3">
     <framemodel id="record">
-        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="RajdhaniMono" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="RajdhaniMono" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="RajdhaniMono" />
-        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="RajdhaniMono" />
+        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
     </framemodel>
 
     <frame id="widget" pos="{config('cp-pos-tracker.pos')}" size="40 60" scale="{config('cp-pos-tracker.scale')}">
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="RajdhaniMono" />
+        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('cp-pos-tracker.show'); $i++}

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:GroupsManagerAddPlayer" id="GroupsManager" version="3">
     <frame id="overview" pos="-60 {ceil($playerCount / 2) * 3 + 3}">
-        <quad size="120 {ceil($playerCount / 2) * 3 + 5.5}" pos="0 -6" bgcolor="{config('colors.ui.background')}" opacity="0.85" z-index="-1" />
-        <quad size="120 6" bgcolor="{config('colors.ui.header')}" opacity="0.95" z-index="0" />
-        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Select player to add" z-index="1" textfont="RajdhaniMono" />
-        <label class="close" pos="117 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="ffff" ScriptEvents="1" focusareacolor1="0000" />
+        <quad size="120 {ceil($playerCount / 2) * 3 + 5.5}" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
+        <quad size="120 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.95" z-index="0" />
+        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Select player to add" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="close" pos="117 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.text.primary')}" ScriptEvents="1" focusareacolor1="0000" />
 
         <frame pos="0 0">
             {foreach $players as $player}
             <frame pos="{$iterator->counter > ceil($playerCount / 2) ? 60 : 0} {$iterator->counter * -6 - 4 + ($iterator->counter > ceil($playerCount / 2) ? $playerCount * 3 + 0 : 0)}">
-                <label pos="2 0" textsize="1" text="{$player}" valign="center" scale="0.9" textfont="RajdhaniMono" />
-                <label class="select" pos="52.5 0" size="16 5" textsize="1" text=" Select" valign="center" scale="0.8" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.header')}3" focusareacolor2="{config('colors.ui.header')}9" data-login="{$player->Login}" data-nick="{$player}" />
+                <label pos="2 0" textsize="1" text="{$player}" valign="center" scale="0.9" textfont="{config('colors.ui.font')|noescape}" />
+                <label class="select" pos="52.5 0" size="16 5" textsize="1" text=" Select" valign="center" scale="0.8" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" data-login="{$player->Login}" data-nick="{$player}" />
 
                 <label size="60 6" focusareacolor1="0000" ScriptEvents="1" valign="center" />
             </frame>
