@@ -59,11 +59,10 @@
     <frame id="music-container" pos="-80 45" hidden="1">
         <frame id="list">
             <quad id="handle" pos="0 0" size="160 5" z-index="10"/>
-            <quad pos="0 0" size="160 5" bgcolor="{header_color()|noescape}c"/>
-            <quad pos="0 0" size="160 95" bgcolor="{background_color()|noescape}" opacity="0.75"/>
+            <quad pos="0 0" size="160 5" bgcolor="{config('colors.ui.window.header.color')|noescape}"/>
+            <quad pos="0 0" size="160 95" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')}"/>
             <quad pos="0 0" size="160 95" style="Bgs1" substyle="BgDialogBlur"/>
-            <label pos="1.5 -2.5" size="20 5" text="♫ Music" valign="center" textsize="1" z-index="2" textcolor="ffff"
-                   textfont="RajdhaniMono"/>
+            <label pos="1.5 -2.5" size="20 5" text="♫ Music" valign="center" textsize="1" z-index="2" textcolor="{config('colors.ui.window.header.text')|noescape}" textfont="{config('colors.ui.font')|noescape}"/>
             <label class="close" pos="157.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" valign="center" halign="center" textcolor="ffff" focusareacolor1="0000" focusareacolor2="fff3" ScriptEvents="1"/>
 
             <frame pos="2 -6.5" z-index="2">
@@ -276,9 +275,10 @@ Void loadMusicLibrary(){
 }
 
 main() {
+    declare Text SearchSong for This = "";
     progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
 
-    hoverColor = CL::HexToRgb({config('colors.ui.header')});
+    hoverColor = CL::HexToRgb({config('colors.ui.window.header.color')});
     musicEnabled = False;
     baserUrl = "{config('music.url')|noescape}";
 
@@ -306,6 +306,12 @@ main() {
 
     while(True){
         yield;
+
+        if(SearchSong != ""){
+            search(SearchSong);
+            Page.MainFrame.GetFirstChild("music-container").Show();
+            SearchSong = "";
+        }
 
         if(InputPlayer != Null){
             if(loading){

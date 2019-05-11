@@ -7,7 +7,8 @@
   "local"    : "3d4",
   "dedi"     : "4b2",
   "ui"       : {
-    "window"    : {
+    "font"  : "RajdhaniMono",
+    "window": {
       "bg"    : {
         "color"  : "111",
         "opacity": 0.8
@@ -17,7 +18,22 @@
         "text" : "fff"
       },
       "text"  : {
-        "font"     : "RajdhaniMono",
+        "primary"  : "fff",
+        "highlight": "38c",
+        "warning"  : "fc0",
+        "danger"   : "f00"
+      }
+    },
+    "widget": {
+      "bg"    : {
+        "color"  : "111",
+        "opacity": 0.8
+      },
+      "header": {
+        "color": "38c",
+        "text" : "fff"
+      },
+      "text"  : {
         "primary"  : "fff",
         "highlight": "38c",
         "warning"  : "fc0",
