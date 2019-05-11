@@ -27,6 +27,9 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | ⚠ If the cache and log folder aren't created automatically, you need to create them and restart the controller. |
 | --- |
 
+### Music server installation
+Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
+
 ___
 
 ## EvoSC CLI
