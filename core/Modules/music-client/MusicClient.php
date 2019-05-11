@@ -34,7 +34,10 @@ class MusicClient
         self::$song = self::$music->random(1)->first();
         Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
         $song = json_encode(self::$song);
-        Template::showAll('music-client.start-song', compact('song'));
+
+        if($song){
+            Template::showAll('music-client.start-song', compact('song'));
+        }
     }
 
     /**
@@ -46,7 +49,10 @@ class MusicClient
     {
         Template::show($player, 'music-client.music-client');
         $song = json_encode(self::$song);
-        Template::showAll('music-client.start-song', compact('song'));
+
+        if($song) {
+            Template::showAll('music-client.start-song', compact('song'));
+        }
     }
 
     public static function searchMusic(Player $player, $cmd, ...$arguments)
