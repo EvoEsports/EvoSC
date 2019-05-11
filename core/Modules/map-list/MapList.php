@@ -59,7 +59,7 @@ class MapList
 
     private static function getMapFavoritesJson(Player $player): string
     {
-        return $player->favorites->pluck('id')->toJson();
+        return $player->favorites()->where('enabled', true)->pluck('id')->toJson();
     }
 
     public static function beginMap(Map $map)
