@@ -124,6 +124,7 @@ declare Boolean loading;
 declare Integer totalPages;
 declare Integer page;
 declare Vec3 hoverColor;
+declare Ident currentMap;
 
 {(new esc\Classes\HideScript())|noescape}
 {(new esc\Classes\ManiaLinkDrag())|noescape}
@@ -295,7 +296,6 @@ main() {
     page = 0;
     currentSelection = music;
     updateList();
-    playRandomSong();
 
     declare controlsVisible = False;
     declare musicPlaying = True;
@@ -311,6 +311,11 @@ main() {
             search(SearchSong);
             Page.MainFrame.GetFirstChild("music-container").Show();
             SearchSong = "";
+        }
+
+        if(Map.Id != currentMap){
+            playRandomSong();
+            currentMap = Map.Id;
         }
 
         if(InputPlayer != Null){
