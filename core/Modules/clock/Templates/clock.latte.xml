@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:clock-widget" id="clock-widget" version="3">
-    <frame pos="{config('clock.pos.visible')}" id="widget">
-        <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
-        <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
-        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="time" textfont="{config('colors.ui.font')|noescape}" />
+    <frame pos="{config('clock.pos.visible')}" id="widget" scale="0.8" size="50 10">
+        <quad id="bg" pos="0 0" size="40 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-2"/>
+        <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-2"/>
 
-        <frame pos="-0.1 -0.05">
-            <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
-            <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
-            <frame id="pointerSeconds" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="2.5 0.4" bgcolor="{config('colors.ui.window.header.color')|noescape}F"/></frame>
+        <label id="time" pos="38 -5" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s" textcolor="{config('colors.ui.widget.text.primary')|noescape}" textfont="{config('colors.ui.font')|noescape}" />
+
+        <frame pos="41.5 -1.5" scale="0.9">
+            <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
+
+            <frame pos="-0.1 -0.25">
+                <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
+                <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
+            </frame>
         </frame>
     </frame>
 
@@ -20,11 +24,13 @@
         }
 
         main() {
+            declare hideSpeed for LocalUser = 10;
+    
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare pointerHours <=> (Page.MainFrame.GetFirstChild("pointerHours") as CMlQuad);
             declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
             declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
-            declare pointerSeconds <=> (Page.MainFrame.GetFirstChild("pointerSeconds") as CMlQuad);
+            declare time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
             declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
@@ -36,10 +42,7 @@
             declare Text timeString = "";
             declare Integer hours = 0;
             declare Integer minutes = 0;
-            declare Integer seconds = 0;
-            declare Real rotHours = 0.0;
-            declare Real rotMinutes = 0.0;
-            declare Real rotSeconds = 0.0;
+            declare Real originalOpacity = bg.Opacity;
 
             while(True){
                 yield;
@@ -49,44 +52,30 @@
 
                 hours = TextLib::ToInteger(TextLib::SubString(timeString, 0, 2));
                 minutes = TextLib::ToInteger(TextLib::SubString(timeString, 3, 2));
-                seconds = TextLib::ToInteger(TextLib::SubString(CurrentLocalDateText, 17, 2));
 
-                rotHours = (hours/12.0) * 360 - 90;
-                rotMinutes = (minutes/60.0) * 360 - 90;
-                rotSeconds = (seconds/60.0) * 360 - 90;
+                pointerHours.RelativeRotation = (hours/12.0) * 360 - 90;
+                pointerMinutes.RelativeRotation = (minutes/60.0) * 360 - 90;
+                pointerHours.RelativeRotation += (pointerMinutes.RelativeRotation / 12);
 
-                pointerHours.RelativeRotation = rotHours;
-                pointerMinutes.RelativeRotation = rotMinutes;
-                pointerSeconds.RelativeRotation = rotSeconds;
+                if(InputPlayer == Null){
+                    sleep(500);
+                    continue;
+                }
 
-                if(InputPlayer != Null){
-                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
+                declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+                declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
 
-                    speed = InputPlayer.Speed;
-
-                    if(speed < 0){
-                        speed = speed  * -1;
-                    }
-
-                    if(!isLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                        if(speed < UI_Hide_Speed && hidden){
-                            anim(widget, visiblePos, duration);
-                            hidden = False;
-                            AnimMgr.Add(bg, "<quad opacity='0.6' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-                        }
-                    }else{
-                        if(speed >= UI_Hide_Speed && !hidden){
-                            anim(widget, hiddenPos, duration);
-                            hidden = True;
-                            AnimMgr.Add(bg, "<quad opacity='0.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-                        }
-
-                        if(speed < UI_Hide_Speed && hidden){
-                            anim(widget, visiblePos, duration);
-                            hidden = False;
-                            AnimMgr.Add(bg, "<quad opacity='0.6' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-                        }
-                    }
+                if(overHidespeed && playerIsRacing && !hidden){
+                    hidden = True;
+                    AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                }
+                if((!overHidespeed || !playerIsRacing) && hidden){
+                    hidden = False;
+                    AnimMgr.Add(widget, visiblePos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                    AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 }
             }
         }

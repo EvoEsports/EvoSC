@@ -5,6 +5,7 @@ namespace esc\Modules;
 use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class Clock
@@ -17,8 +18,7 @@ class Clock
 
     public static function displayClock(Player $player)
     {
-        $clock = config('clock');
-        Template::show($player, 'clock.clock', compact('clock'));
+        Template::show($player, 'clock.clock');
     }
 
     public static function configUpdated(Config $config = null)

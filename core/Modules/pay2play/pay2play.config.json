@@ -2,8 +2,8 @@
   "addtime": {
     "enabled": true,
     "pos": {
-      "visible": "125 7",
-      "hidden": "160 7"
+      "visible": "125 -2.5",
+      "hidden": "160 -2.5"
     },
     "cost": 100,
     "time-limit": 1800,
@@ -13,8 +13,8 @@
   "skip": {
     "enabled": false,
     "pos": {
-      "visible": "120 7",
-      "hidden": "160 7"
+      "visible": "120 -2.5",
+      "hidden": "160 -2.5"
     },
     "cost": 5000
   }

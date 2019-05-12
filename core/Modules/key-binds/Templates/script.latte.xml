@@ -10,10 +10,6 @@
 
         foreach(key => bind in keyBinds){
             keyBinds[key]["key"] = TL::ToLowerCase(bind["default"]);
-
-            if(CustomKeyBinds.existskey(bind["id"])){
-                keyBinds[key]["key"] = TL::ToLowerCase(CustomKeyBinds[bind["id"]]);
-            }
         }
 
         while (True) {
