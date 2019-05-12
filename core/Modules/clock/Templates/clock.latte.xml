@@ -6,13 +6,10 @@
 
         <label id="time" pos="38 -5" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s" textcolor="{config('colors.ui.widget.text.primary')|noescape}" textfont="{config('colors.ui.font')|noescape}" />
 
-        <frame pos="41.5 -1.5" scale="0.9">
-            <label pos="4 -3.5" text="" textsize="5" halign="center" valign="center"/>
-
-            <frame pos="-0.1 -0.25">
-                <frame id="pointerHours" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.2" size="1.5 0.4" bgcolor="FFFF"/></frame>
-                <frame id="pointerMinutes" pos="4.3 -3.5" rot="0"><quad pos="-0.1 0.15" size="2.4 0.3" bgcolor="FFFF"/></frame>
-            </frame>
+        <frame pos="45 -5">
+            <quad id="circle" size="5 5" halign="center" valign="center" image="https://i.imgur.com/xHjYvK1.png" />
+            <quad id="big" size="5 5" halign="center" valign="center" image="https://i.imgur.com/7QJ9G3b.png" />
+            <quad id="small" size="5 5" halign="center" valign="center" image="https://i.imgur.com/SHfVTWC.png" opacity="0.9" />
         </frame>
     </frame>
 
@@ -27,17 +24,17 @@
             declare hideSpeed for LocalUser = 10;
     
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
-            declare pointerHours <=> (Page.MainFrame.GetFirstChild("pointerHours") as CMlQuad);
-            declare pointerMinutes <=> (Page.MainFrame.GetFirstChild("pointerMinutes") as CMlQuad);
             declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
             declare time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
             declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
             declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
             declare Boolean hidden = False;
-            declare Boolean isLapRace = Map.TMObjective_IsLapRace;
             declare Integer duration = 800;
             declare Real speed = 0.0;
+
+            declare big <=> (Page.MainFrame.GetFirstChild("big") as CMlQuad);
+            declare small <=> (Page.MainFrame.GetFirstChild("small") as CMlQuad);
 
             declare Text timeString = "";
             declare Integer hours = 0;
@@ -53,9 +50,8 @@
                 hours = TextLib::ToInteger(TextLib::SubString(timeString, 0, 2));
                 minutes = TextLib::ToInteger(TextLib::SubString(timeString, 3, 2));
 
-                pointerHours.RelativeRotation = (hours/12.0) * 360 - 90;
-                pointerMinutes.RelativeRotation = (minutes/60.0) * 360 - 90;
-                pointerHours.RelativeRotation += (pointerMinutes.RelativeRotation / 12);
+                small.RelativeRotation = (hours/12.0) * 360;
+                big.RelativeRotation = (minutes/60.0) * 360;
 
                 if(InputPlayer == Null){
                     sleep(500);
