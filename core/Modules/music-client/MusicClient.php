@@ -13,7 +13,14 @@ use esc\Modules\KeyBinds;
 
 class MusicClient
 {
+    /**
+     * @var \Illuminate\Support\Collection
+     */
     private static $music;
+
+    /**
+     * @var \stdClass
+     */
     private static $song;
 
     public function __construct()
@@ -35,7 +42,7 @@ class MusicClient
         Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
         $song = json_encode(self::$song);
 
-        if($song != 'null'){
+        if ($song != 'null') {
             Template::showAll('music-client.start-song', compact('song'));
         }
     }
@@ -48,9 +55,17 @@ class MusicClient
     public static function playerConnect(Player $player)
     {
         Template::show($player, 'music-client.music-client');
-        $song = json_encode(self::$song);
 
-        if($song != 'null') {
+        $url = Server::getForcedMusic()->url;
+
+        if ($url) {
+            $file = urldecode(preg_replace('/.+\?song=/', '', Server::getForcedMusic()->url));
+            $song = json_encode(self::$music->where('file', $file)->first());
+        } else {
+            $song = json_encode(self::$song);
+        }
+
+        if ($song != 'null') {
             Template::showAll('music-client.start-song', compact('song'));
         }
     }
