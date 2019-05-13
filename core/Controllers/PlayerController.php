@@ -109,6 +109,7 @@ class PlayerController implements ControllerInterface
 
         $player->update([
             'last_visit' => now(),
+            'player_id'  => 0,
         ]);
 
         self::$players = self::$players->forget($player->Login);
