@@ -64,7 +64,7 @@ class MapController implements ControllerInterface
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
