@@ -10,6 +10,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
@@ -45,6 +46,7 @@ class PlayerController implements ControllerInterface
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
@@ -113,6 +115,20 @@ class PlayerController implements ControllerInterface
         ]);
 
         self::$players = self::$players->forget($player->Login);
+    }
+
+    /**
+     * Reset player ids on begin map
+     *
+     *
+     * @param \esc\Models\Map $map
+     */
+    public static function beginMap(Map $map)
+    {
+        Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
+            'player_id'        => 0,
+            'spectator_status' => 0,
+        ]);
     }
 
     /**
