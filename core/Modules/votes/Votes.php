@@ -152,7 +152,6 @@ class Votes
         $secondsToAdd = MapController::getOriginalTimeLimit() * config('votes.time-multiplier');
         $question     = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
 
-
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
                 infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
@@ -166,7 +165,7 @@ class Votes
         if ($voteStarted) {
             self::$lastVote = now();
 
-            infoMessage($player, ' started a vote to ', secondary('add 10 minutes?'), '. Use ', secondary('F5/F6'), ' and ',
+            infoMessage($player, ' started a vote to ', secondary('add ' . round($secondsToAdd / 60, 1) . ' minutes?'), '. Use ', secondary('F5/F6'), ' and ',
                 secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
         }
     }
