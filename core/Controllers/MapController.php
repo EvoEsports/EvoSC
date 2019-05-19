@@ -57,8 +57,8 @@ class MapController implements ControllerInterface
      */
     public static function init()
     {
-        self::$mapsPath          = Server::getMapsDirectory();
-        self::$timeLimit         = self::getTimeLimitFromMatchSettings();
+        self::$mapsPath = Server::getMapsDirectory();
+        self::$timeLimit = self::getTimeLimitFromMatchSettings();
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
 
         if (File::exists(cacheDir('added_time.txt'))) {
@@ -84,7 +84,8 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
+            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
@@ -110,7 +111,7 @@ class MapController implements ControllerInterface
 
         if ($file) {
             $matchSettings = File::get(self::$mapsPath . 'MatchSettings/' . $file);
-            $xml           = new \SimpleXMLElement($matchSettings);
+            $xml = new \SimpleXMLElement($matchSettings);
             foreach ($xml->mode_script_settings->children() as $child) {
                 if ($child->attributes()['name'] == 'S_TimeLimit') {
                     return intval($child->attributes()['value']);
@@ -142,7 +143,7 @@ class MapController implements ControllerInterface
     public static function addTime(int $seconds = 600)
     {
         self::$addedTime += $seconds;
-        $newTimeLimit    = self::$timeLimit + self::$addedTime;
+        $newTimeLimit = self::$timeLimit + self::$addedTime;
         self::setTimelimit($newTimeLimit);
 
         $file = cacheDir('added_time.txt');
@@ -181,7 +182,7 @@ class MapController implements ControllerInterface
      */
     public static function setTimelimit(int $seconds)
     {
-        $settings                = Server::getModeScriptSettings();
+        $settings = Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $seconds;
         Server::setModeScriptSettings($settings);
     }
@@ -191,11 +192,13 @@ class MapController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
-        self::$nextMap    = null;
+        self::$nextMap = null;
         self::$currentMap = $map;
-        self::$mapStart   = now();
+        self::$mapStart = now();
 
-        Map::where('id', '!=', $map->id)->where('cooldown', '<=', config('server.map-cooldown'))->increment('cooldown');
+        Map::where('id', '!=', $map->id)
+            ->where('cooldown', '<=', config('server.map-cooldown'))
+            ->increment('cooldown');
 
         $map->update([
             'last_played' => now(),
@@ -206,9 +209,10 @@ class MapController implements ControllerInterface
         MxMapDetails::loadMxDetails($map);
 
         //TODO: move to player controller
-        Player::where('Score', '>', 0)->update([
-            'Score' => 0,
-        ]);
+        Player::where('Score', '>', 0)
+            ->update([
+                'Score' => 0,
+            ]);
     }
 
     /**
@@ -227,8 +231,9 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        $mapUid        = Server::getNextMapInfo()->uId;
-        self::$nextMap = Map::where('uid', $mapUid)->first();
+        $mapUid = Server::getNextMapInfo()->uId;
+        self::$nextMap = Map::where('uid', $mapUid)
+            ->first();
 
         if ($request) {
             if (!Server::isFilenameInSelection($request->map->filename)) {
@@ -246,7 +251,7 @@ class MapController implements ControllerInterface
                 Log::logAddLine('MapController', 'Failed to chooseNextMap ' . $request->map->filename);
             }
 
-            $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
             self::$nextMap = $request->map;
         } else {
             $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
@@ -254,7 +259,8 @@ class MapController implements ControllerInterface
 
         NextMap::showNextMap(self::$nextMap);
 
-        $chatMessage->setIcon('')->sendAll();
+        $chatMessage->setIcon('')
+            ->sendAll();
     }
 
     /**
@@ -288,9 +294,12 @@ class MapController implements ControllerInterface
             }
         }
 
-        $map->locals()->delete();
-        $map->dedis()->delete();
-        MapFavorite::whereMapId($map->id)->delete();
+        $map->locals()
+            ->delete();
+        $map->dedis()
+            ->delete();
+        MapFavorite::whereMapId($map->id)
+            ->delete();
         $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
@@ -298,7 +307,8 @@ class MapController implements ControllerInterface
                 $map->delete();
                 Log::logAddLine('MapController', $player . ' deleted map ' . $map->filename);
             } catch (\Exception $e) {
-                Log::logAddLine('MapController', 'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
+                Log::logAddLine('MapController',
+                    'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -307,7 +317,8 @@ class MapController implements ControllerInterface
 
             warningMessage($player, ' deleted map ', $map)->sendAll();
         } else {
-            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
+            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(),
+                isVerbose());
         }
     }
 
@@ -378,9 +389,9 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename): string
     {
-        $mps     = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
+        $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
-        $cmd     = "$mps /parsegbx=$mapFile";
+        $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
 
         Log::logAddLine('MapController', 'Get GBX information: ' . $cmd);
 
@@ -399,29 +410,37 @@ class MapController implements ControllerInterface
 
         foreach ($maps as $mapInfo) {
             $filename = $mapInfo->file;
-            $uid      = $mapInfo->ident;
-            $mapFile  = self::$mapsPath . $filename;
+            $uid = $mapInfo->ident;
+            $mapFile = self::$mapsPath . $filename;
 
             if (!File::exists($mapFile)) {
                 Log::error("File $mapFile not found.");
 
-                if (Map::whereFilename($filename)->exists()) {
-                    Map::whereFilename($filename)->update(['enabled' => 0]);
+                if (Map::whereFilename($filename)
+                    ->exists()) {
+                    Map::whereFilename($filename)
+                        ->update(['enabled' => 0]);
                 }
 
                 continue;
             }
 
-            if (Map::whereFilename($filename)->exists()) {
-                $map = Map::whereFilename($filename)->first();
+            if (Map::whereFilename($filename)
+                ->exists()) {
+                $map = Map::whereFilename($filename)
+                    ->first();
 
                 if ($map->uid != $uid) {
                     Log::logAddLine('MapController', 'UID changed for map: ' . $map, isVerbose());
 
-                    LocalRecord::whereMap($map->id)->delete();
-                    Dedi::whereMap($map->id)->delete();
-                    MapFavorite::whereMapId($map->id)->delete();
-                    MapQueue::whereMapUid($map->uid)->delete();
+                    LocalRecord::whereMap($map->id)
+                        ->delete();
+                    Dedi::whereMap($map->id)
+                        ->delete();
+                    MapFavorite::whereMapId($map->id)
+                        ->delete();
+                    MapQueue::whereMapUid($map->uid)
+                        ->delete();
 
                     $map->update([
                         'gbx'             => self::getGbxInformation($filename),
@@ -431,16 +450,20 @@ class MapController implements ControllerInterface
                     ]);
                 }
             } else {
-                if (Map::whereUid($uid)->exists()) {
-                    $map = Map::whereUid($uid)->first();
+                if (Map::whereUid($uid)
+                    ->exists()) {
+                    $map = Map::whereUid($uid)
+                        ->first();
 
-                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)", isVerbose());
+                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)",
+                        isVerbose());
 
                     $map->update([
                         'filename' => $filename,
                     ]);
                 } else {
-                    if (Player::where('Login', $mapInfo->author)->exists()) {
+                    if (Player::where('Login', $mapInfo->author)
+                        ->exists()) {
                         $authorId = Player::find($mapInfo->author)->id;
                     } else {
                         $authorId = Player::insertGetId([
@@ -474,12 +497,12 @@ class MapController implements ControllerInterface
 
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
-           ->update(['enabled' => true]);
+            ->update(['enabled' => true]);
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-           ->orWhere('gbx', null)
-           ->update(['enabled' => false]);
+            ->orWhere('gbx', null)
+            ->update(['enabled' => false]);
     }
 
     /**
