@@ -10,6 +10,7 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
+use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Dedi;
@@ -59,6 +60,10 @@ class MapController implements ControllerInterface
         self::$mapsPath          = Server::getMapsDirectory();
         self::$timeLimit         = self::getTimeLimitFromMatchSettings();
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
+        if (File::exists(cacheDir('added_time.txt'))) {
+            self::$addedTime = intval(File::get(cacheDir('added_time.txt')));
+        }
 
         self::loadMaps();
 
@@ -124,6 +129,9 @@ class MapController implements ControllerInterface
         self::$addedTime = 0;
         self::$timeLimit = self::getTimeLimitFromMatchSettings();
         self::setTimelimit(self::$timeLimit);
+
+        $file = cacheDir('added_time.txt');
+        File::put($file, self::$addedTime);
     }
 
     /**
@@ -136,6 +144,9 @@ class MapController implements ControllerInterface
         self::$addedTime += $seconds;
         $newTimeLimit    = self::$timeLimit + self::$addedTime;
         self::setTimelimit($newTimeLimit);
+
+        $file = cacheDir('added_time.txt');
+        File::put($file, self::$addedTime);
 
         Hook::fire('TimeLimitUpdated', $newTimeLimit);
     }
@@ -476,7 +487,7 @@ class MapController implements ControllerInterface
      */
     public static function getTimeLimit(): int
     {
-        return self::$timeLimit + self::$addedTime;
+        return self::$originalTimeLimit + self::$addedTime;
     }
 
     /**
@@ -537,5 +548,41 @@ class MapController implements ControllerInterface
     public static function setCurrentMap(\esc\Models\Map $currentMap): void
     {
         self::$currentMap = $currentMap;
+    }
+
+    /**
+     * @param bool $getAsCarbon
+     *
+     * @return \Carbon\Carbon|int
+     */
+    public static function getRoundStartTime(bool $getAsCarbon = false)
+    {
+        if (File::exists(cacheDir('round_start_time.txt'))) {
+            $startTime = File::get(cacheDir('round_start_time.txt')) ?? -1;
+        } else {
+            return -1;
+        }
+
+        if ($getAsCarbon) {
+            return Carbon::createFromTimestamp($startTime);
+        } else {
+            return $startTime;
+        }
+    }
+
+    public static function getSecondsLeft(): int
+    {
+        $calculatedProgressTime = self::getRoundStartTime() + self::getTimeLimit() + 2;
+
+        $timeLeft = $calculatedProgressTime - time();
+
+        return $timeLeft < 0 ? 0 : $timeLeft;
+    }
+
+    public static function getSecondsPassed(): int
+    {
+        $startTime = self::getRoundStartTime() + 2;
+
+        return time() - $startTime;
     }
 }

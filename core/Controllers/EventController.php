@@ -4,6 +4,7 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -65,6 +66,7 @@ class EventController implements ControllerInterface
                     break;
 
                 case 'ManiaPlanet.BeginMatch':
+                    self::setMatchStartTime();
                     Hook::fire('BeginMatch');
                     break;
 
@@ -248,5 +250,11 @@ class EventController implements ControllerInterface
         } else {
             throw new \Exception('Malformed callback');
         }
+    }
+
+    private static function setMatchStartTime()
+    {
+        $file = cacheDir('round_start_time.txt');
+        File::put($file, time());
     }
 }
