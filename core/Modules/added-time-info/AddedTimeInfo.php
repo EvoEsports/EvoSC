@@ -8,7 +8,7 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Models\Player;
 
-class AddedTimeInfo
+class aAddedTimeInfo
 {
     public function __construct()
     {

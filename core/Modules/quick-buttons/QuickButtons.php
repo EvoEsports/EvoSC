@@ -20,8 +20,6 @@ class QuickButtons
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
 
-        // KeyController::createBind('Q', [self::class, 'addOne'], 'time');
-
         self::addButton('', '+5 min', 'time.add,5', 'time');
         self::addButton('', '+10 min', 'time.add,10', 'time');
         self::addButton('', '+15 min', 'time.add,15', 'time');
@@ -33,9 +31,9 @@ class QuickButtons
             self::$buttons = collect();
         }
 
-        $button = collect();
-        $button->icon = $icon;
-        $button->text = $text;
+        $button         = collect();
+        $button->icon   = $icon;
+        $button->text   = $text;
         $button->action = $maniaLinkAction;
         $button->access = $access;
 
@@ -60,13 +58,9 @@ class QuickButtons
         Template::show($player, 'quick-buttons.overlay', compact('buttons'));
     }
 
-    public static function addOne(Player $player)
-    {
-        self::addTime($player, 1);
-    }
-
     public static function addTime(Player $player, $time)
     {
         MapController::addTimeManually($player, "addtime", intval($time));
+        infoMessage($player, " added " . secondary("$time minutes") . " of playtime.")->sendAdmin();
     }
 }
