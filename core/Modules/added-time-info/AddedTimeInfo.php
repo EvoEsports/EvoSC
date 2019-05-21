@@ -12,8 +12,8 @@ class aAddedTimeInfo
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
+        // Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        // Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
     }
 
     public static function timeLimitUpdated($timeLimitInSeconds)
