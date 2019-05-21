@@ -131,6 +131,8 @@ class MapController implements ControllerInterface
         self::$timeLimit = self::getTimeLimitFromMatchSettings();
         self::setTimelimit(self::$timeLimit);
 
+        Hook::fire('TimeLimitUpdated', 0);
+
         $file = cacheDir('added_time.txt');
         File::put($file, self::$addedTime);
     }
@@ -146,10 +148,10 @@ class MapController implements ControllerInterface
         $newTimeLimit    = self::$timeLimit + self::$addedTime;
         self::setTimelimit($newTimeLimit);
 
+        Hook::fire('TimeLimitUpdated', $newTimeLimit);
+
         $file = cacheDir('added_time.txt');
         File::put($file, self::$addedTime);
-
-        Hook::fire('TimeLimitUpdated', $newTimeLimit);
     }
 
     /**
