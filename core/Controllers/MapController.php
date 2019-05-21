@@ -231,6 +231,7 @@ class MapController implements ControllerInterface
      */
     public static function endMatch()
     {
+        self::resetTime();
         $request = MapQueue::getFirst();
 
         $mapUid        = Server::getNextMapInfo()->uId;

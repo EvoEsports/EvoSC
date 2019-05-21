@@ -18,7 +18,7 @@ class aAddedTimeInfo
 
     public static function timeLimitUpdated($timeLimitInSeconds)
     {
-        $addedMinutes = floor(MapController::getAddedTime() / 60);
+        $addedMinutes = floor($timeLimitInSeconds / 60);
         Template::showAll('added-time-info.meter', compact('addedMinutes'));
     }
 
