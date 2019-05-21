@@ -30,6 +30,12 @@ class MusicClient
     {
         $url = config('music.url');
 
+        if (!$url) {
+            self::enableMusicDisabledNotice();
+
+            return;
+        }
+
         try {
             $response = RestClient::get($url);
         } catch (GuzzleException $e) {
