@@ -85,7 +85,7 @@ class Votes
 
         $secondsLeft = MapController::getSecondsLeft();
 
-        if ($secondsLeft < 9) {
+        if ($secondsLeft < 10) {
             warningMessage('Sorry, it is too late to start a vote.')->send($player);
 
             return false;

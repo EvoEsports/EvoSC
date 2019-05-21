@@ -606,7 +606,7 @@ class MapController implements ControllerInterface
 
     public static function getSecondsPassed(): int
     {
-        $startTime = self::getRoundStartTime() + 2;
+        $startTime = self::getRoundStartTime() + 1;
 
         return time() - $startTime;
     }
