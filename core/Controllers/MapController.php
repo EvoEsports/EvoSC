@@ -2,15 +2,12 @@
 
 namespace esc\Controllers;
 
-
-use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
-use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Dedi;
@@ -19,11 +16,9 @@ use esc\Models\Map;
 use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
 use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
-use Illuminate\Support\Collection;
 
 /**
  * Class MapController
@@ -42,34 +37,19 @@ class MapController implements ControllerInterface
      */
     private static $nextMap;
 
-    /**
-     * @var Carbon
-     */
-    private static $mapStart;
-
     private static $mapsPath;
-    private static $addedTime = 0;
-    private static $timeLimit;
-    private static $originalTimeLimit;
 
     /**
      * Initialize MapController
      */
     public static function init()
     {
-        self::$mapsPath          = Server::getMapsDirectory();
-        self::$timeLimit         = self::getTimeLimitFromMatchSettings();
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
-
-        if (File::exists(cacheDir('added_time.txt'))) {
-            self::$addedTime = intval(File::get(cacheDir('added_time.txt')));
-        }
-
+        self::$mapsPath = Server::getMapsDirectory();
         self::loadMaps();
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
+        Hook::add('AddedTimeChanged', [self::class, 'addedTimeChanged']);
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
@@ -84,111 +64,16 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
-            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
-
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F3', 'time');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
             // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
             // QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
         }
-    }
-
-    /**
-     * Load the time limit from the default match-settings.
-     *
-     * @return int
-     */
-    private static function getTimeLimitFromMatchSettings(): int
-    {
-        $file = config('server.default-matchsettings');
-
-        if ($file) {
-            $matchSettings = File::get(self::$mapsPath . 'MatchSettings/' . $file);
-            $xml           = new \SimpleXMLElement($matchSettings);
-            foreach ($xml->mode_script_settings->children() as $child) {
-                if ($child->attributes()['name'] == 'S_TimeLimit') {
-                    return intval($child->attributes()['value']);
-                }
-            }
-        }
-
-        return 600;
-    }
-
-    /**
-     * Reset time on round end for example
-     */
-    public static function resetTime()
-    {
-        self::$addedTime = 0;
-        self::$timeLimit = self::getTimeLimitFromMatchSettings();
-        self::setTimelimit(self::$timeLimit);
-
-        Hook::fire('TimeLimitUpdated', 0);
-
-        $file = cacheDir('added_time.txt');
-        File::put($file, self::$addedTime);
-    }
-
-    /**
-     * Add time to the counter
-     *
-     * @param int $seconds
-     */
-    public static function addTime(int $seconds = 600)
-    {
-        self::$addedTime += $seconds;
-        $newTimeLimit    = self::$timeLimit + self::$addedTime;
-        self::setTimelimit($newTimeLimit);
-
-        Hook::fire('TimeLimitUpdated', $newTimeLimit);
-
-        $file = cacheDir('added_time.txt');
-        File::put($file, self::$addedTime);
-    }
-
-    /**
-     * Add one minute to the countdown.
-     *
-     * @param \esc\Models\Player $player
-     */
-    public static function addMinute(Player $player)
-    {
-        self::addTime(60);
-        infoMessage($player, ' quickly added a minute of playtime.')->sendAdmin();
-    }
-
-    /**
-     * Chat-command: Add time
-     *
-     * @param \esc\Models\Player $player
-     * @param                    $cmd
-     * @param float              $amount
-     */
-    public static function addTimeManually(Player $player, $cmd, float $amount)
-    {
-        self::addTime($amount * 60.0);
-        Log::logAddLine('MapController', $player . ' added ' . $amount . ' minutes');
-        infoMessage($player, ($amount < 0 ? ' removed ' : ' added ') . secondary(abs($amount) . " minutes") . ' of playtime.')->sendAdmin();
-    }
-
-    /**
-     * Set a new timelimit in seconds.
-     *
-     * @param int $seconds
-     */
-    public static function setTimelimit(int $seconds)
-    {
-        $settings                = Server::getModeScriptSettings();
-        $settings['S_TimeLimit'] = $seconds;
-        Server::setModeScriptSettings($settings);
     }
 
     /*
@@ -198,7 +83,6 @@ class MapController implements ControllerInterface
     {
         self::$nextMap    = null;
         self::$currentMap = $map;
-        self::$mapStart   = now();
 
         Map::where('id', '!=', $map->id)
            ->where('cooldown', '<=', config('server.map-cooldown'))
@@ -220,20 +104,10 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Hook: BeginMatch
-     */
-    public static function beginMatch()
-    {
-        self::resetTime();
-        self::addTime(0);
-    }
-
-    /**
      * Hook: EndMatch
      */
     public static function endMatch()
     {
-        self::resetTime();
         $request = MapQueue::getFirst();
 
         $mapUid        = Server::getNextMapInfo()->uId;
@@ -511,30 +385,6 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * @return int
-     */
-    public static function getTimeLimit(): int
-    {
-        return self::$originalTimeLimit + self::$addedTime;
-    }
-
-    /**
-     * @return int
-     */
-    public static function getOriginalTimeLimit(): int
-    {
-        return self::$originalTimeLimit;
-    }
-
-    /**
-     * @return int
-     */
-    public static function getAddedTime(): int
-    {
-        return self::$addedTime;
-    }
-
-    /**
      * Reset the round.
      *
      * @param \esc\Models\Player $player
@@ -561,56 +411,10 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Get the round-start-time.
-     *
-     * @return \Carbon\Carbon
-     */
-    public static function getMapStart(): Carbon
-    {
-        return self::$mapStart;
-    }
-
-    /**
      * @param \esc\Models\Map $currentMap
      */
     public static function setCurrentMap(\esc\Models\Map $currentMap): void
     {
         self::$currentMap = $currentMap;
-    }
-
-    /**
-     * @param bool $getAsCarbon
-     *
-     * @return \Carbon\Carbon|int
-     */
-    public static function getRoundStartTime(bool $getAsCarbon = false)
-    {
-        if (File::exists(cacheDir('round_start_time.txt'))) {
-            $startTime = File::get(cacheDir('round_start_time.txt')) ?? -1;
-        } else {
-            return -1;
-        }
-
-        if ($getAsCarbon) {
-            return Carbon::createFromTimestamp($startTime);
-        } else {
-            return $startTime;
-        }
-    }
-
-    public static function getSecondsLeft(): int
-    {
-        $calculatedProgressTime = self::getRoundStartTime() + self::getTimeLimit() + 2;
-
-        $timeLeft = $calculatedProgressTime - time();
-
-        return $timeLeft < 0 ? 0 : $timeLeft;
-    }
-
-    public static function getSecondsPassed(): int
-    {
-        $startTime = self::getRoundStartTime() + 1;
-
-        return time() - $startTime;
     }
 }

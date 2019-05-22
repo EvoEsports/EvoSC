@@ -9,6 +9,7 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Models\AccessRight;
 use esc\Models\Player;
@@ -83,7 +84,7 @@ class Votes
             return false;
         }
 
-        $secondsLeft = MapController::getSecondsLeft();
+        $secondsLeft = CountdownController::getSecondsLeft();
 
         if ($secondsLeft < 10) {
             warningMessage('Sorry, it is too late to start a vote.')->send($player);
@@ -154,11 +155,11 @@ class Votes
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
-                infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
+                infoMessage('Vote ', secondary($question), ' was successful.')->setIcon('')->sendAll();
                 MapController::addTime($secondsToAdd);
                 self::$timeVotesThisRound++;
             } else {
-                infoMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
+                infoMessage('Vote ', secondary($question), ' did not pass.')->setIcon('')->sendAll();
             }
         });
 
@@ -166,7 +167,7 @@ class Votes
             self::$lastVote = now();
 
             infoMessage($player, ' started a vote to ', secondary('add ' . round($secondsToAdd / 60, 1) . ' minutes?'), '. Use ', secondary('F5/F6'), ' and ',
-                secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
+                secondary('/y'), ' or ', secondary('/n'), ' to vote.')->setIcon('')->sendAll();
         }
     }
 
@@ -175,7 +176,7 @@ class Votes
         $question = implode(' ', $questionArray);
 
         self::startVote($player, $question, function (bool $success) use ($question) {
-            infoMessage('Vote ', secondary($question), ' ended with ', secondary($success ? 'yes' : 'no'))->sendAll();
+            infoMessage('Vote ', secondary($question), ' ended with ', secondary($success ? 'yes' : 'no'))->setIcon('')->sendAll();
         });
     }
 
@@ -226,7 +227,7 @@ class Votes
             self::$lastVote = now();
 
             infoMessage($player, ' started a vote to ', secondary('skip the map'), '. Use ', secondary('F5/F6'), ' and ',
-                secondary('/y'), ' or ', secondary('/n'), ' to vote.')->sendAll();
+                secondary('/y'), ' or ', secondary('/n'), ' to vote.')->setIcon('')->sendAll();
         }
     }
 
@@ -320,7 +321,7 @@ class Votes
             self::$voters  = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
             Template::showAll('votes.update-vote', compact('voteStateJson'));
-            infoMessage('Vote cancelled.')->sendAll();
+            infoMessage('Vote cancelled.')->setIcon('')->sendAll();
         }
     }
 

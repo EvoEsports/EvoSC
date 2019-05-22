@@ -17,12 +17,6 @@ class QuickButtons
     {
         Hook::add('PlayerConnect', [self::class, 'showButtons']);
         Hook::add('GroupChanged', [self::class, 'showButtons']);
-
-        ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
-
-        self::addButton('', '+5 min', 'time.add,5', 'time');
-        self::addButton('', '+10 min', 'time.add,10', 'time');
-        self::addButton('', '+15 min', 'time.add,15', 'time');
     }
 
     public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = '')
@@ -56,11 +50,5 @@ class QuickButtons
         })->implode(',');
 
         Template::show($player, 'quick-buttons.overlay', compact('buttons'));
-    }
-
-    public static function addTime(Player $player, $time)
-    {
-        MapController::addTimeManually($player, "addtime", intval($time));
-        infoMessage($player, " added " . secondary("$time minutes") . " of playtime.")->sendAdmin();
     }
 }
