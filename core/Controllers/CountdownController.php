@@ -10,7 +10,6 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
-use esc\Classes\Timer;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 

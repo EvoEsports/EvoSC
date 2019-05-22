@@ -30,7 +30,7 @@ class MxMapDetails
             self::loadMxDetails($map);
         }
 
-        $rating = self::getRatingString($map->ratings()->avg(''));
+        $rating = self::getRatingString($map->ratings()->avg('Rating'));
         Template::show($player, 'mx-details.window', compact('map', 'rating'));
     }
 
