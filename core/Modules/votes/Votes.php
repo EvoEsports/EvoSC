@@ -150,16 +150,16 @@ class Votes
             return;
         }
 
-        $secondsToAdd = MapController::getOriginalTimeLimit() * config('votes.time-multiplier');
+        $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         $question     = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
-                infoMessage('Vote ', secondary($question), ' was successful.')->setIcon('')->sendAll();
-                MapController::addTime($secondsToAdd);
+                infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
+                CountdownController::addTime($secondsToAdd);
                 self::$timeVotesThisRound++;
             } else {
-                infoMessage('Vote ', secondary($question), ' did not pass.')->setIcon('')->sendAll();
+                infoMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
             }
         });
 
@@ -182,7 +182,7 @@ class Votes
 
     public static function askSkip(Player $player)
     {
-        $secondsPassed = MapController::getSecondsLeft();
+        $secondsPassed = CountdownController::getSecondsLeft();
 
         if (!$player->hasAccess('vote_always')) {
             if ($secondsPassed < 15) {

@@ -10,6 +10,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Classes\Timer;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 
@@ -25,6 +26,9 @@ class CountdownController
 
         if (File::exists(cacheDir('added_time.txt'))) {
             self::$addedSeconds = intval(File::get(cacheDir('added_time.txt')));
+        }
+        if (File::exists(cacheDir('round_start_time.txt'))) {
+            self::$matchStart = intval(File::get(cacheDir('round_start_time.txt')));
         }
 
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
@@ -51,7 +55,7 @@ class CountdownController
         }
     }
 
-    public static function addTime(Player $player, int $seconds)
+    public static function addTime(int $seconds, Player $player = null)
     {
         $addedTime = self::$addedSeconds;
         $addedTime += $seconds;
@@ -61,11 +65,13 @@ class CountdownController
         self::$addedSeconds = $addedTime;
         self::setTimeLimit(self::getOriginalTimeLimit() + $addedTime);
 
-        if($seconds > 0){
-            infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
-        }else{
+        if ($player != null) {
+            if ($seconds > 0) {
+                infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
+            } else {
 
-            infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
+                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
+            }
         }
 
         try {
@@ -78,12 +84,12 @@ class CountdownController
 
     public static function addTimeManually(Player $player, $cmd, float $amount)
     {
-        self::addTime($player, round($amount * 60));
+        self::addTime(round($amount * 60), $player);
     }
 
     public static function addMinute(Player $player)
     {
-        self::addTime($player, 60);
+        self::addTime(60, $player);
     }
 
     /**
@@ -93,22 +99,16 @@ class CountdownController
      */
     public static function getRoundStartTime(bool $getAsCarbon = false)
     {
-        if (File::exists(cacheDir('round_start_time.txt'))) {
-            $startTime = File::get(cacheDir('round_start_time.txt')) ?? -1;
-        } else {
-            return -1;
-        }
-
         if ($getAsCarbon) {
-            return Carbon::createFromTimestamp($startTime);
+            return Carbon::createFromTimestamp(self::$matchStart);
         } else {
-            return $startTime;
+            return self::$matchStart;
         }
     }
 
     public static function getSecondsLeft(): int
     {
-        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + 2;
+        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 2;
 
         $timeLeft = $calculatedProgressTime - time();
 
@@ -117,7 +117,7 @@ class CountdownController
 
     public static function getSecondsPassed(): int
     {
-        $startTime = self::getRoundStartTime() + 1;
+        $startTime = self::getRoundStartTime();
 
         return time() - $startTime;
     }

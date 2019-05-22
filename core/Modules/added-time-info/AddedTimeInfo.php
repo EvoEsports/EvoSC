@@ -42,6 +42,6 @@ class AddedTimeInfo
 
     public static function addTime(Player $player, float $time)
     {
-        CountdownController::addTime($player, round($time * 60));
+        CountdownController::addTime(round($time * 60), $player);
     }
 }

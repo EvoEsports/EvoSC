@@ -49,7 +49,7 @@ class Pay2Play
     public static function addTimePaySuccess(Player $player, int $amount)
     {
         infoMessage($player, ' paid ', $amount, ' to add more time')->sendAll();
-        CountdownController::addTime($player, CountdownController::getOriginalTimeLimit());
+        CountdownController::addTime(CountdownController::getOriginalTimeLimit(), $player);
         Template::showAll('pay2play.widget');
     }
 
