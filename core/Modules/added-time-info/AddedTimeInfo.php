@@ -35,6 +35,8 @@ class AddedTimeInfo
 
     public static function showWidget(Player $player)
     {
+        $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
+        Template::showAll('added-time-info.update', compact('addedTime'));
         Template::show($player, 'added-time-info.widget');
     }
 
