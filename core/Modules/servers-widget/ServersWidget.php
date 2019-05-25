@@ -29,7 +29,7 @@ class ServersWidget
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
-            Timer::create('refresh_server_list', [self::class, 'updateServerInformation'], '5s', true);
+            Timer::create('refresh_server_list', [self::class, 'updateServerInformation'], '30s', true);
         }
     }
 
