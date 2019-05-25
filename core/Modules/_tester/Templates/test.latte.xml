@@ -11,7 +11,8 @@
 main(){
     declare label <=> (Page.MainFrame.GetFirstChild("test") as CMlLabel);
 
-
+    log(System.Platform);
+    //System.ClipboardSet("");
 }
     --></script>
 </manialink>

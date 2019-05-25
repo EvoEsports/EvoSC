@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:servers-widget" id="servers-widget" version="3">
+    <frame pos="-160 -33" id="widget" scale="0.855">
+        <quad size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1" />
+        <quad id="bg" size="50 20" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
+        <label pos="2 -2.5" valign="center" textsize="1" text=" Servers" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
+
+        <frame id="data" pos="0 -7.25">
+            {for $i=0; $i<5; $i++}
+            <frame pos="0 {$i * -3.5}">
+                <label pos="9.5 0" size="8 4" halign="right" valign="center" text="0/0" textsize="0.8" textfont="{config('colors.ui.font')|noescape}" />
+                <label pos="10.5 0" size="38 4" valign="center" text="server name" textsize="0.8" textfont="{config('colors.ui.font')|noescape}" />
+            </frame>
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    {(new esc\Classes\HideScript())|noescape}
+
+    Text getJoinLink(Text login, Text title, Text name){
+        declare Text youAreHere = "";
+
+        if(login == CurrentServerLogin){
+            youAreHere = "$z  $999 you";
+        }
+
+        return "$p[#join=" ^ login ^ "@" ^ title ^ "]" ^ name ^ youAreHere;
+    }
+
+    Void updateWidget(Text data){
+        declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+        declare dataFrame <=> (Page.MainFrame.GetFirstChild("data") as CMlFrame);
+        declare Text[Text][] servers;
+        declare filled = 0;
+        servers.fromjson(data);
+
+        foreach(server in servers){
+            if(filled >= servers.count){
+                break;
+            }
+
+            declare frame = (dataFrame.Controls[filled] as CMlFrame);
+            (frame.Controls[0] as CMlLabel).SetText(server["players"] ^ "/" ^ server["max"]);
+            (frame.Controls[1] as CMlLabel).SetText(getJoinLink(server["login"],server["title"],server["name"]));
+
+            filled += 1;
+        }
+
+        for(x, filled, 4){
+            (dataFrame.Controls[x] as CMlFrame).Hide();
+        }
+
+        bg.Size = <bg.Size[0], filled * 3.0 + 3.0>;
+    }
+
+    main() {
+        declare Integer LastServersWidgetUpdate for This;
+        declare Text ServersWidgetInfo for This;
+        declare Integer lastUpdate = 0;
+
+        while(True){
+            yield;
+
+            if(lastUpdate != LastServersWidgetUpdate){
+                lastUpdate = LastServersWidgetUpdate;
+                updateWidget(ServersWidgetInfo);
+                log(ServersWidgetInfo);
+            }
+
+            hidescript();
+        }
+    }
+    --></script>
+</manialink>

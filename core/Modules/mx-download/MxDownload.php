@@ -105,6 +105,8 @@ class MxDownload
 
                     infoMessage($player, ' added map ', $map)->sendAll();
 
+                    Log::logAddLine('MxDownload', $player . '(' . $player->Login . ') added map ' . $map . ' [' . $map->uid . ']');
+
                     //Send updated map-list
                     Hook::fire('MapPoolUpdated');
 

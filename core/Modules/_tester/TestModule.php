@@ -20,6 +20,6 @@ class TestModule
     public static function testStuff(Player $player)
     {
         TemplateController::loadTemplates();
-        AddedTimeInfo::showWidget($player);
+        ServersWidget::showWidget($player);
     }
 }
