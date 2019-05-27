@@ -4,6 +4,7 @@
 [![GitHub](https://img.shields.io/github/license/EvoTM/EvoSC.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
+[![Paypal](https://img.shields.io/badge/PAYPAL-Donate-169BD7.svg?style=for-the-badge&link=http://google.com/)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QCLGR6A7KVS22&source=url)
 
 A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 support.
 
@@ -12,7 +13,7 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 
 ### Requirements
 * PHP 7.2+
-* MySql or MariaDB Server
+* MySQL or MariaDB Server
 
 ### Installation (git)
 ###### Requirements
@@ -61,5 +62,5 @@ Each module must contain a base class in the `esc\Modules` namespace and a `modu
   "version": 1.0
 }
 ```
-Modules can contain Templates, Classes, Models and Database-Migrations. The constructor of the base class is called on controller start, after all controllers have beeb started.
+Modules can contain Templates, Classes, Models and Database-Migrations. The constructor of the base class is called on controller start, after all controllers have been started.
 Configs are in json format and are located at the base directory of your module. Name it as your-config-file.config.json, it will automatically be loaded on controller-start.
