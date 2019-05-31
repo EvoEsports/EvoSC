@@ -291,10 +291,9 @@ class MapController implements ControllerInterface
         $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
 
         foreach ($maps as $mapInfo) {
-            $filename    = $mapInfo->file;
-            $uid         = $mapInfo->ident;
-            $authorLogin = $mapInfo->author;
-            $mapFile     = self::$mapsPath . $filename;
+            $filename = $mapInfo->file;
+            $uid      = $mapInfo->ident;
+            $mapFile  = self::$mapsPath . $filename;
 
             if (!File::exists($mapFile)) {
                 Log::error("File $mapFile not found.");
@@ -345,6 +344,10 @@ class MapController implements ControllerInterface
                         'filename' => $filename,
                     ]);
                 } else {
+                    $gbxJson     = self::getGbxInformation($filename);
+                    $gbx         = json_decode($gbxJson);
+                    $authorLogin = $gbx->AuthorLogin;
+
                     if (Player::where('Login', $authorLogin)
                               ->exists()) {
                         $authorId = Player::find($authorLogin)->id;
