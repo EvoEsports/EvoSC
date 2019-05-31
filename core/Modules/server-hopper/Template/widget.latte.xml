@@ -6,7 +6,7 @@
         <label pos="2 -2.5" valign="center" textsize="1" text=" Servers" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="data" pos="0 -7.25">
-            {for $i=0; $i<5; $i++}
+            {for $i=0; $i<7; $i++}
             <frame pos="0 {$i * -3.5}">
                 <label pos="5.5 0" size="8 4" halign="right" valign="center" text="0" textsize="0.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
                 <label pos="5.5 -0.35" size="6 4" halign="left" valign="center" text="1" textsize="1" scale="0.65" textprefix="/" textfont="{config('colors.ui.font')|noescape}" textcolor="aaa" />
@@ -46,7 +46,7 @@
         servers.fromjson(data);
 
         foreach(server in servers){
-            if(filled >= servers.count){
+            if(filled >= servers.count || filled >= dataFrame.Controls.count){
                 break;
             }
 
