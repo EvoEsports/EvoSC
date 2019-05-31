@@ -356,7 +356,7 @@ class MapController implements ControllerInterface
 
                     $map = Map::create([
                         'author'   => $authorId,
-                        'filename' => $mapInfo->fileName,
+                        'filename' => $filename,
                         'gbx'      => self::getGbxInformation($filename),
                         'uid'      => $uid,
                     ]);
