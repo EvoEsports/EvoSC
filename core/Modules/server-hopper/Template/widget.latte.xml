@@ -65,7 +65,7 @@
             filled += 1;
         }
 
-        for(x, filled, 4){
+        for(x, filled, dataFrame.Controls.count - 1){
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
 
