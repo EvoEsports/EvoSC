@@ -136,6 +136,26 @@ class File
         return $files;
     }
 
+    public static function getFiles(string $baseDirectory, string $filterPattern)
+    {
+        $files = collect();
+
+        File::getDirectoryContents($baseDirectory)
+            ->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
+                $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
+
+                if (!is_dir($path)) {
+                    //File is not directory
+                    if (preg_match($filterPattern, $file)) {
+                        //Add template
+                        $files->push($path);
+                    }
+                }
+            });
+
+        return $files;
+    }
+
     /**
      * Delete a file.
      *
@@ -198,5 +218,13 @@ class File
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
         rename($sourceFile, $targetFile);
+    }
+
+    public static function copy(string $source, string $target)
+    {
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
+        $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
+
+        copy($source, $target);
     }
 }

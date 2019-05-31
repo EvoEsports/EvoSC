@@ -2,7 +2,7 @@
 <manialink name="ESC:Statistics" id="Statistics" version="3">
     <frame id="main" z-index="1000">
         {foreach $statCollection as $statisticWidget}
-        <frame pos="{$statisticWidget->config->pos}" scale="{$statisticWidget->config->scale ?? 0.75}" data-show="{$statisticWidget->config->show ?? 6}">
+        <frame pos="{$statisticWidget->pos}" scale="{$statisticWidget->scale ?? 0.75}" data-show="{$statisticWidget->show ?? 6}">
             <quad pos="0 0" z-index="-1" size="50 {($statisticWidget->config->show ?? 6) * 4 + 8}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}a" />
             <label pos="2 -3" z-index="1" size="48 3" text="{$statisticWidget->title}" textsize=".8" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
             <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.widget.header.color')}c"/>

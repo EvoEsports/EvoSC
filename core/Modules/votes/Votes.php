@@ -41,11 +41,11 @@ class Votes
         self::$lastVote = now();
         self::$lastVote->subSeconds(config('votes.cooldown'));
         self::$timeVotesThisRound = 0;
-        self::$voteLimit          = config('votes.vote-limit');
+        self::$voteLimit          = config('votes.vote_limit');
 
         if (!self::$voteLimit) {
             self::$voteLimit = 1;
-            Log::error('Failed to get config "votes.vote-limit". Setting limit to 1.');
+            Log::error('Failed to get config "votes.vote_limit". Setting limit to 1.');
         }
 
         AccessRight::createIfNonExistent('vote_custom', 'Create a custom vote. Enter question after command.');

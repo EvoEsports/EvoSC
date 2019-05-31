@@ -6,8 +6,6 @@ require 'global-functions.php';
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
-use esc\Controllers\AfkController;
-use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -30,7 +28,7 @@ class EscRun extends Command
 
         $escVersion = '0.62.0';
 
-        esc\Classes\Config::loadConfigFiles();
+        esc\Controllers\ConfigController::init();
 
         //Check that cache directory exists
         if (!is_dir(cacheDir())) {
