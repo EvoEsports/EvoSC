@@ -9,7 +9,7 @@ use esc\Classes\Timer;
 use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 
-class ServersWidget
+class ServerHopper
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -56,9 +56,9 @@ class ServersWidget
         })->filter()->values()->toJson();
 
         if ($player != null) {
-            Template::show($player, 'servers-widget.update', compact('serversJson'));
+            Template::show($player, 'server-hopper.update', compact('serversJson'));
         } else {
-            Template::showAll('servers-widget.update', compact('serversJson'));
+            Template::showAll('server-hopper.update', compact('serversJson'));
         }
     }
 
