@@ -54,7 +54,7 @@ class ServerHopper
             }
 
             return null;
-        })->filter()->values()->toJson();
+        })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
             Template::show($player, 'server-hopper.update', compact('serversJson'));
