@@ -96,6 +96,10 @@ class File
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
+        if (!is_dir($path)) {
+            return collect();
+        }
+
         if ($filterPattern) {
             return collect(scandir($path))->filter(function ($file) use ($filterPattern) {
                 return preg_match($filterPattern, $file);
@@ -116,6 +120,10 @@ class File
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {
         $files = collect();
+
+        if (!is_dir($baseDirectory)) {
+            return $files;
+        }
 
         File::getDirectoryContents($baseDirectory)
             ->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
