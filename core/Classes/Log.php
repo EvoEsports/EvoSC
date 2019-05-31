@@ -61,7 +61,13 @@ class Log
         }
 
         list($childClass, $caller) = debug_backtrace(false, 2);
-        $callingClass = $caller['class'] . $caller['type'] . $caller['function'];
+
+        if (isset($caller['class']) && isset($caller['type'])) {
+            $callingClass = $caller['class'] . $caller['type'] . $caller['function'];
+        }else{
+            $callingClass = $caller['function'];
+        }
+
 
         if (isVerbose()) {
             $callingClass .= '(';

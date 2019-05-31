@@ -82,6 +82,14 @@ class Migrate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        global $_isVerbose;
+        global $_isVeryVerbose;
+        global $_isDebug;
+
+        $_isVerbose     = $output->isVerbose();
+        $_isVeryVerbose = $output->isVeryVerbose();
+        $_isDebug       = $output->isDebug();
+
         $output->writeln('Executing migrations...');
 
         $config = json_decode(file_get_contents('config/database.config.json'));
