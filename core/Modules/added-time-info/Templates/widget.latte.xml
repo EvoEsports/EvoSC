@@ -39,6 +39,8 @@
             declare xMax = buttons.AbsolutePosition_V3[0] + buttons.Size[0];
             declare yMax = buttons.AbsolutePosition_V3[1] - buttons.Size[1];
 
+            declare Text sign = "";
+
             while(True){
                 yield;
 
@@ -58,10 +60,16 @@
                     }else{
                         timeLabel.Show();
 
-                        if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
-                            timeLabel.SetText(" +" ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                        if(currentAddedTime < 0){
+                            sign = "";
                         }else{
-                            timeLabel.SetText(" +" ^ currentAddedTime ^ " min.");
+                            sign = "+";
+                        }
+
+                        if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
+                            timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                        }else{
+                            timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
                         }
 
                         buttons.Hide();

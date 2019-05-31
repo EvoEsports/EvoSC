@@ -22,7 +22,7 @@ class ServerHopper
          * TODO: Add pagination
          */
 
-        self::$servers = collect(config('servers-widget.servers'));
+        self::$servers = collect(config('server-hopper.servers'));
 
         if (count(self::$servers)) {
             self::updateServerInformation();
@@ -36,7 +36,7 @@ class ServerHopper
     public static function showWidget(Player $player)
     {
         self::sendUpdatedServerInformations($player);
-        Template::show($player, 'servers-widget.widget');
+        Template::show($player, 'server-hopper.widget');
     }
 
     public static function sendUpdatedServerInformations(Player $player = null)
@@ -49,6 +49,7 @@ class ServerHopper
                     'players' => $server->players,
                     'max'     => $server->maxPlayers,
                     'title'   => $server->titlePack,
+                    'pw'      => $server->hasPassword,
                 ];
             }
 
@@ -66,12 +67,13 @@ class ServerHopper
     {
         self::$servers = self::$servers->map(function ($server) {
             try {
-                $connection         = Connection::factory($server->rpc->host, $server->rpc->port, 100, $server->rpc->login, $server->rpc->pw);
-                $server->online     = true;
-                $server->name       = $connection->getServerName();
-                $server->players    = count($connection->getPlayerList());
-                $server->maxPlayers = $connection->getMaxPlayers()['CurrentValue'];
-                $server->titlePack  = $connection->getVersion()->titleId;
+                $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 100, $server->rpc->login, $server->rpc->pw);
+                $server->online      = true;
+                $server->name        = $connection->getServerName();
+                $server->players     = count($connection->getPlayerList());
+                $server->maxPlayers  = $connection->getMaxPlayers()['CurrentValue'];
+                $server->titlePack   = $connection->getVersion()->titleId;
+                $server->hasPassword = $connection->getServerPassword() != false;
             } catch (\Exception $e) {
                 $server->online = false;
             }
