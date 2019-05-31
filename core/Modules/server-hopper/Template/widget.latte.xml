@@ -51,6 +51,7 @@
             }
 
             declare frame = (dataFrame.Controls[filled] as CMlFrame);
+            frame.Show();
 
             if(TL::ToInteger(server["players"]) > 0){
                 (frame.Controls[0] as CMlLabel).SetText("$fff" ^ server["players"]);

@@ -66,10 +66,9 @@ class ServerHopper
     public static function updateServerInformation()
     {
         self::$servers = self::$servers->map(function ($server) {
-            $server->online = true;
-
             try {
                 $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 100, $server->rpc->login, $server->rpc->pw);
+                $server->online      = true;
                 $server->name        = $connection->getServerName();
                 $server->players     = count($connection->getPlayerList());
                 $server->maxPlayers  = $connection->getMaxPlayers()['CurrentValue'];
