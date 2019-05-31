@@ -19,6 +19,7 @@ use esc\Models\Player;
 use esc\Modules\MxMapDetails;
 use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
+use Illuminate\Contracts\Queue\Queue;
 
 /**
  * Class MapController
@@ -109,7 +110,7 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        $mapUid        = Server::getNextMapInfo()->uId;
+        $mapUid = Server::getNextMapInfo()->uId;
 
         if ($request) {
             if (!Server::isFilenameInSelection($request->map->filename)) {
@@ -131,7 +132,7 @@ class MapController implements ControllerInterface
             self::$nextMap = $request->map;
         } else {
             self::$nextMap = Map::where('uid', $mapUid)->first();
-            $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
+            $chatMessage   = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
 
         NextMap::showNextMap(self::$nextMap);
@@ -193,6 +194,8 @@ class MapController implements ControllerInterface
             Hook::fire('MapPoolUpdated');
 
             warningMessage($player, ' deleted map ', $map)->sendAll();
+
+            QueueController::preCacheNextMap();
         } else {
             Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(),
                 isVerbose());
@@ -222,6 +225,8 @@ class MapController implements ControllerInterface
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
         Hook::fire('MapPoolUpdated');
+
+        QueueController::preCacheNextMap();
     }
 
     /**
