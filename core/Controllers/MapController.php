@@ -110,8 +110,6 @@ class MapController implements ControllerInterface
         $request = MapQueue::getFirst();
 
         $mapUid        = Server::getNextMapInfo()->uId;
-        self::$nextMap = Map::where('uid', $mapUid)
-                            ->first();
 
         if ($request) {
             if (!Server::isFilenameInSelection($request->map->filename)) {
@@ -132,6 +130,7 @@ class MapController implements ControllerInterface
             $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
             self::$nextMap = $request->map;
         } else {
+            self::$nextMap = Map::where('uid', $mapUid)->first();
             $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
 
