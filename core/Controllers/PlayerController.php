@@ -53,6 +53,20 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'], 'Set the server password, leave empty to clear it.', 'ma');
+    }
+
+    public static function setServerPassword(Player $player, $cmd, $pw)
+    {
+        if (Server::setServerPassword($pw)) {
+            if ($pw == '') {
+                infoMessage($player, ' cleared the server password.')->sendAll();
+            } else {
+                infoMessage($player, ' set a server password.')->sendAll();
+                infoMessage($player, ' set a server password to "' . $pw . '".')->sendAdmin();
+            }
+        }
     }
 
     /**

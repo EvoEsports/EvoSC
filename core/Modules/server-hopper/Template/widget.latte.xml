@@ -34,7 +34,7 @@
             pw = " $fff";
         }
 
-        return "$p[#join=" ^ login ^ "@" ^ title ^ "]" ^ name ^ youAreHere ^ pw;
+        return "$p[#join=" ^ login ^ "@" ^ title ^ "]" ^ name ^ pw ^ youAreHere;
     }
 
     Void updateWidget(Text data){
