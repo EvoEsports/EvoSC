@@ -49,6 +49,7 @@ class Votes
         }
 
         AccessRight::createIfNonExistent('vote_custom', 'Create a custom vote. Enter question after command.');
+        AccessRight::createIfNonExistent('vote_always', 'Allowed to always start a time or skip vote.');
 
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
