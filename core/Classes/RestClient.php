@@ -3,8 +3,10 @@
 namespace esc\Classes;
 
 
+use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Class RestClient
@@ -57,7 +59,7 @@ class RestClient
      */
     public static function get(string $url, array $options = null): Response
     {
-        if(isDebug()){
+        if (isDebug()) {
             Log::logAddLine('RestClient', 'Requesting GET: ' . $url, isDebug());
         }
 
@@ -75,7 +77,7 @@ class RestClient
      */
     public static function post(string $url, array $options = null): Response
     {
-        if(isDebug()) {
+        if (isDebug()) {
             Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options), isDebug());
         }
 
@@ -93,6 +95,7 @@ class RestClient
             $options['headers'] = [];
         }
 
+        $options[RequestOptions::VERIFY]  = CaBundle::getSystemCaRootBundlePath();
         $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.2', getEscVersion());
 
         return $options;
