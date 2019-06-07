@@ -14,18 +14,22 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 * PHP 7.2+
 * MySql or MariaDB Server
 
-### Installation (git)
+### Installation (From GitHub)
 ###### Requirements
 * Composer
-###### Installation
-1. Clone project `git clone https://github.com/EvoTM/EvoSC.git`
-2. Go into the directory and run `composer install`
-3. Copy contents from `config/default` to `config` and fill out the required fields
-4. Run `php esc migrate` to create the database tables.
-5. Run EvoSC
+###### Clean installation
+1. Clone project `git clone https://github.com/EvoTM/EvoSC.git`.
+2. Switch to the new directory.
+3. (Checkout develop branch `git checkout develop` to get the latest version).
+4. Install required packages with `composer install`.
+5. Run the controller `php esc run` it will exit with "Cannot open socket" because the configs are empty (This step is nessecay to copy all required config files to the /config directory).
+6. Run `php esc migrate` to create the database tables.
+7. Run EvoSC with `php esc run`.
 
-| ⚠ If the cache and log folder aren't created automatically, you need to create them and restart the controller. |
+| ⚠ If the cache and log folder are not created automatically, you need to create them and restart the controller. |
 | --- |
+###### Updating a github installation
+1. Go to the EvoSC directory you want to update and run `git pull`.
 
 ### Music server installation
 Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
@@ -38,7 +42,7 @@ Get all available commands `php esc list`
 
 | Action | Description |
 | --------- | -------------------------------------------- |
-| Run EvoSC | In terminal type `php esc run (-v\|-vv\|-vvv)` |
+| Run EvoSC | In terminal type `php esc run (-v&#124;-vv&#124;-vvv)` |
 | Import data from UASECO | In terminal type `php esc import:uaseco {host} {database} {user} {password}` optionally add `{table_prefix}` |
 | Fix player scores and ranking | Run `php esc fix:scores` to re-calculate all scores and fix the player ranks. |
 | Creating a database migration | Run `php esc make:migration <MigrationClassName>`. The migration is saved to to /Migrations. Copy it to your module if necessary. |

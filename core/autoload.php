@@ -77,7 +77,9 @@ function esc_class_loader($className)
         }
     } else {
         // \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className, isVeryVerbose());
-        var_dump('Class not found: ' . $className);
+        if ($className != 'Doctrine\DBAL\Driver\PDOConnection') {
+            var_dump('Class not found: ' . $className);
+        }
     }
 }
 
