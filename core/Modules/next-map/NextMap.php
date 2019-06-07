@@ -12,13 +12,10 @@ class NextMap
 {
     public function __construct()
     {
-        // Hook::add('EndMatch', [self::class, 'showNextMap']);
     }
 
     public static function showNextMap(Map $map)
     {
-        if ($map) {
-            Template::showAll('next-map.widget', compact('map'));
-        }
+        Template::showAll('next-map.widget', compact('map'));
     }
 }

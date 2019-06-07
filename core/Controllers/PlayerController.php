@@ -10,6 +10,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
@@ -45,12 +46,27 @@ class PlayerController implements ControllerInterface
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'], 'Set the server password, leave empty to clear it.', 'ma');
+    }
+
+    public static function setServerPassword(Player $player, $cmd, $pw)
+    {
+        if (Server::setServerPassword($pw)) {
+            if ($pw == '') {
+                infoMessage($player, ' cleared the server password.')->sendAll();
+            } else {
+                infoMessage($player, ' set a server password.')->sendAll();
+                infoMessage($player, ' set a server password to "' . $pw . '".')->sendAdmin();
+            }
+        }
     }
 
     /**
@@ -109,9 +125,24 @@ class PlayerController implements ControllerInterface
 
         $player->update([
             'last_visit' => now(),
+            'player_id'  => 0,
         ]);
 
         self::$players = self::$players->forget($player->Login);
+    }
+
+    /**
+     * Reset player ids on begin map
+     *
+     *
+     * @param \esc\Models\Map $map
+     */
+    public static function beginMap(Map $map)
+    {
+        Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
+            'player_id'        => 0,
+            'spectator_status' => 0,
+        ]);
     }
 
     /**

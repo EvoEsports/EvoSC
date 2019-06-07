@@ -140,7 +140,7 @@ class Dedimania extends DedimaniaApi
 
         if ($records && $records->count() > 0) {
             //Wipe all dedis for current map
-            $map->dedis()->where('New', 0)->delete();
+            $map->dedis()->where('New', '=', 0)->delete();
 
             $insert = $records->map(function ($record) use ($map) {
                 $player = Player::firstOrCreate(['Login' => $record->login], [
@@ -181,7 +181,7 @@ class Dedimania extends DedimaniaApi
                 'rank'  => $dedi->Rank,
                 'cps'   => $checkpoints,
                 'score' => $dedi->Score,
-                'name'  => $dedi->player->NickName,
+                'name'  => str_replace('{', '\u007B', str_replace('}', '\u007D', $dedi->player->NickName)),
                 'login' => $dedi->player->Login,
             ];
         })->toJson();

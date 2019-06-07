@@ -84,6 +84,7 @@ class Statistics
 
                 return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
             })->sort()->take(config('statistics.RoundAvg.show'));
+
             $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
             self::$scores = collect();
         }

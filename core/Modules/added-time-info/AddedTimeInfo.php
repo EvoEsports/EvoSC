@@ -4,7 +4,10 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Models\Player;
 
@@ -12,19 +15,33 @@ class AddedTimeInfo
 {
     public function __construct()
     {
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('TimeLimitUpdated', [self::class, 'timeLimitUpdated']);
+        Hook::add('PlayerConnect', [self::class, 'showWidget']);
+        Hook::add('AddedTimeChanged', [self::class, 'addedTimeChanged']);
+        Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
+
+        ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
     }
 
-    public static function timeLimitUpdated($timeLimitInSeconds)
+    public static function addedTimeChanged($addedSeconds)
     {
-        $addedMinutes = floor(MapController::getAddedTime() / 60);
-        Template::showAll('added-time-info.meter', compact('addedMinutes'));
+        $addedTime = round($addedSeconds / 60, 1);
+        Template::showAll('added-time-info.update', compact('addedTime'));
     }
 
-    public static function playerConnect(Player $player)
+    public static function resetAddedTimeInfo()
     {
-        $addedMinutes = floor(MapController::getAddedTime() / 60);
-        Template::show($player, 'added-time-info.meter', compact('addedMinutes'));
+        self::addedTimeChanged(0);
+    }
+
+    public static function showWidget(Player $player)
+    {
+        $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
+        Template::showAll('added-time-info.update', compact('addedTime'));
+        Template::show($player, 'added-time-info.widget');
+    }
+
+    public static function addTime(Player $player, float $time)
+    {
+        CountdownController::addTime(round($time * 60), $player);
     }
 }

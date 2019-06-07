@@ -74,6 +74,7 @@ class ModeScriptEventController implements ControllerInterface
 
                 return;
 
+            case 'Maniaplanet.EndRound_Start':
             case 'Maniaplanet.StartMap_Start':
             case 'Maniaplanet.EndMap_Start':
                 Hook::fire($callback);

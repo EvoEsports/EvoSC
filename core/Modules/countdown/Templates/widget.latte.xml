@@ -10,7 +10,7 @@
 
     main(){
         declare cdLabel <=> (Page.MainFrame.GetFirstChild("cd-label") as CMlLabel);
-        declare Integer roundLimit = {esc\Controllers\MapController::getTimeLimit() + esc\Controllers\MapController::getAddedTime()} * 60;
+        declare Integer roundLimit = {esc\Controllers\CountdownController::getAddedSeconds() + esc\Controllers\CountdownController::getOriginalTimeLimit()};
         declare Integer bestTime = {$bestTime};
         declare Text lastUpdateHash = "";
         declare status = 0;
@@ -23,7 +23,7 @@
             }
 
             declare TL_Hash for InputPlayer = "";
-            declare TL_Limit for InputPlayer = {esc\Controllers\MapController::getTimeLimit() + esc\Controllers\MapController::getAddedTime()};
+            declare TL_Limit for InputPlayer = {esc\Controllers\CountdownController::getOriginalTimeLimit() + esc\Controllers\CountdownController::getAddedSeconds()};
             if(TL_Hash != lastUpdateHash){
                 lastUpdateHash = TL_Hash;
                 roundLimit = TL_Limit;

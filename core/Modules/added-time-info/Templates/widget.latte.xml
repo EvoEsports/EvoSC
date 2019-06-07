@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:add-time" id="add-time" version="3">
+    <frame pos="145 -24.5">
+        <frame scale="0.6">
+            <label class="open-controls" id="time" pos="22.5 0" z-index="0" size="23 5" text="added_time" textsize="3" halign="right"
+                   valign="center" textfont="{config('colors.ui.font')|noescape}"
+                    scriptevents="1" focusareacolor1="0000" focusareacolor2="0000"/>
+        </frame>
+        <frame pos="-9 1.5" scale="0.6" size="40 5.5" hidden="1" id="buttons">
+            {if $localPlayer->hasAccess('time')}
+            <label action="time.add,0.5" pos="5 -2.75" z-index="0" size="10 5.5" text="+½" textsize="0.9" halign="center"
+                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            <label action="time.add,2" pos="15 -2.75" z-index="0" size="10 5.5" text="+2" textsize="0.9" halign="center"
+                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            <label action="time.add,5" pos="25 -2.75" z-index="0" size="10 5.5" text="+5" textsize="0.9" halign="center"
+                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            <label action="time.add,10" pos="35 -2.75" z-index="0" size="10 5.5" text="+10" textsize="0.9" halign="center"
+                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            {/if}
+        </frame>
+    </frame>
+
+    <script><!--
+        #Include "MathLib" as ML
+
+        main() {
+            declare Real AddedTimeR for This = 0.0;
+            declare Real currentAddedTime = -1.0;
+
+            declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
+            declare buttons <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+
+            declare xMin = buttons.AbsolutePosition_V3[0];
+            declare yMin = buttons.AbsolutePosition_V3[1];
+            declare xMax = buttons.AbsolutePosition_V3[0] + buttons.Size[0];
+            declare yMax = buttons.AbsolutePosition_V3[1] - buttons.Size[1];
+
+            declare Text sign = "";
+
+            while(True){
+                yield;
+
+                if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                    buttons.Hide();
+                    timeLabel.Hide();
+                    wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+                    buttons.Show();
+                }
+
+                if(currentAddedTime != AddedTimeR){
+                    currentAddedTime = AddedTimeR;
+
+                    if(currentAddedTime == 0){
+                        timeLabel.Hide();
+                        buttons.Show();
+                    }else{
+                        timeLabel.Show();
+
+                        if(currentAddedTime < 0){
+                            sign = "";
+                        }else{
+                            sign = "+";
+                        }
+
+                        if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
+                            timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                        }else{
+                            timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
+                        }
+
+                        buttons.Hide();
+                    }
+                }
+
+                {if $localPlayer->hasAccess('time')}
+                foreach(event in PendingEvents){
+                    if(event.Control == Null) continue;
+
+                    if(event.Control.HasClass("open-controls")){
+                        timeLabel.Hide();
+                        buttons.Show();
+
+                        wait(MouseX > xMax || MouseX < xMin || MouseY < yMax || MouseY > yMin);
+
+                        timeLabel.Show();
+                        buttons.Hide();
+                    }
+                }
+                {/if}
+            }
+        }
+    --></script>
+</manialink>

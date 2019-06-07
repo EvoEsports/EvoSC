@@ -96,6 +96,10 @@ class File
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
+        if (!is_dir($path)) {
+            return collect();
+        }
+
         if ($filterPattern) {
             return collect(scandir($path))->filter(function ($file) use ($filterPattern) {
                 return preg_match($filterPattern, $file);
@@ -117,6 +121,10 @@ class File
     {
         $files = collect();
 
+        if (!is_dir($baseDirectory)) {
+            return $files;
+        }
+
         File::getDirectoryContents($baseDirectory)
             ->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
                 $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
@@ -125,6 +133,26 @@ class File
                     //Check directory contents
                     $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
                 } else {
+                    //File is not directory
+                    if (preg_match($filterPattern, $file)) {
+                        //Add template
+                        $files->push($path);
+                    }
+                }
+            });
+
+        return $files;
+    }
+
+    public static function getFiles(string $baseDirectory, string $filterPattern)
+    {
+        $files = collect();
+
+        File::getDirectoryContents($baseDirectory)
+            ->each(function ($file) use ($baseDirectory, $filterPattern, &$files) {
+                $path = $baseDirectory . DIRECTORY_SEPARATOR . $file;
+
+                if (!is_dir($path)) {
                     //File is not directory
                     if (preg_match($filterPattern, $file)) {
                         //Add template
@@ -198,5 +226,13 @@ class File
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
         rename($sourceFile, $targetFile);
+    }
+
+    public static function copy(string $source, string $target)
+    {
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
+        $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
+
+        copy($source, $target);
     }
 }

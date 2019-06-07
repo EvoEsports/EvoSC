@@ -70,7 +70,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 
 function config(string $id, $default = null)
 {
-    return esc\Classes\Config::get($id) ?: $default;
+    return \esc\Controllers\ConfigController::getConfig(strtolower($id)) ?: $default;
 }
 
 function cacheDir(string $filename = ''): string

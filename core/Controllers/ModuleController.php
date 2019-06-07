@@ -126,8 +126,8 @@ class ModuleController implements ControllerInterface
             if ($configId == null) {
                 Log::warning('Missing config: ' . $module->class, isDebug());
             } else {
-                $config = config($configId);
-                if (property_exists($config, 'enabled') && !$config->enabled) {
+                $enabled = ConfigController::getConfig($configId . '.enabled');
+                if (!is_null($enabled) && $enabled == false) {
                     return;
                 }
             }

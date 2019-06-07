@@ -6,7 +6,6 @@
         <quad id="background" pos="0 0" z-index="-1" size="40 10" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}"/>
         <quad id="icon-background" pos="40 0" z-index="-1" size="10 10" bgcolor="{config('colors.ui.widget.header.color')|noescape}"/>
         <label pos="45 -5" valign="center" halign="center" textsize="3" size="6 6" text="♫" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <audio id="music" music="1" hidden="0" volume="1.0"/>
 
         <frame id="main-frame" z-index="1" size="50 10">
             <frame id="content" pos="38 -2.5" hidden="1">
@@ -21,8 +20,10 @@
                     <label pos="0.15 0.7" z-index="1" text="⟳" halign="center" valign="center" textcolor="fffe"
                            textsize="4" textfont="{config('colors.ui.font')|noescape}"/>
                 </frame>
-                <label pos="4 0" z-index="1" text="Loading music" halign="left" valign="center" textcolor="fffe"
+                <label pos="4 1.15" z-index="1" text="Loading" halign="left" valign="center" textcolor="fffe"
                        textsize="1" textfont="{config('colors.ui.font')|noescape}"/>
+                <label id="loading-title" pos="4 -1.45" z-index="1" text="Title" halign="left" valign="center" textcolor="bbbe"
+                       textsize="0.35" size="24" textfont="{config('colors.ui.font')|noescape}"/>
             </frame>
 
             <frame id="widget-controls" pos="5 -10.5" z-index="10">
@@ -117,21 +118,25 @@
 declare Song[] music;
 declare Song[] currentSelection;
 declare CMlFrame progress;
-declare Text baserUrl;
+declare Text baseUrl;
 declare Boolean musicEnabled;
 declare Boolean loading;
 declare Integer totalPages;
 declare Integer page;
 declare Vec3 hoverColor;
 declare Ident currentMap;
+declare Boolean controlsVisible;
 
 {(new esc\Classes\HideScript())|noescape}
 {(new esc\Classes\ManiaLinkDrag())|noescape}
 
-Void startLoading(){
+Void startLoading(Text title){
     declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
     declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
     loadingFrame.Show();
+    controlsVisible = False;
+    AnimMgr.Add(Page.MainFrame.GetFirstChild("widget-controls"), " <frame pos='5.0 -10.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+    (Page.MainFrame.GetFirstChild("loading-title") as CMlLabel).SetText(title);
     content.Hide();
     loading = True;
 }
@@ -140,27 +145,71 @@ Void stopLoading(){
     declare loadingFrame <=> (Page.MainFrame.GetFirstChild("loading") as CMlLabel);
     declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
     loadingFrame.Hide();
+    (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame).Show();
     content.Show();
     loading = False;
 }
 
-Void playSong(Song song){
-    declare audio <=> (Page.MainFrame.GetFirstChild("music") as CMlMediaPlayer);
-    declare url = baserUrl ^ "?song=" ^ TL::URLEncode(song.file);
+Void stopAllSounds(){
+    declare CAudioSource[] toDestroy = CAudioSource[];
 
-    startLoading();
+    foreach(sound in Audio.Sounds){
+        if(sound.IsPlaying && !sound.DownloadInProgress){
+            toDestroy.add(sound);
+        }
+    }
+
+    foreach(sound in toDestroy){
+        Audio.DestroySound(sound);
+    }
+}
+
+Void updateWidget(Song song){
+    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song.title);
+
+    declare artist = song.artist;
+
+    if(song.album != "n/a"){
+        artist = song.album ^ " - " ^ artist;
+    }
+
+    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(artist);
+}
+
+Void playSong(Song song){
+    declare url = baseUrl ^ "?song=" ^ TL::URLEncode(song.file);
+
+    startLoading(song.title);
+
+    declare audio = Audio.CreateSound(url, 1.0, True, True, False);
+    declare startTime = GameTime;
+
+    while(audio.DownloadInProgress){
+        yield;
+        hidescript();
+        progress.RelativeRotation = progress.RelativeRotation + 2.0;
+
+        if(GameTime > (startTime + 3500)){
+            startLoading("Reset to start the song.");
+
+            if(GameTime > (startTime + 15000)){
+                startLoading("Failed to start song.");
+                sleep(2500);
+                stopLoading();
+                return;
+            }
+        }
+    }
+
+    stopAllSounds();
+
+    audio.Play();
 
     {if isVerbose()}
     log("[EvoSC:music-client] Playing '" ^ song.title ^ "' by " ^ song.artist ^ " (" ^ song.length ^ ")");
     {/if}
 
-    audio.Url = url;
-    sleep(100);
-    audio.Url = url;
-    audio.Play();
-
-    (Page.MainFrame.GetFirstChild("title") as CMlLabel).SetText(song.title);
-    (Page.MainFrame.GetFirstChild("artist") as CMlLabel).SetText(song.artist);
+    updateWidget(song);
 
     stopLoading();
 }
@@ -242,9 +291,9 @@ Void setColors(CMlControl songFrameControl, Vec3 color){
 }
 
 Void loadMusicLibrary(){
-    startLoading();
+    startLoading("Loading music");
 
-    declare CHttpRequest getSongList = Http.CreateGet(baserUrl);
+    declare CHttpRequest getSongList = Http.CreateGet(baseUrl);
 
     while(!getSongList.IsCompleted){
         yield;
@@ -271,18 +320,23 @@ Void loadMusicLibrary(){
     log("[EvoSC:music-client] Loaded " ^ music.count ^ " songs");
     {/if}
 
+    musicEnabled = True;
+
     stopLoading();
 }
 
 main() {
     declare Text SearchSong for This = "";
-    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
+    declare Song StartSong for This;
 
+    progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
     hoverColor = TL::ToColor({config('colors.ui.window.header.color')});
     musicEnabled = False;
-    baserUrl = "{config('music.url')|noescape}";
+    baseUrl = "{config('music.url')|noescape}";
 
-    loadMusicLibrary();
+    if(baseUrl != ""){
+        loadMusicLibrary();
+    }
 
     declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
     declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);
@@ -296,7 +350,7 @@ main() {
     currentSelection = music;
     updateList();
 
-    declare controlsVisible = False;
+    controlsVisible = False;
     declare musicPlaying = True;
     declare x_min = widget.RelativePosition_V3[0];
     declare x_max = widget.RelativePosition_V3[0] + (mainFrame.Size[0] * widget.RelativeScale);
@@ -312,12 +366,13 @@ main() {
             SearchSong = "";
         }
 
-        if(Map.Id != currentMap){
-            playRandomSong();
-            currentMap = Map.Id;
-        }
+        if(InputPlayer != Null && musicEnabled){
+            if(Map.Id != currentMap && StartSong.title != ""){
+                updateWidget(StartSong);
+                stopAllSounds();
+                currentMap = Map.Id;
+            }
 
-        if(InputPlayer != Null){
             if(loading){
                 progress.RelativeRotation = progress.RelativeRotation + 2.0;
             }
@@ -381,9 +436,9 @@ main() {
                         setColors(event.Control.Parent, hoverColor);
                     }
                     if(event.Type == CMlScriptEvent::Type::MouseClick){
-                        setColors(event.Control.Parent, <1.0, 1.0, 1.0>);
                         declare Song song;
                         song.fromjson(event.Control.DataAttributeGet("song"));
+                        Page.MainFrame.GetFirstChild("music-container").Hide();
                         playSong(song);
                         continue;
                     }
@@ -404,10 +459,10 @@ main() {
                     continue;
                 }
             }
-
-            maniaLinkDrag();
-            hidescript();
         }
+
+        maniaLinkDrag();
+        hidescript();
     }
 }
     --></script>

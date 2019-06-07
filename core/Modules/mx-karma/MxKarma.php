@@ -8,6 +8,7 @@ use esc\Classes\MXK;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
+use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Models\Karma;
 use esc\Models\Map;
@@ -292,7 +293,7 @@ class MxKarma extends MXK
                     'mapname'   => $map->gbx->Name,
                     'mapauthor' => $map->gbx->AuthorLogin,
                     'isimport'  => 'false',
-                    'maptime'   => MapController::getTimeLimit(),
+                    'maptime'   => CountdownController::getOriginalTimeLimit(),
                     'votes'     => $votes,
                 ];
 

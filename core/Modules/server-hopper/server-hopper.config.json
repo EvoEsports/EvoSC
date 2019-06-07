@@ -1,0 +1,24 @@
+{
+  "enabled": false,
+  "pos"    : "",
+  "servers": [
+    {
+      "login": "",
+      "rpc"  : {
+        "host" : "localhost",
+        "port" : 5000,
+        "login": "",
+        "pw"   : ""
+      }
+    },
+    {
+      "login": "",
+      "rpc"  : {
+        "host" : "localhost",
+        "port" : 5001,
+        "login": "",
+        "pw"   : ""
+      }
+    }
+  ]
+}

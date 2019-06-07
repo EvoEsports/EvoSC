@@ -15,14 +15,12 @@
     main(){
         declare uid = Map.MapInfo.MapUid;
 
-        while(True){
-            if(Map.MapInfo.MapUid != uid){
-                (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-                return;
-            }
+        wait(UI.UISequence == CUIConfig::EUISequence::Podium);
+        wait(Map.MapInfo.MapUid != uid || UI.UISequence != CUIConfig::EUISequence::Podium);
 
-            sleep(1000);
-        }
+        sleep(1000);
+
+        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
     }
 
     --></script>

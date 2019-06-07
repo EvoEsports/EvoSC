@@ -5,7 +5,7 @@ namespace esc\Modules;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
+use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Controllers\PlanetsController;
 use esc\Models\Player;
@@ -36,7 +36,7 @@ class Pay2Play
         if (config('pay2play.addtime.enabled')) {
             /* TODO: Block force replay */
 
-            if (MapController::getAddedTime() + MapController::getTimeLimit() >= config('pay2play.addtime.time-limit')) {
+            if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimit() >= config('pay2play.addtime.time-limit')) {
                 warningMessage('Maximum playtime for this round reached.')->send($player);
 
                 return;
@@ -49,8 +49,8 @@ class Pay2Play
     public static function addTimePaySuccess(Player $player, int $amount)
     {
         infoMessage($player, ' paid ', $amount, ' to add more time')->sendAll();
-        MapController::addTime(MapController::getTimeLimit());
-        onlinePlayers()->each([self::class, 'showWidget']);
+        CountdownController::addTime(CountdownController::getOriginalTimeLimit(), $player);
+        Template::showAll('pay2play.widget');
     }
 
     public static function skip(Player $player)

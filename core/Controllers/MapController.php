@@ -2,8 +2,6 @@
 
 namespace esc\Controllers;
 
-
-use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -18,11 +16,10 @@ use esc\Models\Map;
 use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
 use esc\Modules\MxMapDetails;
 use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Queue\Queue;
 
 /**
  * Class MapController
@@ -41,30 +38,18 @@ class MapController implements ControllerInterface
      */
     private static $nextMap;
 
-    /**
-     * @var Carbon
-     */
-    private static $mapStart;
-
     private static $mapsPath;
-    private static $addedTime = 0;
-    private static $timeLimit;
-    private static $originalTimeLimit;
 
     /**
      * Initialize MapController
      */
     public static function init()
     {
-        self::$mapsPath          = Server::getMapsDirectory();
-        self::$timeLimit         = self::getTimeLimitFromMatchSettings();
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
-
+        self::$mapsPath = Server::getMapsDirectory();
         self::loadMaps();
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('BeginMatch', [self::class, 'beginMatch']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
+        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
 
         AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
         AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
@@ -79,100 +64,16 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
-
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'Q', 'time');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
             // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
             // QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
         }
-    }
-
-    /**
-     * Load the time limit from the default match-settings.
-     *
-     * @return int
-     */
-    private static function getTimeLimitFromMatchSettings(): int
-    {
-        $file = config('server.default-matchsettings');
-
-        if ($file) {
-            $matchSettings = File::get(self::$mapsPath . 'MatchSettings/' . $file);
-            $xml           = new \SimpleXMLElement($matchSettings);
-            foreach ($xml->mode_script_settings->children() as $child) {
-                if ($child->attributes()['name'] == 'S_TimeLimit') {
-                    return intval($child->attributes()['value']);
-                }
-            }
-        }
-
-        return 600;
-    }
-
-    /**
-     * Reset time on round end for example
-     */
-    public static function resetTime()
-    {
-        self::$addedTime = 0;
-        self::$timeLimit = self::getTimeLimitFromMatchSettings();
-        self::setTimelimit(self::$timeLimit);
-    }
-
-    /**
-     * Add time to the counter
-     *
-     * @param int $seconds
-     */
-    public static function addTime(int $seconds = 600)
-    {
-        self::$addedTime += $seconds;
-        $newTimeLimit    = self::$timeLimit + self::$addedTime;
-        self::setTimelimit($newTimeLimit);
-
-        Hook::fire('TimeLimitUpdated', $newTimeLimit);
-    }
-
-    /**
-     * Add one minute to the countdown.
-     *
-     * @param \esc\Models\Player $player
-     */
-    public static function addMinute(Player $player)
-    {
-        self::addTime(60);
-    }
-
-    /**
-     * Chat-command: Add time
-     *
-     * @param \esc\Models\Player $player
-     * @param                    $cmd
-     * @param float              $amount
-     */
-    public static function addTimeManually(Player $player, $cmd, float $amount)
-    {
-        self::addTime($amount * 60.0);
-        Log::logAddLine('MapController', $player . ' added ' . $amount . ' minutes');
-    }
-
-    /**
-     * Set a new timelimit in seconds.
-     *
-     * @param int $seconds
-     */
-    public static function setTimelimit(int $seconds)
-    {
-        $settings                = Server::getModeScriptSettings();
-        $settings['S_TimeLimit'] = $seconds;
-        Server::setModeScriptSettings($settings);
     }
 
     /*
@@ -182,9 +83,10 @@ class MapController implements ControllerInterface
     {
         self::$nextMap    = null;
         self::$currentMap = $map;
-        self::$mapStart   = now();
 
-        Map::where('id', '!=', $map->id)->where('cooldown', '<=', config('server.map-cooldown'))->increment('cooldown');
+        Map::where('id', '!=', $map->id)
+           ->where('cooldown', '<=', config('server.map-cooldown'))
+           ->increment('cooldown');
 
         $map->update([
             'last_played' => now(),
@@ -195,18 +97,10 @@ class MapController implements ControllerInterface
         MxMapDetails::loadMxDetails($map);
 
         //TODO: move to player controller
-        Player::where('Score', '>', 0)->update([
-            'Score' => 0,
-        ]);
-    }
-
-    /**
-     * Hook: BeginMatch
-     */
-    public static function beginMatch()
-    {
-        self::resetTime();
-        self::addTime(0);
+        Player::where('Score', '>', 0)
+              ->update([
+                  'Score' => 0,
+              ]);
     }
 
     /**
@@ -216,8 +110,7 @@ class MapController implements ControllerInterface
     {
         $request = MapQueue::getFirst();
 
-        $mapUid        = Server::getNextMapInfo()->uId;
-        self::$nextMap = Map::where('uid', $mapUid)->first();
+        $mapUid = Server::getNextMapInfo()->uId;
 
         if ($request) {
             if (!Server::isFilenameInSelection($request->map->filename)) {
@@ -238,12 +131,14 @@ class MapController implements ControllerInterface
             $chatMessage   = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
             self::$nextMap = $request->map;
         } else {
-            $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
+            self::$nextMap = Map::where('uid', $mapUid)->first();
+            $chatMessage   = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
 
         NextMap::showNextMap(self::$nextMap);
 
-        $chatMessage->setIcon('')->sendAll();
+        $chatMessage->setIcon('')
+                    ->sendAll();
     }
 
     /**
@@ -277,17 +172,21 @@ class MapController implements ControllerInterface
             }
         }
 
-        $map->locals()->delete();
-        $map->dedis()->delete();
-        MapFavorite::whereMapId($map->id)->delete();
+        $map->locals()
+            ->delete();
+        $map->dedis()
+            ->delete();
+        MapFavorite::whereMapId($map->id)
+                   ->delete();
         $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
             try {
                 $map->delete();
-                Log::logAddLine('MapController', $player . ' deleted map ' . $map->filename);
+                Log::logAddLine('MapController', $player . '(' . $player->Login . ') deleted map ' . $map . ' [' . $map->uid . ']');
             } catch (\Exception $e) {
-                Log::logAddLine('MapController', 'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
+                Log::logAddLine('MapController',
+                    'Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -295,8 +194,11 @@ class MapController implements ControllerInterface
             Hook::fire('MapPoolUpdated');
 
             warningMessage($player, ' deleted map ', $map)->sendAll();
+
+            QueueController::preCacheNextMap();
         } else {
-            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
+            Log::logAddLine('MapController', 'Failed to delete map "' . $map->filename . '": ' . $e->getMessage(),
+                isVerbose());
         }
     }
 
@@ -317,12 +219,14 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::logAddLine('MapController', $player . ' disabled map ' . $map->filename);
+        Log::logAddLine('MapController', $player . '(' . $player->Login . ') disabled map ' . $map . ' [' . $map->uid . ']');
 
         $map->update(['enabled' => 0]);
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
         Hook::fire('MapPoolUpdated');
+
+        QueueController::preCacheNextMap();
     }
 
     /**
@@ -369,7 +273,7 @@ class MapController implements ControllerInterface
     {
         $mps     = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
-        $cmd     = "$mps /parsegbx=$mapFile";
+        $cmd     = $mps . sprintf(' /parsegbx="%s"', $mapFile);
 
         Log::logAddLine('MapController', 'Get GBX information: ' . $cmd);
 
@@ -394,23 +298,31 @@ class MapController implements ControllerInterface
             if (!File::exists($mapFile)) {
                 Log::error("File $mapFile not found.");
 
-                if (Map::whereFilename($filename)->exists()) {
-                    Map::whereFilename($filename)->update(['enabled' => 0]);
+                if (Map::whereFilename($filename)
+                       ->exists()) {
+                    Map::whereFilename($filename)
+                       ->update(['enabled' => 0]);
                 }
 
                 continue;
             }
 
-            if (Map::whereFilename($filename)->exists()) {
-                $map = Map::whereFilename($filename)->first();
+            if (Map::whereFilename($filename)
+                   ->exists()) {
+                $map = Map::whereFilename($filename)
+                          ->first();
 
                 if ($map->uid != $uid) {
                     Log::logAddLine('MapController', 'UID changed for map: ' . $map, isVerbose());
 
-                    LocalRecord::whereMap($map->id)->delete();
-                    Dedi::whereMap($map->id)->delete();
-                    MapFavorite::whereMapId($map->id)->delete();
-                    MapQueue::whereMapUid($map->uid)->delete();
+                    LocalRecord::whereMap($map->id)
+                               ->delete();
+                    Dedi::whereMap($map->id)
+                        ->delete();
+                    MapFavorite::whereMapId($map->id)
+                               ->delete();
+                    MapQueue::whereMapUid($map->uid)
+                            ->delete();
 
                     $map->update([
                         'gbx'             => self::getGbxInformation($filename),
@@ -420,27 +332,35 @@ class MapController implements ControllerInterface
                     ]);
                 }
             } else {
-                if (Map::whereUid($uid)->exists()) {
-                    $map = Map::whereUid($uid)->first();
+                if (Map::whereUid($uid)
+                       ->exists()) {
+                    $map = Map::whereUid($uid)
+                              ->first();
 
-                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)", isVerbose());
+                    Log::logAddLine('MapController', "Filename changed for map: (" . $map->filename . " -> $filename)",
+                        isVerbose());
 
                     $map->update([
                         'filename' => $filename,
                     ]);
                 } else {
-                    if (Player::where('Login', $mapInfo->author)->exists()) {
-                        $authorId = Player::find($mapInfo->author)->id;
+                    $gbxJson     = self::getGbxInformation($filename);
+                    $gbx         = json_decode($gbxJson);
+                    $authorLogin = $gbx->AuthorLogin;
+
+                    if (Player::where('Login', $authorLogin)
+                              ->exists()) {
+                        $authorId = Player::find($authorLogin)->id;
                     } else {
                         $authorId = Player::insertGetId([
-                            'Login'    => $mapInfo->author,
-                            'NickName' => $mapInfo->author,
+                            'Login'    => $authorLogin,
+                            'NickName' => $authorLogin,
                         ]);
                     }
 
                     $map = Map::create([
                         'author'   => $authorId,
-                        'filename' => $mapInfo->fileName,
+                        'filename' => $filename,
                         'gbx'      => self::getGbxInformation($filename),
                         'uid'      => $uid,
                     ]);
@@ -472,30 +392,6 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * @return int
-     */
-    public static function getTimeLimit(): int
-    {
-        return self::$timeLimit + self::$addedTime;
-    }
-
-    /**
-     * @return int
-     */
-    public static function getOriginalTimeLimit(): int
-    {
-        return self::$originalTimeLimit;
-    }
-
-    /**
-     * @return int
-     */
-    public static function getAddedTime(): int
-    {
-        return self::$addedTime;
-    }
-
-    /**
      * Reset the round.
      *
      * @param \esc\Models\Player $player
@@ -519,16 +415,6 @@ class MapController implements ControllerInterface
         }
 
         return self::$mapsPath;
-    }
-
-    /**
-     * Get the round-start-time.
-     *
-     * @return \Carbon\Carbon
-     */
-    public static function getMapStart(): Carbon
-    {
-        return self::$mapStart;
     }
 
     /**

@@ -5,5 +5,5 @@
   "cooldown": 120,
   "time-multiplier": 1.0,
   "enabled": true,
-  "vote-limit": 2
+  "vote_limit": 2
 }
