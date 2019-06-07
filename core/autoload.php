@@ -35,7 +35,8 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
             $classFile->namespace = $matches[1] . '\\' . $classFile->class;
         } else {
             //Abort execution when class wasn't loaded correctly
-            \esc\Classes\Log::logAddLine('autoload', "Class without namespace found: $classFile->file");
+            // \esc\Classes\Log::logAddLine('autoload', "Class without namespace found: $classFile->file");
+            var_dump("Class without namespace found: $classFile->file");
         }
 
         return $classFile;
@@ -75,7 +76,8 @@ function esc_class_loader($className)
             die("Trying to load non-existant file: " . $class->file);
         }
     } else {
-        \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className, isVeryVerbose());
+        // \esc\Classes\Log::logAddLine('class_loader', 'Class not found: ' . $className, isVeryVerbose());
+        var_dump('Class not found: ' . $className);
     }
 }
 
