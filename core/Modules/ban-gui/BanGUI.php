@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -13,23 +14,26 @@ class BanGUI
 {
     public function __construct()
     {
-        ChatCommand::add('//ban', [self::class, 'banPlayer'], 'Ban & blacklist player.', 'player_ban');
+        ChatCommand::add('//ban', [self::class, 'cmdBanPlayer'], 'Ban & blacklist player.', 'player_ban');
 
-        ManiaLinkEvent::add('ban.search', [self::class, 'searchPlayerAndShowResults']);
-    }
-
-    public static function showAddBanTab(Player $player)
-    {
-        Template::show($player, 'ban-gui.manialink');
+        ManiaLinkEvent::add('banui.show_bans', [self::class, 'showBansTab']);
+        ManiaLinkEvent::add('banui.show_add_ban', [self::class, 'showAddBanTab']);
+        ManiaLinkEvent::add('banui.search', [self::class, 'mleSearchPlayerAndShowResults']);
+        ManiaLinkEvent::add('banui.ban', [self::class, 'mleBanPlayer'], 'player_ban');
     }
 
     public static function showBansTab(Player $player)
     {
         $bans = Server::getBlackList(0, 999);
-        var_dump($bans);
+        Template::show($player, 'ban-gui.list', compact('bans'));
     }
 
-    public static function searchPlayerAndShowResults(Player $player, $search)
+    public static function showAddBanTab(Player $player)
+    {
+        Template::show($player, 'ban-gui.add');
+    }
+
+    public static function mleSearchPlayerAndShowResults(Player $player, $search)
     {
         $results = Player::pluck('NickName', 'Login')->filter(function ($nick, $login) use ($search) {
             if ($login == $search || strpos($login, $search) !== false) {
@@ -43,15 +47,39 @@ class BanGUI
             return false;
         });
 
-        Template::show($player, 'ban-gui.manialink', compact('results', 'search'));
+        Template::show($player, 'ban-gui.add', compact('results', 'search'));
     }
 
-    public static function banPlayer(Player $player, $cmd, $name = null)
+    public static function cmdBanPlayer(Player $player, $cmd, $name = null)
     {
         if ($name) {
-            self::searchPlayerAndShowResults($player, $name);
+            self::mleSearchPlayerAndShowResults($player, $name);
         } else {
             self::showAddBanTab($player);
+        }
+    }
+
+    public static function mleBanPlayer(Player $player, $login, ...$reasonParts)
+    {
+        $toBan = Player::find($login);
+
+        if (count($reasonParts) > 0) {
+            $reason = implode(' ', $reasonParts);
+        } else {
+            $reason = '';
+        }
+
+        try {
+            if (Server::banAndBlackList($login, $reason, true)) {
+                if ($reason != '') {
+                    warningMessage($player, ' banned ', secondary($toBan->NickName ?? $login), ', reason: ', secondary($reason))->sendAll();
+                } else {
+                    warningMessage($player, ' banned ', secondary($toBan->NickName ?? $login))->sendAll();
+                }
+            }
+        } catch (\Exception $e) {
+            warningMessage($e->getMessage())->send($player);
+            Log::logAddLine('BanGUI', 'Failed to ban & blacklist: ' . $login);
         }
     }
 }
