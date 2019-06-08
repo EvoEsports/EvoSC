@@ -59,7 +59,7 @@
 
     <frame id="music-container" pos="-80 45" hidden="1">
         <frame id="list">
-            <quad id="handle" pos="0 0" size="160 5" z-index="10"/>
+            <quad id="handle" data-id="music" pos="0 0" size="160 5" z-index="10"/>
             <quad pos="0 0" size="160 5" bgcolor="{config('colors.ui.window.header.color')|noescape}"/>
             <quad pos="0 0" size="160 95" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')}"/>
             <quad pos="0 0" size="160 95" style="Bgs1" substyle="BgDialogBlur"/>

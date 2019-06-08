@@ -32,30 +32,47 @@ class ManiaLinkDrag
     {
         return '
 Void maniaLinkDrag(){
-    declare frame <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
+    declare Vec2[Text] lastFramePosition for This;
+    declare handle <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
     
-    if(!frame.Parent.Visible){
+    if(!handle.Parent.Visible){
         return;
     }
     
-    declare framePos = frame.AbsolutePosition_V3;
-    declare frameSize = frame.Size;
+    declare Text handleId = handle.DataAttributeGet("id");
+    
+    if(handleId == ""){
+        handleId = "" ^ handle.Id;
+    }
+    
+    declare framePos = handle.AbsolutePosition_V3;
+    declare frameSize = handle.Size;
+    
+    if(handle.Parent.DataAttributeGet("centered") != "centered"){
+        if(lastFramePosition.existskey(handleId)){
+            handle.Parent.RelativePosition_V3 = lastFramePosition[handleId];
+        }else{
+            handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]/-2.0, handle.Parent.Size[1]/2.0>;
+        }
+    
+        handle.Parent.DataAttributeSet("centered", "centered");
+    }
     
     if(MouseLeftButton){
         if(MouseX >= framePos[0]){
             if(MouseY <= framePos[1]){
                 if(MouseX <= (framePos[0] + frameSize[0]) && MouseY >= (framePos[1] - frameSize[1])){
                     declare Real ZIndex for LocalUser = 305.0;
-                    declare startPos = frame.Parent.RelativePosition_V3;
+                    declare startPos = handle.Parent.RelativePosition_V3;
                     declare startX = MouseX;
                     declare startY = MouseY;
                     
-                    if(frame.Parent.ZIndex > ZIndex){
-                        ZIndex = frame.Parent.ZIndex;
+                    if(handle.Parent.ZIndex > ZIndex){
+                        ZIndex = handle.Parent.ZIndex;
                     }
                     
                     ZIndex = ZIndex + 1.0;
-                    frame.Parent.ZIndex = ZIndex;
+                    handle.Parent.ZIndex = ZIndex;
                     
                     while(MouseLeftButton){
                         yield;
@@ -63,8 +80,10 @@ Void maniaLinkDrag(){
                         declare newPosX = startPos[0] + (MouseX - startX);
                         declare newPosY = startPos[1] + (MouseY - startY);
                         
-                        frame.Parent.RelativePosition_V3 = <newPosX, newPosY>;
+                        handle.Parent.RelativePosition_V3 = <newPosX, newPosY>;
                     }
+                    
+                    lastFramePosition[handleId] = handle.Parent.RelativePosition_V3;
                 }
             }
         }

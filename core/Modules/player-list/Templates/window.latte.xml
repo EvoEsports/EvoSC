@@ -16,7 +16,7 @@
 
     <frame id="playerlist" pos="-60 42.5" size="120 180">
         <quad pos="0 0" size="120 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1" />
-        <quad id="handle" pos="0 0" size="115 5" z-index="5" />
+        <quad id="handle" data-id="playerlist" pos="0 0" size="115 5" z-index="5" />
         <quad id="bg" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1" />
         <label pos="2 -2.5" textsize="0.8" text="👥 Player List" textprefix="$s" valign="center" />
         <label class="close" pos="117.5 -2.5" size="5 5" textsize="0.2" text="❌" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />

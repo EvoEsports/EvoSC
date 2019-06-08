@@ -8,7 +8,7 @@
     </frame>
 
     <frame id="settings" pos="-20 7" hidden="1">
-        <quad id="handle" z-index="5" size="35 5" />
+        <quad id="handle" data-id="speedo" z-index="5" size="35 5" />
         <quad z-index="-1" size="41 5" bgcolor="{config('colors.ui.window.header.color')}c" />
         <quad z-index="-1" size="41 18" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}c" />
         <label class="close" pos="37.5 -2.5" size="5 5" halign="center" valign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />

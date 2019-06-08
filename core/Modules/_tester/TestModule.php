@@ -20,5 +20,6 @@ class TestModule
     public static function testStuff(Player $player)
     {
         TemplateController::loadTemplates();
+        BanGUI::showBanUi($player);
     }
 }
