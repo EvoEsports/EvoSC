@@ -6,6 +6,7 @@ namespace esc\Controllers;
 
 use esc\Classes\File;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use Illuminate\Support\Collection;
 
 class ConfigController implements ControllerInterface

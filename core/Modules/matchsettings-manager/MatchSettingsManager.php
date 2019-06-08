@@ -11,9 +11,9 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\TemplateController;
+use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\MapList\MapList;
 use Illuminate\Support\Collection;
 
 class MatchSettingsManager
@@ -26,20 +26,22 @@ class MatchSettingsManager
         self::$path    = Server::getMapsDirectory() . '/MatchSettings/';
         self::$objects = collect();
 
-        ChatCommand::add('//ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', 'ms.edit');
+        AccessRight::createIfNonExistent('ms_edit', 'Change match-settings.');
 
-        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting'], 'ms.edit');
-        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings'], 'ms.edit');
-        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings'], 'ms.edit');
-        ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview'], 'ms.edit');
-        ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings'], 'ms.edit');
+        ChatCommand::add('//ms', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', 'ms_edit');
 
-        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings'], 'ms.edit');
-        ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings'], 'ms.edit');
-        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps'], 'ms.edit');
-        ManiaLinkEvent::add('msm.edit_gameinfo', [self::class, 'editGameInfo'], 'ms.edit');
-        ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter'], 'ms.edit');
-        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings'], 'ms.edit');
+        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchSetting'], 'ms_edit');
+        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchSettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchSettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.overview', [self::class, 'showMatchSettingsOverview'], 'ms_edit');
+        ManiaLinkEvent::add('msm.save', [self::class, 'saveMatchSettings'], 'ms_edit');
+
+        ManiaLinkEvent::add('msm.edit', [self::class, 'editMatchSettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit_mss', [self::class, 'editModeScriptSettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'editMaps'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit_gameinfo', [self::class, 'editGameInfo'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit_filter', [self::class, 'editFilter'], 'ms_edit');
+        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchSettings'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');

@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -64,8 +65,11 @@ class ChatCommand
         $chatCommand = new ChatCommand($command, $callback, $description, $access, $hidden);
         self::$commands->put($command, $chatCommand);
 
-        // if(!config('enable-chat-routing')){
-        // }
+        if ($access && $access != 'ma') {
+            if (!AccessRight::whereName($access)->exists()) {
+                Log::warning("Missing access-right: $access");
+            }
+        }
 
         return $chatCommand;
     }

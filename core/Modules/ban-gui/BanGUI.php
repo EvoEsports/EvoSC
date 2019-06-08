@@ -8,12 +8,15 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 
 class BanGUI
 {
     public function __construct()
     {
+        AccessRight::createIfNonExistent('player_ban', 'Ban/unban players.');
+
         ChatCommand::add('//ban', [self::class, 'cmdBanPlayer'], 'Ban & blacklist player.', 'player_ban');
 
         ManiaLinkEvent::add('banui.show_bans', [self::class, 'showBansTab']);
