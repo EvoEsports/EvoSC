@@ -67,7 +67,7 @@
         {if isset($search)}
         nameEntry.Value = {$search};
         {else}
-        //nameEntry.StartEdition();
+        nameEntry.StartEdition();
         {/if}
 
         while(True){
