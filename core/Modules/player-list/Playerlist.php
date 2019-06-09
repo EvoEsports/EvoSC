@@ -34,7 +34,7 @@ class Playerlist
         $target = player($targetLogin);
 
         if (ChatController::isPlayerMuted($target)) {
-            ChatController::unmute($player, $target->Login);
+            ChatController::unmute($player, $target);
         } else {
             ChatController::mute($player, $target);
         }
