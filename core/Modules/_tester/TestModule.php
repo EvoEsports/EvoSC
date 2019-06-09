@@ -27,6 +27,6 @@ class TestModule
         $start      = microtime(true) + time();
         $players    = Player::whereIn('Login', $testLogins)->get();
         $end        = microtime(true) + time();
-        printf("Took %.3fs\n", ($duration = $end - $start));
+        Log::logAddLine('TestModule', sprintf("Took %.3fs\n", ($duration = $end - $start)));
     }
 }
