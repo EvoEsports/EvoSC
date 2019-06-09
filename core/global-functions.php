@@ -107,6 +107,8 @@ function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collect
 {
     global $_onlinePlayers;
 
+    \esc\Classes\Log::logAddLine('global', 'GET_ONLINE_PLAYERS');
+
     return $_onlinePlayers;
 }
 

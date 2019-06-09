@@ -8,6 +8,7 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Controllers\BansController;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 
@@ -73,13 +74,7 @@ class BanGUI
         }
 
         try {
-            if (Server::banAndBlackList($login, $reason, true)) {
-                if ($reason != '') {
-                    warningMessage($player, ' banned ', secondary($toBan->NickName ?? $login), ', reason: ', secondary($reason))->sendAll();
-                } else {
-                    warningMessage($player, ' banned ', secondary($toBan->NickName ?? $login))->sendAll();
-                }
-            }
+            BansController::ban($toBan, $player, $reason);
         } catch (\Exception $e) {
             warningMessage($e->getMessage())->send($player);
             Log::logAddLine('BanGUI', 'Failed to ban & blacklist: ' . $login);
