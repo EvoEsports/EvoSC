@@ -86,7 +86,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool unIgnore(string $string)
  * @method static bool unIgnoreId(int $int)
  * @method static bool cleanIgnoreList()
- * @method static array getIgnoreList(int $int, int $int)
+ * @method static array getIgnoreList(int $int = null, int $int = null)
  * @method static int pay(string $string, int $int, string $string)
  * @method static int sendBill(string $string, int $int, string $string, string $string = null)
  * @method static object getBillState(int $int)
