@@ -3,6 +3,7 @@
 require 'autoload.php';
 require 'global-functions.php';
 
+use esc\Classes\File;
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
@@ -11,6 +12,7 @@ use esc\Models\Map;
 use esc\Models\Player;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class EscRun extends Command
@@ -18,6 +20,7 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
+             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.')
              ->setDescription('Run Evo Server Controller');
     }
 
@@ -37,16 +40,9 @@ class EscRun extends Command
 
         Log::setOutput($output);
         esc\Controllers\ConfigController::init();
-        esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
 
-        //Check that cache directory exists
-        if (!is_dir(cacheDir())) {
-            mkdir(cacheDir());
-        }
-
-        //Check that logs directory exists
-        if (!is_dir(logDir())) {
-            mkdir(logDir());
+        if ($input->hasOption('setup') || !File::exists(cacheDir('.setupfinished'))) {
+            esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
         }
 
         try {

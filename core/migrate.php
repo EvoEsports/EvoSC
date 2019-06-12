@@ -9,7 +9,7 @@ class Migrate extends Command
 {
     protected function configure()
     {
-        $this->setName('migrate')->setDescription('Run all database migrations. Run after pulling updates');
+        $this->setName('migrate')->addOption('--setup')->setDescription('Run all database migrations. Run after pulling updates');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

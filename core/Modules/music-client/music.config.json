@@ -1,8 +1,9 @@
 {
-  "url": "",
-  "pos": {
+  "url"    : "",
+  "pos"    : {
     "visible": "120 71",
-    "hidden": "160 71"
+    "hidden" : "160 71"
   },
-  "scale": 0.8
+  "scale"  : 0.8,
+  "enabled": false
 }

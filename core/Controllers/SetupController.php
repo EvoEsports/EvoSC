@@ -4,9 +4,11 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\File;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 class SetupController
@@ -26,16 +28,31 @@ class SetupController
      */
     private static $helper;
 
-    private static $startMessageShown = false;
-
     public static function startSetup(InputInterface $input, OutputInterface $output, QuestionHelper $helper)
     {
         self::$input  = $input;
         self::$output = $output;
         self::$helper = $helper;
 
+        self::$output->writeln('<fg=cyan>Starting EvoSC Setup.</>');
+
         self::doServerConfig();
         self::doDatabaseConfig();
+        self::doDedimaniaConfig();
+        self::doMxKarmaConfig();
+        self::doMusicConfig();
+
+        //Check that cache directory exists
+        if (!is_dir(cacheDir())) {
+            mkdir(cacheDir());
+        }
+
+        //Check that logs directory exists
+        if (!is_dir(logDir())) {
+            mkdir(logDir());
+        }
+
+        File::put(cacheDir('.setupfinished'), 1);
     }
 
     private static function doServerConfig()
@@ -104,6 +121,74 @@ class SetupController
         self::askBatch('database', $questions);
     }
 
+    private static function doDedimaniaConfig()
+    {
+        $question = new ConfirmationQuestion('<fg=green>Configure dedimania? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+
+        if (!self::$helper->ask(self::$input, self::$output, $question)) {
+            return;
+        }
+
+        $questions = [
+            [
+                'id'       => 'login',
+                'question' => 'Enter your dedimania login',
+                'default'  => '',
+            ],
+            [
+                'id'       => 'key',
+                'question' => 'Enter your dedimania key',
+                'default'  => '',
+            ],
+        ];
+
+        self::askBatch('dedimania', $questions);
+
+        ConfigController::saveConfig('dedimania.enabled', true);
+    }
+
+    private static function doMxKarmaConfig()
+    {
+        $question = new ConfirmationQuestion('<fg=green>Configure ManiaExchange-Karma? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+
+        if (!self::$helper->ask(self::$input, self::$output, $question)) {
+            return;
+        }
+
+        $questions = [
+            [
+                'id'       => 'key',
+                'question' => 'Enter your mx-karma key',
+                'default'  => '',
+            ],
+        ];
+
+        self::askBatch('mx-karma', $questions);
+
+        ConfigController::saveConfig('mx-karma.enabled', true);
+    }
+
+    private static function doMusicConfig()
+    {
+        $question = new ConfirmationQuestion('<fg=green>Configure music server url? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+
+        if (!self::$helper->ask(self::$input, self::$output, $question)) {
+            return;
+        }
+
+        $questions = [
+            [
+                'id'       => 'url',
+                'question' => 'Enter your music server url',
+                'default'  => '',
+            ],
+        ];
+
+        self::askBatch('music', $questions);
+
+        ConfigController::saveConfig('music.enabled', true);
+    }
+
     private static function printError(string $text)
     {
         self::$output->writeln("<error>$text</error>");
@@ -132,15 +217,9 @@ class SetupController
             $optional = array_key_exists('optional', $questionData);
 
             if (!config($id)) {
-                if (!self::$startMessageShown) {
-                    self::$output->writeln('<fg=red>Detected missing config value.</>');
-                    self::$output->writeln('<fg=cyan>Starting EvoSC Setup.</>');
-                    self::$startMessageShown = true;
-                }
-
                 while (true) {
                     $required = 'string';
-                    $value    = self::askEnter(sprintf('[%s %d/%d] %s', $file, $key + 1, count($questions), $question), $default, $optional);
+                    $value    = self::askEnter(sprintf("\033[1m[%s %d/%d]\033[0m %s", $file, $key + 1, count($questions), $question), $default, $optional);
 
                     if (is_int($default)) {
                         $value    = intval($value);
