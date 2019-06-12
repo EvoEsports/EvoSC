@@ -1,7 +1,7 @@
 {
   "login": "",
-  "ip": "127.0.0.1",
-  "port": 5000,
+  "ip": "",
+  "port": 0,
   "rpc": {
     "login": "",
     "password": ""
@@ -9,7 +9,7 @@
   "default-matchsettings": "",
   "matchsettings-directory": "MatchSettings",
   "map-cooldown": 10,
-  "afk-timeout": 8,
+  "afk-timeout": 5,
   "controller-interval": 100,
   "enable-chat-routing": true,
   "echoes": {

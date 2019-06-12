@@ -25,10 +25,19 @@ class EscRun extends Command
     {
         global $escVersion;
         global $serverName;
+        global $_isVerbose;
+        global $_isVeryVerbose;
+        global $_isDebug;
+
+        $_isVerbose     = $output->isVerbose();
+        $_isVeryVerbose = $output->isVeryVerbose();
+        $_isDebug       = $output->isDebug();
 
         $escVersion = '0.68.26';
 
+        Log::setOutput($output);
         esc\Controllers\ConfigController::init();
+        esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
 
         //Check that cache directory exists
         if (!is_dir(cacheDir())) {
@@ -70,7 +79,7 @@ class EscRun extends Command
             $output->writeln("Connection established.");
         } catch (\Exception $e) {
             $msg = $e->getMessage();
-            $output->writeln("<error>$msg</error>");
+            $output->writeln("<error>Connecting to server failed: $msg</error>");
             exit(1);
         }
     }
@@ -92,18 +101,9 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // $this->migrate($input, $output);
+        $this->migrate($input, $output);
 
-        global $_isVerbose;
-        global $_isVeryVerbose;
-        global $_isDebug;
         global $_onlinePlayers;
-
-        $_isVerbose     = $output->isVerbose();
-        $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug       = $output->isDebug();
-
-        Log::setOutput($output);
 
         $version = getEscVersion();
         $motd    = "      ______           _____ ______
