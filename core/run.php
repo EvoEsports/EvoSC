@@ -20,7 +20,7 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
-             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.')
+             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
              ->setDescription('Run Evo Server Controller');
     }
 
@@ -41,7 +41,7 @@ class EscRun extends Command
         Log::setOutput($output);
         esc\Controllers\ConfigController::init();
 
-        if ($input->hasOption('setup') || !File::exists(cacheDir('.setupfinished'))) {
+        if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
         }
 
