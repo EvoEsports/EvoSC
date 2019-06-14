@@ -21,6 +21,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchSettingsManagerNew::showOverview($player);
+        MatchSettingsManager::showOverview($player);
     }
 }
