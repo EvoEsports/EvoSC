@@ -15,7 +15,5 @@
   "echoes": {
     "join": true,
     "leave": true
-  },
-  "owner-logins": [
-  ]
+  }
 }

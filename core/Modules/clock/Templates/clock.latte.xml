@@ -7,9 +7,9 @@
         <label id="time" pos="38 -5" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s" textcolor="{config('colors.ui.widget.text.primary')|noescape}" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame pos="45 -5">
-            <quad id="circle" size="5 5" halign="center" valign="center" image="https://i.imgur.com/xHjYvK1.png" />
-            <quad id="big" size="5 5" halign="center" valign="center" image="https://i.imgur.com/7QJ9G3b.png" />
-            <quad id="small" size="5 5" halign="center" valign="center" image="https://i.imgur.com/SHfVTWC.png" opacity="0.9" />
+            <quad id="circle" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/ring.png" />
+            <quad id="big" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/long.png" />
+            <quad id="small" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/short.png" opacity="0.9" />
         </frame>
     </frame>
 
