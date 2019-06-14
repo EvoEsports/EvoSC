@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist>
+    <gameinfos>
+        <game_mode>0</game_mode>
+        <chat_time>10000</chat_time>
+        <finishtimeout>1</finishtimeout>
+        <allwarmupduration>0</allwarmupduration>
+        <disablerespawn>0</disablerespawn>
+        <forceshowallopponents>0</forceshowallopponents>
+        <script_name><![CDATA[Team.Script.txt]]></script_name>
+    </gameinfos>
+    <filter>
+        <is_lan>1</is_lan>
+        <is_internet>1</is_internet>
+        <is_solo>0</is_solo>
+        <is_hotseat>0</is_hotseat>
+        <sort_index>1000</sort_index>
+        <random_map_order>0</random_map_order>
+    </filter>
+    <script_settings>
+        <setting name="S_ChatTime" type="integer" value="10"/>
+        <setting name="S_UseClublinks" type="boolean" value="0"/>
+        <setting name="S_UseClublinksSponsors" type="boolean" value="0"/>
+        <setting name="S_NeutralEmblemUrl" type="text" value=""/>
+        <setting name="S_ScriptEnvironment" type="text" value="production"/>
+        <setting name="S_MatchmakingAPIUrl" type="text" value="https://v4.live.maniaplanet.com/ingame/public/matchmaking"/>
+        <setting name="S_MatchmakingMatchServers" type="text" value=""/>
+        <setting name="S_MatchmakingMode" type="integer" value="0"/>
+        <setting name="S_MatchmakingRematchRatio" type="real" value="-1"/>
+        <setting name="S_MatchmakingRematchNbMax" type="integer" value="2"/>
+        <setting name="S_MatchmakingVoteForMap" type="boolean" value="0"/>
+        <setting name="S_MatchmakingProgressive" type="boolean" value="0"/>
+        <setting name="S_MatchmakingWaitingTime" type="integer" value="20"/>
+        <setting name="S_LobbyRoundPerMap" type="integer" value="6"/>
+        <setting name="S_LobbyMatchmakerPerRound" type="integer" value="30"/>
+        <setting name="S_LobbyMatchmakerWait" type="integer" value="2"/>
+        <setting name="S_LobbyMatchmakerTime" type="integer" value="8"/>
+        <setting name="S_LobbyDisplayMasters" type="boolean" value="1"/>
+        <setting name="S_LobbyDisableUI" type="boolean" value="0"/>
+        <setting name="S_KickTimedOutPlayers" type="boolean" value="1"/>
+        <setting name="S_MatchmakingErrorMessage" type="text" value="An error occured in the matchmaking API. If the problem persist please try to contact this server administrator."/>
+        <setting name="S_MatchmakingLogAPIError" type="boolean" value="0"/>
+        <setting name="S_MatchmakingLogAPIDebug" type="boolean" value="0"/>
+        <setting name="S_MatchmakingLogMiscDebug" type="boolean" value="0"/>
+        <setting name="S_ProgressiveActivation_WaitingTime" type="integer" value="180000"/>
+        <setting name="S_ProgressiveActivation_PlayersNbRatio" type="integer" value="1"/>
+        <setting name="S_AllowRespawn" type="boolean" value="1"/>
+        <setting name="S_UseLegacyXmlRpcCallbacks" type="boolean" value="1"/>
+        <setting name="S_PointsLimit" type="integer" value="50"/>
+        <setting name="S_PointsRepartition" type="text" value=""/>
+        <setting name="S_FinishTimeout" type="integer" value="-1"/>
+        <setting name="S_UseAlternateRules" type="boolean" value="0"/>
+        <setting name="S_ForceLapsNb" type="integer" value="10"/>
+        <setting name="S_DisplayTimeDiff" type="boolean" value="0"/>
+        <setting name="S_MaxPointsPerRound" type="integer" value="6"/>
+        <setting name="S_PointsGap" type="integer" value="1"/>
+        <setting name="S_WarmUpNb" type="integer" value="0"/>
+        <setting name="S_WarmUpDuration" type="integer" value="0"/>
+        <setting name="S_NbPlayersPerTeamMax" type="integer" value="3"/>
+        <setting name="S_NbPlayersPerTeamMin" type="integer" value="3"/>
+    </script_settings>
+    <startindex>0</startindex>
+</playlist>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3"
+           xmlns:n="http://www.w3.org/1999/xhtml">
+    <frame id="window" pos="-25 10">
+        <quad pos="0 0" size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
+        <quad id="handle" data-id="help" pos="0 0" size="35 5" z-index="5"/>
+        <quad id="bg" pos="0 -5" size="50 {count($matchsettings) * 5 + 8}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity')}" z-index="-1"/>
+        <label pos="2 -2.5" textsize="0.8" text=" Matchsettings Manager" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+        <label class="close" pos="47.5 -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+        <label pos="25 -9"
+               text=" Create new"
+               halign="center"
+               valign="center"
+               size="46 4"
+               textsize="0.5"
+               textprefix="$s"
+               action="msmn.create"
+               focusareacolor1="{config('colors.ui.window.btn.primary')}3"
+               focusareacolor2="{config('colors.ui.window.btn.primary')}c"
+               textfont="{config('colors.ui.font')|noescape}"
+        />
+
+        <frame pos="2 -4" n:if="count($matchsettings)">
+            <label n:foreach="$matchsettings as $i => $name"
+                   pos="15.5 {$i * -5}"
+                   text="{$name}  "
+                   halign="center"
+                   valign="center"
+                   size="31 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   action="msmn.edit,{$name}"
+                   focusareacolor1="{config('colors.ui.window.btn.default')}3"
+                   focusareacolor2="{config('colors.ui.window.btn.default')}c"
+                   textfont="{config('colors.ui.font')|noescape}"
+            />
+
+            <label n:foreach="$matchsettings as $i => $name"
+                   pos="33.5 {$i * -5}"
+                   text=""
+                   halign="center"
+                   valign="center"
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="load"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+                   focusareacolor1="{config('colors.ui.window.btn.default')}3"
+                   focusareacolor2="{config('colors.ui.window.btn.default')}c"
+                   textfont="{config('colors.ui.font')|noescape}"
+            />
+
+            <label n:foreach="$matchsettings as $i => $name"
+                   pos="38.5 {$i * -5}"
+                   text=""
+                   halign="center"
+                   valign="center"
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   action="msmn.duplicate,{$name}"
+                   focusareacolor1="{config('colors.ui.window.btn.default')}3"
+                   focusareacolor2="{config('colors.ui.window.btn.default')}c"
+                   textfont="{config('colors.ui.font')|noescape}"
+            />
+
+            <label n:foreach="$matchsettings as $i => $name"
+                   pos="43.5 {$i * -5}"
+                   text=""
+                   halign="center"
+                   valign="center"
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="delete"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+                   focusareacolor1="{config('colors.ui.window.btn.danger')}3"
+                   focusareacolor2="{config('colors.ui.window.btn.danger')}c"
+                   textfont="{config('colors.ui.font')|noescape}"
+            />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+    --></script>
+
+    {include 'dialogues.confirm'}
+
+    <script><!--
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        while(True){
+            yield;
+
+            if(window.Visible){
+                foreach(event in PendingEvents){
+                    if(event.Control == Null) continue;
+
+                    if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        window.Hide();
+                        return;
+                    }
+
+                    if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+
+                        if(confirm("Delete " ^ name ^ "?")){
+                            TriggerPageAction("msmn.delete," ^ name);
+                        }
+                    }
+
+                    if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+
+                        if(confirm("Do you really want to load " ^ name ^ " now?")){
+                            TriggerPageAction("msmn.load," ^ name);
+                        }
+                    }
+                }
+
+                maniaLinkDrag();
+            }
+        }
+    }
+
+    --></script>
+</manialink>

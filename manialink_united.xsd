@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Trackmania United : Manialink XML Schema-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ml="http://www.tm-united.com/manialink" targetNamespace="http://www.tm-united.com/manialink" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<element name="manialink">
+		<complexType>
+			<sequence>
+				<element name="type" minOccurs="0">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="default"/>
+						</restriction>
+					</simpleType>
+				</element>
+				<element name="background" minOccurs="0">
+					<complexType>
+						<attribute name="bgcolor" use="optional">
+							<simpleType>
+								<restriction base="ml:color"/>
+							</simpleType>
+						</attribute>
+						<attribute name="bgborderx" type="ml:size" use="optional"/>
+						<attribute name="bgbordery" type="ml:size" use="optional"/>
+					</complexType>
+				</element>
+				<element name="format" minOccurs="0">
+					<complexType>
+						<attribute name="textsize" type="ml:textsize" use="optional"/>
+						<attribute name="textcolor" type="ml:color" use="optional"/>
+					</complexType>
+				</element>
+				<element ref="ml:line" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="line">
+		<complexType>
+			<sequence>
+				<element ref="ml:cell" minOccurs="0" maxOccurs="unbounded"/>
+			</sequence>
+			<attribute name="height" type="ml:size" use="optional"/>
+		</complexType>
+	</element>
+	<element name="cell">
+		<complexType>
+			<choice minOccurs="0">
+				<element name="text">
+					<complexType>
+						<simpleContent>
+							<extension base="string">
+								<attribute name="textsize" type="ml:textsize" use="optional"/>
+								<attribute name="textcolor" type="ml:color" use="optional"/>
+								<attribute name="halign" type="ml:halignement" use="optional"/>
+							</extension>
+						</simpleContent>
+					</complexType>
+				</element>
+				<element name="icon">
+					<complexType>
+						<simpleContent>
+							<extension base="string">
+								<attribute name="width" type="ml:size" use="optional"/>
+								<attribute name="height" type="ml:size" use="optional"/>
+								<attribute name="halign" type="ml:halignement" use="optional"/>
+								<attribute name="url" type="string" use="optional"/>
+								<attribute name="manialink" type="string" use="optional"/>
+							</extension>
+						</simpleContent>
+					</complexType>
+				</element>
+				<element name="video" type="ml:multimedia_item"/>
+				<element name="audio" type="ml:multimedia_item"/>
+			</choice>
+			<attribute name="width" type="ml:size" use="optional"/>
+			<attribute name="bgcolor" type="ml:color" use="optional"/>
+		</complexType>
+	</element>
+	<complexType name="multimedia_item">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="width" type="ml:size" use="optional"/>
+				<attribute name="height" type="ml:size" use="optional"/>
+				<attribute name="halign" type="ml:halignement" use="optional"/>
+				<attribute name="play" use="optional">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="0"/>
+							<enumeration value="1"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<simpleType name="color">
+		<restriction base="string">
+			<length value="4"/>
+			<pattern value="[a-fA-F0-9]*"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="halignement">
+		<restriction base="string">
+			<enumeration value="left"/>
+			<enumeration value="center"/>
+			<enumeration value="right"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="size">
+		<restriction base="decimal">
+			<minExclusive value="0" fixed="false"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="textsize">
+		<restriction base="nonNegativeInteger"/>
+	</simpleType>
+</schema>

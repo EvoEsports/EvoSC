@@ -19,7 +19,7 @@
       },
       "btn"   : {
         "primary": "38c",
-        "default": "555",
+        "default": "999",
         "warning": "e90",
         "danger" : "e33"
       },

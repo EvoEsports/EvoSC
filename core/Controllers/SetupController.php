@@ -34,7 +34,7 @@ class SetupController
         self::$output = $output;
         self::$helper = $helper;
 
-        self::$output->writeln('<fg=cyan>Starting EvoSC Setup.</>');
+        self::printInfo('<fg=cyan>Starting EvoSC Setup.</>');
 
         self::doServerConfig();
         self::doDatabaseConfig();
@@ -91,6 +91,7 @@ class SetupController
         ];
 
         self::askBatch('server', $questions);
+        self::printInfo('Configuration of server.config.json finished.');
     }
 
     private static function doDatabaseConfig()
@@ -119,6 +120,7 @@ class SetupController
         ];
 
         self::askBatch('database', $questions);
+        self::printInfo('Configuration of database.config.json finished.');
     }
 
     private static function doDedimaniaConfig()
@@ -143,6 +145,7 @@ class SetupController
         ];
 
         self::askBatch('dedimania', $questions);
+        self::printInfo('Configuration of dedimania.config.json finished.');
 
         ConfigController::saveConfig('dedimania.enabled', true);
     }
@@ -166,6 +169,7 @@ class SetupController
         self::askBatch('mx-karma', $questions);
 
         ConfigController::saveConfig('mx-karma.enabled', true);
+        self::printInfo('Configuration of mx-karma.config.json finished.');
     }
 
     private static function doMusicConfig()
@@ -185,6 +189,7 @@ class SetupController
         ];
 
         self::askBatch('music', $questions);
+        self::printInfo('Configuration of music.config.json finished.');
 
         ConfigController::saveConfig('music.enabled', true);
     }
@@ -192,6 +197,11 @@ class SetupController
     private static function printError(string $text)
     {
         self::$output->writeln("<error>$text</error>");
+    }
+
+    private static function printInfo(string $text)
+    {
+        self::$output->writeln("<fg=cyan>$text</>");
     }
 
     private static function askEnter(string $questionString, string $default = '', bool $optional = false)
