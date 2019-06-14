@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:InfoMessages" id="InfoMessages" version="3">
     <frame id="settings" pos="-60 30">
-        <quad id="handle" size="115 5" z-index="5" />
+        <quad id="handle" data-id="infomsgs" size="115 5" z-index="5" />
         <quad size="120 5" bgcolor="{config('colors.ui.window.header.color')}9" z-index="-1" />
         <quad size="120 {$messages->count() * 4 + 16}" bgcolor="000c" z-index="-1" />
         <label textfont="{config('colors.ui.font')|noescape}" pos="1.5 -2.5" valign="center" textsize="0.5" textprefix="$s" text="Info Messages" />

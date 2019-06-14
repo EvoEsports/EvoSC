@@ -156,7 +156,11 @@ class PlayerController implements ControllerInterface
     public static function findPlayerByName(Player $callee, $nick): ?Player
     {
         $players = onlinePlayers()->filter(function (Player $player) use ($nick) {
-            return strpos(stripStyle(stripColors(strtolower($player))), strtolower($nick)) !== false || $player->Login == $nick;
+            if ($player->Login == $nick) {
+                return true;
+            }
+
+            return strpos(stripAll(strtolower($player)), strtolower($nick)) !== false;
         });
 
 

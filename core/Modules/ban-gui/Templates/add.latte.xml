@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:ban-ui" id="ban-ui" version="3">
+    <frame id="window" pos="0 0" size="50 {isset($results) ? 44 + count($results)*4 : 24}" scale="1.0">
+        <quad size="50 {isset($results) ? 37.5 + count($results)*4 : 20}" pos="0 0" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
+        <quad size="50 9" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
+        <quad id="handle" data-id="ban-ui" size="45 9" z-index="5" />
+        <label pos="2 -2.5" valign="center" textsize="1" text=" Bans" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="close" pos="47.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.text.primary')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" textfont="{config('colors.ui.font')|noescape}" />
+
+        <frame id="navbar" pos="0 -4.5" z-index="5" scale="0.95">
+            <label textfont="{config('colors.ui.font')|noescape}" class="nav-btn" pos="10 -3" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   text=" Add Ban" valign="center" halign="center" size="15 3.5" ScriptEvents="1"
+                   focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+            <label textfont="{config('colors.ui.font')|noescape}" class="nav-btn" pos="27 -3" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   text=" Ban-list" valign="center" halign="center" size="15 3.5" action="banui.show_bans"
+                   focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+            <quad id="nav-active" pos="10 -3" size="15 3.5" bgcolor="{config('colors.ui.window.header.color')}f" z-index="-1"
+                  halign="center" valign="center"/>
+
+            <quad pos="0 -4.7" size="200 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="2"/>
+        </frame>
+
+        <frame pos="2 -11">
+            <label pos="0 -0" size="20 3" textsize="0.5" text="Player" textfont="{config('colors.ui.font')|noescape}"/>
+            <entry id="name" class="name-entry" pos="0 -5" size="40 4" textsize="0.8" valign="center" ScriptEvents="1" />
+            <label class="search" pos="43 -5" size="6 4" textsize="0.8" text="🔍" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+
+        {if isset($results)}
+            <quad pos="-2 -8" size="50 {count($results) * 4 + 2}" bgcolor="{config('colors.ui.window.bg.color')}9" />
+
+            {foreach $results as $login => $nick}
+            <frame z-index="2" pos="0 {$iterator->counter * -4 - 7}">
+                <label pos="0 0" size="15 3.5" textsize="0.5" valign="center" text="{$login}" />
+                <label pos="16 0" size="19 3.5" textsize="0.5" valign="center" text="{$nick}" />
+                <label pos="41 0" size="10 3.5" textsize="0.01" text="SELECT" valign="center" halign="center" class="select" data-login="{$login}" data-nick="{$nick}" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            </frame>
+            {/foreach}
+
+            <frame pos="0 {count($results) * -4 - 11.5}">
+                <label pos="0 0" size="20 3" textsize="0.5" text="Reason" textfont="{config('colors.ui.font')|noescape}"/>
+                <textedit id="reason" pos="0 -3" size="46 5.5" textsize="0.5" />
+                <label pos="41 -11.5" size="10 3.5" textsize="0.01" text="BAN" valign="center" halign="center" class="ban" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+                <label id="selected" pos="0 -11.5" size="36 4" textsize="0.3" textprefix="Selected: " valign="center" textfont="{config('colors.ui.font')|noescape}" opacity="0.75"/>
+            </frame>
+            {/if}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    {(new esc\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare nameEntry <=> (Page.MainFrame.GetFirstChild("name") as CMlEntry);
+        declare selectedLabel <=> (Page.MainFrame.GetFirstChild("selected") as CMlLabel);
+        declare selectedLogin = "";
+
+        {if isset($results)}
+        declare reasonTextEdit <=> (Page.MainFrame.GetFirstChild("reason") as CMlTextEdit);
+        reasonTextEdit.AutoNewLine = True;
+        reasonTextEdit.MaxLine = 1;
+        {/if}
+
+        {if isset($search)}
+        nameEntry.Value = {$search};
+        {else}
+        nameEntry.StartEdition();
+        {/if}
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    mainFrame.Hide();
+                    return;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::EntrySubmit && event.Control.HasClass("name-entry") && nameEntry.Value != "" ||
+                    event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("search") && nameEntry.Value != ""){
+                    TriggerPageAction("banui.search," ^ nameEntry.Value);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("select")){
+                    selectedLogin = event.Control.DataAttributeGet("login");
+                    selectedLabel.SetText(event.Control.DataAttributeGet("nick"));
+                }
+
+                {if isset($results)}
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("ban") && selectedLogin != ""){
+                    TriggerPageAction("banui.ban," ^ selectedLogin ^ "," ^ reasonTextEdit.Value);
+                    mainFrame.Hide();
+                    return;
+                }
+                {/if}
+            }
+
+            maniaLinkDrag();
+        }
+    }
+
+    --></script>
+</manialink>

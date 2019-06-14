@@ -63,7 +63,8 @@ class ModuleController implements ControllerInterface
     {
         $name    = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
         $author  = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        $version = str_pad(sprintf('%.1f', floatval($module->version)), 12, ' ', STR_PAD_RIGHT);
+        // $version = str_pad(sprintf('%.1f', floatval($module->version)), 12, ' ', STR_PAD_RIGHT);
+        $version = str_pad(getEscVersion(), 12, ' ', STR_PAD_RIGHT);
 
         Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
     }

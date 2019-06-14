@@ -1,9 +1,7 @@
 <?php
 
-/**
- * @var \Illuminate\Support\Collection
- */
-global $_onlinePlayers;
+use esc\Classes\Server;
+use esc\Models\Player;
 
 function chatMessage(...$message)
 {
@@ -105,9 +103,9 @@ function baseDir(string $filename = ''): string
 
 function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
 {
-    global $_onlinePlayers;
+    $logins = collect(Server::getPlayerList())->pluck('login');
 
-    return $_onlinePlayers;
+    return Player::whereIn('Login', $logins)->get();
 }
 
 function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\Player

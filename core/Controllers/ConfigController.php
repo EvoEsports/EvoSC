@@ -5,7 +5,9 @@ namespace esc\Controllers;
 
 
 use esc\Classes\File;
+use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use Illuminate\Support\Collection;
 
 class ConfigController implements ControllerInterface
@@ -53,11 +55,42 @@ class ConfigController implements ControllerInterface
         return self::$config->has($id);
     }
 
+    /**
+     * @param string                                       $id
+     * @param string|\stdClass|array|int|float|double|bool $value
+     */
+    public static function saveConfig(string $id, $value)
+    {
+        self::setConfig($id, $value);
+
+        $idParts = collect(explode('.', $id));
+        $file    = $idParts->shift();
+
+        $configFile = configDir($file . '.config.json');
+        $jsonData   = File::get($configFile, true);
+        $path       = $idParts->map(function ($part) {
+            return sprintf("{'%s'}", $part);
+        })->implode('->');
+
+        eval('$jsonData->' . $path . ' = $value;');
+        File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
+
+        Log::logAddLine('ConfigController', "Updated config $id", isVerbose());
+    }
+
+    /**
+     * @param string                                       $id
+     * @param string|\stdClass|array|int|float|double|bool $value
+     */
+    public static function setConfig(string $id, $value)
+    {
+        self::$config->put($id, $value);
+    }
+
     private static function loadConfigurationFiles()
     {
-        $defaultConfigFiles = collect();
+        $defaultConfigFiles = File::getFilesRecursively(configDir('default'), self::$configFilePattern);
         $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern));
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('../config/default'), self::$configFilePattern));
         $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('../modules'), self::$configFilePattern));
 
         $defaultConfigFiles->each(function ($configFile) {

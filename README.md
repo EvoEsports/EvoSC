@@ -21,11 +21,8 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 ###### Clean installation
 1. Clone project `git clone https://github.com/EvoTM/EvoSC.git`.
 2. Switch to the new directory.
-3. (Checkout develop branch `git checkout develop` to get the latest version).
-4. Install required packages with `composer install`.
-5. Run the controller `php esc run` it will exit with "Cannot open socket" because the configs are empty (This step is nessecay to copy all required config files to the /config directory).
-6. Run `php esc migrate` to create the database tables.
-7. Run EvoSC with `php esc run`.
+3. Install required packages with `composer install`.
+4. Run EvoSC with `php esc run`.
 
 | ⚠ If the cache and log folder are not created automatically, you need to create them and restart the controller. |
 | --- |

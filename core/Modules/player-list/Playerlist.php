@@ -31,6 +31,12 @@ class Playerlist
 
     public static function mute(Player $player, $targetLogin)
     {
-        ChatController::mute($player, player($targetLogin));
+        $target = player($targetLogin);
+
+        if (ChatController::isPlayerMuted($target)) {
+            ChatController::unmute($player, $target);
+        } else {
+            ChatController::mute($player, $target);
+        }
     }
 }

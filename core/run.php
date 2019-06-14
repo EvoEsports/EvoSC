@@ -3,6 +3,7 @@
 require 'autoload.php';
 require 'global-functions.php';
 
+use esc\Classes\File;
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
@@ -11,6 +12,7 @@ use esc\Models\Map;
 use esc\Models\Player;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class EscRun extends Command
@@ -18,6 +20,7 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
+             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
              ->setDescription('Run Evo Server Controller');
     }
 
@@ -25,19 +28,21 @@ class EscRun extends Command
     {
         global $escVersion;
         global $serverName;
+        global $_isVerbose;
+        global $_isVeryVerbose;
+        global $_isDebug;
 
-        $escVersion = '0.62.0';
+        $_isVerbose     = $output->isVerbose();
+        $_isVeryVerbose = $output->isVeryVerbose();
+        $_isDebug       = $output->isDebug();
 
+        $escVersion = '0.68.26';
+
+        Log::setOutput($output);
         esc\Controllers\ConfigController::init();
 
-        //Check that cache directory exists
-        if (!is_dir(cacheDir())) {
-            mkdir(cacheDir());
-        }
-
-        //Check that logs directory exists
-        if (!is_dir(logDir())) {
-            mkdir(logDir());
+        if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
+            esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
         }
 
         try {
@@ -70,7 +75,7 @@ class EscRun extends Command
             $output->writeln("Connection established.");
         } catch (\Exception $e) {
             $msg = $e->getMessage();
-            $output->writeln("<error>$msg</error>");
+            $output->writeln("<error>Connecting to server failed: $msg</error>");
             exit(1);
         }
     }
@@ -92,18 +97,9 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // $this->migrate($input, $output);
+        $this->migrate($input, $output);
 
-        global $_isVerbose;
-        global $_isVeryVerbose;
-        global $_isDebug;
         global $_onlinePlayers;
-
-        $_isVerbose     = $output->isVerbose();
-        $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug       = $output->isDebug();
-
-        Log::setOutput($output);
 
         $version = getEscVersion();
         $motd    = "      ______           _____ ______

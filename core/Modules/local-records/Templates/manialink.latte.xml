@@ -45,7 +45,7 @@
     </frame>
 
     <frame id="window" pos="-90 40" hidden="1">
-        <quad id="handle" size="175 6" z-index="5" />
+        <quad id="handle" data-id="locals" size="175 6" z-index="5" />
         <quad size="180 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
         <quad id="bg" size="180 79" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="🏆 Local records" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />

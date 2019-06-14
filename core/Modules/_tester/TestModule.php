@@ -9,6 +9,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class TestModule
 {
@@ -17,8 +18,9 @@ class TestModule
         KeyBinds::add('test_stuff', '', [self::class, 'testStuff'], 'X', 'ma');
     }
 
-    public static function testStuff(Player $player)
+    public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
+        GearInfo::show($player);
     }
 }

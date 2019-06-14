@@ -55,7 +55,7 @@
     </framemodel>
 
     <frame id="map-list-window" pos="-20 55" size="122 106" hidden="1" z-index="300" scale="1.1">
-        <quad id="handle" pos="0 0" size="1 6" z-index="1"/>
+        <quad id="handle" data-id="maps" pos="0 0" size="1 6" z-index="1"/>
         <quad pos="0 0" size="200 11" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0.9"/>
         <quad pos="0 -10.5" size="200 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="2"/>
         <quad pos="0 0" size="200 150" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')}"/>

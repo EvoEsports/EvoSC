@@ -28,66 +28,33 @@ class BansController implements ControllerInterface
     {
         AccessRight::createIfNonExistent('player_ban', 'Ban and unban players.');
 
-        ChatCommand::add('//ban', [self::class, 'banPlayer'], 'Ban player by nickname.', 'player_ban');
-
         ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
 
     /**
      * Ban a player
      *
-     * @param \esc\Models\Player $player The player to be banned
+     * @param \esc\Models\Player $toBan  The player to be banned
      * @param \esc\Models\Player $admin  The admin who is banning
      * @param string             $reason The reason
      */
-    public static function ban(Player $player, Player $admin, string $reason = '')
+    public static function ban(Player $toBan, Player $admin, string $reason = '')
     {
-        Server::banAndBlackList($player->Login, $reason, true);
-        warningMessage($admin, ' banned ', $player, ', reason: ', secondary($reason))->sendAll();
-        $player->update(['banned' => 1]);
+        Server::banAndBlackList($toBan->Login, $reason, true);
+        warningMessage($admin, ' banned ', $toBan, ', reason: ', secondary($reason))->sendAll();
+        $toBan->update(['banned' => 1]);
     }
 
     /**
      * Unban a player
      *
-     * @param \esc\Models\Player $player The player to be unbanned
-     * @param \esc\Models\Player $admin  The admin who is unbanning
+     * @param \esc\Models\Player $toUnban The player to be unbanned
+     * @param \esc\Models\Player $admin   The admin who is unbanning
      */
-    public static function unban(Player $player, Player $admin)
+    public static function unban(Player $toUnban, Player $admin)
     {
-        Server::unBan($player->Login);
-        infoMessage($admin, ' unbanned ', $player)->sendAll();
-        $player->update(['banned' => 0]);
-    }
-
-    /**
-     * [INTERNAL] Handle ban player mania script action
-     *
-     * @param \esc\Models\Player $admin
-     * @param                    $login
-     * @param string             $reason
-     */
-    public static function banPlayerEvent(Player $admin, $cmd, $login, $reason = '')
-    {
-        self::ban(player($login), $admin, $reason);
-    }
-
-    /**
-     * [INTERNAL] Handle ban player chat command
-     *
-     * @param \esc\Models\Player $admin
-     * @param                    $cmd
-     * @param                    $nick
-     * @param mixed              ...$reason
-     */
-    public static function banPlayer(Player $admin, $cmd, $nick, ...$reason)
-    {
-        $playerToBeBanned = PlayerController::findPlayerByName($admin, $nick);
-
-        if (!$playerToBeBanned) {
-            return;
-        }
-
-        self::ban($playerToBeBanned, $admin, implode(' ', $reason));
+        Server::unBan($toUnban->Login);
+        infoMessage($admin, ' unbanned ', $toUnban)->sendAll();
+        $toUnban->update(['banned' => 0]);
     }
 }

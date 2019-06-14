@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:gear-info" id="gear-info" version="3">
     <frame id="main" pos="0 0" z-index="100">
-        <label id="up" halign="center" valign="center" textsize="5.5" textprefix="" text="" opacity="0" />
-        <label id="down" halign="center" valign="center" textsize="5.5" textprefix="" text="" opacity="0" />
+        <label id="up" halign="center" valign="center" textsize="5.5" textcolor="fff" text="" opacity="0" />
+        <label id="down" halign="center" valign="center" textsize="5.5" textcolor="f33" text="" opacity="0" />
     </frame>
 
     <script><!--
@@ -12,19 +12,20 @@
     Void resetLabel(CMlLabel label){
         label.Hide();
         label.RelativePosition_V3 = <0.0, 0.0>;
-        label.Opacity = 0.8;
+        label.Opacity = 0.85;
+        label.Show();
     }
 
     Void animUp(){
         declare up <=> (Page.MainFrame.GetFirstChild("up") as CMlLabel);
         resetLabel(up);
-        AnimMgr.Add(up, "<label pos='0 5' opacity='0' />", 1200, CAnimManager::EAnimManagerEasing::QuintOut);
+        AnimMgr.Add(up, "<label pos='0 6' opacity='0' />", 800, CAnimManager::EAnimManagerEasing::QuintOut);
     }
 
     Void animDown(){
         declare down <=> (Page.MainFrame.GetFirstChild("down") as CMlLabel);
         resetLabel(down);
-        AnimMgr.Add(down, "<label pos='0 -5' opacity='0' />", 1200, CAnimManager::EAnimManagerEasing::QuintOut);
+        AnimMgr.Add(down, "<label pos='0 -12' opacity='0' />", 1000, CAnimManager::EAnimManagerEasing::QuintOut);
     }
 
     main(){
