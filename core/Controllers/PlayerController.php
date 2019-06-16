@@ -50,11 +50,12 @@ class PlayerController implements ControllerInterface
 
         AccessRight::createIfNonExistent('player_kick', 'Kick players.');
         AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
-        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        AccessRight::createIfNonExistent('override_join_msg', 'Always announce join/leave.');
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
 
         ChatCommand::add('//setpw', [self::class, 'setServerPassword'], 'Set the server password, leave empty to clear it.', 'ma');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
     }
 
     public static function setServerPassword(Player $player, $cmd, $pw)
@@ -93,7 +94,7 @@ class PlayerController implements ControllerInterface
 
         Log::logAddLine('PlayerController', $message->getMessage());
 
-        if (config('server.echoes.join') || $player->hasAccess('admin_echoes')) {
+        if (config('server.echoes.join') || $player->hasAccess('override_join_msg')) {
             $message->sendAll();
         } else {
             $message->sendAdmin();
