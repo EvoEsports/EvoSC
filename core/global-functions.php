@@ -190,6 +190,12 @@ function matchSettings(string $filename = null)
     return \esc\Classes\Server::getMapsDirectory() . '/MatchSettings/' . ($filename);
 }
 
+function dd($object)
+{
+    var_dump($object);
+    die();
+}
+
 function getMapInfoFromFile(string $filename)
 {
     $mps  = config('server.mps');

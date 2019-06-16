@@ -38,7 +38,7 @@ class MatchSettingsManager
 
         AccessRight::createIfNonExistent('ms_edit', 'Change match-settings.');
 
-        ChatCommand::add('//msm', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', 'ms_edit');
+        ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'ms_edit');
 
         ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'ms_edit');
         ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'ms_edit');
@@ -69,10 +69,21 @@ class MatchSettingsManager
 
     public static function showEditMatchsettings(Player $player, string $name)
     {
-        $file = Server::getMapsDirectory() . '/MatchSettings/' . $name . '.txt';
-        $data = File::get($file);
+        $file  = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
+        $data  = File::get($file);
+        $maps  = collect();
+        $nodes = collect();
+        $xml   = new \SimpleXMLElement($data);
 
-        Template::show($player, 'matchsettings-manager.edit', compact('data', 'name'));
+        foreach ($xml as $node) {
+            if ($node->getName() == 'map') {
+                $maps->push($node);
+            } else {
+                $nodes->push($node);
+            }
+        }
+
+        Template::show($player, 'matchsettings-manager.edit', compact('name', 'nodes', 'maps'));
     }
 
     public static function createNewMatchsettings(Player $player, string $modeName)
@@ -80,7 +91,7 @@ class MatchSettingsManager
         $modeFile               = self::$modes[$modeName];
         $modeBaseName           = str_replace('.xml', '', $modeFile);
         $sourceMatchsettings    = __DIR__ . '/MatchSettingsRepo/' . $modeFile;
-        $matchsettingsDirectory = Server::getMapsDirectory() . '/MatchSettings/';
+        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
         $i                      = 0;
 
         do {
@@ -97,7 +108,7 @@ class MatchSettingsManager
     {
         $file                   = $matchsettingsFile . '.txt';
         $targetFile             = $matchsettingsFile . '_copy.txt';
-        $matchsettingsDirectory = Server::getMapsDirectory() . '/MatchSettings/';
+        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
 
         File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
 
@@ -112,7 +123,7 @@ class MatchSettingsManager
             return;
         }
 
-        File::delete(Server::getMapsDirectory() . '/MatchSettings/' . $matchsettingsFile . '.txt');
+        File::delete(Server::getMapsDirectory() . 'MatchSettings/' . $matchsettingsFile . '.txt');
 
         self::showOverview($player);
     }
