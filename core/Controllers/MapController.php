@@ -307,6 +307,13 @@ class MapController implements ControllerInterface
                 continue;
             }
 
+            if (!$uid) {
+                Log::logAddLine('MapController', 'Missing ident in match-settings for map: ' . $filename);
+                $gbxJson = self::getGbxInformation($filename);
+                $gbx     = json_decode($gbxJson);
+                $uid     = $gbx->MapUid;
+            }
+
             if (Map::whereFilename($filename)
                    ->exists()) {
                 $map = Map::whereFilename($filename)
