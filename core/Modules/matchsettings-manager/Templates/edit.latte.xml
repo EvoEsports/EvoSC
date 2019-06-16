@@ -6,7 +6,7 @@
         <quad id="handle" data-id="help" pos="0 0" size="95 5" z-index="5"/>
         <quad id="bg" pos="0 -5" size="100 100" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity')}" z-index="-1"/>
         <label pos="5 -2.5" textsize="0.8" text="Edit {$name} (does not save atm)" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-        <label pos="2 -2.5" textsize="0.8" text="" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" action="msmn.overview"/>
+        <label pos="2 -2.5" textsize="0.8" text="" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" action="msm.overview"/>
         <label class="close" pos="97.5 -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
         <textedit id="textedit" pos="8 -7" size="90 96" textsize="0.5" showlinenumbers="1" />

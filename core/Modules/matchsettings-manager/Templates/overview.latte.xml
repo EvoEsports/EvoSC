@@ -15,7 +15,7 @@
                size="46 4"
                textsize="0.5"
                textprefix="$s"
-               action="msmn.create"
+               action="msm.create"
                focusareacolor1="{config('colors.ui.window.btn.primary')}3"
                focusareacolor2="{config('colors.ui.window.btn.primary')}c"
                textfont="{config('colors.ui.font')|noescape}"
@@ -30,7 +30,7 @@
                    size="31 4"
                    textsize="0.5"
                    textprefix="$s"
-                   action="msmn.edit,{$name}"
+                   action="msm.edit,{$name}"
                    focusareacolor1="{config('colors.ui.window.btn.default')}3"
                    focusareacolor2="{config('colors.ui.window.btn.default')}c"
                    textfont="{config('colors.ui.font')|noescape}"
@@ -60,7 +60,7 @@
                    size="5 4"
                    textsize="0.5"
                    textprefix="$s"
-                   action="msmn.duplicate,{$name}"
+                   action="msm.duplicate,{$name}"
                    focusareacolor1="{config('colors.ui.window.btn.default')}3"
                    focusareacolor2="{config('colors.ui.window.btn.default')}c"
                    textfont="{config('colors.ui.font')|noescape}"
@@ -113,7 +113,7 @@
                         declare name = event.Control.DataAttributeGet("name");
 
                         if(confirm("Delete " ^ name ^ "?")){
-                            TriggerPageAction("msmn.delete," ^ name);
+                            TriggerPageAction("msm.delete," ^ name);
                         }
                     }
 
@@ -121,7 +121,7 @@
                         declare name = event.Control.DataAttributeGet("name");
 
                         if(confirm("Do you really want to load " ^ name ^ " now?")){
-                            TriggerPageAction("msmn.load," ^ name);
+                            TriggerPageAction("msm.load," ^ name);
                         }
                     }
                 }

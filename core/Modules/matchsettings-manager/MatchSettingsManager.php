@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\File;
+use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MatchSettings;
@@ -39,13 +40,13 @@ class MatchSettingsManager
 
         ChatCommand::add('//msm', [self::class, 'showMatchSettingsOverview'], 'Show MatchSettingsManager', 'ms_edit');
 
-        ManiaLinkEvent::add('msmn.overview', [self::class, 'showOverview'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.create', [self::class, 'showCreateMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.edit', [self::class, 'showEditMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.load', [self::class, 'loadMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.duplicate', [self::class, 'duplicateMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msmn.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'ms_edit');
+        ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
@@ -105,6 +106,12 @@ class MatchSettingsManager
 
     public static function deleteMatchsettings(Player $player, string $matchsettingsFile)
     {
+        if (config('server.default-matchsettings') == $matchsettingsFile . '.txt') {
+            warningMessage('Can not delete default match-settings.')->send($player);
+
+            return;
+        }
+
         File::delete(Server::getMapsDirectory() . '/MatchSettings/' . $matchsettingsFile . '.txt');
 
         self::showOverview($player);
@@ -115,6 +122,8 @@ class MatchSettingsManager
         Server::loadMatchSettings('MatchSettings/' . $matchsettingsFile . '.txt');
 
         infoMessage($player, ' loads matchsettings ', secondary($matchsettingsFile))->sendAll();
+
+        Hook::fire('MatchSettingsLoaded');
     }
 
     public static function getMatchsettings()

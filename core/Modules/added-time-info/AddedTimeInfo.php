@@ -18,6 +18,7 @@ class AddedTimeInfo
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
         Hook::add('AddedTimeChanged', [self::class, 'addedTimeChanged']);
         Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
+        Hook::add('MatchSettingsLoaded', [self::class, 'resetAddedTimeInfo']);
 
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
     }
