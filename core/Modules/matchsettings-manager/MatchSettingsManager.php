@@ -43,6 +43,7 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
@@ -75,11 +76,39 @@ class MatchSettingsManager
             if ($node->getName() == 'map') {
                 $maps->push($node);
             } else {
-                $nodes->push($node);
+                if (count($node) > 0) {
+                    $nodeName = $node->getName();
+                    $items    = collect();
+
+                    foreach ($node as $item) {
+                        if ($nodeName == 'mode_script_settings') {
+                            $items->put('' . $item['name'], '' . $item['value']);
+                        } else {
+                            $items->put($item->getName(), '' . $item[0]);
+                        }
+                    }
+
+                    $nodes->put($nodeName, $items);
+                } else {
+                    $nodes->put($node->getName(), '' . $node[0]);
+                }
             }
         }
 
         Template::show($player, 'matchsettings-manager.edit', compact('name', 'nodes', 'maps'));
+    }
+
+    public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
+    {
+        $settings = json_decode(implode(',', $settings));
+
+        var_dump([
+            'old_file' => $oldFilename,
+            'file'     => $filename,
+            'changes'  => $settings,
+        ]);
+
+        self::showEditMatchsettings($player, $oldFilename);
     }
 
     public static function createNewMatchsettings(Player $player, string $modeName)

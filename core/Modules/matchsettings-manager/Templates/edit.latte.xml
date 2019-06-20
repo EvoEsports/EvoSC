@@ -10,28 +10,31 @@
         <label class="close" pos="87.5 -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
         <entry id="filename" pos="2 -9" size="60 4" textsize="0.5" valign="center" textfont="{config('colors.ui.font')|noescape}" />
-        <label pos="75 -9" size="25 4" text=" Save" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+        <label class="save" pos="75 -9" size="25 4" text=" Save" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
 
         <frame pos="2 -15" id="rows">
+            {php $row=0}
             {foreach $nodes as $key => $node}
-            <frame id="r{$key}" pos="0 {$key * -4.5}" data-row="{$key}" data-nodes="{$node->count()}">
-                {if $node->count() > 0}
-                <label class="collapsable" pos="43 0" size="86 4" textprefix="{$node->getName()}  " text="" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}"
+            <frame id="r{$row}" pos="0 {$row * -4.5}" data-row="{$row}" data-nodes="{count($node)}">
+                {if !is_string($node)}
+                <label class="collapsable" pos="43 0" size="86 4" textprefix="{$key}  " text="" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}"
                        ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
 
-                <frame pos="0 -1.5" size="86 {$node->count()*5}" z-index="100">
-                    <quad pos="0 -0.5" size="100 {$node->count()*5}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
+                <frame pos="0 -1.5" size="86 {count($node)*5}" z-index="100">
+                    <quad pos="0 -0.5" size="100 {count($node)*5}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
                     {php $i=0}
-                    {foreach $node as $subNode}
-                    <label pos="2 {$i * -5 - 3}" size="25 4" text="{$subNode->getName()}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
-                    <entry pos="84 {$i++ * -5 - 2.5}" size="25 3" default="{$subNode}" data-prev="{$subNode}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                    {foreach $node as $subKey => $subNode}
+                    <label pos="2 {$i * -5 - 3}" size="55 4" text="{$subKey}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                    <entry class="entry" pos="84 {$i++ * -5 - 2.5}" size="35 4" default="{$subNode}" data-key="{$subKey}" data-prev="{$subNode}" data-parent="{$key}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
                     {/foreach}
                 </frame>
                 {else}
-                <label pos="2 0" size="25 4" text="{$node->getName()}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
-                <entry pos="84 -0.5" size="25 3" default="{$node}" data-prev="{$node}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                <quad pos="0 2" size="86 4" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
+                <label pos="2 0" size="55 4" text="{$key}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                <entry class="entry" pos="84 0" size="35 4" default="{$node}" data-key="{$key}" data-prev="{$node}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
                 {/if}
             </frame>
+            {php $row++}
             {/foreach}
         </frame>
     </frame>
@@ -67,6 +70,31 @@
         }
     }
 
+    Void save(){
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare filenameEntry <=> (Page.MainFrame.GetFirstChild("filename") as CMlEntry);
+        declare Text[Text] changedNodes = Text[Text];
+
+        Page.GetClassChildren("entry", window, True);
+
+        foreach(entryControl in Page.GetClassChildren_Result){
+            declare entry = (entryControl as CMlEntry);
+            declare key = entry.DataAttributeGet("key");
+            declare prevValue = entry.DataAttributeGet("prev");
+            declare parent = entry.DataAttributeGet("parent");
+
+            if(entry.Value != prevValue){
+                if(parent != ""){
+                    changedNodes[parent ^ "." ^ key] = entry.Value;
+                }else{
+                    changedNodes[key] = entry.Value;
+                }
+            }
+        }
+
+        TriggerPageAction("msm.update,{$name|noescape}," ^ filenameEntry.Value ^ "," ^ changedNodes.tojson());
+    }
+
     main(){
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
@@ -97,6 +125,10 @@
                     if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                         window.Hide();
                         return;
+                    }
+
+                    if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        save();
                     }
 
                     if(event.Control.HasClass("collapsable") && event.Type == CMlScriptEvent::Type::MouseClick){
