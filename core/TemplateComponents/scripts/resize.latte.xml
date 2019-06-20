@@ -1,0 +1,40 @@
+<quad id="resize_handle" class="resize_handle" size="90 1.5" z-index="1000000" ScriptEvents="1" />
+<label id="resize" text="$s" textsize="1.1" textcolor="fff" z-index="1000000" />
+
+<script><!--
+declare CMlFrame resizableWindow;
+declare CMlQuad resizeHandle;
+declare CMlLabel resizeCursor;
+Void windowresize(){
+    if(resizableWindow == Null){
+        resizableWindow <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        resizeHandle <=> (Page.MainFrame.GetFirstChild("resize_handle") as CMlQuad);
+        resizeCursor <=> (Page.MainFrame.GetFirstChild("resize") as CMlLabel);
+    }
+
+    resizeHandle.RelativePosition_V3 = <resizableWindow.AbsolutePosition_V3[0], resizableWindow.AbsolutePosition_V3[1] - resizableWindow.Size[1] + 0.75>;
+
+    if(MouseY < resizeHandle.AbsolutePosition_V3[1] && MouseY > resizeHandle.AbsolutePosition_V3[1] - resizeHandle.Size[1]){
+        resizeCursor.RelativePosition_V3 = <MouseX + 1.5, MouseY - 1>;
+        resizeCursor.Show();
+
+        declare oldY = MouseY;
+        declare oldSizeY = resizableWindow.Size[1];
+
+        while(MouseLeftButton){
+            declare diffY = oldY - MouseY;
+            resizableWindow.Size = <resizableWindow.Size[0], oldSizeY + diffY>;
+
+            if(resizableWindow.Size[1] < 12.5){
+                resizableWindow.Size[1] = 12.5;
+            }
+
+            resizeHandle.RelativePosition_V3 = <resizableWindow.AbsolutePosition_V3[0], resizableWindow.AbsolutePosition_V3[1] - resizableWindow.Size[1] + 0.5>;
+            resizeCursor.RelativePosition_V3 = <MouseX + 1.5, MouseY - 1>;
+            yield;
+        }
+    }else{
+        resizeCursor.Hide();
+    }
+}
+--></script>

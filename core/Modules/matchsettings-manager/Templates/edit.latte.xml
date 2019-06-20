@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3"
            xmlns:n="http://www.w3.org/1999/xhtml">
-    <frame id="window" pos="-50 10" size="90 70">
+    <frame id="window" pos="-45 10" size="90 70">
         <quad pos="0 0" size="90 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
         <quad id="handle" data-id="help" pos="0 0" size="85 5" z-index="5"/>
         <quad id="bg" pos="0 -5" size="90 100" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity')}" z-index="-1"/>
@@ -24,7 +24,7 @@
                     {php $i=0}
                     {foreach $node as $subNode}
                     <label pos="2 {$i * -5 - 3}" size="25 4" text="{$subNode->getName()}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
-                    <entry pos="84 {$i++ * -5 - 3.5}" size="25 3" default="{$subNode}" data-prev="{$subNode}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                    <entry pos="84 {$i++ * -5 - 2.5}" size="25 3" default="{$subNode}" data-prev="{$subNode}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
                     {/foreach}
                 </frame>
                 {else}
@@ -38,6 +38,7 @@
 
     {include 'scripts.includes'}
     {include 'scripts.drag'}
+    {include 'scripts.resize'}
 
     <script><!--
 
@@ -88,6 +89,8 @@
             yield;
 
             if(window.Visible){
+                windowresize();
+
                 foreach(event in PendingEvents){
                     if(event.Control == Null) continue;
 

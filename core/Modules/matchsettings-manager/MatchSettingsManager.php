@@ -5,17 +5,13 @@ namespace esc\Modules;
 
 use esc\Classes\File;
 use esc\Classes\Hook;
-use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MatchSettings;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
-use esc\Controllers\TemplateController;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Support\Collection;
 
 class MatchSettingsManager
 {
