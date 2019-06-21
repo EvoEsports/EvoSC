@@ -247,7 +247,14 @@ class Dedimania extends DedimaniaApi
             $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
             $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
 
-            if ($newRank > 100 || ($newRank > self::$maxRank && $player->MaxRank < self::$maxRank)) {
+            $saveRecord = $newRank <= self::$maxRank;
+
+            if (!$saveRecord) {
+                //check for dedimania premium
+                $saveRecord = $newRank <= $player->MaxRank;
+            }
+
+            if (!$saveRecord) {
                 return;
             }
 

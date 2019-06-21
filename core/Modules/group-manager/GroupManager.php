@@ -175,12 +175,12 @@ class GroupManager
         $newMember = Player::find($playerLogin);
 
         if (!$newMember) {
-            Player::create([
-                'NickName' => $playerLogin,
-                'Login'    => $playerLogin,
-            ]);
+            $newMember = new Player();
 
-            $newMember = Player::find($playerLogin);
+            $newMember->NickName = $playerLogin;
+            $newMember->Login = $playerLogin;
+
+            $newMember->save();
         }
 
         $group = Group::find($groupId);
