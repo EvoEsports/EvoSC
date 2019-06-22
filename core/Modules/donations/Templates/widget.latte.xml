@@ -14,9 +14,11 @@
         <!--
         #Include "MathLib" as ML
         #Include "TextLib" as TL
+    --></script>
 
-        {(new esc\Classes\HideScript('main-frame'))|noescape}
+    {include 'scripts.hide', target => main-frame}
 
+    <script><!--
         Void anim(CMlFrame frame, Text targetPos){
             AnimMgr.Add(frame, targetPos, 200, CAnimManager::EAnimManagerEasing::CubicInOut);
         }

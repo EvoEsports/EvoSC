@@ -1,0 +1,53 @@
+<script><!--
+
+declare Text HS_Pos_Visible;
+declare Text HS_Pos_Hidden;
+declare CMlFrame HS_Target;
+declare Boolean HS_Hidden;
+
+Void hidescript(){
+    if(HS_Target == Null){
+        HS_Target <=> (Page.MainFrame.GetFirstChild({isset($target) ? $target : 'widget'}) as CMlFrame);
+        declare orig = HS_Target.RelativePosition_V3;
+        declare hidden = orig;
+
+        hidden[0] = 160.0;
+
+        if(orig[0] < 0.0){
+            hidden[0] = -160.0;
+            hidden[0] -= HS_Target.Size[0] * HS_Target.RelativeScale;
+        }
+
+        HS_Pos_Visible = "<frame pos='" ^ orig[0] ^ " " ^ orig[1] ^ "' />";
+        HS_Pos_Hidden = "<frame pos='" ^ hidden[0] ^ " " ^ hidden[1] ^ "' />";
+    }
+
+    declare hideSpeed for LocalUser = 10;
+
+    if(hideSpeed == -1 || InputPlayer == Null){
+        return;
+    }
+
+    declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+    declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+    declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
+
+    if(mapFinished){
+        if(!HS_Hidden){
+            HS_Hidden = True;
+            AnimMgr.Add(HS_Target, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }else{
+        if(overHidespeed && playerIsRacing && !HS_Hidden){
+            HS_Hidden = True;
+            AnimMgr.Add(HS_Target, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+        }
+        if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+            HS_Hidden = False;
+            AnimMgr.Add(HS_Target, HS_Pos_Visible, 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }
+
+}
+--></script>

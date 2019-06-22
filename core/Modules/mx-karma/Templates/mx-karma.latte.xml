@@ -44,6 +44,11 @@
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+    --></script>
+
+    {include 'scripts.hide'}
+
+    <script><!--
 
 Text getStarString(Real rating){
     if(rating == -1.0){
@@ -112,8 +117,6 @@ Void updateMyRating(Integer myRating){
     }
 
 }
-
-{(new esc\Classes\HideScript())|noescape}
 
 main(){
     declare Integer MxKarmaRating for LocalUser = -2;

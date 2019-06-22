@@ -54,6 +54,13 @@ Void maniaLinkDrag(){
         }else{
             handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]/-2.0, handle.Parent.Size[1]/2.0>;
         }
+        
+        if(handle.Parent.RelativePosition_V3[1] > 150){
+            handle.Parent.RelativePosition_V3 = <handle.Parent.RelativePosition_V3[0], handle.Parent.RelativePosition_V3[1] - 10>;
+        }
+        if(handle.Parent.RelativePosition_V3[1] < -150){
+            handle.Parent.RelativePosition_V3 = <handle.Parent.RelativePosition_V3[0], handle.Parent.RelativePosition_V3[1] + 10>;
+        }
     
         handle.Parent.DataAttributeSet("centered", "centered");
     }
