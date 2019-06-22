@@ -266,6 +266,12 @@
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+--></script>
+
+    {include 'scripts.hide', ['hideOnPodium' => true]}
+    {include 'scripts.drag'}
+
+    <script><!--
 
 declare Integer[] favorites;
 declare Text[Text][] maps;
@@ -942,10 +948,6 @@ Void quickFavAction(CMlScriptEvent event){
         }
     }
 }
-
-{(new esc\Classes\ManiaLinkDrag())|noescape}
-
-{(new esc\Classes\HideScript("widget", true))|noescape}
 
 main() {
     inSearch = False;

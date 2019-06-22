@@ -22,7 +22,7 @@
 
         main() {
             declare hideSpeed for LocalUser = 10;
-    
+
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
             declare time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);

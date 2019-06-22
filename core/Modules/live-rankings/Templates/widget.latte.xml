@@ -20,8 +20,13 @@
     </frame>
 
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+--></script>
+
+    {include 'scripts.hide'}
+
+    <script><!--
 
     declare Integer[Text] scores;
 
@@ -109,8 +114,6 @@
         }
         scores = Integer[Text];
     }
-
-    {(new esc\Classes\HideScript())|noescape}
 
     main(){
         declare Text currentMapUid = Map.MapInfo.MapUid;
