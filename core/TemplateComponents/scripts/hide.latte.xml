@@ -41,7 +41,9 @@ Void hidescript(){
         if(overHidespeed && playerIsRacing && !HS_Hidden){
             HS_Hidden = True;
             AnimMgr.Add(HS_Target, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            {if !isset($continue)}
             wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            {/if}
         }
         if((!overHidespeed || !playerIsRacing) && HS_Hidden){
             HS_Hidden = False;
