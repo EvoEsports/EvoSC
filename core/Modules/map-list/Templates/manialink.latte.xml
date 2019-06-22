@@ -268,7 +268,7 @@
 #Include "TextLib" as TL
 --></script>
 
-    {include 'scripts.hide', ['hideOnPodium' => true]}
+    {include 'scripts.hide', hideOnPodium => true}
     {include 'scripts.drag'}
 
     <script><!--

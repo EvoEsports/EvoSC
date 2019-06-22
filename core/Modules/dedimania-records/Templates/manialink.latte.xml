@@ -106,6 +106,12 @@
         Text name;
         Text login;
     }
+    --></script>
+
+    {include 'scripts.hide'}
+    {include 'scripts.drag'}
+
+    <script><!--
 
     declare Integer currentPage;
     declare Integer maxPage;
@@ -383,9 +389,6 @@
 
         return answer;
     }
-
-    {(new esc\Classes\HideScript())|noescape}
-    {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     main(){
         declare Record[Integer] DediRecords_ for LocalUser;

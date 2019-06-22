@@ -28,67 +28,22 @@
     </frame>
     {/if}
 
-    <script><!--
-        Void anim(CMlFrame frame, Text targetPos, Integer duration){
-            AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-        }
+    <script>
+        <!--
+        #Include "TextLib" as TL
+    --></script>
 
+    {include 'scripts.hide', target => addtime}
+
+    <script><!--
         main() {
-            declare Text addtimeVisible = "<frame pos='{config('pay2play.addtime.pos.visible')|noescape}' />";
-            declare Text addtimeHidden = "<frame pos='{config('pay2play.addtime.pos.hidden')|noescape}' />";
-            declare Text skipVisible = "<frame pos='{config('pay2play.skip.pos.visible')|noescape}' />";
-            declare Text skipHidden = "<frame pos='{config('pay2play.skip.pos.hidden')|noescape}' />";
             declare addtime <=> (Page.MainFrame.GetFirstChild("addtime") as CMlFrame);
             declare skip <=> (Page.MainFrame.GetFirstChild("skip") as CMlFrame);
-            declare Boolean hidden = False;
-            declare Integer duration = 800;
             declare Real speed = 0.0;
 
             while(True){
                 yield;
-
-                if(InputPlayer != Null){
-                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
-
-                    speed = InputPlayer.Speed;
-
-                    if(speed < 0){
-                        speed = speed  * -1;
-                    }
-
-                    if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                        if(speed < UI_Hide_Speed && hidden){
-
-                            {if config('pay2play.addtime.enabled')}
-                            anim(addtime, addtimeVisible, duration);
-                            {/if}
-                            {if config('pay2play.skip.enabled')}
-                            anim(skip, skipVisible, duration);
-                            {/if}
-                            hidden = False;
-                        }
-                    }else{
-                        if(speed >= UI_Hide_Speed && !hidden){
-                            {if config('pay2play.addtime.enabled')}
-                            anim(addtime, addtimeHidden, duration);
-                            {/if}
-                            {if config('pay2play.skip.enabled')}
-                            anim(skip, skipHidden, duration);
-                            {/if}
-                            hidden = True;
-                        }
-
-                        if(speed < UI_Hide_Speed && hidden){
-                            {if config('pay2play.addtime.enabled')}
-                            anim(addtime, addtimeVisible, duration);
-                            {/if}
-                            {if config('pay2play.skip.enabled')}
-                            anim(skip, skipVisible, duration);
-                            {/if}
-                            hidden = False;
-                        }
-                    }
-                }
+                hidescript();
             }
         }
     --></script>

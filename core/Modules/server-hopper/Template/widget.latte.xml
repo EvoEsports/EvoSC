@@ -19,8 +19,11 @@
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
+    --></script>
 
-    {(new esc\Classes\HideScript())|noescape}
+    {include 'scripts.hide'}
+
+    <script><!--
 
     Text getJoinLink(Text login, Text title, Text name, Boolean hasPassword){
         declare Text youAreHere = "";
