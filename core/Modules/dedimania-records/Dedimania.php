@@ -190,19 +190,24 @@ class Dedimania extends DedimaniaApi
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 8000) {
-            //ignore times under 3 seconds
+            //ignore times under 8 seconds
             return;
         }
 
-        $map = MapController::getCurrentMap();
+        $map              = MapController::getCurrentMap();
+        $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
+        $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
+
+        $saveRecord = $newRank <= self::$maxRank;
+
+        if (!$saveRecord) {
+            //check for dedimania premium
+            $saveRecord = $newRank <= $player->MaxRank;
+        }
 
         if (self::$dedis->has($player->id)) {
             $oldRecord = self::$dedis->get($player->id);
             $oldRank   = $oldRecord->Rank;
-
-            if ($oldRecord->Score < $score) {
-                return;
-            }
 
             $chatMessage = chatMessage()
                 ->setIcon('')
@@ -214,10 +219,18 @@ class Dedimania extends DedimaniaApi
                 return;
             }
 
+            if (!$saveRecord) {
+                return;
+            }
+
+            if ($oldRecord->Score < $score) {
+                return;
+            }
+
             $map->dedis()->updateOrCreate(['Player' => $player->id], [
                 'Score'       => $score,
                 'Checkpoints' => $checkpoints,
-                'Rank'        => -1,
+                'Rank'        => $newRank,
                 'New'         => 1,
             ]);
 
@@ -244,16 +257,6 @@ class Dedimania extends DedimaniaApi
             self::cacheDedisJson();
             self::sendUpdatedDedis();
         } else {
-            $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
-            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
-
-            $saveRecord = $newRank <= self::$maxRank;
-
-            if (!$saveRecord) {
-                //check for dedimania premium
-                $saveRecord = $newRank <= $player->MaxRank;
-            }
-
             if (!$saveRecord) {
                 return;
             }
