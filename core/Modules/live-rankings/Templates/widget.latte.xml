@@ -24,7 +24,7 @@
 #Include "TextLib" as TL
 --></script>
 
-    {include 'scripts.hide', ['continue' => true]}
+    {include 'scripts.hide', doNotPause => true}
 
     <script><!--
 
