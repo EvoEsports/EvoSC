@@ -233,7 +233,7 @@ class Dedimania extends DedimaniaApi
             }
 
             if ($oldRank == $newRank) {
-                $chatMessage->setParts($player, ' secured his/her ', $oldRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $chatMessage->setParts($player, ' secured his/her ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             } else {
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
             }
