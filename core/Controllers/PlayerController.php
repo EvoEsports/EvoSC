@@ -40,6 +40,9 @@ class PlayerController implements ControllerInterface
                 'NickName' => $playerInfo->nickName,
             ]);
 
+            $player->spectator_status = $playerInfo->spectatorStatus;
+            $player->player_id        = $playerInfo->playerId;
+
             return $player;
         })->keyBy('Login');
 

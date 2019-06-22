@@ -4,10 +4,13 @@ namespace esc\Controllers;
 
 
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
+use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Models\Player;
 use esc\Interfaces\ControllerInterface;
+use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
 /**
  * Class AfkController
@@ -21,22 +24,31 @@ class AfkController implements ControllerInterface
     /**
      * @var \Illuminate\Support\Collection
      */
-    private static $afkTracker;
+    private static $pingTracker;
 
     /**
      * Initialize
      */
     public static function init()
     {
-        self::$afkTracker = collect();
+        self::$pingTracker = collect();
 
-        Hook::add('PlayerConnect', [self::class, 'interaction']);
-        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
-        Hook::add('PlayerFinish', [self::class, 'interaction']);
-        Hook::add('PlayerStartLine', [self::class, 'interaction']);
+        Hook::add('PlayerConnect', [self::class, 'sendPinger']);
         Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
 
-        Timer::create('checkAfkStatus', [self::class, 'checkAfkStatus'], '20s', true);
+        ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
+
+        Timer::create('checkPing', [self::class, 'checkPing'], '15s', true);
+    }
+
+    /**
+     * Add player to the tracker and send pinger
+     *
+     * @param \esc\Models\Player $player
+     */
+    public static function sendPinger(Player $player)
+    {
+        Template::show($player, 'pinger');
     }
 
     /**
@@ -46,60 +58,65 @@ class AfkController implements ControllerInterface
      */
     public static function removePlayerFromTracker(Player $player)
     {
-        self::$afkTracker->forget($player->Login);
+        self::$pingTracker->forget($player->Login);
     }
 
     /**
-     * Update the last interaction.
+     * Handle received ping
      *
      * @param \esc\Models\Player $player
-     * @param mixed              ...$arguments
+     * @param int                $secondsSinceLastInteraction
      */
-    public static function interaction(Player $player, ...$arguments)
+    public static function pingReceived(Player $player, int $secondsSinceLastInteraction)
     {
-        self::$afkTracker->put($player->Login, [
-            'last_interaction' => now(),
-            'is_afk'           => false,
-        ]);
+        self::$pingTracker->put($player->Login, time());
+
+        if (($secondsSinceLastInteraction / 60) >= config('server.afk-timeout') && !$player->isSpectator()) {
+            $message = infoMessage($player, ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('');
+
+            if (config('server.echoes.join')) {
+                $message->sendAll();
+            } else {
+                $message->sendAdmin();
+            }
+
+            Server::forceSpectator($player->Login, 3);
+        }
+    }
+
+    private static function revivePlayer(Player $player)
+    {
+        warningMessage('EvoSC detected you as offline and is now reconnecting you.')->send($player);
+        Hook::fire('PlayerConnect', $player);
     }
 
     /**
-     * Check the afk status for all players.
+     * Check the ping status for all players.
      */
-    public static function checkAfkStatus()
+    public static function checkPing()
     {
-        $afkPlayers = collect();
+        onlinePlayers()->each(function (Player $player) {
+            if (!self::$pingTracker->has($player->Login)) {
+                self::$pingTracker->put($player->Login, 0);
 
-        self::$afkTracker->each(function (array $data, string $playerLogin) use ($afkPlayers) {
-            $lastInteraction = $data['last_interaction'];
-
-            if ($data['is_afk']) {
                 return;
             }
 
-            if ($lastInteraction->diffInMinutes() >= config('server.afk-timeout')) {
-                $player = Player::whereLogin($playerLogin)->first();
+            $lastPing = self::$pingTracker->get($player->Login);
 
-                if ($player->isSpectator() ?? false) {
+            if ($lastPing <= 0) {
+                $lastPing--;
+
+                if ($lastPing < -2) {
+                    self::$pingTracker->put($player->Login, 0);
+                    self::revivePlayer($player);
+
                     return;
                 }
 
-                $afkPlayers->push($player->NickName);
-
-                self::$afkTracker->put($playerLogin, [
-                    'last_interaction' => $lastInteraction,
-                    'is_afk'           => true,
-                ]);
-
-                Server::forceSpectator($playerLogin, 3);
+                self::$pingTracker->put($player->Login, $lastPing);
             }
         });
-
-        if ($afkPlayers->count() == 1) {
-            infoMessage($afkPlayers->first(), ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
-        } elseif ($afkPlayers->count() > 1) {
-            infoMessage($afkPlayers->implode(secondary(', ')), ' were moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('')->sendAll();
-        }
     }
 
     /**

@@ -7,6 +7,7 @@ use esc\Classes\File;
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
+use esc\Controllers\AfkController;
 use esc\Controllers\EventController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -126,8 +127,8 @@ class EscRun extends Command
         esc\Controllers\QueueController::init();
         esc\Controllers\MatchSettingsController::init();
         esc\Controllers\MapController::init();
-        // esc\Controllers\AfkController::init();
         esc\Controllers\PlayerController::init();
+        esc\Controllers\AfkController::init();
         esc\Controllers\BansController::init();
         esc\Controllers\ModuleController::init();
         esc\Controllers\PlanetsController::init();

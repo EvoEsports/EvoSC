@@ -203,6 +203,7 @@ class Player extends Model
      *
      * @return \Illuminate\Support\Collection
      */
+    /*
     public function getSpectatorStatusAttribute($value)
     {
         $object                     = collect([]);
@@ -214,6 +215,7 @@ class Player extends Model
 
         return $object;
     }
+    */
 
     /**
      * Check if the player is in spectator-mode.
@@ -222,7 +224,7 @@ class Player extends Model
      */
     public function isSpectator(): bool
     {
-        return $this->spectator_status->spectator ?? false;
+        return $this->spectator_status > 0;
     }
 
     /**

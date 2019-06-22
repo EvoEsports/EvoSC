@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:Pinger" id="Pinger" version="3">
+    <script><!--
+main() {
+    declare lastInteraction = GameTime;
+    declare lastUpdate = GameTime;
+
+    while(True){
+        yield;
+
+        foreach(event in RaceEvents){
+            if(event.Player.User.Login == LocalUser.Login){
+                lastInteraction = GameTime;
+            }
+        }
+
+        declare updateDiff = (GameTime - lastUpdate) / 1000;
+
+        if(updateDiff > 10){
+            declare diff = (GameTime - lastInteraction) / 1000;
+            lastUpdate = GameTime;
+            TriggerPageAction("ping," ^ diff);
+        }
+    }
+}
+    --></script>
+</manialink>

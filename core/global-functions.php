@@ -118,8 +118,21 @@ function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\
 
     if (!$player || !isset($player->Login)) {
         \esc\Classes\Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
+        $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
-        return null;
+        if ($data) {
+            Player::create([
+                'Login'    => $data->login,
+                'NickName' => $data->nickName,
+            ]);
+        } else {
+            Player::create([
+                'Login'    => $login,
+                'NickName' => $login,
+            ]);
+        }
+
+        $player = \esc\Models\Player::find($login);
     }
 
     if ($addToOnlineIfOffline) {

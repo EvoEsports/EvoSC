@@ -31,6 +31,7 @@ class CountdownController
         }
 
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
+        Hook::add('EndMatch', [self::class, 'setMatchStart']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
