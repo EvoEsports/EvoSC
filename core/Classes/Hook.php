@@ -4,6 +4,8 @@ namespace esc\Classes;
 
 
 use esc\Controllers\HookController;
+use Exception;
+use TypeError;
 
 /**
  * Class Hook
@@ -38,16 +40,15 @@ class Hook
     /**
      * Hook constructor.
      *
-     * @param string $event
-     * @param        $function
-     * @param bool   $runOnce
-     *
-     * @throws \Exception
+     * @param string   $event
+     * @param callable $function
+     * @param bool     $runOnce
+     * @param int      $priority
      */
-    public function __construct(string $event, $function, bool $runOnce = false, int $priority = 0)
+    public function __construct(string $event, callable $function, bool $runOnce = false, int $priority = 0)
     {
-        $this->event    = $event;
-        $this->runOnce  = $runOnce;
+        $this->event = $event;
+        $this->runOnce = $runOnce;
         $this->priority = $priority;
 
         if (gettype($function) == "object") {
@@ -78,16 +79,16 @@ class Hook
                     call_user_func($this->function, ...$arguments);
                     // Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
                 } else {
-                    throw new \Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
+                    throw new Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
             if ($message != "Login unknown.") {
                 Log::logAddLine('Hook', "Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
                 Log::logAddLine('DEBUG', json_encode($this->function), isDebug());
             }
-        } catch (\TypeError $e) {
+        } catch (TypeError $e) {
             Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }
 
@@ -120,15 +121,16 @@ class Hook
      * Use Hook::add.
      * Register a hook.
      *
-     * @param string $event
-     * @param        $callback
-     * @param bool   $runOnce
+     * @param string   $event
+     * @param callable $callback
+     * @param bool     $runOnce
+     * @param int      $priority
      */
-    public static function add(string $event, $callback, bool $runOnce = false, int $priority = 0)
+    public static function add(string $event, callable $callback, bool $runOnce = false, int $priority = 0)
     {
         try {
             HookController::add($event, $callback, $runOnce, $priority);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::logAddLine('!] Hook [!', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
         }
     }
@@ -150,7 +152,7 @@ class Hook
         foreach ($hooks as $hook) {
             try {
                 $hook->execute(...$arguments);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::logAddLine('Hook:' . $hook->event, $e->getMessage() . "\n" . $e->getTraceAsString());
             }
         }

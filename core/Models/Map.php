@@ -6,42 +6,104 @@ namespace esc\Models;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Class Map
+ *
+ * @package esc\Models
+ *
+ * @property string  $uid
+ * @property string  $filename
+ * @property boolean $plays
+ * @property string  $author
+ * @property boolean $enabled
+ * @property string  $last_played
+ * @property string  $mx_details
+ * @property string  $mx_world_record
+ * @property string  $cooldown
+ *
+ */
 class Map extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'maps';
 
-    protected $fillable = ['uid', 'filename', 'plays', 'author', 'last_played', 'enabled', 'mx_details', 'mx_world_record', 'gbx', 'cooldown'];
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'uid',
+        'filename',
+        'plays',
+        'author',
+        'last_played',
+        'enabled',
+        'mx_details',
+        'mx_world_record',
+        'gbx',
+        'cooldown'
+    ];
 
+    /**
+     * @var array
+     */
     protected $dates = ['last_played'];
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @return HasMany
+     */
     public function locals()
     {
         return $this->hasMany(LocalRecord::class, 'Map');
     }
 
+    /**
+     * @return HasMany
+     */
     public function dedis()
     {
         return $this->hasMany(Dedi::class, 'Map');
     }
 
+    /**
+     * @return HasOne
+     */
     public function author()
     {
         return $this->hasOne(Player::class, 'id', 'author');
     }
 
+    /**
+     * @param $playerId
+     *
+     * @return mixed
+     */
     public function getAuthorAttribute($playerId)
     {
         return Player::whereId($playerId)->first();
     }
 
+    /**
+     * @return HasMany
+     */
     public function ratings()
     {
         return $this->hasMany(Karma::class, 'Map', 'id');
     }
 
+    /**
+     * @return mixed
+     */
     public function getAverageRatingAttribute()
     {
         $mxDetails = $this->mx_details;
@@ -53,11 +115,19 @@ class Map extends Model
         return $this->ratings()->pluck('Rating')->average();
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function favorites()
     {
         return $this->belongsToMany(Player::class, 'map-favorites');
     }
 
+    /**
+     * @param $jsonMxDetails
+     *
+     * @return mixed|null
+     */
     public function getMxDetailsAttribute($jsonMxDetails)
     {
         if ($jsonMxDetails) {
@@ -71,16 +141,29 @@ class Map extends Model
         return null;
     }
 
+    /**
+     * @param $jsonMxWorldRecordDetails
+     *
+     * @return mixed
+     */
     public function getMxWorldRecordAttribute($jsonMxWorldRecordDetails)
     {
         return json_decode($jsonMxWorldRecordDetails);
     }
 
+    /**
+     * @param $gbxJson
+     *
+     * @return mixed
+     */
     public function getGbxAttribute($gbxJson)
     {
         return json_decode($gbxJson);
     }
 
+    /**
+     * @return bool
+     */
     public function canBeJuked(): bool
     {
         $lastPlayedDate = $this->last_played;
@@ -92,13 +175,16 @@ class Map extends Model
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $gbx = $this->gbx;
 
         if (!$gbx) {
             Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
-            $gbx       = MapController::getGbxInformation($this->filename);
+            $gbx = MapController::getGbxInformation($this->filename);
             $this->gbx = $gbx;
             $this->save();
 
@@ -108,12 +194,17 @@ class Map extends Model
         return $gbx->Name;
     }
 
+    /**
+     * @param string $mapUid
+     *
+     * @return Map|null
+     */
     public static function getByUid(string $mapUid): ?Map
     {
         if (config('database.type') == 'mysql') {
             return Map::where('gbx->MapUid', $mapUid)
-                      ->get()
-                      ->first();
+                ->get()
+                ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mapUid) {
                 return $map->gbx->MapUid == $mapUid;
@@ -121,12 +212,17 @@ class Map extends Model
         }
     }
 
+    /**
+     * @param string $mxId
+     *
+     * @return Map|null
+     */
     public static function getByMxId(string $mxId): ?Map
     {
         if (config('database.type') == 'mysql') {
             return Map::where('mx_details->TrackID', $mxId)
-                      ->get()
-                      ->first();
+                ->get()
+                ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mxId) {
                 $details = $map->mx_details;

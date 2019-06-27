@@ -27,6 +27,7 @@ class ChatController implements ControllerInterface
      */
     private static $mutedPlayers;
 
+    /** @var boolean */
     private static $routingEnabled;
 
     /**
@@ -34,7 +35,7 @@ class ChatController implements ControllerInterface
      */
     public static function init()
     {
-        self::$mutedPlayers   = collect();
+        self::$mutedPlayers = collect();
         self::$routingEnabled = config('server.enable-chat-routing');
 
         if (self::$routingEnabled) {
@@ -64,8 +65,8 @@ class ChatController implements ControllerInterface
     /**
      * Mute a player
      *
-     * @param \esc\Models\Player $admin
-     * @param \esc\Models\Player $target
+     * @param Player $admin
+     * @param Player $target
      */
     public static function mute(Player $admin, Player $target)
     {
@@ -78,8 +79,8 @@ class ChatController implements ControllerInterface
     /**
      * Unmute a player
      *
-     * @param \esc\Models\Player $player
-     * @param \esc\Models\Player $target
+     * @param Player $player
+     * @param Player $target
      */
     public static function unmute(Player $player, Player $target)
     {
@@ -92,7 +93,7 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: mute player.
      *
-     * @param \esc\Models\Player $admin
+     * @param Player             $admin
      * @param                    $cmd
      * @param                    $nick
      */
@@ -111,7 +112,7 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: unmute player.
      *
-     * @param \esc\Models\Player $player
+     * @param Player             $player
      * @param                    $cmd
      * @param                    $nick
      */
@@ -136,10 +137,10 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: send pm to a player
      *
-     * @param \esc\Models\Player $player
-     * @param                    $cmd
-     * @param                    $nick
-     * @param mixed              ...$message
+     * @param Player $player
+     * @param string $cmd
+     * @param string $nick
+     * @param mixed  ...$message
      */
     public static function pm(Player $player, $cmd, $nick, ...$message)
     {
@@ -157,7 +158,7 @@ class ChatController implements ControllerInterface
         }
 
         $from = sprintf(secondary('[from:') . $player . secondary('] '));
-        $to   = sprintf(secondary('[to:') . $target . secondary('] '));
+        $to = sprintf(secondary('[to:') . $target . secondary('] '));
 
         chatMessage($from . implode(' ', $message))->setIcon('')->send($target);
         chatMessage($to . implode(' ', $message))->setIcon('')->send($player);
@@ -166,13 +167,14 @@ class ChatController implements ControllerInterface
     /**
      * Process chat-message and detect commands.
      *
-     * @param \esc\Models\Player $player
-     * @param                    $text
+     * @param Player $player
+     * @param string $text
      */
     public static function playerChat(Player $player, $text)
     {
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
-            warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
+            warningMessage('Invalid chat-command entered. See ', secondary('/help'),
+                ' for all commands.')->send($player);
             warningMessage('We switched to a new server-controller, it is missing features you had before but we are working on it to give you the best user-experience.')->send($player);
 
             return;
@@ -197,8 +199,8 @@ class ChatController implements ControllerInterface
             $nick = '$eee📷 ' . $nick;
         }
 
-        $prefix   = $player->group->chat_prefix;
-        $color    = $player->group->color ?? config('colors.chat');
+        $prefix = $player->group->chat_prefix;
+        $color = $player->group->color ?? config('colors.chat');
         $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
 
         if ($prefix) {

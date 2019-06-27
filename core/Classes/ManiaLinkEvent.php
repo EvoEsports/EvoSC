@@ -37,9 +37,9 @@ class ManiaLinkEvent
     /**
      * ManiaLinkEvent constructor.
      *
-     * @param string      $id
-     * @param array       $callback
-     * @param string|null $access
+     * @param string $id
+     * @param array  $callback
+     * @param string $access
      */
     private function __construct(string $id, array $callback, string $access = null)
     {
@@ -51,7 +51,7 @@ class ManiaLinkEvent
     /**
      * Get all registered mania link events.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private static function getManiaLinkEvents(): Collection
     {
@@ -82,8 +82,8 @@ class ManiaLinkEvent
     /**
      * Handle an ingoing mania-link event.
      *
-     * @param \esc\Models\Player $ply
-     * @param string             $action
+     * @param Player $ply
+     * @param string $action
      */
     public static function call(Player $ply, string $action)
     {

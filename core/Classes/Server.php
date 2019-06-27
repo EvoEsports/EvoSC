@@ -4,6 +4,9 @@ namespace esc\Classes;
 
 
 use Maniaplanet\DedicatedServer\Connection;
+use Maniaplanet\DedicatedServer\InvalidArgumentException;
+use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
+use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
 /**
  * Class Server
@@ -260,8 +263,8 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int saveMatchSettings(string $string)
  * @method static int insertPlaylistFromMatchSettings(string $string)
  * @method static array getPlayerList(int $int = 0, int $int = 0, int $int = 0)
- * @method static \Maniaplanet\DedicatedServer\Structures\PlayerInfo getPlayerInfo(string $string, int $int = 0)
- * @method static \Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo getDetailedPlayerInfo(string $string)
+ * @method static PlayerInfo getPlayerInfo(string $string, int $int = 0)
+ * @method static PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
  * @method static array getCurrentRanking(int $int, int $int)
  * @method static array getCurrentRankingForLogin(string $string)
@@ -299,7 +302,7 @@ class Server
      * @param $login
      * @param $password
      *
-     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function init($host, $port, $timeout, $login, $password)
     {
@@ -313,7 +316,7 @@ class Server
     /**
      * Get the rpc-connection-instance of the maniaplanet-package (Useful to get type-hints).
      *
-     * @return \Maniaplanet\DedicatedServer\Connection
+     * @return Connection
      */
     public static function rpc(): Connection
     {
@@ -328,8 +331,8 @@ class Server
     /**
      * Call an rpc-method.
      *
-     * @param string $rpc_func
-     * @param null   $args
+     * @param string       $rpc_func
+     * @param null|mixed[] $args
      */
     public static function call(string $rpc_func, $args = null)
     {

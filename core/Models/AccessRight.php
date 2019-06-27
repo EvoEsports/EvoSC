@@ -13,11 +13,18 @@ class AccessRight extends Model
 
     public $timestamps = false;
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
-        return $this->name;
+        return strval($this->name);
     }
 
+    /**
+     * @param string $name
+     * @param string $description
+     */
     public static function createIfNonExistent(string $name, string $description)
     {
         if (self::whereName($name)->get()->isEmpty()) {

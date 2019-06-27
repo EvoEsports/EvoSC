@@ -11,6 +11,7 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
@@ -21,6 +22,9 @@ class MatchSettingsController
      */
     private static $currentMatchSettingsFile;
 
+    /**
+     *
+     */
     public static function init()
     {
         self::$currentMatchSettingsFile = config('server.default-matchsettings') ?? 'MatchSettings';
@@ -41,6 +45,12 @@ class MatchSettingsController
         return self::$currentMatchSettingsFile;
     }
 
+    /**
+     * @param string $matchSettings
+     * @param string $filename
+     *
+     * @return bool
+     */
     public static function filenameExists(string $matchSettings, string $filename): bool
     {
         foreach (self::getMapFilenamesFrom($matchSettings) as $mapInfo) {
@@ -52,6 +62,12 @@ class MatchSettingsController
         return false;
     }
 
+    /**
+     * @param string $matchSettings
+     * @param string $uid
+     *
+     * @return bool
+     */
     public static function uidExists(string $matchSettings, string $uid): bool
     {
         foreach (self::getMapFilenamesFrom($matchSettings) as $mapInfo) {
@@ -63,6 +79,10 @@ class MatchSettingsController
         return false;
     }
 
+    /**
+     * @param string $matchSettings
+     * @param Map    $map
+     */
     public static function addMap(string $matchSettings, Map $map)
     {
         $file     = self::getPath($matchSettings);
@@ -74,11 +94,14 @@ class MatchSettingsController
 
         try {
             self::saveMatchSettings($file, $settings);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::logAddLine('MatchSettingsController', "Failed to add map ($map) to $matchSettings.");
         }
     }
 
+    /**
+     * @param Player $player
+     */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
         infoMessage('The map-list gets shuffled after the map finished.')->sendAdmin();
@@ -90,6 +113,9 @@ class MatchSettingsController
         }, true);
     }
 
+    /**
+     *
+     */
     public static function shuffleCurrentMapList()
     {
         $maps     = collect();
@@ -115,11 +141,15 @@ class MatchSettingsController
 
         try {
             self::saveMatchSettings($file, $settings);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::logAddLine('MatchSettingsController', "Failed to shuffle map-list.");
         }
     }
 
+    /**
+     * @param string $matchSettings
+     * @param string $uid
+     */
     public static function removeByUid(string $matchSettings, string $uid)
     {
         $file     = self::getPath($matchSettings);
@@ -136,6 +166,10 @@ class MatchSettingsController
         self::saveMatchSettings($file, $settings);
     }
 
+    /**
+     * @param string $matchSettings
+     * @param string $filename
+     */
     public static function removeByFilename(string $matchSettings, string $filename)
     {
         $file     = self::getPath($matchSettings);
@@ -152,6 +186,11 @@ class MatchSettingsController
         self::saveMatchSettings($file, $settings);
     }
 
+    /**
+     * @param string $matchSettings
+     *
+     * @return Collection
+     */
     public static function getMapFilenamesFrom(string $matchSettings): Collection
     {
         $mapInfos = collect();
@@ -164,41 +203,72 @@ class MatchSettingsController
         return $mapInfos;
     }
 
+    /**
+     * @return Collection
+     */
     public static function getMapFilenamesFromCurrentMatchSettings(): Collection
     {
         return self::getMapFilenamesFrom(self::$currentMatchSettingsFile);
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return bool
+     */
     public static function filenameExistsInCurrentMatchSettings(string $filename): bool
     {
         return self::filenameExists(self::$currentMatchSettingsFile, $filename);
     }
 
+    /**
+     * @param string $uid
+     *
+     * @return bool
+     */
     public static function uidExistsInCurrentMatchSettings(string $uid): bool
     {
         return self::uidExists(self::$currentMatchSettingsFile, $uid);
     }
 
+    /**
+     * @param string $uid
+     */
     public static function removeByUidFromCurrentMatchSettings(string $uid)
     {
         self::removeByUid(self::$currentMatchSettingsFile, $uid);
     }
 
+    /**
+     * @param string $filename
+     */
     public static function removeByFilenameFromCurrentMatchSettings(string $filename)
     {
         self::removeByFilename(self::$currentMatchSettingsFile, $filename);
     }
 
+    /**
+     * @param Map $map
+     */
     public static function addMapToCurrentMatchSettings(Map $map)
     {
         self::addMap(self::$currentMatchSettingsFile, $map);
     }
 
+    /**
+     * @param string $matchSettingsFile
+     *
+     * @return string
+     */
     private static function getPath(string $matchSettingsFile)
     {
         return Server::getMapsDirectory() . config('server.matchsettings-directory') . DIRECTORY_SEPARATOR . $matchSettingsFile;
     }
 
+    /**
+     * @param string           $file
+     * @param SimpleXMLElement $matchSettings
+     */
     private static function saveMatchSettings(string $file, SimpleXMLElement $matchSettings)
     {
         $domDocument                     = new \DOMDocument("1.0");

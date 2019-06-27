@@ -13,6 +13,7 @@ use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
@@ -25,7 +26,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 class PlayerController implements ControllerInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $players;
 
@@ -41,7 +42,7 @@ class PlayerController implements ControllerInterface
             ]);
 
             $player->spectator_status = $playerInfo->spectatorStatus;
-            $player->player_id        = $playerInfo->playerId;
+            $player->player_id = $playerInfo->playerId;
 
             return $player;
         })->keyBy('Login');
@@ -57,10 +58,16 @@ class PlayerController implements ControllerInterface
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
 
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'], 'Set the server password, leave empty to clear it.', 'ma');
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
+            'Set the server password, leave empty to clear it.', 'ma');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
     }
 
+    /**
+     * @param Player $player
+     * @param string $cmd
+     * @param string $pw
+     */
     public static function setServerPassword(Player $player, $cmd, $pw)
     {
         if (Server::setServerPassword($pw)) {
@@ -76,18 +83,22 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerConnect
      *
-     * @param \esc\Models\Player $player
+     * @param Player $player
+     *
+     * @throws \Exception
      */
     public static function playerConnect(Player $player)
     {
         $diffString = $player->last_visit->diffForHumans();
-        $stats      = $player->stats;
+        $stats = $player->stats;
 
         if ($stats) {
-            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined, rank: ', secondary($stats->Rank), ' last visit ', secondary($diffString), '.')
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
+                ' joined, rank: ', secondary($stats->Rank), ' last visit ', secondary($diffString), '.')
                 ->setIcon('');
         } else {
-            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'), ' joined for the first time.')
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
+                ' joined for the first time.')
                 ->setIcon('');
 
             Stats::updateOrCreate(['Player' => $player->id], [
@@ -112,13 +123,16 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerDisconnect
      *
-     * @param \esc\Models\Player $player
+     * @param Player $player
+     *
+     * @throws \Exception
      */
     public static function playerDisconnect(Player $player)
     {
-        $diff     = $player->last_visit->diffForHumans();
+        $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::logAddLine('PlayerController', $player . " [" . $player->Login . "] left the server after $playtime playtime.");
+        Log::logAddLine('PlayerController',
+            $player . " [" . $player->Login . "] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {
@@ -138,8 +152,7 @@ class PlayerController implements ControllerInterface
     /**
      * Reset player ids on begin map
      *
-     *
-     * @param \esc\Models\Map $map
+     * @param Map $map
      */
     public static function beginMap(Map $map)
     {
@@ -153,7 +166,7 @@ class PlayerController implements ControllerInterface
      * Gets a player by nickname or login.
      *
      * @param Player $callee
-     * @param        $nick
+     * @param string $nick
      *
      * @return Player|null
      */
@@ -202,7 +215,8 @@ class PlayerController implements ControllerInterface
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
-            warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ', secondary($reason))->setIcon('')->sendAll();
+            warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
+                secondary($reason))->setIcon('')->sendAll();
         } catch (InvalidArgumentException $e) {
             Log::logAddLine('PlayerController', 'Failed to kick player: ' . $e->getMessage(), true);
             Log::logAddLine('PlayerController', '' . $e->getTraceAsString(), false);
@@ -212,11 +226,9 @@ class PlayerController implements ControllerInterface
     /**
      * ManiaLinkEvent: kick player
      *
-     * @param \esc\Models\Player $player
-     * @param                    $login
-     * @param string             $reason
-     *
-     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     * @param Player $player
+     * @param string $login
+     * @param string $reason
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
@@ -227,9 +239,9 @@ class PlayerController implements ControllerInterface
         }
 
         try {
-            $kicked = Server::rpc()->kick($login, $reason);
+            $kicked = Server::kick($login, $reason);
         } catch (Exception $e) {
-            $kicked = Server::rpc()->disconnectFakePlayer($login);
+            $kicked = Server::disconnectFakePlayer($login);
         }
 
         if (!$kicked) {
@@ -268,23 +280,38 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public static function getPlayers(): \Illuminate\Support\Collection
+    public static function getPlayers(): Collection
     {
         return self::$players;
     }
 
+    /**
+     * @param string $login
+     *
+     * @return bool
+     */
     public static function hasPlayer(string $login)
     {
         return self::$players->has($login);
     }
 
+    /**
+     * @param string $login
+     *
+     * @return Player
+     */
     public static function getPlayer(string $login): Player
     {
         return self::$players->get($login);
     }
 
+    /**
+     * @param Player $player
+     *
+     * @return Collection
+     */
     public static function addPlayer(Player $player)
     {
         return self::$players->put($player->Login, $player);

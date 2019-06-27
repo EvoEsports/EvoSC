@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,7 +51,7 @@ class Migrate extends Command
 
         if (!$schemaBuilder->hasTable('migrations')) {
             $output->writeln('Creating migrations table');
-            $schemaBuilder->create('migrations', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $schemaBuilder->create('migrations', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('file')->unique();
                 $table->integer('batch');
@@ -91,7 +93,7 @@ class Migrate extends Command
         });
     }
 
-    private function getMigrations(): \Illuminate\Support\Collection
+    private function getMigrations(): Collection
     {
         $migrations = collect();
 
