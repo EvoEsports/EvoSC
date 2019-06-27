@@ -49,6 +49,23 @@ class Cache
     }
 
     /**
+     * @param string $id
+     *
+     * @return Carbon|null
+     */
+    public static function getAdded(string $id): ?Carbon
+    {
+        $cacheObject = File::get(cacheDir($id), true);
+
+        try {
+            return (new Carbon($cacheObject->expires));
+        } catch (\Exception $e) {
+        }
+
+        return null;
+    }
+
+    /**
      * Saves an object to the cache directory
      *
      * @param                     $id
@@ -60,7 +77,7 @@ class Cache
         try {
             $cacheObject          = new \stdClass();
             $cacheObject->data    = $data;
-            $cacheObject->class   = get_class($data);
+            $cacheObject->added   = now();
             $cacheObject->expires = $expires;
         } catch (\Exception $e) {
             Log::logAddLine('Cache', "Failed to save $id");

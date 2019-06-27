@@ -15,12 +15,12 @@ class TestModule
 {
     public function __construct()
     {
-        KeyBinds::add('test_stuff', '', [self::class, 'testStuff'], 'X', 'ma');
+        KeyBinds::add('test_stuff', 'Trigger TextModule::testStuff', [self::class, 'testStuff'], 'X', 'ma');
     }
 
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        LiveRankings::playerConnect($player);
+        MxPackLoader::showAddMapPack($player, '', 170);
     }
 }

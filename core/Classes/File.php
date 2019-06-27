@@ -42,7 +42,7 @@ class File
     /**
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
-     * @param string $fileName
+     * @param string       $fileName
      * @param string|mixed $content
      *
      * @return bool
@@ -50,10 +50,15 @@ class File
     public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
+        $dir      = str_replace(basename($fileName), '', $fileName);
 
-        if($jsonEncode){
+        if (!is_dir(realpath($dir))) {
+            mkdir(realpath($dir));
+        }
+
+        if ($jsonEncode) {
             file_put_contents($fileName, json_encode($content));
-        }else{
+        } else {
             file_put_contents($fileName, $content);
         }
 
