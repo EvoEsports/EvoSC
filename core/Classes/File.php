@@ -43,15 +43,19 @@ class File
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
      * @param string $fileName
-     * @param string $content
+     * @param string|mixed $content
      *
      * @return bool
      */
-    public static function put(string $fileName, string $content): bool
+    public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
 
-        file_put_contents($fileName, $content);
+        if($jsonEncode){
+            file_put_contents($fileName, json_encode($content));
+        }else{
+            file_put_contents($fileName, $content);
+        }
 
         return self::exists($fileName);
     }
