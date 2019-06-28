@@ -31,8 +31,8 @@ class ModuleController implements ControllerInterface
     /**
      * [Bugging] reload a module
      *
-     * @param \esc\Models\Player $callee
-     * @param string             $moduleName
+     * @param Player $callee
+     * @param string $moduleName
      */
     public static function reloadModule(Player $callee, string $moduleName)
     {
@@ -47,7 +47,7 @@ class ModuleController implements ControllerInterface
     /**
      * Get all loaded modules.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getModules(): Collection
     {

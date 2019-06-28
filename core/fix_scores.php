@@ -1,7 +1,9 @@
 <?php
 
+use esc\Classes\Log;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,7 +16,7 @@ class FixScores extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        \esc\Classes\Log::setOutput($output);
+        Log::setOutput($output);
 
         if (!file_exists('config/database.config.json')) {
             $output->writeln('config/database.config.json not found');
@@ -42,7 +44,7 @@ class FixScores extends Command
         $output->writeln("Updating player scores.");
         $playerIds = $evoSC->table('stats')->where('Locals', '>', 0)->pluck('Player')->toArray();
         $players   = $evoSC->table('players')->whereIn('id', $playerIds)->get();
-        $bar       = new \Symfony\Component\Console\Helper\ProgressBar($output, $players->count());
+        $bar       = new ProgressBar($output, $players->count());
         $limit     = 200;
         $players->each(function ($player) use ($evoSC, $bar, $limit) {
             $score = $evoSC->table('local-records')->where('Player', $player->id)->where('Rank', '<', $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
@@ -60,7 +62,7 @@ class FixScores extends Command
         $output->writeln("Fixing local ranks.");
         $evoSC->table('stats')->update(['Rank' => 9999]);
         $ranked = $evoSC->table('stats')->orderByDesc('Score')->where('Score', '>', 0)->get();
-        $bar    = new \Symfony\Component\Console\Helper\ProgressBar($output, $ranked->count());
+        $bar    = new ProgressBar($output, $ranked->count());
         $ranked->each(function ($stat, $key) use ($evoSC, $bar) {
             $evoSC->table('stats')->where('Player', $stat->Player)->update(['Rank' => $key + 1]);
             $bar->advance();

@@ -2,16 +2,41 @@
 
 namespace esc\Models;
 
-class Stats extends \Illuminate\Database\Eloquent\Model
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/**
+ * Class Stats
+ *
+ * @package esc\Models
+ *
+ * @property integer Visits
+ * @property  integer Rank
+ *
+ */
+class Stats extends Model
 {
     protected $table = 'stats';
 
-    protected $fillable = ['Visits', 'LastPlayer', 'Finishes', 'Locals', 'Donations', 'Playtime', 'Wins', 'Player', 'Score', 'Rank', 'updated_at', 'created_at'];
+    protected $fillable = [
+        'Visits',
+        'LastPlayer',
+        'Finishes',
+        'Locals',
+        'Donations',
+        'Playtime',
+        'Wins',
+        'Player',
+        'Score',
+        'Rank',
+        'updated_at',
+        'created_at'
+    ];
 
     protected $primaryKey = 'Player';
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function player()
     {

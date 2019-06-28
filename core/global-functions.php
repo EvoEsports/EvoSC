@@ -1,33 +1,64 @@
 <?php
 
+use Carbon\Carbon;
+use esc\Classes\ChatMessage;
+use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Controllers\ConfigController;
+use esc\Controllers\PlayerController;
+use esc\Models\Map;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
+use Symfony\Component\Process\Process;
 
+/**
+ * @param mixed ...$message
+ *
+ * @return ChatMessage
+ */
 function chatMessage(...$message)
 {
-    return new \esc\Classes\ChatMessage(...$message);
+    return new ChatMessage(...$message);
 }
 
+/**
+ * @param mixed ...$message
+ *
+ * @return ChatMessage
+ */
 function infoMessage(...$message)
 {
-    return (new \esc\Classes\ChatMessage(...$message))->setIsInfoMessage();
+    return (new ChatMessage(...$message))->setIsInfoMessage();
 }
 
+/**
+ * @param mixed ...$message
+ *
+ * @return ChatMessage
+ */
 function warningMessage(...$message)
 {
-    return (new \esc\Classes\ChatMessage(...$message))->setIsWarning();
+    return (new ChatMessage(...$message))->setIsWarning();
 }
 
+/**
+ * @param int $score
+ *
+ * @return string
+ */
 function formatScore(int $score): string
 {
     $seconds = floor($score / 1000);
-    $ms      = $score - ($seconds * 1000);
+    $ms = $score - ($seconds * 1000);
     $minutes = floor($seconds / 60);
     $seconds -= $minutes * 60;
 
     return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
+/**
+ * @return string
+ */
 function serverName(): string
 {
     global $serverName;
@@ -35,19 +66,35 @@ function serverName(): string
     return $serverName;
 }
 
+/**
+ * @param int $score
+ *
+ * @return string
+ */
 function formatScoreNoMinutes(int $score): string
 {
     $seconds = floor($score / 1000);
-    $ms      = $score - ($seconds * 1000);
+    $ms = $score - ($seconds * 1000);
 
     return sprintf('%d.%03d', $seconds, $ms);
 }
 
+/**
+ * @param string|null $colored
+ *
+ * @return string
+ */
 function stripColors(?string $colored): string
 {
     return preg_replace('/(?<![$])\${1}(?:[\w\d]{1,3})/i', '', $colored);
 }
 
+/**
+ * @param string|null $styled
+ * @param bool        $keepLinks
+ *
+ * @return string
+ */
 function stripStyle(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
@@ -57,6 +104,12 @@ function stripStyle(?string $styled = '', bool $keepLinks = false): string
     return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1})/i', '', $styled);
 }
 
+/**
+ * @param string|null $styled
+ * @param bool        $keepLinks
+ *
+ * @return string
+ */
 function stripAll(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
@@ -66,58 +119,107 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
     return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
+/**
+ * @param string $id
+ * @param null   $default
+ *
+ * @return null
+ */
 function config(string $id, $default = null)
 {
-    return \esc\Controllers\ConfigController::getConfig(strtolower($id)) ?: $default;
+    return ConfigController::getConfig(strtolower($id)) ?: $default;
 }
 
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
 function cacheDir(string $filename = ''): string
 {
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
 }
 
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
 function logDir(string $filename = ''): string
 {
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
-function ghost(string $filename = ''): stringex
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
+function ghost(string $filename = ''): string
 {
-    return \esc\Classes\Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
+    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
+            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
 function coreDir(string $filename = ''): string
 {
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
 function configDir(string $filename = ''): string
 {
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
 }
 
+/**
+ * @param string $filename
+ *
+ * @return string
+ */
 function baseDir(string $filename = ''): string
 {
     return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
 }
 
-function onlinePlayers(bool $withSpectators = true): \Illuminate\Support\Collection
+/**
+ * @param bool $withSpectators
+ *
+ * @return Collection
+ * @todo implement $withSpectators
+ */
+function onlinePlayers(bool $withSpectators = true): Collection
 {
     $logins = collect(Server::getPlayerList())->pluck('login');
 
     return Player::whereIn('Login', $logins)->get();
 }
 
-function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\Player
+/**
+ * @param string $login
+ * @param bool   $addToOnlineIfOffline
+ *
+ * @return Player
+ */
+function player(string $login, bool $addToOnlineIfOffline = false): Player
 {
-    if (\esc\Controllers\PlayerController::hasPlayer($login)) {
+    if (PlayerController::hasPlayer($login)) {
         return esc\Controllers\PlayerController::getPlayer($login);
     }
 
-    $player = \esc\Models\Player::find($login);
+    $player = Player::find($login);
 
     if (!$player || !isset($player->Login)) {
-        \esc\Classes\Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
+        Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {
@@ -132,60 +234,102 @@ function player(string $login, bool $addToOnlineIfOffline = false): \esc\Models\
             ]);
         }
 
-        $player = \esc\Models\Player::find($login);
+        $player = Player::find($login);
     }
 
     if ($addToOnlineIfOffline) {
-        \esc\Controllers\PlayerController::addPlayer($player);
+        PlayerController::addPlayer($player);
     }
 
     return $player;
 }
 
-function echoPlayers(): \Illuminate\Support\Collection
+/**
+ * @return Collection
+ */
+function echoPlayers(): Collection
 {
-    $players = onlinePlayers()->filter(function (\esc\Models\Player $player) {
+    $players = onlinePlayers()->filter(function (Player $player) {
         return $player->hasAccess('admin_echoes');
     });
 
     return $players;
 }
 
-function finishPlayers(): \Illuminate\Support\Collection
+/**
+ * @return Collection
+ */
+function finishPlayers(): Collection
 {
-    return \esc\Models\Player::where('Score', '>', 0)->get();
+    return Player::where('Score', '>', 0)->get();
 }
 
-function now(): \Carbon\Carbon
+/**
+ * @return Carbon
+ * @throws Exception
+ */
+function now(): Carbon
 {
-    return (new \Carbon\Carbon())->now();
+    return (new Carbon())->now();
 }
 
+/**
+ * @param string $formattedScore
+ *
+ * @return string
+ */
 function cutZeroes(string $formattedScore): string
 {
     return preg_replace('/^[0\:\.]+/', '', $formattedScore);
 }
 
+/**
+ * get secondary color
+ *
+ * @param string $str
+ *
+ * @return string
+ */
 function secondary(string $str = ""): string
 {
     return '$z$s$' . config('colors.secondary') . $str;
 }
 
+/**
+ * get primary color
+ *
+ * @param string $str
+ *
+ * @return string
+ */
 function primary(string $str = ""): string
 {
     return '$' . config('colors.primary') . $str;
 }
 
+/**
+ * @param string $str
+ *
+ * @return string
+ */
 function warning(string $str = ""): string
 {
     return '$' . config('colors.warning') . $str;
 }
 
+/**
+ * @param string $str
+ *
+ * @return string
+ */
 function info(string $str = ""): string
 {
     return '$' . config('colors.info') . $str;
 }
 
+/**
+ * @return string
+ */
 function getEscVersion(): string
 {
     global $escVersion;
@@ -193,28 +337,44 @@ function getEscVersion(): string
     return $escVersion;
 }
 
+/**
+ * @return mixed
+ */
 function maps()
 {
-    return \esc\Models\Map::whereEnabled(true)->get();
+    return Map::whereEnabled(true)->get();
 }
 
+/**
+ * @param string|null $filename
+ *
+ * @return string
+ */
 function matchSettings(string $filename = null)
 {
-    return \esc\Classes\Server::getMapsDirectory() . '/MatchSettings/' . ($filename);
+    return Server::getMapsDirectory() . '/MatchSettings/' . ($filename);
 }
 
+/**
+ * @param $object
+ */
 function dd($object)
 {
     var_dump($object);
     die();
 }
 
+/**
+ * @param string $filename
+ *
+ * @return mixed|null
+ */
 function getMapInfoFromFile(string $filename)
 {
-    $mps  = config('server.mps');
+    $mps = config('server.mps');
     $maps = config('server.maps') . '/';
     if (file_exists($maps . $filename) && file_exists($mps)) {
-        $process = new \Symfony\Component\Process\Process($mps . ' /parsegbx=' . $maps . $filename);
+        $process = new Process([$mps, ' /parsegbx=' . $maps . $filename]);
         $process->run();
 
         return json_decode($process->getOutput());
@@ -223,6 +383,9 @@ function getMapInfoFromFile(string $filename)
     return null;
 }
 
+/**
+ * @return bool
+ */
 function isVerbose(): bool
 {
     global $_isVerbose;
@@ -232,6 +395,9 @@ function isVerbose(): bool
     return ($_isVerbose || $_isVeryVerbose || $_isDebug);
 }
 
+/**
+ * @return bool
+ */
 function isVeryVerbose(): bool
 {
     global $_isVeryVerbose;
@@ -240,6 +406,9 @@ function isVeryVerbose(): bool
     return ($_isVeryVerbose || $_isDebug);
 }
 
+/**
+ * @return bool
+ */
 function isDebug(): bool
 {
     global $_isDebug;
@@ -247,6 +416,9 @@ function isDebug(): bool
     return $_isDebug;
 }
 
+/**
+ * @return bool
+ */
 function isWindows(): bool
 {
     return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';

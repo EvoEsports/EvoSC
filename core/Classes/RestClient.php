@@ -5,6 +5,7 @@ namespace esc\Classes;
 
 use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
@@ -41,7 +42,7 @@ class RestClient
     /**
      * Get the client-instance.
      *
-     * @return \GuzzleHttp\Client
+     * @return Client
      */
     public static function getClient(): Client
     {
@@ -54,8 +55,8 @@ class RestClient
      * @param string     $url
      * @param array|null $options
      *
-     * @return \GuzzleHttp\Psr7\Response
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return Response
+     * @throws GuzzleException
      */
     public static function get(string $url, array $options = null): Response
     {
@@ -72,19 +73,26 @@ class RestClient
      * @param string     $url
      * @param array|null $options
      *
-     * @return \GuzzleHttp\Psr7\Response
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return Response
+     * @throws GuzzleException
      */
     public static function post(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options), isDebug());
+            Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options),
+                isDebug());
         }
 
         return self::$client->request('POST', $url, self::addUserAgent($options));
     }
 
     //Add user-agent to current options.
+
+    /**
+     * @param array|null $options
+     *
+     * @return array
+     */
     private static function addUserAgent(array $options = null): array
     {
         if (!$options) {
@@ -95,7 +103,7 @@ class RestClient
             $options['headers'] = [];
         }
 
-        $options[RequestOptions::VERIFY]  = CaBundle::getSystemCaRootBundlePath();
+        $options[RequestOptions::VERIFY] = CaBundle::getSystemCaRootBundlePath();
         $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.2', getEscVersion());
 
         return $options;

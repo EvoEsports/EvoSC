@@ -1,10 +1,12 @@
 <?php
 
-
 namespace esc\Controllers;
 
 
 use esc\Classes\File;
+
+use Migrate;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,17 +32,11 @@ class SetupController
 
     public static function startSetup(InputInterface $input, OutputInterface $output, QuestionHelper $helper)
     {
-        self::$input  = $input;
+        self::$input = $input;
         self::$output = $output;
         self::$helper = $helper;
 
         self::printInfo('<fg=cyan>Starting EvoSC Setup.</>');
-
-        self::doServerConfig();
-        self::doDatabaseConfig();
-        self::doDedimaniaConfig();
-        self::doMxKarmaConfig();
-        self::doMusicConfig();
 
         //Check that cache directory exists
         if (!is_dir(cacheDir())) {
@@ -51,6 +47,13 @@ class SetupController
         if (!is_dir(logDir())) {
             mkdir(logDir());
         }
+
+        self::doServerConfig();
+        self::doDatabaseConfig();
+        self::doDedimaniaConfig();
+        self::doMxKarmaConfig();
+        self::doMusicConfig();
+
 
         File::put(cacheDir('.setupfinished'), 1);
     }
@@ -76,17 +79,17 @@ class SetupController
             [
                 'id'       => 'rpc.login',
                 'question' => 'Enter the RPC login',
-                'default'  => '',
+                'default'  => 'SuperAdmin',
             ],
             [
                 'id'       => 'rpc.password',
                 'question' => 'Enter the RPC password',
-                'default'  => '',
+                'default'  => 'SuperAdmin',
             ],
             [
                 'id'       => 'default-matchsettings',
                 'question' => 'Enter the default match-settings filename',
-                'default'  => '',
+                'default'  => 'maplist.txt',
             ],
         ];
 
@@ -121,11 +124,22 @@ class SetupController
 
         self::askBatch('database', $questions);
         self::printInfo('Configuration of database.config.json finished.');
+        self::printInfo('Running database migrate.');
+
+        $application = new Application();
+        $application->add(new Migrate());
+        $application->setDefaultCommand("migrate", true);
+        try {
+            $application->run();
+        } catch (\Exception $e) {
+            self::printError($e->getMessage());
+        }
     }
 
     private static function doDedimaniaConfig()
     {
-        $question = new ConfirmationQuestion('<fg=green>Configure dedimania? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+        $question = new ConfirmationQuestion('<fg=green>Configure dedimania? [</><fg=yellow>y/n</><fg=green>]:</> ',
+            true);
 
         if (!self::$helper->ask(self::$input, self::$output, $question)) {
             return;
@@ -152,7 +166,8 @@ class SetupController
 
     private static function doMxKarmaConfig()
     {
-        $question = new ConfirmationQuestion('<fg=green>Configure ManiaExchange-Karma? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+        $question = new ConfirmationQuestion('<fg=green>Configure ManiaExchange-Karma? [</><fg=yellow>y/n</><fg=green>]:</> ',
+            true);
 
         if (!self::$helper->ask(self::$input, self::$output, $question)) {
             return;
@@ -174,7 +189,8 @@ class SetupController
 
     private static function doMusicConfig()
     {
-        $question = new ConfirmationQuestion('<fg=green>Configure music server url? [</><fg=yellow>y/n</><fg=green>]:</> ', true);
+        $question = new ConfirmationQuestion('<fg=green>Configure music server url? [</><fg=yellow>y/n</><fg=green>]:</> ',
+            true);
 
         if (!self::$helper->ask(self::$input, self::$output, $question)) {
             return;
@@ -206,8 +222,9 @@ class SetupController
 
     private static function askEnter(string $questionString, string $default = '', bool $optional = false)
     {
-        $question = new Question('<fg=green>' . $questionString . (empty($default) ? ": " : "[$default]: ") . '</>', $default);
-        $answer   = self::$helper->ask(self::$input, self::$output, $question);
+        $question = new Question('<fg=green>' . $questionString . (empty($default) ? ": " : "[$default]: ") . '</>',
+            $default);
+        $answer = self::$helper->ask(self::$input, self::$output, $question);
 
         if (!$answer) {
             if (!empty($default) || $optional) {
@@ -221,28 +238,29 @@ class SetupController
     private static function askBatch(string $file, array $questions)
     {
         foreach ($questions as $key => $questionData) {
-            $id       = $file . '.' . $questionData['id'];
+            $id = $file . '.' . $questionData['id'];
             $question = $questionData['question'];
-            $default  = $questionData['default'];
+            $default = $questionData['default'];
             $optional = array_key_exists('optional', $questionData);
 
             if (!config($id)) {
                 while (true) {
                     $required = 'string';
-                    $value    = self::askEnter(sprintf("\033[1m[%s %d/%d]\033[0m %s", $file, $key + 1, count($questions), $question), $default, $optional);
+                    $value = self::askEnter(sprintf("\033[1m[%s %d/%d]\033[0m %s", $file, $key + 1, count($questions),
+                        $question), $default, $optional);
 
                     if (is_int($default)) {
-                        $value    = intval($value);
+                        $value = intval($value);
                         $required = 'integer';
                     }
 
                     if (is_float($default)) {
-                        $value    = floatval($value);
+                        $value = floatval($value);
                         $required = 'float';
                     }
 
                     if (is_bool($default)) {
-                        $value    = boolval($value);
+                        $value = boolval($value);
                         $required = 'boolean';
                     }
 

@@ -21,8 +21,8 @@ class EscRun extends Command
     protected function configure()
     {
         $this->setName('run')
-             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-             ->setDescription('Run Evo Server Controller');
+            ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
+            ->setDescription('Run Evo Server Controller');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -33,9 +33,9 @@ class EscRun extends Command
         global $_isVeryVerbose;
         global $_isDebug;
 
-        $_isVerbose     = $output->isVerbose();
+        $_isVerbose = $output->isVerbose();
         $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug       = $output->isDebug();
+        $_isDebug = $output->isDebug();
 
         $escVersion = '0.68.26';
 
@@ -103,7 +103,7 @@ class EscRun extends Command
         global $_onlinePlayers;
 
         $version = getEscVersion();
-        $motd    = "      ______           _____ ______
+        $motd = "      ______           _____ ______
      / ____/  _______ / ___// ____/
     / __/| | / / __ \\__ \/ /     
    / /___| |/ / /_/ /__/ / /___   
@@ -177,17 +177,19 @@ class EscRun extends Command
 
                 EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
 
-                $pause                    = esc\Classes\Timer::getNextCyclePause();
+                $pause = esc\Classes\Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
 
                 usleep($pause);
             } catch (\Exception $e) {
-                Log::logAddLine('MPS', 'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
+                Log::logAddLine('MPS',
+                    'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::logAddLine('MPS', $e->getMessage());
 
                 $failedConnectionRequests++;
                 if ($failedConnectionRequests > 50) {
-                    Log::logAddLine('MPS', sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
+                    Log::logAddLine('MPS',
+                        sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
                 }

@@ -72,7 +72,8 @@ class AfkController implements ControllerInterface
         self::$pingTracker->put($player->Login, time());
 
         if (($secondsSinceLastInteraction / 60) >= config('server.afk-timeout') && !$player->isSpectator()) {
-            $message = infoMessage($player, ' was moved to spectators after ', secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('');
+            $message = infoMessage($player, ' was moved to spectators after ',
+                secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('');
 
             if (config('server.echoes.join')) {
                 $message->sendAll();

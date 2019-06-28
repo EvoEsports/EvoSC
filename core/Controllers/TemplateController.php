@@ -8,6 +8,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
+use Exception;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
@@ -61,7 +62,7 @@ class TemplateController implements ControllerInterface
     /**
      * Get all loaded templates.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getTemplates(): Collection
     {
@@ -84,7 +85,7 @@ class TemplateController implements ControllerInterface
             }
 
             return self::$latte->renderToString($index, $values);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             //Build parameter string
             $parameters = [];
             foreach ($values as $key => $value) {

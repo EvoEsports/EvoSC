@@ -92,6 +92,9 @@ class QueueController implements ControllerInterface
         self::preCacheNextMap();
     }
 
+    /**
+     * @param Map $map
+     */
     public static function beginMap(Map $map)
     {
         self::dropMapSilent($map->uid);
@@ -120,6 +123,9 @@ class QueueController implements ControllerInterface
         }
     }
 
+    /**
+     * @param $mapUid
+     */
     public static function dropMapSilent($mapUid)
     {
         if (MapQueue::whereMapUid($mapUid)->exists()) {
@@ -146,7 +152,7 @@ class QueueController implements ControllerInterface
     /**
      * Get maps in queue sorted by adding time.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getMapQueue(): Collection
     {
@@ -179,6 +185,9 @@ class QueueController implements ControllerInterface
         }
     }
 
+    /**
+     *
+     */
     public static function preCacheNextMap()
     {
         if (MapQueue::count() > 0) {

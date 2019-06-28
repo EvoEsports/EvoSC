@@ -25,12 +25,25 @@ class PlanetsController implements ControllerInterface
      * @var Collection
      */
     private static $openBills;
-    private static $billStates;
+    /**
+     * @var string[]
+     */
+    private static $billStates = [
+        'CreatingTransaction',
+        'Issued',
+        'ValidatingPayement',
+        'Payed',
+        'Refused',
+        'Error'
+    ];
 
+    /**
+     *
+     */
     public static function init()
     {
-        self::$openBills  = collect();
-        self::$billStates = explode(', ', 'CreatingTransaction, Issued, ValidatingPayement, Payed, Refused, Error');
+        self::$openBills = collect();
+        //   self::$billStates = explode(', ', 'CreatingTransaction, Issued, ValidatingPayement, Payed, Refused, Error');
 
         Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
@@ -38,7 +51,7 @@ class PlanetsController implements ControllerInterface
     /**
      * Check payment state.
      *
-     * @param \esc\Models\Bill $bill
+     * @param Bill $bill
      */
     public static function checkBill(Bill &$bill)
     {
@@ -77,14 +90,19 @@ class PlanetsController implements ControllerInterface
     /**
      * Create payment request.
      *
-     * @param \esc\Models\Player $player
-     * @param int                $amount
-     * @param string             $label
-     * @param array              $successFunction
-     * @param array|null         $failFunction
+     * @param Player     $player
+     * @param int        $amount
+     * @param string     $label
+     * @param array      $successFunction
+     * @param array|null $failFunction
      */
-    public static function createBill(Player $player, int $amount, string $label, array $successFunction, array $failFunction = null)
-    {
+    public static function createBill(
+        Player $player,
+        int $amount,
+        string $label,
+        array $successFunction,
+        array $failFunction = null
+    ) {
         $billId = Server::sendBill($player->Login, $amount, $label);
 
         if (!$billId || !is_int($billId)) {

@@ -75,19 +75,17 @@ class {className} extends Migration
 }
 
 
-
 $application = new Application();
 
 $run = new EscRun();
 
 $application->add(new Migrate());
 $application->add(new MakeMigration());
-$application->add(new Migrate());
 $application->add(new ImportUaseco());
 $application->add(new FixScores());
 $application->add($run);
 
-$application->setDefaultCommand($run);
+$application->setDefaultCommand("list");
 
 
 try {

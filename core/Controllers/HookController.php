@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
+use Exception;
 use Illuminate\Support\Collection;
 
 /**
@@ -16,7 +17,7 @@ use Illuminate\Support\Collection;
 class HookController implements ControllerInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $hooks;
 
@@ -54,17 +55,17 @@ class HookController implements ControllerInterface
     /**
      * Add a new hook
      *
-     * @param string $event
-     * @param        $callback
-     * @param bool   $runOnce
-     * @param int    $priority
+     * @param string   $event
+     * @param callable $callback
+     * @param bool     $runOnce
+     * @param int      $priority
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function add(string $event, $callback, bool $runOnce = false, int $priority = 0)
+    public static function add(string $event, callable $callback, bool $runOnce = false, int $priority = 0)
     {
         $hooks = self::$hooks;
-        $hook  = new Hook($event, $callback, $runOnce, $priority);
+        $hook = new Hook($event, $callback, $runOnce, $priority);
 
         if ($hooks) {
             if (!$hooks->has($event)) {
