@@ -3,11 +3,13 @@
 namespace esc\Commands;
 
 use esc\Classes\Log;
+use esc\Classes\Server;
 use esc\Controllers\ConfigController;
 use esc\Models\Group;
 use esc\Classes\Database;
 use esc\Models\Player;
 use Exception;
+use Maniaplanet\DedicatedServer\Connection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
@@ -35,6 +37,7 @@ class AddAdmin extends Command
         ConfigController::init();
         Database::init();
 
+
         $player = Player::find($login);
 
 
@@ -44,7 +47,7 @@ class AddAdmin extends Command
         }
         if (!$groupId) {
             $table = new Table($output);
-            $table->setHeaders(["id", "title"]);
+            $table->setHeaders(["Id", "Title"]);
             $groups = Group::all();
 
             foreach ($groups as $group) {
@@ -71,7 +74,22 @@ class AddAdmin extends Command
             $player->save();
             $output->writeln("Successfully added '{$login}' to {$groupName} group.");
         } catch (Exception $e) {
-            $output->writeln("Error while adding player {$login} to group.".$e->getMessage());
+            $output->writeln("Error while adding player {$login} to group. ".$e->getMessage());
+        }
+        try {
+            $server = Connection::factory(
+                config('server.ip'),
+                config('server.port'),
+                5,
+                config('server.rpc.login'),
+                config('server.rpc.password')
+            );
+
+            $server->chatSendServerMessage(
+                "You have been added to group {$groupName}, please rejoin to this server.", $login);
+
+        } catch (Exception $e) {
+            // silent exception
         }
     }
 }
