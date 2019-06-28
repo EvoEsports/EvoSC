@@ -5,12 +5,42 @@ require 'core/autoload.php';
 require 'core/global-functions.php';
 require "core/EscRun.php";
 
+use esc\Commands\AddAdmin;
 use esc\Commands\FixScores;
 use esc\Commands\ImportUaseco;
 use esc\Commands\MakeMigration;
 use esc\Commands\Migrate;
-
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+
+global $_isVerbose;
+global $_isVeryVerbose;
+global $_isDebug;
+global $escVersion;
+$escVersion = '0.68.26';
+$_isVerbose = false;
+$_isVeryVerbose = false;
+$_isDebug = false;
+
+$input = new ArgvInput();
+if ($input->hasParameterOption('-vvv', true) ||
+    $input->hasParameterOption('--verbose=3', true) ||
+    3 === $input->getParameterOption('--verbose', false, true)) {
+    $_isDebug = true;
+    $_isVerbose = true;
+    $_isVeryVerbose = true;
+} elseif ($input->hasParameterOption('-vv', true) ||
+    $input->hasParameterOption('--verbose=2', true) ||
+    2 === $input->getParameterOption('--verbose', false, true)) {
+    $_isVeryVerbose = true;
+    $_isVerbose = true;
+} elseif ($input->hasParameterOption('-v', true) ||
+    $input->hasParameterOption('--verbose=1', true) ||
+    $input->hasParameterOption('--verbose', true) ||
+    $input->getParameterOption('--verbose', false, true)) {
+    $_isVerbose = true;
+}
 
 
 $application = new Application();
@@ -19,12 +49,12 @@ $application->add(new MakeMigration());
 $application->add(new ImportUaseco());
 $application->add(new FixScores());
 $application->add(new EscRun());
-
+$application->add(new AddAdmin());
 $application->setDefaultCommand("list");
 
 
 try {
     $application->run();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     die($e);
 }

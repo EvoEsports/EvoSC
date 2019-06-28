@@ -23,17 +23,7 @@ class EscRun extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        global $escVersion;
         global $serverName;
-        global $_isVerbose;
-        global $_isVeryVerbose;
-        global $_isDebug;
-
-        $_isVerbose = $output->isVerbose();
-        $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug = $output->isDebug();
-
-        $escVersion = '0.68.26';
 
         Log::setOutput($output);
         esc\Controllers\ConfigController::init();

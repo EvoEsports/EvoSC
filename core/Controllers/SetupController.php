@@ -5,7 +5,7 @@ namespace esc\Controllers;
 
 use esc\Classes\File;
 
-use Migrate;
+use esc\Commands\Migrate;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
