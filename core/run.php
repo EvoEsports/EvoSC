@@ -2,6 +2,7 @@
 
 require 'autoload.php';
 require 'global-functions.php';
+require 'gbxdatafetcher/gbxdatafetcher.inc.php';
 
 use esc\Classes\File;
 use esc\Classes\Server;

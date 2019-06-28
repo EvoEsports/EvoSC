@@ -21,7 +21,7 @@ class Log
     /**
      * Get the output-interface
      *
-     * @return \Symfony\Component\Console\Output\OutputInterface|null
+     * @return OutputInterface|null
      */
     public static function getOutput(): ?OutputInterface
     {
