@@ -183,7 +183,6 @@ class PlayerController implements ControllerInterface
         };
 
         $fuzzyLogin = self::findClosestMatchingString($nick, $nicknamesByLogin);
-        Log::getOutput()->writeln(print_r($nicknamesByLogin, true));
 
         $players = $online->filter(function (Player $player) use ($nick, $fuzzyLogin) {
             if ($player->Login == $nick || ($fuzzyLogin !== null && $player->Login == $fuzzyLogin)) {
@@ -339,9 +338,6 @@ class PlayerController implements ControllerInterface
         foreach ($array as $key => $value) {
             $editDistance = levenshtein($value, $search);
 
-            Log::getOutput()->writeln($editDistance);
-
-            // exact match
             if ($editDistance == 0) {
                 return $key;
 
