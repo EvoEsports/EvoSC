@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Commands;
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
@@ -11,7 +13,7 @@ class Migrate extends Command
 {
     protected function configure()
     {
-        $this->setName('migrate')->addOption('--setup')->setDescription('Run all database migrations. Run after pulling updates');
+        $this->setName('migrate')->setDescription('Run all database migrations. Run after pulling updates');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -20,9 +22,9 @@ class Migrate extends Command
         global $_isVeryVerbose;
         global $_isDebug;
 
-        $_isVerbose     = $output->isVerbose();
+        $_isVerbose = $output->isVerbose();
         $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug       = $output->isDebug();
+        $_isDebug = $output->isDebug();
 
         $output->writeln('Executing migrations...');
 
@@ -59,9 +61,9 @@ class Migrate extends Command
         }
 
         $previousBatch = $connection->table('migrations')
-                                    ->get(['batch'])
-                                    ->sortByDesc('batch')
-                                    ->first();
+            ->get(['batch'])
+            ->sortByDesc('batch')
+            ->first();
 
         if ($previousBatch) {
             $batch = $previousBatch->batch + 1;
@@ -69,11 +71,17 @@ class Migrate extends Command
             $batch = 1;
         }
 
-        $migrations         = $this->getMigrations();
-        $migrationsTable    = $connection->table('migrations');
+        $migrations = $this->getMigrations();
+        $migrationsTable = $connection->table('migrations');
         $executedMigrations = $migrationsTable->get(['file']);
 
-        $migrations->each(function ($migration) use ($executedMigrations, $batch, $schemaBuilder, $migrationsTable, $output) {
+        $migrations->each(function ($migration) use (
+            $executedMigrations,
+            $batch,
+            $schemaBuilder,
+            $migrationsTable,
+            $output
+        ) {
             if ($executedMigrations->where('file', $migration->file)->isNotEmpty()) {
                 //Skip already executed migrations
                 return;
@@ -104,7 +112,7 @@ class Migrate extends Command
 
             return preg_match('/extends Migration/', $content);
         })->map(function ($migration) {
-            $col       = collect();
+            $col = collect();
             $col->path = "Migrations/$migration";
             $col->file = $migration;
 
@@ -125,7 +133,7 @@ class Migrate extends Command
 
                 return preg_match('/extends Migration/', $content);
             })->map(function ($migration) use ($moduleDir) {
-                $col       = collect();
+                $col = collect();
                 $col->path = "core/Modules/$moduleDir/Migrations/$migration";
                 $col->file = $migration;
 
