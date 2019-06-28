@@ -3,6 +3,7 @@
     "php"                             : "^7.2",
     "ext-json"                        : "*",
     "ext-simplexml"                   : "*",
+    "ext-mbstring"                    : "*",
     "maniaplanet/dedicated-server-api": "^5.0",
     "illuminate/database"             : "^5.5",
     "symfony/console"                 : "^4.0",
