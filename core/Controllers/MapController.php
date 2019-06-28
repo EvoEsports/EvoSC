@@ -317,7 +317,7 @@ class MapController implements ControllerInterface
         $gbx->ClassName = 'CGameCtnChallenge';
         $gbx->ClassId = '03043000';
 
-        Log::logAddLine('MapController', 'Get GBX information: '.$cmd);
+        Log::logAddLine('MapController', 'Get GBX information: '.$filename);
 
         return json_encode($gbx);
     }
