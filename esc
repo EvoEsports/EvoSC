@@ -1,95 +1,60 @@
 <?php
 
 require 'vendor/autoload.php';
+require 'core/autoload.php';
+require 'core/global-functions.php';
+require "core/EscRun.php";
 
+use esc\Commands\AddAdmin;
+use esc\Commands\FixScores;
+use esc\Commands\ImportUaseco;
+use esc\Commands\MakeMigration;
+use esc\Commands\Migrate;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Symfony\Component\Console\Input\ArgvInput;
 
-require 'core/fix_scores.php';
-require 'core/migrate.php';
-require 'core/import_uaseco.php';
-require 'core/run.php';
 
-class MakeMigration extends Command
-{
-    protected function configure()
-    {
-        $this->setName('make:migration')
-            ->setDescription('Create migration, placed in /Migrations')
-            ->addArgument('migration_name', InputArgument::REQUIRED, 'The migration name');
-    }
+global $_isVerbose;
+global $_isVeryVerbose;
+global $_isDebug;
+global $escVersion;
+$escVersion = '0.68.26';
+$_isVerbose = false;
+$_isVeryVerbose = false;
+$_isDebug = false;
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $name = $input->getArgument('migration_name');
-
-        if (preg_match_all('/([A-Z][a-z]+)/', $name, $matches)) {
-            $filename = 'Migrations/' . time() . '_' . str_slug(implode(' ', $matches[0])) . '.php';
-
-            $template = str_replace('{className}', $name, '<?php
-
-namespace esc\Migrations;
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
-
-class {className} extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up(Builder $schemaBuilder)
-    {
-        $schemaBuilder->create(\'table-name\', function (Blueprint $table) {
-            $table->increments(\'id\');
-            $table->string(\'column1\');
-            $table->integer(\'column2\')->nullable();
-            $table->boolean(\'column3\')->default(false);
-            $table->timestamps();
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down(Builder $schemaBuilder)
-    {
-        $schemaBuilder->drop(\'table-name\');
-    }
-}');
-
-            file_put_contents($filename, $template);
-        } else {
-            $output->writeln('Error: Invalid name entered, please use camel case (example: CreatePlayersTable)');
-        }
-    }
+$input = new ArgvInput();
+if ($input->hasParameterOption('-vvv', true) ||
+    $input->hasParameterOption('--verbose=3', true) ||
+    3 === $input->getParameterOption('--verbose', false, true)) {
+    $_isDebug = true;
+    $_isVerbose = true;
+    $_isVeryVerbose = true;
+} elseif ($input->hasParameterOption('-vv', true) ||
+    $input->hasParameterOption('--verbose=2', true) ||
+    2 === $input->getParameterOption('--verbose', false, true)) {
+    $_isVeryVerbose = true;
+    $_isVerbose = true;
+} elseif ($input->hasParameterOption('-v', true) ||
+    $input->hasParameterOption('--verbose=1', true) ||
+    $input->hasParameterOption('--verbose', true) ||
+    $input->getParameterOption('--verbose', false, true)) {
+    $_isVerbose = true;
 }
 
 
 $application = new Application();
-
-$run = new EscRun();
-
 $application->add(new Migrate());
 $application->add(new MakeMigration());
 $application->add(new ImportUaseco());
 $application->add(new FixScores());
-$application->add($run);
-
+$application->add(new EscRun());
+$application->add(new AddAdmin());
 $application->setDefaultCommand("list");
 
 
 try {
     $application->run();
-} catch (\Exception $e) {
+} catch (Exception $e) {
     die($e);
 }

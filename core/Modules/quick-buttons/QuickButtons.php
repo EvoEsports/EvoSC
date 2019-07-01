@@ -19,7 +19,7 @@ class QuickButtons
         Hook::add('GroupChanged', [self::class, 'showButtons']);
     }
 
-    public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = '')
+    public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = "")
     {
         if (!self::$buttons) {
             self::$buttons = collect();

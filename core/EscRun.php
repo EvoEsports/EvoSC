@@ -1,14 +1,9 @@
 <?php
 
-require 'autoload.php';
-require 'global-functions.php';
-require 'gbxdatafetcher/gbxdatafetcher.inc.php';
-
 use esc\Classes\File;
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
-use esc\Controllers\AfkController;
 use esc\Controllers\EventController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -28,17 +23,7 @@ class EscRun extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        global $escVersion;
         global $serverName;
-        global $_isVerbose;
-        global $_isVeryVerbose;
-        global $_isDebug;
-
-        $_isVerbose = $output->isVerbose();
-        $_isVeryVerbose = $output->isVeryVerbose();
-        $_isDebug = $output->isDebug();
-
-        $escVersion = '0.68.26';
 
         Log::setOutput($output);
         esc\Controllers\ConfigController::init();
@@ -75,7 +60,7 @@ class EscRun extends Command
             Server::setCallVoteTimeOut(0);
 
             $output->writeln("Connection established.");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $msg = $e->getMessage();
             $output->writeln("<error>Connecting to server failed: $msg</error>");
             exit(1);
@@ -182,7 +167,7 @@ class EscRun extends Command
                 $failedConnectionRequests = 0;
 
                 usleep($pause);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::logAddLine('MPS',
                     'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::logAddLine('MPS', $e->getMessage());

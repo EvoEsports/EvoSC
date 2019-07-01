@@ -1,5 +1,7 @@
 <?php
 
+namespace esc\Commands;
+
 use esc\Classes\Log;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
@@ -43,11 +45,12 @@ class FixScores extends Command
 
         $output->writeln("Updating player scores.");
         $playerIds = $evoSC->table('stats')->where('Locals', '>', 0)->pluck('Player')->toArray();
-        $players   = $evoSC->table('players')->whereIn('id', $playerIds)->get();
-        $bar       = new ProgressBar($output, $players->count());
-        $limit     = 200;
+        $players = $evoSC->table('players')->whereIn('id', $playerIds)->get();
+        $bar = new ProgressBar($output, $players->count());
+        $limit = 200;
         $players->each(function ($player) use ($evoSC, $bar, $limit) {
-            $score = $evoSC->table('local-records')->where('Player', $player->id)->where('Rank', '<', $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
+            $score = $evoSC->table('local-records')->where('Player', $player->id)->where('Rank', '<',
+                $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
 
             $evoSC->table('stats')->where('Player', $player->id)->update([
                 'Score' => $score,
@@ -62,7 +65,7 @@ class FixScores extends Command
         $output->writeln("Fixing local ranks.");
         $evoSC->table('stats')->update(['Rank' => 9999]);
         $ranked = $evoSC->table('stats')->orderByDesc('Score')->where('Score', '>', 0)->get();
-        $bar    = new ProgressBar($output, $ranked->count());
+        $bar = new ProgressBar($output, $ranked->count());
         $ranked->each(function ($stat, $key) use ($evoSC, $bar) {
             $evoSC->table('stats')->where('Player', $stat->Player)->update(['Rank' => $key + 1]);
             $bar->advance();

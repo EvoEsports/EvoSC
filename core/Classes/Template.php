@@ -33,7 +33,7 @@ class Template
      */
     public function __construct(string $index, string $template)
     {
-        $this->index    = $index;
+        $this->index = $index;
         $this->template = $template;
     }
 
@@ -60,7 +60,9 @@ class Template
      */
     public static function hideAll(string $index)
     {
-        Server::sendDisplayManialinkPage('', sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>', $index));
+        Server::sendDisplayManialinkPage('',
+            sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>',
+                $index));
     }
 
     /**
@@ -70,16 +72,18 @@ class Template
      */
     public static function hide(Player $player, string $index)
     {
-        Server::sendDisplayManialinkPage($player->Login, sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>', $index));
+        Server::sendDisplayManialinkPage($player->Login,
+            sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>',
+                $index));
     }
 
     /**
      * Render and send a template to a player.
      *
-     * @param \esc\Models\Player $player
-     * @param string             $index
-     * @param null               $values
-     * @param bool               $multicall
+     * @param Player $player
+     * @param string $index
+     * @param null   $values
+     * @param bool   $multicall
      */
     public static function show(Player $player, string $index, $values = null, bool $multicall = false)
     {
@@ -94,7 +98,7 @@ class Template
         }
 
         $data['localPlayer'] = $player;
-        $xml                 = TemplateController::getTemplate($index, $data);
+        $xml = TemplateController::getTemplate($index, $data);
 
         if ($xml != '') {
             if ($multicall) {

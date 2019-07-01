@@ -5,6 +5,9 @@
 //     die('Unauthorized');
 // }
 
+use Illuminate\Support\Collection;
+
+
 require __DIR__ . '/vendor/autoload.php';
 
 if (isset($_GET['song']) && file_exists(__DIR__ . '/' . $_GET['song'])) {
@@ -30,11 +33,11 @@ if (file_exists(__DIR__ . '/music.lib')) {
     }
 }
 
-$songs = new \Tightenco\Collect\Support\Collection();
+$songs = new Collection();
 
 foreach ($files as $file) {
     $getID3 = new getID3();
-    $info   = collect($getID3->analyze(__DIR__ . '/' . $file))->only(['playtime_string', 'tags', 'filename']);
+    $info = collect($getID3->analyze(__DIR__ . '/' . $file))->only(['playtime_string', 'tags', 'filename']);
 
     $tags = collect($info->get('tags')['vorbiscomment']);
 
