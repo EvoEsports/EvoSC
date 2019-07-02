@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="frameinstance">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="modelid" type="xs:string"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="graph">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="video">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="data" type="xs:string"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:string"/>
+            <xs:attribute name="play" type="xs:string" use="optional"/>
+            <xs:attribute name="music" type="xs:string" use="optional"/>
+            <xs:attribute name="volume" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="audio">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:string" use="optional"/>
+            <xs:attribute name="volume" type="xs:string" use="optional"/>
+            <xs:attribute name="play" type="xs:string" use="optional"/>
+            <xs:attribute name="data" type="xs:string"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+            <xs:attribute name="music" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="label">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="size" type="xs:string" use="optional"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="text" type="xs:string"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="textsize" type="xs:string" use="optional"/>
+            <xs:attribute name="textcolor" type="xs:string" use="optional"/>
+            <xs:attribute name="translate" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor1" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor2" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+            <xs:attribute name="textfont" type="xs:string" use="optional"/>
+            <xs:attribute name="textprefix" type="xs:string" use="optional"/>
+            <xs:attribute name="opacity" type="xs:string" use="optional"/>
+            <xs:attribute name="textemboss" type="xs:string" use="optional"/>
+            <xs:attribute name="autonewline" type="xs:string" use="optional"/>
+            <xs:attribute name="maxline" type="xs:string" use="optional"/>
+            <xs:attribute name="textid" type="xs:string" use="optional"/>
+            <xs:attribute name="linespacing" type="xs:string" use="optional"/>
+            <xs:attribute name="action" type="xs:string" use="optional"/>
+            <xs:attribute name="url" type="xs:string" use="optional"/>
+            <xs:attribute name="manialink" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptaction" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="gauge">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="size" type="xs:string"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="ratio" type="xs:string" use="optional"/>
+            <xs:attribute name="grading" type="xs:string" use="optional"/>
+            <xs:attribute name="clan" type="xs:string" use="optional"/>
+            <xs:attribute name="centered" type="xs:string" use="optional"/>
+            <xs:attribute name="color" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="fileentry">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="size" type="xs:string"/>
+            <xs:attribute name="default" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="textsize" type="xs:string" use="optional"/>
+            <xs:attribute name="textcolor" type="xs:string" use="optional"/>
+            <xs:attribute name="textfont" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor1" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor2" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="folder" type="xs:string" use="optional"/>
+            <xs:attribute name="selecttext" type="xs:string" use="optional"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="type" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="quad">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="size" type="xs:string"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="bgcolor" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="image" type="xs:string" use="optional"/>
+            <xs:attribute name="imagefocus" type="xs:string" use="optional"/>
+            <xs:attribute name="keepratio" type="xs:string" use="optional"/>
+            <xs:attribute name="colorize" type="xs:string" use="optional"/>
+            <xs:attribute name="modulatecolor" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="substyle" type="xs:string" use="optional"/>
+            <xs:attribute name="autoscalefixedwidth" type="xs:string" use="optional"/>
+            <xs:attribute name="styleselected" type="xs:string" use="optional"/>
+            <xs:attribute name="opacity" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+            <xs:attribute name="action" type="xs:string" use="optional"/>
+            <xs:attribute name="url" type="xs:string" use="optional"/>
+            <xs:attribute name="manialink" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptaction" type="xs:string" use="optional"/>
+            <xs:attribute name="bluramount" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="entry">
+        <xs:complexType>
+            <xs:attribute name="pos" type="xs:string"/>
+            <xs:attribute name="z-index" type="xs:string"/>
+            <xs:attribute name="size" type="xs:string"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="default" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="halign" type="xs:string" use="optional"/>
+            <xs:attribute name="valign" type="xs:string" use="optional"/>
+            <xs:attribute name="style" type="xs:string" use="optional"/>
+            <xs:attribute name="textfont" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor1" type="xs:string" use="optional"/>
+            <xs:attribute name="focusareacolor2" type="xs:string" use="optional"/>
+            <xs:attribute name="textcolor" type="xs:string" use="optional"/>
+            <xs:attribute name="textsize" type="xs:string" use="optional"/>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="textformat" type="xs:string" use="optional"/>
+            <xs:attribute name="selecttext" type="xs:string" use="optional"/>
+            <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="textedit" nillable="true">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="pos" type="xs:string"/>
+                    <xs:attribute name="z-index" type="xs:string"/>
+                    <xs:attribute name="size" type="xs:string" use="optional"/>
+                    <xs:attribute name="default" type="xs:string" use="optional"/>
+                    <xs:attribute name="rot" type="xs:string" use="optional"/>
+                    <xs:attribute name="hidden" type="xs:string" use="optional"/>
+                    <xs:attribute name="id" type="xs:string" use="optional"/>
+                    <xs:attribute name="class" type="xs:string" use="optional"/>
+                    <xs:attribute name="halign" type="xs:string" use="optional"/>
+                    <xs:attribute name="valign" type="xs:string" use="optional"/>
+                    <xs:attribute name="style" type="xs:string" use="optional"/>
+                    <xs:attribute name="textsize" type="xs:string" use="optional"/>
+                    <xs:attribute name="textcolor" type="xs:string" use="optional"/>
+                    <xs:attribute name="textfont" type="xs:string" use="optional"/>
+                    <xs:attribute name="focusareacolor1" type="xs:string" use="optional"/>
+                    <xs:attribute name="focusareacolor2" type="xs:string" use="optional"/>
+                    <xs:attribute name="scriptevents" type="xs:string" use="optional"/>
+                    <xs:attribute name="showlinenumbers" type="xs:string" use="optional"/>
+                    <xs:attribute name="autonewline" type="xs:string" use="optional"/>
+                    <xs:attribute name="maxline" type="xs:string" use="optional"/>
+                    <xs:attribute name="textformat" type="xs:string" use="optional"/>
+                    <xs:attribute name="linespacing" type="xs:string" use="optional"/>
+                    <xs:attribute name="scale" type="xs:string" use="optional"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="frame">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="frame" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="frameinstance" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="graph" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="video" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="audio" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="label" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="gauge" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="fileentry" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="quad" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="textedit" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:choice>
+            <xs:attribute name="z-index" type="xs:string" use="optional"/>
+            <xs:attribute name="pos" type="xs:string" use="optional"/>
+            <xs:attribute name="rot" type="xs:string" use="optional"/>
+            <xs:attribute name="hidden" type="xs:string" use="optional"/>
+            <xs:attribute name="clip" type="xs:string" use="optional"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="class" type="xs:string" use="optional"/>
+            <xs:attribute name="size" type="xs:string" use="optional"/>
+            <xs:attribute name="scale" type="xs:string" use="optional"/>
+            <xs:attribute name="scroll" type="xs:string" use="optional"/>
+            <xs:attribute name="scrollmax" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="manialink">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="stylesheet" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="style" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                    <xs:attribute name="class" type="xs:string"/>
+                                    <xs:anyAttribute processContents="skip" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="dico" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="language" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:any processContents="skip"/>
+                                    </xs:choice>
+                                    <xs:attribute name="id" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="framemodel" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element ref="frameinstance" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="graph" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="video" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="audio" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="label" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="gauge" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="fileentry" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="quad" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="textedit" minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element ref="frame" minOccurs="0" maxOccurs="unbounded"/>
+                        </xs:choice>
+                        <xs:attribute name="id" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element ref="frameinstance" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="graph" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="video" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="audio" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="label" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="gauge" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="fileentry" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="quad" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="entry" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="textedit" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="frame" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="script" minOccurs="0" maxOccurs="unbounded">
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="version" type="xs:string"/>
+            <xs:attribute name="id" type="xs:string" use="optional"/>
+            <xs:attribute name="name" type="xs:string" use="optional"/>
+            <xs:attribute name="background" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
