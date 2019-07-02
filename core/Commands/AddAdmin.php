@@ -80,7 +80,7 @@ class AddAdmin extends Command
             $server = Connection::factory(
                 config('server.ip'),
                 config('server.port'),
-                5,
+                2,
                 config('server.rpc.login'),
                 config('server.rpc.password')
             );
