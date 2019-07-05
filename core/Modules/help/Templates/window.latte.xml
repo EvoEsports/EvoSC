@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <manialink name="ESC:Help" id="Help" version="3">
     <frame id="help" pos="-60 38" scale="1.1">
         <quad pos="0 0" size="120 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>

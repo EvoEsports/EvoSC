@@ -27,12 +27,13 @@ class MatchSettingsController
      */
     public static function init()
     {
-        self::$currentMatchSettingsFile = config('server.default-matchsettings') ?? 'MatchSettings';
+        self::$currentMatchSettingsFile = config('server.default-matchsettings');
 
-        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.', 'map_add');
+        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
+            'map_add');
 
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
-            Log::error('MatchSettings "' . self::getPath(self::$currentMatchSettingsFile) . '" not found.');
+            Log::error('MatchSettings "'.self::getPath(self::$currentMatchSettingsFile).'" not found.');
             exit(1);
         }
     }
@@ -46,8 +47,8 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
-     * @param string $filename
+     * @param  string  $matchSettings
+     * @param  string  $filename
      *
      * @return bool
      */
@@ -63,8 +64,8 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
-     * @param string $uid
+     * @param  string  $matchSettings
+     * @param  string  $uid
      *
      * @return bool
      */
@@ -80,12 +81,12 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
-     * @param Map    $map
+     * @param  string  $matchSettings
+     * @param  Map  $map
      */
     public static function addMap(string $matchSettings, Map $map)
     {
-        $file     = self::getPath($matchSettings);
+        $file = self::getPath($matchSettings);
         $settings = new SimpleXMLElement(File::get($file));
 
         $node = $settings->addChild('map');
@@ -100,7 +101,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
@@ -118,14 +119,14 @@ class MatchSettingsController
      */
     public static function shuffleCurrentMapList()
     {
-        $maps     = collect();
-        $file     = self::getPath(self::$currentMatchSettingsFile);
+        $maps = collect();
+        $file = self::getPath(self::$currentMatchSettingsFile);
         $settings = new SimpleXMLElement(File::get($file));
 
         foreach ($settings->map as $mapInfo) {
             $maps->push([
-                'file'  => (string)$mapInfo->file,
-                'ident' => (string)$mapInfo->ident,
+                'file' => (string) $mapInfo->file,
+                'ident' => (string) $mapInfo->ident,
             ]);
         }
 
@@ -147,12 +148,12 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
-     * @param string $uid
+     * @param  string  $matchSettings
+     * @param  string  $uid
      */
     public static function removeByUid(string $matchSettings, string $uid)
     {
-        $file     = self::getPath($matchSettings);
+        $file = self::getPath($matchSettings);
         $settings = new SimpleXMLElement(File::get($file));
 
         foreach ($settings->map as $mapInfo) {
@@ -167,12 +168,12 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
-     * @param string $filename
+     * @param  string  $matchSettings
+     * @param  string  $filename
      */
     public static function removeByFilename(string $matchSettings, string $filename)
     {
-        $file     = self::getPath($matchSettings);
+        $file = self::getPath($matchSettings);
         $settings = new SimpleXMLElement(File::get($file));
 
         foreach ($settings->map as $mapInfo) {
@@ -187,14 +188,14 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettings
+     * @param  string  $matchSettings
      *
      * @return Collection
      */
     public static function getMapFilenamesFrom(string $matchSettings): Collection
     {
         $mapInfos = collect();
-        $file     = self::getPath($matchSettings);
+        $file = self::getPath($matchSettings);
 
         foreach ((new SimpleXMLElement(File::get($file)))->map as $mapInfo) {
             $mapInfos->push($mapInfo);
@@ -212,7 +213,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $filename
+     * @param  string  $filename
      *
      * @return bool
      */
@@ -222,7 +223,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $uid
+     * @param  string  $uid
      *
      * @return bool
      */
@@ -232,7 +233,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $uid
+     * @param  string  $uid
      */
     public static function removeByUidFromCurrentMatchSettings(string $uid)
     {
@@ -240,7 +241,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $filename
+     * @param  string  $filename
      */
     public static function removeByFilenameFromCurrentMatchSettings(string $filename)
     {
@@ -248,7 +249,7 @@ class MatchSettingsController
     }
 
     /**
-     * @param Map $map
+     * @param  Map  $map
      */
     public static function addMapToCurrentMatchSettings(Map $map)
     {
@@ -256,25 +257,39 @@ class MatchSettingsController
     }
 
     /**
-     * @param string $matchSettingsFile
+     * @param  string  $matchSettingsFile
      *
      * @return string
      */
     private static function getPath(string $matchSettingsFile)
     {
-        return Server::getMapsDirectory() . config('server.matchsettings-directory') . DIRECTORY_SEPARATOR . $matchSettingsFile;
+        return Server::getMapsDirectory().config('server.matchsettings-directory').DIRECTORY_SEPARATOR.$matchSettingsFile;
     }
 
     /**
-     * @param string           $file
-     * @param SimpleXMLElement $matchSettings
+     * @param  string  $file
+     * @param  SimpleXMLElement  $matchSettings
      */
     private static function saveMatchSettings(string $file, SimpleXMLElement $matchSettings)
     {
-        $domDocument                     = new \DOMDocument("1.0");
+        $domDocument = new \DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;
-        $domDocument->formatOutput       = true;
+        $domDocument->formatOutput = true;
         $domDocument->loadXML($matchSettings->asXML());
         File::put($file, $domDocument->saveXML());
+    }
+
+    public static function setMapIdent(string $matchSettingsFile, string $filename, string $uid)
+    {
+        $file = self::getPath($matchSettingsFile);
+        $settings = new SimpleXMLElement(File::get($file));
+
+        foreach ($settings->map as $mapInfo) {
+            if ($mapInfo->file == $filename) {
+                $mapInfo->ident = $uid;
+            }
+        }
+
+        self::saveMatchSettings($file, $settings);
     }
 }

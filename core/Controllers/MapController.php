@@ -22,6 +22,7 @@ use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
 use Illuminate\Contracts\Queue\Queue;
+use stdClass;
 
 /**
  * Class MapController
@@ -277,9 +278,10 @@ class MapController implements ControllerInterface
      *
      * @param $filename
      *
-     * @return string
+     * @param  bool  $asString
+     * @return string|stdClass|null
      */
-    public static function getGbxInformation($filename): ?string
+    public static function getGbxInformation($filename, bool $asString = true)
     {
         $mapFile = Server::GameDataDirectory().'Maps'.DIRECTORY_SEPARATOR.$filename;
         $data = new GBXChallMapFetcher(true);
@@ -292,7 +294,7 @@ class MapController implements ControllerInterface
             return null;
         }
 
-        $gbx = new \stdClass();
+        $gbx = new stdClass();
         $gbx->CheckpointsPerLaps = $data->nbChecks;
         $gbx->NbLaps = $data->nbLaps;
         $gbx->DisplayCost = $data->cost;
@@ -313,13 +315,18 @@ class MapController implements ControllerInterface
         $gbx->Comment = $data->comment;
         $gbx->TitleId = 'TMStadium'; //TODO: maybe support canyon
         $gbx->AuthorLogin = $data->authorLogin;
+        $gbx->AuthorNick = $data->authorNick;
         $gbx->Name = $data->name;
         $gbx->ClassName = 'CGameCtnChallenge';
         $gbx->ClassId = '03043000';
 
         Log::logAddLine('MapController', 'Get GBX information: '.$filename);
 
-        return json_encode($gbx);
+        if ($asString) {
+            return json_encode($gbx);
+        }
+
+        return $gbx;
     }
 
     /**
@@ -335,94 +342,74 @@ class MapController implements ControllerInterface
         foreach ($maps as $mapInfo) {
             $filename = $mapInfo->file;
             $uid = $mapInfo->ident;
-            $mapFile = self::$mapsPath.$filename;
 
-            if (!File::exists($mapFile)) {
-                Log::error("File $mapFile not found.");
+            if (!File::exists(self::$mapsPath.$filename)) {
+                Log::error("File $filename not found.");
 
-                if (Map::whereFilename($filename)
-                    ->exists()) {
-                    Map::whereFilename($filename)
-                        ->update(['enabled' => 0]);
+                if (Map::whereFilename($filename)->exists()) {
+                    Map::whereFilename($filename)->update(['enabled' => 0]);
                 }
 
                 continue;
             }
 
-            if (!$uid) {
-                Log::logAddLine('MapController', 'Missing ident in match-settings for map: '.$filename);
-                $gbxJson = self::getGbxInformation($filename);
-                $gbx = json_decode($gbxJson);
+            $gbx = self::getGbxInformation($filename, false);
+
+            if (!$uid || ($uid && $uid != $gbx->MapUid)) {
                 $uid = $gbx->MapUid;
+
+                MatchSettingsController::setMapIdent(config('server.default-matchsettings'), $filename, $uid);
             }
 
-            if (Map::whereFilename($filename)
-                ->exists()) {
-                $map = Map::whereFilename($filename)
-                    ->first();
+            if (Map::whereFilename($filename)->exists()) {
+                $map = Map::whereFilename($filename)->first();
 
                 if ($map->uid != $uid) {
-                    Log::logAddLine('MapController', 'UID changed for map: '.$map, isVerbose());
-
-                    LocalRecord::whereMap($map->id)
-                        ->delete();
-                    Dedi::whereMap($map->id)
-                        ->delete();
-                    MapFavorite::whereMapId($map->id)
-                        ->delete();
-                    MapQueue::whereMapUid($map->uid)
-                        ->delete();
-
                     $map->update([
-                        'gbx' => self::getGbxInformation($filename),
-                        'uid' => $uid,
-                        'mx_details' => null,
-                        'mx_world_record' => null,
+                        'filename' => '_'.$map->filename,
+                        'enabled' => false
                     ]);
+
+                    try {
+                        $map = self::createMap($filename, $uid, $gbx);
+                    } catch (\Throwable $e) {
+                        Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+
+                        continue;
+                    }
                 }
             } else {
-                if (Map::whereUid($uid)
-                    ->exists()) {
-                    $map = Map::whereUid($uid)
-                        ->first();
+                if (Map::whereUid($uid)->exists()) {
+                    $map = Map::whereUid($uid)->first();
 
-                    Log::logAddLine('MapController', "Filename changed for map: (".$map->filename." -> $filename)",
-                        isVerbose());
+                    if ($map->filename != $filename) {
+                        Log::logAddLine('MapController', "Filename changed for map: (".$map->filename." -> $filename)",
+                            isVerbose());
 
-                    $map->update([
-                        'filename' => $filename,
-                    ]);
-                } else {
-                    $gbxJson = self::getGbxInformation($filename);
-                    $gbx = json_decode($gbxJson);
-                    $authorLogin = $gbx->AuthorLogin;
-
-                    if (Player::where('Login', $authorLogin)
-                        ->exists()) {
-                        $authorId = Player::find($authorLogin)->id;
-                    } else {
-                        $authorId = Player::insertGetId([
-                            'Login' => $authorLogin,
-                            'NickName' => $authorLogin,
-                        ]);
+                        $map->update(['filename' => $filename,]);
                     }
+                } else {
+                    try {
+                        $map = self::createMap($filename, $uid, $gbx);
+                    } catch (\Throwable $e) {
+                        Log::error('Failed to create map '.$filename.' with uid: '.$uid);
 
-                    $map = Map::create([
-                        'author' => $authorId,
-                        'filename' => $filename,
-                        'gbx' => self::getGbxInformation($filename),
-                        'uid' => $uid,
-                    ]);
+                        continue;
+                    }
                 }
             }
-
-            $map->update(['enabled' => 1]);
 
             if (isVerbose()) {
                 printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->gbx->Name));
             } else {
                 echo ".";
             }
+        }
+
+        if (!$map->gbx) {
+            $map->update([
+                'gbx' => json_encode($gbx)
+            ]);
         }
 
         echo "\n";
@@ -436,8 +423,47 @@ class MapController implements ControllerInterface
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-            ->orWhere('gbx', null)
             ->update(['enabled' => false]);
+    }
+
+    /**
+     * Create map and retrieve object
+     *
+     * @param  string  $filename
+     * @param  stdClass  $gbx
+     * @return Map|null
+     * @throws \Throwable
+     */
+    private static function createMap(string $filename, string $uid, stdClass $gbx): ?Map
+    {
+        $authorLogin = $gbx->AuthorLogin;
+
+        if (Player::where('Login', $authorLogin)->exists()) {
+            $author = Player::find($authorLogin);
+
+            if ($author->Login == $author->NickName) {
+                $author->update([
+                    'NickName' => $gbx->AuthorNick
+                ]);
+            }
+
+            $authorId = $author->id;
+        } else {
+            $authorId = Player::insertGetId([
+                'Login' => $authorLogin,
+                'NickName' => $gbx->AuthorNick,
+            ]);
+        }
+
+        $map = new Map();
+        $map->uid = $uid;
+        $map->author = $authorId;
+        $map->filename = $filename;
+        $map->enabled = false;
+        $map->gbx = json_encode($gbx);
+        $map->saveOrFail();
+
+        return $map;
     }
 
     /**
