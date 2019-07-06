@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 require 'core/autoload.php';
 require 'core/global-functions.php';
 require "core/EscRun.php";
+require 'core/gbxdatafetcher/gbxdatafetcher.inc.php';
 
 use esc\Commands\AddAdmin;
 use esc\Commands\FixScores;
