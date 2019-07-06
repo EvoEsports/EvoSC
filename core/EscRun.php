@@ -1,5 +1,7 @@
 <?php
 
+require 'gbxdatafetcher/gbxdatafetcher.inc.php';
+
 use esc\Classes\File;
 use esc\Classes\Server;
 use esc\Classes\Log;

@@ -10,8 +10,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
-use esc\Models\Dedi;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
@@ -21,7 +19,6 @@ use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
-use Illuminate\Contracts\Queue\Queue;
 use stdClass;
 
 /**
