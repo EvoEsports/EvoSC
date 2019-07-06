@@ -61,7 +61,7 @@ class RestClient
     public static function get(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'Requesting GET: ' . $url, isDebug());
+            Log::logAddLine('RestClient', 'GET: ' . $url, isDebug());
         }
 
         return self::$client->request('GET', $url, self::addUserAgent($options));
@@ -79,11 +79,30 @@ class RestClient
     public static function post(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'Requesting GET: ' . $url . ' with options: ' . json_encode($options),
+            Log::logAddLine('RestClient', 'POST: ' . $url . ' with options: ' . json_encode($options),
                 isDebug());
         }
 
         return self::$client->request('POST', $url, self::addUserAgent($options));
+    }
+
+    /**
+     * Create a put-request.
+     *
+     * @param string     $url
+     * @param array|null $options
+     *
+     * @return Response
+     * @throws GuzzleException
+     */
+    public static function put(string $url, array $options = null): Response
+    {
+        if (isDebug()) {
+            Log::logAddLine('RestClient', 'PUT: ' . $url . ' with options: ' . json_encode($options),
+                isDebug());
+        }
+
+        return self::$client->request('PUT', $url, self::addUserAgent($options));
     }
 
     //Add user-agent to current options.

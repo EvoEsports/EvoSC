@@ -153,7 +153,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool setVehicleNetQuality(int $int)
  * @method static object getVehicleNetQuality()
  * @method static bool setServerOptions(object $struct)
- * @method static object getServerOptions()
+ * @method static \Maniaplanet\DedicatedServer\Structures\ServerOptions getServerOptions()
  * @method static bool setForcedTeams(bool $boolean)
  * @method static bool getForcedTeams()
  * @method static bool setForcedMods(bool $boolean, array $array)

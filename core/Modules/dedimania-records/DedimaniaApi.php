@@ -362,7 +362,7 @@ class DedimaniaApi
         // Log::logAddLine('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
 
         try {
-            $VReplay = Server::rpc()->getValidationReplay($bestRecord->player->Login);
+            $VReplay = Server::getValidationReplay($bestRecord->player->Login);
         } catch (\Exception $e) {
             Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
             Log::logAddLine('DedimaniaApi', $e->getTraceAsString(), isVerbose());
