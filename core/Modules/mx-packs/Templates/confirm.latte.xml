@@ -1,3 +1,4 @@
+{contentType text}
 {extends 'components.window'}
 
 {block id}
@@ -17,7 +18,7 @@ Add {$info->Name} map-pack
 <label pos="0 -6" size="58 20" text="{$info->Description}" textsize="0.5" autonewline="1" textcolor="{config('colors.ui.window.text.primary')}" textfont=""/>
 
 <label pos="10 -70.5" size="20 5" text=" Install" textsize="0.75" valign="center" halign="center" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"
-ScriptEvents="1"/>
+ScriptEvents="1" class="confirm"/>
 
 <label pos="60 0" size="116 3" text="Map" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
 <label pos="80 0" size="116 3" text="Author" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
@@ -35,7 +36,6 @@ ScriptEvents="1"/>
 
 {block pendingEvents}
 if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::MouseClick){
-    window.Hide();
     TriggerPageAction("mappack.aprove,{$info->ID}");
 
     return;

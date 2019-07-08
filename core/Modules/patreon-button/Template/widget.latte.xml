@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:patreon-widget" id="patreon-widget" version="3">
     <frame pos="{config('patreon.pos.visible')|noescape}" id="widget">

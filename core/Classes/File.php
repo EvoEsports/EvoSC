@@ -153,7 +153,7 @@ class File
         return $files;
     }
 
-    public static function getFiles(string $baseDirectory, string $filterPattern)
+    public static function getFiles(string $baseDirectory, string $filterPattern = null)
     {
         $files = collect();
 
@@ -163,7 +163,7 @@ class File
 
                 if (!is_dir($path)) {
                     //File is not directory
-                    if (preg_match($filterPattern, $file)) {
+                    if (!$filterPattern || $filterPattern && preg_match($filterPattern, $file)) {
                         //Add template
                         $files->push($path);
                     }

@@ -1,3 +1,4 @@
+{contentType text}
 <frame id="confirm-dialog" pos="-40 9" z-index="10000" hidden="1">
     <quad size="80 18" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-1" />
     <quad size="80 2" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />

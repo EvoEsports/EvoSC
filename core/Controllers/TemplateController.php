@@ -89,11 +89,7 @@ class TemplateController implements ControllerInterface
             //Build parameter string
             $parameters = [];
             foreach ($values as $key => $value) {
-                if (is_array($value)) {
-                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . implode(', ', $value) . "</>");
-                } else {
-                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>$value</>");
-                }
+                array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . json_encode($value, JSON_PRETTY_PRINT) . "</>");
             }
             $vals = implode(', ', $parameters);
 

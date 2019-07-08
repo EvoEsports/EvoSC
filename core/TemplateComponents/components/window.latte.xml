@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
 <frame id="window" pos="0 0">
@@ -36,7 +37,7 @@ main() {
                 return;
             }
 
-            {block pendingEvents}{/block}
+            {include pendingEvents}
         }
 
         maniaLinkDrag();

@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:donations-widget" id="donations-widget" version="3">
     <frame id="main-frame" pos="{config('donations.pos.visible')}" size="50 5" scale="0.8">

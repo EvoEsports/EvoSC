@@ -1,3 +1,4 @@
+{contentType text}
 <script><!--
 declare CMlFrame handle;
 declare Text handleId;
@@ -13,7 +14,7 @@ Void maniaLinkDrag(){
         if(lastFramePosition.existskey(handleId)){
             handle.Parent.RelativePosition_V3 = lastFramePosition[handleId];
         }else{
-            handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]/-2.0, handle.Parent.Size[1]/2.0>;
+            handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]*-0.5, handle.Parent.Size[1]*0.5>;
         }
 
         handleId = handle.DataAttributeGet("id");

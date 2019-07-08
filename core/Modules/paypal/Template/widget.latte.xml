@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:paypal-widget" id="paypal-widget" version="3">
     <frame pos="{config('paypal.pos.visible')|noescape}" id="widget">

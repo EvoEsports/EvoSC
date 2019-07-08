@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-widget" id="music-widget" version="3">
     <frame id="widget" z-index="5000" pos="{config('music.pos.visible')}"
@@ -57,8 +58,8 @@
         <quad class="song" pos="0 0" size="156 3.7" bgcolor="fff0" ScriptEvents="1"/>
     </framemodel>
 
-    <frame id="music-container" pos="-80 45" hidden="1">
-        <frame id="list">
+    <frame id="music-container" pos="0 0" hidden="1">
+        <frame id="list" pos="0 150">
             <quad id="handle" data-id="music" pos="0 0" size="155 5" z-index="10"/>
             <quad pos="0 0" size="160 5" bgcolor="{config('colors.ui.window.header.color')|noescape}"/>
             <quad pos="0 0" size="160 95" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')}"/>
@@ -332,7 +333,7 @@ main() {
     declare Song StartSong for This;
 
     progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
-    hoverColor = TL::ToColor({config('colors.ui.window.header.color')});
+    hoverColor = TL::ToColor("{config('colors.ui.window.header.color')}");
     musicEnabled = False;
     baseUrl = "{config('music.url')|noescape}";
 

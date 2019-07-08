@@ -1,3 +1,4 @@
+{contentType text}
 <script><!--
 
 declare Text HS_Pos_Visible;
@@ -7,7 +8,7 @@ declare Boolean HS_Hidden;
 
 Void hidescript(){
     if(HS_Target == Null){
-        HS_Target <=> (Page.MainFrame.GetFirstChild({isset($target) ? $target : 'widget'}) as CMlFrame);
+        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
         declare orig = HS_Target.RelativePosition_V3;
         declare hidden = orig;
 
