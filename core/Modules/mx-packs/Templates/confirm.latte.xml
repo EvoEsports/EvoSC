@@ -36,6 +36,7 @@ ScriptEvents="1" class="confirm"/>
 
 {block pendingEvents}
 if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::MouseClick){
+    window.Hide();
     TriggerPageAction("mappack.aprove,{$info->ID}");
 
     return;
