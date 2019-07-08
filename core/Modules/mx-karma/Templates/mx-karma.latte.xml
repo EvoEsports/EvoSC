@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MxKarma:MxKarmaWidget" id="MxKarmaWidget" version="3">
     <frame id="widget" pos="{config('mx-karma.pos')|noescape}" scale="{config('mx-karma.scale')}">

@@ -146,7 +146,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool isAutoSaveValidationReplaysEnabled()
  * @method static bool saveCurrentReplay(string $string)
  * @method static bool saveBestGhostsReplay(string $string, string $string)
- * @method static string getValidationReplay(string $string)
+ * @method static string getValidationReplay(string $login)
  * @method static bool setLadderMode(int $int)
  * @method static object getLadderMode()
  * @method static object getLadderServerLimits()
