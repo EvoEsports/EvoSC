@@ -6,6 +6,7 @@ use esc\Classes\File;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -15,6 +16,7 @@ class Migrate extends Command
     protected function configure()
     {
         $this->setName('migrate')->setDescription('Run all database migrations. Run after pulling updates');
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

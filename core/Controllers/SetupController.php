@@ -8,6 +8,7 @@ use esc\Classes\File;
 use esc\Commands\Migrate;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -126,11 +127,15 @@ class SetupController
         self::printInfo('Configuration of database.config.json finished.');
         self::printInfo('Running database migrate.');
 
+
         $application = new Application();
         $application->add(new Migrate());
-        $application->setDefaultCommand("migrate", true);
         try {
-            $application->run();
+            $application->find("migrate")
+                /** fixme: adding additional unused option and argument to run this command from setup controller  */
+                ->addArgument("run", InputArgument::OPTIONAL)
+                ->addOption("--setup", InputArgument::OPTIONAL)
+                ->run(self::$input, self::$output);
         } catch (\Exception $e) {
             self::printError($e->getMessage());
         }
@@ -222,7 +227,7 @@ class SetupController
 
     private static function askEnter(string $questionString, string $default = '', bool $optional = false)
     {
-        $question = new Question('<fg=green>' . $questionString . (empty($default) ? ": " : "[$default]: ") . '</>',
+        $question = new Question('<fg=green>'.$questionString.(empty($default) ? ": " : "[$default]: ").'</>',
             $default);
         $answer = self::$helper->ask(self::$input, self::$output, $question);
 
@@ -238,7 +243,7 @@ class SetupController
     private static function askBatch(string $file, array $questions)
     {
         foreach ($questions as $key => $questionData) {
-            $id = $file . '.' . $questionData['id'];
+            $id = $file.'.'.$questionData['id'];
             $question = $questionData['question'];
             $default = $questionData['default'];
             $optional = array_key_exists('optional', $questionData);
@@ -265,7 +270,7 @@ class SetupController
                     }
 
                     if (empty($value)) {
-                        self::printError('Value can not be empty and needs to be of type "' . $required . '"');
+                        self::printError('Value can not be empty and needs to be of type "'.$required.'"');
                         continue;
                     }
 
