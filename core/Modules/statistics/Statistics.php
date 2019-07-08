@@ -2,6 +2,7 @@
 
 namespace esc\Modules;
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -43,6 +44,8 @@ class Statistics
         Hook::add('AnnounceWinner', [self::class, 'announceWinner']);
 
         Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
+
+        ChatCommand::add('/rank', [self::class, 'showRank'], 'Show your current server rank');
     }
 
     public static function showScores(Collection $players)
