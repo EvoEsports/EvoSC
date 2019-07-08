@@ -45,7 +45,7 @@ class Statistics
 
         Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
 
-        ChatCommand::add('/rank', [self::class, 'showRank'], 'Show your current server rank');
+        ChatCommand::add('/rank', [self::class, 'showRank'], 'Show your current server rank.');
     }
 
     public static function showScores(Collection $players)
