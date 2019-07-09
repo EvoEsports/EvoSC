@@ -10,6 +10,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 use Exception;
@@ -47,7 +48,7 @@ class CountdownController
         }
 
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
-        Hook::add('EndMatch', [self::class, 'setMatchStart']);
+        Hook::add('EndMap', [self::class, 'endMap']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
@@ -64,13 +65,27 @@ class CountdownController
         self::$matchStart = $time;
         self::$addedSeconds = 0;
 
-        self::setTimeLimit(self::getOriginalTimeLimit());
-
         try {
             $file = cacheDir('round_start_time.txt');
             File::put($file, $time);
         } catch (Exception $e) {
             Log::logAddLine('CountdownController', 'Failed to save match start to cache-file.');
+        }
+    }
+
+    public static function endMap(Map $map){
+        self::resetTimeLimit();
+    }
+
+    public static function resetTimeLimit()
+    {
+        self::setTimeLimit(self::$originalTimeLimit);
+
+        try {
+            $file = cacheDir('added_time.txt');
+            File::put($file, 0);
+        } catch (Exception $e) {
+            Log::logAddLine('CountdownController', 'Failed to save added time to cache-file.');
         }
     }
 

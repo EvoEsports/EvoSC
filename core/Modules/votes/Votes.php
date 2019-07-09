@@ -131,7 +131,7 @@ class Votes
 
     public static function askMoreTime(Player $player)
     {
-        if (self::$timeVotesThisRound >= self::$voteLimit && !$player->hasAccess('vote_always')) {
+        if (self::$timeVotesThisRound >= self::$voteLimit/* && !$player->hasAccess('vote_always')*/) {
             warningMessage('The maximum time-limit is already reached, sorry.')->send($player);
 
             return;
