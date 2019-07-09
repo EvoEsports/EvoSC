@@ -21,10 +21,12 @@ class CountdownController
      * @var int
      */
     private static $addedSeconds = 0;
+
     /**
      * @var int
      */
     private static $matchStart;
+
     /**
      * @var int
      */
@@ -50,7 +52,7 @@ class CountdownController
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F3', 'time');
+        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 
     /**
@@ -73,8 +75,8 @@ class CountdownController
     }
 
     /**
-     * @param int         $seconds
-     * @param Player|null $player
+     * @param  int  $seconds
+     * @param  Player|null  $player
      */
     public static function addTime(int $seconds, Player $player = null)
     {
@@ -88,11 +90,11 @@ class CountdownController
 
         if ($player != null) {
             if ($seconds > 0) {
-                infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'),
+                infoMessage($player, ' added ', secondary(round($seconds / 60, 1).' minutes'),
                     ' of playtime.')->sendAdmin();
             } else {
 
-                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'),
+                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1).' minutes'),
                     ' of playtime.')->sendAdmin();
             }
         }
@@ -106,9 +108,9 @@ class CountdownController
     }
 
     /**
-     * @param Player $player
-     * @param string $cmd
-     * @param float  $amount
+     * @param  Player  $player
+     * @param  string  $cmd
+     * @param  float  $amount
      */
     public static function addTimeManually(Player $player, $cmd, float $amount)
     {
@@ -116,7 +118,7 @@ class CountdownController
     }
 
     /**
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function addMinute(Player $player)
     {
@@ -124,7 +126,7 @@ class CountdownController
     }
 
     /**
-     * @param bool $getAsCarbon
+     * @param  bool  $getAsCarbon
      *
      * @return Carbon|int
      */
@@ -169,7 +171,7 @@ class CountdownController
         $file = config('server.default-matchsettings');
 
         if ($file) {
-            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
+            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
             $xml = new SimpleXMLElement($matchSettings);
             foreach ($xml->mode_script_settings->children() as $child) {
                 if ($child->attributes()['name'] == 'S_TimeLimit') {
@@ -200,7 +202,7 @@ class CountdownController
     /**
      * Set a new time limit in seconds.
      *
-     * @param int $seconds
+     * @param  int  $seconds
      */
     public static function setTimeLimit(int $seconds)
     {

@@ -37,16 +37,11 @@ class Votes
 
     public function __construct()
     {
-        self::$voters   = collect();
+        self::$voters = collect();
         self::$lastVote = now();
         self::$lastVote->subSeconds(config('votes.cooldown'));
-        self::$timeVotesThisRound = 0;
-        self::$voteLimit          = config('votes.vote_limit');
-
-        if (!self::$voteLimit) {
-            self::$voteLimit = 1;
-            Log::error('Failed to get config "votes.vote_limit". Setting limit to 1.');
-        }
+        self::$voteLimit = config('votes.vote_limit', 1);
+        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / (CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier')));
 
         AccessRight::createIfNonExistent('vote_custom', 'Create a custom vote. Enter question after command.');
         AccessRight::createIfNonExistent('vote_always', 'Allowed to always start a time or skip vote.');
@@ -56,9 +51,9 @@ class Votes
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
         ChatCommand::add('/time', [self::class, 'askMoreTime'], 'Start a vote to add 10 minutes.')
-                   ->addAlias('/replay')
-                   ->addAlias('/restart')
-                   ->addAlias('/res');
+            ->addAlias('/replay')
+            ->addAlias('/restart')
+            ->addAlias('/res');
 
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
@@ -80,7 +75,7 @@ class Votes
     public static function startVote(Player $player, string $question, $action, $duration = null): bool
     {
         if (self::$vote != null) {
-            warningMessage('There is already a vot ein progress.')->send($player);
+            warningMessage('There is already a vote in progress.')->send($player);
 
             return false;
         }
@@ -100,10 +95,10 @@ class Votes
         }
 
         self::$vote = collect([
-            'question'   => $question,
+            'question' => $question,
             'start_time' => now(),
-            'duration'   => $duration,
-            'action'     => $action,
+            'duration' => $duration,
+            'action' => $action,
         ]);
 
         Timer::create('vote.check_state', [self::class, 'checkVoteState'], '1s', true);
@@ -124,11 +119,11 @@ class Votes
 
         if (now()->diffInSeconds(self::$vote['start_time']) > self::$vote['duration']) {
             Timer::destroy('vote.check_state');
-            $action    = self::$vote['action'];
+            $action = self::$vote['action'];
             $voteState = self::getVoteState();
             $action($voteState['yes'] > $voteState['no']);
-            self::$vote    = null;
-            self::$voters  = collect();
+            self::$vote = null;
+            self::$voters = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
             Template::showAll('votes.update-vote', compact('voteStateJson'));
         }
@@ -137,7 +132,7 @@ class Votes
     public static function askMoreTime(Player $player)
     {
         if (self::$timeVotesThisRound >= self::$voteLimit && !$player->hasAccess('vote_always')) {
-            warningMessage('The maximum timelimit is already reached, sorry.')->send($player);
+            warningMessage('The maximum time-limit is already reached, sorry.')->send($player);
 
             return;
         }
@@ -145,14 +140,14 @@ class Votes
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
-            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
+            warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
                 ' before voting again.')->send($player);
 
             return;
         }
 
         $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
-        $question     = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
+        $question = 'Add '.round($secondsToAdd / 60, 1).' minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
@@ -167,7 +162,8 @@ class Votes
         if ($voteStarted) {
             self::$lastVote = now();
 
-            infoMessage($player, ' started a vote to ', secondary('add ' . round($secondsToAdd / 60, 1) . ' minutes?'), '. Use ', secondary('F5/F6'), ' and ',
+            infoMessage($player, ' started a vote to ', secondary('add '.round($secondsToAdd / 60, 1).' minutes?'),
+                '. Use ', secondary('F5/F6'), ' and ',
                 secondary('/y'), ' or ', secondary('/n'), ' to vote.')->setIcon('')->sendAll();
         }
     }
@@ -177,7 +173,8 @@ class Votes
         $question = implode(' ', $questionArray);
 
         self::startVote($player, $question, function (bool $success) use ($question) {
-            infoMessage('Vote ', secondary($question), ' ended with ', secondary($success ? 'yes' : 'no'))->setIcon('')->sendAll();
+            infoMessage('Vote ', secondary($question), ' ended with ',
+                secondary($success ? 'yes' : 'no'))->setIcon('')->sendAll();
         });
     }
 
@@ -187,7 +184,7 @@ class Votes
 
         if (!$player->hasAccess('vote_always')) {
             if ($secondsPassed < 15) {
-                warningMessage('Please wait ', secondary((15 - $secondsPassed) . ' seconds'),
+                warningMessage('Please wait ', secondary((15 - $secondsPassed).' seconds'),
                     ' before asking to skip the map.')->send($player);
 
                 return;
@@ -209,7 +206,7 @@ class Votes
         $diffInSeconds = self::$lastVote->diffInSeconds();
         if ($diffInSeconds < config('votes.cooldown') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.cooldown') - $diffInSeconds;
-            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
+            warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
                 ' before voting again.')->send($player);
 
             return;
@@ -227,7 +224,8 @@ class Votes
         if ($voteStarted) {
             self::$lastVote = now();
 
-            infoMessage($player, ' started a vote to ', secondary('skip the map'), '. Use ', secondary('F5/F6'), ' and ',
+            infoMessage($player, ' started a vote to ', secondary('skip the map'), '. Use ', secondary('F5/F6'),
+                ' and ',
                 secondary('/y'), ' or ', secondary('/n'), ' to vote.')->setIcon('')->sendAll();
         }
     }
@@ -237,23 +235,23 @@ class Votes
         $yesVotes = self::$voters->filter(function ($vote) {
             return $vote == true;
         })
-                                 ->count();
+            ->count();
 
         $noVotes = self::$voters->filter(function ($vote) {
             return $vote == false;
         })
-                                ->count();
+            ->count();
 
         return collect([
             'yes' => $yesVotes,
-            'no'  => $noVotes,
+            'no' => $noVotes,
         ]);
     }
 
     private static function updateVoteState()
     {
         $voteStateJson = self::getVoteState()
-                             ->toJson();
+            ->toJson();
 
         Template::showAll('votes.update-vote', compact('voteStateJson'));
     }
@@ -281,7 +279,7 @@ class Votes
             Log::logAddLine('Votes', $e->getMessage());
         }
 
-        self::$vote   = null;
+        self::$vote = null;
         self::$voters = collect();
         infoMessage($player, ' passes vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
@@ -299,7 +297,7 @@ class Votes
             Log::logAddLine('Votes', $e->getMessage());
         }
 
-        self::$vote   = null;
+        self::$vote = null;
         self::$voters = collect();
         infoMessage($player, ' cancels vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
@@ -318,12 +316,13 @@ class Votes
                 Log::logAddLine('Votes', $e->getMessage());
             }
 
-            self::$vote    = null;
-            self::$voters  = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
             Template::showAll('votes.update-vote', compact('voteStateJson'));
             infoMessage('Vote cancelled.')->setIcon('')->sendAll();
         }
+
+        self::$vote = null;
+        self::$voters = collect();
     }
 
     public static function beginMatch()

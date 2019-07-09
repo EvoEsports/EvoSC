@@ -59,9 +59,9 @@ class Statistics
         $statCollection->push(new StatisticWidget('Visits', " Top visitors"));
 
         //Most played
-        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($min) {
+        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($sec) {
             //Get playtime as hours
-            return round($min / 60, 1);
+            return round(($sec / 60) / 60, 1);
         }));
 
         //Most finishes
@@ -231,7 +231,7 @@ class Statistics
     public static function updateConnectedPlayerPlaytimes()
     {
         $onlinePlayerIds = onlinePlayers()->pluck('id');
-        Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime');
+        Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime', 5);
     }
 
     /**
