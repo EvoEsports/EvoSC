@@ -61,7 +61,7 @@ class Statistics
         //Most played
         $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($min) {
             //Get playtime as hours
-            return round($min / (60 * 5), 1);
+            return round($min / 60, 1);
         }));
 
         //Most finishes
