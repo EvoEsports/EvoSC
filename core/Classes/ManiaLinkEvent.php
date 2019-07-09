@@ -37,15 +37,15 @@ class ManiaLinkEvent
     /**
      * ManiaLinkEvent constructor.
      *
-     * @param string $id
-     * @param array  $callback
-     * @param string $access
+     * @param  string  $id
+     * @param  array  $callback
+     * @param  string  $access
      */
     private function __construct(string $id, array $callback, string $access = null)
     {
-        $this->id       = $id;
+        $this->id = $id;
         $this->callback = $callback;
-        $this->access   = $access;
+        $this->access = $access;
     }
 
     /**
@@ -61,9 +61,9 @@ class ManiaLinkEvent
     /**
      * Add a manialink event. Callback must be of type [MyClass::class, 'methodToCall'].
      *
-     * @param string      $id
-     * @param array       $callback
-     * @param string|null $access
+     * @param  string  $id
+     * @param  array  $callback
+     * @param  string|null  $access
      */
     public static function add(string $id, array $callback, string $access = null)
     {
@@ -82,12 +82,14 @@ class ManiaLinkEvent
     /**
      * Handle an ingoing mania-link event.
      *
-     * @param Player $ply
-     * @param string $action
+     * @param  Player  $ply
+     * @param  string  $action
      */
     public static function call(Player $ply, string $action)
     {
-        Log::logAddLine('Mania Link Event', "$action", false);
+        if (isVerbose()) {
+            Log::logAddLine('Mania Link Event', "$action", false);
+        }
 
         if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
@@ -105,13 +107,15 @@ class ManiaLinkEvent
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
             warningMessage('Access denied.')->send($ply);
-            Log::logAddLine('Access', 'Player ' . $ply . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::', $event->callback));
+            Log::logAddLine('Access',
+                'Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
+                    $event->callback));
 
             return;
         }
 
         if (strlen($event->id) < strlen($action)) {
-            $arguments    = explode(',', $action);
+            $arguments = explode(',', $action);
             $arguments[0] = $ply;
             call_user_func_array($event->callback, $arguments);
 
