@@ -21,6 +21,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxPackLoader::showAddMapPack($player, '', 170);
+        MxDownload::showAddMapInfo($player, '', 149386);
     }
 }

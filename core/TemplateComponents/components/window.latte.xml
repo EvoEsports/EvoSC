@@ -26,6 +26,8 @@
 main() {
     declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
 
+    {include bootScript}
+
     while(True){
         yield;
 

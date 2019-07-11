@@ -86,7 +86,7 @@ function formatScoreNoMinutes(int $score): string
  */
 function stripColors(?string $colored): string
 {
-    return preg_replace('/(?<![$])\${1}(?:[\w\d]{1,3})/i', '', $colored);
+    return preg_replace('/\${0}\${1}(?:[a-f0-9]{1,3})/i', '', $colored);
 }
 
 /**
@@ -116,7 +116,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
         return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}((l|h)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 /**
