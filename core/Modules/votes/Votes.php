@@ -32,6 +32,7 @@ class Votes
      */
     private static $lastVote;
 
+    private static $onlinePlayersCount;
     private static $timeVotesThisRound;
     private static $voteLimit;
 
@@ -94,6 +95,8 @@ class Votes
             $duration = $secondsLeft - 3;
         }
 
+        self::$onlinePlayersCount = onlinePlayers()->count();
+        self::$voters = collect();
         self::$vote = collect([
             'question' => $question,
             'start_time' => now(),
@@ -111,13 +114,17 @@ class Votes
         return true;
     }
 
-    public static function checkVoteState()
+    public static function checkVoteState(): int
     {
         if (!self::$vote) {
-            return;
+            return 0;
         }
 
-        if (now()->diffInSeconds(self::$vote['start_time']) > self::$vote['duration']) {
+        $timerRanOut = now()->diffInSeconds(self::$vote['start_time']) > self::$vote['duration'];
+        $everyoneVoted = self::$voters->count() == self::$onlinePlayersCount;
+        $noUndecided = self::$voters->where('decision', null)->count() == 0;
+
+        if ($timerRanOut || ($everyoneVoted && $noUndecided)) {
             Timer::destroy('vote.check_state');
             $action = self::$vote['action'];
             $voteState = self::getVoteState();
@@ -126,12 +133,16 @@ class Votes
             self::$voters = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
             Template::showAll('votes.update-vote', compact('voteStateJson'));
+
+            return 1;
         }
+
+        return 0;
     }
 
     public static function askMoreTime(Player $player)
     {
-        if (self::$timeVotesThisRound >= self::$voteLimit/* && !$player->hasAccess('vote_always')*/) {
+        if (self::$timeVotesThisRound >= self::$voteLimit && !$player->hasAccess('vote_always')) {
             warningMessage('The maximum time-limit is already reached, sorry.')->send($player);
 
             return;
@@ -232,15 +243,8 @@ class Votes
 
     private static function getVoteState(): Collection
     {
-        $yesVotes = self::$voters->filter(function ($vote) {
-            return $vote == true;
-        })
-            ->count();
-
-        $noVotes = self::$voters->filter(function ($vote) {
-            return $vote == false;
-        })
-            ->count();
+        $yesVotes = self::$voters->whereStrict('decision', 'true')->count();
+        $noVotes = self::$voters->whereStrict('decision', 'false')->count();
 
         return collect([
             'yes' => $yesVotes,
@@ -250,22 +254,57 @@ class Votes
 
     private static function updateVoteState()
     {
-        $voteStateJson = self::getVoteState()
-            ->toJson();
+        $voteStateJson = self::getVoteState()->toJson();
 
         Template::showAll('votes.update-vote', compact('voteStateJson'));
     }
 
     public static function voteYes(Player $player)
     {
-        self::$voters->put($player->Login, true);
+        $vote = new \stdClass();
+        $vote->player = $player->Login;
+        $vote->decision = 'true';
+        self::$voters->put($player->Login, $vote);
+
         self::updateVoteState();
+        self::checkVoteState();
     }
 
     public static function voteNo(Player $player)
     {
-        self::$voters->put($player->Login, false);
+        $vote = new \stdClass();
+        $vote->player = $player->Login;
+        $vote->decision = 'false';
+        self::$voters->put($player->Login, $vote);
+
         self::updateVoteState();
+        self::checkVoteState();
+    }
+
+    public static function playerConnect(Player $player)
+    {
+        if (!self::$vote) {
+            return;
+        }
+
+        $vote = new \stdClass();
+        $vote->player = $player->Login;
+        $vote->decision = null;
+        self::$voters->put($player->Login, $vote);
+        self::$onlinePlayersCount++;
+    }
+
+    public static function playerDisconnect(Player $player)
+    {
+        if (!self::$vote) {
+            return;
+        }
+
+        self::$voters->forget($player->Login);
+        self::$onlinePlayersCount--;
+
+        self::updateVoteState();
+        self::checkVoteState();
     }
 
     public static function approveVote(Player $player)
