@@ -19,11 +19,6 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    Void hideWidget(CMlFrame widget){
-        declare targetScale = """ <frame scale="0" /> """;
-        AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticIn);
-    }
-
     main() {
         declare Integer[Text] VoteState for LocalUser = Integer[Text];
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
@@ -48,15 +43,22 @@
         declare targetPos = (widget.Size[0]/-2.0) ^ " " ^ widget.RelativePosition_V3[1];
         declare targetScale = """ <frame pos='""" ^ targetPos ^ """' scale="{config('votes.scale')|noescape}" /> """;
         AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
+        declare originalScale = {config('votes.scale')};
 
         declare startTime = GameTime;
+        declare voteEnded = False;
 
         while(True){
             yield;
 
-            if((GameTime - startTime) / 1000 > duration){
-                hideWidget(widget);
-                return;
+            if(voteEnded){
+                if(widget.RelativeScale == originalScale){
+                    AnimMgr.Add(widget, """ <frame scale="0" /> """, 500, CAnimManager::EAnimManagerEasing::ElasticIn);
+                }
+
+                sleep(500);
+                if(widget.RelativeScale == 0) return;
+                continue;
             }
 
             foreach(event in PendingEvents){
@@ -71,24 +73,16 @@
                 }
             }
 
-            //foreach (event in Input.PendingEvents) {
-            //    if(event.Button == CInputEvent::EButton::Left){
-            //        TriggerPageAction("votes.yes");
-            //    }
-            //    if(event.Button == CInputEvent::EButton::Right){
-            //        TriggerPageAction("votes.no");
-            //    }
-            //}
-
-            timeLeftLabel.SetText(TL::ToText(duration - (GameTime - startTime) / 1000));
+            declare timeLeft = duration - (GameTime - startTime) / 1000;
+            timeLeftLabel.SetText(TL::ToText(timeLeft));
 
             if(VoteState.count > 0){
                 declare Integer yes = VoteState["yes"];
                 declare Integer no = VoteState["no"];
 
-                if(yes == -1 && no == -1){
-                    hideWidget(widget);
-                    return;
+                if((yes == -1 && no == -1) || timeLeft <= 0){
+                    voteEnded = True;
+                    continue;
                 }
 
                 declare Real total = (yes * 1.0) + (no * 1.0);
@@ -99,8 +93,6 @@
 
                 declare Real yesWidth = (yes / total) * backgroundBarWidth;
                 declare Real noWidth = (no / total) * backgroundBarWidth;
-
-                log("yes: " ^ (yes / total) ^ " no: " ^ (no / total) ^ " total: " ^ total);
 
                 yesBar.Size = <yesWidth, yesBar.Size[1]>;
                 noBar.Size = <noWidth, noBar.Size[1]>;
