@@ -19,7 +19,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool changeAuthPassword(string $string, string $string)
  * @method static bool enableCallbacks(bool $boolean)
  * @method static bool setApiVersion(string $string)
- * @method static object getVersion()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Version getVersion()
  * @method static object getStatus()
  * @method static bool quitGame()
  * @method static bool callVote(string $string)
