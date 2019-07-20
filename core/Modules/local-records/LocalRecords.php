@@ -10,6 +10,7 @@ use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
+use esc\Models\AccessRight;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -36,7 +37,9 @@ class LocalRecords
         Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
 
-        ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
+        AccessRight::createIfNonExistent('local_delete', 'Delete local-records.');
+
+        ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
     }
 
     public static function showManialink(Player $player)
