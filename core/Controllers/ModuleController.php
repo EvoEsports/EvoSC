@@ -102,7 +102,7 @@ class ModuleController implements ControllerInterface
         $modules = $moduleClasses->pluck(['dir'])->unique();
 
         //Load module information
-        Log::logAddLine('Modules', 'Loading module information');
+        Log::write('Modules', 'Loading module information');
         self::loadModulesInformation($modules);
 
         //Output loaded modules
@@ -113,7 +113,7 @@ class ModuleController implements ControllerInterface
         Log::getOutput()->writeln("");
 
         //Boot modules
-        Log::logAddLine('Modules', 'Booting modules...');
+        Log::write('Modules', 'Booting modules...');
 
         $moduleClasses->each(function ($module) {
             $files    = scandir(coreDir('Modules' . DIRECTORY_SEPARATOR . $module->dir));

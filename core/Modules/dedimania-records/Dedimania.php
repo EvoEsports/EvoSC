@@ -59,7 +59,7 @@ class Dedimania extends DedimaniaApi
 
         //Session exists and is not expired
         self::$enabled = true;
-        Log::logAddLine('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
+        Log::write('Dedimania', 'Started. Session last updated: ' . self::getSessionLastUpdated());
 
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
@@ -69,7 +69,7 @@ class Dedimania extends DedimaniaApi
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
 
-        Log::logAddLine('Dedimania_constructor', 'call');
+        Log::write('Dedimania_constructor', 'call');
 
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
@@ -82,7 +82,7 @@ class Dedimania extends DedimaniaApi
         $data = self::updateServerPlayers($map);
 
         if ($data && !isset($data->params->param->value->boolean)) {
-            Log::logAddLine('!] Dedimania [!', 'Failed to report connected players. Trying again in 5 minutes.');
+            Log::write('!] Dedimania [!', 'Failed to report connected players. Trying again in 5 minutes.');
         }
 
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
@@ -166,7 +166,7 @@ class Dedimania extends DedimaniaApi
         self::cacheDedisJson();
         self::sendUpdatedDedis();
 
-        Log::logAddLine('Dedimania', "Loaded records for map $map #" . $map->id);
+        Log::write('Dedimania', "Loaded records for map $map #" . $map->id);
     }
 
     private static function cacheDedisJson()

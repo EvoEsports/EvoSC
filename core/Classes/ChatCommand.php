@@ -161,7 +161,7 @@ class ChatCommand
             $callback = $this->callback;
             $callback(...$arguments);
         } else {
-            Log::logAddLine('ChatCommand', sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), isVeryVerbose());
+            Log::write('ChatCommand', sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), isVeryVerbose());
             call_user_func_array($this->callback, $arguments);
         }
     }

@@ -183,7 +183,7 @@ class Map extends Model
         $gbx = $this->gbx;
 
         if (!$gbx) {
-            Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
+            Log::write('Map', 'Loading missing GBX for ' . $this->filename);
             $gbx = MapController::getGbxInformation($this->filename);
             $this->gbx = $gbx;
             $this->save();

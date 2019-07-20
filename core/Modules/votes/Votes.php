@@ -315,7 +315,7 @@ class Votes
         try {
             $action(true);
         } catch (\Error $e) {
-            Log::logAddLine('Votes', $e->getMessage());
+            Log::write('Votes', $e->getMessage());
         }
 
         self::$vote = null;
@@ -333,7 +333,7 @@ class Votes
         try {
             $action(false);
         } catch (\Error $e) {
-            Log::logAddLine('Votes', $e->getMessage());
+            Log::write('Votes', $e->getMessage());
         }
 
         self::$vote = null;
@@ -352,7 +352,7 @@ class Votes
             try {
                 $action(false);
             } catch (\Error $e) {
-                Log::logAddLine('Votes', $e->getMessage());
+                Log::write('Votes', $e->getMessage());
             }
 
             $voteStateJson = '{"yes":-1,"no":-1}';

@@ -32,8 +32,8 @@ class ModeScriptEventController implements ControllerInterface
         if ($modescriptCallbackArray[0] == 'ManiaPlanet.ModeScriptCallbackArray') {
             self::call($modescriptCallbackArray[1][0], $modescriptCallbackArray[1][1]);
         } else {
-            Log::logAddLine('ModeScriptEventController', 'Modescript callback is not ManiaPlanet.ModeScriptCallbackArray', isVerbose());
-            Log::logAddLine('ModeScriptEventController', serialize($modescriptCallbackArray), isVeryVerbose());
+            Log::write('ModeScriptEventController', 'Modescript callback is not ManiaPlanet.ModeScriptCallbackArray', isVerbose());
+            Log::write('ModeScriptEventController', serialize($modescriptCallbackArray), isVeryVerbose());
         }
     }
 
@@ -96,7 +96,7 @@ class ModeScriptEventController implements ControllerInterface
                 return;
 
             default:
-                Log::logAddLine('ModeScriptEventController', 'Calling unhandled ' . $callback, isVeryVerbose());
+                Log::write('ModeScriptEventController', 'Calling unhandled ' . $callback, isVeryVerbose());
                 Hook::fire($callback, $arguments);
         }
     }

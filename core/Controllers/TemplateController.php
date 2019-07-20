@@ -37,7 +37,7 @@ class TemplateController implements ControllerInterface
      */
     public static function init()
     {
-        Log::logAddLine('TemplateController', 'Starting...');
+        Log::write('TemplateController', 'Starting...');
 
         ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
 
@@ -81,7 +81,7 @@ class TemplateController implements ControllerInterface
     {
         try {
             if (isVerbose()) {
-                Log::logAddLine('TemplateController', 'Rendering Template: ' . $index);
+                Log::write('TemplateController', 'Rendering Template: ' . $index);
             }
 
             return self::$latte->renderToString($index, $values);
@@ -93,7 +93,7 @@ class TemplateController implements ControllerInterface
             }
             $vals = implode(', ', $parameters);
 
-            Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
+            Log::write('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
             var_dump($e->getTraceAsString());
         }
 
@@ -107,7 +107,7 @@ class TemplateController implements ControllerInterface
      */
     public static function loadTemplates($args = null)
     {
-        Log::logAddLine('TemplateController', 'Loading templates...');
+        Log::write('TemplateController', 'Loading templates...');
 
         self::$templates = collect();
         self::$latte     = new Engine();

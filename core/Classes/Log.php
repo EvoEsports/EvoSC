@@ -33,7 +33,7 @@ class Log
      *
      * @param string $line
      */
-    public static function writeLn(string $line)
+    private static function writeLn(string $line)
     {
         $output = self::getOutput();
         $output->writeln(stripAll($line));
@@ -50,7 +50,7 @@ class Log
      * @param string $string
      * @param bool   $echo
      */
-    public static function logAddLine(string $prefix, string $string, $echo = true)
+    public static function write(string $prefix, string $string, $echo = true)
     {
         $date    = date("Y-m-d", time());
         $time    = date("H:i:s", time());
@@ -156,7 +156,7 @@ class Log
      */
     public static function info($message, bool $echo = true)
     {
-        self::logAddLine('Info', $message, $echo);
+        self::write('Info', $message, $echo);
     }
 
     /**
@@ -167,7 +167,7 @@ class Log
      */
     public static function error($message, bool $echo = true)
     {
-        self::logAddLine("ERROR", $message, $echo);
+        self::write("ERROR", $message, $echo);
     }
 
     /**
@@ -178,7 +178,7 @@ class Log
      */
     public static function warning($message, bool $echo = true)
     {
-        self::logAddLine('Warning', $message, $echo);
+        self::write('Warning', $message, $echo);
     }
 
     /**
@@ -191,7 +191,7 @@ class Log
     {
         $line = "$nick: ";
         $line .= $message;
-        self::logAddLine(stripAll($line), true);
+        self::write(stripAll($line), true);
     }
 
     /**

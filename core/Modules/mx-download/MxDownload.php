@@ -50,9 +50,9 @@ class MxDownload
 
                 Template::show($player, 'mx-download.add-map-info', compact('details'));
             } catch (\Exception $e) {
-                Log::logAddLine('MxDownload', $e->getMessage());
+                Log::write('MxDownload', $e->getMessage());
             } catch (GuzzleException $e) {
-                Log::logAddLine('MxDownload', $e->getMessage());
+                Log::write('MxDownload', $e->getMessage());
             }
         }
     }
@@ -64,7 +64,7 @@ class MxDownload
             $mxMap->mxDetails = self::loadMxDetails($mxId);
             $mxMap->loadGbxInformationAndSetUid();
         } catch (\Exception $e) {
-            Log::logAddLine('MxDownload', $e->getMessage());
+            Log::write('MxDownload', $e->getMessage());
         }
 
         if (Map::whereUid($mxMap->uid)->exists()) {
@@ -109,7 +109,7 @@ class MxDownload
             try {
                 Server::addMap($map->filename);
             } catch (\Exception $e) {
-                Log::logAddLine('MxDownload', 'Adding map to selection failed: '.$e->getMessage());
+                Log::write('MxDownload', 'Adding map to selection failed: '.$e->getMessage());
 
                 if (!Server::isFilenameInSelection($map->filename)) {
                     $map->enabled = false;
@@ -128,7 +128,7 @@ class MxDownload
 
             infoMessage($player, ' added map ', $map)->sendAll();
 
-            Log::logAddLine('MxDownload', $player.'('.$player->Login.') added map '.$map.' ['.$map->uid.']');
+            Log::write('MxDownload', $player.'('.$player->Login.') added map '.$map.' ['.$map->uid.']');
 
             //Send updated map-list
             Hook::fire('MapPoolUpdated');

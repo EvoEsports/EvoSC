@@ -186,7 +186,7 @@ class File
 
         if (file_exists($path) && is_file($path)) {
             unlink($path);
-            Log::logAddLine('File', 'Deleted file: ' . $path);
+            Log::write('File', 'Deleted file: ' . $path);
 
             return true;
         }

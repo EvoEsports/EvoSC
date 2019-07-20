@@ -88,7 +88,7 @@ class ManiaLinkEvent
     public static function call(Player $ply, string $action)
     {
         if (isVerbose()) {
-            Log::logAddLine('Mania Link Event', "$action", false);
+            Log::write('Mania Link Event', "$action", false);
         }
 
         if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
@@ -107,7 +107,7 @@ class ManiaLinkEvent
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
             warningMessage('Access denied.')->send($ply);
-            Log::logAddLine('Access',
+            Log::write('Access',
                 'Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
                     $event->callback));
 

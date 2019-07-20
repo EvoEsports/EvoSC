@@ -87,7 +87,7 @@ class KeyBinds
                 $func($player);
             } else {
                 if (is_callable($bind['callback'], false, $callableName)) {
-                    Log::logAddLine('KeyBinds', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
+                    Log::write('KeyBinds', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
                         isVeryVerbose());
                     call_user_func($bind['callback'], $player);
                 } else {

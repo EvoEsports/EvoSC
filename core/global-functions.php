@@ -219,7 +219,7 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
     $player = Player::find($login);
 
     if (!$player || !isset($player->Login)) {
-        Log::logAddLine('global-functions', 'Failed to find player: ' . $login);
+        Log::write('global-functions', 'Failed to find player: ' . $login);
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {

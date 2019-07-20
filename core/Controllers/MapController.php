@@ -123,7 +123,7 @@ class MapController implements ControllerInterface
                 try {
                     Server::addMap($request->map->filename);
                 } catch (Exception $e) {
-                    Log::logAddLine('MxDownload', 'Adding map to selection failed: '.$e->getMessage());
+                    Log::write('MxDownload', 'Adding map to selection failed: '.$e->getMessage());
                 }
             }
 
@@ -131,7 +131,7 @@ class MapController implements ControllerInterface
             $chosen = Server::chooseNextMap($request->map->filename);
 
             if (!$chosen) {
-                Log::logAddLine('MapController', 'Failed to chooseNextMap '.$request->map->filename);
+                Log::write('MapController', 'Failed to chooseNextMap '.$request->map->filename);
             }
 
             $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
@@ -189,10 +189,10 @@ class MapController implements ControllerInterface
         if ($deleted) {
             try {
                 $map->delete();
-                Log::logAddLine('MapController',
+                Log::write('MapController',
                     $player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
             } catch (Exception $e) {
-                Log::logAddLine('MapController',
+                Log::write('MapController',
                     'Failed to remove map "'.$map->uid.'" from database: '.$e->getMessage(), isVerbose());
             }
 
@@ -204,7 +204,7 @@ class MapController implements ControllerInterface
 
             QueueController::preCacheNextMap();
         } else {
-            Log::logAddLine('MapController', 'Failed to delete map "'.$map->filename.'": '.$e->getMessage(),
+            Log::write('MapController', 'Failed to delete map "'.$map->filename.'": '.$e->getMessage(),
                 isVerbose());
         }
     }
@@ -226,7 +226,7 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::logAddLine('MapController',
+        Log::write('MapController',
             $player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
 
         $map->update(['enabled' => 0]);
@@ -286,7 +286,7 @@ class MapController implements ControllerInterface
         try {
             $data->processFile($mapFile);
         } catch (Exception $e) {
-            Log::logAddLine('MapController', $e->getMessage(), isVerbose());
+            Log::write('MapController', $e->getMessage(), isVerbose());
 
             return null;
         }
@@ -317,7 +317,7 @@ class MapController implements ControllerInterface
         $gbx->ClassName = 'CGameCtnChallenge';
         $gbx->ClassId = '03043000';
 
-        Log::logAddLine('MapController', 'Get GBX information: '.$filename, isVerbose());
+        Log::write('MapController', 'Get GBX information: '.$filename, isVerbose());
 
         if ($asString) {
             return json_encode($gbx);
@@ -331,7 +331,7 @@ class MapController implements ControllerInterface
      */
     public static function loadMaps()
     {
-        Log::logAddLine('MapController', 'Loading maps...');
+        Log::write('MapController', 'Loading maps...');
 
         //Get loaded matchsettings maps
         $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
@@ -380,7 +380,7 @@ class MapController implements ControllerInterface
                     $map = Map::whereUid($uid)->first();
 
                     if ($map->filename != $filename) {
-                        Log::logAddLine('MapController', "Filename changed for map: (".$map->filename." -> $filename)",
+                        Log::write('MapController', "Filename changed for map: (".$map->filename." -> $filename)",
                             isVerbose());
 
                         $map->update(['filename' => $filename,]);

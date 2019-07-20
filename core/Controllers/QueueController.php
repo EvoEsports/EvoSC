@@ -91,7 +91,7 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' queued map ', secondary($map), '.')->sendAll();
         }
 
-        Log::logAddLine('QueueController', $player.'('.$player->Login.') queued map '.$map.' ['.$map->uid.']');
+        Log::write('QueueController', $player.'('.$player->Login.') queued map '.$map.' ['.$map->uid.']');
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
 
@@ -194,7 +194,7 @@ class QueueController implements ControllerInterface
                 MapQueue::whereMapUid($queueItem->map_uid)->delete();
                 infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player),
                     ' left.')->sendAll();
-                Log::logAddLine('QueueController',
+                Log::write('QueueController',
                     'Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
             });
 
@@ -217,7 +217,7 @@ class QueueController implements ControllerInterface
             $firstMapInQueue = $firstQueueItem->map;
 
             if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
-                Log::logAddLine('QueueController',
+                Log::write('QueueController',
                     sprintf('Pre-caching map %s [%s]', $firstMapInQueue->gbx->Name, $firstMapInQueue->uid));
                 Server::chooseNextMap($firstMapInQueue->filename);
             }

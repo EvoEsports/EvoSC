@@ -131,13 +131,13 @@ class EscRun extends Command
         });
 
         if (isVerbose()) {
-            Log::logAddLine('BOOT', 'Booting core finished.', true);
+            Log::write('BOOT', 'Booting core finished.', true);
         }
 
         esc\Controllers\ModuleController::bootModules();
 
         if (isVerbose()) {
-            Log::logAddLine('BOOT', 'Booting modules finished.', true);
+            Log::write('BOOT', 'Booting modules finished.', true);
         }
 
         $map = Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
@@ -170,13 +170,13 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::logAddLine('MPS',
+                Log::write('MPS',
                     'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
-                Log::logAddLine('MPS', $e->getMessage());
+                Log::write('MPS', $e->getMessage());
 
                 $failedConnectionRequests++;
                 if ($failedConnectionRequests > 50) {
-                    Log::logAddLine('MPS',
+                    Log::write('MPS',
                         sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
@@ -189,8 +189,8 @@ class EscRun extends Command
                 $output->writeln("<error>===============================================================================</error>");
                 $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
 
-                Log::logAddLine('CYCLE-ERROR', 'EvoSC encountered an error: ' . $e->getMessage(), false);
-                Log::logAddLine('CYCLE-ERROR', $e->getTraceAsString(), false);
+                Log::write('CYCLE-ERROR', 'EvoSC encountered an error: ' . $e->getMessage(), false);
+                Log::write('CYCLE-ERROR', $e->getTraceAsString(), false);
             }
         }
     }

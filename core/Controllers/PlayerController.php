@@ -109,7 +109,7 @@ class PlayerController implements ControllerInterface
             ]);
         }
 
-        Log::logAddLine('PlayerController', $message->getMessage());
+        Log::write('PlayerController', $message->getMessage());
 
         if (config('server.echoes.join') || $player->hasAccess('override_join_msg')) {
             $message->sendAll();
@@ -134,7 +134,7 @@ class PlayerController implements ControllerInterface
     {
         $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::logAddLine('PlayerController',
+        Log::write('PlayerController',
             $player." [".$player->Login."] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
@@ -230,8 +230,8 @@ class PlayerController implements ControllerInterface
             warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
                 secondary($reason))->setIcon('')->sendAll();
         } catch (InvalidArgumentException $e) {
-            Log::logAddLine('PlayerController', 'Failed to kick player: '.$e->getMessage(), true);
-            Log::logAddLine('PlayerController', ''.$e->getTraceAsString(), false);
+            Log::write('PlayerController', 'Failed to kick player: '.$e->getMessage(), true);
+            Log::write('PlayerController', ''.$e->getTraceAsString(), false);
         }
     }
 

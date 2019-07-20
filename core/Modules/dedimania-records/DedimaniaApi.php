@@ -45,7 +45,7 @@ class DedimaniaApi
 
         foreach (['login', 'key'] as $necessaryConfig) {
             if (config('dedimania.' . $necessaryConfig) == "") {
-                Log::logAddLine('Dedimania', sprintf('Necessary config value %s is not set, dedimania stays disabled.'));
+                Log::write('Dedimania', sprintf('Necessary config value %s is not set, dedimania stays disabled.'));
 
                 return false;
             }
@@ -74,13 +74,13 @@ class DedimaniaApi
         if (isset($data->params->param->value->struct->member->name) && $data->params->param->value->struct->member->name == 'SessionId') {
             $sessionKey = $data->params->param->value->struct->member->value->string;
             if (self::setSessionKey($sessionKey)) {
-                Log::logAddLine('Dedimania', 'Session created and saved');
+                Log::write('Dedimania', 'Session created and saved');
             }
 
             return true;
         }
 
-        Log::logAddLine('Dedimania', 'Failed to open session at dedimania.');
+        Log::write('Dedimania', 'Failed to open session at dedimania.');
 
         return false;
     }
@@ -115,7 +115,7 @@ class DedimaniaApi
             return $data->params->param->value->boolean == "1";
         }
 
-        Log::logAddLine('Dedimania', 'Failed to check session at dedimania.');
+        Log::write('Dedimania', 'Failed to check session at dedimania.');
 
         return false;
     }
@@ -145,7 +145,7 @@ class DedimaniaApi
      */
     static function getChallengeRecords(Map $map): ?Collection
     {
-        Log::logAddLine('DedimaniaApi', sprintf('getChallengeRecords(%s)', $map));
+        Log::write('DedimaniaApi', sprintf('getChallengeRecords(%s)', $map));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.GetChallengeRecords');
@@ -155,7 +155,7 @@ class DedimaniaApi
         $params->addChild('param')->addChild('value', self::getSessionKey());
 
         if (!$map->gbx) {
-            Log::logAddLine('Dedimania', 'Error: No gbx info available for map ' . $map);
+            Log::write('Dedimania', 'Error: No gbx info available for map ' . $map);
 
             return null;
         }
@@ -199,7 +199,7 @@ class DedimaniaApi
         if (isset($responseData->fault)) {
             //Error
             $errorMsg = $responseData->fault->value->struct->member[1]->value->string;
-            Log::logAddLine('DedimaniaApi', $errorMsg);
+            Log::write('DedimaniaApi', $errorMsg);
 
             return null;
         }
@@ -233,7 +233,7 @@ class DedimaniaApi
      */
     static function updateServerPlayers(Map $map)
     {
-        Log::logAddLine('DedimaniaApi', sprintf('updateServerPlayers(%s)', $map));
+        Log::write('DedimaniaApi', sprintf('updateServerPlayers(%s)', $map));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.UpdateServerPlayers');
@@ -291,12 +291,12 @@ class DedimaniaApi
 
         if ($newTimes->count() == 0) {
             //No new records
-            Log::logAddLine('DedimaniaApi', 'No records made.');
+            Log::write('DedimaniaApi', 'No records made.');
 
             return;
         }
 
-        Log::logAddLine('DedimaniaApi', sprintf('setChallengeTimes(%s) New records: %d', $map, $newTimes->count()));
+        Log::write('DedimaniaApi', sprintf('setChallengeTimes(%s) New records: %d', $map, $newTimes->count()));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.SetChallengeTimes');
@@ -318,8 +318,8 @@ class DedimaniaApi
         //string GameMode
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
-        Log::logAddLine('DedimaniaApi', 'New Times:');
-        Log::logAddLine('DedimaniaApi', $newTimes->toJson());
+        Log::write('DedimaniaApi', 'New Times:');
+        Log::write('DedimaniaApi', $newTimes->toJson());
 
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
@@ -331,7 +331,7 @@ class DedimaniaApi
                 continue;
             }
 
-            Log::logAddLine('DedimaniaApi', sprintf('Add %s\'s time %s', $dedi->player, formatScore($dedi->Score)), isVerbose());
+            Log::write('DedimaniaApi', sprintf('Add %s\'s time %s', $dedi->player, formatScore($dedi->Score)), isVerbose());
 
             $checkpoints = $dedi->Checkpoints;
 
@@ -359,13 +359,13 @@ class DedimaniaApi
 
         $bestRecord = $sortedScores->first();
 
-        // Log::logAddLine('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
+        // Log::write('DedimaniaApi', 'Best Record: ' . serialize($bestRecord), isVerbose());
 
         try {
             $VReplay = Server::getValidationReplay($bestRecord->player->Login);
         } catch (\Exception $e) {
-            Log::logAddLine('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
-            Log::logAddLine('DedimaniaApi', $e->getTraceAsString(), isVerbose());
+            Log::write('DedimaniaApi', 'Failed to get validation replay for player ' . $bestRecord->player->Login . ': ' . $e->getMessage(), true);
+            Log::write('DedimaniaApi', $e->getTraceAsString(), isVerbose());
 
             $VReplay = '';
         }
@@ -379,7 +379,7 @@ class DedimaniaApi
                 $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
 
                 if ($Top1GReplay == '') {
-                    Log::logAddLine('DedimaniaApi', 'Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
+                    Log::write('DedimaniaApi', 'Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
                 }
             }
 
@@ -393,8 +393,8 @@ class DedimaniaApi
             //Send the request
             $data = self::post($xml);
 
-            Log::logAddLine('DedimaniaApi', 'Response:');
-            // Log::logAddLine('DedimaniaApi', $data->asXML());
+            Log::write('DedimaniaApi', 'Response:');
+            // Log::write('DedimaniaApi', $data->asXML());
             $data->saveXML(cacheDir('dedimania_' . time()));
 
             if ($data) {
@@ -406,7 +406,7 @@ class DedimaniaApi
                     if (!$data->params->param->value->boolean) {
                         //Request failed
 
-                        Log::logAddLine('DedimaniaApi', 'Failed to update dedis.', true);
+                        Log::write('DedimaniaApi', 'Failed to update dedis.', true);
                     }
                 }
             }
@@ -430,7 +430,7 @@ class DedimaniaApi
     public static function playerConnect(Player $player)
     {
         if (isVerbose()) {
-            Log::logAddLine('DedimaniaApi', sprintf('playerConnect(%s)', $player), true);
+            Log::write('DedimaniaApi', sprintf('playerConnect(%s)', $player), true);
         }
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
@@ -498,7 +498,7 @@ class DedimaniaApi
             }
 
             if (isVerbose()) {
-                // Log::logAddLine('DedimaniaApi', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
+                // Log::write('DedimaniaApi', sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
             }
 
             switch (gettype($value)) {
@@ -542,9 +542,9 @@ class DedimaniaApi
 
             if (isVerbose()) {
                 if (gettype($value) == 'array') {
-                    Log::logAddLine('DedimaniaApi', sprintf('paramAddArray %s => [%s]', $key, implode(', ', $value)), true);
+                    Log::write('DedimaniaApi', sprintf('paramAddArray %s => [%s]', $key, implode(', ', $value)), true);
                 } else {
-                    Log::logAddLine('DedimaniaApi', sprintf('paramAddArray %s => %s', $key, $value), true);
+                    Log::write('DedimaniaApi', sprintf('paramAddArray %s => %s', $key, $value), true);
                 }
             }
 
@@ -593,13 +593,13 @@ class DedimaniaApi
                 'body'           => $xml->asXML(),
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            Log::logAddLine('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
-            Log::logAddLine('Dedimania', $e->getTraceAsString(), isVerbose());
+            Log::write('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
+            Log::write('Dedimania', $e->getTraceAsString(), isVerbose());
 
             return null;
         } catch (RequestException $e) {
-            Log::logAddLine('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
-            Log::logAddLine('Dedimania', $e->getTraceAsString(), isVerbose());
+            Log::write('Dedimania', 'DedimaniaAp::post failed: ' . $e->getMessage());
+            Log::write('Dedimania', $e->getTraceAsString(), isVerbose());
 
             return null;
         }

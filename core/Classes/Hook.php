@@ -77,7 +77,7 @@ class Hook
             } else {
                 if (is_callable($this->function, false, $callableName)) {
                     call_user_func($this->function, ...$arguments);
-                    // Log::logAddLine('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
+                    // Log::write('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
                 } else {
                     throw new Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
                 }
@@ -85,11 +85,11 @@ class Hook
         } catch (Exception $e) {
             $message = $e->getMessage();
             if ($message != "Login unknown.") {
-                Log::logAddLine('Hook', "Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
-                Log::logAddLine('DEBUG', json_encode($this->function), isDebug());
+                Log::write('Hook', "Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
+                Log::write('DEBUG', json_encode($this->function), isDebug());
             }
         } catch (TypeError $e) {
-            Log::logAddLine('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
+            Log::write('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }
 
         if ($this->runOnce) {
@@ -131,8 +131,18 @@ class Hook
         try {
             HookController::add($event, $callback, $runOnce, $priority);
         } catch (Exception $e) {
-            Log::logAddLine('!] Hook [!', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
+            Log::write('Hook', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
         }
+    }
+
+    /**
+     * TODO: Remove a hook
+     *
+     * @param  string  $event
+     * @param  callable  $callback
+     */
+    public static function remove(string $event, callable $callback)
+    {
     }
 
     /**
@@ -153,7 +163,7 @@ class Hook
             try {
                 $hook->execute(...$arguments);
             } catch (Exception $e) {
-                Log::logAddLine('Hook:' . $hook->event, $e->getMessage() . "\n" . $e->getTraceAsString());
+                Log::write('Hook:' . $hook->event, $e->getMessage() . "\n" . $e->getTraceAsString());
             }
         }
     }

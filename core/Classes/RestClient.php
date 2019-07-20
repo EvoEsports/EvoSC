@@ -61,7 +61,7 @@ class RestClient
     public static function get(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'GET: ' . $url, isDebug());
+            Log::write('RestClient', 'GET: ' . $url, isDebug());
         }
 
         return self::$client->request('GET', $url, self::addUserAgent($options));
@@ -79,7 +79,7 @@ class RestClient
     public static function post(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'POST: ' . $url . ' with options: ' . json_encode($options),
+            Log::write('RestClient', 'POST: ' . $url . ' with options: ' . json_encode($options),
                 isDebug());
         }
 
@@ -98,7 +98,7 @@ class RestClient
     public static function put(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::logAddLine('RestClient', 'PUT: ' . $url . ' with options: ' . json_encode($options),
+            Log::write('RestClient', 'PUT: ' . $url . ' with options: ' . json_encode($options),
                 isDebug());
         }
 

@@ -39,7 +39,7 @@ class ChatController implements ControllerInterface
         self::$routingEnabled = config('server.enable-chat-routing');
 
         if (self::$routingEnabled) {
-            Log::logAddLine('ChatController', 'Enabling manual chat routing.');
+            Log::write('ChatController', 'Enabling manual chat routing.');
 
             try {
                 Server::call('ChatEnableManualRouting', [true, false]);
@@ -187,7 +187,7 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        Log::logAddLine("Chat", '[' . $player . '] ' . $text, true);
+        Log::write("Chat", '[' . $player . '] ' . $text, true);
         $nick = $player->NickName;
 
         if (preg_match('/([$]+)$/', $text, $matches)) {

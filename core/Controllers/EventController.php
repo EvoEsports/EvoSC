@@ -39,7 +39,7 @@ class EventController implements ControllerInterface
             $name = $callback[0];
             $arguments = $callback[1];
 
-            // Log::logAddLine('EventController', "$name", isVeryVerbose());
+            // Log::write('EventController', "$name", isVeryVerbose());
 
             switch ($name) {
                 case 'ManiaPlanet.PlayerInfoChanged':
@@ -84,7 +84,7 @@ class EventController implements ControllerInterface
                     break;
 
                 case 'ManiaPlanet.Echo':
-                    Log::logAddLine('Echo', json_encode($callback));
+                    Log::write('Echo', json_encode($callback));
                     break;
 
                 default:
@@ -136,7 +136,7 @@ class EventController implements ControllerInterface
                 try {
                     Hook::fire('PlayerChat', player($login), $text, false);
                 } catch (Exception $e) {
-                    Log::logAddLine('PlayerChat', "Error: " . $e->getMessage());
+                    Log::write('PlayerChat', "Error: " . $e->getMessage());
                 }
             }
         } else {
@@ -192,7 +192,7 @@ class EventController implements ControllerInterface
             try {
                 $map = Map::whereUid($mapUid)->get()->last();
             } catch (Exception $e) {
-                Log::logAddLine('mpBeginMap', "Error: Map ($mapUid) not found!");
+                Log::write('mpBeginMap', "Error: Map ($mapUid) not found!");
             }
 
             MapController::setCurrentMap($map);
@@ -200,7 +200,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('BeginMap', $map);
             } catch (Exception $e) {
-                Log::logAddLine('Hook', "Error: " . $e->getMessage());
+                Log::write('Hook', "Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -220,13 +220,13 @@ class EventController implements ControllerInterface
             try {
                 $map = Map::where('uid', $mapUid)->first();
             } catch (Exception $e) {
-                Log::logAddLine('mpEndMap', "Error: Map ($mapUid) not found!");
+                Log::write('mpEndMap', "Error: Map ($mapUid) not found!");
             }
 
             try {
                 Hook::fire('EndMap', $map);
             } catch (Exception $e) {
-                Log::logAddLine('Hook', "Error: " . $e->getMessage());
+                Log::write('Hook', "Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -244,7 +244,7 @@ class EventController implements ControllerInterface
             try {
                 ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
             } catch (Exception $e) {
-                Log::logAddLine('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
+                Log::write('ManiaLinkEvent:' . $arguments[2], "Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');

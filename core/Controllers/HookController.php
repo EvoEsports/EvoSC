@@ -77,9 +77,9 @@ class HookController implements ControllerInterface
             $hooks->put($event, $hookGroup->sortBy('priority'));
 
             if (gettype($callback) == "object") {
-                Log::logAddLine('Hook', "Added $event (Closure)", isVeryVerbose());
+                Log::write('Hook', "Added $event (Closure)", isVeryVerbose());
             } else {
-                Log::logAddLine('Hook', "Added " . $callback[0] . "::" . $callback[1], isVeryVerbose());
+                Log::write('Hook', "Added " . $callback[0] . "::" . $callback[1], isVeryVerbose());
             }
         }
     }
