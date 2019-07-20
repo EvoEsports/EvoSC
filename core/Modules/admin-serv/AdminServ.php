@@ -16,11 +16,11 @@ class AdminServ
 
     public static function mapAdded(...$arguments)
     {
-        Log::write('AdminServ', json_encode($arguments));
+        Log::write(json_encode($arguments));
     }
 
     public static function mapDeleted(...$arguments)
     {
-        Log::write('AdminServ', json_encode($arguments));
+        Log::write(json_encode($arguments));
     }
 }

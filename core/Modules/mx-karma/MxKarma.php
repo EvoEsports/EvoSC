@@ -94,8 +94,8 @@ class MxKarma extends MXK
             return;
         }
 
-        Log::write('MxKarma', $ratings->count() . ' new map ratings:', isVerbose());
-        Log::write('MxKarma', $ratings->toJson(), isVeryVerbose());
+        Log::write($ratings->count() . ' new map ratings:', isVerbose());
+        Log::write($ratings->toJson(), isVeryVerbose());
 
         $votes = $ratings->map(function (Karma $rating) {
             return [
@@ -325,8 +325,8 @@ class MxKarma extends MXK
 
         //Check if method was executed properly
         if (!$mxResponse->success) {
-            Log::write('MxKarma', sprintf('%s->%s failed', $requestMethod, $function), isVerbose());
-            Log::write('MxKarma', $responseBody, isVeryVerbose());
+            Log::write(sprintf('%s->%s failed', $requestMethod, $function), isVerbose());
+            Log::write($responseBody, isVeryVerbose());
 
             return null;
         }

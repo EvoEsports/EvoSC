@@ -98,7 +98,7 @@ class MxMap implements \Serializable
             throw new \Exception("Download $mxId failed: ".$download->getReasonPhrase());
         }
 
-        Log::write('MxDownload', "Request $mxId finished.", isVeryVerbose());
+        Log::write("Request $mxId finished.", isVeryVerbose());
 
         if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
             throw new \Exception('File is not a valid GBX.');
@@ -110,7 +110,7 @@ class MxMap implements \Serializable
         $filename = preg_replace('/[^a-z0-9\-\_\#\ \.]/i', '', $filename);
         $filename = preg_replace('/\ /i', '_', $filename);
 
-        Log::write('MxMap', 'Saving new map as '.MapController::getMapsPath($filename), isVerbose());
+        Log::write('Saving new map as '.MapController::getMapsPath($filename), isVerbose());
 
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
 

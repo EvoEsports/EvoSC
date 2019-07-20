@@ -145,7 +145,7 @@ class MxPackJob
             try {
                 Server::addMap($filename);
             } catch (\Exception $e) {
-                Log::write('MxPackJob', $e->getMessage());
+                Log::write($e->getMessage());
             }
         });
 

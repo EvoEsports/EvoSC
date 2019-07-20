@@ -91,7 +91,7 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' queued map ', secondary($map), '.')->sendAll();
         }
 
-        Log::write('QueueController', $player.'('.$player->Login.') queued map '.$map.' ['.$map->uid.']');
+        Log::write($player.'('.$player->Login.') queued map '.$map.' ['.$map->uid.']');
 
         Hook::fire('MapQueueUpdated', self::getMapQueue());
 

@@ -39,14 +39,14 @@ class MusicClient
         try {
             $response = RestClient::get($url);
         } catch (GuzzleException $e) {
-            Log::write('MusicClient', 'Failed to fetch music list from ' . $url);
+            Log::write('Failed to fetch music list from ' . $url);
             self::enableMusicDisabledNotice();
 
             return;
         }
 
         if ($response->getStatusCode() != 200) {
-            Log::write('MusicClient', 'Failed to fetch music list from ' . $url);
+            Log::write('Failed to fetch music list from ' . $url);
             self::enableMusicDisabledNotice();
 
             return;

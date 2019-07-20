@@ -35,7 +35,7 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
             $classFile->namespace = $matches[1] . '\\' . $classFile->class;
         } else {
             //Abort execution when class wasn't loaded correctly
-            // \esc\Classes\Log::write('autoload', "Class without namespace found: $classFile->file");
+            // \esc\Classes\Log::write("Class without namespace found: $classFile->file");
             var_dump("Class without namespace found: $classFile->file");
         }
 
@@ -76,7 +76,7 @@ function esc_class_loader($className)
             die("Trying to load non-existant file: " . $class->file);
         }
     } else {
-        // \esc\Classes\Log::write('class_loader', 'Class not found: ' . $className, isVeryVerbose());
+        // \esc\Classes\Log::write('Class not found: ' . $className, isVeryVerbose());
         if ($className != 'Doctrine\DBAL\Driver\PDOConnection') {
             var_dump('Class not found: ' . $className);
         }

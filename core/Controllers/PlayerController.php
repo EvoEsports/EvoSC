@@ -109,7 +109,7 @@ class PlayerController implements ControllerInterface
             ]);
         }
 
-        Log::write('PlayerController', $message->getMessage());
+        Log::write($message->getMessage());
 
         if (config('server.echoes.join') || $player->hasAccess('override_join_msg')) {
             $message->sendAll();
@@ -230,8 +230,8 @@ class PlayerController implements ControllerInterface
             warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
                 secondary($reason))->setIcon('')->sendAll();
         } catch (InvalidArgumentException $e) {
-            Log::write('PlayerController', 'Failed to kick player: '.$e->getMessage(), true);
-            Log::write('PlayerController', ''.$e->getTraceAsString(), false);
+            Log::write('Failed to kick player: '.$e->getMessage(), true);
+            Log::write(''.$e->getTraceAsString(), false);
         }
     }
 

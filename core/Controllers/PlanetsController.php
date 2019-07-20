@@ -71,7 +71,7 @@ class PlanetsController implements ControllerInterface
                 break;
 
             case 6:
-                Log::write('PlanetController', $billState->stateName);
+                Log::write($billState->stateName);
                 $bill->expired = true;
                 break;
         }
@@ -106,7 +106,7 @@ class PlanetsController implements ControllerInterface
         $billId = Server::sendBill($player->Login, $amount, $label);
 
         if (!$billId || !is_int($billId)) {
-            Log::write('PlanetsController', 'Failed to create bill');
+            Log::write('Failed to create bill');
 
             return;
         }

@@ -96,7 +96,7 @@ class MatchSettingsController
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write('MatchSettingsController', "Failed to add map ($map) to $matchSettings.");
+            Log::write("Failed to add map ($map) to $matchSettings.");
         }
     }
 
@@ -143,7 +143,7 @@ class MatchSettingsController
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write('MatchSettingsController', "Failed to shuffle map-list.");
+            Log::write("Failed to shuffle map-list.");
         }
     }
 
@@ -158,7 +158,7 @@ class MatchSettingsController
 
         foreach ($settings->map as $mapInfo) {
             if ($mapInfo->ident == $uid) {
-                Log::write('MatchSettingsController', "Removing map by uid ($uid) from $matchSettings.");
+                Log::write("Removing map by uid ($uid) from $matchSettings.");
                 unset($mapInfo[0]);
                 break;
             }
@@ -178,7 +178,7 @@ class MatchSettingsController
 
         foreach ($settings->map as $mapInfo) {
             if ($mapInfo->file == $filename) {
-                Log::write('MatchSettingsController', "Removing map by filename ($filename) from $matchSettings.");
+                Log::write("Removing map by filename ($filename) from $matchSettings.");
                 unset($mapInfo[0]);
                 break;
             }

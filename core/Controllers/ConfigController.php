@@ -77,7 +77,7 @@ class ConfigController implements ControllerInterface
         eval('$jsonData->' . $path . ' = $value;');
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
-        Log::write('ConfigController', "Updated config $id", isVerbose());
+        Log::write("Updated config $id", isVerbose());
     }
 
     /**

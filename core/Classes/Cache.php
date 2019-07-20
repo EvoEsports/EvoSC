@@ -80,7 +80,7 @@ class Cache
             $cacheObject->added   = now();
             $cacheObject->expires = $expires;
         } catch (\Exception $e) {
-            Log::write('Cache', "Failed to save $id");
+            Log::write("Failed to save $id");
         }
 
         File::put(cacheDir($id), $cacheObject, true);

@@ -120,12 +120,12 @@ class Statistics
      */
     private static function updatePlayerRanks(Collection $players)
     {
-        Log::write('Statistics', 'Updating player-ranks.', isVeryVerbose());
+        Log::write('Updating player-ranks.', isVeryVerbose());
 
         Database::getConnection()->statement('SET @rank=0');
         Database::getConnection()->statement('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
-        Log::write('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
+        Log::write('Updating player-ranks finished.', isVeryVerbose());
 
         $playerIds    = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
         $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->keys())->get()->keyBy('Player');
@@ -158,12 +158,12 @@ class Statistics
      */
     public static function announceWinner(Player $player)
     {
-        Log::write('Statistics', 'Winner: ' . $player);
+        Log::write('Winner: ' . $player);
 
         try {
             $player->stats()->increment('Wins');
         } catch (\Exception $e) {
-            Log::write('Statistics', 'Failed to increment win count of ' . $player);
+            Log::write('Failed to increment win count of ' . $player);
         }
 
         infoMessage($player, ' wins this round. Total wins: ', $player->stats->Wins)

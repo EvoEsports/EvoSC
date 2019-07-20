@@ -77,7 +77,7 @@ class Hook
             } else {
                 if (is_callable($this->function, false, $callableName)) {
                     call_user_func($this->function, ...$arguments);
-                    // Log::write('Hook', "Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
+                    // Log::write("Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
                 } else {
                     throw new Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
                 }
@@ -85,11 +85,11 @@ class Hook
         } catch (Exception $e) {
             $message = $e->getMessage();
             if ($message != "Login unknown.") {
-                Log::write('Hook', "Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
-                Log::write('DEBUG', json_encode($this->function), isDebug());
+                Log::write("Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
+                Log::write(json_encode($this->function), isDebug());
             }
         } catch (TypeError $e) {
-            Log::write('Hook', "TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
+            Log::write("TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
         }
 
         if ($this->runOnce) {
@@ -131,7 +131,7 @@ class Hook
         try {
             HookController::add($event, $callback, $runOnce, $priority);
         } catch (Exception $e) {
-            Log::write('Hook', sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
+            Log::write(sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
         }
     }
 
@@ -163,7 +163,7 @@ class Hook
             try {
                 $hook->execute(...$arguments);
             } catch (Exception $e) {
-                Log::write('Hook:' . $hook->event, $e->getMessage() . "\n" . $e->getTraceAsString());
+                Log::write($e->getMessage() . "\n" . $e->getTraceAsString());
             }
         }
     }

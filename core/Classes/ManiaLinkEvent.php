@@ -88,7 +88,7 @@ class ManiaLinkEvent
     public static function call(Player $ply, string $action)
     {
         if (isVerbose()) {
-            Log::write('Mania Link Event', "$action", false);
+            Log::write("$action", false);
         }
 
         if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {

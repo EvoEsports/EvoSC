@@ -61,7 +61,7 @@ class RestClient
     public static function get(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::write('RestClient', 'GET: ' . $url, isDebug());
+            Log::write('GET: ' . $url, isDebug());
         }
 
         return self::$client->request('GET', $url, self::addUserAgent($options));

@@ -123,7 +123,7 @@ class MapController implements ControllerInterface
                 try {
                     Server::addMap($request->map->filename);
                 } catch (Exception $e) {
-                    Log::write('MxDownload', 'Adding map to selection failed: '.$e->getMessage());
+                    Log::write('Adding map to selection failed: '.$e->getMessage());
                 }
             }
 
@@ -131,7 +131,7 @@ class MapController implements ControllerInterface
             $chosen = Server::chooseNextMap($request->map->filename);
 
             if (!$chosen) {
-                Log::write('MapController', 'Failed to chooseNextMap '.$request->map->filename);
+                Log::write('Failed to chooseNextMap '.$request->map->filename);
             }
 
             $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
@@ -286,7 +286,7 @@ class MapController implements ControllerInterface
         try {
             $data->processFile($mapFile);
         } catch (Exception $e) {
-            Log::write('MapController', $e->getMessage(), isVerbose());
+            Log::write($e->getMessage(), isVerbose());
 
             return null;
         }
@@ -317,7 +317,7 @@ class MapController implements ControllerInterface
         $gbx->ClassName = 'CGameCtnChallenge';
         $gbx->ClassId = '03043000';
 
-        Log::write('MapController', 'Get GBX information: '.$filename, isVerbose());
+        Log::write('Get GBX information: '.$filename, isVerbose());
 
         if ($asString) {
             return json_encode($gbx);
@@ -331,7 +331,7 @@ class MapController implements ControllerInterface
      */
     public static function loadMaps()
     {
-        Log::write('MapController', 'Loading maps...');
+        Log::write('Loading maps...');
 
         //Get loaded matchsettings maps
         $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();

@@ -69,7 +69,7 @@ class CountdownController
             $file = cacheDir('round_start_time.txt');
             File::put($file, $time);
         } catch (Exception $e) {
-            Log::write('CountdownController', 'Failed to save match start to cache-file.');
+            Log::write('Failed to save match start to cache-file.');
         }
     }
 
@@ -85,7 +85,7 @@ class CountdownController
             $file = cacheDir('added_time.txt');
             File::put($file, 0);
         } catch (Exception $e) {
-            Log::write('CountdownController', 'Failed to save added time to cache-file.');
+            Log::write('Failed to save added time to cache-file.');
         }
     }
 
@@ -118,7 +118,7 @@ class CountdownController
             $file = cacheDir('added_time.txt');
             File::put($file, $addedTime);
         } catch (Exception $e) {
-            Log::write('CountdownController', 'Failed to save added time to cache-file.');
+            Log::write('Failed to save added time to cache-file.');
         }
     }
 
