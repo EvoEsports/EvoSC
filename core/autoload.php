@@ -49,7 +49,7 @@ function buildClassMap()
 {
     global $classes;
 
-    $dirs = ['Interfaces', 'Classes', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations'];
+    $dirs = ['Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations'];
 
     foreach ($dirs as $dir) {
         getClassesInDirectory($classes, __DIR__ . DIRECTORY_SEPARATOR . $dir);

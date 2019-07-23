@@ -162,9 +162,9 @@ class DedimaniaApi
 
         self::paramAddStruct($params->addChild('param'), [
             'UId'           => $map->gbx->MapUid,
-            'Name'          => str_replace('&', '', $map->gbx->Name),
+            'Name'          => str_replace('&', '', $map->name),
             'Environment'   => $map->gbx->Environment,
-            'Author'        => $map->gbx->AuthorLogin,
+            'Author'        => $map->author->Login,
             'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
             'NbLaps'        => $map->gbx->NbLaps,
         ]);
@@ -308,9 +308,9 @@ class DedimaniaApi
         //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
             'UId'           => $map->gbx->MapUid,
-            'Name'          => $map->gbx->Name,
+            'Name'          => $map->name,
             'Environment'   => $map->gbx->Environment,
-            'Author'        => $map->gbx->AuthorLogin,
+            'Author'        => $map->author->Login,
             'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
             'NbLaps'        => $map->gbx->NbLaps,
         ]);

@@ -48,6 +48,10 @@ class MapController implements ControllerInterface
      */
     public static function init()
     {
+        if (!File::dirExists(cacheDir('gbx'))) {
+            File::makeDir(cacheDir('gbx'));
+        }
+
         self::$mapsPath = Server::getMapsDirectory();
         self::loadMaps();
 
@@ -310,7 +314,7 @@ class MapController implements ControllerInterface
         $gbx->PlayerModel = 'Unassigned';
         $gbx->MapUid = $data->uid;
         $gbx->Comment = $data->comment;
-        $gbx->TitleId = 'TMStadium'; //TODO: maybe support canyon
+        $gbx->TitleId = Server::getVersion()->titleId;
         $gbx->AuthorLogin = $data->authorLogin;
         $gbx->AuthorNick = $data->authorNick;
         $gbx->Name = $data->name;
@@ -396,17 +400,29 @@ class MapController implements ControllerInterface
                 }
             }
 
+            if (!$map->name) {
+                $map->update([
+                    'name' => $gbx->Name
+                ]);
+            }
+
+            if (!$map->environment) {
+                $map->update([
+                    'environment' => $gbx->Environment
+                ]);
+            }
+
+            if (!$map->title_id) {
+                $map->update([
+                    'title_id' => $gbx->TitleId
+                ]);
+            }
+
             if (isVerbose()) {
-                printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->gbx->Name));
+                printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->name));
             } else {
                 echo ".";
             }
-        }
-
-        if (!$map->gbx) {
-            $map->update([
-                'gbx' => json_encode($gbx)
-            ]);
         }
 
         echo "\n";
@@ -427,6 +443,7 @@ class MapController implements ControllerInterface
      * Create map and retrieve object
      *
      * @param  string  $filename
+     * @param  string  $uid
      * @param  stdClass  $gbx
      * @return Map|null
      * @throws \Throwable
@@ -457,7 +474,9 @@ class MapController implements ControllerInterface
         $map->author = $authorId;
         $map->filename = $filename;
         $map->enabled = false;
-        $map->gbx = json_encode($gbx);
+        $map->name = $gbx->Name;
+        $map->environment = $gbx->Environment;
+        $map->title_id = $gbx->TitleId;
         $map->saveOrFail();
 
         return $map;

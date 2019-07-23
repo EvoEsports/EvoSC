@@ -218,7 +218,7 @@ class QueueController implements ControllerInterface
 
             if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
                 Log::write('QueueController',
-                    sprintf('Pre-caching map %s [%s]', $firstMapInQueue->gbx->Name, $firstMapInQueue->uid));
+                    sprintf('Pre-caching map %s [%s]', $firstMapInQueue->name, $firstMapInQueue->uid));
                 Server::chooseNextMap($firstMapInQueue->filename);
             }
         } else {

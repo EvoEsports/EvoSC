@@ -19,10 +19,10 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('maplist.disable', [MapList::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
+        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
+        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
 
         Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
         Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
@@ -148,7 +148,7 @@ class MapList
 
             return [
                 'id'   => (string)$map->id,
-                'name' => $map->gbx->Name,
+                'name' => $map->name,
                 'a'    => $map->author->id,
                 'r'    => sprintf('%.1f', $map->average_rating),
                 'uid'  => $map->gbx->MapUid,

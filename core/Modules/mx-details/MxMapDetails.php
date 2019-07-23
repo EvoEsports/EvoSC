@@ -72,13 +72,13 @@ class MxMapDetails
         Log::write('Received: ' . $data, isVeryVerbose());
 
         if ($data == '[]') {
-            Log::write('No MX information available for: ' . $map->gbx->Name);
+            Log::write('No MX information available for: ' . $map->name);
 
             return;
         }
 
         $map->update(['mx_details' => $data]);
-        Log::write('Updated MX details for track: ' . $map->gbx->Name);
+        Log::write('Updated MX details for track: ' . $map->name);
 
         self::loadMxWordlRecord($map);
     }
@@ -95,6 +95,6 @@ class MxMapDetails
 
         $map->update(['mx_world_record' => $result->getBody()->getContents()]);
 
-        Log::write('Updated MX world record for track: ' . $map->gbx->Name);
+        Log::write('Updated MX world record for track: ' . $map->name);
     }
 }

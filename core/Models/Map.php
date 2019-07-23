@@ -3,27 +3,33 @@
 namespace esc\Models;
 
 
+use esc\Classes\Cache;
+use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use stdClass;
 
 /**
  * Class Map
  *
  * @package esc\Models
  *
- * @property string  $uid
- * @property string  $filename
+ * @property string $uid
+ * @property string $filename
  * @property boolean $plays
- * @property string  $author
+ * @property string $author
  * @property boolean $enabled
- * @property string  $last_played
- * @property string  $mx_details
- * @property string  $mx_world_record
- * @property string  $cooldown
+ * @property string $last_played
+ * @property string $mx_details
+ * @property string $mx_world_record
+ * @property string $cooldown
+ * @property string $name
+ * @property string $environment
+ * @property string $title_id
  *
  */
 class Map extends Model
@@ -45,8 +51,10 @@ class Map extends Model
         'enabled',
         'mx_details',
         'mx_world_record',
-        'gbx',
-        'cooldown'
+        'cooldown',
+        'name',
+        'environment',
+        'title_id',
     ];
 
     /**
@@ -152,13 +160,20 @@ class Map extends Model
     }
 
     /**
-     * @param $gbxJson
-     *
-     * @return mixed
+     * @return stdClass
      */
-    public function getGbxAttribute($gbxJson)
+    public function getGbxAttribute()
     {
-        return json_decode($gbxJson);
+        $cacheId = 'gbx/'.$this->uid;
+
+        if (Cache::has($cacheId)) {
+            return Cache::get($cacheId);
+        }
+
+        $gbx = MapController::getGbxInformation($this->filename, false);
+        Cache::put($cacheId, $gbx);
+
+        return $gbx;
     }
 
     /**
@@ -183,7 +198,7 @@ class Map extends Model
         $gbx = $this->gbx;
 
         if (!$gbx) {
-            Log::write('Loading missing GBX for ' . $this->filename);
+            Log::write('Loading missing GBX for '.$this->filename);
             $gbx = MapController::getGbxInformation($this->filename);
             $this->gbx = $gbx;
             $this->save();
@@ -195,25 +210,23 @@ class Map extends Model
     }
 
     /**
-     * @param string $mapUid
+     * @param  string  $mapUid
      *
      * @return Map|null
      */
     public static function getByUid(string $mapUid): ?Map
     {
-        if (config('database.type') == 'mysql') {
-            return Map::where('gbx->MapUid', $mapUid)
-                ->get()
-                ->first();
-        } else {
-            return Map::all()->filter(function (Map $map) use ($mapUid) {
-                return $map->gbx->MapUid == $mapUid;
-            })->first();
+        foreach (Map::all() as $map) {
+            if ($map->gbx->MapUid == $mapUid) {
+                return $map;
+            }
         }
+
+        return null;
     }
 
     /**
-     * @param string $mxId
+     * @param  string  $mxId
      *
      * @return Map|null
      */
