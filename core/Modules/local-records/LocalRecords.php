@@ -158,7 +158,7 @@ class LocalRecords
         self::$playerIdScoreMap = collect();
         self::$localsJson = "[]";
         self::fixRanks($map);
-        self::$records = $map->locals()->orderBy('Score')->orderBy('id')->limit(config('locals.limit'))->get()->keyBy('Player');
+        self::$records = $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->keyBy('Player');
         self::cacheAndSendLocals();
     }
 
@@ -231,8 +231,7 @@ class LocalRecords
      */
     private static function getNextBetterRank(Player $player, Map $map, int $score)
     {
-        $nextBetterRecord = $map->locals()->where('Score', '<=',
-            $score)->orderByDesc('Score')->orderByDesc('id')->first();
+        $nextBetterRecord = self::$records->where('Score', '<=', $score)->sortByDesc('Score')->first();
 
         if ($nextBetterRecord) {
             if ($nextBetterRecord->Player == $player->id) {
