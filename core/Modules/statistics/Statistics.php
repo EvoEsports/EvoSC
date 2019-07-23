@@ -39,7 +39,6 @@ class Statistics
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
-        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('ShowScores', [self::class, 'showScores']);
@@ -101,7 +100,8 @@ class Statistics
             $popularMaps));
 
         //Least recently played tracks
-        $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled', 1)->take(6)->pluck('last_played', 'name');
+        $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled',
+            1)->take(6)->pluck('last_played', 'name');
         $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
             function (Carbon $last_played) {
                 return $last_played->diffForHumans();
@@ -115,12 +115,17 @@ class Statistics
 
         $players = $players->sortBy('bestracetime');
 
+        $disabledMapIds = Map::whereEnabled(0)->pluck('id');
         $limit = config('locals.limit');
-        $players->each(function ($player_) use ($limit) {
+        $players->each(function ($player_) use ($limit, $disabledMapIds) {
             $player = player($player_->login, true);
-            $localsCount = $player->locals()->where('Rank', '<', $limit)->count();
-            $rankSum = $player->locals()->where('Rank', '<', $limit)->select('Rank')->get()->sum('Rank');
-            $player->stats()->update(['Score' => $limit * $localsCount - $rankSum]);
+            $localsCount = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<', $limit)->count();
+            $rankSum = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<',
+                $limit)->select('Rank')->get()->sum('Rank');
+            $player->stats()->update([
+                'Score' => $limit * $localsCount - $rankSum,
+                'Locals' => $localsCount
+            ]);
         });
 
         self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
@@ -230,17 +235,6 @@ class Statistics
     {
         $player->Ratings = $player->ratings()->count();
         $player->save();
-    }
-
-    /**
-     * @param  Player  $player
-     * @param  LocalRecord  $local
-     */
-    public static function playerLocal(Player $player, $local = null)
-    {
-        $player->stats()->update([
-            'Locals' => $player->locals->count(),
-        ]);
     }
 
     /**
