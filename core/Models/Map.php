@@ -20,13 +20,13 @@ use stdClass;
  *
  * @property string $uid
  * @property string $filename
- * @property boolean $plays
  * @property string $author
  * @property boolean $enabled
  * @property string $last_played
  * @property string $mx_details
  * @property string $mx_world_record
- * @property string $cooldown
+ * @property int $cooldown
+ * @property int $plays
  * @property string $name
  * @property string $environment
  * @property string $title_id

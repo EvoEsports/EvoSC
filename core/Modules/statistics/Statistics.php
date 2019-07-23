@@ -2,6 +2,7 @@
 
 namespace esc\Modules;
 
+use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\Hook;
@@ -11,6 +12,7 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
@@ -88,9 +90,22 @@ class Statistics
                 return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
             })->sort()->take(config('statistics.RoundAvg.show'));
 
-            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
+            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true,
+                $averageScores));
             self::$scores = collect();
         }
+
+        //Popular Maps
+        $popularMaps = Map::orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
+        $statCollection->push(new StatisticWidget('PopularMaps', " Most played maps", '', ' plays', null, true, true,
+            $popularMaps));
+
+        //Least recently played tracks
+        $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled', 1)->take(6)->pluck('last_played', 'name');
+        $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
+            function (Carbon $last_played) {
+                return $last_played->diffForHumans();
+            }, true, true, $popularMaps));
 
         Template::showAll('statistics.widgets', compact('statCollection'));
 
@@ -102,9 +117,9 @@ class Statistics
 
         $limit = config('locals.limit');
         $players->each(function ($player_) use ($limit) {
-            $player      = player($player_->login, true);
+            $player = player($player_->login, true);
             $localsCount = $player->locals()->where('Rank', '<', $limit)->count();
-            $rankSum     = $player->locals()->where('Rank', '<', $limit)->select('Rank')->get()->sum('Rank');
+            $rankSum = $player->locals()->where('Rank', '<', $limit)->select('Rank')->get()->sum('Rank');
             $player->stats()->update(['Score' => $limit * $localsCount - $rankSum]);
         });
 
@@ -116,7 +131,7 @@ class Statistics
     /**
      * Set ranks for players
      *
-     * @param \Illuminate\Support\Collection $players
+     * @param  \Illuminate\Support\Collection  $players
      */
     private static function updatePlayerRanks(Collection $players)
     {
@@ -127,12 +142,14 @@ class Statistics
 
         Log::write('Updating player-ranks finished.', isVeryVerbose());
 
-        $playerIds    = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
-        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->keys())->get()->keyBy('Player');
+        $playerIds = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
+        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player',
+            $playerIds->keys())->get()->keyBy('Player');
 
         $playerScores->each(function ($score) use ($playerIds) {
             $login = $playerIds->get($score->Player);
-            infoMessage('Your server rank is ', secondary($score->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $score->Score . ')'))->send($login);
+            infoMessage('Your server rank is ',
+                secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($login);
         });
 
         $players->pluck('login')->diff($playerIds->values())->each(function ($player) {
@@ -145,7 +162,8 @@ class Statistics
         $stats = $player->stats;
 
         if ($stats && $stats->Rank && $stats->Rank > 0) {
-            infoMessage('Your server rank is ', secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
+            infoMessage('Your server rank is ',
+                secondary($stats->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$stats->Score.')'))->send($stats->player);
         } else {
             infoMessage('You need at least one local record before receiving a rank.')->send($player);
         }
@@ -154,16 +172,16 @@ class Statistics
     /**
      * Announce the winner of the round and increment his win count
      *
-     * @param \esc\Models\Player $player
+     * @param  \esc\Models\Player  $player
      */
     public static function announceWinner(Player $player)
     {
-        Log::write('Winner: ' . $player);
+        Log::write('Winner: '.$player);
 
         try {
             $player->stats()->increment('Wins');
         } catch (\Exception $e) {
-            Log::write('Failed to increment win count of ' . $player);
+            Log::write('Failed to increment win count of '.$player);
         }
 
         infoMessage($player, ' wins this round. Total wins: ', $player->stats->Wins)
@@ -172,7 +190,7 @@ class Statistics
     }
 
     /**
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function playerConnect(Player $player)
     {
@@ -186,8 +204,8 @@ class Statistics
     }
 
     /**
-     * @param Player $player
-     * @param int    $score
+     * @param  Player  $player
+     * @param  int  $score
      */
     public static function playerFinish(Player $player, int $score)
     {
@@ -205,8 +223,8 @@ class Statistics
     }
 
     /**
-     * @param Player $player
-     * @param Karma  $karma
+     * @param  Player  $player
+     * @param  Karma  $karma
      */
     public static function playerRateMap(Player $player, Karma $karma)
     {
@@ -215,8 +233,8 @@ class Statistics
     }
 
     /**
-     * @param Player      $player
-     * @param LocalRecord $local
+     * @param  Player  $player
+     * @param  LocalRecord  $local
      */
     public static function playerLocal(Player $player, $local = null)
     {
@@ -235,7 +253,7 @@ class Statistics
     }
 
     /**
-     * @param mixed ...$args
+     * @param  mixed  ...$args
      */
     public static function beginMap(...$args)
     {

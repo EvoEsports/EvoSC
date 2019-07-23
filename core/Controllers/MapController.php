@@ -483,16 +483,6 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Reset the round.
-     *
-     * @param  Player  $player
-     */
-    public static function resetRound(Player $player)
-    {
-        Server::restartMap();
-    }
-
-    /**
      * Get the maps directory-path, optionally add the filename at the end.
      *
      * @param  string|null  $fileName
