@@ -57,8 +57,9 @@ class Help implements ModuleInterface
     {
         switch ($mode){
             default:
-            case 'TimeAttack':
                 ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
+                ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
+            case 'TimeAttack':
         }
     }
 
