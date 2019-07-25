@@ -1,0 +1,53 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:{include id}" id="{include id}" version="3">
+<frame id="window" pos="0 0">
+    <quad pos="0 0" size="120 11" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0.9" z-index="-3"/>
+    <quad pos="0 -10.5" size="120 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="-1"/>
+    <quad id="handle" data-id="help" pos="0 0" size="115 5" z-index="5"/>
+    <quad id="bg" pos="0 0" size="120 88" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1" />
+    <label pos="2 -3" textsize="0.8" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="close" pos="117.5 -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+    {include navbar}
+
+    <frame pos="2 -6">
+        {include content}
+    </frame>
+</frame>
+
+<script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+--></script>
+
+{include scriptDeclarations}
+
+{include 'scripts.drag'}
+
+<script><!--
+main() {
+    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+    {include bootScript}
+
+    while(True){
+        yield;
+
+        foreach(event in PendingEvents){
+            if(event.Control == Null) continue;
+
+            if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                window.Hide();
+                return;
+            }
+
+            {include pendingEvents}
+        }
+
+        maniaLinkDrag();
+    }
+}
+    --></script>
+</manialink>

@@ -332,9 +332,7 @@ function info(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    global $escVersion;
-
-    return $escVersion;
+    return '0.71.0';
 }
 
 /**

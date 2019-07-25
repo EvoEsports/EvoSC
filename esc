@@ -17,8 +17,6 @@ use Symfony\Component\Console\Input\ArgvInput;
 global $_isVerbose;
 global $_isVeryVerbose;
 global $_isDebug;
-global $escVersion;
-$escVersion = '0.68.26';
 $_isVerbose = false;
 $_isVeryVerbose = false;
 $_isDebug = false;

@@ -4,6 +4,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -21,6 +22,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxDownload::showAddMapInfo($player, '', 149386);
+        Help::showAbout($player);
     }
 }

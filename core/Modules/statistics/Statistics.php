@@ -119,8 +119,8 @@ class Statistics
         $limit = config('locals.limit');
         $players->each(function ($player_) use ($limit, $disabledMapIds) {
             $player = player($player_->login, true);
-            $localsCount = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<', $limit)->count();
-            $rankSum = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<',
+            $localsCount = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=', $limit)->count();
+            $rankSum = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=',
                 $limit)->select('Rank')->get()->sum('Rank');
             $player->stats()->update([
                 'Score' => $limit * $localsCount - $rankSum,
