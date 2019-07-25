@@ -117,7 +117,7 @@ class MapList
         $maps       = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
-        if (strlen($maps->values()->toJson()) > 65000) {
+        if (strlen($maps->toJson()) > 65000) {
             Log::error('The map list json is too long! You have too many maps. Sorry, we are working on this.');
 
             return;
@@ -125,12 +125,12 @@ class MapList
 
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
-                'maps'       => $maps->toJson(),
+                'maps'       => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         } else {
             Template::showAll('map-list.update-map-list', [
-                'maps'       => $maps->toJson(),
+                'maps'       => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         }
