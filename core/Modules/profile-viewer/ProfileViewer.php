@@ -33,7 +33,7 @@ class ProfileViewer
                 'Dedis'        => $target->dedis()->count(),
                 'Maps'         => Map::whereAuthor($target->id)->count(),
                 'Visits'       => $target->stats->Visits,
-                'Playtime'     => round($target->stats->Playtime / 60, 0) . 'h',
+                'Playtime'     => round($target->stats->Playtime / 3600.0, 1) . 'h',
                 'Finishes'     => $target->stats->Finishes,
                 'Wins'         => $target->stats->Wins,
                 'Donations'    => $target->stats->Donations . ' Planets',

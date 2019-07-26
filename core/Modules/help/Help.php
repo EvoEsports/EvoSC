@@ -55,10 +55,10 @@ class Help implements ModuleInterface
      */
     public static function up(string $mode)
     {
+        ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
+        ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
+
         switch ($mode){
-            default:
-                ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
-                ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
             case 'TimeAttack':
         }
     }

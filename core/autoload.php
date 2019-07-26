@@ -49,10 +49,11 @@ function buildClassMap()
 {
     global $classes;
 
-    $dirs = ['Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations'];
+    $dirs = ['Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations', '..' . DIRECTORY_SEPARATOR . 'modules'];
 
     foreach ($dirs as $dir) {
-        getClassesInDirectory($classes, __DIR__ . DIRECTORY_SEPARATOR . $dir);
+        var_dump( realpath(__DIR__ . DIRECTORY_SEPARATOR . $dir));
+        getClassesInDirectory($classes, realpath(__DIR__ . DIRECTORY_SEPARATOR . $dir));
     }
 
     $classes = getNameSpaces($classes);
