@@ -52,7 +52,6 @@ function buildClassMap()
     $dirs = ['Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations', '..' . DIRECTORY_SEPARATOR . 'modules'];
 
     foreach ($dirs as $dir) {
-        var_dump( realpath(__DIR__ . DIRECTORY_SEPARATOR . $dir));
         getClassesInDirectory($classes, realpath(__DIR__ . DIRECTORY_SEPARATOR . $dir));
     }
 
@@ -74,7 +73,7 @@ function esc_class_loader($className)
         if (file_exists($class->file)) {
             require_once $class->file;
         } else {
-            die("Trying to load non-existant file: " . $class->file);
+            die("Trying to load non-existent file: " . $class->file);
         }
     } else {
         // \esc\Classes\Log::write('Class not found: ' . $className, isVeryVerbose());

@@ -116,7 +116,7 @@ class ModuleController implements ControllerInterface
         Log::write('Booting modules...');
 
         $moduleClasses->each(function ($module) {
-            $files    = scandir(coreDir('Modules' . DIRECTORY_SEPARATOR . $module->dir));
+            $files    = scandir(dirname($module->file));
             $configId = null;
             foreach ($files as $file) {
                 if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
