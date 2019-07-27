@@ -127,10 +127,12 @@ class MxPackJob
                 Map::create([
                     'uid' => $uid,
                     'filename' => $filename,
-                    'gbx' => json_encode($gbx),
                     'author' => $authorId,
                     'mx_id' => $mx_id,
-                    'enabled' => 1
+                    'enabled' => 1,
+                    'name' => $gbx->Name,
+                    'environment' => $gbx->Environment,
+                    'title_id' => $gbx->TitleId
                 ]);
             }
 
