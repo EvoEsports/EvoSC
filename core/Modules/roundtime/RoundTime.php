@@ -20,7 +20,7 @@ class RoundTime
 
     public static function show(Player $player)
     {
-        $settings = $player->setting('speedo');
+        $settings = $player->setting('roundtime');
 
         Template::show($player, 'roundtime.meter', compact('settings'));
     }
