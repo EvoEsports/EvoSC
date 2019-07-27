@@ -96,7 +96,7 @@ class MxDownload
             }
 
             $map->uid = $mxMap->uid;
-            $map->author = self::getAuthorId($mxMap->author->Login);
+            $map->author = self::getAuthorId($mxMap->gbx->AuthorLogin, $mxMap->gbx->AuthorNick);
             $map->mx_details = json_encode($mxMap->mxDetails);
             $map->filename = $mxMap->getFilename();
             $map->enabled = true;
@@ -142,14 +142,14 @@ class MxDownload
         }
     }
 
-    private static function getAuthorId($authorLogin): int
+    private static function getAuthorId($authorLogin, $authorNick): int
     {
         if (Player::where('Login', $authorLogin)->exists()) {
             return Player::find($authorLogin)->id;
         } else {
             return Player::insertGetId([
                 'Login' => $authorLogin,
-                'NickName' => $authorLogin,
+                'NickName' => $authorNick,
             ]);
         }
     }
