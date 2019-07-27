@@ -7,7 +7,7 @@ function getClassesInDirectory(&$classes, $path)
     return collect(scandir($path))->filter(function ($string) {
         return substr($string, 0, 1) != '.';
     })->each(function ($classFile) use ($classes, $path) {
-        $file = $path . DIRECTORY_SEPARATOR . $classFile;
+        $file = $path.DIRECTORY_SEPARATOR.$classFile;
 
         if (is_dir($file)) {
             //Get classes from subdirs
@@ -16,10 +16,10 @@ function getClassesInDirectory(&$classes, $path)
 
         //If php file, add to classes collection
         if (preg_match('/\.php$/', $classFile, $matches)) {
-            $class        = collect();
-            $class->file  = $file;
-            $type         = explode(DIRECTORY_SEPARATOR, $path);
-            $class->dir   = array_pop($type);
+            $class = collect();
+            $class->file = $file;
+            $type = explode(DIRECTORY_SEPARATOR, $path);
+            $class->dir = array_pop($type);
             $class->class = str_replace('.php', '', $classFile);
             $classes->push($class);
         }
@@ -32,7 +32,7 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
         $contents = file_get_contents($classFile->file);
 
         if (preg_match('/namespace (.+)?;/i', $contents, $matches)) {
-            $classFile->namespace = $matches[1] . '\\' . $classFile->class;
+            $classFile->namespace = $matches[1].'\\'.$classFile->class;
         } else {
             //Abort execution when class wasn't loaded correctly
             // \esc\Classes\Log::write("Class without namespace found: $classFile->file");
@@ -49,10 +49,16 @@ function buildClassMap()
 {
     global $classes;
 
-    $dirs = ['Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations', '..' . DIRECTORY_SEPARATOR . 'modules'];
+    $dirs = [
+        'Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..'.DIRECTORY_SEPARATOR.'Migrations'
+    ];
+
+    if (is_dir(realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'modules'))) {
+        array_push($dirs, '..'.DIRECTORY_SEPARATOR.'modules');
+    }
 
     foreach ($dirs as $dir) {
-        getClassesInDirectory($classes, realpath(__DIR__ . DIRECTORY_SEPARATOR . $dir));
+        getClassesInDirectory($classes, realpath(__DIR__.DIRECTORY_SEPARATOR.$dir));
     }
 
     $classes = getNameSpaces($classes);
@@ -73,12 +79,12 @@ function esc_class_loader($className)
         if (file_exists($class->file)) {
             require_once $class->file;
         } else {
-            die("Trying to load non-existent file: " . $class->file);
+            die("Trying to load non-existent file: ".$class->file);
         }
     } else {
         // \esc\Classes\Log::write('Class not found: ' . $className, isVeryVerbose());
         if ($className != 'Doctrine\DBAL\Driver\PDOConnection') {
-            var_dump('Class not found: ' . $className);
+            var_dump('Class not found: '.$className);
         }
     }
 }
