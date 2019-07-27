@@ -124,14 +124,6 @@ class Map extends Model
     }
 
     /**
-     * @return BelongsToMany
-     */
-    public function favorites()
-    {
-        return $this->belongsToMany(Player::class, 'map-favorites');
-    }
-
-    /**
      * @param $jsonMxDetails
      *
      * @return mixed|null

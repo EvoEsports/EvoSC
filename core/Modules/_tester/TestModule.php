@@ -22,6 +22,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Help::showAbout($player);
+        Template::show($player, '_tester.test');
     }
 }

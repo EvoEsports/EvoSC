@@ -45,8 +45,7 @@ class MxMap implements \Serializable
      */
     public function loadGbxInformationAndSetUid()
     {
-        $this->gbxString = MapController::getGbxInformation($this->directory.$this->filename);
-        $this->gbx = json_decode($this->gbxString);
+        $this->gbx = MapController::getGbxInformation($this->directory.$this->filename, false);
 
         if (!$this->gbx || !isset($this->gbx->MapUid)) {
             throw new \Exception('Failed to load GBX information of file "'.$this->directory.$this->filename.'".');

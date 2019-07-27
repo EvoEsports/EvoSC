@@ -97,11 +97,13 @@ class MxDownload
 
             $map->uid = $mxMap->uid;
             $map->author = self::getAuthorId($mxMap->author->Login);
-            $map->gbx = $mxMap->gbxString;
             $map->mx_details = json_encode($mxMap->mxDetails);
             $map->filename = $mxMap->getFilename();
             $map->enabled = true;
             $map->cooldown = 999;
+            $map->name = $mxMap->gbx->Name;
+            $map->title_id = $mxMap->gbx->TitleId;
+            $map->environment = $mxMap->gbx->Environment;
             $map->saveOrFail();
         }
 
