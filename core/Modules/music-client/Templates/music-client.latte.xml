@@ -32,20 +32,24 @@
                 <quad class="music-control" pos="-5 0" size="36 8" bgcolor="{config('colors.ui.widget.header.color')}6"
                       z-index="-2"/>
 
-                <label class="skip" pos="1.7 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
-                       valign="center" ScriptEvents="1" focusareacolor1="0000"
-                       focusareacolor2="{config('colors.ui.widget.header.color')}9"/>
-                <label class="music-list" pos="15 -5" textsize="1.5" size="13.3 10" text="" z-index="0" halign="center"
-                       valign="center" ScriptEvents="1" focusareacolor1="0000"
-                       focusareacolor2="{config('colors.ui.widget.header.color')}9"/>
+                <frame pos="1 -4">
+                    <label class="skip" textsize="1.5" size="12 8.2" text="" z-index="0" halign="center"
+                           valign="center" ScriptEvents="1" focusareacolor1="0000"
+                           focusareacolor2="{config('colors.ui.widget.header.color')}9"/>
+                    <label pos="0 1" textsize="1" size="8 8" text="" z-index="1" halign="center" valign="center"/>
+                    <label pos="0 -2" textsize="1" scale="0.6" size="8 8" text="Skip" z-index="1" halign="center"
+                           valign="center"/>
+                </frame>
+                <frame pos="19 -4">
+                    <label class="music-list" textsize="1.5" size="24 8.2" text="" z-index="0" halign="center"
+                           valign="center" ScriptEvents="1" focusareacolor1="0000"
+                           focusareacolor2="{config('colors.ui.widget.header.color')}9"/>
 
-                <label pos="1.7 -3" textsize="1" size="8 8" text="" z-index="1" halign="center" valign="center"/>
-                <label pos="15 -3" textsize="1" size="8 8" text="" z-index="1" halign="center" valign="center"/>
+                    <label pos="0 1" textsize="1" size="8 8" text="" z-index="1" halign="center" valign="center"/>
 
-                <label pos="1.7 -6" textsize="1" scale="0.6" size="8 8" text="Skip" z-index="1" halign="center"
-                       valign="center"/>
-                <label pos="15 -6" textsize="1" scale="0.6" size="8 8" text="Music" z-index="1" halign="center"
-                       valign="center"/>
+                    <label pos="0 -2" textsize="1" scale="0.6" size="8 8" text="Music" z-index="1" halign="center"
+                           valign="center"/>
+                </frame>
             </frame>
         </frame>
     {/block}
@@ -389,7 +393,7 @@ Void loadMusicLibrary(){
         }
         if((xInBounds && yInBounds) && !controlsVisible){
             controlsVisible = True;
-            AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 0.1' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
         }
 
         maniaLinkDrag();
