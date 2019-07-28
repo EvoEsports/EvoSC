@@ -6,21 +6,27 @@ declare Text HS_Pos_Hidden;
 declare CMlFrame HS_Target;
 declare Boolean HS_Hidden;
 
+Void hidescript_setup(){
+    HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+    declare orig = HS_Target.RelativePosition_V3;
+    declare hidden = orig;
+
+    log(orig);
+
+    hidden[0] = 160.0;
+
+    if(orig[0] < 0.0){
+        hidden[0] *= -1;
+        hidden[0] -= HS_Target.Size[0] * HS_Target.RelativeScale;
+    }
+
+    HS_Pos_Visible = "<frame pos='" ^ orig[0] ^ " " ^ orig[1] ^ "' />";
+    HS_Pos_Hidden = "<frame pos='" ^ hidden[0] ^ " " ^ hidden[1] ^ "' />";
+}
+
 Void hidescript(){
     if(HS_Target == Null){
-        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
-        declare orig = HS_Target.RelativePosition_V3;
-        declare hidden = orig;
-
-        hidden[0] = 160.0;
-
-        if(orig[0] < 0.0){
-            hidden[0] *= -1;
-            hidden[0] -= HS_Target.Size[0] * HS_Target.RelativeScale;
-        }
-
-        HS_Pos_Visible = "<frame pos='" ^ orig[0] ^ " " ^ orig[1] ^ "' />";
-        HS_Pos_Hidden = "<frame pos='" ^ hidden[0] ^ " " ^ hidden[1] ^ "' />";
+        hidescript_setup();
     }
 
     declare hideSpeed for LocalUser = 10;

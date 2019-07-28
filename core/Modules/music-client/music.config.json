@@ -1,8 +1,8 @@
 {
   "url"    : "",
-  "pos"    : {
-    "visible": "120 71",
-    "hidden" : "160 71"
+  "ui": {
+    "position": "right",
+    "slot": 2
   },
   "scale"  : 0.8,
   "enabled": false

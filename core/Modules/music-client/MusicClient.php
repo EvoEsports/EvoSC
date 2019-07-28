@@ -90,7 +90,7 @@ class MusicClient
      */
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'music-client.music-client');
+        Template::show($player, 'music-client.music-client-new');
 
         $url = Server::getForcedMusic()->url;
 

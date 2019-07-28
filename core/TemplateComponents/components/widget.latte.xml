@@ -5,10 +5,18 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
+#Struct UIGrid {
+    CMlFrame[Text][Integer] left;
+    CMlFrame[Text][Integer] right;
+}
+
+{include globals}
+
 declare CMlFrame widget;
 declare CMlQuad bg;
 declare Boolean left__;
 declare Integer slot__;
+declare Text id__;
 --></script>
 
     <frame pos="0 0" id="widget" size="44 8">
@@ -18,60 +26,111 @@ declare Integer slot__;
         {include content}
     </frame>
 
+    {if !isset($noHidescript)}
+    {include 'scripts.hide'}
+    {/if}
     {include script}
 
     <script><!--
+    Real getColumnHeight__(CMlFrame[Text] column){
+        declare maxHeight = 0.0;
 
-    Void rearrange__(){
+        foreach(frame in column){
+            declare height = frame.Size[1] * frame.RelativeScale;
+
+            if(height > maxHeight){
+                maxHeight = height;
+            }
+        }
+
+        return maxHeight;
+    }
+
+    Void rearrange__(UIGrid grid){
+        declare CMlFrame[Text][Integer] column;
         declare Real gutter = 1.0;
 
-        declare width = widget.Size[0];
-        declare height = widget.Size[1];
-        declare scale = widget.RelativeScale;
+        declare width = widget.Size[0] * widget.RelativeScale;
+        declare height = widget.Size[1] * widget.RelativeScale;
 
         if(left__){
             widget.RelativePosition_V3[0] = 0.0;
+            column = grid.left;
         }else{
-            widget.RelativePosition_V3[0] = 160.0 - width * scale;
+            widget.RelativePosition_V3[0] = 160.0 - width;
+            column = grid.right;
         }
 
         if(slot__ == 1){
             widget.RelativePosition_V3[1] = 90.0 - gutter * slot__;
+        }else{
+            declare heights = 0.0;
+            declare count = 1;
+
+            for(i, 1, slot__ - 1){
+                if(!column.existskey(i)){
+                    continue;
+                }
+
+                heights += getColumnHeight__(column[i]);
+                count += 1;
+            }
+
+            widget.RelativePosition_V3[1] = 90.0 - heights - (gutter * count);
         }
+
+        hidescript_setup();
     }
 
-        main() {
-            declare Integer LastUiUpdate for This = 0;
-            declare Integer lastUiUpdate;
+    main() {
+        declare UIGrid grid for This;
+        declare Integer LastUiUpdate for This = 0;
+        declare Integer lastUiUpdate;
 
-            if(LastUiUpdate == 0){
-                LastUiUpdate = GameTime;
+        if(LastUiUpdate == 0){
+            LastUiUpdate = GameTime;
+            lastUiUpdate = LastUiUpdate;
+        }
+
+        widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+        id__ = "{include id}";
+
+        if(left__){
+            if(!grid.left.existskey(slot__)){
+                grid.left[slot__] = CMlFrame[Text];
+            }
+            grid.left[slot__][id__] = widget;
+        }else{
+            if(!grid.right.existskey(slot__)){
+                grid.right[slot__] = CMlFrame[Text];
+            }
+            grid.right[slot__][id__] = widget;
+        }
+
+        rearrange__(grid);
+        LastUiUpdate = GameTime;
+
+        {include bootScript}
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+
+                {include pendingEvents}
             }
 
-            widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-            bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+            {include loop}
 
-            {include bootScript}
-            rearrange__();
+            hidescript();
 
-            while(True){
-                yield;
-
-                foreach(event in PendingEvents){
-                    if(event.Control == Null) continue;
-
-                    {include pendingEvents}
-                }
-
-                {include loop}
-
-                hidescript();
-
-                if(lastUiUpdate != LastUiUpdate){
-                    lastUiUpdate = LastUiUpdate;
-                    rearrange__();
-                }
+            if(lastUiUpdate != LastUiUpdate){
+                lastUiUpdate = LastUiUpdate;
+                rearrange__(grid);
             }
         }
+    }
     --></script>
 </manialink>

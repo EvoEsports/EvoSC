@@ -10,6 +10,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use esc\Modules\MusicClient\MusicClient;
 use Illuminate\Support\Collection;
 
 class TestModule
@@ -22,6 +23,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Template::show($player, 'clock.clock');
+        MusicClient::playerConnect($player);
+        Clock::displayClock($player);
     }
 }
