@@ -37,22 +37,24 @@ class MusicClient
         }
 
         try {
-            $response = RestClient::get($url);
+            $response = RestClient::get($url, [
+                'connect_timeout' => 3
+            ]);
         } catch (GuzzleException $e) {
-            Log::write('Failed to fetch music list from ' . $url);
+            Log::error('Failed to fetch music list from '.$url);
             self::enableMusicDisabledNotice();
 
             return;
         }
 
         if ($response->getStatusCode() != 200) {
-            Log::write('Failed to fetch music list from ' . $url);
+            Log::write('Failed to fetch music list from '.$url);
             self::enableMusicDisabledNotice();
 
             return;
         }
 
-        $musicJson   = $response->getBody()->getContents();
+        $musicJson = $response->getBody()->getContents();
         self::$music = collect(json_decode($musicJson));
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -73,7 +75,7 @@ class MusicClient
     public static function setNextSong(Map $map = null)
     {
         self::$song = self::$music->random(1)->first();
-        Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
+        Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));
         $song = json_encode(self::$song);
 
         if ($song != 'null') {
@@ -84,7 +86,7 @@ class MusicClient
     /**
      * Hook: PlayerConnect
      *
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function playerConnect(Player $player)
     {

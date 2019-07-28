@@ -1,79 +1,117 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:clock-widget" id="clock-widget" version="3">
-    <frame pos="{config('clock.pos.visible')}" id="widget" scale="0.8" size="50 10">
-        <quad id="bg" pos="0 0" size="40 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-2"/>
-        <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-2"/>
+{contentType text}
+{extends 'components.widget'}
 
-        <label id="time" pos="38 -5" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s" textcolor="{config('colors.ui.widget.text.primary')|noescape}" textfont="{config('colors.ui.font')|noescape}" />
+{block id}clock-widget{/block}
 
-        <frame pos="45 -5">
-            <quad id="circle" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/ring.png" />
-            <quad id="big" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/long.png" />
-            <quad id="small" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/short.png" opacity="0.9" />
-        </frame>
-    </frame>
+{block content}
+<label id="time" pos="34 -4" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s" textcolor="{config('colors.ui.widget.text.primary')|noescape}" textfont="{config('colors.ui.font')|noescape}" />
 
-    <script><!--
-        #Include "TextLib" as TextLib
+<frame pos="40 -4" scale="0.75">
+<quad id="circle" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/ring.png" />
+<quad id="big" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/long.png" />
+<quad id="small" size="5 5" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/short.png" opacity="0.9" />
+</frame>
+{/block}
 
-        Void anim(CMlFrame frame, Text targetPos, Integer duration){
-            AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+{block script}
+<script><!--
+    declare Text HS_Pos_Visible;
+    declare Text HS_Pos_Hidden;
+    declare CMlFrame HS_Target;
+    declare Boolean HS_Hidden;
+
+    declare CMlLabel time;
+    declare Real originalOpacity;
+
+    Void anim(CMlFrame frame, Text targetPos, Integer duration){
+        AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        if(HS_Target == Null){
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+            declare orig = HS_Target.RelativePosition_V3;
+            declare hidden = orig;
+            declare multiplier = 1;
+
+            hidden[0] = orig[0];
+
+            if(orig[0] < 0.0){
+                multiplier = -1;
+            }
+
+            hidden[0] += 8 * HS_Target.RelativeScale * multiplier;
+
+            HS_Pos_Visible = "<frame pos='" ^ orig[0] ^ " " ^ orig[1] ^ "' />";
+            HS_Pos_Hidden = "<frame pos='" ^ hidden[0] ^ " " ^ hidden[1] ^ "' />";
         }
 
-        main() {
-            declare hideSpeed for LocalUser = 10;
+        declare hideSpeed for LocalUser = 10;
 
-            declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
-            declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
-            declare time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
-            declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
-            declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
-            declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-            declare Boolean hidden = False;
-            declare Integer duration = 800;
-            declare Real speed = 0.0;
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
 
-            declare big <=> (Page.MainFrame.GetFirstChild("big") as CMlQuad);
-            declare small <=> (Page.MainFrame.GetFirstChild("small") as CMlQuad);
+        declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+        declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+        declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
 
-            declare Text timeString = "";
-            declare Integer hours = 0;
-            declare Integer minutes = 0;
-            declare Real originalOpacity = bg.Opacity;
-
-            while(True){
-                yield;
-
-                timeString = TextLib::SubString(CurrentLocalDateText, 11, 5);
-                timeLabel.SetText(timeString);
-
-                hours = TextLib::ToInteger(TextLib::SubString(timeString, 0, 2));
-                minutes = TextLib::ToInteger(TextLib::SubString(timeString, 3, 2));
-
-                small.RelativeRotation = (hours/12.0) * 360;
-                big.RelativeRotation = (minutes/60.0) * 360;
-
-                if(InputPlayer == Null){
-                    sleep(500);
-                    continue;
-                }
-
-                declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
-                declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
-
-                if(overHidespeed && playerIsRacing && !hidden){
-                    hidden = True;
-                    AnimMgr.Add(widget, hiddenPos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                }
-                if((!overHidespeed || !playerIsRacing) && hidden){
-                    hidden = False;
-                    AnimMgr.Add(widget, visiblePos, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                    AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                }
+        if(mapFinished){
+            if(!HS_Hidden){
+                HS_Hidden = True;
+                AnimMgr.Add(widget, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+        }else{
+            if(overHidespeed && playerIsRacing && !HS_Hidden){
+                HS_Hidden = True;
+                AnimMgr.Add(widget, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                {if !isset($doNotPause)}
+                wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+                {/if}
+            }
+            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+                HS_Hidden = False;
+                AnimMgr.Add(widget, HS_Pos_Visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
         }
-    --></script>
-</manialink>
+    }
+--></script>
+{/block}
+
+{block bootScript}
+    originalOpacity = bg.Opacity;
+    time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
+    declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
+    declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
+
+    declare big <=> (Page.MainFrame.GetFirstChild("big") as CMlQuad);
+    declare small <=> (Page.MainFrame.GetFirstChild("small") as CMlQuad);
+
+    declare Text timeString = "";
+    declare Integer hours = 0;
+    declare Integer minutes = 0;
+    declare Real originalOpacity = bg.Opacity;
+
+    left__ = {config('clock.ui.position') == 'left' ? 'True' : 'False'};
+    slot__ = {config('clock.ui.slot')};
+{/block}
+
+{block loop}
+    timeString = TL::SubString(CurrentLocalDateText, 11, 5);
+    time.SetText(timeString);
+
+    hours = TL::ToInteger(TL::SubString(timeString, 0, 2));
+    minutes = TL::ToInteger(TL::SubString(timeString, 3, 2));
+
+    small.RelativeRotation = (hours/12.0) * 360;
+    big.RelativeRotation = (minutes/60.0) * 360;
+{/block}
+
+{block pendingEvents}
+{/block}

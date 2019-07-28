@@ -1,0 +1,77 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:{include id}" id="{include id}" version="3">
+    <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+declare CMlFrame widget;
+declare CMlQuad bg;
+declare Boolean left__;
+declare Integer slot__;
+--></script>
+
+    <frame pos="0 0" id="widget" size="44 8">
+        <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+        <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+
+        {include content}
+    </frame>
+
+    {include script}
+
+    <script><!--
+
+    Void rearrange__(){
+        declare Real gutter = 1.0;
+
+        declare width = widget.Size[0];
+        declare height = widget.Size[1];
+        declare scale = widget.RelativeScale;
+
+        if(left__){
+            widget.RelativePosition_V3[0] = 0.0;
+        }else{
+            widget.RelativePosition_V3[0] = 160.0 - width * scale;
+        }
+
+        if(slot__ == 1){
+            widget.RelativePosition_V3[1] = 90.0 - gutter * slot__;
+        }
+    }
+
+        main() {
+            declare Integer LastUiUpdate for This = 0;
+            declare Integer lastUiUpdate;
+
+            if(LastUiUpdate == 0){
+                LastUiUpdate = GameTime;
+            }
+
+            widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+            bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+
+            {include bootScript}
+            rearrange__();
+
+            while(True){
+                yield;
+
+                foreach(event in PendingEvents){
+                    if(event.Control == Null) continue;
+
+                    {include pendingEvents}
+                }
+
+                {include loop}
+
+                hidescript();
+
+                if(lastUiUpdate != LastUiUpdate){
+                    lastUiUpdate = LastUiUpdate;
+                    rearrange__();
+                }
+            }
+        }
+    --></script>
+</manialink>

@@ -2,5 +2,9 @@
   "pos": {
     "visible": "120 89",
     "hidden": "128 89"
+  },
+  "ui": {
+    "position": "right",
+    "slot": 1
   }
 }

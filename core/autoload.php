@@ -12,6 +12,7 @@ function getClassesInDirectory(&$classes, $path)
         if (is_dir($file)) {
             //Get classes from subdirs
             getClassesInDirectory($classes, $file);
+            return;
         }
 
         //If php file, add to classes collection
@@ -24,6 +25,25 @@ function getClassesInDirectory(&$classes, $path)
             $classes->push($class);
         }
     });
+}
+
+function buildClassMap()
+{
+    global $classes;
+
+    $dirs = [
+        'Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..'.DIRECTORY_SEPARATOR.'Migrations'
+    ];
+
+    if (is_dir(realpath('..'.DIRECTORY_SEPARATOR.'modules'))) {
+        array_push($dirs, '..'.DIRECTORY_SEPARATOR.'modules');
+    }
+
+    foreach ($dirs as $dir) {
+        getClassesInDirectory($classes, realpath(__DIR__.DIRECTORY_SEPARATOR.$dir));
+    }
+
+    $classes = getNameSpaces($classes);
 }
 
 function getNameSpaces(\Illuminate\Support\Collection $classFiles)
@@ -43,25 +63,6 @@ function getNameSpaces(\Illuminate\Support\Collection $classFiles)
     });
 
     return $classFiles;
-}
-
-function buildClassMap()
-{
-    global $classes;
-
-    $dirs = [
-        'Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..'.DIRECTORY_SEPARATOR.'Migrations'
-    ];
-
-    if (is_dir(realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'modules'))) {
-        array_push($dirs, '..'.DIRECTORY_SEPARATOR.'modules');
-    }
-
-    foreach ($dirs as $dir) {
-        getClassesInDirectory($classes, realpath(__DIR__.DIRECTORY_SEPARATOR.$dir));
-    }
-
-    $classes = getNameSpaces($classes);
 }
 
 /**

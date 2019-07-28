@@ -12,7 +12,7 @@ class Help implements ModuleInterface
 {
     public function __construct()
     {
-        self::up('TimeAttack');
+        self::start('TimeAttack');
 
         ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
         ManiaLinkEvent::add('help.show_cmds', [Help::class, 'showCommandsHelp']);
@@ -53,7 +53,7 @@ class Help implements ModuleInterface
      *
      * @param  string  $mode
      */
-    public static function up(string $mode)
+    public static function start(string $mode)
     {
         ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
         ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
@@ -61,13 +61,5 @@ class Help implements ModuleInterface
         switch ($mode){
             case 'TimeAttack':
         }
-    }
-
-    /**
-     * Called when the module is unloaded
-     */
-    public static function down()
-    {
-        // TODO: Implement down() method.
     }
 }

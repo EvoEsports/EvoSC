@@ -64,7 +64,7 @@ class RestClient
             Log::write('GET: ' . $url, isDebug());
         }
 
-        return self::$client->request('GET', $url, self::addUserAgent($options));
+        return self::$client->request('GET', $url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     /**
@@ -83,7 +83,7 @@ class RestClient
                 isDebug());
         }
 
-        return self::$client->request('POST', $url, self::addUserAgent($options));
+        return self::$client->request('POST', $url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     /**
@@ -102,7 +102,7 @@ class RestClient
                 isDebug());
         }
 
-        return self::$client->request('PUT', $url, self::addUserAgent($options));
+        return self::$client->request('PUT', $url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     //Add user-agent to current options.
@@ -112,7 +112,7 @@ class RestClient
      *
      * @return array
      */
-    private static function addUserAgent(array $options = null): array
+    private static function addUserAgentAndDefaultTimeout(array $options = null): array
     {
         if (!$options) {
             $options = [];
@@ -120,6 +120,10 @@ class RestClient
 
         if (!array_key_exists('headers', $options)) {
             $options['headers'] = [];
+        }
+
+        if (!array_key_exists('connect_timeout', $options)) {
+            $options['connect_timeout'] = config('server.rest-timeout', 10);
         }
 
         $options[RequestOptions::VERIFY] = CaBundle::getSystemCaRootBundlePath();

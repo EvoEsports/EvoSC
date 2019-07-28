@@ -51,6 +51,5 @@ Void hidescript(){
             AnimMgr.Add(HS_Target, HS_Pos_Visible, 600, CAnimManager::EAnimManagerEasing::ExpInOut);
         }
     }
-
 }
 --></script>

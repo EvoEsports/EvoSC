@@ -2,10 +2,8 @@
 
 namespace esc\Modules;
 
-use esc\Classes\Config;
 use esc\Classes\Hook;
 use esc\Classes\Template;
-use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class Clock

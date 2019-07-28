@@ -133,6 +133,10 @@ class ModuleController implements ControllerInterface
                 }
             }
 
+            if(isVeryVerbose()){
+                Log::info('Loading ' . $module->namespace);
+            }
+
             if (method_exists($module->namespace, '__construct')) {
                 $reflectionMethod = new ReflectionMethod($module->namespace, '__construct');
 

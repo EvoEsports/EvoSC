@@ -11,10 +11,5 @@ interface ModuleInterface
      *
      * @param  string  $mode
      */
-    public static function up(string $mode);
-
-    /**
-     * Called when the module is unloaded
-     */
-    public static function down();
+    public static function start(string $mode);
 }
