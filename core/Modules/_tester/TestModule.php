@@ -8,6 +8,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use esc\Modules\MusicClient\MusicClient;
@@ -23,7 +24,5 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MusicClient::playerConnect($player);
-        Clock::displayClock($player);
     }
 }

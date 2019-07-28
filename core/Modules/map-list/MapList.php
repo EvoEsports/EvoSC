@@ -213,6 +213,6 @@ class MapList
         self::sendUpdatedMaplist($player);
         $favorites      = self::getMapFavoritesJson($player);
         $ignoreCooldown = $player->hasAccess('queue.recent');
-        Template::show($player, 'map-list.manialink', compact('favorites', 'ignoreCooldown'));
+        Template::show($player, 'map-list.map-list', compact('favorites', 'ignoreCooldown'));
     }
 }
