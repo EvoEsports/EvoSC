@@ -323,11 +323,24 @@ class MapController implements ControllerInterface
 
         Log::write('Get GBX information: '.$filename, isVerbose());
 
+        if (!$gbx->Name) {
+            $gbx = self::getGbxInformationByExecutable($filename);
+        }
+
         if ($asString) {
             return json_encode($gbx);
         }
 
         return $gbx;
+    }
+
+    private static function getGbxInformationByExecutable($filename)
+    {
+        $mps = Server::GameDataDirectory().(isWindows() ? DIRECTORY_SEPARATOR : '').'..'.DIRECTORY_SEPARATOR.'ManiaPlanetServer';
+        $mapFile = Server::GameDataDirectory().'Maps'.DIRECTORY_SEPARATOR.$filename;
+        $cmd = $mps.sprintf(' /parsegbx="%s"', $mapFile);
+
+        return json_decode(shell_exec($cmd));
     }
 
     /**
