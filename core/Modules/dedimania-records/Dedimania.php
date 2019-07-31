@@ -28,11 +28,15 @@ class Dedimania extends DedimaniaApi
      */
     private static $dedisJson;
 
+    private static $offlineMode;
+
     public function __construct()
     {
         if (!config('dedimania.enabled')) {
             return;
         }
+
+        self::$offlineMode = false;
 
         //Check for session key
         if (!self::getSessionKey()) {
@@ -40,8 +44,7 @@ class Dedimania extends DedimaniaApi
 
             if (!DedimaniaApi::openSession()) {
                 //Failed to start session
-
-                return;
+                self::$offlineMode = true;
             }
         } else {
             //Session exists
@@ -51,15 +54,17 @@ class Dedimania extends DedimaniaApi
 
                 if (!DedimaniaApi::openSession()) {
                     //Failed to start session
-
-                    return;
+                    self::$offlineMode = true;
+                }else{
+                    Log::write('Started. Session last updated: '.self::getSessionLastUpdated());
                 }
+            }else{
+                Log::write('Started. Session last updated: '.self::getSessionLastUpdated());
             }
         }
 
         //Session exists and is not expired
         self::$enabled = true;
-        Log::write('Started. Session last updated: '.self::getSessionLastUpdated());
 
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
@@ -117,6 +122,10 @@ class Dedimania extends DedimaniaApi
 
     public static function showManialink(Player $player)
     {
+        if (self::$offlineMode) {
+            warningMessage('Unfortunately Dedimania is offline, new records will not be visible before it comes online again.')->send($player);
+        }
+
         $dedisJson = self::$dedisJson;
 
         Template::show($player, 'dedimania-records.update', compact('dedisJson'));
@@ -137,6 +146,26 @@ class Dedimania extends DedimaniaApi
     public static function beginMap(Map $map)
     {
         $records = self::getChallengeRecords($map);
+
+        if (self::$offlineMode) {
+            if ($records) {
+                new Dedimania();
+                return;
+            }
+        }
+
+        if (!$records && self::$offlineMode) {
+            $records = $map->dedis->map(function (Dedi $dedi) {
+                $record = collect();
+                $record->login = $dedi->player->Login;
+                $record->nickname = $dedi->player->NickName;
+                $record->score = $dedi->Score;
+                $record->rank = $dedi->Rank;
+                $record->max_rank = $dedi->player->MaxRank;
+                $record->checkpoints = $dedi->Checkpoints;
+                return $record;
+            });
+        }
 
         if ($records && $records->count() > 0) {
             //Wipe all dedis for current map
@@ -318,5 +347,13 @@ class Dedimania extends DedimaniaApi
         } catch (\Exception $e) {
             Log::error('Could not save ghost: '.$e->getMessage());
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isOfflineMode(): bool
+    {
+        return self::$offlineMode;
     }
 }
