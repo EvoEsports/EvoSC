@@ -11,8 +11,6 @@ Void hidescript_setup(){
     declare orig = HS_Target.RelativePosition_V3;
     declare hidden = orig;
 
-    log(orig);
-
     hidden[0] = 160.0;
 
     if(orig[0] < 0.0){

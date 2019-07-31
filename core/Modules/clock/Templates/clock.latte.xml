@@ -1,6 +1,6 @@
 {contentType text}
 {extends 'components.widget'}
-{php $noHidescript = true;}
+{php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}clock{/block}
@@ -26,20 +26,16 @@
     declare CMlLabel time;
     declare Real originalOpacity;
 
-    Void anim(CMlFrame frame, Text targetPos, Integer duration){
-        AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-    }
-
     Void hidescript_setup(){
         HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
         declare orig = HS_Target.RelativePosition_V3;
         declare hidden = orig;
-        declare multiplier = 1;
+        declare multiplier = 1.0;
 
         hidden[0] = orig[0];
 
         if(orig[0] < 0.0){
-            multiplier = -1;
+            multiplier = -1.0;
         }
 
         hidden[0] += 8 * HS_Target.RelativeScale * multiplier;
@@ -101,8 +97,6 @@
     {block bootScript}
         originalOpacity = bg.Opacity;
         time <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
-        declare Text visiblePos = "<frame pos='{config('clock.pos.visible')|noescape}' />";
-        declare Text hiddenPos = "<frame pos='{config('clock.pos.hidden')|noescape}' />";
 
         declare big <=> (Page.MainFrame.GetFirstChild("big") as CMlQuad);
         declare small <=> (Page.MainFrame.GetFirstChild("small") as CMlQuad);
@@ -125,6 +119,8 @@
 
         small.RelativeRotation = (hours/12.0) * 360;
         big.RelativeRotation = (minutes/60.0) * 360;
+
+        hidescript();
     {/block}
 
     {block pendingEvents}

@@ -5,9 +5,9 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-#Struct UIGrid {
-    CMlFrame[Text][Integer] left;
-    CMlFrame[Text][Integer] right;
+#Struct UIGrid___ {
+    CMlFrame[][Integer] left;
+    CMlFrame[][Integer] right;
 }
 
 {include globals}
@@ -16,7 +16,6 @@ declare CMlFrame widget;
 declare CMlQuad bg;
 declare Boolean left__;
 declare Integer slot__;
-declare Text id__;
 --></script>
 
     <frame pos="0 0" id="widget" size="44 8">
@@ -26,16 +25,20 @@ declare Text id__;
         {include content}
     </frame>
 
-    {if !isset($noHidescript)}
+    {if !isset($customHidescript)}
     {include 'scripts.hide'}
     {/if}
     {include script}
 
     <script><!--
-    Real getColumnHeight__(CMlFrame[Text] column){
+    Real getColumnHeight__(CMlFrame[] column){
         declare maxHeight = 0.0;
 
         foreach(frame in column){
+            if(!frame.Visible){
+                continue;
+            }
+
             declare height = frame.Size[1] * frame.RelativeScale;
 
             if(height > maxHeight){
@@ -46,8 +49,8 @@ declare Text id__;
         return maxHeight;
     }
 
-    Void rearrange__(UIGrid grid){
-        declare CMlFrame[Text][Integer] column;
+    Void rearrange__(UIGrid___ gridd){
+        declare CMlFrame[][Integer] column;
         declare Real gutter = 1.0;
 
         declare width = widget.Size[0] * widget.RelativeScale;
@@ -55,35 +58,27 @@ declare Text id__;
 
         if(left__){
             widget.RelativePosition_V3[0] = 0.0;
-            column = grid.left;
+            column = gridd.left;
         }else{
             widget.RelativePosition_V3[0] = 160.0 - width;
-            column = grid.right;
+            column = gridd.right;
         }
 
-        if(slot__ == 1){
-            widget.RelativePosition_V3[1] = 90.0 - gutter * slot__;
-        }else{
-            declare heights = 0.0;
-            declare count = 1;
+        declare heights = 0.0;
+        declare count = 1;
 
-            for(i, 1, slot__ - 1){
-                if(!column.existskey(i)){
-                    continue;
-                }
-
-                heights += getColumnHeight__(column[i]);
-                count += 1;
-            }
-
-            widget.RelativePosition_V3[1] = 90.0 - heights - (gutter * count);
+        for(i, 0, slot__ - 1){
+            //heights += getColumnHeight__(column[i]);
+            count += 1;
         }
+
+        widget.RelativePosition_V3[1] = 90.0 - slot__*8.0 - (gutter * count) + 9.0;
 
         hidescript_setup();
     }
 
     main() {
-        declare UIGrid grid for This;
+        declare UIGrid___ gridd for This;
         declare Integer LastUiUpdate for This = 0;
         declare Integer lastUiUpdate;
 
@@ -94,21 +89,20 @@ declare Text id__;
 
         widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
-        id__ = "{include id}";
 
         if(left__){
-            if(!grid.left.existskey(slot__)){
-                grid.left[slot__] = CMlFrame[Text];
+            if(!gridd.left.existskey(slot__)){
+                gridd.left[slot__] = CMlFrame[];
             }
-            grid.left[slot__][id__] = widget;
+            gridd.left[slot__].add(widget);
         }else{
-            if(!grid.right.existskey(slot__)){
-                grid.right[slot__] = CMlFrame[Text];
+            if(!gridd.right.existskey(slot__)){
+                gridd.right[slot__] = CMlFrame[];
             }
-            grid.right[slot__][id__] = widget;
+            gridd.right[slot__].add(widget);
         }
 
-        rearrange__(grid);
+        rearrange__(gridd);
         LastUiUpdate = GameTime;
 
         {include bootScript}
@@ -124,11 +118,13 @@ declare Text id__;
 
             {include loop}
 
+            {if !isset($customHidescript)}
             hidescript();
+            {/if}
 
             if(lastUiUpdate != LastUiUpdate){
                 lastUiUpdate = LastUiUpdate;
-                rearrange__(grid);
+                rearrange__(gridd);
             }
         }
     }
