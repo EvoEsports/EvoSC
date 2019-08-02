@@ -2,7 +2,7 @@
   "url"    : "",
   "ui": {
     "position": "right",
-    "slot": 3
+    "slot": 4
   },
   "enabled": false
 }

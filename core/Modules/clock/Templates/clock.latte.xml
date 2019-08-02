@@ -111,7 +111,7 @@
     {/block}
 
     {block loop}
-        timeString = TL::SubString(CurrentLocalDateText, 11, 5);
+        timeString = TL::SubString(System.CurrentLocalDateText, 11, 5);
         time.SetText(timeString);
 
         hours = TL::ToInteger(TL::SubString(timeString, 0, 2));

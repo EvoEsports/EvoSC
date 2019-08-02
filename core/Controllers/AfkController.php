@@ -35,16 +35,17 @@ class AfkController implements ControllerInterface
 
         Hook::add('PlayerConnect', [self::class, 'sendPinger']);
         Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
+        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
 
         ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
 
-        Timer::create('checkPing', [self::class, 'checkPing'], '15s', true);
+        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
     }
 
     /**
      * Add player to the tracker and send pinger
      *
-     * @param \esc\Models\Player $player
+     * @param  \esc\Models\Player  $player
      */
     public static function sendPinger(Player $player)
     {
@@ -54,7 +55,7 @@ class AfkController implements ControllerInterface
     /**
      * Remove players from afk-tracker (when he leaves, or goes spec himself).
      *
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function removePlayerFromTracker(Player $player)
     {
@@ -64,8 +65,8 @@ class AfkController implements ControllerInterface
     /**
      * Handle received ping
      *
-     * @param \esc\Models\Player $player
-     * @param int                $secondsSinceLastInteraction
+     * @param  \esc\Models\Player  $player
+     * @param  int  $secondsSinceLastInteraction
      */
     public static function pingReceived(Player $player, int $secondsSinceLastInteraction)
     {
@@ -73,7 +74,7 @@ class AfkController implements ControllerInterface
 
         if (($secondsSinceLastInteraction / 60) >= config('server.afk-timeout') && !$player->isSpectator()) {
             $message = infoMessage($player, ' was moved to spectators after ',
-                secondary(config('server.afk-timeout') . ' minutes'), ' of inactivity.')->setIcon('');
+                secondary(config('server.afk-timeout').' minutes'), ' of inactivity.')->setIcon('');
 
             if (config('server.echoes.join')) {
                 $message->sendAll();
@@ -83,6 +84,11 @@ class AfkController implements ControllerInterface
 
             Server::forceSpectator($player->Login, 3);
         }
+    }
+
+    public static function interaction(Player $player)
+    {
+        self::$pingTracker->put($player->Login, time());
     }
 
     private static function revivePlayer(Player $player)
@@ -108,7 +114,7 @@ class AfkController implements ControllerInterface
             if ($lastPing <= 0) {
                 $lastPing--;
 
-                if ($lastPing < -2) {
+                if ($lastPing < -20) {
                     self::$pingTracker->put($player->Login, 0);
                     self::revivePlayer($player);
 
@@ -123,8 +129,8 @@ class AfkController implements ControllerInterface
     /**
      * Force a player to spectator-mode.
      *
-     * @param \esc\Models\Player $player
-     * @param \esc\Models\Player $admin
+     * @param  \esc\Models\Player  $player
+     * @param  \esc\Models\Player  $admin
      */
     public static function forceToSpectators(Player $player, Player $admin)
     {

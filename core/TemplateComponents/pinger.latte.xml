@@ -5,6 +5,8 @@ main() {
     declare lastInteraction = GameTime;
     declare lastUpdate = GameTime;
 
+    TriggerPageAction("ping,0");
+
     while(True){
         yield;
 

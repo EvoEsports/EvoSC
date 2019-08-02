@@ -29,6 +29,13 @@
     {block loop}
         if(Map.MapInfo.MapUid != uid){
             widget.Hide();
+
+            if(left__){
+                grid__.left[slot__].visible = False;
+            }else{
+                grid__.right[slot__].visible = False;
+            }
+
             LastUiUpdate = GameTime;
             return;
         }
