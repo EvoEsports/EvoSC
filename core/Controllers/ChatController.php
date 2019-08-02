@@ -48,11 +48,11 @@ class ChatController implements ControllerInterface
                 Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
                 exit(2);
             }
-
-            Hook::add('PlayerChat', [self::class, 'playerChat']);
         } else {
             Server::call('ChatEnableManualRouting', [false, false]);
         }
+
+        Hook::add('PlayerChat', [self::class, 'playerChat']);
 
         AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
         AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
@@ -65,8 +65,8 @@ class ChatController implements ControllerInterface
     /**
      * Mute a player
      *
-     * @param Player $admin
-     * @param Player $target
+     * @param  Player  $admin
+     * @param  Player  $target
      */
     public static function mute(Player $admin, Player $target)
     {
@@ -79,8 +79,8 @@ class ChatController implements ControllerInterface
     /**
      * Unmute a player
      *
-     * @param Player $player
-     * @param Player $target
+     * @param  Player  $player
+     * @param  Player  $target
      */
     public static function unmute(Player $player, Player $target)
     {
@@ -93,7 +93,7 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: mute player.
      *
-     * @param Player             $admin
+     * @param  Player  $admin
      * @param                    $cmd
      * @param                    $nick
      */
@@ -112,7 +112,7 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: unmute player.
      *
-     * @param Player             $player
+     * @param  Player  $player
      * @param                    $cmd
      * @param                    $nick
      */
@@ -137,10 +137,10 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: send pm to a player
      *
-     * @param Player $player
-     * @param string $cmd
-     * @param string $nick
-     * @param mixed  ...$message
+     * @param  Player  $player
+     * @param  string  $cmd
+     * @param  string  $nick
+     * @param  mixed  ...$message
      */
     public static function pm(Player $player, $cmd, $nick, ...$message)
     {
@@ -157,18 +157,18 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        $from = sprintf(secondary('[from:') . $player . secondary('] '));
-        $to = sprintf(secondary('[to:') . $target . secondary('] '));
+        $from = sprintf(secondary('[from:').$player.secondary('] '));
+        $to = sprintf(secondary('[to:').$target.secondary('] '));
 
-        chatMessage($from . implode(' ', $message))->setIcon('')->send($target);
-        chatMessage($to . implode(' ', $message))->setIcon('')->send($player);
+        chatMessage($from.implode(' ', $message))->setIcon('')->send($target);
+        chatMessage($to.implode(' ', $message))->setIcon('')->send($player);
     }
 
     /**
      * Process chat-message and detect commands.
      *
-     * @param Player $player
-     * @param string $text
+     * @param  Player  $player
+     * @param  string  $text
      */
     public static function playerChat(Player $player, $text)
     {
@@ -187,7 +187,12 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        Log::write('[' . $player . '] ' . $text, true);
+        Log::write('['.$player.'] '.$text, true);
+
+        if (!self::$routingEnabled) {
+            return;
+        }
+
         $nick = $player->NickName;
 
         if (preg_match('/([$]+)$/', $text, $matches)) {
@@ -196,7 +201,7 @@ class ChatController implements ControllerInterface
         }
 
         if ($player->isSpectator()) {
-            $nick = '$eee📷 ' . $nick;
+            $nick = '$eee📷 '.$nick;
         }
 
         $prefix = $player->group->chat_prefix;
@@ -204,7 +209,7 @@ class ChatController implements ControllerInterface
         $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
 
         if ($prefix) {
-            $chatText = '$' . $color . $prefix . ' ' . $chatText;
+            $chatText = '$'.$color.$prefix.' '.$chatText;
         }
 
         Server::call('ChatSendServerMessage', [$chatText]);

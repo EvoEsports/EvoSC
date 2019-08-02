@@ -11,12 +11,13 @@ main() {
         foreach(event in RaceEvents){
             if(event.Player.User.Login == LocalUser.Login){
                 lastInteraction = GameTime;
+                break;
             }
         }
 
         declare updateDiff = (GameTime - lastUpdate) / 1000;
 
-        if(updateDiff > 10){
+        if(updateDiff > 90){
             declare diff = (GameTime - lastInteraction) / 1000;
             lastUpdate = GameTime;
             TriggerPageAction("ping," ^ diff);
