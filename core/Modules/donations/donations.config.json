@@ -1,6 +1,6 @@
 {
-  "pos": {
-    "visible": "120 2.5",
-    "hidden": "160 2.5"
+  "ui": {
+    "position": "right",
+    "slot": 7
   }
 }

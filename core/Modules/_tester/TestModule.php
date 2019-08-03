@@ -24,6 +24,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxKarma::showWidget($player);
+        Donations::show($player);
     }
 }
