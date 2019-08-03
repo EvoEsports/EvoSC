@@ -24,5 +24,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
+        LiveRankings::playerConnect($player);
     }
 }

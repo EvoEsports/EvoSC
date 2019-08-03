@@ -23,10 +23,7 @@ declare Boolean left__;
 declare Integer slot__;
 --></script>
 
-    <frame pos="0 0" id="widget" size="44 8">
-        <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
-        <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
-
+    <frame pos="0 0" id="widget" size="{include size}">
         {include content}
     </frame>
 
@@ -59,12 +56,20 @@ declare Integer slot__;
             if(!column.existskey(i)){
                 continue;
             }
+            if(!column[i].visible){
+                continue;
+            }
 
             heights += column[i].height;
             count += 1;
         }
 
-        widget.RelativePosition_V3[1] = 90.0 - heights - (gutter * count);
+        declare newY = 90.0 - heights - (gutter * count);
+        if(widget.RelativePosition_V3[1] != newY){
+            declare posString = widget.RelativePosition_V3[0] ^ " " ^ newY;
+            AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 200, CAnimManager::EAnimManagerEasing::Linear);
+        }
+        sleep(200);
         hidescript_setup();
 
         log(grid__);
@@ -137,7 +142,6 @@ declare Integer slot__;
 
             if(lastUiUpdate != LastUiUpdate){
                 lastUiUpdate = LastUiUpdate;
-                log("move it");
                 rearrange__();
             }
         }
