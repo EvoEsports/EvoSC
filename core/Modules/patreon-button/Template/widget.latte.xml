@@ -1,45 +1,48 @@
 {contentType text}
+{extends 'components.widget-base'}
+{php $slotHorizontal = config('patreon.ui.slot_horizontal')}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:patreon-widget" id="patreon-widget" version="3">
-    <frame pos="{config('patreon.pos.visible')|noescape}" id="widget">
-        <quad id="background" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="0.6" z-index="-1" ScriptEvents="1" />
+<manialink version="3">
+    {block id}patreon-button{/block}
+    {block size}8 10{/block}
 
-        <frame z-index="2">
-            <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/patreon-button/patreon.png" imagefocus="" />
+    {block content}
+    <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" ScriptEvents="1" />
 
-            <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Patreon" textfont="{config('colors.ui.font')|noescape}" />
-        </frame>
+    <frame z-index="2">
+        <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/patreon-button/patreon.png" imagefocus="" />
+
+        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="patreon" textfont="{config('colors.ui.font')|noescape}" />
     </frame>
+    {/block}
 
-    <script>
-        <!--
-        #Include "TextLib" as TL
+    {block script}
+    <script><!--
     --></script>
-
-    {include 'scripts.hide'}
+    {/block}
 
     <script><!--
-        main() {
-            declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-            declare background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
+    {block globals}
+    {/block}
 
-            while(True){
-                yield;
+    {block bootScript}
+        left__ = {config('patreon.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('patreon.ui.slot')};
+    {/block}
 
-                foreach(event in PendingEvents){
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseClick){
                         OpenLink("{config('patreon.url')|noescape}", ::LinkType::ExternalBrowser);
                     }
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOver){
-                        AnimMgr.Add(background, """<quad opacity="0.95" bgcolor="e54" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
+                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="038" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOut){
-                        AnimMgr.Add(background, """<quad opacity="0.75" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
+                        AnimMgr.Add(bg, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
-                }
-
-                hidescript();
-            }
-        }
-    --></script>
+    {/block}
+--></script>
 </manialink>

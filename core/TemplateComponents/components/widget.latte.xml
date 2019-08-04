@@ -8,6 +8,7 @@
 #Struct WidgetRow {
     Real height;
     Boolean visible;
+    Real[Integer] widths;
 }
 
 #Struct WidgetGrid {
@@ -23,7 +24,7 @@ declare Boolean left__;
 declare Integer slot__;
 --></script>
 
-    <frame pos="0 0" id="widget" size="44 8">
+    <frame pos="0 0" id="widget" size="44 8" z-index="10000">
         <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
         <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
 
@@ -37,7 +38,7 @@ declare Integer slot__;
 
     <script><!--
     Void rearrange__(){
-        declare WidgetGrid grid__ for This;
+        declare WidgetGrid grid_ for This;
         declare WidgetRow[Integer] column;
         declare Real gutter = 1.0;
 
@@ -46,10 +47,10 @@ declare Integer slot__;
 
         if(left__){
             widget.RelativePosition_V3[0] = 0.0;
-            column = grid__.left;
+            column = grid_.left;
         }else{
             widget.RelativePosition_V3[0] = 160.0 - width;
-            column = grid__.right;
+            column = grid_.right;
         }
 
         declare heights = 0.0;
@@ -72,7 +73,7 @@ declare Integer slot__;
     }
 
     main() {
-        declare WidgetGrid grid__ for This;
+        declare WidgetGrid grid_ for This;
         declare Integer LastUiUpdate for This = 0;
         declare Integer lastUiUpdate;
 
@@ -87,35 +88,35 @@ declare Integer slot__;
         {include bootScript}
 
         if(left__){
-            if(grid__.left.count == 0){
-                grid__.left = WidgetRow[Integer];
+            if(grid_.left.count == 0){
+                grid_.left = WidgetRow[Integer];
             }
-            if(!grid__.left.existskey(slot__)){
+            if(!grid_.left.existskey(slot__)){
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
-                grid__.left[slot__] = wr;
+                grid_.left[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
-            if(height > grid__.left[slot__].height){
-                grid__.left[slot__].height = height;
+            if(height > grid_.left[slot__].height){
+                grid_.left[slot__].height = height;
             }
-            grid__.left[slot__].visible = True;
+            grid_.left[slot__].visible = True;
         }else{
-            if(grid__.right.count == 0){
-                grid__.right = WidgetRow[Integer];
+            if(grid_.right.count == 0){
+                grid_.right = WidgetRow[Integer];
             }
-            if(!grid__.right.existskey(slot__)){
+            if(!grid_.right.existskey(slot__)){
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
-                grid__.right[slot__] = wr;
+                grid_.right[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
-            if(height > grid__.right[slot__].height){
-                grid__.right[slot__].height = height;
+            if(height > grid_.right[slot__].height){
+                grid_.right[slot__].height = height;
             }
-            grid__.right[slot__].visible = True;
+            grid_.right[slot__].visible = True;
         }
 
         LastUiUpdate = GameTime;

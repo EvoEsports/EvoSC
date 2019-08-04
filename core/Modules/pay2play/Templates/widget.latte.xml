@@ -7,7 +7,6 @@
 
         <frame z-index="2" pos="4 -5" scale="0.5">
             {if esc\Controllers\CountdownController::getAddedSeconds() + esc\Controllers\CountdownController::getOriginalTimeLimit() <= config('pay2play.addtime.time-limit')}
-            <label size="12 3" halign="center" valign="center" textsize="1.2" text="PAY {config('pay2play.addtime.cost')} TO ADD TIME" autonewline="1" textfont="{config('colors.ui.font')|noescape}" />
             {else}
             <label size="12 3" halign="center" valign="center" textsize="1.2" text="TIME LIMIT REACHED" autonewline="1" textfont="{config('colors.ui.font')|noescape}" />
             {/if}

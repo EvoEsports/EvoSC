@@ -31,12 +31,12 @@
             widget.Hide();
 
             if(left__){
-                grid__.left[slot__].visible = False;
+                grid_.left[slot__].visible = False;
             }else{
-                grid__.right[slot__].visible = False;
+                grid_.right[slot__].visible = False;
             }
 
-            LastUiUpdate = GameTime;
+            LastUiUpdate = GameTime + 1;
             return;
         }
     {/block}

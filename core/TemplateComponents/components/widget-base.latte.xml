@@ -8,6 +8,7 @@
 #Struct WidgetRow {
     Real height;
     Boolean visible;
+    Real[Integer] widths;
 }
 
 #Struct WidgetGrid {
@@ -23,7 +24,7 @@ declare Boolean left__;
 declare Integer slot__;
 --></script>
 
-    <frame pos="0 0" id="widget" size="{include size}">
+    <frame pos="0 0" id="widget" size="{include size}" z-index="10000">
         {include content}
     </frame>
 
@@ -34,7 +35,7 @@ declare Integer slot__;
 
     <script><!--
     Void rearrange__(){
-        declare WidgetGrid grid__ for This;
+        declare WidgetGrid grid_ for This;
         declare WidgetRow[Integer] column;
         declare Real gutter = 1.0;
 
@@ -43,13 +44,14 @@ declare Integer slot__;
 
         if(left__){
             widget.RelativePosition_V3[0] = 0.0;
-            column = grid__.left;
+            column = grid_.left;
         }else{
             widget.RelativePosition_V3[0] = 160.0 - width;
-            column = grid__.right;
+            column = grid_.right;
         }
 
         declare heights = 0.0;
+        declare widths = 0.0;
         declare count = 1;
 
         for(i, 1, slot__ - 1){
@@ -64,19 +66,32 @@ declare Integer slot__;
             count += 1;
         }
 
+        {if isset($slotHorizontal)}
+        for(i, 1, {$slotHorizontal}){
+            if(!column[slot__].widths.existskey(i)){
+                continue;
+            }
+            widths += column[slot__].widths[i] + gutter;
+        }
+        declare newX = 160.0 - widths + gutter;
+        {else}
+        declare newX = widget.RelativePosition_V3[0];
+        {/if}
+
         declare newY = 90.0 - heights - (gutter * count);
         if(widget.RelativePosition_V3[1] != newY){
-            declare posString = widget.RelativePosition_V3[0] ^ " " ^ newY;
-            AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 200, CAnimManager::EAnimManagerEasing::Linear);
+            declare posString = newX ^ " " ^ newY;
+            AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
         }
-        sleep(200);
+        sleep(500);
+        if(widget.RelativePosition_V3[0] != newX){
+            widget.RelativePosition_V3[0] = newX;
+        }
         hidescript_setup();
-
-        log(grid__);
     }
 
     main() {
-        declare WidgetGrid grid__ for This;
+        declare WidgetGrid grid_ for This;
         declare Integer LastUiUpdate for This = 0;
         declare Integer lastUiUpdate;
 
@@ -91,35 +106,43 @@ declare Integer slot__;
         {include bootScript}
 
         if(left__){
-            if(grid__.left.count == 0){
-                grid__.left = WidgetRow[Integer];
+            if(grid_.left.count == 0){
+                grid_.left = WidgetRow[Integer];
             }
-            if(!grid__.left.existskey(slot__)){
+            if(!grid_.left.existskey(slot__)){
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
-                grid__.left[slot__] = wr;
+                grid_.left[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
-            if(height > grid__.left[slot__].height){
-                grid__.left[slot__].height = height;
+            if(height > grid_.left[slot__].height){
+                grid_.left[slot__].height = height;
             }
-            grid__.left[slot__].visible = True;
+            grid_.left[slot__].visible = True;
+            {if isset($slotHorizontal)}
+            declare width = widget.Size[0] * widget.RelativeScale;
+            grid_.left[slot__].widths[{$slotHorizontal}] = width;
+            {/if}
         }else{
-            if(grid__.right.count == 0){
-                grid__.right = WidgetRow[Integer];
+            if(grid_.right.count == 0){
+                grid_.right = WidgetRow[Integer];
             }
-            if(!grid__.right.existskey(slot__)){
+            if(!grid_.right.existskey(slot__)){
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
-                grid__.right[slot__] = wr;
+                grid_.right[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
-            if(height > grid__.right[slot__].height){
-                grid__.right[slot__].height = height;
+            if(height > grid_.right[slot__].height){
+                grid_.right[slot__].height = height;
             }
-            grid__.right[slot__].visible = True;
+            grid_.right[slot__].visible = True;
+            {if isset($slotHorizontal)}
+            declare width = widget.Size[0] * widget.RelativeScale;
+            grid_.right[slot__].widths[{$slotHorizontal}] = width;
+            {/if}
         }
 
         LastUiUpdate = GameTime;
