@@ -1,6 +1,11 @@
 {contentType text}
+{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Dedimania" id="Dedimania" version="3">
+<manialink version="3">
+    {block id}dedimania-records{/block}
+    {block size}44 {config('dedimania.rows') * 3 + 6.5}{/block}
+
+    {block content}
     <label id="header-color" textcolor="{config('colors.ui.window.header.color')|noescape}" />
 
     <framemodel id="record">
@@ -27,19 +32,19 @@
         </frame>
     </framemodel>
 
-    <frame id="widget" pos="{config('dedimania.pos')}" scale="{config('dedimania.scale')}" z-index="100">
-        <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
-        <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.25}"/>
-        <quad size="45 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.8"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textcolor="{config('colors.ui.widget.header.text')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <quad class="widget" z-index="-1" size="45 {config('dedimania.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
+    <quad z-index="-2" pos="0 -5" size="45 {config('dedimania.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.25}"/>
+    <quad size="45 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.8"/>
+    <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records" textcolor="{config('colors.ui.widget.header.text')}" textfont="{config('colors.ui.font')}"/>
 
-        <frame id="records" pos="1 -7">
-            {for $i=0; $i<config('dedimania.rows'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
-            {/for}
-        </frame>
+    <frame id="records" pos="1 -7">
+        {for $i=0; $i<config('dedimania.rows'); $i++}
+        <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
+        {/for}
     </frame>
+    {/block}
 
+    {block script}
     <frame id="window" pos="-90 40" hidden="1">
         <quad id="handle" data-id="dedis" size="175 6" z-index="5" />
         <quad size="180 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
@@ -87,38 +92,7 @@
         </frame>
     </frame>
 
-    <frame id="confirm-dialog" pos="-40 9" z-index="10" hidden="1">
-        <quad size="80 18" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-1" />
-        <quad size="80 2" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
-        <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
-
-        <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
-        <label class="cancel" pos="48 -13" z-index="0" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
-    </frame>
-
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    #Struct Record {
-        Integer rank;
-        Integer[] cps;
-        Integer score;
-        Text name;
-        Text login;
-    }
-    --></script>
-
-    {include 'scripts.hide'}
-    {include 'scripts.drag'}
-
-    <script><!--
-
-    declare Integer currentPage;
-    declare Integer maxPage;
-    declare Vec3 headerColor;
-    declare Vec3 primaryColor;
-
     Text[] getOnlinePlayers(){
         declare Text[] onlinePlayers = Text[];
         foreach(player in Players){
@@ -390,8 +364,26 @@
 
         return answer;
     }
+    --></script>
+    {/block}
 
-    main(){
+    <script><!--
+    {block globals}
+    #Struct Record {
+        Integer rank;
+        Integer[] cps;
+        Integer score;
+        Text name;
+        Text login;
+    }
+
+    declare Integer currentPage;
+    declare Integer maxPage;
+    declare Vec3 headerColor;
+    declare Vec3 primaryColor;
+    {/block}
+
+    {block bootScript}
         declare Record[Integer] DediRecords_ for LocalUser;
         declare Integer LastDediRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
@@ -406,12 +398,27 @@
         primaryColor = TL::ToColor("{config('colors.ui.window.text.primary')|noescape}");
         headerColor = TL::ToColor("{config('colors.ui.window.header.color')|noescape}");
 
-        while(True){
-            yield;
+        left__ = {config('dedimania.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('dedimania.ui.slot')};
+    {/block}
 
-            foreach(event in PendingEvents){
-                if(event.Control == Null) continue;
+    {block loop}
+            if(LastDediRecordsUpdate != lastUpdate){
+                //update
+                lastUpdate = LastDediRecordsUpdate;
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
+            }
 
+            if(playerCount != Players.count){
+                sleep(150);
+                playerCount = Players.count;
+                updateWindow(DediRecords_);
+                updateWidget(DediRecords_);
+            }
+    {/block}
+
+    {block pendingEvents}
                 if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
                     window.Show();
                 }
@@ -465,26 +472,6 @@
 
                     updateWindow(DediRecords_);
                 }
-            }
-
-            if(LastDediRecordsUpdate != lastUpdate){
-                //update
-                lastUpdate = LastDediRecordsUpdate;
-                updateWindow(DediRecords_);
-                updateWidget(DediRecords_);
-            }
-
-            if(playerCount != Players.count){
-                sleep(150);
-                playerCount = Players.count;
-                updateWindow(DediRecords_);
-                updateWidget(DediRecords_);
-            }
-
-            hidescript();
-            maniaLinkDrag();
-        }
-    }
-
-    --></script>
+    {/block}
+--></script>
 </manialink>

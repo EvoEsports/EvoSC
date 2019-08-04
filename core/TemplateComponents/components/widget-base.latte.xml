@@ -52,7 +52,7 @@ declare Integer slot__;
         declare height = widget.Size[1] * widget.RelativeScale;
 
         if(left__){
-            widget.RelativePosition_V3[0] = 0.0;
+            widget.RelativePosition_V3[0] = -160.0;
             column = grid_.left;
         }else{
             widget.RelativePosition_V3[0] = 160.0 - width;
@@ -86,7 +86,12 @@ declare Integer slot__;
             widths += column[slot__].widths[i] + gutter;
         }
         widths *= settings.scale;
-        declare newX = 160.0 - widths + gutter;
+        declare newX = 0.0;
+        if(left__){
+            newX = -160.0 + widths + gutter;
+        }else{
+            newX = 160.0 - widths + gutter;
+        }
         {else}
         declare newX = widget.RelativePosition_V3[0];
         {/if}

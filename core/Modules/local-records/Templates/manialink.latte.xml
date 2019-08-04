@@ -1,7 +1,11 @@
 {contentType text}
+{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Locals-Records" id="Locals" version="3">
-    <label id="header-color" textcolor="{config('colors.ui.window.header.color')|noescape}" />
+<manialink version="3">
+    {block id}local-records-widget{/block}
+    {block size}44 {config('locals.rows') * 3 + 6.5}{/block}
+
+    {block content}
     <framemodel id="record">
         <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}"/>
         <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="{config('colors.ui.font')|noescape}"/>
@@ -10,39 +14,20 @@
         <quad pos="-1 -0.2" size="45 3" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
     </framemodel>
 
-    <frame id="widget" pos="{config('locals.pos')}" scale="{config('locals.scale')}" z-index="100">
-        <quad class="widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
-        <quad z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.25}"/>
-        <quad size="45 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.8"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records" textcolor="{config('colors.ui.widget.header.text')}" textfont="{config('colors.ui.font')}"/>
+    <quad class="widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
+    <quad z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.25}"/>
+    <quad size="45 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.8"/>
+    <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records" textcolor="{config('colors.ui.widget.header.text')}" textfont="{config('colors.ui.font')}"/>
 
-        <frame id="records" pos="1 -7">
-            {for $i=0; $i<config('locals.rows'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
-            {/for}
-        </frame>
+    <frame id="records" pos="1 -7">
+        {for $i=0; $i<config('locals.rows'); $i++}
+        <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
+        {/for}
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    #Struct Record {
-        Integer r;
-        Integer s;
-        Text n;
-        Text l;
-    }
---></script>
-
-    {include 'scripts.hide'}
-
-    <script><!--
-
-    declare Integer currentPage;
-    declare Integer maxPage;
-    declare Vec3 headerColor;
-
     Text[] getOnlinePlayers(){
         declare Text[] onlinePlayers = Text[];
         foreach(player in Players){
@@ -173,32 +158,39 @@
             frame.Hide();
         }
     }
+    --></script>
+    {/block}
 
-    main(){
+    <script><!--
+    {block globals}
+    #Struct Record {
+        Integer r;
+        Integer s;
+        Text n;
+        Text l;
+    }
+
+    declare Integer currentPage;
+    declare Integer maxPage;
+    declare Vec3 headerColor;
+    {/block}
+
+    {block bootScript}
         declare Record[] LocalRecords for LocalUser;
         declare Integer LastLocalRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
-
-        declare CMlFrame window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
-        declare CMlFrame currentHoverFrame = Null;
 
         currentPage = 0;
         maxPage = 0;
 
         headerColor = TL::ToColor("{config('colors.ui.window.header.color')|noescape}");
 
-        while(True){
-            yield;
+        left__ = {config('locals.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('locals.ui.slot')};
+    {/block}
 
-            foreach(event in PendingEvents){
-                if(event.Control == Null) continue;
-
-                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    //window.Show();
-                }
-            }
-
+    {block loop}
             if(LastLocalRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastLocalRecordsUpdate;
@@ -210,10 +202,9 @@
                 playerCount = Players.count;
                 updateWidget(LocalRecords);
             }
+    {/block}
 
-            hidescript();
-        }
-    }
-
-    --></script>
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>
