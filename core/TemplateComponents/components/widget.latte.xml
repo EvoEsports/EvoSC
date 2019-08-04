@@ -16,6 +16,12 @@
     WidgetRow[Integer] right;
 }
 
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Real scale;
+}
+
 {include globals}
 
 declare CMlFrame widget;

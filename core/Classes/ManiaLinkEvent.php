@@ -21,6 +21,10 @@ class ManiaLinkEvent
     private static $maniaLinkEvents;
 
     public $id;
+
+    /**
+     * @var callable
+     */
     public $callback;
     public $access;
 
@@ -38,10 +42,10 @@ class ManiaLinkEvent
      * ManiaLinkEvent constructor.
      *
      * @param  string  $id
-     * @param  array  $callback
+     * @param  callable|array  $callback
      * @param  string  $access
      */
-    private function __construct(string $id, array $callback, string $access = null)
+    private function __construct(string $id, $callback, string $access = null)
     {
         $this->id = $id;
         $this->callback = $callback;
@@ -62,10 +66,10 @@ class ManiaLinkEvent
      * Add a manialink event. Callback must be of type [MyClass::class, 'methodToCall'].
      *
      * @param  string  $id
-     * @param  array  $callback
+     * @param  callable|array  $callback
      * @param  string|null  $access
      */
-    public static function add(string $id, array $callback, string $access = null)
+    public static function add(string $id, $callback, string $access = null)
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 

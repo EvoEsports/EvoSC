@@ -28,6 +28,9 @@ Add map?
 ScriptEvents="1" class="confirm"/>
 {/block}
 
+{block globals}
+{/block}
+
 {block bootScript}
     declare commentsLabel <=> (Page.MainFrame.GetFirstChild("comments") as CMlLabel);
     declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);

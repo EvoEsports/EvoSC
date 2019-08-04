@@ -1,10 +1,14 @@
 {contentType text}
-{extends 'components.widget'}
+{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}music-client{/block}
+    {block size}44 8{/block}
 
     {block content}
+        <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+        <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+
         <label pos="40 -3.5" valign="center" halign="center" textsize="2.3" size="6 6" text="♫" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
 
         <frame id="main-frame" z-index="1" pos="0 -0" size="50 10">

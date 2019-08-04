@@ -24,6 +24,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Pay2Play::showWidget($player);
+        UiSettings::mleShowSettingsWindow($player);
     }
 }

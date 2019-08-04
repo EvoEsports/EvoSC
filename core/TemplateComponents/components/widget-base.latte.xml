@@ -16,6 +16,12 @@
     WidgetRow[Integer] right;
 }
 
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Real scale;
+}
+
 {include globals}
 
 declare CMlFrame widget;
@@ -37,7 +43,10 @@ declare Integer slot__;
     Void rearrange__(){
         declare WidgetGrid grid_ for This;
         declare WidgetRow[Integer] column;
-        declare Real gutter = 1.0;
+        declare UISettings settings for This;
+        declare Real gutter = 1.0 * settings.scale;
+
+        widget.RelativeScale = settings.scale;
 
         declare width = widget.Size[0] * widget.RelativeScale;
         declare height = widget.Size[1] * widget.RelativeScale;
@@ -62,17 +71,21 @@ declare Integer slot__;
                 continue;
             }
 
-            heights += column[i].height;
+            heights += column[i].height * settings.scale;
             count += 1;
         }
 
         {if isset($slotHorizontal)}
         for(i, 1, {$slotHorizontal}){
+            if(!column.existskey(slot__)){
+                continue;
+            }
             if(!column[slot__].widths.existskey(i)){
                 continue;
             }
             widths += column[slot__].widths[i] + gutter;
         }
+        widths *= settings.scale;
         declare newX = 160.0 - widths + gutter;
         {else}
         declare newX = widget.RelativePosition_V3[0];

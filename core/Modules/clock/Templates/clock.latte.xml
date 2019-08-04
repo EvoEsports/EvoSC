@@ -1,11 +1,15 @@
 {contentType text}
-{extends 'components.widget'}
+{extends 'components.widget-base'}
 {php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}clock{/block}
+    {block size}44 8{/block}
 
     {block content}
+    <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+    <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+
     <label id="time" pos="34 -4" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s"
            textcolor="{config('colors.ui.widget.text.primary')|noescape}"
            textfont="{config('colors.ui.font')|noescape}"/>
@@ -49,7 +53,8 @@
             hidescript_setup();
         }
 
-        declare hideSpeed for LocalUser = 10;
+        declare UISettings settings for This;
+        declare hideSpeed = settings.speed;
 
         if(hideSpeed == -1 || InputPlayer == Null){
             return;

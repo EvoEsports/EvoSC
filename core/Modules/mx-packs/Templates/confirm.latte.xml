@@ -34,6 +34,9 @@ ScriptEvents="1" class="confirm"/>
 {/foreach}
 {/block}
 
+{block globals}
+{/block}
+
 {block pendingEvents}
 if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::MouseClick){
     window.Hide();

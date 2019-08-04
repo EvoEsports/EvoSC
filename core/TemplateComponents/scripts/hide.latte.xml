@@ -1,6 +1,5 @@
 {contentType text}
 <script><!--
-
 declare Text HS_Pos_Visible;
 declare Text HS_Pos_Hidden;
 declare CMlFrame HS_Target;
@@ -27,7 +26,8 @@ Void hidescript(){
         hidescript_setup();
     }
 
-    declare hideSpeed for LocalUser = 10;
+    declare UISettings settings for This;
+    declare hideSpeed = settings.speed;
 
     if(hideSpeed == -1 || InputPlayer == Null){
         return;
