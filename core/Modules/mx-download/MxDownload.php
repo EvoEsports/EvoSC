@@ -35,18 +35,18 @@ class MxDownload
     }
 
     /**
-     * @param  \esc\Models\Player  $player
-     * @param                    $cmd
+     * @param  Player  $player
+     * @param $cmd
      * @param  string  ...$arguments
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Throwable
      */
     public static function showAddMapInfo(Player $player, $cmd, string ...$arguments)
     {
         foreach ($arguments as $mxId) {
             try {
                 $details = self::loadMxDetails($mxId);
+                //168063
+                //dd(Template::toString('mx-download.add-map-info', compact('details')));
+
 
                 Template::show($player, 'mx-download.add-map-info', compact('details'));
             } catch (\Exception $e) {
@@ -156,6 +156,8 @@ class MxDownload
 
     public static function parseBB(string $bbEncoded): string
     {
+        $bbEncoded = str_replace('"', "'", $bbEncoded);
+
         //bbcode
         $bbEncoded = preg_replace('/\[b\](.+?)\[\/b\]/', '$o$1$z', $bbEncoded);
         $bbEncoded = preg_replace('/\[url=(.+?)\](.+?)\[\/url\]/', '$l[$1]$2', $bbEncoded);

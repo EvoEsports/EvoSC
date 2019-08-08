@@ -30,34 +30,44 @@ class ChatCommand
     /**
      * ChatCommand constructor.
      *
-     * @param string      $command
+     * @param  string  $command
      * @param             $callback
-     * @param string      $description
-     * @param string|null $access
-     * @param bool        $hidden
+     * @param  string  $description
+     * @param  string|null  $access
+     * @param  bool  $hidden
      */
-    public function __construct(string $command, $callback, string $description = '', string $access = null, bool $hidden = false)
-    {
-        $this->command     = $command;
-        $this->callback    = $callback;
+    public function __construct(
+        string $command,
+        $callback,
+        string $description = '',
+        string $access = null,
+        bool $hidden = false
+    ) {
+        $this->command = $command;
+        $this->callback = $callback;
         $this->description = $description;
-        $this->access      = $access;
-        $this->hidden      = $hidden;
+        $this->access = $access;
+        $this->hidden = $hidden;
     }
 
     /**
      * Add chat-command
      *
-     * @param string      $command
-     * @param             $callback
-     * @param string      $description
-     * @param string|null $access
-     * @param bool        $hidden
+     * @param  string  $command
+     * @param  callable  $callback
+     * @param  string  $description
+     * @param  string|null  $access
+     * @param  bool  $hidden
      *
      * @return \esc\Classes\ChatCommand
      */
-    public static function add(string $command, $callback, string $description = '-', string $access = null, bool $hidden = false): ChatCommand
-    {
+    public static function add(
+        string $command,
+        $callback,
+        string $description = '-',
+        string $access = null,
+        bool $hidden = false
+    ): ChatCommand {
         if (!self::$commands) {
             self::$commands = collect();
         }
@@ -77,7 +87,7 @@ class ChatCommand
     /**
      * Add chat-command alias (chainable)
      *
-     * @param string $alias
+     * @param  string  $alias
      *
      * @return \esc\Classes\ChatCommand
      */
@@ -92,7 +102,7 @@ class ChatCommand
     /**
      * Checks if a command already exists.
      *
-     * @param string $command
+     * @param  string  $command
      *
      * @return bool
      */
@@ -104,7 +114,7 @@ class ChatCommand
     /**
      * Gets the command-object by the chat-command
      *
-     * @param string $command
+     * @param  string  $command
      *
      * @return \esc\Classes\ChatCommand
      */
@@ -126,8 +136,8 @@ class ChatCommand
     /**
      * Method is called when a chat-command is detected by {@see ChatController::playerChat()}
      *
-     * @param \esc\Models\Player $player
-     * @param string             $text
+     * @param  \esc\Models\Player  $player
+     * @param  string  $text
      */
     public function execute(Player $player, string $text)
     {
@@ -141,7 +151,7 @@ class ChatCommand
         if (preg_match_all('/\"(.+?)\"/', $text, $matches)) {
             foreach ($matches[1] as $match) {
                 //Replace all spaces in quotes to ;:§;
-                $new  = str_replace(' ', ';:§;', $match);
+                $new = str_replace(' ', ';:§;', $match);
                 $text = str_replace("\"$match\"", $new, $text);
             }
         }
@@ -161,7 +171,8 @@ class ChatCommand
             $callback = $this->callback;
             $callback(...$arguments);
         } else {
-            Log::write(sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)), isVeryVerbose());
+            Log::write(sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)),
+                isVeryVerbose());
             call_user_func_array($this->callback, $arguments);
         }
     }

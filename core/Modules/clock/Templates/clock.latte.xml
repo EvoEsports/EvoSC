@@ -30,27 +30,23 @@
     declare CMlLabel time;
     declare Real originalOpacity;
 
-    Void hidescript_setup(){
-        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
-        declare orig = HS_Target.RelativePosition_V3;
-        declare hidden = orig;
-        declare multiplier = 1.0;
+    Void hide(){
+        HS_Hidden = True;
+        AnimMgr.Add(widget, "<frame pos='" ^ (HS_POS[0]+8.0) ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
 
-        hidden[0] = orig[0];
-
-        if(orig[0] < 0.0){
-            multiplier = -1.0;
-        }
-
-        hidden[0] += 8 * HS_Target.RelativeScale * multiplier;
-
-        HS_Pos_Visible = "<frame pos='" ^ orig[0] ^ " " ^ orig[1] ^ "' />";
-        HS_Pos_Hidden = "<frame pos='" ^ hidden[0] ^ " " ^ hidden[1] ^ "' />";
+    Void show(){
+        HS_Hidden = False;
+        AnimMgr.Add(widget, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
     Void hidescript(){
         if(HS_Target == Null){
-            hidescript_setup();
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
         }
 
         declare UISettings settings for This;
@@ -60,32 +56,24 @@
             return;
         }
 
-        declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
         declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
-        declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
 
         if(mapFinished){
             if(!HS_Hidden){
-                HS_Hidden = True;
-                AnimMgr.Add(widget, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                hide();
             }
         }else{
+            declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+            declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
+
             if(overHidespeed && playerIsRacing && !HS_Hidden){
-                HS_Hidden = True;
-                AnimMgr.Add(widget, HS_Pos_Hidden, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                hide();
                 {if !isset($doNotPause)}
                 wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
                 {/if}
             }
             if((!overHidespeed || !playerIsRacing) && HS_Hidden){
-                HS_Hidden = False;
-                AnimMgr.Add(widget, HS_Pos_Visible, 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-                AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                show();
             }
         }
     }--></script>
@@ -93,8 +81,7 @@
 
 <script><!--
     {block globals}
-        declare Text HS_Pos_Visible;
-        declare Text HS_Pos_Hidden;
+        declare Vec2 HS_POS;
         declare CMlFrame HS_Target;
         declare Boolean HS_Hidden;
     {/block}

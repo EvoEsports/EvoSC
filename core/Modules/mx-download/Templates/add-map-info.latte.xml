@@ -24,8 +24,7 @@ Add map?
     <label id="comments" pos="0 -24" size="115 20" text="{\esc\Modules\MxDownload::parseBB($details->Comments)}" textsize="0.5" autonewline="1" textcolor="{config('colors.ui.window.text.primary')}" textfont=""/>
 </frame>
 
-<label pos="105 -3" size="20 5" text=" Add" textsize="0.75" valign="center" halign="center" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"
-ScriptEvents="1" class="confirm"/>
+<label pos="105 -3" size="20 5" text=" Add" textsize="0.75" valign="center" halign="center" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c" ScriptEvents="1" class="confirm"/>
 {/block}
 
 {block globals}

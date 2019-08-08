@@ -97,6 +97,7 @@ declare Integer slot__;
         {/if}
 
         declare newY = 90.0 - heights - (gutter * count);
+        HS_POS = <newX, newY>;
         if(widget.RelativePosition_V3[1] != newY){
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
@@ -105,7 +106,6 @@ declare Integer slot__;
         if(widget.RelativePosition_V3[0] != newX){
             widget.RelativePosition_V3[0] = newX;
         }
-        hidescript_setup();
     }
 
     main() {
