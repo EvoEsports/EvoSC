@@ -44,9 +44,14 @@ declare Integer slot__;
         declare WidgetGrid grid_ for This;
         declare WidgetRow[Integer] column;
         declare UISettings settings for This;
-        declare Real gutter = 1.0 * settings.scale;
+        declare Real scale = settings.scale;
 
-        widget.RelativeScale = settings.scale;
+        if(scale < 0.1){
+            scale = 1.0;
+        }
+
+        declare Real gutter = 1.0 * scale;
+        widget.RelativeScale = scale;
 
         declare width = widget.Size[0] * widget.RelativeScale;
         declare height = widget.Size[1] * widget.RelativeScale;
@@ -71,7 +76,7 @@ declare Integer slot__;
                 continue;
             }
 
-            heights += column[i].height * settings.scale;
+            heights += column[i].height * scale;
             count += 1;
         }
 
@@ -85,7 +90,7 @@ declare Integer slot__;
             }
             widths += column[slot__].widths[i] + gutter;
         }
-        widths *= settings.scale;
+        widths *= scale;
         declare newX = 0.0;
         if(left__){
             newX = -160.0 + widths + gutter;
