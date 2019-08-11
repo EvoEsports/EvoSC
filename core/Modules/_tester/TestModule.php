@@ -25,6 +25,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        LocalRecords::showLocalsTable($player);
+        Dedimania::showDedisTable($player);
     }
 }

@@ -7,6 +7,7 @@ use esc\Classes\Database;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
@@ -55,10 +56,10 @@ class Dedimania extends DedimaniaApi
                 if (!DedimaniaApi::openSession()) {
                     //Failed to start session
                     self::$offlineMode = true;
-                }else{
+                } else {
                     Log::write('Started. Session last updated: '.self::getSessionLastUpdated());
                 }
-            }else{
+            } else {
                 Log::write('Started. Session last updated: '.self::getSessionLastUpdated());
             }
         }
@@ -79,6 +80,8 @@ class Dedimania extends DedimaniaApi
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
+
+        ManiaLinkEvent::add('dedis.show', [self::class, 'showDedisTable']);
     }
 
     public static function reportConnectedPlayers()
@@ -130,6 +133,13 @@ class Dedimania extends DedimaniaApi
 
         Template::show($player, 'dedimania-records.update', compact('dedisJson'));
         Template::show($player, 'dedimania-records.manialink');
+    }
+
+    public static function showDedisTable(Player $player)
+    {
+        $records = MapController::getCurrentMap()->dedis()->orderBy('Score')->get();
+
+        RecordsTable::show($player, $records, 'Dedimania Records');
     }
 
     public static function sendUpdatedDedis()
