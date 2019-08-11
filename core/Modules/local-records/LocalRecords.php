@@ -205,7 +205,7 @@ class LocalRecords implements ModuleInterface
         $playerIds = $locals->pluck('Player');
         $players = Player::whereIn('id', $playerIds)->get()->keyBy('id');
 
-        return $locals->sortBy('Rank')->map(function (LocalRecord $local) use ($players) {
+        return $locals->sortBy('Rank')->transform(function (LocalRecord $local) use ($players) {
             return [
                 'r' => $local->Rank,
                 's' => $local->Score,
@@ -223,7 +223,7 @@ class LocalRecords implements ModuleInterface
      */
     private static function incrementRanksAboveScore(Map $map, int $score)
     {
-        self::$records->where('Score', '>', $score)->map(function (LocalRecord $record) {
+        self::$records->where('Score', '>', $score)->transform(function (LocalRecord $record) {
             $record->Rank++;
             return $record;
         });

@@ -164,7 +164,7 @@ class MatchSettingsManager
 
     public static function getMatchsettings()
     {
-        $files = File::getDirectoryContents(self::$path, '/\.txt$/')->map(function (String $file) {
+        $files = File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (String $file) {
             return preg_replace('/\.txt$/', '', $file);
         });
 

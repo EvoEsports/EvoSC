@@ -65,7 +65,7 @@ class ServerHopper
 
     public static function updateServerInformation()
     {
-        self::$servers = self::$servers->map(function ($server) {
+        self::$servers->transform(function ($server) {
             try {
                 $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 100, $server->rpc->login, $server->rpc->pw);
                 $server->online      = true;

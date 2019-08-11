@@ -48,7 +48,7 @@ function buildClassMap()
 
 function getNameSpaces(\Illuminate\Support\Collection $classFiles)
 {
-    $classFiles = $classFiles->map(function (\Illuminate\Support\Collection $classFile) {
+    $classFiles = $classFiles->transform(function (\Illuminate\Support\Collection $classFile) {
         $contents = file_get_contents($classFile->file);
 
         if (preg_match('/namespace (.+)?;/i', $contents, $matches)) {

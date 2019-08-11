@@ -165,7 +165,7 @@ class Dedimania extends DedimaniaApi
         }
 
         if (!$records && self::$offlineMode) {
-            $records = $map->dedis->map(function (Dedi $dedi) {
+            $records = $map->dedis->transform(function (Dedi $dedi) {
                 $record = collect();
                 $record->login = $dedi->player->Login;
                 $record->nickname = $dedi->player->NickName;
@@ -181,7 +181,7 @@ class Dedimania extends DedimaniaApi
             //Wipe all dedis for current map
             $map->dedis()->where('New', '=', 0)->delete();
 
-            $insert = $records->map(function ($record) use ($map) {
+            $insert = $records->transform(function ($record) use ($map) {
                 $player = Player::updateOrCreate(['Login' => $record->login], [
                     'MaxRank' => $record->max_rank,
                 ]);
@@ -215,7 +215,7 @@ class Dedimania extends DedimaniaApi
     {
         self::$dedisJson = self::$dedis->map(function (Dedi $dedi) {
             $checkpoints = collect(explode(',', $dedi->Checkpoints));
-            $checkpoints = $checkpoints->map(function ($time) {
+            $checkpoints = $checkpoints->transform(function ($time) {
                 return intval($time);
             });
 

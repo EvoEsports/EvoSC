@@ -141,7 +141,7 @@ class MapList
         //max length ~65762
         //length 60088 is ok
 
-        return Map::whereEnabled(1)->get()->map(function (Map $map) {
+        return Map::whereEnabled(1)->get()->transform(function (Map $map) {
             if (!$map->id || !$map->gbx->MapUid) {
                 return null;
             }
@@ -159,7 +159,7 @@ class MapList
 
     private static function getMapAuthors($authorIds): Collection
     {
-        return Player::whereIn('id', $authorIds)->get()->map(function (Player $player) {
+        return Player::whereIn('id', $authorIds)->get()->transform(function (Player $player) {
             return [
                 'nick'  => $player->NickName,
                 'login' => $player->Login,
