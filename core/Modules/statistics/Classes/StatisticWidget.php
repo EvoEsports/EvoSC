@@ -38,7 +38,7 @@ class StatisticWidget
 
         if ($function) {
             //Execute function on values
-            $this->records = $this->records->map($function);
+            $this->records = $this->records->transform($function);
         }
 
         $this->prefix   = $prefix;

@@ -8,6 +8,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
+use Exception;
 use Illuminate\Support\Collection;
 use Latte\Engine;
 use Latte\Loaders\StringLoader;
@@ -36,7 +37,7 @@ class TemplateController implements ControllerInterface
      */
     public static function init()
     {
-        Log::logAddLine('TemplateController', 'Starting...');
+        Log::write('Starting...');
 
         ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
 
@@ -61,7 +62,7 @@ class TemplateController implements ControllerInterface
     /**
      * Get all loaded templates.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getTemplates(): Collection
     {
@@ -80,23 +81,19 @@ class TemplateController implements ControllerInterface
     {
         try {
             if (isVerbose()) {
-                Log::logAddLine('TemplateController', 'Rendering Template: ' . $index);
+                Log::write('Rendering Template: ' . $index);
             }
 
             return self::$latte->renderToString($index, $values);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             //Build parameter string
             $parameters = [];
             foreach ($values as $key => $value) {
-                if (is_array($value)) {
-                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . implode(', ', $value) . "</>");
-                } else {
-                    array_push($parameters, "<options=bold>$key:</> <fg=yellow>$value</>");
-                }
+                array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . json_encode($value, JSON_PRETTY_PRINT) . "</>");
             }
             $vals = implode(', ', $parameters);
 
-            Log::logAddLine('Template:' . $index, 'Failed to render template: ' . $index . " [$vals]");
+            Log::write('Failed to render template: ' . $index . " [$vals]");
             var_dump($e->getTraceAsString());
         }
 
@@ -110,7 +107,7 @@ class TemplateController implements ControllerInterface
      */
     public static function loadTemplates($args = null)
     {
-        Log::logAddLine('TemplateController', 'Loading templates...');
+        Log::write('Loading templates...');
 
         self::$templates = collect();
         self::$latte     = new Engine();

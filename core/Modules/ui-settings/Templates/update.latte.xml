@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-ui-settings" id="update-ui-settings" version="3">
+    <script><!--
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Real scale;
+}
+
+main() {
+        declare UISettings settings for This;
+        declare Integer LastUiUpdate for This;
+
+        {if isset($settings)}
+        settings.fromjson("""{$settings|noescape}""");
+        LastUiUpdate = GameTime + 2;
+        {/if}
+}
+--></script>
+</manialink>

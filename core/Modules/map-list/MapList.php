@@ -19,10 +19,10 @@ class MapList
 {
     public function __construct()
     {
-        ManiaLinkEvent::add('maplist.disable', [MapList::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [MapList::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [MapList::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [MapList::class, 'favRemove']);
+        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
+        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
 
         Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
         Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
@@ -125,12 +125,12 @@ class MapList
 
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
-                'maps'       => $maps->toJson(),
+                'maps'       => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         } else {
             Template::showAll('map-list.update-map-list', [
-                'maps'       => $maps->toJson(),
+                'maps'       => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         }
@@ -141,14 +141,14 @@ class MapList
         //max length ~65762
         //length 60088 is ok
 
-        return Map::whereEnabled(1)->get()->map(function (Map $map) {
+        return Map::whereEnabled(1)->get()->transform(function (Map $map) {
             if (!$map->id || !$map->gbx->MapUid) {
                 return null;
             }
 
             return [
                 'id'   => (string)$map->id,
-                'name' => $map->gbx->Name,
+                'name' => $map->name,
                 'a'    => $map->author->id,
                 'r'    => sprintf('%.1f', $map->average_rating),
                 'uid'  => $map->gbx->MapUid,
@@ -159,7 +159,7 @@ class MapList
 
     private static function getMapAuthors($authorIds): Collection
     {
-        return Player::whereIn('id', $authorIds)->get()->map(function (Player $player) {
+        return Player::whereIn('id', $authorIds)->get()->transform(function (Player $player) {
             return [
                 'nick'  => $player->NickName,
                 'login' => $player->Login,
@@ -213,6 +213,6 @@ class MapList
         self::sendUpdatedMaplist($player);
         $favorites      = self::getMapFavoritesJson($player);
         $ignoreCooldown = $player->hasAccess('queue.recent');
-        Template::show($player, 'map-list.manialink', compact('favorites', 'ignoreCooldown'));
+        Template::show($player, 'map-list.map-list', compact('favorites', 'ignoreCooldown'));
     }
 }

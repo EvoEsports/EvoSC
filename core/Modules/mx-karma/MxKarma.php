@@ -94,8 +94,8 @@ class MxKarma extends MXK
             return;
         }
 
-        Log::logAddLine('MxKarma', $ratings->count() . ' new map ratings:', isVerbose());
-        Log::logAddLine('MxKarma', $ratings->toJson(), isVeryVerbose());
+        Log::write($ratings->count() . ' new map ratings:', isVerbose());
+        Log::write($ratings->toJson(), isVeryVerbose());
 
         $votes = $ratings->map(function (Karma $rating) {
             return [
@@ -290,8 +290,8 @@ class MxKarma extends MXK
                     'gamemode'  => self::getGameMode(),
                     'titleid'   => Server::getVersion()->titleId,
                     'mapuid'    => $map->uid,
-                    'mapname'   => $map->gbx->Name,
-                    'mapauthor' => $map->gbx->AuthorLogin,
+                    'mapname'   => $map->name,
+                    'mapauthor' => $map->author->Login,
                     'isimport'  => 'false',
                     'maptime'   => CountdownController::getOriginalTimeLimit(),
                     'votes'     => $votes,
@@ -325,8 +325,8 @@ class MxKarma extends MXK
 
         //Check if method was executed properly
         if (!$mxResponse->success) {
-            Log::logAddLine('MxKarma', sprintf('%s->%s failed', $requestMethod, $function), isVerbose());
-            Log::logAddLine('MxKarma', $responseBody, isVeryVerbose());
+            Log::write(sprintf('%s->%s failed', $requestMethod, $function), isVerbose());
+            Log::write($responseBody, isVeryVerbose());
 
             return null;
         }

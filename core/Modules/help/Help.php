@@ -5,15 +5,18 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Help
+class Help implements ModuleInterface
 {
     public function __construct()
     {
-        ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
+        self::start('TimeAttack');
 
         ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
+        ManiaLinkEvent::add('help.show_cmds', [Help::class, 'showCommandsHelp']);
+        ManiaLinkEvent::add('help.show_about', [Help::class, 'showAbout']);
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Help', 'help');
@@ -37,6 +40,26 @@ class Help
             ];
         })->sortBy('access')->values()->toJson();
 
-        Template::show($player, 'help.window', compact('commands'));
+        Template::show($player, 'help.cmds', compact('commands'));
+    }
+
+    public static function showAbout(Player $player)
+    {
+        Template::show($player, 'help.about');
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
+        ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
+        ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
+
+        switch ($mode){
+            case 'TimeAttack':
+        }
     }
 }

@@ -1,73 +1,48 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $slotHorizontal = config('discord.ui.slot_horizontal')}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:discord-widget" id="discord-widget" version="3">
-    <frame pos="{config('discord.pos.visible')|noescape}" id="widget">
-        <quad id="background" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" ScriptEvents="1" />
+<manialink version="3">
+    {block id}discord-button{/block}
+    {block size}8 10{/block}
 
-        <frame z-index="2">
-            <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/discord/discord.png" imagefocus="" />
+    {block content}
+    <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" ScriptEvents="1" />
 
-            <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Discord" textfont="{config('colors.ui.font')|noescape}" />
-        </frame>
+    <frame z-index="2">
+        <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/discord/discord.png" imagefocus="" />
+
+        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Discord" textfont="{config('colors.ui.font')|noescape}" />
     </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    --></script>
+    {/block}
 
     <script><!--
-        #Include "TextLib" as TextLib
+    {block globals}
+    {/block}
 
-        Void anim(CMlFrame frame, Text targetPos, Integer duration){
-            AnimMgr.Add(frame, targetPos, duration, CAnimManager::EAnimManagerEasing::ExpInOut);
-        }
+    {block bootScript}
+        left__ = {config('discord.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('discord.ui.slot')};
+    {/block}
 
-        main() {
-            declare Text visiblePos = "<frame pos='{config('discord.pos.visible')|noescape}' />";
-            declare Text hiddenPos = "<frame pos='{config('discord.pos.hidden')|noescape}' />";
-            declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-            declare background <=> (Page.MainFrame.GetFirstChild("background") as CMlQuad);
-            declare Boolean hidden = False;
-            declare Integer duration = 800;
-            declare Real speed = 0.0;
+    {block loop}
+    {/block}
 
-            while(True){
-                yield;
-
-                foreach(event in PendingEvents){
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseClick){
+    {block pendingEvents}
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseClick){
                         OpenLink("{config('discord.url')|noescape}", ::LinkType::ExternalBrowser);
                     }
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOver){
-                        AnimMgr.Add(background, """<quad opacity="0.95" bgcolor="78d" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
+                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="038" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
-                    if(event.Control == background && event.Type == CMlScriptEvent::Type::MouseOut){
-                        AnimMgr.Add(background, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                    if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
+                        AnimMgr.Add(bg, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
-                }
-
-                if(InputPlayer != Null){
-                    declare Real UI_Hide_Speed for InputPlayer = 1.0;
-
-                    speed = InputPlayer.Speed;
-
-                    if(speed < 0){
-                        speed = speed  * -1;
-                    }
-
-                    if(!Map.TMObjective_IsLapRace && InputPlayer.CurrentNbLaps >= 1 || UI_Hide_Speed == 0.0){
-                        if(speed < UI_Hide_Speed && hidden){
-                            anim(widget, visiblePos, duration);
-                            hidden = False;
-                        }
-                    }else{
-                        if(speed >= UI_Hide_Speed && !hidden){
-                            anim(widget, hiddenPos, duration);
-                            hidden = True;
-                        }
-
-                        if(speed < UI_Hide_Speed && hidden){
-                            anim(widget, visiblePos, duration);
-                            hidden = False;
-                        }
-                    }
-                }
-            }
-        }
-    --></script>
+    {/block}
+--></script>
 </manialink>

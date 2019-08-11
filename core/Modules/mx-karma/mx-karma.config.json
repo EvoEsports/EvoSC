@@ -2,5 +2,9 @@
   "key": "",
   "enabled": false,
   "pos": "120 13.25",
-  "scale": 0.8
+  "scale": 0.8,
+  "ui": {
+    "position": "right",
+    "slot": 6
+  }
 }

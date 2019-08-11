@@ -19,7 +19,7 @@ class QuickButtons
         Hook::add('GroupChanged', [self::class, 'showButtons']);
     }
 
-    public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = '')
+    public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = "")
     {
         if (!self::$buttons) {
             self::$buttons = collect();
@@ -44,7 +44,7 @@ class QuickButtons
 
             //Only get buttons the player has access to
             return $player->hasAccess($button->access);
-        })->map(function ($button) {
+        })->transform(function ($button) {
             //convert into maniascript format
             return sprintf('["%s", "%s", "%s"]', $button->icon, $button->text, $button->action);
         })->implode(',');

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist>
+    <gameinfos>
+        <game_mode>0</game_mode>
+        <chat_time>10000</chat_time>
+        <finishtimeout>1</finishtimeout>
+        <allwarmupduration>0</allwarmupduration>
+        <disablerespawn>0</disablerespawn>
+        <forceshowallopponents>0</forceshowallopponents>
+        <script_name><![CDATA[TimeAttack.Script.txt]]></script_name>
+    </gameinfos>
+    <filter>
+        <is_lan>1</is_lan>
+        <is_internet>1</is_internet>
+        <is_solo>0</is_solo>
+        <is_hotseat>0</is_hotseat>
+        <sort_index>1000</sort_index>
+        <random_map_order>0</random_map_order>
+    </filter>
+    <script_settings>
+        <setting name="S_ChatTime" type="integer" value="10"/>
+        <setting name="S_UseClublinks" type="boolean" value="0"/>
+        <setting name="S_UseClublinksSponsors" type="boolean" value="0"/>
+        <setting name="S_NeutralEmblemUrl" type="text" value=""/>
+        <setting name="S_ScriptEnvironment" type="text" value="production"/>
+        <setting name="S_AllowRespawn" type="boolean" value="1"/>
+        <setting name="S_UseLegacyXmlRpcCallbacks" type="boolean" value="1"/>
+        <setting name="S_WarmUpNb" type="integer" value="0"/>
+        <setting name="S_WarmUpDuration" type="integer" value="0"/>
+        <setting name="S_TimeLimit" type="integer" value="300"/>
+    </script_settings>
+    <startindex>0</startindex>
+</playlist>

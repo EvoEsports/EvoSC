@@ -1,37 +1,47 @@
 {
   "Visits": {
-    "pos"  : "-115 89",
+    "pos": "-115 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "Playtime": {
-    "pos"  : "-76 89",
+    "pos": "-76 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "Finishes": {
-    "pos"  : "-37 89",
+    "pos": "-37 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "Wins": {
-    "pos"  : "2 89",
+    "pos": "2 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "Rank": {
-    "pos"  : "41 89",
+    "pos": "41 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "Donations": {
-    "pos"  : "80 89",
+    "pos": "80 89",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
   },
   "RoundAvg": {
-    "pos"  : "-115 63.68",
+    "pos": "-115 63.68",
     "scale": 0.76,
-    "show" : 6
+    "show": 6
+  },
+  "LeastRecentlyPlayed": {
+    "pos": "41 63.68",
+    "scale": 0.76,
+    "show": 6
+  },
+  "PopularMaps": {
+    "pos": "80 63.68",
+    "scale": 0.76,
+    "show": 6
   }
 }

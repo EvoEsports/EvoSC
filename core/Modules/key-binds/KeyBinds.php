@@ -27,7 +27,7 @@ class KeyBinds
         ManiaLinkEvent::add('bound_key_pressed', [self::class, 'keyPressed']);
         ManiaLinkEvent::add('update_keybinds', [self::class, 'sendScript']);
 
-        QuickButtons::addButton('', 'Keyboard Setup', 'show_key_bind_settings');
+        QuickButtons::addButton('', 'Keyboard Setup', 'show_key_bind_settings');
     }
 
     public static function showSettings(Player $player)
@@ -87,7 +87,8 @@ class KeyBinds
                 $func($player);
             } else {
                 if (is_callable($bind['callback'], false, $callableName)) {
-                    Log::logAddLine('KeyBinds', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1], isVeryVerbose());
+                    Log::write('KeyBinds', "Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
+                        isVeryVerbose());
                     call_user_func($bind['callback'], $player);
                 } else {
                     throw new \Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
@@ -108,7 +109,8 @@ class KeyBinds
                 return null;
             }
 
-            return sprintf('["id"=>"%s","description"=>"%s","default"=>"%s"]', $bind['id'], $bind['description'], strtolower($bind['default']));
+            return sprintf('["id"=>"%s","description"=>"%s","default"=>"%s"]', $bind['id'], $bind['description'],
+                strtolower($bind['default']));
         })->filter()->implode(',');
 
         $binds = "[$binds]";

@@ -3,45 +3,115 @@
 namespace esc\Models;
 
 
+use esc\Classes\Cache;
+use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use stdClass;
 
+/**
+ * Class Map
+ *
+ * @package esc\Models
+ *
+ * @property string $uid
+ * @property string $filename
+ * @property string $author
+ * @property boolean $enabled
+ * @property string $last_played
+ * @property string $mx_details
+ * @property string $mx_world_record
+ * @property int $cooldown
+ * @property int $plays
+ * @property string $name
+ * @property string $environment
+ * @property string $title_id
+ *
+ */
 class Map extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'maps';
 
-    protected $fillable = ['uid', 'filename', 'plays', 'author', 'last_played', 'enabled', 'mx_details', 'mx_world_record', 'gbx', 'cooldown'];
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'uid',
+        'filename',
+        'plays',
+        'author',
+        'last_played',
+        'enabled',
+        'mx_details',
+        'mx_world_record',
+        'cooldown',
+        'name',
+        'environment',
+        'title_id',
+    ];
 
+    /**
+     * @var array
+     */
     protected $dates = ['last_played'];
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @return HasMany
+     */
     public function locals()
     {
         return $this->hasMany(LocalRecord::class, 'Map');
     }
 
+    /**
+     * @return HasMany
+     */
     public function dedis()
     {
         return $this->hasMany(Dedi::class, 'Map');
     }
 
+    /**
+     * @return HasOne
+     */
     public function author()
     {
         return $this->hasOne(Player::class, 'id', 'author');
     }
 
+    /**
+     * @param $playerId
+     *
+     * @return mixed
+     */
     public function getAuthorAttribute($playerId)
     {
         return Player::whereId($playerId)->first();
     }
 
+    /**
+     * @return HasMany
+     */
     public function ratings()
     {
         return $this->hasMany(Karma::class, 'Map', 'id');
     }
 
+    /**
+     * @return mixed
+     */
     public function getAverageRatingAttribute()
     {
         $mxDetails = $this->mx_details;
@@ -53,11 +123,11 @@ class Map extends Model
         return $this->ratings()->pluck('Rating')->average();
     }
 
-    public function favorites()
-    {
-        return $this->belongsToMany(Player::class, 'map-favorites');
-    }
-
+    /**
+     * @param $jsonMxDetails
+     *
+     * @return mixed|null
+     */
     public function getMxDetailsAttribute($jsonMxDetails)
     {
         if ($jsonMxDetails) {
@@ -71,16 +141,36 @@ class Map extends Model
         return null;
     }
 
+    /**
+     * @param $jsonMxWorldRecordDetails
+     *
+     * @return mixed
+     */
     public function getMxWorldRecordAttribute($jsonMxWorldRecordDetails)
     {
         return json_decode($jsonMxWorldRecordDetails);
     }
 
-    public function getGbxAttribute($gbxJson)
+    /**
+     * @return stdClass
+     */
+    public function getGbxAttribute()
     {
-        return json_decode($gbxJson);
+        $cacheId = 'gbx/'.$this->uid;
+
+        if (Cache::has($cacheId)) {
+            return Cache::get($cacheId);
+        }
+
+        $gbx = MapController::getGbxInformation($this->filename, false);
+        Cache::put($cacheId, $gbx);
+
+        return $gbx;
     }
 
+    /**
+     * @return bool
+     */
     public function canBeJuked(): bool
     {
         $lastPlayedDate = $this->last_played;
@@ -92,13 +182,16 @@ class Map extends Model
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $gbx = $this->gbx;
 
         if (!$gbx) {
-            Log::logAddLine('Map', 'Loading missing GBX for ' . $this->filename);
-            $gbx       = MapController::getGbxInformation($this->filename);
+            Log::write('Loading missing GBX for '.$this->filename);
+            $gbx = MapController::getGbxInformation($this->filename);
             $this->gbx = $gbx;
             $this->save();
 
@@ -108,25 +201,33 @@ class Map extends Model
         return $gbx->Name;
     }
 
+    /**
+     * @param  string  $mapUid
+     *
+     * @return Map|null
+     */
     public static function getByUid(string $mapUid): ?Map
     {
-        if (config('database.type') == 'mysql') {
-            return Map::where('gbx->MapUid', $mapUid)
-                      ->get()
-                      ->first();
-        } else {
-            return Map::all()->filter(function (Map $map) use ($mapUid) {
-                return $map->gbx->MapUid == $mapUid;
-            })->first();
+        foreach (Map::all() as $map) {
+            if ($map->gbx->MapUid == $mapUid) {
+                return $map;
+            }
         }
+
+        return null;
     }
 
+    /**
+     * @param  string  $mxId
+     *
+     * @return Map|null
+     */
     public static function getByMxId(string $mxId): ?Map
     {
         if (config('database.type') == 'mysql') {
             return Map::where('mx_details->TrackID', $mxId)
-                      ->get()
-                      ->first();
+                ->get()
+                ->first();
         } else {
             return Map::all()->filter(function (Map $map) use ($mxId) {
                 $details = $map->mx_details;

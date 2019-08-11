@@ -1,0 +1,73 @@
+{contentType text}
+<script><!--
+declare CMlFrame handle;
+declare Text handleId;
+declare Text D_Centered;
+
+Void maniaLinkDrag(){
+    declare Vec2[Text] lastFramePosition for This;
+    declare Boolean G_Drag_Active for This = False;
+
+    if(D_Centered == ""){
+        handle <=> (Page.MainFrame.GetFirstChild("handle") as CMlFrame);
+
+        if(lastFramePosition.existskey(handleId)){
+            handle.Parent.RelativePosition_V3 = lastFramePosition[handleId];
+        }else{
+            handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]*-0.5, handle.Parent.Size[1]*0.5>;
+        }
+
+        handleId = handle.DataAttributeGet("id");
+
+        if(handleId == ""){
+            //fallback if unset
+            handleId = "" ^ handle.Id;
+        }
+
+        D_Centered = "x";
+    }
+
+    if(!handle.Parent.Visible){
+        return;
+    }
+
+    declare framePos = handle.AbsolutePosition_V3;
+    declare frameSize = handle.Size;
+
+    if(MouseLeftButton && !G_Drag_Active){
+        if(MouseX >= framePos[0]){
+            if(MouseY <= framePos[1]){
+                if(MouseX <= (framePos[0] + frameSize[0]) && MouseY >= (framePos[1] - frameSize[1])){
+                    declare Real ZIndex for LocalUser = 305.0;
+                    declare startPos = handle.Parent.RelativePosition_V3;
+                    declare startX = MouseX;
+                    declare startY = MouseY;
+
+                    G_Drag_Active = True;
+
+                    if(handle.Parent.ZIndex > ZIndex){
+                        ZIndex = handle.Parent.ZIndex;
+                    }
+
+                    ZIndex = ZIndex + 1.0;
+                    handle.Parent.ZIndex = ZIndex;
+
+                    while(MouseLeftButton){
+                        yield;
+
+                        declare newPosX = startPos[0] + (MouseX - startX);
+                        declare newPosY = startPos[1] + (MouseY - startY);
+
+                        handle.Parent.RelativePosition_V3 = <newPosX, newPosY>;
+                    }
+
+                    lastFramePosition[handleId] = handle.Parent.RelativePosition_V3;
+
+                    G_Drag_Active = False;
+                }
+            }
+        }
+    }
+
+}
+--></script>

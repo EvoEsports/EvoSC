@@ -1,27 +1,28 @@
+{contentType text}
+{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:server-hopper" id="server-hopper" version="3">
-    <frame pos="-160 -33" id="widget" scale="0.855" z-index="50000">
-        <quad size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1" />
-        <quad id="bg" size="50 20" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
-        <label pos="2 -2.5" valign="center" textsize="1" text=" Servers" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
+<manialink version="3">
+    {block id}server-hopper-widget{/block}
+    {block size}44 50{/block}
 
-        <frame id="data" pos="0 -7.25">
-            {for $i=0; $i<7; $i++}
-            <frame pos="0 {$i * -3.5}">
-                <label pos="5.5 0" size="8 4" halign="right" valign="center" text="0" textsize="0.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
-                <label pos="5.5 -0.35" size="6 4" halign="left" valign="center" text="1" textsize="1" scale="0.65" textprefix="/" textfont="{config('colors.ui.font')|noescape}" textcolor="aaa" />
-                <label pos="10.5 0" size="38 4" valign="center" text="server name" textsize="0.8" textfont="{config('colors.ui.font')|noescape}" />
-            </frame>
-            {/for}
+    {block content}
+    <quad size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1" />
+    <quad id="bg" size="50 20" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
+    <label pos="2 -2.5" valign="center" textsize="0.5" text=" Servers" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
+
+    <frame id="data" pos="0 -7.25" scale="0.9">
+        {for $i=0; $i<7; $i++}
+        <frame pos="0 {$i * -3.5}">
+            <label pos="5.5 0" size="8 4" halign="right" valign="center" text="0" textsize="0.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
+            <label pos="5.5 -0.35" size="6 4" halign="left" valign="center" text="1" textsize="1" scale="0.65" textprefix="/" textfont="{config('colors.ui.font')|noescape}" textcolor="aaa" />
+            <label pos="10.5 0" size="38 4" valign="center" text="server name" textsize="0.8" textfont="{config('colors.ui.font')|noescape}" />
         </frame>
+        {/for}
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    {(new esc\Classes\HideScript())|noescape}
-
     Text getJoinLink(Text login, Text title, Text name, Boolean hasPassword){
         declare Text youAreHere = "";
         declare Text pw = "";
@@ -71,22 +72,30 @@
 
         bg.Size = <bg.Size[0], filled * 3.0 + 3.0>;
     }
+    --></script>
+    {/block}
 
-    main() {
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
         declare Integer LastServersWidgetUpdate for This;
         declare Text ServersWidgetInfo for This;
         declare Integer lastUpdate = 0;
 
-        while(True){
-            yield;
+        left__ = {config('server-hopper.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('server-hopper.ui.slot')};
+    {/block}
 
+    {block loop}
             if(lastUpdate != LastServersWidgetUpdate){
                 lastUpdate = LastServersWidgetUpdate;
                 updateWidget(ServersWidgetInfo);
             }
+    {/block}
 
-            hidescript();
-        }
-    }
-    --></script>
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>

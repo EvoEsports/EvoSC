@@ -5,8 +5,31 @@ namespace esc\Models;
 
 use Carbon\Carbon;
 use esc\Modules\MxKarma;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 
+/**
+ * Class Player
+ *
+ * @package esc\Models
+ * @property string  $Login
+ * @property string  $NickName
+ * @property mixed   $Score
+ * @property integer $player_id
+ * @property boolean $Afk
+ * @property string  $path
+ * @property string  $spectator_status
+ * @property integer $MaxRank
+ * @property boolean $banned
+ * @property carbon  $last_visit
+ * @property Group   $group
+ *
+ * @method static find(string $login)
+ */
 class Player extends Model
 {
     protected $table = 'players';
@@ -36,7 +59,7 @@ class Player extends Model
     /**
      * Gets the players current time (formatted)
      *
-     * @param bool $asMilliseconds
+     * @param boolean $asMilliseconds
      *
      * @return mixed|string
      */
@@ -113,7 +136,7 @@ class Player extends Model
      *
      * ->locals()->get() = ->locals
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function locals()
     {
@@ -123,7 +146,7 @@ class Player extends Model
     /**
      * Get players dedis, like locals.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function dedis()
     {
@@ -133,7 +156,7 @@ class Player extends Model
     /**
      * Get players ratings, like locals.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function ratings()
     {
@@ -143,7 +166,7 @@ class Player extends Model
     /**
      * Get the statistics of that player
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function stats()
     {
@@ -153,7 +176,7 @@ class Player extends Model
     /**
      * Get the player group
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function group()
     {
@@ -163,7 +186,7 @@ class Player extends Model
     /**
      * Get the players favorite maps.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function favorites()
     {
@@ -173,7 +196,7 @@ class Player extends Model
     /**
      * Get the players user settings.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function settings()
     {
@@ -201,8 +224,9 @@ class Player extends Model
      *
      * @param $value
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
+    /*
     public function getSpectatorStatusAttribute($value)
     {
         $object                     = collect([]);
@@ -214,6 +238,7 @@ class Player extends Model
 
         return $object;
     }
+    */
 
     /**
      * Check if the player is in spectator-mode.
@@ -222,14 +247,14 @@ class Player extends Model
      */
     public function isSpectator(): bool
     {
-        return $this->spectator_status->spectator ?? false;
+        return $this->spectator_status > 0;
     }
 
     /**
      * Update a user-setting.
      *
-     * @param $settingName
-     * @param $value
+     * @param string $settingName
+     * @param mixed  $value
      */
     public function setSetting($settingName, $value)
     {
@@ -260,7 +285,7 @@ class Player extends Model
     /**
      * Get a user-setting.
      *
-     * @param $settingName
+     * @param string $settingName
      *
      * @return mixed|null
      */
@@ -278,10 +303,10 @@ class Player extends Model
     /**
      * Get last visit as Carbon object.
      *
-     * @param $date
+     * @param string $date
      *
-     * @return \Carbon\Carbon
-     * @throws \Exception
+     * @return Carbon
+     * @throws Exception
      */
     public function getLastVisitAttribute($date): Carbon
     {

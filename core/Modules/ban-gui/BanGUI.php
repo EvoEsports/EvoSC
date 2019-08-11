@@ -77,7 +77,7 @@ class BanGUI
             BansController::ban($toBan, $player, $reason);
         } catch (\Exception $e) {
             warningMessage($e->getMessage())->send($player);
-            Log::logAddLine('BanGUI', 'Failed to ban & blacklist: ' . $login);
+            Log::write('Failed to ban & blacklist: ' . $login);
         }
     }
 }

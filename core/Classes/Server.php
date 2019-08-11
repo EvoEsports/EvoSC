@@ -4,6 +4,9 @@ namespace esc\Classes;
 
 
 use Maniaplanet\DedicatedServer\Connection;
+use Maniaplanet\DedicatedServer\InvalidArgumentException;
+use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
+use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
 /**
  * Class Server
@@ -16,7 +19,7 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool changeAuthPassword(string $string, string $string)
  * @method static bool enableCallbacks(bool $boolean)
  * @method static bool setApiVersion(string $string)
- * @method static object getVersion()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Version getVersion()
  * @method static object getStatus()
  * @method static bool quitGame()
  * @method static bool callVote(string $string)
@@ -143,14 +146,14 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool isAutoSaveValidationReplaysEnabled()
  * @method static bool saveCurrentReplay(string $string)
  * @method static bool saveBestGhostsReplay(string $string, string $string)
- * @method static string getValidationReplay(string $string)
+ * @method static string getValidationReplay(string $login)
  * @method static bool setLadderMode(int $int)
  * @method static object getLadderMode()
  * @method static object getLadderServerLimits()
  * @method static bool setVehicleNetQuality(int $int)
  * @method static object getVehicleNetQuality()
  * @method static bool setServerOptions(object $struct)
- * @method static object getServerOptions()
+ * @method static \Maniaplanet\DedicatedServer\Structures\ServerOptions getServerOptions()
  * @method static bool setForcedTeams(bool $boolean)
  * @method static bool getForcedTeams()
  * @method static bool setForcedMods(bool $boolean, array $array)
@@ -244,12 +247,12 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static bool jumpToMapIdent(string $string)
  * @method static object getCurrentMapInfo()
  * @method static object getNextMapInfo()
- * @method static object getMapInfo(string $string)
+ * @method static object getMapInfo(string $filename)
  * @method static bool checkMapForCurrentServerParams(string $string)
  * @method static array getMapList(int $int = 0, int $int = 0)
- * @method static bool addMap(string $string)
+ * @method static bool addMap(string $filename)
  * @method static int addMapList(array $array)
- * @method static bool removeMap(string $string)
+ * @method static bool removeMap(string $filename)
  * @method static int removeMapList(array $array)
  * @method static bool insertMap(string $filename)
  * @method static int insertMapList(array $array)
@@ -260,8 +263,8 @@ use Maniaplanet\DedicatedServer\Connection;
  * @method static int saveMatchSettings(string $string)
  * @method static int insertPlaylistFromMatchSettings(string $string)
  * @method static array getPlayerList(int $int = 0, int $int = 0, int $int = 0)
- * @method static \Maniaplanet\DedicatedServer\Structures\PlayerInfo getPlayerInfo(string $string, int $int = 0)
- * @method static \Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo getDetailedPlayerInfo(string $string)
+ * @method static PlayerInfo getPlayerInfo(string $string, int $int = 0)
+ * @method static PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
  * @method static array getCurrentRanking(int $int, int $int)
  * @method static array getCurrentRankingForLogin(string $string)
@@ -299,7 +302,7 @@ class Server
      * @param $login
      * @param $password
      *
-     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function init($host, $port, $timeout, $login, $password)
     {
@@ -313,7 +316,7 @@ class Server
     /**
      * Get the rpc-connection-instance of the maniaplanet-package (Useful to get type-hints).
      *
-     * @return \Maniaplanet\DedicatedServer\Connection
+     * @return Connection
      */
     public static function rpc(): Connection
     {
@@ -328,8 +331,8 @@ class Server
     /**
      * Call an rpc-method.
      *
-     * @param string $rpc_func
-     * @param null   $args
+     * @param string       $rpc_func
+     * @param null|mixed[] $args
      */
     public static function call(string $rpc_func, $args = null)
     {

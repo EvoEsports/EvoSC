@@ -21,7 +21,7 @@ class Log
     /**
      * Get the output-interface
      *
-     * @return \Symfony\Component\Console\Output\OutputInterface|null
+     * @return OutputInterface|null
      */
     public static function getOutput(): ?OutputInterface
     {
@@ -33,7 +33,7 @@ class Log
      *
      * @param string $line
      */
-    public static function writeLn(string $line)
+    private static function writeLn(string $line)
     {
         $output = self::getOutput();
         $output->writeln(stripAll($line));
@@ -50,15 +50,11 @@ class Log
      * @param string $string
      * @param bool   $echo
      */
-    public static function logAddLine(string $prefix, string $string, $echo = true)
+    public static function write(string $string, $echo = true)
     {
         $date    = date("Y-m-d", time());
         $time    = date("H:i:s", time());
         $logFile = sprintf("logs/%s.txt", $date);
-
-        if ($prefix == 'Info') {
-            $prefix = 'i';
-        }
 
         list($childClass, $caller) = debug_backtrace(false, 2);
 
@@ -105,6 +101,10 @@ class Log
         $line = stripAll($line);
 
         if ($echo == true || isVeryVerbose()) {
+            self::writeLn($line);
+
+            /*
+             * TODO: Fix color output
             switch ($prefix) {
                 case 'Module':
                 case 'Modules':
@@ -143,6 +143,7 @@ class Log
                 default:
                     self::writeLn($line);
             }
+            */
         }
 
         File::appendLine($logFile, $line);
@@ -156,7 +157,7 @@ class Log
      */
     public static function info($message, bool $echo = true)
     {
-        self::logAddLine('Info', $message, $echo);
+        self::write($message, $echo);
     }
 
     /**
@@ -167,7 +168,7 @@ class Log
      */
     public static function error($message, bool $echo = true)
     {
-        self::logAddLine("ERROR", $message, $echo);
+        self::write($message, $echo);
     }
 
     /**
@@ -178,7 +179,7 @@ class Log
      */
     public static function warning($message, bool $echo = true)
     {
-        self::logAddLine('Warning', $message, $echo);
+        self::write($message, $echo);
     }
 
     /**
@@ -191,7 +192,7 @@ class Log
     {
         $line = "$nick: ";
         $line .= $message;
-        self::logAddLine(stripAll($line), true);
+        self::write(stripAll($line), true);
     }
 
     /**

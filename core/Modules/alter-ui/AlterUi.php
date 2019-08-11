@@ -39,7 +39,7 @@ class AlterUi
  		<!-- Small scores table displayed at the end of race of the round based modes (Rounds, Cup, ...) on the right of the screen -->
  		<round_scores visible="true" pos="-158.5 40. 150." />
  		<!-- Race time left displayed at the bottom right of the screen -->
- 		<countdown visible="true" pos="155 -10 5." />
+ 		<countdown visible="true" pos="155 -20 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->
  		<go visible="true" />
  		<!-- Current race chrono displayed at the bottom center of the screen -->
@@ -57,13 +57,11 @@ class AlterUi
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
  		<warmup visible="true" pos="153. 13. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
- 		<endmap_ladder_recap visible="true" />
+ 		<endmap_ladder_recap visible="false" />
  		<!-- Laps count displayed on the right of the screen on multilaps map -->
  		<multilap_info visible="true" pos="140. 84. 5." />
  		<!-- Player\'s ranking at the latest checkpoint -->
  		<checkpoint_ranking visible="false" pos="0. 84. 5." />
- 		<!-- Scores table displayed in the middle of the screen -->
- 		<scorestable alt_visible="true" />
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
  		<viewers_count visible="true" pos="157. -40. 5." />
  		<!-- Scores table displayed in the middle of the screen -->

@@ -2,19 +2,20 @@
 
 namespace esc\Modules\LocalRecords;
 
-use esc\Classes\Config;
 use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
+use esc\Models\AccessRight;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\RecordsTable;
+use Illuminate\Support\Collection;
 
-class LocalRecords
+class LocalRecords implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -27,18 +28,27 @@ class LocalRecords
     private static $localsJson;
 
     /**
+     * @var Collection
+     */
+    private static $playerIdScoreMap;
+
+    /**
      * LocalRecords constructor.
      */
     public function __construct()
     {
-        Hook::add('PlayerFinish', [self::class, 'playerFinish'], false);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'initialize']);
+        Hook::add('EndMap', [self::class, 'fixRanks']);
 
-        ManiaLinkEvent::add('local.delete', [self::class, 'delete']);
+        AccessRight::createIfNonExistent('local_delete', 'Delete local-records.');
+
+        ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
+        ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
     }
 
+    //Called on PlayerConnect
     public static function showManialink(Player $player)
     {
         $localsJson = self::$localsJson;
@@ -47,72 +57,39 @@ class LocalRecords
         Template::show($player, 'local-records.manialink');
     }
 
-    public static function delete(Player $player, string $localRank)
+    public static function showLocalsTable(Player $player)
     {
-        $map = MapController::getCurrentMap();
-        $map->locals()->where('Rank', $localRank)->delete();
-        self::cacheLocals($map);
-        self::sendUpdatedLocals();
-        warningMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
+        $records = MapController::getCurrentMap()->locals()->orderBy('Score')->get();
+
+        RecordsTable::show($player, $records, 'Local Records');
     }
 
-    public static function sendUpdatedLocals()
-    {
-        $localsJson = self::$localsJson;
-        Template::showAll('local-records.update', compact('localsJson'));
-    }
-
-    public static function endMap(Map $map)
-    {
-        // $map->locals()->orderBy('Score')->skip(500)->delete();
-    }
-
-    public static function beginMap(Map $map)
-    {
-        self::fixRanks($map);
-        self::cacheLocals($map);
-        self::sendUpdatedLocals();
-    }
-
-    private static function fixRanks(Map $map)
-    {
-        Database::getConnection()->statement('SET @rank=0');
-        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $map->id . ' ORDER BY `Score`');
-    }
-
-    private static function cacheLocals(Map $map)
-    {
-        self::$records = $map->locals()->orderBy('Rank')->limit(config('locals.limit'))->get();
-
-        self::$localsJson = self::$records->map(function (LocalRecord $local) {
-            return [
-                'r' => $local->Rank,
-                'c' => $local->Checkpoints,
-                's' => $local->Score,
-                'n' => $local->player->NickName,
-                'l' => $local->player->Login,
-            ];
-        })->toJson();
-
-        self::$records = self::$records->keyBy('Player');
-    }
-
+    //Called on PlayerFinish
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
-        if ($score < 3000) {
-            //ignore times under 3 seconds
+        if ($score < 5000) {
+            //ignore times under 5 seconds
             return;
         }
 
-        $map = MapController::getCurrentMap();
-
-        if (self::$records->has($player->id)) {
-            $oldRecord = $map->locals()->wherePlayer($player->id)->first();
-            $oldRank   = $oldRecord->Rank;
-
-            if ($oldRecord->Score < $score) {
+        $playerId = $player->id;
+        if (self::$playerIdScoreMap->has($playerId)) {
+            if (self::$playerIdScoreMap->get($playerId) <= $score) {
                 return;
             }
+        }
+
+        $map = MapController::getCurrentMap();
+        $newRank = self::getNextBetterRank($player, $map, $score);
+
+        if ($newRank > config('locals.limit')) {
+            return;
+        }
+
+        if (self::$records->has($playerId)) {
+            $oldRecord = self::$records->get($playerId);
+            $oldScore = $oldRecord->Score;
+            $oldRank = $oldRecord->Rank;
 
             $chatMessage = chatMessage()
                 ->setIcon('')
@@ -124,22 +101,22 @@ class LocalRecords
                 return;
             }
 
-            $map->locals()->updateOrCreate(['Player' => $player->id], [
-                'Score'       => $score,
-                'Checkpoints' => $checkpoints,
-                'Rank'        => -1,
-            ]);
+            $oldRecord->Score = $score;
+            $oldRecord->Checkpoints = $checkpoints;
+            $oldRecord->Rank = $newRank;
+            $oldRecord->save();
 
-            self::fixRanks($map);
+            self::$playerIdScoreMap->put($playerId, $score);
+            self::$records->put($playerId, $oldRecord);
 
-            $newRecord = $map->locals()->wherePlayer($player->id)->first();
-            $newRank   = $newRecord->Rank;
-            $diff      = $oldRecord->Score - $score;
+            $diff = $oldScore - $score;
 
             if ($oldRank == $newRank) {
-                $chatMessage->setParts($player, ' secured his/her ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $chatMessage->setParts($player, ' secured his/her ', $oldRecord,
+                    ' ('.$oldRank.'. -'.formatScore($diff).')');
             } else {
-                $chatMessage->setParts($player, ' gained the ', $newRecord, ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                self::incrementRanksAboveScore($map, $score);
+                $chatMessage->setParts($player, ' gained the ', $oldRecord, ' ('.$oldRank.'. -'.formatScore($diff).')');
             }
 
             if ($newRank <= config('locals.echo-top')) {
@@ -148,26 +125,19 @@ class LocalRecords
                 $chatMessage->send($player);
             }
 
-            self::cacheLocals($map);
-            self::sendUpdatedLocals();
-            Hook::fire('PlayerLocal', $player, $newRecord);
+            $newRecord = $oldRecord;
         } else {
-            $nextBetterRecord = $map->locals()->where('Score', '<=', $score)->orderByDesc('Score')->first();
-            $newRank          = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
+            $newRecord = new LocalRecord();
+            $newRecord->Map = $map->id;
+            $newRecord->Player = $playerId;
+            $newRecord->Checkpoints = $checkpoints;
+            $newRecord->Score = $score;
+            $newRecord->Rank = $newRank;
+            $newRecord->save();
 
-            if ($newRank > config('locals.limit')) {
-                return;
-            }
-
-            $map->locals()->updateOrCreate(['Player' => $player->id], [
-                'Score'       => $score,
-                'Checkpoints' => $checkpoints,
-                'Rank'        => $newRank,
-            ]);
-
-            self::fixRanks($map);
-
-            $newRecord = $map->locals()->wherePlayer($player->id)->first();
+            self::$playerIdScoreMap->put($playerId, $score);
+            self::$records->put($playerId, $newRecord);
+            self::incrementRanksAboveScore($map, $score);
 
             $chatMessage = chatMessage($player, ' gained the ', $newRecord)
                 ->setIcon('')
@@ -178,10 +148,119 @@ class LocalRecords
             } else {
                 $chatMessage->send($player);
             }
-
-            self::cacheLocals($map);
-            self::sendUpdatedLocals();
-            Hook::fire('PlayerLocal', $player, $newRecord);
         }
+
+        self::cacheAndSendLocals();
+        Hook::fire('PlayerLocal', $player, $newRecord);
+    }
+
+    //Called on local.delete
+    public static function delete(Player $player, string $localRank)
+    {
+        $map = MapController::getCurrentMap();
+        $map->locals()->where('Rank', $localRank)->delete();
+        warningMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
+        self::initialize($map);
+    }
+
+    public static function initialize(Map $map)
+    {
+        self::$playerIdScoreMap = collect();
+        self::$localsJson = "[]";
+        self::fixRanks($map);
+        self::$records = $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->keyBy('Player');
+        self::cacheAndSendLocals();
+    }
+
+    /**
+     * Assign ranks to records of a certain map
+     *
+     * @param  Map  $map
+     */
+    public static function fixRanks(Map $map)
+    {
+        Database::getConnection()->statement('SET @rank=0');
+        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
+    }
+
+    /**
+     * Cache the locals and send them to everyone
+     */
+    private static function cacheAndSendLocals()
+    {
+        $localsJson = self::createJsonFromLocals(self::$records);
+        self::$playerIdScoreMap = self::$records->pluck('Score', 'Player');
+        self::$localsJson = $localsJson;
+        Template::showAll('local-records.update', compact('localsJson'));
+    }
+
+    /**
+     * Get the JSON send to to the player from a collection of locals
+     *
+     * @param  Collection  $locals
+     * @return string
+     */
+    private static function createJsonFromLocals(Collection $locals)
+    {
+        $playerIds = $locals->pluck('Player');
+        $players = Player::whereIn('id', $playerIds)->get()->keyBy('id');
+
+        return $locals->sortBy('Rank')->transform(function (LocalRecord $local) use ($players) {
+            return [
+                'r' => $local->Rank,
+                's' => $local->Score,
+                'n' => $players->get($local->Player)->NickName,
+                'l' => $players->get($local->Player)->Login
+            ];
+        })->values()->toJson();
+    }
+
+    /**
+     * Increment ranks of records with worse score
+     *
+     * @param  Map  $map
+     * @param  int  $score
+     */
+    private static function incrementRanksAboveScore(Map $map, int $score)
+    {
+        self::$records->where('Score', '>', $score)->transform(function (LocalRecord $record) {
+            $record->Rank++;
+            return $record;
+        });
+
+        $map->locals()->where('Score', '>', $score)->increment('Rank');
+    }
+
+    /**
+     * Get the rank for given score
+     *
+     * @param  Player  $player
+     * @param  Map  $map
+     * @param  int  $score
+     * @return int|mixed
+     */
+    private static function getNextBetterRank(Player $player, Map $map, int $score)
+    {
+        $nextBetterRecord = self::$records->where('Score', '<=', $score)->sortByDesc('Score')->first();
+
+        if ($nextBetterRecord) {
+            if ($nextBetterRecord->Player == $player->id) {
+                return $nextBetterRecord->Rank;
+            }
+
+            return $nextBetterRecord->Rank + 1;
+        }
+
+        return 1;
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
+        // TODO: Implement start() method.
     }
 }

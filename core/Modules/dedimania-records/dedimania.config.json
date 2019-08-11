@@ -2,10 +2,11 @@
   "module": "dedimania",
   "login": "",
   "key": "",
-
-  "pos": "-160 26",
-  "scale": 0.95,
-  "rows": 18,
+  "ui": {
+    "position": "left",
+    "slot": 2
+  },
+  "rows": 16,
   "showtop": 3,
   "enabled": false
 }

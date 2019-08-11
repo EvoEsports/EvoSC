@@ -9,14 +9,16 @@ use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use Illuminate\Support\Collection;
+use stdClass;
 
 class ConfigController implements ControllerInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $config;
 
+    /** @var string */
     protected static $configFilePattern = '/\.config\.json$/';
 
     /**
@@ -56,42 +58,47 @@ class ConfigController implements ControllerInterface
     }
 
     /**
-     * @param string                                       $id
-     * @param string|\stdClass|array|int|float|double|bool $value
+     * @param string                                      $id
+     * @param string|stdClass|array|int|float|double|bool $value
      */
     public static function saveConfig(string $id, $value)
     {
         self::setConfig($id, $value);
 
         $idParts = collect(explode('.', $id));
-        $file    = $idParts->shift();
+        $file = $idParts->shift();
 
         $configFile = configDir($file . '.config.json');
-        $jsonData   = File::get($configFile, true);
-        $path       = $idParts->map(function ($part) {
+        $jsonData = File::get($configFile, true);
+        $path = $idParts->map(function ($part) {
             return sprintf("{'%s'}", $part);
         })->implode('->');
 
         eval('$jsonData->' . $path . ' = $value;');
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
-        Log::logAddLine('ConfigController', "Updated config $id", isVerbose());
+        Log::write("Updated config $id", isVerbose());
     }
 
     /**
-     * @param string                                       $id
-     * @param string|\stdClass|array|int|float|double|bool $value
+     * @param string                                      $id
+     * @param string|stdClass|array|int|float|double|bool $value
      */
     public static function setConfig(string $id, $value)
     {
         self::$config->put($id, $value);
     }
 
+    /**
+     *
+     */
     private static function loadConfigurationFiles()
     {
         $defaultConfigFiles = File::getFilesRecursively(configDir('default'), self::$configFilePattern);
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern));
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('../modules'), self::$configFilePattern));
+        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'),
+            self::$configFilePattern));
+        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('../modules'),
+            self::$configFilePattern));
 
         $defaultConfigFiles->each(function ($configFile) {
             $name = basename($configFile);
@@ -106,7 +113,8 @@ class ConfigController implements ControllerInterface
             }
         });
 
-        $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)->mapWithKeys(function ($configFile) {
+        $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)->mapWithKeys(function ($configFile
+        ) {
             $name = basename($configFile);
             $name = preg_replace(self::$configFilePattern, '', $name);
             $data = File::get($configFile, true);
@@ -121,7 +129,7 @@ class ConfigController implements ControllerInterface
     {
         if ($sourceJson != $targetJson) {
             foreach ($sourceJson as $key => $value) {
-                if ($value instanceof \stdClass) {
+                if ($value instanceof stdClass) {
                     if (!isset($targetJson->{$key})) {
                         $targetJson->{$key} = $value;
                     } else {
@@ -156,7 +164,7 @@ class ConfigController implements ControllerInterface
 
         if (isVeryVerbose()) {
             $map->each(function ($value, $key) {
-                if ($value instanceof \stdClass) {
+                if ($value instanceof stdClass) {
                     $data = 'stdClass';
                 } else {
                     if (is_array($value)) {
@@ -175,11 +183,11 @@ class ConfigController implements ControllerInterface
 
     private static function createPathsRecursively(string $base, $values)
     {
-        $base  = strtolower($base);
+        $base = strtolower($base);
         $paths = collect();
 
         foreach ($values as $key => $value) {
-            if ($value instanceof \stdClass) {
+            if ($value instanceof stdClass) {
                 $paths = $paths->merge(self::createPathsRecursively($base . '.' . strtolower($key), $value));
             } else {
                 $paths->put($base . '.' . strtolower($key), $value);

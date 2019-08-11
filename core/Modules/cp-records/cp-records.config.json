@@ -1,5 +1,6 @@
 {
   "columns": 6,
   "pos"    : "-100 87",
-  "scale"  : 0.77
+  "scale"  : 0.77,
+  "enabled": true
 }

@@ -1,7 +1,8 @@
 {
-  "url" : "",
-  "pos": {
-    "visible": "152 -2.5",
-    "hidden": "160 -2.5"
+  "url": "",
+  "ui": {
+    "position": "right",
+    "slot": 8,
+    "slot_horizontal": 1
   }
 }

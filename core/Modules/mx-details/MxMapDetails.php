@@ -62,23 +62,23 @@ class MxMapDetails
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
 
         if ($result->getStatusCode() != 200) {
-            Log::logAddLine('MapController', 'Failed to fetch MX details: ' . $result->getReasonPhrase(), isVerbose());
+            Log::write('Failed to fetch MX details: ' . $result->getReasonPhrase(), isVerbose());
 
             return;
         }
 
         $data = $result->getBody()->getContents();
 
-        Log::logAddLine('MxMapDetails', 'Received: ' . $data, isVeryVerbose());
+        Log::write('Received: ' . $data, isVeryVerbose());
 
         if ($data == '[]') {
-            Log::logAddLine('MapController', 'No MX information available for: ' . $map->gbx->Name);
+            Log::write('No MX information available for: ' . $map->name);
 
             return;
         }
 
         $map->update(['mx_details' => $data]);
-        Log::logAddLine('MapController', 'Updated MX details for track: ' . $map->gbx->Name);
+        Log::write('Updated MX details for track: ' . $map->name);
 
         self::loadMxWordlRecord($map);
     }
@@ -88,13 +88,13 @@ class MxMapDetails
         $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
 
         if ($result->getStatusCode() != 200) {
-            Log::logAddLine('MapController', 'Failed to fetch MX world record: ' . $result->getReasonPhrase());
+            Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
 
             return;
         }
 
         $map->update(['mx_world_record' => $result->getBody()->getContents()]);
 
-        Log::logAddLine('MapController', 'Updated MX world record for track: ' . $map->gbx->Name);
+        Log::write('Updated MX world record for track: ' . $map->name);
     }
 }

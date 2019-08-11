@@ -42,16 +42,25 @@ class File
     /**
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
-     * @param string $fileName
-     * @param string $content
+     * @param string       $fileName
+     * @param string|mixed $content
      *
      * @return bool
      */
-    public static function put(string $fileName, string $content): bool
+    public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
+        $dir      = str_replace(basename($fileName), '', $fileName);
 
-        file_put_contents($fileName, $content);
+        if (!is_dir(realpath($dir))) {
+            mkdir(realpath($dir));
+        }
+
+        if ($jsonEncode) {
+            file_put_contents($fileName, json_encode($content));
+        } else {
+            file_put_contents($fileName, $content);
+        }
 
         return self::exists($fileName);
     }
@@ -144,7 +153,7 @@ class File
         return $files;
     }
 
-    public static function getFiles(string $baseDirectory, string $filterPattern)
+    public static function getFiles(string $baseDirectory, string $filterPattern = null)
     {
         $files = collect();
 
@@ -154,7 +163,7 @@ class File
 
                 if (!is_dir($path)) {
                     //File is not directory
-                    if (preg_match($filterPattern, $file)) {
+                    if (!$filterPattern || $filterPattern && preg_match($filterPattern, $file)) {
                         //Add template
                         $files->push($path);
                     }
@@ -177,7 +186,7 @@ class File
 
         if (file_exists($path) && is_file($path)) {
             unlink($path);
-            Log::logAddLine('File', 'Deleted file: ' . $path);
+            Log::write('Deleted file: ' . $path);
 
             return true;
         }

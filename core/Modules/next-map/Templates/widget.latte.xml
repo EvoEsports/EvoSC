@@ -1,27 +1,51 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $noHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:next-map-widget" id="next-map-widget" version="3">
-    <frame id="widget" pos="{config('map-list.pos.visible')}" data-pos-visible="{config('map-list.pos.visible')}" data-pos-hidden="{config('map-list.pos.hidden')}" scale="0.8" size="50 10" z-index="5000">
-        <label pos="38 -2" z-index="1" size="36 3" text="{$map->gbx->Name}" halign="right" textcolor="eeee" textsize="1.4" textfont="{config('colors.ui.font')|noescape}"/>
-        <label pos="38 -7" z-index="1" size="36 3" text="{$map->author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
+<manialink version="3">
+{block id}next-map-widget{/block}
+{block size}44 8{/block}
 
-        <label pos="45 -5" valign="center" halign="center" textsize="0.4" size="6 6" text="NEXT" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+{block content}
+<quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+<quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
 
-        <quad pos="0 0" size="40 10" bgcolor="{config('colors.ui.widget.bg.color')}9" z-index="-2"/>
-        <quad pos="40 0" size="10 10" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
-    </frame>
+<label pos="40 -4" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="NEXT" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
 
-    <script><!--
+<label pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="{$map->name}" halign="right" textcolor="eeee" textsize="1.4" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="{$map->author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
+{/block}
 
-    main(){
+{block script}
+{/block}
+
+<script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        left__ = {config('next-map.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('next-map.ui.slot')};
+
         declare uid = Map.MapInfo.MapUid;
+    {/block}
 
-        wait(UI.UISequence == CUIConfig::EUISequence::Podium);
-        wait(Map.MapInfo.MapUid != uid || UI.UISequence != CUIConfig::EUISequence::Podium);
+    {block loop}
+        if(Map.MapInfo.MapUid != uid){
+            widget.Hide();
 
-        sleep(1000);
+            if(left__){
+                grid_.left[slot__].visible = False;
+            }else{
+                grid_.right[slot__].visible = False;
+            }
 
-        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-    }
+            LastUiUpdate = GameTime + 1;
+            return;
+        }
+    {/block}
 
-    --></script>
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>

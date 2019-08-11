@@ -24,9 +24,9 @@ class CreateGroupsTable extends Migration
         });
 
         $seed = [
-            ['id' => 1, 'Name' => 'Masteradmin', 'Protected' => true],
-            ['id' => 2, 'Name' => 'Admin', 'Protected' => true],
-            ['id' => 3, 'Name' => 'Player', 'Protected' => true],
+            ['id' => 1, 'Name' => 'Masteradmin', 'chat_prefix' => '', 'color' => 'd00', 'Protected' => true],
+            ['id' => 2, 'Name' => 'Admin', 'chat_prefix' => '', 'color' => 'd00', 'Protected' => true],
+            ['id' => 3, 'Name' => 'Player', 'chat_prefix' => '', 'color' => 'ff0', 'Protected' => true],
         ];
 
         $schemaBuilder->getConnection()->table('groups')->insert($seed);

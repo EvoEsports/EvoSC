@@ -2,6 +2,8 @@
 
 namespace esc\Modules;
 
+use Carbon\Carbon;
+use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -10,6 +12,7 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
@@ -36,13 +39,14 @@ class Statistics
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerRateMap', [self::class, 'playerRateMap']);
-        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('ShowScores', [self::class, 'showScores']);
         Hook::add('AnnounceWinner', [self::class, 'announceWinner']);
 
         Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
+
+        ChatCommand::add('/rank', [self::class, 'showRank'], 'Show your current server rank.');
     }
 
     public static function showScores(Collection $players)
@@ -56,9 +60,9 @@ class Statistics
         $statCollection->push(new StatisticWidget('Visits', " Top visitors"));
 
         //Most played
-        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($min) {
+        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($sec) {
             //Get playtime as hours
-            return round($min / (60 * 5), 1);
+            return round(($sec / 60) / 60, 1);
         }));
 
         //Most finishes
@@ -85,9 +89,23 @@ class Statistics
                 return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
             })->sort()->take(config('statistics.RoundAvg.show'));
 
-            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
+            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true,
+                $averageScores));
             self::$scores = collect();
         }
+
+        //Popular Maps
+        $popularMaps = Map::orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
+        $statCollection->push(new StatisticWidget('PopularMaps', " Most played maps", '', ' plays', null, true, true,
+            $popularMaps));
+
+        //Least recently played tracks
+        $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled',
+            1)->take(6)->pluck('last_played', 'name');
+        $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
+            function (Carbon $last_played) {
+                return $last_played->diffForHumans();
+            }, true, true, $popularMaps));
 
         Template::showAll('statistics.widgets', compact('statCollection'));
 
@@ -97,12 +115,17 @@ class Statistics
 
         $players = $players->sortBy('bestracetime');
 
+        $disabledMapIds = Map::whereEnabled(0)->pluck('id');
         $limit = config('locals.limit');
-        $players->each(function ($player_) use ($limit) {
-            $player      = player($player_->login, true);
-            $localsCount = $player->locals()->where('Rank', '<', $limit)->count();
-            $rankSum     = $player->locals()->where('Rank', '<', $limit)->select('Rank')->get()->sum('Rank');
-            $player->stats()->update(['Score' => $limit * $localsCount - $rankSum]);
+        $players->each(function ($player_) use ($limit, $disabledMapIds) {
+            $player = player($player_->login, true);
+            $localsCount = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=', $limit)->count();
+            $rankSum = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=',
+                $limit)->select('Rank')->get()->sum('Rank');
+            $player->stats()->update([
+                'Score' => $limit * $localsCount - $rankSum,
+                'Locals' => $localsCount
+            ]);
         });
 
         self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
@@ -113,23 +136,25 @@ class Statistics
     /**
      * Set ranks for players
      *
-     * @param \Illuminate\Support\Collection $players
+     * @param  \Illuminate\Support\Collection  $players
      */
     private static function updatePlayerRanks(Collection $players)
     {
-        Log::logAddLine('Statistics', 'Updating player-ranks.', isVeryVerbose());
+        Log::write('Updating player-ranks.', isVeryVerbose());
 
         Database::getConnection()->statement('SET @rank=0');
         Database::getConnection()->statement('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
-        Log::logAddLine('Statistics', 'Updating player-ranks finished.', isVeryVerbose());
+        Log::write('Updating player-ranks finished.', isVeryVerbose());
 
-        $playerIds    = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
-        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player', $playerIds->keys())->get()->keyBy('Player');
+        $playerIds = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
+        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player',
+            $playerIds->keys())->get()->keyBy('Player');
 
         $playerScores->each(function ($score) use ($playerIds) {
             $login = $playerIds->get($score->Player);
-            infoMessage('Your server rank is ', secondary($score->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $score->Score . ')'))->send($login);
+            infoMessage('Your server rank is ',
+                secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($login);
         });
 
         $players->pluck('login')->diff($playerIds->values())->each(function ($player) {
@@ -142,7 +167,8 @@ class Statistics
         $stats = $player->stats;
 
         if ($stats && $stats->Rank && $stats->Rank > 0) {
-            infoMessage('Your server rank is ', secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
+            infoMessage('Your server rank is ',
+                secondary($stats->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$stats->Score.')'))->send($stats->player);
         } else {
             infoMessage('You need at least one local record before receiving a rank.')->send($player);
         }
@@ -151,16 +177,16 @@ class Statistics
     /**
      * Announce the winner of the round and increment his win count
      *
-     * @param \esc\Models\Player $player
+     * @param  \esc\Models\Player  $player
      */
     public static function announceWinner(Player $player)
     {
-        Log::logAddLine('Statistics', 'Winner: ' . $player);
+        Log::write('Winner: '.$player);
 
         try {
             $player->stats()->increment('Wins');
         } catch (\Exception $e) {
-            Log::logAddLine('Statistics', 'Failed to increment win count of ' . $player);
+            Log::write('Failed to increment win count of '.$player);
         }
 
         infoMessage($player, ' wins this round. Total wins: ', $player->stats->Wins)
@@ -169,7 +195,7 @@ class Statistics
     }
 
     /**
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function playerConnect(Player $player)
     {
@@ -183,8 +209,8 @@ class Statistics
     }
 
     /**
-     * @param Player $player
-     * @param int    $score
+     * @param  Player  $player
+     * @param  int  $score
      */
     public static function playerFinish(Player $player, int $score)
     {
@@ -202,8 +228,8 @@ class Statistics
     }
 
     /**
-     * @param Player $player
-     * @param Karma  $karma
+     * @param  Player  $player
+     * @param  Karma  $karma
      */
     public static function playerRateMap(Player $player, Karma $karma)
     {
@@ -212,27 +238,16 @@ class Statistics
     }
 
     /**
-     * @param Player      $player
-     * @param LocalRecord $local
-     */
-    public static function playerLocal(Player $player, $local = null)
-    {
-        $player->stats()->update([
-            'Locals' => $player->locals->count(),
-        ]);
-    }
-
-    /**
      * Increment play-times each minute
      */
     public static function updateConnectedPlayerPlaytimes()
     {
         $onlinePlayerIds = onlinePlayers()->pluck('id');
-        Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime');
+        Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime', 5);
     }
 
     /**
-     * @param mixed ...$args
+     * @param  mixed  ...$args
      */
     public static function beginMap(...$args)
     {

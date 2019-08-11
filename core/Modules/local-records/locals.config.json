@@ -1,8 +1,10 @@
 {
-  "pos"     : "-160 89",
-  "scale"   : 0.95,
-  "rows"    : 20,
-  "showtop" : 3,
-  "limit"   : 200,
-  "echo-top": 100
+  "rows": 16,
+  "showtop": 3,
+  "limit": 200,
+  "echo-top": 100,
+  "ui": {
+    "position": "left",
+    "slot": 1
+  }
 }

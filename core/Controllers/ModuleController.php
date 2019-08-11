@@ -31,8 +31,8 @@ class ModuleController implements ControllerInterface
     /**
      * [Bugging] reload a module
      *
-     * @param \esc\Models\Player $callee
-     * @param string             $moduleName
+     * @param Player $callee
+     * @param string $moduleName
      */
     public static function reloadModule(Player $callee, string $moduleName)
     {
@@ -47,7 +47,7 @@ class ModuleController implements ControllerInterface
     /**
      * Get all loaded modules.
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getModules(): Collection
     {
@@ -102,7 +102,7 @@ class ModuleController implements ControllerInterface
         $modules = $moduleClasses->pluck(['dir'])->unique();
 
         //Load module information
-        Log::logAddLine('Modules', 'Loading module information');
+        Log::write('Loading module information');
         self::loadModulesInformation($modules);
 
         //Output loaded modules
@@ -113,10 +113,10 @@ class ModuleController implements ControllerInterface
         Log::getOutput()->writeln("");
 
         //Boot modules
-        Log::logAddLine('Modules', 'Booting modules...');
+        Log::write('Booting modules...');
 
         $moduleClasses->each(function ($module) {
-            $files    = scandir(coreDir('Modules' . DIRECTORY_SEPARATOR . $module->dir));
+            $files    = scandir(dirname($module->file));
             $configId = null;
             foreach ($files as $file) {
                 if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
@@ -131,6 +131,10 @@ class ModuleController implements ControllerInterface
                 if (!is_null($enabled) && $enabled == false) {
                     return;
                 }
+            }
+
+            if(isVeryVerbose()){
+                Log::info('Loading ' . $module->namespace);
             }
 
             if (method_exists($module->namespace, '__construct')) {

@@ -10,15 +10,32 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
+use Exception;
+use SimpleXMLElement;
 
 class CountdownController
 {
+    /**
+     * @var int
+     */
     private static $addedSeconds = 0;
+
+    /**
+     * @var int
+     */
     private static $matchStart;
+
+    /**
+     * @var int
+     */
     private static $originalTimeLimit;
 
+    /**
+     *
+     */
     public static function init()
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
@@ -31,29 +48,51 @@ class CountdownController
         }
 
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
+        Hook::add('EndMap', [self::class, 'endMap']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F3', 'time');
+        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 
+    /**
+     *
+     */
     public static function setMatchStart()
     {
-        $time               = time();
-        self::$matchStart   = $time;
+        $time = time();
+        self::$matchStart = $time;
         self::$addedSeconds = 0;
-
-        self::setTimeLimit(self::getOriginalTimeLimit());
 
         try {
             $file = cacheDir('round_start_time.txt');
             File::put($file, $time);
-        } catch (\Exception $e) {
-            Log::logAddLine('CountdownController', 'Failed to save match start to cache-file.');
+        } catch (Exception $e) {
+            Log::write('Failed to save match start to cache-file.');
         }
     }
 
+    public static function endMap(Map $map){
+        self::resetTimeLimit();
+    }
+
+    public static function resetTimeLimit()
+    {
+        self::setTimeLimit(self::$originalTimeLimit);
+
+        try {
+            $file = cacheDir('added_time.txt');
+            File::put($file, 0);
+        } catch (Exception $e) {
+            Log::write('Failed to save added time to cache-file.');
+        }
+    }
+
+    /**
+     * @param  int  $seconds
+     * @param  Player|null  $player
+     */
     public static function addTime(int $seconds, Player $player = null)
     {
         $addedTime = self::$addedSeconds;
@@ -66,35 +105,45 @@ class CountdownController
 
         if ($player != null) {
             if ($seconds > 0) {
-                infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
+                infoMessage($player, ' added ', secondary(round($seconds / 60, 1).' minutes'),
+                    ' of playtime.')->sendAdmin();
             } else {
 
-                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'), ' of playtime.')->sendAdmin();
+                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1).' minutes'),
+                    ' of playtime.')->sendAdmin();
             }
         }
 
         try {
             $file = cacheDir('added_time.txt');
             File::put($file, $addedTime);
-        } catch (\Exception $e) {
-            Log::logAddLine('CountdownController', 'Failed to save added time to cache-file.');
+        } catch (Exception $e) {
+            Log::write('Failed to save added time to cache-file.');
         }
     }
 
+    /**
+     * @param  Player  $player
+     * @param  string  $cmd
+     * @param  float  $amount
+     */
     public static function addTimeManually(Player $player, $cmd, float $amount)
     {
         self::addTime(round($amount * 60), $player);
     }
 
+    /**
+     * @param  Player  $player
+     */
     public static function addMinute(Player $player)
     {
         self::addTime(60, $player);
     }
 
     /**
-     * @param bool $getAsCarbon
+     * @param  bool  $getAsCarbon
      *
-     * @return \Carbon\Carbon|int
+     * @return Carbon|int
      */
     public static function getRoundStartTime(bool $getAsCarbon = false)
     {
@@ -105,6 +154,9 @@ class CountdownController
         }
     }
 
+    /**
+     * @return int
+     */
     public static function getSecondsLeft(): int
     {
         $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 2;
@@ -114,6 +166,9 @@ class CountdownController
         return $timeLeft < 0 ? 0 : $timeLeft;
     }
 
+    /**
+     * @return int
+     */
     public static function getSecondsPassed(): int
     {
         $startTime = self::getRoundStartTime();
@@ -131,8 +186,8 @@ class CountdownController
         $file = config('server.default-matchsettings');
 
         if ($file) {
-            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
-            $xml           = new \SimpleXMLElement($matchSettings);
+            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
+            $xml = new SimpleXMLElement($matchSettings);
             foreach ($xml->mode_script_settings->children() as $child) {
                 if ($child->attributes()['name'] == 'S_TimeLimit') {
                     return intval($child->attributes()['value']);
@@ -144,7 +199,7 @@ class CountdownController
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
     public static function getAddedSeconds()
     {
@@ -152,7 +207,7 @@ class CountdownController
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
     public static function getOriginalTimeLimit()
     {
@@ -160,13 +215,13 @@ class CountdownController
     }
 
     /**
-     * Set a new timelimit in seconds.
+     * Set a new time limit in seconds.
      *
-     * @param int $seconds
+     * @param  int  $seconds
      */
     public static function setTimeLimit(int $seconds)
     {
-        $settings                = Server::getModeScriptSettings();
+        $settings = Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $seconds;
         Server::setModeScriptSettings($settings);
     }

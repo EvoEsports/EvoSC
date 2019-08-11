@@ -1,5 +1,16 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $doNotPause = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Liverankings" id="Liverankings" version="3">
+<manialink version="3">
+    {block id}liverankings{/block}
+    {block size}44 {config('live-rankings.show') * 3 + 6}{/block}
+
+    {block content}
+    <quad id="header" pos="0 0" size="44 5" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+    <quad id="bg" pos="0 -5" size="44 200" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+    <label z-index="1" valign="center" pos="1.5 -2.5" size="44 5" textsize="0.3" text=" Live ranking" textfont="{config('colors.ui.font')|noescape}" />
+
     <framemodel id="record">
         <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
         <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
@@ -7,24 +18,15 @@
         <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
     </framemodel>
 
-    <frame id="widget" pos="{config('live-rankings.pos')}" size="40 60" scale="{config('live-rankings.scale')}" z-index="5000">
-        <quad class="widget" z-index="-5" size="40 {config('live-rankings.show') * 3 + 1}" pos="0 -5" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
-        <quad size="40 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.9"/>
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Live ranking" textfont="{config('colors.ui.font')|noescape}" />
-
-        <frame id="ranking" pos="1 -7">
-            {for $i=0; $i < config('live-rankings.show'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
-            {/for}
-        </frame>
+    <frame id="ranking" pos="1 -7">
+        {for $i=0; $i < config('live-rankings.show'); $i++}
+        <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
+        {/for}
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    declare Integer[Text] scores;
-
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
         declare Text msString;
@@ -109,48 +111,50 @@
         }
         scores = Integer[Text];
     }
+    --></script>
+    {/block}
 
-    {(new esc\Classes\HideScript())|noescape}
+    <script><!--
+    {block globals}
+    declare Integer[Text] scores;
+    {/block}
 
-    main(){
+    {block bootScript}
+        left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('live-rankings.ui.slot')};
+
         declare Text currentMapUid = Map.MapInfo.MapUid;
 
         reset();
-
-        foreach(player in Players){
-            if(player == Null) continue;
-            if(player.Score == Null) continue;
-            if(player.Score.BestLap == Null) continue;
-
-            declare score = player.Score.BestLap.Time;
-            if(score > 0){
-                scores[player.User.Name] = score;
+        foreach(score in Scores){
+            declare time = score.BestLap.Time;
+            if(time > 0){
+                scores[score.User.Name] = time;
             }
         }
 
         updateList();
+    {/block}
 
-        while(True){
-            yield;
-
-            foreach(event in RaceEvents){
-                if(event.IsEndLap == True){
-                    if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
-                        scores[event.Player.Name] = event.LapTime;
-                        updateList();
-                    }
-                    break;
+    {block loop}
+        foreach(event in RaceEvents){
+            if(event.IsEndLap == True){
+                if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
+                    scores[event.Player.Name] = event.LapTime;
+                    log(event.LapTime);
+                    updateList();
                 }
+                break;
             }
+        }
 
             if(currentMapUid != Map.MapInfo.MapUid){
                 currentMapUid = Map.MapInfo.MapUid;
                 reset();
             }
+    {/block}
 
-            hidescript();
-        }
-    }
-
-    --></script>
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>

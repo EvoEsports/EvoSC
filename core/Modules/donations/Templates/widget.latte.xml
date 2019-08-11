@@ -1,68 +1,59 @@
+{contentType text}
+{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:donations-widget" id="donations-widget" version="3">
-    <frame id="main-frame" pos="{config('donations.pos.visible')}" size="50 5" scale="0.8">
-        <quad size="50 5" z-index="0" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" id="bg-quad" ScriptEvents="1" />
+<manialink version="3">
+    {block id}donate-planets{/block}
+    {block size}44 4{/block}
 
-        <frame id="content-frame" pos="0 -7.55" z-index="1">
-            <label pos="25 5" halign="center" valign="center" textsize="1" textcolor="{config('colors.ui.widget.text.primary')}" text="Donate planets" textfont="{config('colors.ui.font')|noescape}"/>
-            <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="1" textcolor="{config('colors.ui.widget.text.primary')}" text="12000 Planets" z-index="3" textfont="{config('colors.ui.font')|noescape}"/>
-            <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 5" bgcolor="{config('colors.ui.widget.header.color')|noescape}9" />
-        </frame>
+    {block content}
+    <quad size="44 4" z-index="0" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" id="bg-quad" ScriptEvents="1" />
+
+    <frame id="content-frame" pos="0 -6" z-index="1">
+        <label pos="25 4" halign="center" valign="center" textsize="0.5" textcolor="{config('colors.ui.widget.text.primary')}" text="Donate planets" textfont="{config('colors.ui.font')|noescape}"/>
+        <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="0.5" textcolor="{config('colors.ui.widget.text.primary')}" text="12000 Planets" z-index="3" textfont="{config('colors.ui.font')|noescape}"/>
+        <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 4" bgcolor="{config('colors.ui.widget.header.color')|noescape}9" />
     </frame>
+    {/block}
 
-    <script>
-        <!--
-        #Include "MathLib" as ML
-        #Include "TextLib" as TL
-
-        {(new esc\Classes\HideScript('main-frame'))|noescape}
-
+    {block script}
+    <script><!--
         Void anim(CMlFrame frame, Text targetPos){
             AnimMgr.Add(frame, targetPos, 200, CAnimManager::EAnimManagerEasing::CubicInOut);
         }
+    --></script>
+    {/block}
 
-        main(){
-            declare Text visible = "<frame pos='{config('donations.pos.visible')|noescape}' />";
-            declare Text hidden = "<frame pos='{config('donations.pos.hidden')|noescape}' />";
-            declare Boolean isHidden = False;
+    <script><!--
+    {block globals}
+    {/block}
 
-            declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg-quad") as CMlQuad);
-            declare barQuad <=> (Page.MainFrame.GetFirstChild("bar-quad") as CMlQuad);
-            declare contentFrame <=> (Page.MainFrame.GetFirstChild("content-frame") as CMlFrame);
-            declare mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-            declare amountLabel <=> (Page.MainFrame.GetFirstChild("amount-label") as CMlLabel);
+    {block bootScript}
+        declare Text visible = "<frame pos='{config('donations.pos.visible')|noescape}' />";
+        declare Text hidden = "<frame pos='{config('donations.pos.hidden')|noescape}' />";
+        declare Boolean isHidden = False;
 
-            declare Boolean barVisible = False;
-            declare Integer amount = 0;
-            declare Real xOffset = {sprintf('%.1f', floatval(explode(' ', config('donations.pos.visible'))[0]))|noescape};
+        declare bgQuad <=> (Page.MainFrame.GetFirstChild("bg-quad") as CMlQuad);
+        declare barQuad <=> (Page.MainFrame.GetFirstChild("bar-quad") as CMlQuad);
+        declare contentFrame <=> (Page.MainFrame.GetFirstChild("content-frame") as CMlFrame);
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+        declare amountLabel <=> (Page.MainFrame.GetFirstChild("amount-label") as CMlLabel);
 
-            while(True){
-                yield;
+        declare Boolean barVisible = False;
+        declare Integer amount = 0;
 
-                foreach(Event in PendingEvents){
-                    if(Event.Type == CMlScriptEvent::Type::MouseOver && Event.Control == bgQuad){
-                        anim(contentFrame, """<frame pos="0 -2.55" />""");
-                        barVisible = True;
-                    }
-                    if(Event.Type == CMlScriptEvent::Type::MouseOut && Event.Control == bgQuad){
-                        anim(contentFrame, """<frame pos="0 -7.55" />""");
-                        barQuad.Size = <0.0, 5.0>;
-                        barVisible = False;
-                    }
-                    if(Event.Type == CMlScriptEvent::Type::MouseClick && Event.Control == bgQuad){
-                        TriggerPageAction("donate," ^ amount);
-                    }
-                }
+        left__ = {config('donations.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('donations.ui.slot')};
+    {/block}
 
-                hidescript();
-
+    {block loop}
                 if(barVisible){
-                    declare posX = MouseX - xOffset;
+                    declare posX = MouseX - widget.RelativePosition_V3[0];
+                    log(posX);
 
                     if(posX > 0){
-                        declare posCoef = posX / 39.8333;
+                        declare posCoef = posX / 44.0;
 
-                        barQuad.Size = <posCoef * 50, 5.0>;
+                        barQuad.Size = <posCoef * 44, 4.0>;
                         amount = ML::NearestInteger((posCoef * 100)*(posCoef * 100));
 
                         amount = (amount / 10) * 10;
@@ -78,8 +69,21 @@
                         }
                     }
                 }
-            }
-        }
-        -->
-    </script>
+    {/block}
+
+    {block pendingEvents}
+                    if(event.Type == CMlScriptEvent::Type::MouseOver && event.Control == bgQuad){
+                        anim(contentFrame, """<frame pos="0 -2" />""");
+                        barVisible = True;
+                    }
+                    if(event.Type == CMlScriptEvent::Type::MouseOut && event.Control == bgQuad){
+                        anim(contentFrame, """<frame pos="0 -6.0" />""");
+                        barQuad.Size = <0.0, 5.0>;
+                        barVisible = False;
+                    }
+                    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control == bgQuad){
+                        TriggerPageAction("donate," ^ amount);
+                    }
+    {/block}
+--></script>
 </manialink>

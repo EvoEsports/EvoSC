@@ -18,32 +18,39 @@ class Pay2Play
     public function __construct()
     {
         self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
-        self::$priceSkip    = config('pay2play.skip.cost') ?? 5000;
+        self::$priceSkip = config('pay2play.skip.cost') ?? 5000;
 
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
-        ManiaLinkEvent::add('addtime', [self::class, 'addTime']);
-        ManiaLinkEvent::add('skip', [self::class, 'skip']);
+        if (config('pay2play.addtime.enabled')) {
+            ManiaLinkEvent::add('pay2play.addtime', [self::class, 'addTime']);
+        }
+        if (config('pay2play.skip.enabled')) {
+            ManiaLinkEvent::add('pay2play.skip', [self::class, 'skip']);
+        }
     }
 
     public static function showWidget(Player $player)
     {
-        Template::show($player, 'pay2play.widget');
+        if (config('pay2play.addtime.enabled')) {
+            Template::show($player, 'pay2play.add-time');
+        }
+
+        if (config('pay2play.skip.enabled')) {
+            Template::show($player, 'pay2play.skip-map');
+        }
     }
 
     public static function addTime(Player $player)
     {
-        if (config('pay2play.addtime.enabled')) {
-            /* TODO: Block force replay */
+        if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimit() >= config('pay2play.addtime.time-limit-in-seconds')) {
+            warningMessage('Maximum playtime for this round reached.')->send($player);
 
-            if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimit() >= config('pay2play.addtime.time-limit')) {
-                warningMessage('Maximum playtime for this round reached.')->send($player);
-
-                return;
-            }
-
-            PlanetsController::createBill($player, self::$priceAddTime, 'Pay ' . self::$priceAddTime . ' planets to add more time?', [self::class, 'addTimePaySuccess']);
+            return;
         }
+
+        PlanetsController::createBill($player, self::$priceAddTime,
+            'Pay '.self::$priceAddTime.' planets to add more time?', [self::class, 'addTimePaySuccess']);
     }
 
     public static function addTimePaySuccess(Player $player, int $amount)
@@ -55,9 +62,8 @@ class Pay2Play
 
     public static function skip(Player $player)
     {
-        if (config('pay2play.skip.enabled')) {
-            PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?', [self::class, 'skipPaySuccess']);
-        }
+        PlanetsController::createBill($player, self::$priceSkip, 'Pay '.self::$priceSkip.' planets to skip map?',
+            [self::class, 'skipPaySuccess']);
     }
 
     public static function skipPaySuccess(Player $player, int $amount)

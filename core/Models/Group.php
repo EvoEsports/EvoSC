@@ -16,7 +16,7 @@ class Group extends Model
     public function hasAccess(string $accessRightName)
     {
         if ($this->id == 1) {
-            //Masteradrmin always has access
+            //Master admin always has access
             return true;
         }
 

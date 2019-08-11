@@ -1,21 +1,23 @@
 {
   "addtime": {
     "enabled": true,
-    "pos": {
-      "visible": "125 -2.5",
-      "hidden": "160 -2.5"
-    },
-    "cost": 100,
-    "time-limit": 1800,
-    "forceable": false
+    "cost": 500,
+    "forceable": false,
+    "time-limit-in-seconds": 1800,
+    "ui": {
+      "position": "right",
+      "slot": 8,
+      "slot_horizontal": 5
+    }
   },
 
   "skip": {
     "enabled": false,
-    "pos": {
-      "visible": "120 -2.5",
-      "hidden": "160 -2.5"
-    },
-    "cost": 5000
+    "cost": 5000,
+    "ui": {
+      "position": "right",
+      "slot": 8,
+      "slot_horizontal": 4
+    }
   }
 }
