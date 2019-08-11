@@ -1,14 +1,34 @@
 <?php
 
-require 'gbxdatafetcher/gbxdatafetcher.inc.php';
+namespace esc\Commands;
 
+use Error;
+use esc\Classes\Database;
 use esc\Classes\File;
+use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
+use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Log;
 use esc\Classes\Timer;
+use esc\Controllers\AfkController;
+use esc\Controllers\BansController;
+use esc\Controllers\ChatController;
+use esc\Controllers\ConfigController;
+use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
+use esc\Controllers\HookController;
+use esc\Controllers\MapController;
+use esc\Controllers\MatchSettingsController;
+use esc\Controllers\ModuleController;
+use esc\Controllers\PlanetsController;
+use esc\Controllers\PlayerController;
+use esc\Controllers\QueueController;
+use esc\Controllers\SetupController;
+use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,16 +48,16 @@ class EscRun extends Command
         global $serverName;
 
         Log::setOutput($output);
-        esc\Controllers\ConfigController::init();
+        ConfigController::init();
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
-            esc\Controllers\SetupController::startSetup($input, $output, $this->getHelper('question'));
+            SetupController::startSetup($input, $output, $this->getHelper('question'));
         }
 
         try {
             $output->writeln("Connecting to server...");
 
-            esc\Classes\Server::init(
+            Server::init(
                 config('server.ip'),
                 config('server.port'),
                 5,
@@ -71,7 +91,7 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
+        file_put_contents(baseDir(config('server.login').'_evosc.pid'), getmypid());
     }
 
     private function migrate(InputInterface $input, OutputInterface $output)
@@ -106,22 +126,23 @@ class EscRun extends Command
 
         $_onlinePlayers = collect();
 
-        esc\Classes\Database::init();
-        esc\Classes\RestClient::init(serverName());
-        esc\Controllers\HookController::init();
-        esc\Controllers\TemplateController::init();
-        esc\Controllers\ChatController::init();
-        esc\Classes\ManiaLinkEvent::init();
-        esc\Controllers\QueueController::init();
-        esc\Controllers\MatchSettingsController::init();
-        esc\Controllers\MapController::init();
-        esc\Controllers\PlayerController::init();
-        esc\Controllers\AfkController::init();
-        esc\Controllers\BansController::init();
-        esc\Controllers\ModuleController::init();
-        esc\Controllers\PlanetsController::init();
-        esc\Controllers\CountdownController::init();
+        Database::init();
+        RestClient::init(serverName());
+        HookController::init();
+        TemplateController::init();
+        ChatController::init();
+        ManiaLinkEvent::init();
+        QueueController::init();
+        MatchSettingsController::init();
+        MapController::init();
+        PlayerController::init();
+        AfkController::init();
+        BansController::init();
+        ModuleController::init();
+        PlanetsController::init();
+        CountdownController::init();
 
+        //TODO: Collection Transform
         $logins = [];
         foreach (Server::getPlayerList(500, 0) as $player) {
             array_push($logins, $player->login);
@@ -134,14 +155,14 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        esc\Controllers\ModuleController::bootModules();
+        ModuleController::bootModules();
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);
         }
 
-        $map = Map::where('filename', esc\Classes\Server::getCurrentMapInfo()->fileName)->first();
-        esc\Classes\Hook::fire('BeginMap', $map);
+        $map = Map::where('filename', Server::getCurrentMapInfo()->fileName)->first();
+        Hook::fire('BeginMap', $map);
 
         //Set connected players online
         $playerList = collect(Server::rpc()->getPlayerList());
@@ -161,17 +182,17 @@ class EscRun extends Command
         //cycle-loop
         while (true) {
             try {
-                esc\Classes\Timer::startCycle();
+                Timer::startCycle();
 
-                EventController::handleCallbacks(esc\Classes\Server::executeCallbacks());
+                EventController::handleCallbacks(Server::executeCallbacks());
 
-                $pause = esc\Classes\Timer::getNextCyclePause();
+                $pause = Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
 
                 usleep($pause);
             } catch (Exception $e) {
                 Log::write('MPS',
-                    'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
+                    'Failed to fetch callbacks from dedicated-server. Failed attempts: '.$failedConnectionRequests.'/50');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
@@ -184,12 +205,12 @@ class EscRun extends Command
                 sleep(5);
             } catch (Error $e) {
                 $errorClass = get_class($e);
-                $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
-                $output->writeln("<fg=white;bg=red;options=bold>" . $e->getMessage() . "</>");
+                $output->writeln("<error>$errorClass in ".$e->getFile()." on Line ".$e->getLine()."</error>");
+                $output->writeln("<fg=white;bg=red;options=bold>".$e->getMessage()."</>");
                 $output->writeln("<error>===============================================================================</error>");
-                $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
+                $output->writeln("<error>".$e->getTraceAsString()."</error>");
 
-                Log::write('EvoSC encountered an error: ' . $e->getMessage(), false);
+                Log::write('EvoSC encountered an error: '.$e->getMessage(), false);
                 Log::write($e->getTraceAsString(), false);
             }
         }

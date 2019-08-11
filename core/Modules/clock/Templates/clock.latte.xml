@@ -64,7 +64,7 @@
             }
         }else{
             declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
-            declare Boolean overHidespeed = InputPlayer.DisplaySpeed >= hideSpeed;
+            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
 
             if(overHidespeed && playerIsRacing && !HS_Hidden){
                 hide();

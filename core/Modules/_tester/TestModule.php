@@ -11,6 +11,7 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use esc\Modules\LocalRecords\LocalRecords;
 use esc\Modules\MusicClient\MusicClient;
 use Illuminate\Support\Collection;
 
@@ -24,6 +25,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        UiSettings::mleShowSettingsWindow($player);
+        LocalRecords::showLocalsTable($player);
     }
 }

@@ -7,13 +7,15 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\RecordsTable;
 use Illuminate\Support\Collection;
 
-class LocalRecords
+class LocalRecords implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -43,6 +45,7 @@ class LocalRecords
         AccessRight::createIfNonExistent('local_delete', 'Delete local-records.');
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
+        ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
     }
 
     //Called on PlayerConnect
@@ -52,6 +55,13 @@ class LocalRecords
 
         Template::show($player, 'local-records.update', compact('localsJson'));
         Template::show($player, 'local-records.manialink');
+    }
+
+    public static function showLocalsTable(Player $player)
+    {
+        $records = MapController::getCurrentMap()->locals()->orderBy('Score')->get();
+
+        RecordsTable::show($player, $records, 'Local Records');
     }
 
     //Called on PlayerFinish
@@ -242,5 +252,15 @@ class LocalRecords
         }
 
         return 1;
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
+        // TODO: Implement start() method.
     }
 }

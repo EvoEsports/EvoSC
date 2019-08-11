@@ -28,14 +28,18 @@ class AddAdmin extends Command
             ->addArgument('groupId', InputArgument::OPTIONAL, 'Group id to add');
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        Log::setOutput($output);
+        ConfigController::init();
+        Database::init();
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $login = $input->getArgument('login');
         $groupId = $input->getArgument('groupId');
         $helper = new QuestionHelper();
-        Log::setOutput($output);
-        ConfigController::init();
-        Database::init();
 
 
         $player = Player::find($login);

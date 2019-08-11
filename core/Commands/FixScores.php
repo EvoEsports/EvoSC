@@ -16,10 +16,13 @@ class FixScores extends Command
         $this->setName('fix:scores');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
         Log::setOutput($output);
+    }
 
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         if (!file_exists('config/database.config.json')) {
             $output->writeln('config/database.config.json not found');
 
