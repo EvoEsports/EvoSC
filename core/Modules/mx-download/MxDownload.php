@@ -80,6 +80,9 @@ class MxDownload
                 $map->filename = $mxMap->getFilename();
             }
 
+            $map->name = $mxMap->gbx->Name;
+            $map->title_id = $mxMap->gbx->TitleId;
+            $map->environment = $mxMap->gbx->Environment;
             $map->enabled = true;
             $map->cooldown = 999;
             $map->saveOrFail();
