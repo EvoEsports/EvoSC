@@ -17,9 +17,8 @@ About EvoSC
 {block navbar}
     {include 'components.tabs', tabs => [
         'Commands'=>'help.show_cmds',
-        'About'=>'help.show_about'
-    ],
-        active => 'help.show_about'
+        'About'=>''
+    ]
     }
 {/block}
 

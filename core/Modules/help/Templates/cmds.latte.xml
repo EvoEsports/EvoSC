@@ -16,10 +16,9 @@ Help
 
 {block navbar}
     {include 'components.tabs', tabs => [
-        'Commands'=>'help.show_cmds',
+        'Commands'=>'',
         'About'=>'help.show_about'
-    ],
-        active => 'help.show_cmds'
+    ]
     }
 {/block}
 

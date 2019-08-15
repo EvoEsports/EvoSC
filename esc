@@ -18,9 +18,11 @@ use Symfony\Component\Console\Input\ArgvInput;
 global $_isVerbose;
 global $_isVeryVerbose;
 global $_isDebug;
+global $_skipMapCheck;
 $_isVerbose = false;
 $_isVeryVerbose = false;
 $_isDebug = false;
+$_skipMapCheck = false;
 
 $input = new ArgvInput();
 if ($input->hasParameterOption('-vvv', true) ||
@@ -40,7 +42,6 @@ if ($input->hasParameterOption('-vvv', true) ||
     $input->getParameterOption('--verbose', false, true)) {
     $_isVerbose = true;
 }
-
 
 $application = new Application();
 $application->add(new Migrate());

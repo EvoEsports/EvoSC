@@ -10,9 +10,8 @@
 
     {block navbar}
     {include 'components.tabs', tabs => [
-    'Records'=>'locals.show',
-    ],
-    active => 'locals.show'
+    'Records'=>'',
+    ]
     }
     {/block}
 

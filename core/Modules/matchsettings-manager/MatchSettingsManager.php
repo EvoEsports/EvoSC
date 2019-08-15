@@ -40,11 +40,13 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'ms_edit');
         ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'showEditMatchsettingsMaps'], 'ms_edit');
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
@@ -93,7 +95,7 @@ class MatchSettingsManager
             }
         }
 
-        Template::show($player, 'matchsettings-manager.edit-settings', compact('name', 'nodes'));
+        @Template::show($player, 'matchsettings-manager.edit-settings', compact('name', 'nodes'));
     }
 
     public static function showEditMatchsettingsMaps(Player $player, string $name)
@@ -109,16 +111,36 @@ class MatchSettingsManager
             }
         }
 
-        $chunks = Map::all()->map(function (Map $map) use ($enabledMaps) {
-            $map->enabled = false;
-            $map->name = str_replace('"', '', $map->name);
+        $chunks = Map::all()
+            ->map(function (Map $map) use ($enabledMaps) {
+                if (!$map->name) {
+                    $map->name = $map->gbx->Name;
+                    $map->environment = $map->gbx->Environment;
+                    $map->title_id = $map->gbx->TitleId;
+                    $map->save();
+                }
 
-            return $map;
-        })->chunk(19)->map(function (Collection $chunk) {
-            return $chunk->values();
-        });
+                $map->enabled = $enabledMaps->contains('ident', $map->uid);
+                $map->name = str_replace('"', '', $map->name);
 
-        Template::show($player, 'matchsettings-manager.edit-maps', compact('chunks'));
+                return $map;
+            })
+            ->sortByDesc('enabled')
+            ->chunk(19)
+            ->map(function (Collection $chunk) {
+                return $chunk->values();
+            });
+
+        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'chunks'));
+    }
+
+    public static function saveMaps(Player $player, string $name, ...$mapsJson)
+    {
+        $mapIDs = collect(json_decode(implode(',', $mapsJson)))->values();
+
+        $maps = Map::whereIn('id', $mapIDs)->get();
+
+        var_dump($maps->pluck('name'));
     }
 
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)

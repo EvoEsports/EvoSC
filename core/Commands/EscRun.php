@@ -40,6 +40,7 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
+            ->addOption('skip_map_check', null, InputOption::VALUE_OPTIONAL, 'Start without loading maps properly.', false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -52,6 +53,11 @@ class EscRun extends Command
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));
+        }
+
+        if ($input->getOption('skip_map_check') !== false) {
+            global $_skipMapCheck;
+            $_skipMapCheck = true;
         }
 
         try {

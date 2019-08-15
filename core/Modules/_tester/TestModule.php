@@ -25,6 +25,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchSettingsManager::showEditMatchsettingsMaps($player, 'rounds_0');
+        MatchSettingsManager::showEditMatchsettingsMaps($player, 'drtk01.ms');
     }
 }

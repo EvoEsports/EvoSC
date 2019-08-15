@@ -48,12 +48,19 @@ class MapController implements ControllerInterface
      */
     public static function init()
     {
+        global $_skipMapCheck;
+
         if (!File::dirExists(cacheDir('gbx'))) {
             File::makeDir(cacheDir('gbx'));
         }
 
         self::$mapsPath = Server::getMapsDirectory();
-        self::loadMaps();
+
+        var_dump($_skipMapCheck);
+
+        if (!$_skipMapCheck) {
+            self::loadMaps();
+        }
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);

@@ -2,7 +2,7 @@
 <frame id="navbar" pos="0 -5.5" z-index="5">
     {php $i=0;}
     {foreach $tabs as $tab => $action}
-    {if $action == $active}
+    {if $action == ''}
     <quad id="nav-active" pos="{$i * 18 + 10} -3" size="17 4" bgcolor="{config('colors.ui.window.header.color')}f" z-index="-1"
           halign="center" valign="center"/>
     {/if}
