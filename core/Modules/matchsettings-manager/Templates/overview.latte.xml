@@ -1,7 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3"
-           xmlns:n="http://www.w3.org/1999/xhtml">
+<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
     <frame id="window" pos="-25 10">
         <quad pos="0 0" size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
         <quad id="handle" data-id="help" pos="0 0" size="35 5" z-index="5"/>
@@ -22,9 +21,9 @@
                textfont="{config('colors.ui.font')|noescape}"
         />
 
-        <frame pos="2 -4" n:if="count($matchsettings)">
-            <label n:foreach="$matchsettings as $i => $name"
-                   pos="15.5 {$i * -5}"
+        <frame pos="2 -14" n:if="count($matchsettings) > 0">
+            {foreach $matchsettings as $i => $name}
+            <label pos="15.5 {$i * -5}"
                    text="{$name}  "
                    halign="center"
                    valign="center"
@@ -37,8 +36,7 @@
                    textfont="{config('colors.ui.font')|noescape}"
             />
 
-            <label n:foreach="$matchsettings as $i => $name"
-                   pos="33.5 {$i * -5}"
+            <label pos="33.5 {$i * -5}"
                    text=""
                    halign="center"
                    valign="center"
@@ -53,8 +51,7 @@
                    textfont="{config('colors.ui.font')|noescape}"
             />
 
-            <label n:foreach="$matchsettings as $i => $name"
-                   pos="38.5 {$i * -5}"
+            <label pos="38.5 {$i * -5}"
                    text=""
                    halign="center"
                    valign="center"
@@ -67,8 +64,7 @@
                    textfont="{config('colors.ui.font')|noescape}"
             />
 
-            <label n:foreach="$matchsettings as $i => $name"
-                   pos="43.5 {$i * -5}"
+            <label pos="43.5 {$i * -5}"
                    text=""
                    halign="center"
                    valign="center"
@@ -82,6 +78,7 @@
                    focusareacolor2="{config('colors.ui.window.btn.danger')}c"
                    textfont="{config('colors.ui.font')|noescape}"
             />
+            {/foreach}
         </frame>
     </frame>
 

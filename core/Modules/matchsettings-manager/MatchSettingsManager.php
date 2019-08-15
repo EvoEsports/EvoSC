@@ -20,16 +20,16 @@ class MatchSettingsManager
 
     private static $modes = [
         'TimeAttack' => 'timeattack.xml',
-        'Team'       => 'team.xml',
-        'Rounds'     => 'rounds.xml',
-        'Laps'       => 'laps.xml',
-        'Cup'        => 'cup.xml',
-        'Chase'      => 'chase.xml',
+        'Team' => 'team.xml',
+        'Rounds' => 'rounds.xml',
+        'Laps' => 'laps.xml',
+        'Cup' => 'cup.xml',
+        'Chase' => 'chase.xml',
     ];
 
     public function __construct()
     {
-        self::$path    = Server::getMapsDirectory() . '/MatchSettings/';
+        self::$path = Server::getMapsDirectory().'/MatchSettings/';
         self::$objects = collect();
 
         AccessRight::createIfNonExistent('ms_edit', 'Change match-settings.');
@@ -52,7 +52,7 @@ class MatchSettingsManager
 
     public static function showOverview(Player $player)
     {
-        $matchsettings = self::getMatchsettings();
+        $matchsettings = self::getMatchsettings()->values();
 
         Template::show($player, 'matchsettings-manager.overview', compact('matchsettings'));
     }
@@ -66,11 +66,11 @@ class MatchSettingsManager
 
     public static function showEditMatchsettings(Player $player, string $name)
     {
-        $file  = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
-        $data  = File::get($file);
-        $maps  = collect();
+        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
+        $data = File::get($file);
+        $maps = collect();
         $nodes = collect();
-        $xml   = new \SimpleXMLElement($data);
+        $xml = new \SimpleXMLElement($data);
 
         foreach ($xml as $node) {
             if ($node->getName() == 'map') {
@@ -78,19 +78,19 @@ class MatchSettingsManager
             } else {
                 if (count($node) > 0) {
                     $nodeName = $node->getName();
-                    $items    = collect();
+                    $items = collect();
 
                     foreach ($node as $item) {
                         if ($nodeName == 'mode_script_settings') {
-                            $items->put('' . $item['name'], '' . $item['value']);
+                            $items->put(''.$item['name'], ''.$item['value']);
                         } else {
-                            $items->put($item->getName(), '' . $item[0]);
+                            $items->put($item->getName(), ''.$item[0]);
                         }
                     }
 
                     $nodes->put($nodeName, $items);
                 } else {
-                    $nodes->put($node->getName(), '' . $node[0]);
+                    $nodes->put($node->getName(), ''.$node[0]);
                 }
             }
         }
@@ -104,8 +104,8 @@ class MatchSettingsManager
 
         var_dump([
             'old_file' => $oldFilename,
-            'file'     => $filename,
-            'changes'  => $settings,
+            'file' => $filename,
+            'changes' => $settings,
         ]);
 
         self::showEditMatchsettings($player, $oldFilename);
@@ -113,49 +113,49 @@ class MatchSettingsManager
 
     public static function createNewMatchsettings(Player $player, string $modeName)
     {
-        $modeFile               = self::$modes[$modeName];
-        $modeBaseName           = str_replace('.xml', '', $modeFile);
-        $sourceMatchsettings    = __DIR__ . '/MatchSettingsRepo/' . $modeFile;
-        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
-        $i                      = 0;
+        $modeFile = self::$modes[$modeName];
+        $modeBaseName = str_replace('.xml', '', $modeFile);
+        $sourceMatchsettings = __DIR__.'/MatchSettingsRepo/'.$modeFile;
+        $matchsettingsDirectory = Server::getMapsDirectory().'MatchSettings/';
+        $i = 0;
 
         do {
             $filename = sprintf('%s_%d.txt', $modeBaseName, $i);
             $i++;
-        } while (File::exists($matchsettingsDirectory . $filename));
+        } while (File::exists($matchsettingsDirectory.$filename));
 
-        File::copy($sourceMatchsettings, $matchsettingsDirectory . $filename);
+        File::copy($sourceMatchsettings, $matchsettingsDirectory.$filename);
 
         self::showOverview($player);
     }
 
     public static function duplicateMatchsettings(Player $player, string $matchsettingsFile)
     {
-        $file                   = $matchsettingsFile . '.txt';
-        $targetFile             = $matchsettingsFile . '_copy.txt';
-        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
+        $file = $matchsettingsFile.'.txt';
+        $targetFile = $matchsettingsFile.'_copy.txt';
+        $matchsettingsDirectory = Server::getMapsDirectory().'MatchSettings/';
 
-        File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
+        File::copy($matchsettingsDirectory.$file, $matchsettingsDirectory.$targetFile);
 
         self::showOverview($player);
     }
 
     public static function deleteMatchsettings(Player $player, string $matchsettingsFile)
     {
-        if (config('server.default-matchsettings') == $matchsettingsFile . '.txt') {
+        if (config('server.default-matchsettings') == $matchsettingsFile.'.txt') {
             warningMessage('Can not delete default match-settings.')->send($player);
 
             return;
         }
 
-        File::delete(Server::getMapsDirectory() . 'MatchSettings/' . $matchsettingsFile . '.txt');
+        File::delete(Server::getMapsDirectory().'MatchSettings/'.$matchsettingsFile.'.txt');
 
         self::showOverview($player);
     }
 
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
-        Server::loadMatchSettings('MatchSettings/' . $matchsettingsFile . '.txt');
+        Server::loadMatchSettings('MatchSettings/'.$matchsettingsFile.'.txt');
 
         infoMessage($player, ' loads matchsettings ', secondary($matchsettingsFile))->sendAll();
 
