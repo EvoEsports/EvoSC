@@ -12,6 +12,7 @@ use esc\Classes\ChatCommand;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class MatchSettingsManager
 {
@@ -68,14 +69,11 @@ class MatchSettingsManager
     {
         $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
         $data = File::get($file);
-        $maps = collect();
         $nodes = collect();
         $xml = new \SimpleXMLElement($data);
 
         foreach ($xml as $node) {
-            if ($node->getName() == 'map') {
-                $maps->push($node);
-            } else {
+            if ($node->getName() != 'map') {
                 if (count($node) > 0) {
                     $nodeName = $node->getName();
                     $items = collect();
@@ -95,18 +93,48 @@ class MatchSettingsManager
             }
         }
 
-        Template::show($player, 'matchsettings-manager.edit', compact('name', 'nodes', 'maps'));
+        Template::show($player, 'matchsettings-manager.edit-settings', compact('name', 'nodes'));
+    }
+
+    public static function showEditMatchsettingsMaps(Player $player, string $name)
+    {
+        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
+        $data = File::get($file);
+        $enabledMaps = collect();
+        $xml = new \SimpleXMLElement($data);
+
+        foreach ($xml as $node) {
+            if ($node->getName() == 'map') {
+                $enabledMaps->push($node);
+            }
+        }
+
+        $chunks = Map::all()->map(function (Map $map) use ($enabledMaps) {
+            $map->enabled = false;
+            $map->name = str_replace('"', '', $map->name);
+
+            return $map;
+        })->chunk(19)->map(function (Collection $chunk) {
+            return $chunk->values();
+        });
+
+        Template::show($player, 'matchsettings-manager.edit-maps', compact('chunks'));
     }
 
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
     {
         $settings = json_decode(implode(',', $settings));
+        $filename = trim($filename);
 
         var_dump([
             'old_file' => $oldFilename,
             'file' => $filename,
             'changes' => $settings,
         ]);
+
+        if ($oldFilename != $filename) {
+            //name changed
+        }
 
         self::showEditMatchsettings($player, $oldFilename);
     }

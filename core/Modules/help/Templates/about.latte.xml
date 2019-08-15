@@ -44,6 +44,9 @@ EvoSC is a server-controller designed for ManiaPlanet and build with PHP7.3. It 
 {block scriptDeclarations}
 {/block}
 
+{block functions}
+{/block}
+
 {block bootScript}
 {/block}
 

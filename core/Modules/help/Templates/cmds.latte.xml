@@ -107,6 +107,9 @@ Void updatePageInfo(){
 --></script>
 {/block}
 
+{block functions}
+{/block}
+
 {block bootScript}
     declare helpFrame <=> (Page.MainFrame.GetFirstChild("help") as CMlFrame);
 

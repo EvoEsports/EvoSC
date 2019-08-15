@@ -16,17 +16,17 @@ use Illuminate\Support\Collection;
  * Class Player
  *
  * @package esc\Models
- * @property string  $Login
- * @property string  $NickName
- * @property mixed   $Score
+ * @property string $Login
+ * @property string $NickName
+ * @property mixed $Score
  * @property integer $player_id
  * @property boolean $Afk
- * @property string  $path
- * @property string  $spectator_status
+ * @property string $path
+ * @property string $spectator_status
  * @property integer $MaxRank
  * @property boolean $banned
- * @property carbon  $last_visit
- * @property Group   $group
+ * @property carbon $last_visit
+ * @property Group $group
  *
  * @method static find(string $login)
  */
@@ -59,7 +59,7 @@ class Player extends Model
     /**
      * Gets the players current time (formatted)
      *
-     * @param boolean $asMilliseconds
+     * @param  boolean  $asMilliseconds
      *
      * @return mixed|string
      */
@@ -85,7 +85,7 @@ class Player extends Model
     /**
      * Checks if a player exists by login
      *
-     * @param string $login
+     * @param  string  $login
      *
      * @return bool
      */
@@ -206,7 +206,7 @@ class Player extends Model
     /**
      * Check if the player has a specific access-right.
      *
-     * @param string $right
+     * @param  string  $right
      *
      * @return bool
      */
@@ -253,8 +253,8 @@ class Player extends Model
     /**
      * Update a user-setting.
      *
-     * @param string $settingName
-     * @param mixed  $value
+     * @param  string  $settingName
+     * @param  mixed  $value
      */
     public function setSetting($settingName, $value)
     {
@@ -277,7 +277,7 @@ class Player extends Model
         }
 
         $this->settings()->create([
-            'name'  => $settingName,
+            'name' => $settingName,
             'value' => $value,
         ]);
     }
@@ -285,7 +285,7 @@ class Player extends Model
     /**
      * Get a user-setting.
      *
-     * @param string $settingName
+     * @param  string  $settingName
      *
      * @return mixed|null
      */
@@ -303,7 +303,7 @@ class Player extends Model
     /**
      * Get last visit as Carbon object.
      *
-     * @param string $date
+     * @param  string  $date
      *
      * @return Carbon
      * @throws Exception
@@ -319,5 +319,15 @@ class Player extends Model
     public function __toString()
     {
         return trim($this->NickName);
+    }
+
+    public function getNameAttribute()
+    {
+        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\]))/i', '', $this->NickName);
+    }
+
+    public function getNameBlankAttribute()
+    {
+        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
     }
 }

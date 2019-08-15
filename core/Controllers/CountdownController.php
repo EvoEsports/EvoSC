@@ -10,6 +10,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
@@ -53,6 +54,12 @@ class CountdownController
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
 
+        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
+        ChatCommand::add('/endhunt', [self::class, 'disableHuntMode'], 'Enable hunt mode (disable countdown).',
+            'hunt');
+
+        AccessRight::createIfNonExistent('hunt', 'Enabled/disable hunt mode.');
+
         KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 
@@ -73,7 +80,8 @@ class CountdownController
         }
     }
 
-    public static function endMap(Map $map){
+    public static function endMap(Map $map)
+    {
         self::resetTimeLimit();
     }
 
@@ -87,6 +95,18 @@ class CountdownController
         } catch (Exception $e) {
             Log::write('Failed to save added time to cache-file.');
         }
+    }
+
+    public static function enableHuntMode(Player $player)
+    {
+        self::setTimeLimit(0);
+        infoMessage($player, ' enabled hunt mode.')->sendAll();
+    }
+
+    public static function disableHuntMode(Player $player)
+    {
+        self::setTimeLimit(self::getOriginalTimeLimit());
+        infoMessage($player, ' disabled hunt mode.')->sendAll();
     }
 
     /**

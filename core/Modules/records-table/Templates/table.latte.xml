@@ -51,6 +51,9 @@
     {block scriptDeclarations}
     {/block}
 
+    {block functions}
+    {/block}
+
     {block globals}
     {/block}
 
