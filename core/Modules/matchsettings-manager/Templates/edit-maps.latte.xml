@@ -16,11 +16,11 @@
     {/block}
 
     {block content}
-    <frame pos="0 -8">
-        <label size="35 3" textsize="0.3" text="Name" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="37" size="20 3" textsize="0.3" text="Author" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="59" size="30 3" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="91" size="30 3" textsize="0.3" text="Played" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+    <frame pos="0 -7.5">
+        <label size="35 4" textsize="0.3" text="Name" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="37" size="20 4" textsize="0.3" text="Author" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="59" size="30 4" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="91" size="30 4" textsize="0.3" text="Played" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
     </frame>
 
     <label hidden="1" class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />

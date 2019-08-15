@@ -20,10 +20,13 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+
+declare Boolean alertUnsavedChanges;
 --></script>
 
 {include scriptDeclarations}
 {include 'scripts.drag'}
+{include 'dialogues.confirm'}
 {include functions}
 
 <script><!--
@@ -40,6 +43,11 @@ main() {
             if(event.Control == Null) continue;
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(alertUnsavedChanges == True){
+                    if(!confirm("You have unsaved changes, do you want to close without saving?")){
+                        continue;
+                    }
+                }
                 window.Hide();
                 return;
             }
