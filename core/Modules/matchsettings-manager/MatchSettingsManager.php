@@ -9,6 +9,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
+use esc\Controllers\MatchSettingsController;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -46,7 +47,10 @@ class MatchSettingsManager
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'ms_edit');
+
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'ms_edit');
+        ManiaLinkEvent::add('msm.add_map', [self::class, 'addMap'], 'ms_edit');
+        ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
@@ -65,6 +69,24 @@ class MatchSettingsManager
         $modes = collect(self::$modes)->keys();
 
         Template::show($player, 'matchsettings-manager.create', compact('modes'));
+    }
+
+    public static function addMap(Player $player, string $matchSettingsName, string $mapId)
+    {
+        $map = Map::find($mapId);
+
+        if ($map) {
+            MatchSettingsController::addMap("$matchSettingsName.txt", $map);
+        }
+    }
+
+    public static function removeMap(Player $player, string $matchSettingsName, string $mapId)
+    {
+        $map = Map::find($mapId);
+
+        if ($map) {
+            MatchSettingsController::removeByUid("$matchSettingsName.txt", $map->uid);
+        }
     }
 
     public static function showEditMatchsettings(Player $player, string $name)
@@ -134,31 +156,20 @@ class MatchSettingsManager
         Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'chunks'));
     }
 
-    public static function saveMaps(Player $player, string $name, ...$mapsJson)
-    {
-        $mapIDs = collect(json_decode(implode(',', $mapsJson)))->values();
-
-        $maps = Map::whereIn('id', $mapIDs)->get();
-
-        var_dump($maps->pluck('name'));
-    }
-
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
     {
         $settings = json_decode(implode(',', $settings));
         $filename = trim($filename);
 
-        var_dump([
-            'old_file' => $oldFilename,
-            'file' => $filename,
-            'changes' => $settings,
-        ]);
-
-        if ($oldFilename != $filename) {
-            //name changed
+        foreach ($settings as $setting => $value) {
+            MatchSettingsController::updateSetting($oldFilename.'.txt', $setting, $value);
         }
 
-        self::showEditMatchsettings($player, $oldFilename);
+        if ($oldFilename != $filename) {
+            MatchSettingsController::rename($oldFilename.'.txt', $filename.'.txt');
+        }
+
+        self::showOverview($player);
     }
 
     public static function createNewMatchsettings(Player $player, string $modeName)

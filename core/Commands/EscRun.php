@@ -179,6 +179,9 @@ class EscRun extends Command
             ]);
         }
 
+//        Server::cleanBlackList();
+//        Server::cleanBanList();
+
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         Server::disableServiceAnnounces(true);

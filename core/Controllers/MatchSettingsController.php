@@ -256,6 +256,29 @@ class MatchSettingsController
         self::addMap(self::$currentMatchSettingsFile, $map);
     }
 
+    public static function updateSetting(string $matchSettingsFile, string $setting, $value)
+    {
+        $file = self::getPath($matchSettingsFile);
+        $settings = new SimpleXMLElement(File::get($file));
+
+        $nodePath = collect(explode('.', $setting))->transform(function ($node) {
+            return "{$node}";
+        })->implode('->');
+
+        eval('$settings->'.$nodePath.' = $value;');
+
+        $domDocument = new \DOMDocument("1.0");
+        $domDocument->preserveWhiteSpace = false;
+        $domDocument->formatOutput = true;
+        $domDocument->loadXML($settings->asXML());
+        File::put($file, $domDocument->saveXML());
+    }
+
+    public static function rename(string $oldName, string $newName)
+    {
+        File::rename(self::getPath($oldName), self::getPath($newName));
+    }
+
     /**
      * @param  string  $matchSettingsFile
      *

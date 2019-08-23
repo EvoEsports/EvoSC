@@ -23,8 +23,6 @@
         <label pos="91" size="30 4" textsize="0.3" text="Played" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
     </frame>
 
-    <label hidden="1" class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
-
     {foreach $chunks as $chunkN => $maps}
     <frame pos="0 -11.5" hidden="{$iterator->counter > 1 ? 1 : 0}">
         {foreach $maps as $i => $map}
@@ -84,29 +82,17 @@
         if(event.Control.HasClass("toggle") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare parent = event.Control.Parent;
             declare enabled = parent.DataAttributeGet("enabled") != "";
+            declare mapId = parent.DataAttributeGet("id");
 
             if(enabled){
                 (event.Control.Parent.Controls[0] as CMlLabel).SetText("$333");
                 parent.DataAttributeSet("enabled", "");
+                TriggerPageAction("msm.remove_map,{$name}," ^ mapId);
             }else{
                 (event.Control.Parent.Controls[0] as CMlLabel).SetText("$fff");
                 parent.DataAttributeSet("enabled", "1");
+                TriggerPageAction("msm.add_map,{$name}," ^ mapId);
             }
-        }
-
-        if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
-            declare Text[] maps = Text[];
-            Page.GetClassChildren("map", Page.MainFrame, True);
-
-            foreach(frame in Page.GetClassChildren_Result){
-                declare mapId = frame.DataAttributeGet("id");
-
-                if(frame.DataAttributeGet("enabled") != ""){
-                    maps.add(mapId);
-                }
-            }
-
-            TriggerPageAction("msm.save_maps,{$name}," ^ maps.tojson());
         }
 
         if(event.Control.HasClass("icon") && event.Type == CMlScriptEvent::Type::MouseClick){

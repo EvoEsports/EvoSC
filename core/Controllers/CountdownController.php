@@ -53,10 +53,7 @@ class CountdownController
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
-
         ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
-        ChatCommand::add('/endhunt', [self::class, 'disableHuntMode'], 'Enable hunt mode (disable countdown).',
-            'hunt');
 
         AccessRight::createIfNonExistent('hunt', 'Enabled/disable hunt mode.');
 

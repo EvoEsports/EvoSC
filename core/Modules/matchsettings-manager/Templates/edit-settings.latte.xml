@@ -18,7 +18,7 @@
     <label pos="0 -9" size="8 4" textsize="0.5" text="Name:" valign="center" textfont="{config('colors.ui.font')|noescape}" />
     <entry id="filename" pos="8 -9" size="108 4" textsize="0.5" valign="center" textfont="{config('colors.ui.font')|noescape}" />
 
-    <label hidden="1" class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+    <label class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
 
     <frame pos="0 -15" id="rows">
     {php $row=0}
@@ -128,6 +128,8 @@
     {block pendingEvents}
         if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
             save();
+            window.Hide();
+            return;
         }
 
         if(event.Control.HasClass("entry") && event.Type == CMlScriptEvent::Type::EntrySubmit){
