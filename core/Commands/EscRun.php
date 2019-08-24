@@ -15,6 +15,7 @@ use esc\Controllers\AfkController;
 use esc\Controllers\BansController;
 use esc\Controllers\ChatController;
 use esc\Controllers\ConfigController;
+use esc\Controllers\ControllerController;
 use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
 use esc\Controllers\HookController;
@@ -147,6 +148,7 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+        ControllerController::loadControllers('TimeAttack.Script.txt');
 
         //TODO: Collection Transform
         $logins = [];
@@ -161,7 +163,7 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        ModuleController::bootModules();
+        ModuleController::startModules('TimeAttack.Script.txt');
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);
@@ -179,8 +181,8 @@ class EscRun extends Command
             ]);
         }
 
-//        Server::cleanBlackList();
-//        Server::cleanBanList();
+        Server::cleanBlackList();
+        Server::cleanBanList();
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);

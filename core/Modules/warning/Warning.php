@@ -12,7 +12,7 @@ class Warning
 {
     public function __construct()
     {
-        AccessRight::createIfNonExistent('warn_player', 'Warn a player.');
+        AccessRight::createIfMissing('warn_player', 'Warn a player.');
 
         ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn_player');
     }

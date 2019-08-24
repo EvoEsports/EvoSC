@@ -34,7 +34,7 @@ class MatchSettingsManager
         self::$path = Server::getMapsDirectory().'/MatchSettings/';
         self::$objects = collect();
 
-        AccessRight::createIfNonExistent('ms_edit', 'Change match-settings.');
+        AccessRight::createIfMissing('ms_edit', 'Change match-settings.');
 
         ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'ms_edit');
 
@@ -216,11 +216,7 @@ class MatchSettingsManager
 
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
-        Server::loadMatchSettings('MatchSettings/'.$matchsettingsFile.'.txt');
-
-        infoMessage($player, ' loads matchsettings ', secondary($matchsettingsFile))->sendAll();
-
-        Hook::fire('MatchSettingsLoaded');
+        MatchSettingsController::loadMatchSettings($player, $matchsettingsFile.'.txt');
     }
 
     public static function getMatchsettings()

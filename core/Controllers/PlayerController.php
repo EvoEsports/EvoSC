@@ -50,20 +50,9 @@ class PlayerController implements ControllerInterface
             return $player;
         })->keyBy('Login');
 
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        AccessRight::createIfNonExistent('player_kick', 'Kick players.');
-        AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
-        AccessRight::createIfNonExistent('override_join_msg', 'Always announce join/leave.');
-
-        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
-
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
-            'Set the server password, leave empty to clear it.', 'ma');
-        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        AccessRight::createIfMissing('player_kick', 'Kick players.');
+        AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
+        AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
     }
 
     /**
@@ -350,4 +339,20 @@ class PlayerController implements ControllerInterface
         return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
+            'Set the server password, leave empty to clear it.', 'ma');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+    }
 }

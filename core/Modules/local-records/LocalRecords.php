@@ -42,7 +42,7 @@ class LocalRecords implements ModuleInterface
         Hook::add('BeginMap', [self::class, 'initialize']);
         Hook::add('EndMap', [self::class, 'fixRanks']);
 
-        AccessRight::createIfNonExistent('local_delete', 'Delete local-records.');
+        AccessRight::createIfMissing('local_delete', 'Delete local-records.');
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);

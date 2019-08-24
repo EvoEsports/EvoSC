@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\File;
 
 use esc\Commands\Migrate;
+use esc\Interfaces\ControllerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class SetupController
+class SetupController implements ControllerInterface
 {
     /**
      * @var InputInterface
@@ -280,5 +281,13 @@ class SetupController
                 ConfigController::saveConfig($id, $value);
             }
         }
+    }
+
+    public static function init()
+    {
+    }
+
+    public static function start($mode)
+    {
     }
 }

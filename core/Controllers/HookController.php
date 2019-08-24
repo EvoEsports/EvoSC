@@ -83,4 +83,12 @@ class HookController implements ControllerInterface
             }
         }
     }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        self::$hooks = collect();
+    }
 }

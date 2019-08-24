@@ -48,7 +48,7 @@ class KeyBinds
      *
      * @param string      $id
      * @param string      $description
-     * @param             $callback
+     * @param callable    $callback
      * @param string      $defaultKey
      * @param string|null $access
      */

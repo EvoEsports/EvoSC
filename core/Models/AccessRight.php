@@ -25,7 +25,7 @@ class AccessRight extends Model
      * @param string $name
      * @param string $description
      */
-    public static function createIfNonExistent(string $name, string $description)
+    public static function createIfMissing(string $name, string $description)
     {
         if (self::whereName($name)->get()->isEmpty()) {
             self::create([

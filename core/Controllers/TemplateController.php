@@ -39,8 +39,6 @@ class TemplateController implements ControllerInterface
     {
         Log::write('Starting...');
 
-        ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
-
         self::loadTemplates();
     }
 
@@ -72,7 +70,7 @@ class TemplateController implements ControllerInterface
     /**
      * Render template with values
      *
-     * @param string $index
+     * @param  string  $index
      * @param        $values
      *
      * @return string
@@ -81,7 +79,7 @@ class TemplateController implements ControllerInterface
     {
         try {
             if (isVerbose()) {
-                Log::write('Rendering Template: ' . $index);
+                Log::write('Rendering Template: '.$index);
             }
 
             return self::$latte->renderToString($index, $values);
@@ -89,11 +87,12 @@ class TemplateController implements ControllerInterface
             //Build parameter string
             $parameters = [];
             foreach ($values as $key => $value) {
-                array_push($parameters, "<options=bold>$key:</> <fg=yellow>" . json_encode($value, JSON_PRETTY_PRINT) . "</>");
+                array_push($parameters,
+                    "<options=bold>$key:</> <fg=yellow>".json_encode($value, JSON_PRETTY_PRINT)."</>");
             }
             $vals = implode(', ', $parameters);
 
-            Log::write('Failed to render template: ' . $index . " [$vals]");
+            Log::write('Failed to render template: '.$index." [$vals]");
             var_dump($e->getTraceAsString());
         }
 
@@ -103,36 +102,36 @@ class TemplateController implements ControllerInterface
     /**
      * Load templates from all modules.
      *
-     * @param null $args
+     * @param  null  $args
      */
     public static function loadTemplates($args = null)
     {
         Log::write('Loading templates...');
 
         self::$templates = collect();
-        self::$latte     = new Engine();
+        self::$latte = new Engine();
         self::addCustomFilters();
 
         //Get all template files in core directory
         self::$templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')
-                               ->map(function (&$template) {
-                                   $templateObject = collect();
+            ->map(function (&$template) {
+                $templateObject = collect();
 
-                                   //Get path relative to core directory
-                                   $relativePath = str_replace(coreDir('/'), '', $template);
+                //Get path relative to core directory
+                $relativePath = str_replace(coreDir('/'), '', $template);
 
-                                   //Generate template id from filename & path
-                                   $templateObject->id = self::getTemplateId($relativePath);
+                //Generate template id from filename & path
+                $templateObject->id = self::getTemplateId($relativePath);
 
-                                   //Load template contents
-                                   $templateObject->template = file_get_contents($template);
+                //Load template contents
+                $templateObject->template = file_get_contents($template);
 
-                                   //Assign as new value
-                                   return $templateObject;
-                               });
+                //Assign as new value
+                return $templateObject;
+            });
 
         //Set id <=> template map as loader for latte
-        $templateMap  = self::$templates->pluck('template', 'id')->toArray();
+        $templateMap = self::$templates->pluck('template', 'id')->toArray();
         $stringLoader = new StringLoader($templateMap);
         self::$latte->setLoader($stringLoader);
     }
@@ -157,11 +156,19 @@ class TemplateController implements ControllerInterface
 
         if (count($pathParts) > 0) {
             //Template is in sub-directory
-            $id .= implode('.', $pathParts) . '.';
+            $id .= implode('.', $pathParts).'.';
         }
 
         $id .= str_replace('.latte.xml', '', str_replace('.script.txt', '', $filename));
 
         return strtolower($id);
+    }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
     }
 }

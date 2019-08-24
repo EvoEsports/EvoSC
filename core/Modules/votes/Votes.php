@@ -40,8 +40,8 @@ class Votes
         self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
         self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / (CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier')));
 
-        AccessRight::createIfNonExistent('vote_custom', 'Create a custom vote. Enter question after command.');
-        AccessRight::createIfNonExistent('vote_always', 'Allowed to always start a time or skip vote.');
+        AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
+        AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
 
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');

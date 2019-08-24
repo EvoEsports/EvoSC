@@ -198,4 +198,12 @@ class ConfigController implements ControllerInterface
 
         return $paths;
     }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        // TODO: Implement start() method.
+    }
 }

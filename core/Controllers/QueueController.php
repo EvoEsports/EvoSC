@@ -34,17 +34,10 @@ class QueueController implements ControllerInterface
      */
     public static function init()
     {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
-
-        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
-        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
-
-        AccessRight::createIfNonExistent('map_queue_recent', 'Drop maps from queue.');
-        AccessRight::createIfNonExistent('queue_drop', 'Drop maps from queue.');
-        AccessRight::createIfNonExistent('queue_multiple', 'Queue more than one map.');
-        AccessRight::createIfNonExistent('queue_keep', 'Keep maps in queue if player leaves.');
+        AccessRight::createIfMissing('map_queue_recent', 'Drop maps from queue.');
+        AccessRight::createIfMissing('queue_drop', 'Drop maps from queue.');
+        AccessRight::createIfMissing('queue_multiple', 'Queue more than one map.');
+        AccessRight::createIfMissing('queue_keep', 'Keep maps in queue if player leaves.');
     }
 
     /**
@@ -224,5 +217,18 @@ class QueueController implements ControllerInterface
         } else {
             Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
         }
+    }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
+
+        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
+        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
     }
 }

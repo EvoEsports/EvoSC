@@ -176,4 +176,9 @@ class ChatCommand
             call_user_func_array($this->callback, $arguments);
         }
     }
+
+    public static function removeAll()
+    {
+        self::$commands = collect();
+    }
 }

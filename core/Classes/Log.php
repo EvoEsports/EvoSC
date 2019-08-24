@@ -168,7 +168,7 @@ class Log
      */
     public static function error($message, bool $echo = true)
     {
-        self::write($message, $echo);
+        self::write('<fg=red>' . $message . '</>', $echo);
     }
 
     /**

@@ -19,7 +19,7 @@ class InfoMessages
     {
         self::$startTime = time();
 
-        AccessRight::createIfNonExistent('info_messages', 'Add/edit/remove reccuring info-messages.');
+        AccessRight::createIfMissing('info_messages', 'Add/edit/remove reccuring info-messages.');
 
         ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
 

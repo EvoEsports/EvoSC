@@ -227,4 +227,12 @@ class ModeScriptEventController implements ControllerInterface
 
         Hook::fire('PlayerDisconnect', $player);
     }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        // TODO: Implement start() method.
+    }
 }

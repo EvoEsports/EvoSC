@@ -52,14 +52,8 @@ class ChatController implements ControllerInterface
             Server::call('ChatEnableManualRouting', [false, false]);
         }
 
-        Hook::add('PlayerChat', [self::class, 'playerChat']);
-
-        AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
-        AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
-
-        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
-        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
-        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
+        AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
+        AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
     }
 
     /**
@@ -221,5 +215,17 @@ class ChatController implements ControllerInterface
     public static function getRoutingEnabled()
     {
         return self::$routingEnabled;
+    }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        Hook::add('PlayerChat', [self::class, 'playerChat']);
+
+        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
+        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
+        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 }

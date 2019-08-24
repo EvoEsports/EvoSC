@@ -10,6 +10,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -17,7 +18,7 @@ use esc\Modules\KeyBinds;
 use Exception;
 use SimpleXMLElement;
 
-class CountdownController
+class CountdownController implements ControllerInterface
 {
     /**
      * @var int
@@ -48,16 +49,7 @@ class CountdownController
             self::$matchStart = intval(File::get(cacheDir('round_start_time.txt')));
         }
 
-        Hook::add('BeginMatch', [self::class, 'setMatchStart']);
-        Hook::add('EndMap', [self::class, 'endMap']);
-
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
-            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
-        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
-
-        AccessRight::createIfNonExistent('hunt', 'Enabled/disable hunt mode.');
-
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
+        AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
     }
 
     /**
@@ -241,5 +233,19 @@ class CountdownController
         $settings = Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $seconds;
         Server::setModeScriptSettings($settings);
+    }
+
+    /**
+     * @param  string  $mode
+     */
+    public static function start($mode)
+    {
+        Hook::add('BeginMatch', [self::class, 'setMatchStart']);
+        Hook::add('EndMap', [self::class, 'endMap']);
+
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
+        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
+
+        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 }

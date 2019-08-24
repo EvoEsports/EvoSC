@@ -128,4 +128,14 @@ class ManiaLinkEvent
 
         call_user_func($event->callback, $ply);
     }
+
+    public static function removeAll()
+    {
+        self::$maniaLinkEvents = collect();
+    }
+
+    public function __toString()
+    {
+        return $this->id.'('.serialize($this->callback).')';
+    }
 }
