@@ -85,8 +85,8 @@ class AfkController implements ControllerInterface
 
     private static function revivePlayer(Player $player)
     {
-        warningMessage('EvoSC detected you as offline and is now reconnecting you.')->send($player);
-        Hook::fire('PlayerConnect', $player);
+//        warningMessage('EvoSC detected you as offline and is now reconnecting you.')->send($player);
+//        Hook::fire('PlayerConnect', $player);
     }
 
     /**
@@ -142,6 +142,6 @@ class AfkController implements ControllerInterface
 
         ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
 
-        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
+//        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
     }
 }
