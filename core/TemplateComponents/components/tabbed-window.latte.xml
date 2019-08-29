@@ -20,11 +20,14 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
-
-declare Boolean alertUnsavedChanges;
 --></script>
 
 {include scriptDeclarations}
+
+    <script><!--
+declare Boolean alertUnsavedChanges;
+--></script>
+
 {include 'scripts.drag'}
 {include 'dialogues.confirm'}
 {include functions}
