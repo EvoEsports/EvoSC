@@ -46,7 +46,7 @@ Void hidescript(){
             hs_hide();
 
             {if !isset($doNotPause)}
-            wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
             {/if}
         }
         if((!overHidespeed || !playerIsRacing) && HS_Hidden){
