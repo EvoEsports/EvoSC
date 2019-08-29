@@ -26,6 +26,7 @@ UI-Settings
 
 <label pos="27 -9" size="27 3" textsize="0.6" text="Widget scale" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 <entry id="scale" pos="29 -9" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="35 -9" size="27 3" textsize="0.6" text="%" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 
 <label class="save" pos="25 -15" size="12 4" textsize="0.6" halign="center" text=" Save" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
 {/block}
@@ -44,7 +45,15 @@ Void save(){
     declare UISettings newSettings;
     newSettings.hide = True;
     newSettings.speed = TL::ToInteger(speedLabel.Value);
-    newSettings.scale = TL::ToReal(scaleLabel.Value);
+    newSettings.scale = TL::ToReal(scaleLabel.Value) / 100.0;
+    if(newSettings.scale > 1.5){
+        newSettings.scale = 1.5;
+        scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
+    }
+    if(newSettings.scale < 0.1){
+        newSettings.scale = 0.1;
+        scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
+    }
     TriggerPageAction("ui.save," ^ newSettings.tojson());
 }
 --></script>
@@ -62,7 +71,7 @@ if(settings.scale == 0.0){
 declare speedEntry <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
 declare scaleEntry <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
 speedEntry.SetText("" ^ settings.speed, False);
-scaleEntry.SetText("" ^ settings.scale, False);
+scaleEntry.SetText("" ^ TL::ToInteger("" ^ (settings.scale * 100)), False);
 {/block}
 
 {block pendingEvents}
