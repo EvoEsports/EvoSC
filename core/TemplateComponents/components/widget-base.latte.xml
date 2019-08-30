@@ -49,6 +49,9 @@ declare Integer slot__;
         if(scale < 0.1){
             scale = 1.0;
         }
+        if(scale > 1.2){
+            scale = 1.2;
+        }
 
         declare Real gutter = 1.0 * scale;
         widget.RelativeScale = scale;

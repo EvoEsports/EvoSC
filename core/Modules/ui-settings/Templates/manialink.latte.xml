@@ -46,8 +46,8 @@ Void save(){
     newSettings.hide = True;
     newSettings.speed = TL::ToInteger(speedLabel.Value);
     newSettings.scale = TL::ToReal(scaleLabel.Value) / 100.0;
-    if(newSettings.scale > 1.5){
-        newSettings.scale = 1.5;
+    if(newSettings.scale > 1.2){
+        newSettings.scale = 1.2;
         scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
     }
     if(newSettings.scale < 0.1){
