@@ -89,6 +89,5 @@ class HookController implements ControllerInterface
      */
     public static function start($mode)
     {
-        self::$hooks = collect();
     }
 }

@@ -132,7 +132,7 @@ class EventController implements ControllerInterface
 
             if (ChatController::getRoutingEnabled()) {
                 try {
-                    Hook::fire('PlayerChat', player($login), $text, false);
+                    Hook::fire('PlayerChat', player($login), $text);
                 } catch (Exception $e) {
                     Log::write("Error: ".$e->getMessage());
                 }
