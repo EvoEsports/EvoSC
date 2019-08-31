@@ -78,6 +78,14 @@ class ModeScriptEventController implements ControllerInterface
 
                 return;
 
+            case 'Trackmania.WarmUp.End':
+                Hook::fire('WarmUpEnd');
+                break;
+
+            case 'Trackmania.WarmUp.Start':
+                Hook::fire('WarmUpStart');
+                break;
+
             case 'Maniaplanet.EndRound_Start':
             case 'Maniaplanet.StartMap_Start':
             case 'Maniaplanet.EndMap_Start':

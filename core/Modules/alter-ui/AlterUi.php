@@ -55,7 +55,7 @@ class AlterUi
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->
  		<chat_avatar visible="false" />
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
- 		<warmup visible="true" pos="153. 13. 0." />
+ 		<warmup visible="false" pos="153. 13. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
  		<endmap_ladder_recap visible="false" />
  		<!-- Laps count displayed on the right of the screen on multilaps map -->

@@ -526,8 +526,8 @@ class MapController implements ControllerInterface
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
             // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
-            // QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
         }
     }
 }

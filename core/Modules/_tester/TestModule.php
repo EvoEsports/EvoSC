@@ -17,6 +17,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        UiSettings::mleShowSettingsWindow($player);
+        WarmUpWidget::showWarmUpWidget();
     }
 }
