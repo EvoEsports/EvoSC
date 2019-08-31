@@ -17,6 +17,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        WarmUpWidget::showWarmUpWidget();
+        MatchTracker::sendWidget($player);
     }
 }

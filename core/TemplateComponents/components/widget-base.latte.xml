@@ -37,7 +37,6 @@ declare Integer slot__;
     {if !isset($customHidescript)}
     {include 'scripts.hide'}
     {/if}
-    {include script}
 
     <script><!--
     Void rearrange__(){
@@ -116,20 +115,9 @@ declare Integer slot__;
         }
     }
 
-    main() {
+    Void setup__(){
         declare WidgetGrid grid_ for This;
         declare Integer LastUiUpdate for This = 0;
-        declare Integer lastUiUpdate;
-
-        if(LastUiUpdate == 0){
-            LastUiUpdate = GameTime;
-            lastUiUpdate = LastUiUpdate;
-        }
-
-        widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-        bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
-
-        {include bootScript}
 
         if(left__){
             if(grid_.left.count == 0){
@@ -170,7 +158,28 @@ declare Integer slot__;
             grid_.right[slot__].widths[{$slotHorizontal}] = width;
             {/if}
         }
+    }
+    --></script>
 
+    {include script}
+
+    <script><!--
+    main() {
+        declare WidgetGrid grid_ for This;
+        declare Integer LastUiUpdate for This = 0;
+        declare Integer lastUiUpdate;
+
+        if(LastUiUpdate == 0){
+            LastUiUpdate = GameTime;
+            lastUiUpdate = LastUiUpdate;
+        }
+
+        widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+
+        {include bootScript}
+
+        setup__();
         LastUiUpdate = GameTime;
         rearrange__();
 
