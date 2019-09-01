@@ -10,12 +10,13 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\MatchSettingsController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class MatchSettingsManager
+class MatchSettingsManager implements ModuleInterface
 {
     private static $path;
     private static $objects;
@@ -122,6 +123,7 @@ class MatchSettingsManager
 
     public static function showEditMatchsettingsMaps(Player $player, string $name)
     {
+        $perPage = 19;
         $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
         $data = File::get($file);
         $enabledMaps = collect();
@@ -133,27 +135,9 @@ class MatchSettingsManager
             }
         }
 
-        $chunks = Map::all()
-            ->map(function (Map $map) use ($enabledMaps) {
-                if (!$map->name) {
-                    $map->name = $map->gbx->Name;
-                    $map->environment = $map->gbx->Environment;
-                    $map->title_id = $map->gbx->TitleId;
-                    $map->save();
-                }
+        $totalPages = ceil(Map::count() / $perPage);
 
-                $map->enabled = $enabledMaps->contains('ident', $map->uid);
-                $map->name = str_replace('"', '', $map->name);
-
-                return $map;
-            })
-            ->sortByDesc('enabled')
-            ->chunk(19)
-            ->map(function (Collection $chunk) {
-                return $chunk->values();
-            });
-
-        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'chunks'));
+        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'totalPages'));
     }
 
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
@@ -226,5 +210,65 @@ class MatchSettingsManager
         });
 
         return $files;
+    }
+
+    public static function sendFilteredMapsPage(Player $player, string $name, int $page, ...$search)
+    {
+        $perPage = 19;
+        $search = trim(implode(',', $search));
+        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
+        $data = File::get($file);
+        $enabledMaps = collect();
+        $xml = new \SimpleXMLElement($data);
+
+        foreach ($xml as $node) {
+            if ($node->getName() == 'map') {
+                $enabledMaps->push($node);
+            }
+        }
+
+        $maps = Map::all();
+
+        if ($search) {
+            $maps = $maps->filter(function (Map $map) use ($search) {
+                return mb_strpos(stripAll($map->name), $search);
+            });
+        }
+
+        $maps = $maps->map(function (Map $map) use ($enabledMaps) {
+            if (!$map->name) {
+                $map->name = $map->gbx->Name;
+                $map->environment = $map->gbx->Environment;
+                $map->title_id = $map->gbx->TitleId;
+                $map->save();
+            }
+
+            return [
+                'enabled' => $enabledMaps->contains('ident', $map->uid),
+                'name' => str_replace('"', '', $map->name),
+                'author' => $map->author->NickName,
+                'environment' => $map->environment,
+                'title_id' => $map->title_id
+            ];
+        })
+            ->sortByDesc('enabled')
+            ->chunk($perPage)
+            ->get($page)
+            ->values();
+
+        Template::show($player, 'matchsettings-manager.send-maps', [
+            'maps' => $maps->toJson(),
+            'page' => $page
+        ]);
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
+        ManiaLinkEvent::add('msm.load_page', [self::class, 'sendFilteredMapsPage']);
     }
 }

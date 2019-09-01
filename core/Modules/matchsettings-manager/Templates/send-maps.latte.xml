@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-msm-maps" id="update-msm-maps" version="3">
+    <script><!--
+    main() {
+        declare Text[Text][][Integer] mapPages_ for This;
+        declare Text[Text][] mapPage;
+
+        mapPage.fromjson("""{$maps|noescape}""");
+        mapPages_[{$page}] = mapPage;
+    }
+    --></script>
+</manialink>

@@ -43,6 +43,7 @@ main() {
         yield;
 
         foreach(event in PendingEvents){
+            if(event == Null) continue;
             if(event.Control == Null) continue;
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){

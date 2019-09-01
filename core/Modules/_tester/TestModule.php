@@ -17,6 +17,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchTracker::sendWidget($player);
+        MatchSettingsManager::showEditMatchsettingsMaps($player, 'rounds_test');
     }
 }

@@ -10,12 +10,13 @@ use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class MapList
+class MapList implements ModuleInterface
 {
     public function __construct()
     {
@@ -31,23 +32,23 @@ class MapList
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
-                   ->addAlias('/list');
+            ->addAlias('/list');
     }
 
     public static function mapMapQueue(MapQueue $item)
     {
         return [
             'queue_id' => $item->id,
-            'id'       => $item->map->id,
-            'by'       => $item->requesting_player,
-            'nick'     => player($item->requesting_player)->NickName,
+            'id' => $item->map->id,
+            'by' => $item->requesting_player,
+            'nick' => player($item->requesting_player)->NickName,
         ];
     }
 
     /**
      * Send manialink to player
      *
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function playerConnect(Player $player)
     {
@@ -70,7 +71,7 @@ class MapList
     public static function sendRecordsJson(Player $player)
     {
         $locals = $player->locals()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
-        $dedis  = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $dedis = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
@@ -83,8 +84,8 @@ class MapList
     /**
      * Player add favorite map
      *
-     * @param Player $player
-     * @param int    $mapId
+     * @param  Player  $player
+     * @param  int  $mapId
      */
     public static function favAdd(Player $player, string $mapId)
     {
@@ -94,8 +95,8 @@ class MapList
     /**
      * Player remove favorite map
      *
-     * @param Player $player
-     * @param int    $mapId
+     * @param  Player  $player
+     * @param  int  $mapId
      */
     public static function favRemove(Player $player, string $mapId)
     {
@@ -114,7 +115,7 @@ class MapList
 
     public static function sendUpdatedMaplist(Player $player = null)
     {
-        $maps       = self::getMapList();
+        $maps = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
         if (strlen($maps->toJson()) > 65000) {
@@ -125,12 +126,12 @@ class MapList
 
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
-                'maps'       => $maps->values()->toJson(),
+                'maps' => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         } else {
             Template::showAll('map-list.update-map-list', [
-                'maps'       => $maps->values()->toJson(),
+                'maps' => $maps->values()->toJson(),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         }
@@ -147,12 +148,12 @@ class MapList
             }
 
             return [
-                'id'   => (string)$map->id,
+                'id' => (string) $map->id,
                 'name' => $map->name,
-                'a'    => $map->author->id,
-                'r'    => sprintf('%.1f', $map->average_rating),
-                'uid'  => $map->gbx->MapUid,
-                'c'    => $map->cooldown,
+                'a' => $map->author->id,
+                'r' => sprintf('%.1f', $map->average_rating),
+                'uid' => $map->gbx->MapUid,
+                'c' => $map->cooldown,
             ];
         })->filter();
     }
@@ -161,9 +162,9 @@ class MapList
     {
         return Player::whereIn('id', $authorIds)->get()->transform(function (Player $player) {
             return [
-                'nick'  => $player->NickName,
+                'nick' => $player->NickName,
                 'login' => $player->Login,
-                'id'    => $player->id,
+                'id' => $player->id,
             ];
         });
     }
@@ -195,7 +196,7 @@ class MapList
     /**
      * Send updated map queue to everyone
      *
-     * @param \Illuminate\Support\Collection $queueItems
+     * @param  \Illuminate\Support\Collection  $queueItems
      */
     public static function mapQueueUpdated(Collection $queueItems)
     {
@@ -206,13 +207,22 @@ class MapList
     /**
      * Display maplist
      *
-     * @param Player $player
+     * @param  Player  $player
      */
     public static function sendManialink(Player $player)
     {
         self::sendUpdatedMaplist($player);
-        $favorites      = self::getMapFavoritesJson($player);
+        $favorites = self::getMapFavoritesJson($player);
         $ignoreCooldown = $player->hasAccess('queue.recent');
         Template::show($player, 'map-list.map-list', compact('favorites', 'ignoreCooldown'));
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
     }
 }

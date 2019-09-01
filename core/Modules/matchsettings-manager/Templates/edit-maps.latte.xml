@@ -20,30 +20,26 @@
         <label size="35 4" textsize="0.3" text="Name" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="37" size="20 4" textsize="0.3" text="Author" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="59" size="30 4" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="91" size="30 4" textsize="0.3" text="Played" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
     </frame>
 
-    {foreach $chunks as $chunkN => $maps}
-    <frame pos="0 -11.5" hidden="{$iterator->counter > 1 ? 1 : 0}">
-        {foreach $maps as $i => $map}
-        <frame class="map" pos="0 {$i * -3.5}" data-id="{$map->id}" data-enabled="{$map->enabled}">
-            <label pos="113" size="3 3" textsize="0.9" text="{$map->enabled ? '$fff' : '$333'}" valign="center" />
-            <label size="34 3" textsize="0.6" text="{$map->name}" valign="center" />
-            <label pos="37" size="20 3" textsize="0.6" text="{$map->author->name}" valign="center" />
-            <label pos="59" size="30 3" textsize="0.6" text="{$map->environment ?? 'n/a'}({$map->title_id ?? 'n/a'})" valign="center" />
-            <label pos="91" size="30 3" textsize="0.6" text="{$map->plays}" valign="center" />
+    <frame id="map-rows" pos="0 -11.5">
+        {for $i=0; $i<19; $i++}
+        <frame class="map" pos="0 {$i * -3.5}" data-id="id">
+            <label pos="113" size="3 3" textsize="0.9" text="$fff $333" valign="center" />
+            <label size="34 3" textsize="0.6" text="name" valign="center" />
+            <label pos="37" size="20 3" textsize="0.6" text="author_name" valign="center" />
+            <label pos="59" size="30 3" textsize="0.6" text="environment(title_id)" valign="center" />
             <label class="toggle" pos="-2" size="120 3.5" valign="center" ScriptEvents="1" z-index="-1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
         </frame>
-        {/foreach}
+        {/for}
     </frame>
-    {/foreach}
 
     <frame id="pagination" pos="2 -80" scale="0.9">
         <entry id="page-input" class="page-input" pos="6 0" size="8 3.5" valign="center" halign="center"
                text="1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1" textcolor="{config('colors.ui.window.text.primary')}"
                hidden="1"/>
         <label id="page-info" class="enable-page-input" pos="6 0" size="8 3.5" valign="center"
-               halign="center" text="1/{count($chunks)}" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" textcolor="{config('colors.ui.window.text.primary')}"
+               halign="center" text="1/{$totalPages}" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" textcolor="{config('colors.ui.window.text.primary')}"
                ScriptEvents="1"/>
         <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
                textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" textcolor="{config('colors.ui.window.text.primary')}"
@@ -53,7 +49,7 @@
                focusareacolor2="{config('colors.ui.window.header.color')}c"/>
     </frame>
 
-    <frame id="search-frame" pos="89 -80" scale="0.9">
+    <frame id="search-frame" pos="89 -80" scale="0.9" hidden="1">
         <label textfont="{config('colors.ui.font')|noescape}" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
         <entry textfont="{config('colors.ui.font')|noescape}" id="search-input" class="search-input" pos="26.5 0" size="25 3.5" textcolor="{config('colors.ui.window.text.primary')}"
                halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
@@ -66,16 +62,55 @@
     {block scriptDeclarations}
     <script><!--
     declare Integer currentPage;
+    declare Integer totalPages;
+    declare Text searchQuery;
     --></script>
     {/block}
 
     {block functions}
+    <script><!--
+        Void loadPage(Integer page, Boolean switchToPage){
+            declare Text[Text][][Integer] mapPages_ for This;
+            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+            declare mapRows <=> (Page.MainFrame.GetFirstChild("map-rows") as CMlFrame);
+
+            if(!mapPages_.existskey(page)){
+                TriggerPageAction("msm.load_page,{$name}," ^ page ^ "," ^ searchQuery);
+                wait(mapPages_.existskey(page));
+            }
+
+            if(switchToPage){
+                pageInfo.SetText((page + 1) ^ "/" ^ (totalPages + 1));
+
+                for(i, 0, 19){
+                    if(!mapPages_[page].existskey(i)){
+                        break;
+                    }
+
+                    declare map = mapPages_[page][i];
+                    declare frame <=> (mapRows.Controls[i] as CMlFrame);
+
+                    if(map["enabled"] == "True"){
+                        (frame.Controls[0] as CMlLabel).SetText("$fff");
+                    }else{
+                        (frame.Controls[0] as CMlLabel).SetText("$333");
+                    }
+                    (frame.Controls[1] as CMlLabel).SetText(map["name"]);
+                    //(frame.Controls[2] as CMlLabel).SetText(map["author"]);
+                    (frame.Controls[3] as CMlLabel).SetText(map["environment"] ^ "(" ^ map["title_id"] ^ ")");
+                }
+            }
+        }
+    --></script>
     {/block}
 
     <script><!--
 
     {block bootScript}
     currentPage = 0;
+    totalPages = {$totalPages} - 1;
+    searchQuery = "";
+    loadPage(currentPage, True);
     {/block}
 
     {block pendingEvents}
@@ -93,6 +128,35 @@
                 parent.DataAttributeSet("enabled", "1");
                 TriggerPageAction("msm.add_map,{$name}," ^ mapId);
             }
+            continue;
+        }
+
+        if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage += 1;
+            if(currentPage > totalPages){
+                currentPage = 0;
+            }
+            loadPage(currentPage, True);
+            declare nextPage = currentPage + 1;
+            if(nextPage > totalPages){
+                nextPage = 0;
+            }
+            loadPage(nextPage, False);
+            continue;
+        }
+
+        if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage -= 1;
+            if(currentPage < 0){
+                currentPage = totalPages;
+            }
+            loadPage(currentPage, True);
+            declare previousPage = currentPage - 1;
+            if(previousPage < 0){
+                previousPage = totalPages;
+            }
+            loadPage(previousPage, False);
+            continue;
         }
 
         if(event.Control.HasClass("icon") && event.Type == CMlScriptEvent::Type::MouseClick){
