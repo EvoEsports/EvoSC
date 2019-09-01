@@ -118,20 +118,14 @@ class MapList implements ModuleInterface
         $maps = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
-        if (strlen($maps->toJson()) > 65000) {
-            Log::error('The map list json is too long! You have too many maps. Sorry, we are working on this.');
-
-            return;
-        }
-
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
-                'maps' => $maps->values()->toJson(),
+                'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         } else {
             Template::showAll('map-list.update-map-list', [
-                'maps' => $maps->values()->toJson(),
+                'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ]);
         }
