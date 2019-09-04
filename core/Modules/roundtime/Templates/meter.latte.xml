@@ -88,6 +88,7 @@
 
             if(UI.SpectatorAutoTarget != NullId && player.RaceState == CTmMlPlayer::ERaceState::Finished){
                 if(lastSpecId != UI.SpectatorAutoTarget){
+                    lastSpecId = UI.SpectatorAutoTarget;
                     target <=> getPlayerByIdent(UI.SpectatorAutoTarget);
                 }
 
