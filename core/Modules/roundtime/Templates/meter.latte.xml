@@ -65,7 +65,6 @@
         resetMeter();
         {/if}
 
-        declare player <=> InputPlayer;
         declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);
         declare labelDisabled <=> (Page.MainFrame.GetFirstChild("label-disabled") as CMlLabel);
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
@@ -86,17 +85,15 @@
         while(True){
             yield;
 
-            if(player == Null){
-                continue;
-            }
+            wait(InputPlayer != Null);
 
-            if(UI.SpectatorAutoTarget != NullId && player.RaceState == CTmMlPlayer::ERaceState::Finished){
+            if(UI.SpectatorAutoTarget != NullId && InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished){
                 if(lastSpecId != UI.SpectatorAutoTarget){
                     lastSpecId = UI.SpectatorAutoTarget;
                     target <=> getPlayerByIdent(UI.SpectatorAutoTarget);
                 }
             }else{
-                if(target != player){
+                if(target != InputPlayer){
                     target <=> InputPlayer;
                 }
             }
