@@ -17,6 +17,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MapList::sendUpdatedMaplist();
+        RoundTime::show($player);
     }
 }

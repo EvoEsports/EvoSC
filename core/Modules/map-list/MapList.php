@@ -18,23 +18,6 @@ use Illuminate\Support\Collection;
 
 class MapList implements ModuleInterface
 {
-    public function __construct()
-    {
-        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
-
-        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
-        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('GroupChanged', [self::class, 'sendManialink']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
-            ->addAlias('/list');
-    }
-
     public static function mapMapQueue(MapQueue $item)
     {
         return [
@@ -85,7 +68,7 @@ class MapList implements ModuleInterface
      * Player add favorite map
      *
      * @param  Player  $player
-     * @param  int  $mapId
+     * @param  string  $mapId
      */
     public static function favAdd(Player $player, string $mapId)
     {
@@ -96,7 +79,7 @@ class MapList implements ModuleInterface
      * Player remove favorite map
      *
      * @param  Player  $player
-     * @param  int  $mapId
+     * @param  string  $mapId
      */
     public static function favRemove(Player $player, string $mapId)
     {
@@ -133,9 +116,6 @@ class MapList implements ModuleInterface
 
     private static function getMapList(): Collection
     {
-        //max length ~65762
-        //length 60088 is ok
-
         return Map::whereEnabled(1)->get()->transform(function (Map $map) {
             if (!$map->id || !$map->gbx->MapUid) {
                 return null;
@@ -218,5 +198,18 @@ class MapList implements ModuleInterface
      */
     public static function start(string $mode)
     {
+        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
+        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
+
+        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
+        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('GroupChanged', [self::class, 'sendManialink']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
+            ->addAlias('/list');
     }
 }

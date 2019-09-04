@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
-    <frame id="speedometer" z-index="100">
+    <frame id="speedometer" z-index="10000">
         <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label id="label" pos="0.5 -1.5" text="Km/H" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label class="action" pos="-12.5 2.5" size="22.5 6.5" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}c" ScriptEvents="1" />
@@ -48,6 +48,16 @@
         settings.scale = 1.0;
     }
 
+    CTmMlPlayer getPlayerByIdent(Ident id){
+        foreach(player in Players){
+            if(player.Id == id){
+                return player;
+            }
+        }
+
+        return Null;
+    }
+
     main(){
         {if $settings}
         settings.fromjson("""{$settings|noescape}""");
@@ -67,6 +77,8 @@
         declare speed = 0;
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
+        declare Ident lastSpecId;
+        declare CTmMlPlayer target;
 
         speedometer.RelativeScale = settings.scale;
         labelLabel.Visible = settings.showLabel;
@@ -75,20 +87,38 @@
         while(True){
             yield;
 
-            wait(player != Null);
+            if(UI.SpectatorAutoTarget != NullId){
+                if(lastSpecId != UI.SpectatorAutoTarget){
+                    target <=> getPlayerByIdent(UI.SpectatorAutoTarget);
+                }
 
-            speedLabel.SetText("" ^ InputPlayer.DisplaySpeed);
+                if(hidden){
+                    speedometer.Show();
+                    hidden = False;
+                }
+            }else{
+                if(target != InputPlayer){
+                    target <=> InputPlayer;
+                }
 
-            if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
-                speedometer.Hide();
-                hidden = True;
+                if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
+                    speedometer.Hide();
+                    hidden = True;
+                }
+                if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
+                    speedometer.Show();
+                    hidden = False;
+                }
             }
-            if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
-                speedometer.Show();
-                hidden = False;
+
+            if(target == Null){
+                sleep(100);
+                continue;
             }
 
-            if(!hidden){
+            speedLabel.SetText("" ^ target.DisplaySpeed);
+
+            if(!hidden && target.DisplaySpeed < 400){
                 foreach(event in PendingEvents){
                     if(event.Control == Null){
                         continue;
