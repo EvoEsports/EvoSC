@@ -87,33 +87,22 @@
         while(True){
             yield;
 
+            if(player == Null){
+                continue;
+            }
+
             if(UI.SpectatorAutoTarget != NullId && player.RaceState == CTmMlPlayer::ERaceState::Finished){
                 if(lastSpecId != UI.SpectatorAutoTarget){
                     lastSpecId = UI.SpectatorAutoTarget;
                     target <=> getPlayerByIdent(UI.SpectatorAutoTarget);
                 }
-
-                if(hidden){
-                    speedometer.Show();
-                    hidden = False;
-                }
             }else{
-                if(target != InputPlayer){
+                if(target != player){
                     target <=> InputPlayer;
-                }
-
-                if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
-                    speedometer.Hide();
-                    hidden = True;
-                }
-                if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
-                    speedometer.Show();
-                    hidden = False;
                 }
             }
 
             if(target == Null){
-                sleep(100);
                 continue;
             }
 
