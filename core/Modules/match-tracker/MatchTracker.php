@@ -22,10 +22,12 @@ class MatchTracker implements ModuleInterface
      */
     public static function start(string $mode)
     {
-        self::$match = collect();
-        Hook::add('PlayerConnect', [self::class, 'sendWidget']);
-        Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        if ($mode == 'Rounds.Script.txt') {
+            self::$match = collect();
+            Hook::add('PlayerConnect', [self::class, 'sendWidget']);
+            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        }
     }
 
     public static function sendWidget(Player $player)
