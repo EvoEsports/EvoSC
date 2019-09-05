@@ -4,6 +4,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -17,6 +18,11 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        RoundTime::show($player);
+        self::sendTestManialink($player);
+    }
+
+    public static function sendTestManialink(Player $player)
+    {
+        Template::show($player, '_tester.test');
     }
 }

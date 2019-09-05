@@ -76,7 +76,6 @@
         declare speed = 0;
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
-        declare Ident lastSpecId;
         declare CTmMlPlayer target;
 
         speedometer.RelativeScale = settings.scale;
@@ -87,20 +86,19 @@
             yield;
 
             wait(InputPlayer != Null);
-
-            if(UI.SpectatorAutoTarget != NullId && InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished){
-                if(lastSpecId != UI.SpectatorAutoTarget){
-                    target <=> getPlayerByIdent(UI.SpectatorAutoTarget);
-                    lastSpecId = UI.SpectatorAutoTarget;
-                }
-            }else{
-                if(target != InputPlayer){
-                    target <=> InputPlayer;
-                    lastSpecId = InputPlayer.Id;
-                }
+            if(target == Null){
+                target <=> InputPlayer;
             }
 
-            if(target == Null){
+            if(IsSpectator){
+                if(target.Id != UI.SpectatorAutoTarget){
+                    target <=> Players[InputPlayer.Id];
+                }
+            }else if(target.Id != InputPlayer.Id){
+                target <=> InputPlayer;
+            }
+
+            if(target.Id != UI.SpectatorAutoTarget && IsSpectator){
                 continue;
             }
 
