@@ -80,8 +80,8 @@
             }
 
             if(IsSpectator){
-                if(target.Id != UI.SpectatorAutoTarget){
-                    target <=> Players[InputPlayer.Id];
+                if(target.Id != UI.SpectatorAutoTarget && Players.existskey(UI.SpectatorAutoTarget)){
+                    target <=> Players[UI.SpectatorAutoTarget];
                 }
             }else if(target.Id != InputPlayer.Id){
                 target <=> InputPlayer;

@@ -17,7 +17,7 @@ class AlterUi
         $properties = '
  	<!--
  	  Each node is optional and can be omitted.
- 	  If it\'s the case then the previous value will be kept.
+ 	  If it is the case then the previous value will be kept.
  	-->
  	<ui_properties>
  		<!-- The map name and author displayed in the top right of the screen when viewing the scores table -->

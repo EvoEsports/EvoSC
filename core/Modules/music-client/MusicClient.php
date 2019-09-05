@@ -37,8 +37,10 @@ class MusicClient
         }
 
         try {
+            Log::write('Loading music library...');
+
             $response = RestClient::get($url, [
-                'connect_timeout' => 3
+                'connect_timeout' => 10
             ]);
         } catch (GuzzleException $e) {
             Log::error('Failed to fetch music list from '.$url);
@@ -58,7 +60,7 @@ class MusicClient
         self::$music = collect(json_decode($musicJson));
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('EndMap', [self::class, 'setNextSong']);
+        Hook::add('BeginMap', [self::class, 'setNextSong']);
 
         ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
@@ -76,10 +78,9 @@ class MusicClient
     {
         self::$song = self::$music->random(1)->first();
         Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));
-        $song = json_encode(self::$song);
 
-        if ($song != 'null') {
-            Template::showAll('music-client.start-song', compact('song'));
+        if (self::$song) {
+            Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)]);
         }
     }
 
@@ -104,17 +105,5 @@ class MusicClient
         if ($song != 'null') {
             Template::showAll('music-client.start-song', compact('song'));
         }
-    }
-
-    public static function searchMusic(Player $player, $cmd, ...$arguments)
-    {
-        $query = implode(' ', $arguments);
-        Template::show($player, 'music-client.search-command', compact('query'));
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::playerConnect($player);
     }
 }

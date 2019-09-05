@@ -1,0 +1,136 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:321-go" id="321-go" version="3">
+    <frame pos="0 12">
+        <label textcolor="eee" textprefix="$i" opacity="0.4" id="three" text="3" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+        <label textcolor="eee" textprefix="$i" opacity="0.6" id="two" text="2" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+        <label textcolor="eee" textprefix="$i" opacity="0.8" id="one" text="1" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+        <label textcolor="eee" textprefix="$i" opacity="1.0" id="go" text="GO" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+    </frame>
+
+    <script><!--
+    declare CMlLabel three;
+    declare CMlLabel two;
+    declare CMlLabel one;
+    declare CMlLabel go;
+    declare Integer sleepUntil;
+
+    Void reset(){
+        declare orig = "<label scale='1.8' pos='0 0' />";
+        one.Hide();
+        two.Hide();
+        three.Hide();
+        go.Hide();
+        AnimMgr.Add(one, orig, 1, CAnimManager::EAnimManagerEasing::Linear);
+        AnimMgr.Add(two, orig, 1, CAnimManager::EAnimManagerEasing::Linear);
+        AnimMgr.Add(three, orig, 1, CAnimManager::EAnimManagerEasing::Linear);
+        AnimMgr.Add(go, orig, 1, CAnimManager::EAnimManagerEasing::Linear);
+    }
+
+    Boolean playerReset(){
+        foreach(event in RaceEvents){
+            if(GameTime >= sleepUntil){
+                return False;
+            }
+
+            if(event.Player != InputPlayer){
+                continue;
+            }
+
+            if(event.Type == CTmRaceClientEvent::EType::Respawn){
+                return True;
+            }
+        }
+
+        return False;
+    }
+
+    main() {
+        three <=> (Page.MainFrame.GetFirstChild("three") as CMlLabel);
+        two <=> (Page.MainFrame.GetFirstChild("two") as CMlLabel);
+        one <=> (Page.MainFrame.GetFirstChild("one") as CMlLabel);
+        go <=> (Page.MainFrame.GetFirstChild("go") as CMlLabel);
+
+        reset();
+
+        declare Text target = "<label scale='0.8' pos='0 -2' />";
+        declare Boolean reset = False;
+
+        while(True){
+            yield;
+            reset = False;
+
+            wait(InputPlayer != Null);
+            wait(InputPlayer.RaceState == CTmMlPlayer::ERaceState::BeforeStart);
+
+            sleepUntil = GameTime + 400;
+            while(GameTime < sleepUntil && !reset){
+                yield;
+                if(playerReset()){
+                    reset();
+                    reset = True;
+                }
+            }
+            if(reset) continue;
+
+            three.Show();
+            AnimMgr.Add(three, target, 1000, CAnimManager::EAnimManagerEasing::ElasticOut);
+
+            sleepUntil = GameTime + 900;
+            while(GameTime < sleepUntil && !reset){
+                yield;
+                if(playerReset()){
+                    reset();
+                    reset = True;
+                }
+            }
+            if(reset) continue;
+
+            three.Hide();
+            two.Show();
+            AnimMgr.Add(two, target, 1000, CAnimManager::EAnimManagerEasing::ElasticOut);
+
+            sleepUntil = GameTime + 850;
+            while(GameTime < sleepUntil && !reset){
+                yield;
+                if(playerReset()){
+                    reset();
+                    reset = True;
+                }
+            }
+            if(reset) continue;
+
+            two.Hide();
+            one.Show();
+            AnimMgr.Add(one, target, 1000, CAnimManager::EAnimManagerEasing::ElasticOut);
+
+            sleepUntil = GameTime + 900;
+            while(GameTime < sleepUntil && !reset){
+                yield;
+                if(playerReset()){
+                    reset();
+                    reset = True;
+                }
+            }
+            if(reset) continue;
+
+            one.Hide();
+            go.Show();
+            AnimMgr.Add(go, target, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
+
+            sleepUntil = GameTime + 500;
+            while(GameTime < sleepUntil && !reset){
+                yield;
+                if(playerReset()){
+                    reset();
+                    reset = True;
+                }
+            }
+            if(reset) continue;
+
+            go.Hide();
+            reset();
+        }
+    }
+    --></script>
+</manialink>
