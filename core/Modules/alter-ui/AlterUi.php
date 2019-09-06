@@ -45,7 +45,7 @@ class AlterUi
  		<!-- Current race chrono displayed at the bottom center of the screen -->
  		<chrono visible="false" pos="0. -80. -5." />
  		<!-- Speed and distance raced displayed in the bottom right of the screen -->
- 		<speed_and_distance visible="false" pos="137. -69. 5." />
+ 		<speed_and_distance visible="true" pos="137. -69. 5." />
  		<!-- Previous and best times displayed at the bottom right of the screen -->
  		<personal_best_and_rank visible="false" pos="157. -24. 5." />
  		<!-- Current position in the map ranking displayed at the bottom right of the screen -->

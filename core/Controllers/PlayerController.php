@@ -135,7 +135,7 @@ class PlayerController implements ControllerInterface
 
         $player->update([
             'last_visit' => now(),
-            'player_id'  => 0,
+            'player_id' => 0,
         ]);
 
         self::$players = self::$players->forget($player->Login);
@@ -149,7 +149,7 @@ class PlayerController implements ControllerInterface
     public static function beginMap(Map $map)
     {
         Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
-            'player_id'        => 0,
+            'player_id' => 0,
             'spectator_status' => 0,
         ]);
     }
@@ -339,6 +339,15 @@ class PlayerController implements ControllerInterface
         return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
+    public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
+    {
+        for ($i = 0; $i < intval($count); $i++) {
+            Hook::fire('PlayerConnect', Server::connectFakePlayer());
+        }
+
+        infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
+    }
+
     /**
      * @param  string  $mode
      */
@@ -354,5 +363,6 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
             'Set the server password, leave empty to clear it.', 'ma');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
     }
 }

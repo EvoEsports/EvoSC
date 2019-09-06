@@ -58,6 +58,28 @@
         return Null;
     }
 
+    CTmMlPlayer GetOwner() {
+      if (GUIPlayer != Null) return GUIPlayer;
+      if (InputPlayer != Null) return InputPlayer;
+      return Null;
+    }
+
+    Void HideDuringIntro(CMlFrame _Frame) {
+      if (_Frame == Null) return;
+
+      declare IsIntro = (
+        UI.UISequence == CUIConfig::EUISequence::Intro ||
+        UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
+        UI.UISequence == CUIConfig::EUISequence::Outro
+      );
+
+      if (_Frame.Visible && IsIntro) {
+        _Frame.Visible = False;
+      } else if (!_Frame.Visible && !IsIntro) {
+        _Frame.Visible = True;
+      }
+    }
+
     main(){
         {if $settings}
         settings.fromjson("""{$settings|noescape}""");
@@ -76,7 +98,7 @@
         declare speed = 0;
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
-        declare CTmMlPlayer target;
+        declare PrevIsSpectator = !IsSpectator;
 
         speedometer.RelativeScale = settings.scale;
         labelLabel.Visible = settings.showLabel;
@@ -85,26 +107,25 @@
         while(True){
             yield;
 
-            wait(InputPlayer != Null);
-            if(target == Null){
-                target <=> InputPlayer;
+            HideDuringIntro(speedometer);
+            declare Owner <=> GetOwner();
+            if (!PageIsVisible || Owner == Null) continue;
+
+            if (PrevIsSpectator != IsSpectator) {
+              PrevIsSpectator = IsSpectator;
+
+              if (IsSpectator) {
+                speedometer.Visible = False;
+              } else {
+                speedometer.Visible = True;
+              }
             }
 
-            if(IsSpectator){
-                if(target.Id != UI.SpectatorAutoTarget && Players.existskey(UI.SpectatorAutoTarget)){
-                    target <=> Players[UI.SpectatorAutoTarget];
-                }
-            }else if(target.Id != InputPlayer.Id){
-                target <=> InputPlayer;
+            if(speedometer.Visible){
+                speedLabel.Value = TL::ToText(Owner.DisplaySpeed);
             }
 
-            if(target.Id != UI.SpectatorAutoTarget && IsSpectator){
-                continue;
-            }
-
-            speedLabel.SetText("" ^ target.DisplaySpeed);
-
-            if(!hidden && target.DisplaySpeed < 400){
+            if(!hidden){
                 foreach(event in PendingEvents){
                     if(event.Control == Null){
                         continue;

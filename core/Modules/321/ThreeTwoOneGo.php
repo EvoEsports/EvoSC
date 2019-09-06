@@ -20,9 +20,7 @@ class ThreeTwoOneGo implements ModuleInterface
      */
     public static function start(string $mode)
     {
-        Hook::add('PlayerConnect', [self::class, 'sendWidget']);
-
-        Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', ['<ui_properties><go visible="false" /></ui_properties>']);
+//        Hook::add('PlayerConnect', [self::class, 'sendWidget']);
     }
 
     public static function sendWidget(Player $player)

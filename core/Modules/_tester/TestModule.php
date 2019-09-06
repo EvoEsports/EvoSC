@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ThreeTwoOneGo::sendWidget($player);
+        RoundTime::show($player);
     }
 
     public static function sendTestManialink(Player $player)
