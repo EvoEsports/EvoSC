@@ -67,8 +67,8 @@ class LocalRecords implements ModuleInterface
     //Called on PlayerFinish
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
-        if ($score < 5000) {
-            //ignore times under 5 seconds
+        if ($score < 3000) {
+            //ignore times under 3 seconds
             return;
         }
 

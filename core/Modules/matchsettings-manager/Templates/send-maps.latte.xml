@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:update-msm-maps" id="update-msm-maps" version="3">
+<manialink name="ESC:update-msm-maps-{$i}" id="update-msm-maps-{$i}" version="3">
     <script><!--
     main() {
-        declare Text[Text][][Integer] mapPages_ for This;
-        declare Text[Text][] mapPage;
+        declare i = {$i};
+        declare chunks = {$chunks};
+        declare Text[Text][][Integer] MSM_Map_Pages for This;
+        declare Text[Text][] mapsTemp;
 
-        mapPage.fromjson("""{$maps|noescape}""");
-        mapPages_[{$page}] = mapPage;
+        mapsTemp.fromjson("""{$maps|noescape}""");
+        MSM_Map_Pages[i] = mapsTemp;
+
+        if(i + 1 == chunks){
+            declare Text[Text][] MSM_Maps for This;
+            declare Text[Text][] temp;
+
+            for(x, 0, chunks - 1){
+                foreach(map in MSM_Map_Pages[x]){
+                    temp.add(map);
+                }
+            }
+            MSM_Maps = temp;
+        }
     }
     --></script>
 </manialink>

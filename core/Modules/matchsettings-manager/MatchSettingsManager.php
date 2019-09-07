@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 use esc\Classes\File;
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -78,6 +79,7 @@ class MatchSettingsManager implements ModuleInterface
 
         if ($map) {
             MatchSettingsController::addMap("$matchSettingsName.txt", $map);
+            Log::write($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
         }
     }
 
@@ -87,6 +89,7 @@ class MatchSettingsManager implements ModuleInterface
 
         if ($map) {
             MatchSettingsController::removeByUid("$matchSettingsName.txt", $map->uid);
+            Log::write($player.' removed "'.$map.'" from "'.$matchSettingsName.'"');
         }
     }
 
@@ -126,18 +129,39 @@ class MatchSettingsManager implements ModuleInterface
         $perPage = 19;
         $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
         $data = File::get($file);
-        $enabledMaps = collect();
+        $enabledMapUids = collect();
         $xml = new \SimpleXMLElement($data);
 
         foreach ($xml as $node) {
             if ($node->getName() == 'map') {
-                $enabledMaps->push($node);
+                $enabledMapUids->push($node->ident);
             }
         }
 
-        $totalPages = ceil(Map::count() / $perPage);
+        $mapChunks = Map::all()
+            ->map(function (Map $map) use ($enabledMapUids) {
+                return [
+                    'id' => $map->id,
+                    'enabled' => $enabledMapUids->contains($map->uid),
+                    'environment' => $map->environment,
+                    'title_id' => $map->title_id,
+                    'name' => $map->name,
+                    'author_name' => $map->author->NickName,
+                    'author_login' => $map->author->Login
+                ];
+            })
+            ->sortByDesc('enabled')
+            ->chunk(250);
 
-        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'totalPages'));
+        for ($i = 0; $i < $mapChunks->count(); $i++) {
+            Template::show($player, 'matchsettings-manager.send-maps',
+                ['maps' => $mapChunks->get($i)->values(), 'chunks' => $mapChunks->count(), 'i' => $i]);
+        }
+
+        $totalMaps = Map::count();
+        $totalPages = ceil($totalMaps / $perPage);
+
+        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'totalPages', 'totalMaps'));
     }
 
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
