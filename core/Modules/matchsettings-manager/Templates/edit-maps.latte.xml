@@ -19,16 +19,16 @@
     <frame pos="0 -7.5">
         <label size="35 4" textsize="0.3" text="Name" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="37" size="20 4" textsize="0.3" text="Author" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="59" size="30 4" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="69" size="30 4" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
     </frame>
 
     <frame id="map-rows" pos="0 -11.5">
         {for $i=0; $i<19; $i++}
         <frame class="map" pos="0 {$i * -3.5}" data-id="id">
-            <label pos="113" size="3 3" textsize="0.9" text="$fff $333" valign="center" />
+            <label pos="113" size="3 3" textsize="0.9" text="$333" valign="center" />
             <label size="34 3" textsize="0.6" text="name" valign="center" />
             <label pos="37" size="20 3" textsize="0.6" text="author_name" valign="center" />
-            <label pos="59" size="30 3" textsize="0.6" text="environment(title_id)" valign="center" />
+            <label pos="69" size="30 3" textsize="0.6" text="environment(title_id)" valign="center" />
             <label class="toggle" pos="-2" size="120 3.5" valign="center" ScriptEvents="1" z-index="-1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
         </frame>
         {/for}
@@ -49,7 +49,7 @@
                focusareacolor2="{config('colors.ui.window.header.color')}c"/>
     </frame>
 
-    <frame id="search-frame" pos="89 -80" scale="0.9" hidden="1">
+    <frame id="search-frame" pos="89 -80" scale="0.9">
         <label textfont="{config('colors.ui.font')|noescape}" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
         <entry textfont="{config('colors.ui.font')|noescape}" id="search-input" class="search-input" pos="26.5 0" size="25 3.5" textcolor="{config('colors.ui.window.text.primary')}"
                halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
@@ -62,61 +62,96 @@
     {block scriptDeclarations}
     <script><!--
     declare Integer currentPage;
+    declare Integer totalPagesOriginal;
     declare Integer totalPages;
-    declare Text searchQuery;
+    declare Integer perPage;
+    declare Text[Text][] currentSelection;
     --></script>
     {/block}
 
     {block functions}
     <script><!--
-        Void loadPage(Integer page, Boolean switchToPage){
-            declare Text[Text][][Integer] mapPages_ for This;
-            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
-            declare mapRows <=> (Page.MainFrame.GetFirstChild("map-rows") as CMlFrame);
+    Void loadPage(Integer page){
+        declare rows <=> (Page.MainFrame.GetFirstChild("map-rows") as CMlFrame);
+        declare skip = perPage  * page;
+        declare skipped = 0;
+        declare filled = 0;
 
-            if(!mapPages_.existskey(page)){
-                TriggerPageAction("msm.load_page,{$name}," ^ page ^ "," ^ searchQuery);
-                wait(mapPages_.existskey(page));
+        foreach(map in currentSelection){
+            if(skipped < skip){
+                skipped += 1;
+                continue;
             }
 
-            if(switchToPage){
-                pageInfo.SetText((page + 1) ^ "/" ^ (totalPages + 1));
+            declare row = (rows.Controls[filled] as CMlFrame);
+            (row.Controls[1] as CMlLabel).Value = map["name"];
+            (row.Controls[2] as CMlLabel).Value = map["author_name"];
+            (row.Controls[3] as CMlLabel).Value = map["environment"] ^ "(" ^ map["title_id"] ^ ")";
+            row.DataAttributeSet("enabled", map["enabled"]);
+            row.DataAttributeSet("id", map["id"]);
 
-                for(i, 0, 19){
-                    if(!mapPages_[page].existskey(i)){
-                        break;
-                    }
+            if(map["enabled"] == "True"){
+                (row.Controls[0] as CMlLabel).Value = "$fff";
+            }else{
+                (row.Controls[0] as CMlLabel).Value = "$333";
+            }
 
-                    declare map = mapPages_[page][i];
-                    declare frame <=> (mapRows.Controls[i] as CMlFrame);
-
-                    if(map["enabled"] == "True"){
-                        (frame.Controls[0] as CMlLabel).SetText("$fff");
-                    }else{
-                        (frame.Controls[0] as CMlLabel).SetText("$333");
-                    }
-                    (frame.Controls[1] as CMlLabel).SetText(map["name"]);
-                    //(frame.Controls[2] as CMlLabel).SetText(map["author"]);
-                    (frame.Controls[3] as CMlLabel).SetText(map["environment"] ^ "(" ^ map["title_id"] ^ ")");
-                }
+            row.Show();
+            filled += 1;
+            if(filled >= perPage){
+                break;
             }
         }
+
+        if(filled < perPage){
+            for(i, filled, perPage - 1){
+                rows.Controls[i].Hide();
+            }
+        }
+
+        (Page.MainFrame.GetFirstChild("page-info") as CMlLabel).Value = (page + 1) ^ "/" ^ (totalPages + 1);
+    }
+
+    Text[Text][] search(Text search){
+        declare Text[Text][] MSM_Maps for This;
+        declare Text[Text][] matches;
+
+        if(TL::Trim(search) == ""){
+            totalPages = MSM_Maps.count / perPage;
+            return MSM_Maps;
+        }
+
+        foreach(map in MSM_Maps){
+            declare searchString = map["name"]^map["author_name"]^map["author_login"]^map["title_id"]^map["environment"];
+            if(TL::Find(search, searchString, False, False)){
+                matches.add(map);
+            }
+        }
+
+        totalPages = matches.count / perPage;
+
+        return matches;
+    }
     --></script>
     {/block}
 
     <script><!--
-
     {block bootScript}
+    declare Text[Text][] MSM_Maps for This;
+    wait(MSM_Maps.count == {$totalMaps});
+    currentSelection = MSM_Maps;
+
+    perPage = 19;
     currentPage = 0;
     totalPages = {$totalPages} - 1;
-    searchQuery = "";
-    loadPage(currentPage, True);
+    totalPagesOriginal = totalPages;
+    loadPage(currentPage);
     {/block}
 
     {block pendingEvents}
         if(event.Control.HasClass("toggle") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare parent = event.Control.Parent;
-            declare enabled = parent.DataAttributeGet("enabled") != "";
+            declare enabled = parent.DataAttributeGet("enabled") == "True";
             declare mapId = parent.DataAttributeGet("id");
 
             if(enabled){
@@ -136,12 +171,7 @@
             if(currentPage > totalPages){
                 currentPage = 0;
             }
-            loadPage(currentPage, True);
-            declare nextPage = currentPage + 1;
-            if(nextPage > totalPages){
-                nextPage = 0;
-            }
-            loadPage(nextPage, False);
+            loadPage(currentPage);
             continue;
         }
 
@@ -150,12 +180,14 @@
             if(currentPage < 0){
                 currentPage = totalPages;
             }
-            loadPage(currentPage, True);
-            declare previousPage = currentPage - 1;
-            if(previousPage < 0){
-                previousPage = totalPages;
-            }
-            loadPage(previousPage, False);
+            loadPage(currentPage);
+            continue;
+        }
+
+        if(event.Control.HasClass("search-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+            currentSelection = search((event.Control as CMlEntry).Value);
+            currentPage = 0;
+            loadPage(currentPage);
             continue;
         }
 
