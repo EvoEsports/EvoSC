@@ -288,24 +288,10 @@ Void setColors(CMlControl songFrameControl, Vec3 color){
 }
 
 Void loadMusicLibrary(){
-    startLoading("Loading music");
-
-    declare CHttpRequest getSongList = Http.CreateGet(baseUrl);
-
-    while(!getSongList.IsCompleted){
-        yield;
-        hidescript();
-        progress.RelativeRotation = progress.RelativeRotation + 2.0;
-    }
-
-    if(getSongList.StatusCode != 200){
-        (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
-        log("[EvoSC:music-client] Music disabled, can not read song list from server.");
-        return;
-    }
-
-    declare json = getSongList.Result;
-    music.fromjson(json);
+    sleep(250);
+    declare MusicLibrary musicLib for This;
+    music = musicLib.songs;
+    baseUrl = musicLib.server;
 
     if(music.count == 0){
         (Page.MainFrame.GetFirstChild("widget") as CMlFrame).Hide();
@@ -313,12 +299,7 @@ Void loadMusicLibrary(){
         return;
     }
 
-    {if isVerbose()}
-    log("[EvoSC:music-client] Loaded " ^ music.count ^ " songs");
-    {/if}
-
     musicEnabled = True;
-
     stopLoading();
 }
 --></script>
@@ -333,6 +314,11 @@ Void loadMusicLibrary(){
             Text file;
             Text length;
         }
+
+        #Struct MusicLibrary {
+            Song[] songs;
+            Text server;
+        }
     {/block}
 
     {block bootScript}
@@ -342,11 +328,8 @@ Void loadMusicLibrary(){
         progress <=> (Page.MainFrame.GetFirstChild("progress") as CMlFrame);
         hoverColor = TL::ToColor("{config('colors.ui.window.header.color')}");
         musicEnabled = False;
-        baseUrl = "{config('music.url')|noescape}";
 
-        if(baseUrl != ""){
-            loadMusicLibrary();
-        }
+        loadMusicLibrary();
 
         declare CMlFrame widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare CMlFrame widgetControls <=> (Page.MainFrame.GetFirstChild("widget-controls") as CMlFrame);

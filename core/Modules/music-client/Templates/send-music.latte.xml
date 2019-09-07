@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:music-lib-{$i ?? 0}" id="music-lib-{$i ?? 0}" version="3">
+    <script><!--
+    #Struct Song {
+        Text title;
+        Text artist;
+        Text album;
+        Text file;
+        Text length;
+    }
+
+    #Struct MusicLibrary {
+        Song[] songs;
+        Text server;
+    }
+
+    main() {
+        declare Song[][Integer] MusicLibPages for This;
+        declare Song[] tempLib;
+
+        tempLib.fromjson("""{$music|noescape}""");
+        MusicLibPages[{$i}] = tempLib;
+
+        {if $i == $chunks - 1}
+        declare MusicLibrary musicLib for This;
+        declare Song[] temp;
+
+        for(i, 0, {$chunks - 1}){
+            foreach(song in MusicLibPages[i]){
+                temp.add(song);
+            }
+        }
+
+        musicLib.songs = temp;
+        musicLib.server = "{$server|noescape}";
+        {/if}
+    }
+    --></script>
+</manialink>

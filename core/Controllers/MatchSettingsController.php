@@ -43,7 +43,7 @@ class MatchSettingsController implements ControllerInterface
     {
         Server::loadMatchSettings('MatchSettings/'.$matchSettingsFile);
         infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
-        Log::write($player.' loads matchsettings '.$matchSettingsFile);
+        Log::info($player.' loads matchsettings '.$matchSettingsFile);
 
         $mode = self::getModeScript($matchSettingsFile);
 
@@ -124,7 +124,7 @@ class MatchSettingsController implements ControllerInterface
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write("Failed to add map ($map) to $matchSettings.");
+            Log::error("Failed to add map \"$map\" to \"$matchSettings\"");
         }
     }
 
@@ -171,7 +171,7 @@ class MatchSettingsController implements ControllerInterface
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write("Failed to shuffle map-list.");
+            Log::error("Failed to shuffle map-list: " . $e->getMessage());
         }
     }
 

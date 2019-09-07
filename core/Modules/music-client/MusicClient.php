@@ -85,6 +85,21 @@ class MusicClient
         }
     }
 
+    public static function sendMusicLib(Player $player)
+    {
+        $server = config('music.url');
+        $chunks = self::$music->chunk(200);
+
+        for ($i = 0; $i < $chunks->count(); $i++) {
+            Template::show($player, 'music-client.send-music', [
+                'server' => $server,
+                'music' => $chunks->get($i)->values()->toJson(),
+                'i' => $i,
+                'chunks' => $chunks->count()
+            ]);
+        }
+    }
+
     /**
      * Hook: PlayerConnect
      *
@@ -92,6 +107,7 @@ class MusicClient
      */
     public static function playerConnect(Player $player)
     {
+        self::sendMusicLib($player);
         Template::show($player, 'music-client.music-client');
 
         $url = Server::getForcedMusic()->url;

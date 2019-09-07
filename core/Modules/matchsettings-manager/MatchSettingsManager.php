@@ -79,7 +79,7 @@ class MatchSettingsManager implements ModuleInterface
 
         if ($map) {
             MatchSettingsController::addMap("$matchSettingsName.txt", $map);
-            Log::write($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
+            Log::info($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
         }
     }
 
@@ -89,7 +89,7 @@ class MatchSettingsManager implements ModuleInterface
 
         if ($map) {
             MatchSettingsController::removeByUid("$matchSettingsName.txt", $map->uid);
-            Log::write($player.' removed "'.$map.'" from "'.$matchSettingsName.'"');
+            Log::info($player.' removed "'.$map.'" from "'.$matchSettingsName.'"');
         }
     }
 
@@ -171,12 +171,12 @@ class MatchSettingsManager implements ModuleInterface
 
         foreach ($settings as $setting => $value) {
             MatchSettingsController::updateSetting($oldFilename.'.txt', $setting, $value);
-            Log::write($player.' set "'.$setting.'" to "'.$value.'" in "'.$oldFilename.'"');
+            Log::info($player.' set "'.$setting.'" to "'.$value.'" in "'.$oldFilename.'"');
         }
 
         if ($oldFilename != $filename) {
             MatchSettingsController::rename($oldFilename.'.txt', $filename.'.txt');
-            Log::write($player.' renamed "'.$oldFilename.'" to "'.$filename.'"');
+            Log::info($player.' renamed "'.$oldFilename.'" to "'.$filename.'"');
         }
 
         self::showOverview($player);
@@ -196,7 +196,7 @@ class MatchSettingsManager implements ModuleInterface
         } while (File::exists($matchsettingsDirectory.$filename));
 
         File::copy($sourceMatchsettings, $matchsettingsDirectory.$filename);
-        Log::write($player.' created new "'.$filename.'" with mode "'.$modeName.'"');
+        Log::info($player.' created new "'.$filename.'" with mode "'.$modeName.'"');
 
         self::showOverview($player);
     }
