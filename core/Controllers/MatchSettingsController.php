@@ -289,11 +289,28 @@ class MatchSettingsController implements ControllerInterface
         $file = self::getPath($matchSettingsFile);
         $settings = new SimpleXMLElement(File::get($file));
 
-        $nodePath = collect(explode('.', $setting))->transform(function ($node) {
-            return "{$node}";
-        })->implode('->');
+        $root = explode('.', $setting)[0];
 
-        eval('$settings->'.$nodePath.' = $value;');
+        if ($root == 'script_settings') {
+            foreach ($settings->script_settings->setting as $setting_) {
+                if($setting_['name'] == explode('.', $setting)[1]){
+                    $setting_['value'] = $value;
+                }
+            }
+        } else if ($root == 'mode_script_settings') {
+            foreach ($settings->mode_script_settings->setting as $setting_) {
+                if($setting_['name'] == explode('.', $setting)[1]){
+                    $setting_['value'] = $value;
+                }
+            }
+        } else {
+            $nodePath = collect(explode('.', $setting))->transform(function ($node) {
+                return "{$node}";
+            })->implode('->');
+
+            eval('$settings->'.$nodePath.' = $value;');
+        }
+
 
         $domDocument = new \DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;

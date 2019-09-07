@@ -20,6 +20,7 @@
         <label size="35 4" textsize="0.3" text="Name" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="37" size="20 4" textsize="0.3" text="Author" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="69" size="30 4" textsize="0.3" text="Environment(Title)" valign="center" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="116" size="30 4" textsize="0.3" text="Enabled" valign="center" halign="right" textprefix="$o" textcolor="{config('colors.ui.window.header.color')}" />
     </frame>
 
     <frame id="map-rows" pos="0 -11.5">
@@ -122,7 +123,7 @@
         }
 
         foreach(map in MSM_Maps){
-            declare searchString = map["name"]^map["author_name"]^map["author_login"]^map["title_id"]^map["environment"];
+            declare searchString = map["name"]^" "^map["author_name"]^" "^map["author_login"]^" "^map["title_id"]^" "^map["environment"];
             if(TL::Find(search, searchString, False, False)){
                 matches.add(map);
             }

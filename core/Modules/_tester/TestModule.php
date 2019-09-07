@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchSettingsManager::showEditMatchsettingsMaps($player, 'rounds_test');
+        MatchSettingsManager::showEditMatchsettings($player, 'rounds_test');
     }
 
     public static function sendTestManialink(Player $player)

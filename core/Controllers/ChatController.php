@@ -166,8 +166,6 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        var_dump($text);
-
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
             warningMessage('Invalid chat-command entered. See ', secondary('/help'),
                 ' for all commands.')->send($player);
@@ -183,7 +181,7 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        Log::write('['.$player.'] '.$text, true);
+        Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
 
         if (!self::$routingEnabled) {
             return;

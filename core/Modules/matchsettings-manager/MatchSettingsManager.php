@@ -107,7 +107,7 @@ class MatchSettingsManager implements ModuleInterface
                     $items = collect();
 
                     foreach ($node as $item) {
-                        if ($nodeName == 'mode_script_settings') {
+                        if ($nodeName == 'mode_script_settings' || $nodeName == 'script_settings') {
                             $items->put(''.$item['name'], ''.$item['value']);
                         } else {
                             $items->put($item->getName(), ''.$item[0]);
@@ -171,10 +171,12 @@ class MatchSettingsManager implements ModuleInterface
 
         foreach ($settings as $setting => $value) {
             MatchSettingsController::updateSetting($oldFilename.'.txt', $setting, $value);
+            Log::write($player.' set "'.$setting.'" to "'.$value.'" in "'.$oldFilename.'"');
         }
 
         if ($oldFilename != $filename) {
             MatchSettingsController::rename($oldFilename.'.txt', $filename.'.txt');
+            Log::write($player.' renamed "'.$oldFilename.'" to "'.$filename.'"');
         }
 
         self::showOverview($player);
@@ -194,6 +196,7 @@ class MatchSettingsManager implements ModuleInterface
         } while (File::exists($matchsettingsDirectory.$filename));
 
         File::copy($sourceMatchsettings, $matchsettingsDirectory.$filename);
+        Log::write($player.' created new "'.$filename.'" with mode "'.$modeName.'"');
 
         self::showOverview($player);
     }
@@ -205,6 +208,7 @@ class MatchSettingsManager implements ModuleInterface
         $matchsettingsDirectory = Server::getMapsDirectory().'MatchSettings/';
 
         File::copy($matchsettingsDirectory.$file, $matchsettingsDirectory.$targetFile);
+        Log::info($player.' duplicated "'.$file.'" as "'.$targetFile.'"');
 
         self::showOverview($player);
     }
@@ -218,6 +222,7 @@ class MatchSettingsManager implements ModuleInterface
         }
 
         File::delete(Server::getMapsDirectory().'MatchSettings/'.$matchsettingsFile.'.txt');
+        Log::warning($player.' deleted "'.$matchsettingsFile.'"');
 
         self::showOverview($player);
     }
@@ -236,56 +241,6 @@ class MatchSettingsManager implements ModuleInterface
         return $files;
     }
 
-    public static function sendFilteredMapsPage(Player $player, string $name, int $page, ...$search)
-    {
-        $perPage = 19;
-        $search = trim(implode(',', $search));
-        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
-        $data = File::get($file);
-        $enabledMaps = collect();
-        $xml = new \SimpleXMLElement($data);
-
-        foreach ($xml as $node) {
-            if ($node->getName() == 'map') {
-                $enabledMaps->push($node);
-            }
-        }
-
-        $maps = Map::all();
-
-        if ($search) {
-            $maps = $maps->filter(function (Map $map) use ($search) {
-                return mb_strpos(stripAll($map->name), $search);
-            });
-        }
-
-        $maps = $maps->map(function (Map $map) use ($enabledMaps) {
-            if (!$map->name) {
-                $map->name = $map->gbx->Name;
-                $map->environment = $map->gbx->Environment;
-                $map->title_id = $map->gbx->TitleId;
-                $map->save();
-            }
-
-            return [
-                'enabled' => $enabledMaps->contains('ident', $map->uid),
-                'name' => str_replace('"', '', $map->name),
-                'author' => $map->author->NickName,
-                'environment' => $map->environment,
-                'title_id' => $map->title_id
-            ];
-        })
-            ->sortByDesc('enabled')
-            ->chunk($perPage)
-            ->get($page)
-            ->values();
-
-        Template::show($player, 'matchsettings-manager.send-maps', [
-            'maps' => $maps->toJson(),
-            'page' => $page
-        ]);
-    }
-
     /**
      * Called when the module is loaded
      *
@@ -293,6 +248,5 @@ class MatchSettingsManager implements ModuleInterface
      */
     public static function start(string $mode)
     {
-        ManiaLinkEvent::add('msm.load_page', [self::class, 'sendFilteredMapsPage']);
     }
 }

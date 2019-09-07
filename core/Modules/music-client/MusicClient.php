@@ -37,10 +37,11 @@ class MusicClient
         }
 
         try {
-            Log::write('Loading music library...');
+            $timeout = 10;
+            Log::write('Loading music library ('.$timeout.'s timeout).');
 
             $response = RestClient::get($url, [
-                'connect_timeout' => 10
+                'connect_timeout' => $timeout
             ]);
         } catch (GuzzleException $e) {
             Log::error('Failed to fetch music list from '.$url);
