@@ -41,7 +41,7 @@ class AlterUi
  		<!-- Race time left displayed at the bottom right of the screen -->
  		<countdown visible="true" pos="155 -20 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->
- 		<go visible="true" />
+ 		<go visible="false" />
  		<!-- Current race chrono displayed at the bottom center of the screen -->
  		<chrono visible="false" pos="0. -80. -5." />
  		<!-- Speed and distance raced displayed in the bottom right of the screen -->

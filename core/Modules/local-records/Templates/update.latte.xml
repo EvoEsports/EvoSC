@@ -16,8 +16,6 @@
 
             LocalRecords.fromjson(localsJson);
             LastLocalRecordsUpdate = GameTime;
-
-            log(LocalRecords);
         }
         -->
     </script>

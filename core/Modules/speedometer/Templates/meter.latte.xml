@@ -48,16 +48,6 @@
         settings.scale = 1.0;
     }
 
-    CTmMlPlayer getPlayerByIdent(Ident id){
-        foreach(player in Players){
-            if(InputPlayer.Id == id){
-                return player;
-            }
-        }
-
-        return Null;
-    }
-
     CTmMlPlayer GetOwner() {
       if (GUIPlayer != Null) return GUIPlayer;
       if (InputPlayer != Null) return InputPlayer;

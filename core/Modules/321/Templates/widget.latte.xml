@@ -1,11 +1,11 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:321-go" id="321-go" version="3">
-    <frame pos="0 12">
+    <frame id="main-frame" pos="0 12">
         <label textcolor="eee" textprefix="$i" opacity="0.4" id="three" text="3" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
         <label textcolor="eee" textprefix="$i" opacity="0.6" id="two" text="2" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
         <label textcolor="eee" textprefix="$i" opacity="0.8" id="one" text="1" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
-        <label textcolor="eee" textprefix="$i" opacity="1.0" id="go" text="GO" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+        <label textcolor="eee" textprefix="$i" opacity="1.0" id="go" text="GO!" textsize="10" valign="center" halign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
     </frame>
 
     <script><!--
@@ -45,7 +45,24 @@
         return False;
     }
 
+    Void HideDuringIntro(CMlFrame _Frame) {
+      if (_Frame == Null) return;
+
+      declare IsIntro = (
+        UI.UISequence == CUIConfig::EUISequence::Intro ||
+        UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
+        UI.UISequence == CUIConfig::EUISequence::Outro
+      );
+
+      if (_Frame.Visible && IsIntro) {
+        _Frame.Visible = False;
+      } else if (!_Frame.Visible && !IsIntro) {
+        _Frame.Visible = True;
+      }
+    }
+
     main() {
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
         three <=> (Page.MainFrame.GetFirstChild("three") as CMlLabel);
         two <=> (Page.MainFrame.GetFirstChild("two") as CMlLabel);
         one <=> (Page.MainFrame.GetFirstChild("one") as CMlLabel);
@@ -60,7 +77,11 @@
             yield;
             reset = False;
 
-            wait(InputPlayer != Null);
+            HideDuringIntro(mainFrame);
+            if (!PageIsVisible) continue;
+            if(InputPlayer == Null){
+                continue;
+            }
             wait(InputPlayer.RaceState == CTmMlPlayer::ERaceState::BeforeStart);
 
             sleepUntil = GameTime + 400;
@@ -130,6 +151,12 @@
 
             go.Hide();
             reset();
+            while(InputPlayer != Null){
+                if(InputPlayer.RaceState == CTmMlPlayer::ERaceState::BeforeStart){
+                    break;
+                }
+                yield;
+            }
         }
     }
     --></script>

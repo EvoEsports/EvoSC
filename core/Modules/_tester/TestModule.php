@@ -19,7 +19,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MusicClient::playerConnect($player);
+        ThreeTwoOneGo::sendWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
