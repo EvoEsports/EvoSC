@@ -19,7 +19,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ThreeTwoOneGo::sendWidget($player);
+        CountDown::showCountdown($player);
     }
 
     public static function sendTestManialink(Player $player)
