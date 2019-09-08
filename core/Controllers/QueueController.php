@@ -187,8 +187,7 @@ class QueueController implements ControllerInterface
                 MapQueue::whereMapUid($queueItem->map_uid)->delete();
                 infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player),
                     ' left.')->sendAll();
-                Log::write('QueueController',
-                    'Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
+                Log::write('Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());

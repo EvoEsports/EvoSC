@@ -123,8 +123,7 @@ class PlayerController implements ControllerInterface
     {
         $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::write('PlayerController',
-            $player." [".$player->Login."] left the server after $playtime playtime.");
+        Log::write($player." [".$player->Login."] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {

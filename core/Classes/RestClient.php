@@ -79,7 +79,7 @@ class RestClient
     public static function post(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::write('RestClient', 'POST: ' . $url . ' with options: ' . json_encode($options),
+            Log::write('POST: ' . $url . ' with options: ' . json_encode($options),
                 isDebug());
         }
 
@@ -98,7 +98,7 @@ class RestClient
     public static function put(string $url, array $options = null): Response
     {
         if (isDebug()) {
-            Log::write('RestClient', 'PUT: ' . $url . ' with options: ' . json_encode($options),
+            Log::write('PUT: ' . $url . ' with options: ' . json_encode($options),
                 isDebug());
         }
 

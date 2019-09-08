@@ -175,8 +175,7 @@ class MapController implements ControllerInterface
         if ($deleted) {
             try {
                 $map->delete();
-                Log::write('MapController',
-                    $player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
+                Log::write($player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
             } catch (Exception $e) {
                 Log::write('Failed to remove map "'.$map->uid.'" from database: '.$e->getMessage(), isVerbose());
             }
@@ -211,8 +210,7 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::write('MapController',
-            $player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
+        Log::write($player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
 
         $map->update(['enabled' => 0]);
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
