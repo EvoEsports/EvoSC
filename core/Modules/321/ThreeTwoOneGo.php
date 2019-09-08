@@ -20,7 +20,7 @@ class ThreeTwoOneGo implements ModuleInterface
      */
     public static function start(string $mode)
     {
-        Hook::add('PlayerConnect', [self::class, 'sendWidget']);
+//        Hook::add('PlayerConnect', [self::class, 'sendWidget']);
     }
 
     public static function sendWidget(Player $player)
