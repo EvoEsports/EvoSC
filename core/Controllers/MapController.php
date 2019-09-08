@@ -188,8 +188,7 @@ class MapController implements ControllerInterface
 
             QueueController::preCacheNextMap();
         } else {
-            Log::write('Failed to delete map "'.$map->filename.'": '.$e->getMessage(),
-                isVerbose());
+            Log::write('Failed to delete map "'.$map->filename.'": '.$e->getMessage(), isVerbose());
         }
     }
 
