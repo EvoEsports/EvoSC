@@ -31,30 +31,28 @@
                 <point coords="0 {$hMax}" />
                 <point coords="{$wMax} {$hMax}" />
             </curve>
-            {foreach $recordCps as $i => $cp}
-            {if $iterator->first}
-            <curve color="{$diffs->get($i) == 0 ? '36e' : ($diffs->get($i) < 0 ? '3c3' : 'c33')}9" style="thin">
-                <point coords="{$recordCps[0]} {$hMin}" />
-                <point coords="{$recordCps[0] + 1} {$hMax}" />
-            </curve>
-            {else}
-            <curve color="{$diffs->get($i) == 0 ? '36e' : ($diffs->get($i) < 0 ? '3c3' : 'c33')}9" style="thin">
+            {foreach $diffs as $i => $diff}
+            <curve color="{$diff == 0 ? '36e' : ($diff < 0 ? '3c3' : 'c33')}9" style="thin">
                 <point coords="{$recordCps[$i]} {$hMin}" />
                 <point coords="{$recordCps[$i] + 1} {$hMax}" />
             </curve>
-            {/if}
             {/foreach}
             <curve color="999" width="0.15">
                 <point coords="0 0" />
                 <point coords="{$myRecord->Score} 0" />
             </curve>
-            <curve color="fff" width="0.5">
+            <curve color="{$diffs->first() == 0 ? '36e' : ($diffs->first() < 0 ? '3c3' : 'c33')}" width="0.5">
                 <point coords="0 0" />
-                {foreach $recordCps as $cp}
-                <point coords="{$cp} {$diffs->get($iterator->counter)}" />
-                {/foreach}
-                <point coords="{$record->Score} {$diffs->last()}" />
+                <point coords="{$recordCps[0]} {$diffs->first()}" />
             </curve>
+            {foreach $diffs as $i => $diff}
+            <curve color="{$diff == 0 ? '36e' : ($diff < 0 ? '3c3' : 'c33')}" width="0.5">
+                {if !$iterator->first}
+                <point coords="{$recordCps[$i - 1]} {$diffs->get($i - 1)}" />
+                <point coords="{$recordCps[$i]} {$diff}" />
+                {/if}
+            </curve>
+            {/foreach}
         </graph>
 
         <label halign="right" pos="174 -2" valign="center" size="20 5" textsize="0.4" text="+{$hMax}ms" textfont="{config('colors.ui.font')|noescape}" textcolor="666" />
