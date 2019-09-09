@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 use Symfony\Component\Process\Process;
 
 /**
- * @param mixed ...$message
+ * @param  mixed  ...$message
  *
  * @return ChatMessage
  */
@@ -22,7 +22,7 @@ function chatMessage(...$message)
 }
 
 /**
- * @param mixed ...$message
+ * @param  mixed  ...$message
  *
  * @return ChatMessage
  */
@@ -32,7 +32,7 @@ function infoMessage(...$message)
 }
 
 /**
- * @param mixed ...$message
+ * @param  mixed  ...$message
  *
  * @return ChatMessage
  */
@@ -42,18 +42,29 @@ function warningMessage(...$message)
 }
 
 /**
- * @param int $score
+ * @param  int  $score
  *
  * @return string
  */
-function formatScore(int $score): string
+function formatScore(int $score, bool $cutZero = false): string
 {
+    $sign = '';
+
+    if ($score < 0) {
+        $sign = '-';
+    }
+
+    $score = abs($score);
     $seconds = floor($score / 1000);
     $ms = $score - ($seconds * 1000);
     $minutes = floor($seconds / 60);
     $seconds -= $minutes * 60;
 
-    return sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
+    if ($cutZero) {
+        return $sign.preg_replace('/^0:0?/', '', sprintf('%d:%02d.%03d', $minutes, $seconds, $ms));
+    }
+
+    return $sign.sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
 /**
@@ -67,7 +78,7 @@ function serverName(): string
 }
 
 /**
- * @param int $score
+ * @param  int  $score
  *
  * @return string
  */
@@ -80,7 +91,7 @@ function formatScoreNoMinutes(int $score): string
 }
 
 /**
- * @param string|null $colored
+ * @param  string|null  $colored
  *
  * @return string
  */
@@ -90,8 +101,8 @@ function stripColors(?string $colored): string
 }
 
 /**
- * @param string|null $styled
- * @param bool        $keepLinks
+ * @param  string|null  $styled
+ * @param  bool  $keepLinks
  *
  * @return string
  */
@@ -105,8 +116,8 @@ function stripStyle(?string $styled = '', bool $keepLinks = false): string
 }
 
 /**
- * @param string|null $styled
- * @param bool        $keepLinks
+ * @param  string|null  $styled
+ * @param  bool  $keepLinks
  *
  * @return string
  */
@@ -120,8 +131,8 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 }
 
 /**
- * @param string $id
- * @param null   $default
+ * @param  string  $id
+ * @param  null  $default
  *
  * @return null
  */
@@ -131,68 +142,68 @@ function config(string $id, $default = null)
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../cache/'.$filename);
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../logs/'.$filename);
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function ghost(string $filename = ''): string
 {
-    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
+    return Server::GameDataDirectory().str_replace('/', DIRECTORY_SEPARATOR,
+            '/Replays/Ghosts/'.$filename.'.Replay.Gbx');
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function coreDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/'.$filename);
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../config/'.$filename);
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return string
  */
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../'.$filename);
 }
 
 /**
- * @param bool $withSpectators
+ * @param  bool  $withSpectators
  *
  * @return Collection
  * @todo implement $withSpectators
@@ -205,8 +216,8 @@ function onlinePlayers(bool $withSpectators = true): Collection
 }
 
 /**
- * @param string $login
- * @param bool   $addToOnlineIfOffline
+ * @param  string  $login
+ * @param  bool  $addToOnlineIfOffline
  *
  * @return Player
  */
@@ -219,17 +230,17 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
     $player = Player::find($login);
 
     if (!$player || !isset($player->Login)) {
-        Log::write('Failed to find player: ' . $login);
+        Log::write('Failed to find player: '.$login);
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {
             Player::create([
-                'Login'    => $data->login,
+                'Login' => $data->login,
                 'NickName' => $data->nickName,
             ]);
         } else {
             Player::create([
-                'Login'    => $login,
+                'Login' => $login,
                 'NickName' => $login,
             ]);
         }
@@ -274,7 +285,7 @@ function now(): Carbon
 }
 
 /**
- * @param string $formattedScore
+ * @param  string  $formattedScore
  *
  * @return string
  */
@@ -286,45 +297,45 @@ function cutZeroes(string $formattedScore): string
 /**
  * get secondary color
  *
- * @param string $str
+ * @param  string  $str
  *
  * @return string
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$' . config('colors.secondary') . $str;
+    return '$z$s$'.config('colors.secondary').$str;
 }
 
 /**
  * get primary color
  *
- * @param string $str
+ * @param  string  $str
  *
  * @return string
  */
 function primary(string $str = ""): string
 {
-    return '$' . config('colors.primary') . $str;
+    return '$'.config('colors.primary').$str;
 }
 
 /**
- * @param string $str
+ * @param  string  $str
  *
  * @return string
  */
 function warning(string $str = ""): string
 {
-    return '$' . config('colors.warning') . $str;
+    return '$'.config('colors.warning').$str;
 }
 
 /**
- * @param string $str
+ * @param  string  $str
  *
  * @return string
  */
 function info(string $str = ""): string
 {
-    return '$' . config('colors.info') . $str;
+    return '$'.config('colors.info').$str;
 }
 
 /**
@@ -344,13 +355,13 @@ function maps()
 }
 
 /**
- * @param string|null $filename
+ * @param  string|null  $filename
  *
  * @return string
  */
 function matchSettings(string $filename = null)
 {
-    return Server::getMapsDirectory() . '/MatchSettings/' . ($filename);
+    return Server::getMapsDirectory().'/MatchSettings/'.($filename);
 }
 
 /**
@@ -363,16 +374,16 @@ function dd($object)
 }
 
 /**
- * @param string $filename
+ * @param  string  $filename
  *
  * @return mixed|null
  */
 function getMapInfoFromFile(string $filename)
 {
     $mps = config('server.mps');
-    $maps = config('server.maps') . '/';
-    if (file_exists($maps . $filename) && file_exists($mps)) {
-        $process = new Process([$mps, ' /parsegbx=' . $maps . $filename]);
+    $maps = config('server.maps').'/';
+    if (file_exists($maps.$filename) && file_exists($mps)) {
+        $process = new Process([$mps, ' /parsegbx='.$maps.$filename]);
         $process->run();
 
         return json_decode($process->getOutput());

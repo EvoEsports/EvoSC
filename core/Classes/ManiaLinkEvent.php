@@ -91,6 +91,12 @@ class ManiaLinkEvent
      */
     public static function call(Player $ply, string $action)
     {
+        $action = trim($action);
+
+        if ($action == '') {
+            return;
+        }
+
         if (isVerbose()) {
             Log::write("$action", false);
         }

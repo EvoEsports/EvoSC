@@ -2,6 +2,8 @@
 
 namespace esc\Models;
 
+use Illuminate\Support\Collection;
+
 class LocalRecord extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'local-records';
@@ -34,6 +36,15 @@ class LocalRecord extends \Illuminate\Database\Eloquent\Model
     public function score(): string
     {
         return formatScore($this->Score);
+    }
+
+    public function getCpsAttribute(): Collection
+    {
+        $cps = collect(explode(',', $this->Checkpoints))->transform(function($cp){
+            return intval($cp);
+        });
+
+        return $cps;
     }
 
     public function __toString()

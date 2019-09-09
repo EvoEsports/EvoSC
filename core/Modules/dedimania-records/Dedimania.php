@@ -137,9 +137,10 @@ class Dedimania extends DedimaniaApi
 
     public static function showDedisTable(Player $player)
     {
-        $records = MapController::getCurrentMap()->dedis()->orderBy('Score')->get();
+        $map = MapController::getCurrentMap();
+        $records = $map->dedis()->orderBy('Score')->get();
 
-        RecordsTable::show($player, $records, 'Dedimania Records');
+        RecordsTable::show($player, $map, $records, 'Dedimania Records');
     }
 
     public static function sendUpdatedDedis()

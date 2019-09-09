@@ -59,9 +59,10 @@ class LocalRecords implements ModuleInterface
 
     public static function showLocalsTable(Player $player)
     {
-        $records = MapController::getCurrentMap()->locals()->orderBy('Score')->get();
+        $map = MapController::getCurrentMap();
+        $records = $map->locals()->orderBy('Score')->get();
 
-        RecordsTable::show($player, $records, 'Local Records');
+        RecordsTable::show($player, $map, $records, 'Local Records');
     }
 
     //Called on PlayerFinish

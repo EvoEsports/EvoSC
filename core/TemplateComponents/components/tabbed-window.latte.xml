@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-<frame id="window" pos="{($window_width ?? 120)/-2.0} 0">
+<frame id="window" pos="{($window_width ?? 120)/-2.0} 0" scale="1.1">
     <quad pos="0 0" size="{$window_width ?? 120} 11" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0.9" z-index="-3"/>
     <quad pos="0 -10.5" size="{$window_width ?? 120} 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="-1"/>
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
@@ -20,12 +20,19 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Real scale;
+}
 --></script>
 
 {include scriptDeclarations}
 
     <script><!--
 declare Boolean alertUnsavedChanges;
+declare Real lastScale__;
 --></script>
 
 {include 'scripts.drag'}
@@ -36,6 +43,9 @@ declare Boolean alertUnsavedChanges;
 main() {
     declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
     declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
+    declare UISettings settings for This;
+    window.Scale = settings.scale;
+    lastScale__ = settings.scale;
 
     {include bootScript}
 
@@ -60,6 +70,12 @@ main() {
         }
 
         maniaLinkDrag();
+
+        if(lastScale__ != settings.scale){
+            lastScale__ = settings.scale;
+            AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
+            sleep(500);
+        }
     }
 }
     --></script>
