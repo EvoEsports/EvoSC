@@ -3,16 +3,16 @@
 namespace esc\Modules;
 
 use esc\Classes\Server;
+use esc\Interfaces\ModuleInterface;
 
-class AlterUi
+class AlterUi implements ModuleInterface
 {
-    public function __construct()
-    {
-        self::setUiProperties();
-    }
-
-    //https://github.com/maniaplanet/script-xmlrpc/blob/master/XmlRpcListing.md#trackmaniauisetproperties
-    public static function setUiProperties()
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
     {
         $properties = '
  	<!--

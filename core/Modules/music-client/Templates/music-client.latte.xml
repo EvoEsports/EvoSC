@@ -288,7 +288,6 @@ Void setColors(CMlControl songFrameControl, Vec3 color){
 }
 
 Void loadMusicLibrary(){
-    sleep(250);
     declare MusicLibrary musicLib for This;
     music = musicLib.songs;
     baseUrl = musicLib.server;
@@ -337,6 +336,8 @@ Void loadMusicLibrary(){
         declare CMlQuad close <=> (Page.MainFrame.GetFirstChild("close") as CMlQuad);
         declare CMlQuad mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlQuad);
         declare CMlEntry search <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 -8.5' /> ", 1, CAnimManager::EAnimManagerEasing::QuadOut);
 
         totalPages = ML::CeilingInteger(music.count / 20.0);
         page = 0;
