@@ -19,8 +19,8 @@
     {block content}
     <frame pos="0 -7">
         <quad size="176 50" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
-        {php $hMin = $diffs->min() - 150;}
-        {php $hMax = $diffs->max() + 150;}
+        {php $hMin = $diffs->min() - 100;}
+        {php $hMax = $diffs->max() + 100;}
         {php $wMax = ($record->Score > $myRecord->Score ? $record->Score : $myRecord->Score) + 1000;}
         <graph pos="-3 -4" size="179 42" min="-1000 {$hMin}" max="{$wMax} {$hMax}" z-index="2">
             <curve color="333" width="0.3">
@@ -32,16 +32,16 @@
                 <point coords="{$wMax} {$hMax}" />
             </curve>
             {foreach $recordCps as $i => $cp}
-            <curve color="{$diffs->get($i) < 0 ? '3c3' : 'c33'}9" style="thin">
+            <curve color="{$diffs->get($i) == 0 ? '36e' : ($diffs->get($i) < 0 ? '3c3' : 'c33')}9" style="thin">
                 <point coords="{$cp} {$hMin}" />
                 <point coords="{$cp + 1} {$hMax}" />
             </curve>
             {/foreach}
-            <curve color="999" width="0.3">
+            <curve color="999" width="0.15">
                 <point coords="0 0" />
                 <point coords="{$record->Score > $myRecord->Score ? $record->Score : $myRecord->Score} 0" />
             </curve>
-            <curve color="fff" width="0.75">
+            <curve color="fff" width="0.5">
                 <point coords="0 0" />
                 {foreach $recordCps as $cp}
                 <point coords="{$cp} {$diffs->get($iterator->counter)}" />
