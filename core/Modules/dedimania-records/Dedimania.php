@@ -184,12 +184,9 @@ class Dedimania extends DedimaniaApi
 
             $insert = $records->transform(function ($record) use ($map) {
                 $player = Player::updateOrCreate(['Login' => $record->login], [
+                    'NickName' => $record->nickname,
                     'MaxRank' => $record->max_rank,
                 ]);
-
-                if ($player->NickName == $player->Login || $player->NickName == 'unset') {
-                    $player->update(['NickName' => $record->nickname]);
-                }
 
                 return [
                     'Map' => $map->id,
