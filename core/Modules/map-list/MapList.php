@@ -101,6 +101,12 @@ class MapList implements ModuleInterface
         $maps = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
+        if (isVerbose()) {
+            var_dump("Maps count: ".$maps->count());
+            var_dump("Author IDs: ".$maps->pluck('a')->implode(', '));
+            var_dump("Author Logins: ".$mapAuthors->pluck('Login')->implode(', '));
+        }
+
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
                 'maps' => $maps->chunk(100),
