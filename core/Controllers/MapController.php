@@ -359,7 +359,7 @@ class MapController implements ControllerInterface
                 if ($map->uid != $uid) {
                     $map->update([
                         'filename' => '_'.$map->filename,
-                        'enabled' => false
+                        'enabled' => 0
                     ]);
 
                     try {
@@ -423,11 +423,11 @@ class MapController implements ControllerInterface
 
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
-            ->update(['enabled' => true]);
+            ->update(['enabled' => 1]);
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-            ->update(['enabled' => false]);
+            ->update(['enabled' => 0]);
     }
 
     /**
@@ -464,7 +464,7 @@ class MapController implements ControllerInterface
         $map->uid = $uid;
         $map->author = $authorId;
         $map->filename = $filename;
-        $map->enabled = false;
+        $map->enabled = 0;
         $map->name = $gbx->Name;
         $map->environment = $gbx->Environment;
         $map->title_id = $gbx->TitleId;
