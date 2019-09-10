@@ -421,6 +421,10 @@ class MapController implements ControllerInterface
         //get array with the uids
         $enabledMapsuids = $maps->pluck('uId');
 
+        if (isVerbose()) {
+            var_dump('Enabled map UIDs: '.$enabledMapsuids);
+        }
+
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
             ->update(['enabled' => 1]);
