@@ -102,9 +102,8 @@ class MapList implements ModuleInterface
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
         if (isVerbose()) {
-            var_dump("Maps count: ".$maps->count());
-            var_dump("Author IDs: ".$maps->pluck('a')->implode(', '));
-            var_dump("Author Logins: ".$mapAuthors->pluck('Login')->implode(', '));
+            var_dump("All maps count: ".Map::count());
+            var_dump("Enabled maps count: ".Map::whereEnabled(1)->count());
         }
 
         if ($player) {
