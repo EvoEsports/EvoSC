@@ -5,10 +5,8 @@ namespace esc\Modules;
 
 
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
-use esc\Modules\MusicClient\MusicClient;
 
 class TestModule
 {
@@ -20,8 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $map = MapController::getCurrentMap();
-        RecordsTable::showGraph($player, $map->id, 'Dedimania Records', $map->dedis()->inRandomOrder()->first()->id);
+        InfoMessages::showSettings($player);
     }
 
     public static function sendTestManialink(Player $player)

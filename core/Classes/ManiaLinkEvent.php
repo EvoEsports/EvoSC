@@ -20,6 +20,11 @@ class ManiaLinkEvent
      */
     private static $maniaLinkEvents;
 
+    /**
+     * @var Collection
+     */
+    private static $extendedMLE;
+
     public $id;
 
     /**
@@ -33,9 +38,11 @@ class ManiaLinkEvent
      */
     public static function init()
     {
-        self::$maniaLinkEvents = new Collection();
+        self::$maniaLinkEvents = collect();
+        self::$extendedMLE = collect();
 
         Hook::add('PlayerManialinkPageAnswer', [self::class, 'call']);
+        ManiaLinkEvent::add('mle', [self::class, 'maniaLinkExtended']);
     }
 
     /**
@@ -81,6 +88,20 @@ class ManiaLinkEvent
         }
 
         $maniaLinkEvents->push($event);
+    }
+
+    public static function maniaLinkExtended(Player $player, $gameTime, $action, $i, $isFinished, ...$body)
+    {
+        if (!self::$extendedMLE->has($gameTime)) {
+            self::$extendedMLE->put($gameTime, collect());
+        }
+
+        self::$extendedMLE->get($gameTime)->put($i, implode(',', $body));
+
+        if ($isFinished == '1') {
+            self::call($player, $action.','.self::$extendedMLE->get($gameTime)->implode(''));
+            self::$extendedMLE->forget($gameTime);
+        }
     }
 
     /**

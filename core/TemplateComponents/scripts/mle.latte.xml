@@ -1,0 +1,25 @@
+{contentType text}
+<script><!--
+Void ManiaLinkEvent(Text event, Text body){
+    declare characterLimit = 125;
+    declare cmd = event ^ "," ^ body;
+
+    if(TL::Length(cmd) <= characterLimit){
+        TriggerPageAction(cmd);
+    }else{
+        declare Integer headerLength = TL::Length(event) + TL::Length("" ^ GameTime) + 7; // 4 = ,+,+,+,+bool+iteration(2d)
+        declare Integer bodySpace = characterLimit - headerLength;
+        declare Integer iterations = TL::Length(body) / bodySpace;
+
+        for(i, 0, iterations - 1){
+            declare isFinished = 0;
+
+            if(i == iterations - 1){
+                isFinished = 1;
+            }
+
+            TriggerPageAction("mle," ^ GameTime ^ "," ^ event ^ "," ^ i ^ "," ^ isFinished ^ "," ^ TL::SubString(body, i*bodySpace, bodySpace));
+        }
+    }
+}
+--></script>

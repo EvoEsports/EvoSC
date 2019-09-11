@@ -24,7 +24,7 @@ class ChatMessage
      *
      * Parts can be strings, numbers, player/group/map/local/etc-objects (most objects are formatted automatically).
      *
-     * @param mixed ...$message
+     * @param  mixed  ...$message
      */
     public function __construct(...$message)
     {
@@ -35,7 +35,7 @@ class ChatMessage
     /**
      * Set the primary color of the chat message.
      *
-     * @param string $color
+     * @param  string  $color
      *
      * @return \esc\Classes\ChatMessage
      */
@@ -49,7 +49,7 @@ class ChatMessage
     /**
      * Set the icon of the chat-message, can contain color-code.
      *
-     * @param string $icon
+     * @param  string  $icon
      *
      * @return \esc\Classes\ChatMessage
      */
@@ -68,7 +68,7 @@ class ChatMessage
     public function setIsInfoMessage(): ChatMessage
     {
         $this->color = config('colors.info');
-        $this->icon  = '';
+        $this->icon = '';
 
         return $this;
     }
@@ -81,7 +81,7 @@ class ChatMessage
     public function setIsWarning(): ChatMessage
     {
         $this->color = config('colors.warning');
-        $this->icon  = '';
+        $this->icon = '';
 
         return $this;
     }
@@ -89,7 +89,7 @@ class ChatMessage
     /**
      * Overwrite the chat-message content.
      *
-     * @param mixed ...$parts
+     * @param  mixed  ...$parts
      *
      * @return \esc\Classes\ChatMessage
      */
@@ -111,7 +111,7 @@ class ChatMessage
 
         foreach ($this->parts as $part) {
             if ($part instanceof Player || $part instanceof Map) {
-                $message .= secondary($part) . '$z$s';
+                $message .= secondary($part).'$z$s';
                 continue;
             }
 
@@ -120,15 +120,15 @@ class ChatMessage
                 continue;
             }
 
-            $message .= '$z$s$' . $this->color . $part;
+            $message .= '$z$s$'.$this->color.$part;
         }
 
         if ($this->icon) {
-            return '$fff' . $this->icon . ' $z$s' . $message;
+            return '$fff'.$this->icon.' $z$s'.$message;
         }
 
         if (substr($message, -1) != '.') {
-            $message .= '$z$s$' . $this->color . '.';
+            $message .= '$z$s$'.$this->color.'.';
         }
 
         return $message;
@@ -140,7 +140,7 @@ class ChatMessage
     public function sendAll()
     {
         Server::chatSendServerMessage($this->getMessage());
-        Log::write($this->getMessage() . ' (send to all)');
+        Log::info($this->getMessage());
     }
 
     /**
@@ -156,13 +156,13 @@ class ChatMessage
         });
 
         Server::executeMulticall();
-        Log::write($this->getMessage() . ' (send to admins)');
+        Log::info($this->getMessage());
     }
 
     /**
      * Send the message to a specific player.
      *
-     * @param \esc\Models\Player|null|string $player
+     * @param  \esc\Models\Player|null|string  $player
      */
     public function send($player = null)
     {
@@ -172,11 +172,11 @@ class ChatMessage
 
         if ($player instanceof Player) {
             Server::chatSendServerMessage($this->getMessage(), $player->Login);
-            Log::write($this->getMessage() . " (send to $player)");
+            Log::info("(@$player)".$this->getMessage(), isVerbose());
         } else {
             if (is_string($player)) {
                 Server::chatSendServerMessage($this->getMessage(), $player);
-                Log::write($this->getMessage() . " (send to $player)");
+                Log::info("(@$player)".$this->getMessage(), isVerbose());
             }
         }
     }
