@@ -31,14 +31,11 @@ UI-Settings
 <label class="save" pos="25 -15" size="12 4" textsize="0.6" halign="center" text=" Save" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
 {/block}
 
-{block globals}
 <script><!--
-#Struct UISettings {
-    Boolean hide;
-    Integer speed;
-    Real scale;
-}
+{block globals}
+{/block}
 
+{block functions}
 Void save(){
     declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
     declare scaleLabel <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
@@ -56,13 +53,11 @@ Void save(){
     }
     TriggerPageAction("ui.save," ^ newSettings.tojson());
 }
---></script>
 {/block}
+--></script>
 
 {block bootScript}
-        declare UISettings settings for This;
-
-if(settings.scale == 0.0){
+if(settings.speed == 0){
     settings.hide = True;
     settings.speed = 10;
     settings.scale = 1.0;
