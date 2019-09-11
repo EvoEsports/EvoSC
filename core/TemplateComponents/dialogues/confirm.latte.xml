@@ -1,11 +1,11 @@
 {contentType text}
 <frame id="confirm-dialog" pos="-40 9" z-index="10000" hidden="1">
-    <quad size="80 18" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-1" />
-    <quad size="80 2" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
-    <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
+    <quad size="80 16" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.1" z-index="-1" />
+    <quad size="80 16" style="Bgs1" substyle="BgDialogBlur" />
+    <label pos="40 -4.5" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" textfont="{config('colors.ui.font')|noescape}" autonewline="1" />
 
-    <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
-    <label class="cancel" pos="48 -13" z-index="0" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
+    <label class="confirm" pos="32 -11" z-index="1" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" halign="center" valign="center" textsize="0.5" focusareacolor2="{config('colors.ui.window.btn.primary')}c" scriptevents="1" textfont="{config('colors.ui.font')|noescape}" />
+    <label class="cancel" pos="48 -11" z-index="1" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.danger')}9" halign="center" valign="center" textsize="0.5" focusareacolor2="{config('colors.ui.window.btn.danger')}c" scriptevents="1" textfont="{config('colors.ui.font')|noescape}" />
 </frame>
 
 <script><!--

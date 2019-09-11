@@ -9,7 +9,7 @@ Void ManiaLinkEvent(Text event, Text body){
     }else{
         declare Integer headerLength = TL::Length(event) + TL::Length("" ^ GameTime) + 7; // 4 = ,+,+,+,+bool+iteration(2d)
         declare Integer bodySpace = characterLimit - headerLength;
-        declare Integer iterations = TL::Length(body) / bodySpace;
+        declare Integer iterations = ML::CeilingInteger(TL::Length(body) / bodySpace * 1.0);
 
         for(i, 0, iterations - 1){
             declare isFinished = 0;
