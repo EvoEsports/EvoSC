@@ -41,7 +41,7 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-            ->addOption('skip_map_check', null, InputOption::VALUE_OPTIONAL, 'Start without loading maps properly.', false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
             ->setDescription('Run Evo Server Controller');
     }
 

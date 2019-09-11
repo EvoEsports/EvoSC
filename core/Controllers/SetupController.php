@@ -11,6 +11,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -55,7 +56,6 @@ class SetupController implements ControllerInterface
         self::doDedimaniaConfig();
         self::doMxKarmaConfig();
         self::doMusicConfig();
-
 
         File::put(cacheDir('.setupfinished'), 1);
     }
@@ -136,6 +136,7 @@ class SetupController implements ControllerInterface
                 /** fixme: adding additional unused option and argument to run this command from setup controller  */
                 ->addArgument("run", InputArgument::OPTIONAL)
                 ->addOption("--setup", InputArgument::OPTIONAL)
+                ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
                 ->run(self::$input, self::$output);
         } catch (\Exception $e) {
             self::printError($e->getMessage());

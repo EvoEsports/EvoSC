@@ -235,8 +235,11 @@ class MapController implements ControllerInterface
     public static function skip(Player $player = null)
     {
         if ($player) {
+            $map = MapController::getCurrentMap();
             infoMessage($player, ' skips map')->sendAll();
         }
+
+        Log::write($map.' ['.$map->uid.'] was skipped by the server.');
 
         MapController::goToNextMap();
     }
@@ -503,6 +506,13 @@ class MapController implements ControllerInterface
     public static function getNextMap(): Map
     {
         return self::$nextMap;
+    }
+
+    public static function resetRound(Player $player)
+    {
+        infoMessage($player, ' resets the round.')->sendAll();
+
+        Server::restartMap();
     }
 
     /**

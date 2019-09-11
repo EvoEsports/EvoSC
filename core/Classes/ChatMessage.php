@@ -140,6 +140,7 @@ class ChatMessage
     public function sendAll()
     {
         Server::chatSendServerMessage($this->getMessage());
+        Log::write($this->getMessage() . ' (send to all)');
     }
 
     /**
@@ -155,6 +156,7 @@ class ChatMessage
         });
 
         Server::executeMulticall();
+        Log::write($this->getMessage() . ' (send to admins)');
     }
 
     /**
@@ -170,9 +172,11 @@ class ChatMessage
 
         if ($player instanceof Player) {
             Server::chatSendServerMessage($this->getMessage(), $player->Login);
+            Log::write($this->getMessage() . " (send to $player)");
         } else {
             if (is_string($player)) {
                 Server::chatSendServerMessage($this->getMessage(), $player);
+                Log::write($this->getMessage() . " (send to $player)");
             }
         }
     }

@@ -38,21 +38,25 @@ class PlayerController implements ControllerInterface
      */
     public static function init()
     {
-        //Add already connected players to the playerlist
-        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
-            $player = Player::firstOrCreate(['Login' => $playerInfo->login], [
-                'NickName' => $playerInfo->nickName,
-            ]);
-
-            $player->spectator_status = $playerInfo->spectatorStatus;
-            $player->player_id = $playerInfo->playerId;
-
-            return $player;
-        })->keyBy('Login');
+        //Add already connected players to the player-list
+        self::cacheConnectedPlayers();
 
         AccessRight::createIfMissing('player_kick', 'Kick players.');
         AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
         AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
+    }
+
+    public static function cacheConnectedPlayers()
+    {
+        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
+                'NickName' => $playerInfo->nickName,
+                'spectator_status' => $playerInfo->spectatorStatus,
+                'player_id' => $playerInfo->playerId
+            ]);
+
+            return $player;
+        })->keyBy('Login');
     }
 
     /**

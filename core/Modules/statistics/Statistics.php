@@ -189,7 +189,7 @@ class Statistics
             Log::write('Failed to increment win count of '.$player);
         }
 
-        infoMessage($player, ' wins this round. Total wins: ', $player->stats->Wins)
+        infoMessage($player, ' wins this round. Total wins: ', ($player->stats->Wins + 1))
             ->setIcon('🏆')
             ->sendAll();
     }

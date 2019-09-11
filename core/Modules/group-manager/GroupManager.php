@@ -37,14 +37,6 @@ class GroupManager
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
-
-        // KeyController::createBind('X', [self::class, 'reload']);
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::showOverview($player);
     }
 
     public static function showOverview(Player $player)
