@@ -1,5 +1,6 @@
 {contentType text}
 {extends 'components.window'}
+{php $window_height = 40;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}help-window{/block}
@@ -11,13 +12,13 @@
         <label class="create" textfont="{config('colors.ui.font')|noescape}" pos="8 -8.5" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" />
 
         <label text="Messages" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" pos="9 -12" />
-        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" halign="right" pos="118 -12" />
+        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" halign="right" pos="116 -12" />
 
         {foreach $messages as $message}
         <label class="delete" data-id="{$message->id}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="f006" focusareacolor2="f00c" />
         <label class="edit" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="6.5 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" />
-        <label text="{$message->text}" textprefix="${config('colors.ui.window.header.color')}" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
-        <label text="{$message->delay} minutes" halign="right" textsize="0.5" pos="118 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
+        <label text="{$message->text}" textprefix="${config('colors.ui.window.header.color')}" size="94 4" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
+        <label text="{$message->delay} minutes" halign="right" textsize="0.5" pos="116 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
         {/foreach}
 
         <frame id="edit" pos="-30 8" z-index="20" hidden="1">
