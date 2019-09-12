@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-<frame id="window" pos="0 0" scale="1.0">
+<frame id="window" pos="0 0" scale="1.0" hidden="{$startHidden ?: 0}">
     <quad pos="0 0" size="{$window_width ?? 120} 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
     <quad id="bg" pos="0 -5" size="{$window_width ?? 120} {$window_height ?? 77}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1"/>
@@ -25,9 +25,9 @@
     Real scale;
 }
 
+{include globals}
 declare Boolean alertUnsavedChanges;
 declare Real lastScale__;
-{include globals}
 --></script>
 
 {include 'scripts.drag'}
@@ -54,24 +54,32 @@ main() {
     while(True){
         yield;
 
-        foreach(event in PendingEvents){
-            if(event.Control == Null) continue;
+        if(window.Visible){
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
 
-            if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
-                window.Hide();
-                return;
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                    {if !isset($doNotExit)}
+                    return;
+                    {/if}
+                }
+
+                {include pendingEvents}
             }
 
-            {include pendingEvents}
+            maniaLinkDrag();
+
+            if(lastScale__ != settings.scale){
+                lastScale__ = settings.scale;
+                AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 400, CAnimManager::EAnimManagerEasing::ExpInOut);
+                sleep(400);
+            }
+        }else{
+            sleep(250);
         }
 
-        maniaLinkDrag();
-
-        if(lastScale__ != settings.scale){
-            lastScale__ = settings.scale;
-            AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
-            sleep(500);
-        }
+        {include loop}
     }
 }
     --></script>

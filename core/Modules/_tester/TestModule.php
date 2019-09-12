@@ -7,7 +7,6 @@ namespace esc\Modules;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
-use esc\Modules\MusicClient\MusicClient;
 
 class TestModule
 {
@@ -19,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MusicClient::showMusicList($player);
+        MusicClient::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

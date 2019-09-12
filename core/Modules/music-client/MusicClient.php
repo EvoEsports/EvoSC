@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\MusicClient;
+namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
@@ -8,13 +8,12 @@ use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MusicClient
+class MusicClient implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -75,6 +74,11 @@ class MusicClient
         });
     }
 
+    public static function searchMusic(Player $player, string $cmd, string $search = '')
+    {
+        Template::show($player, 'music-client.search-command', compact('search'));
+    }
+
     public static function setNextSong(Map $map = null)
     {
         self::$song = self::$music->random(1)->first();
@@ -109,6 +113,7 @@ class MusicClient
     public static function playerConnect(Player $player)
     {
         self::sendMusicLib($player);
+        self::showMusicList($player);
         Template::show($player, 'music-client.music-client');
 
         $url = Server::getForcedMusic()->url;
@@ -121,7 +126,17 @@ class MusicClient
         }
 
         if ($song != 'null') {
-            Template::showAll('music-client.start-song', compact('song'));
+            Template::show($player, 'music-client.start-song', compact('song'));
         }
+    }
+
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     */
+    public static function start(string $mode)
+    {
+        // TODO: Implement start() method.
     }
 }
