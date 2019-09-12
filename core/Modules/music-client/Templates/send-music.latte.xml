@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:music-lib-{$i ?? 0}" id="music-lib-{$i ?? 0}" version="3">
+<manialink name="ESC:music-lib" id="music-lib" version="3">
     <script><!--
     #Struct Song {
         Text title;
@@ -15,25 +15,19 @@
     }
 
     main() {
-        declare Song[][Integer] MusicLibPages for This;
+        declare MusicLibrary musicLib for This;
+        declare Song[] MusicLibTemp;
         declare Song[] tempLib;
 
-        tempLib.fromjson("""{$music|noescape}""");
-        MusicLibPages[{$i}] = tempLib;
-
-        {if $i == $chunks - 1}
-        declare MusicLibrary musicLib for This;
-        declare Song[] temp;
-
-        for(i, 0, {$chunks - 1}){
-            foreach(song in MusicLibPages[i]){
-                temp.add(song);
-            }
+        {foreach $music as $chunk}
+        tempLib.fromjson("""{$chunk->values()->toJson()|noescape}""");
+        foreach(song in tempLib){
+            MusicLibTemp.add(song);
         }
+        {/foreach}
 
-        musicLib.songs = temp;
+        musicLib.songs = MusicLibTemp;
         musicLib.server = "{$server|noescape}";
-        {/if}
     }
     --></script>
 </manialink>

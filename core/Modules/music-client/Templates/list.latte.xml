@@ -1,0 +1,51 @@
+{contentType text}
+{extends 'components.window'}
+{php $window_width = 130;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}music-list{/block}
+    {block icon}♫{/block}
+    {block title}Music Library{/block}
+
+    {block content}
+    <framemodel id="row">
+        <label pos="0 0" size="20 3" textsize="0.75" text="Title" textfont="{config('colors.ui.font')|noescape}" />
+        <label pos="40 0" size="20 3" textsize="0.75" text="Artist" textfont="{config('colors.ui.font')|noescape}" />
+        <label pos="80 0" size="20 3" textsize="0.75" text="Album" textfont="{config('colors.ui.font')|noescape}" />
+        <label pos="115 0" size="20 3" textsize="0.75" text="Length" textfont="{config('colors.ui.font')|noescape}" />
+    </framemodel>
+
+    <frame>
+        <label pos="0 0" size="20 3" textsize="1" text="Title" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="40 0" size="20 3" textsize="1" text="Arist" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="80 0" size="20 3" textsize="1" text="Album" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
+        <label pos="115 0" size="20 3" textsize="1" text="Length" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
+
+        <frame id="rows" pos="0 -4">
+            {for $i=0; $i<19; $i++}
+            <frameinstance modelid="row" pos="0 {$i * -3.45}"></frameinstance>
+            {/for}
+        </frame>
+
+        <frame pos="2 -72" scale="0.9">
+            {include 'components.pagination'}
+        </frame>
+    </frame>
+    {/block}
+
+    <script><!--
+    {block globals}
+    declare Integer currentPage;
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    currentPage = 0;
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+    --></script>
+</manialink>

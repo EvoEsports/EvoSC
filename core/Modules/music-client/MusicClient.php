@@ -90,14 +90,15 @@ class MusicClient
         $server = config('music.url');
         $chunks = self::$music->chunk(200);
 
-        for ($i = 0; $i < $chunks->count(); $i++) {
-            Template::show($player, 'music-client.send-music', [
-                'server' => $server,
-                'music' => $chunks->get($i)->values()->toJson(),
-                'i' => $i,
-                'chunks' => $chunks->count()
-            ]);
-        }
+        Template::show($player, 'music-client.send-music', [
+            'server' => $server,
+            'music' => $chunks,
+        ]);
+    }
+
+    public static function showMusicList(Player $player)
+    {
+        Template::show($player, 'music-client.list');
     }
 
     /**
