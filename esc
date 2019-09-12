@@ -53,7 +53,6 @@ $application->add(new FakeLocals());
 $application->add(new AddAdmin());
 $application->setDefaultCommand("list");
 
-
 try {
     $application->run();
 } catch (Exception $e) {

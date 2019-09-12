@@ -34,6 +34,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function Sodium\version_string;
 
 class EscRun extends Command
 {
@@ -41,7 +42,8 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.',
+                false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -116,6 +118,8 @@ class EscRun extends Command
         // $this->migrate($input, $output);
 
         global $_onlinePlayers;
+        global $_restart;
+        $_restart = false;
 
         $version = getEscVersion();
         $motd = "      ______           _____ ______
@@ -190,6 +194,8 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
+        infoMessage(secondary('EvoSC v'.getEscVersion()), ' started.')->sendAdmin();
+
         //cycle-loop
         while (true) {
             try {
@@ -199,6 +205,10 @@ class EscRun extends Command
 
                 $pause = Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
+
+                if ($_restart) {
+                    return;
+                }
 
                 usleep($pause);
             } catch (Exception $e) {
@@ -225,4 +235,15 @@ class EscRun extends Command
             }
         }
     }
+
+//    private function restart(InputInterface $input, OutputInterface $output)
+//    {
+//        $output->writeln('<bg=cyan>Restarting</>');
+//
+//        Timer::destroyAll();
+//        HookController::init();
+//
+//        $this->initialize($input, $output);
+//        $this->execute($input, $output);
+//    }
 }

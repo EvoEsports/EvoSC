@@ -40,16 +40,20 @@ class ChatController implements ControllerInterface
 
         if (self::$routingEnabled) {
             Log::write('Enabling manual chat routing.');
+            $routingEnabled = false;
 
-            try {
-                Server::call('ChatEnableManualRouting', [true, false]);
-            } catch (FaultException $e) {
-                $msg = $e->getMessage();
-                Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
-                exit(2);
+            while (!$routingEnabled){
+                try {
+                    Server::chatEnableManualRouting(true, true);
+                    $routingEnabled = true;
+                } catch (FaultException $e) {
+                    $msg = $e->getMessage();
+                    Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
+                    sleep(1);
+                }
             }
         } else {
-            Server::call('ChatEnableManualRouting', [false, false]);
+            Server::chatEnableManualRouting(false, false);
         }
 
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
@@ -222,8 +226,6 @@ class ChatController implements ControllerInterface
      */
     public static function start($mode)
     {
-        Hook::add('PlayerChat', [self::class, 'playerChat']);
-
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');

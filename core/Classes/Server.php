@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
@@ -309,6 +310,8 @@ class Server
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
 
+        ChatCommand::add('//restart', [self::class, 'restartController'], 'Restart EvoSC.', 'ma');
+
         //Hide all previously send manialinks
         // self::call('SendHideManialinkPage');
     }
@@ -331,8 +334,8 @@ class Server
     /**
      * Call an rpc-method.
      *
-     * @param string       $rpc_func
-     * @param null|mixed[] $args
+     * @param  string  $rpc_func
+     * @param  null|mixed[]  $args
      */
     public static function call(string $rpc_func, $args = null)
     {
@@ -348,5 +351,14 @@ class Server
         }
 
         return null;
+    }
+
+    public static function restartController(Player $player)
+    {
+        global $_restart;
+
+        warningMessage($player, ' restarted EvoSC.')->sendAdmin();
+
+        $_restart = true;
     }
 }
