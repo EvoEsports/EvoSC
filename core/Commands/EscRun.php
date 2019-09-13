@@ -34,7 +34,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function Sodium\version_string;
 
 class EscRun extends Command
 {
@@ -50,6 +49,20 @@ class EscRun extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         global $serverName;
+
+        switch (pcntl_fork()) {
+            case -1:
+                $output->writeln('Starting char router failed.');
+                break;
+
+            case 0:
+                $output->writeln('Starting chat router.');
+                pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
+                exit(0);
+
+            default:
+                //parent
+        }
 
         Log::setOutput($output);
         ConfigController::init();

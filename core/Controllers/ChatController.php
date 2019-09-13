@@ -36,6 +36,7 @@ class ChatController implements ControllerInterface
     public static function init()
     {
         self::$mutedPlayers = collect();
+        /*
         self::$routingEnabled = config('server.enable-chat-routing');
 
         if (self::$routingEnabled) {
@@ -44,7 +45,7 @@ class ChatController implements ControllerInterface
 
             while (!$routingEnabled){
                 try {
-                    Server::chatEnableManualRouting(true, true);
+                    Server::chatEnableManualRouting(false, false);
                     $routingEnabled = true;
                 } catch (FaultException $e) {
                     $msg = $e->getMessage();
@@ -55,6 +56,7 @@ class ChatController implements ControllerInterface
         } else {
             Server::chatEnableManualRouting(false, false);
         }
+        */
 
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
@@ -186,6 +188,8 @@ class ChatController implements ControllerInterface
         }
 
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
+
+        return;
 
         if (!self::$routingEnabled) {
             return;

@@ -13,6 +13,7 @@ use esc\Commands\ImportUaseco;
 use esc\Commands\ImportPyplanet;
 use esc\Commands\MakeMigration;
 use esc\Commands\Migrate;
+use esc\Commands\ChatRouter;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
@@ -52,6 +53,7 @@ $application->add(new ImportPyplanet());
 $application->add(new FixScores());
 $application->add(new EscRun());
 $application->add(new FakeLocals());
+$application->add(new ChatRouter());
 $application->add(new AddAdmin());
 $application->setDefaultCommand("list");
 

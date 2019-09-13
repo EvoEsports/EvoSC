@@ -130,6 +130,14 @@ class EventController implements ControllerInterface
                 return;
             }
 
+            if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
+                warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send(player($login));
+
+                return;
+            }
+
+            return;
+
             if (ChatController::getRoutingEnabled()) {
                 try {
                     Hook::fire('PlayerChat', player($login), $text);
