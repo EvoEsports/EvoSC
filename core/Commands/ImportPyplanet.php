@@ -34,6 +34,9 @@ class ImportPyplanet extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $migrate = $this->getApplication()->find('migrate');
+        $migrate->execute($input, $output);
+
         $source = $input->getArguments();
 
         if (!file_exists('config/database.config.json')) {

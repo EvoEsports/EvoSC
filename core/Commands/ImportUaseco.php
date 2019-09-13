@@ -39,6 +39,9 @@ class ImportUaseco extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $migrate = $this->getApplication()->find('migrate');
+        $migrate->execute($input, $output);
+
         $source = $input->getArguments();
 
         if (!file_exists('config/database.config.json')) {
@@ -62,12 +65,6 @@ class ImportUaseco extends Command
             'prefix'    => $targetConfig->prefix,
         ]);
         $esc = $escCapsule->getConnection();
-
-        /*
-        $esc->getSchemaBuilder()->dropAllTables();
-        $migrationOutput = shell_exec('php mod.php migrate');
-        $output->writeln($migrationOutput);
-        */
 
         //Connect to uaseco database
         $uasecoCapsule = new Capsule();
