@@ -54,7 +54,9 @@ Void save(){
     TriggerPageAction("ui.save," ^ newSettings.tojson());
 }
 {/block}
---></script>
+
+{block loop}
+{/block}
 
 {block bootScript}
 if(settings.speed == 0){
@@ -74,3 +76,4 @@ if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseCl
     save();
 }
 {/block}
+--></script>

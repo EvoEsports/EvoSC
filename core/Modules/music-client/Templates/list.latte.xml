@@ -2,7 +2,7 @@
 {extends 'components.window'}
 {php $window_width = 130;}
 {php $doNotExit = true;}
-{php $startHidden = 1;}
+{php $startHidden = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}music-list{/block}

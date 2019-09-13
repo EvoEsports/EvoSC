@@ -42,11 +42,12 @@ class MxDownload
     public static function showAddMapInfo(Player $player, $cmd, string ...$arguments)
     {
         foreach ($arguments as $mxId) {
+            if (intval($mxId) == 0) {
+                continue;
+            }
+
             try {
                 $details = self::loadMxDetails($mxId);
-                //168063
-                //dd(Template::toString('mx-download.add-map-info', compact('details')));
-
 
                 Template::show($player, 'mx-download.add-map-info', compact('details'));
             } catch (\Exception $e) {

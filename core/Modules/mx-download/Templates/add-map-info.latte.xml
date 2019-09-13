@@ -33,12 +33,14 @@ Add map?
 
 {block functions}
 {/block}
---></script>
 
 {block bootScript}
     declare commentsLabel <=> (Page.MainFrame.GetFirstChild("comments") as CMlLabel);
     declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
     bg.Size = <bg.Size[0], commentsLabel.ComputeHeight(commentsLabel.Value) + 29.0>;
+{/block}
+
+{block loop}
 {/block}
 
 {block pendingEvents}
@@ -49,3 +51,4 @@ Add map?
         return;
     }
 {/block}
+--></script>
