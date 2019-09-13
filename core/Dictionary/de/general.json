@@ -1,0 +1,7 @@
+{
+  "hello": "Hallo",
+  "world": "Welt!",
+  "depth1": {
+    "hey": "asd"
+  }
+}

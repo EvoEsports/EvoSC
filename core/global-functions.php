@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use esc\Classes\ChatMessage;
+use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Controllers\ConfigController;
@@ -431,4 +432,24 @@ function isDebug(): bool
 function isWindows(): bool
 {
     return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+}
+
+function __(string $id, string $language = 'en')
+{
+    $parts = explode('.', $id);
+    $base = array_shift($parts);
+    $file = coreDir('Dictionary/'.$language.'/'.$base.'.json');
+
+    if (!File::exists($file)) {
+        return $id;
+    }
+
+    $data = File::get($file, true);
+
+    $root = $data;
+    while (count($parts) > 0) {
+        $root = $root->{array_shift($parts)};
+    }
+
+    return $root ?? $id;
 }
