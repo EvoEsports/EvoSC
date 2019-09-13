@@ -1,7 +1,8 @@
 {
+  "welcome": "Hello :player, welcome to our server.",
   "hello": "Hello",
   "world": "world!",
   "depth1": {
-    "hey": "asd"
+    "hey": "hey"
   }
 }

@@ -18,6 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
+        var_dump(__('general.welcome', ['player' => $player->NickName]));
     }
 
     public static function sendTestManialink(Player $player)

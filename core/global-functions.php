@@ -434,7 +434,7 @@ function isWindows(): bool
     return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 }
 
-function __(string $id, string $language = 'en')
+function __(string $id, array $vars = [], string $language = 'en')
 {
     $parts = explode('.', $id);
     $base = array_shift($parts);
@@ -451,5 +451,13 @@ function __(string $id, string $language = 'en')
         $root = $root->{array_shift($parts)};
     }
 
-    return $root ?? $id;
+    if (!$root) {
+        return $id;
+    }
+
+    foreach ($vars as $key => $var) {
+        $root = str_replace(':'.$key, $var, $root);
+    }
+
+    return $root;
 }
