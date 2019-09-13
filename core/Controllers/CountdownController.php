@@ -207,6 +207,10 @@ class CountdownController implements ControllerInterface
         return 600;
     }
 
+    public static function beginMap(Map $map)
+    {
+    }
+
     /**
      * @return integer
      */
@@ -240,10 +244,12 @@ class CountdownController implements ControllerInterface
      */
     public static function start($mode)
     {
+        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
         Hook::add('EndMap', [self::class, 'endMap']);
 
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
+            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
         ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
 
         KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
