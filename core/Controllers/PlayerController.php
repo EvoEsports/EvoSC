@@ -66,6 +66,8 @@ class PlayerController implements ControllerInterface
      */
     public static function setServerPassword(Player $player, $cmd, ...$pw)
     {
+        $pw = trim(implode(' ', $pw));
+
         if (Server::setServerPassword($pw)) {
             if ($pw == '') {
                 infoMessage($player, ' cleared the server password.')->sendAll();
@@ -354,7 +356,7 @@ class PlayerController implements ControllerInterface
     public static function resetUserSettings(Player $player, string $cmd)
     {
         $player->settings()->delete();
-        infoMessage('Your settings have been cleared.')->send($player);
+        infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
     }
 
     /**
