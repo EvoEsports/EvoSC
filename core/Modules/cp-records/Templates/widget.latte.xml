@@ -122,10 +122,17 @@
     main() {
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare currentMapId = "";
+        declare Record tempRecord;
 
         columns = {config('cp-records.columns')};
         padding = 0.5;
         records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        currentMapId = Map.MapInfo.MapUid;
+
+        {foreach $cps as $record}
+        tempRecord.fromjson("""{json_encode($record)|noescape}""");
+        updateWidget(tempRecord);
+        {/foreach}
 
         while(True){
             yield;
