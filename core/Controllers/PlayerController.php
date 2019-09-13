@@ -64,7 +64,7 @@ class PlayerController implements ControllerInterface
      * @param  string  $cmd
      * @param  string  $pw
      */
-    public static function setServerPassword(Player $player, $cmd, $pw)
+    public static function setServerPassword(Player $player, $cmd, ...$pw)
     {
         if (Server::setServerPassword($pw)) {
             if ($pw == '') {
@@ -351,6 +351,12 @@ class PlayerController implements ControllerInterface
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
     }
 
+    public static function resetUserSettings(Player $player, string $cmd)
+    {
+        $player->settings()->delete();
+        infoMessage('Your settings have been cleared.')->send($player);
+    }
+
     /**
      * @param  string  $mode
      */
@@ -367,5 +373,6 @@ class PlayerController implements ControllerInterface
             'Set the server password, leave empty to clear it.', 'ma');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
+        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
     }
 }
