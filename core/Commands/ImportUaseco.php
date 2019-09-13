@@ -49,7 +49,6 @@ class ImportUaseco extends Command
 
         $targetConfig = json_decode(file_get_contents('config/database.config.json'));
 
-
         //Connect to esc database
         $escCapsule = new Capsule();
         $escCapsule->addConnection([

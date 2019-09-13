@@ -441,7 +441,11 @@ function __(string $id, array $vars = [], string $language = 'en')
     $file = coreDir('Dictionary/'.$language.'/'.$base.'.json');
 
     if (!File::exists($file)) {
-        return $id;
+        $file = coreDir('Dictionary/en/'.$base.'.json');
+
+        if (!File::exists($file)) {
+            return $id;
+        }
     }
 
     $data = File::get($file, true);
