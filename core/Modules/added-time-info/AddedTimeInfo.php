@@ -52,9 +52,9 @@ class AddedTimeInfo
         Template::show($player, 'added-time-info.widget', compact('buttons'));
     }
 
-    public static function voteTime(Player $player, $time)
+    public static function voteTime(Player $player, string $time)
     {
-        Votes::askMoreTime($player, floatval($time));
+        Votes::askMoreTime($player, $time);
     }
 
     public static function addTime(Player $player, $time)
