@@ -43,8 +43,7 @@ class ChatRouter extends Command
 
             $output->writeln("Connection established.");
         } catch (Exception $e) {
-            $msg = $e->getMessage();
-            $output->writeln("<warning>Connecting to server failed: $msg</warning>");
+            //Router already running
             exit(1);
         }
     }
@@ -57,9 +56,12 @@ class ChatRouter extends Command
             foreach (Server::executeCallbacks() as $callback) {
                 if ($callback[0] == 'ManiaPlanet.PlayerChat') {
                     $login = $callback[1][1];
-                    $text = $callback[1][2];
+                    $text = trim($callback[1][2]);
 
                     if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
+                        continue;
+                    }
+                    if (preg_match('/^([+\-]){1,3}$/', $text)) {
                         continue;
                     }
 

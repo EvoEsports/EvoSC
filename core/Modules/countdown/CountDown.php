@@ -19,11 +19,11 @@ class CountDown
 
     public static function showCountdownAll()
     {
-        Template::showAll('countdown.widget');
+        Template::showAll('countdown.widget2');
     }
 
     public static function showCountdown(Player $player)
     {
-        Template::show($player, 'countdown.widget');
+        Template::show($player, 'countdown.widget2');
     }
 }

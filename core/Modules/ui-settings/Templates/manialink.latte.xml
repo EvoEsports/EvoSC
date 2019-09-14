@@ -24,7 +24,7 @@ UI-Settings
 <entry id="speed" pos="29 -5" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 <label pos="35 -5" size="27 3" textsize="0.6" text="kph" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 
-<label pos="27 -9" size="27 3" textsize="0.6" text="Widget scale" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="27 -9" size="27 3" textsize="0.6" text="UI scale" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 <entry id="scale" pos="29 -9" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 <label pos="35 -9" size="27 3" textsize="0.6" text="%" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 
@@ -47,8 +47,8 @@ Void save(){
         newSettings.scale = 1.2;
         scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
     }
-    if(newSettings.scale < 0.1){
-        newSettings.scale = 0.1;
+    if(newSettings.scale < 0.5){
+        newSettings.scale = 0.5;
         scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
     }
     TriggerPageAction("ui.save," ^ newSettings.tojson());

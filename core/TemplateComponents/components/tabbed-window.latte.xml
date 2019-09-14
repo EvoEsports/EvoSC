@@ -78,7 +78,7 @@ main() {
 
         if(lastScale__ != settings.scale){
             lastScale__ = settings.scale;
-            AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
+            AnimMgr.Add(window, "<frame scale='" ^ lastScale__ ^ "' />", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
             sleep(500);
         }
     }
