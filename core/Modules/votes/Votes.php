@@ -146,7 +146,7 @@ class Votes
         return 0;
     }
 
-    public static function askMoreTime(Player $player, float $time = 0)
+    public static function askMoreTime(Player $player, $time = '0')
     {
         if (self::$timeVotesThisRound >= config('votes.time.limit-votes') && !$player->hasAccess('vote_always')) {
             warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
@@ -163,8 +163,8 @@ class Votes
             return;
         }
 
-        if($time > 0){
-            $secondsToAdd = $time * 60;
+        if($time != '0'){
+            $secondsToAdd = floatval($time) * 60;
         }else{
             $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         }
