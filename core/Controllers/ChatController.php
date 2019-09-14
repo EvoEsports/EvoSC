@@ -173,9 +173,7 @@ class ChatController implements ControllerInterface
     public static function playerChat(Player $player, $text)
     {
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
-            warningMessage('Invalid chat-command entered. See ', secondary('/help'),
-                ' for all commands.')->send($player);
-            warningMessage('We switched to a new server-controller, it is missing features you had before but we are working on it to give you the best user-experience.')->send($player);
+            warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
 
             return;
         }
@@ -188,33 +186,6 @@ class ChatController implements ControllerInterface
         }
 
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
-
-        return;
-
-        if (!self::$routingEnabled) {
-            return;
-        }
-
-        $nick = $player->NickName;
-
-        if (preg_match('/([$]+)$/', $text, $matches)) {
-            //Escape dollar signs
-            $text .= $matches[0];
-        }
-
-        if ($player->isSpectator()) {
-            $nick = '$eee📷 '.$nick;
-        }
-
-        $prefix = $player->group->chat_prefix;
-        $color = $player->group->color ?? config('colors.chat');
-        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
-
-        if ($prefix) {
-            $chatText = '$'.$color.$prefix.' '.$chatText;
-        }
-
-        Server::call('ChatSendServerMessage', [$chatText]);
     }
 
     /**

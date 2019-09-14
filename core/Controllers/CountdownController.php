@@ -5,11 +5,13 @@ namespace esc\Controllers;
 
 
 use Carbon\Carbon;
+use esc\Classes\Cache;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
@@ -40,13 +42,13 @@ class CountdownController implements ControllerInterface
      */
     public static function init()
     {
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
-
-        if (File::exists(cacheDir('added_time.txt'))) {
-            self::$addedSeconds = intval(File::get(cacheDir('added_time.txt')));
+        if (Cache::has('added-time')) {
+            self::$addedSeconds = Cache::get('added-time');
         }
-        if (File::exists(cacheDir('round_start_time.txt'))) {
-            self::$matchStart = intval(File::get(cacheDir('round_start_time.txt')));
+        if (Cache::has('match-start')) {
+            self::$matchStart = Cache::get('match-start');
+        } else {
+            self::$matchStart = time();
         }
 
         AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
@@ -57,16 +59,9 @@ class CountdownController implements ControllerInterface
      */
     public static function setMatchStart()
     {
-        $time = time();
-        self::$matchStart = $time;
+        self::$matchStart = time();
         self::$addedSeconds = 0;
-
-        try {
-            $file = cacheDir('round_start_time.txt');
-            File::put($file, $time);
-        } catch (Exception $e) {
-            Log::write('Failed to save match start to cache-file.');
-        }
+        Cache::put('match-start', self::$matchStart);
     }
 
     public static function endMap(Map $map)
@@ -77,25 +72,13 @@ class CountdownController implements ControllerInterface
     public static function resetTimeLimit()
     {
         self::setTimeLimit(self::$originalTimeLimit);
-
-        try {
-            $file = cacheDir('added_time.txt');
-            File::put($file, 0);
-        } catch (Exception $e) {
-            Log::write('Failed to save added time to cache-file.');
-        }
+        Cache::put('added-time', 0);
     }
 
     public static function enableHuntMode(Player $player)
     {
         self::setTimeLimit(0);
         infoMessage($player, ' enabled hunt mode.')->sendAll();
-    }
-
-    public static function disableHuntMode(Player $player)
-    {
-        self::setTimeLimit(self::getOriginalTimeLimit());
-        infoMessage($player, ' disabled hunt mode.')->sendAll();
     }
 
     /**
@@ -123,12 +106,7 @@ class CountdownController implements ControllerInterface
             }
         }
 
-        try {
-            $file = cacheDir('added_time.txt');
-            File::put($file, $addedTime);
-        } catch (Exception $e) {
-            Log::write('Failed to save added time to cache-file.');
-        }
+        Cache::put('added-time', $addedTime);
     }
 
     /**
@@ -168,7 +146,7 @@ class CountdownController implements ControllerInterface
      */
     public static function getSecondsLeft(): int
     {
-        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 2;
+        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 3;
 
         $timeLeft = $calculatedProgressTime - time();
 
@@ -244,6 +222,8 @@ class CountdownController implements ControllerInterface
      */
     public static function start($mode)
     {
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
         Hook::add('EndMap', [self::class, 'endMap']);

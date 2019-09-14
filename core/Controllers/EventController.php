@@ -136,15 +136,11 @@ class EventController implements ControllerInterface
                 return;
             }
 
-            return;
-
-            if (ChatController::getRoutingEnabled()) {
-                try {
-                    Hook::fire('PlayerChat', player($login), $text);
-                    ChatController::playerChat(player($login), $text);
-                } catch (Exception $e) {
-                    Log::write("Error: ".$e->getMessage());
-                }
+            try {
+                Hook::fire('PlayerChat', player($login), $text);
+                ChatController::playerChat(player($login), $text);
+            } catch (Exception $e) {
+                Log::write("Error: ".$e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');

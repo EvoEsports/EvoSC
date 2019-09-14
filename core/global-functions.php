@@ -371,7 +371,7 @@ function matchSettings(string $filename = null)
 function dd($object)
 {
     var_dump($object);
-    die();
+    exit(0);
 }
 
 /**
