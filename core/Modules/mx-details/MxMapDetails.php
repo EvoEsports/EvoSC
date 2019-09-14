@@ -3,11 +3,12 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Cache;
+use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Models\Map;
 use esc\Models\Player;
 
@@ -16,6 +17,13 @@ class MxMapDetails
     public function __construct()
     {
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
+
+        if (!File::dirExists(cacheDir('mx-details'))) {
+            File::makeDir(cacheDir('mx-details'));
+        }
+        if (!File::dirExists(cacheDir('mx-wr'))) {
+            File::makeDir(cacheDir('mx-wr'));
+        }
     }
 
     public static function showDetails(Player $player, string $mapId)
@@ -30,16 +38,20 @@ class MxMapDetails
             self::loadMxDetails($map);
         }
 
-        $rating = self::getRatingString($map->ratings()->avg('Rating'));
+        if (!$map->mx_world_record) {
+            self::loadMxWordlRecord($map);
+        }
+
+        $rating = self::getRatingString($map->average_rating);
         Template::show($player, 'mx-details.window', compact('map', 'rating'));
     }
 
     private static function getRatingString($average): string
     {
         $starString = '';
-        $stars      = $average / 20;
-        $full       = floor($stars);
-        $left       = $stars - $full;
+        $stars = $average / 20;
+        $full = floor($stars);
+        $left = $stars - $full;
 
         for ($i = 0; $i < $full; $i++) {
             $starString .= '';
@@ -57,44 +69,56 @@ class MxMapDetails
         return $starString;
     }
 
+    /**
+     * @param  Map  $map
+     * @return \stdClass|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function loadMxDetails(Map $map)
     {
-        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid);
+        if (!$map->mx_id) {
+            return null;
+        }
+
+        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$map->uid);
 
         if ($result->getStatusCode() != 200) {
-            Log::write('Failed to fetch MX details: ' . $result->getReasonPhrase(), isVerbose());
+            Log::write('Failed to fetch MX details: '.$result->getReasonPhrase(), isVerbose());
 
-            return;
+            return null;
         }
 
         $data = $result->getBody()->getContents();
+        Log::write('Received: '.$data, isVeryVerbose());
+        $data = json_decode($data);
 
-        Log::write('Received: ' . $data, isVeryVerbose());
+        Cache::put('mx-details/'.$map->mx_id, $data[0]);
 
-        if ($data == '[]') {
-            Log::write('No MX information available for: ' . $map->name);
-
-            return;
-        }
-
-        $map->update(['mx_details' => $data]);
-        Log::write('Updated MX details for track: ' . $map->name);
-
-        self::loadMxWordlRecord($map);
+        return $data[0];
     }
 
+    /**
+     * @param  Map  $map
+     * @return \stdClass|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function loadMxWordlRecord(Map $map)
     {
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
-
-        if ($result->getStatusCode() != 200) {
-            Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
-
-            return;
+        if (!$map->mx_id) {
+            return null;
         }
 
-        $map->update(['mx_world_record' => $result->getBody()->getContents()]);
+        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/'.$map->mx_details->TrackID);
 
-        Log::write('Updated MX world record for track: ' . $map->name);
+        if ($result->getStatusCode() != 200) {
+            Log::write('Failed to fetch MX world record: '.$result->getReasonPhrase());
+
+            return null;
+        }
+
+        $data = json_decode($result->getBody()->getContents());
+        Cache::put('mx-wr/'.$map->mx_id, $data);
+
+        return $data;
     }
 }

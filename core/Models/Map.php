@@ -7,6 +7,7 @@ use esc\Classes\Cache;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
+use esc\Modules\MxMapDetails;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,8 +24,7 @@ use stdClass;
  * @property Player $author
  * @property boolean $enabled
  * @property string $last_played
- * @property string $mx_details
- * @property string $mx_world_record
+ * @property string $mx_id
  * @property int $cooldown
  * @property int $plays
  * @property string $name
@@ -49,6 +49,7 @@ class Map extends Model
         'author',
         'last_played',
         'enabled',
+        'mx_id',
         'mx_details',
         'mx_world_record',
         'cooldown',
@@ -124,31 +125,37 @@ class Map extends Model
     }
 
     /**
-     * @param $jsonMxDetails
-     *
-     * @return mixed|null
+     * @return mixed|stdClass|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getMxDetailsAttribute($jsonMxDetails)
+    public function getMxDetailsAttribute()
     {
-        if ($jsonMxDetails) {
-            $data = json_decode($jsonMxDetails);
+        if (!$this->mx_id) {
+            return null;
+        }
 
-            if (array_key_exists(0, $data)) {
-                return $data[0];
-            }
+        if (Cache::has('mx-details/'.$this->mx_id)) {
+            return Cache::get('mx-details/'.$this->mx_id);
         }
 
         return null;
     }
 
     /**
-     * @param $jsonMxWorldRecordDetails
-     *
-     * @return mixed
+     * @return mixed|stdClass|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getMxWorldRecordAttribute($jsonMxWorldRecordDetails)
+    public function getMxWorldRecordAttribute()
     {
-        return json_decode($jsonMxWorldRecordDetails);
+        if (!$this->mx_id) {
+            return null;
+        }
+
+        if (Cache::has('mx-wr/'.$this->mx_id)) {
+            return Cache::get('mx-wr/'.$this->mx_id);
+        }
+
+        return null;
     }
 
     /**

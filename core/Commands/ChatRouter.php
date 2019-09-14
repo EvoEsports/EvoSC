@@ -12,7 +12,6 @@ use esc\Models\Player;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ChatRouter extends Command
@@ -45,7 +44,7 @@ class ChatRouter extends Command
             $output->writeln("Connection established.");
         } catch (Exception $e) {
             $msg = $e->getMessage();
-            $output->writeln("<error>Connecting to server failed: $msg</error>");
+            $output->writeln("<warning>Connecting to server failed: $msg</warning>");
             exit(1);
         }
     }

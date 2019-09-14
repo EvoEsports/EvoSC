@@ -24,10 +24,6 @@ class MxDownload
 {
     public function __construct()
     {
-        if (!File::dirExists(cacheDir('mx'))) {
-            File::makeDir(cacheDir('mx'));
-        }
-
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>',
             'map_add');
 
@@ -196,8 +192,8 @@ class MxDownload
      */
     public static function loadMxDetails($mxId)
     {
-        if (Cache::has("mx/{$mxId}_details")) {
-            return Cache::get("mx/{$mxId}_details");
+        if (Cache::has("mx-details/{$mxId}")) {
+            return Cache::get("mx-details/{$mxId}");
         }
 
         $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$mxId);
@@ -213,7 +209,7 @@ class MxDownload
             throw new \Exception('Failed to parse mx-details: '.$detailsBody);
         }
 
-        Cache::put("mx/{$mxId}_details", $info[0], now()->addMinutes(2));
+        Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));
 
         return $info[0];
     }

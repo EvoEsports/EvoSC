@@ -41,11 +41,12 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     * Queue a map.
+     * Queue a map
      *
      * @param  Player  $player
      * @param  Map  $map
      * @param  bool  $replay
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
@@ -69,8 +70,9 @@ class QueueController implements ControllerInterface
             }
         }
 
-        if (!$map->mx_details) {
+        if ($map->mx_id) {
             MxMapDetails::loadMxDetails($map);
+            MxMapDetails::loadMxWordlRecord($map);
         }
 
         MapQueue::create([
