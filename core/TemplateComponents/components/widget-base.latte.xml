@@ -194,7 +194,7 @@ declare Integer slot__;
 
             {include loop}
 
-            {if !isset($customHidescript)}
+            {if !isset($customHidescript) && !isset($dontHide)}
             hidescript();
             {/if}
 

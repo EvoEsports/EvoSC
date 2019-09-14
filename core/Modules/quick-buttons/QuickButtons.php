@@ -4,9 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
-use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Models\Player;
 
 class QuickButtons

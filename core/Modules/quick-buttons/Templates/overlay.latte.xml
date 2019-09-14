@@ -1,6 +1,12 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $dontHide = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:QuickButtons" id="QuickButtons" version="3">
+<manialink version="3">
+    {block id}QuickButtons{/block}
+    {block size}23 100{/block}
 
+    {block content}
     <framemodel id="button">
         <label valign="center" halign="center" textsize="0.75" text="" textcolor="eeee" />
         <label valign="center" size="23 2" textsize="1" text="button-text button-text" hidden="1" textcolor="eeee" scale="0.75" textfont="{config('colors.ui.font')|noescape}" />
@@ -8,16 +14,15 @@
         <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}e" />
     </framemodel>
 
-    <frame id="cp" pos="{config('quick-buttons.pos')}" ScriptEvents="1" scale="0.9">
+    <frame id="cp" pos="24.75 0" ScriptEvents="1" scale="0.9">
         {for $i=0; $i<20; $i++}
         <frameinstance modelid="button" />
         {/for}
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
     Void setupFrameInstances(CMlFrame cp, Boolean alignLeft){
         declare Integer i = 0;
 
@@ -72,38 +77,46 @@
             label.Parent.Controls[1].Hide();
         }
     }
+    --></script>
+    {/block}
 
-    main(){
-        declare cp <=> (Page.MainFrame.GetFirstChild("cp") as CMlFrame);
-        declare Boolean alignLeft = cp.RelativePosition_V3[0] < 0.0;
+    <script><!--
+        {block globals}
+        {/block}
 
-        setupFrameInstances(cp, alignLeft);
+        {block bootScript}
+    declare cp <=> (Page.MainFrame.GetFirstChild("cp") as CMlFrame);
+    declare Boolean alignLeft = cp.RelativePosition_V3[0] < 0.0;
 
-        declare Text[][] buttons = [
-        {$buttons|noescape}
-        ];
+    setupFrameInstances(cp, alignLeft);
 
-        fillButtons(cp, buttons);
+    declare Text[][] buttons = [
+    {$buttons|noescape}
+    ];
 
-        while(True){
-            yield;
+    fillButtons(cp, buttons);
 
-            foreach(event in PendingEvents){
-                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("trigger_action")){
-                    declare action = event.Control.DataAttributeGet("action");
-                    TriggerPageAction(action);
-                }
+        left__ = {config('quick-buttons.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('quick-buttons.ui.slot')};
+        {/block}
 
-                if(event.Type == CMlScriptEvent::Type::MouseOver && event.Control.HasClass("trigger_action")){
-                    hoverEffect((event.Control as CMlLabel), True);
-                }
+        {block loop}
+        {/block}
 
-                if(event.Type == CMlScriptEvent::Type::MouseOut && event.Control.HasClass("trigger_action")){
-                    hoverEffect((event.Control as CMlLabel), False);
-                }
-            }
-        }
+        {block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("trigger_action")){
+        declare action = event.Control.DataAttributeGet("action");
+        TriggerPageAction(action);
     }
+
+    if(event.Type == CMlScriptEvent::Type::MouseOver && event.Control.HasClass("trigger_action")){
+        hoverEffect((event.Control as CMlLabel), True);
+    }
+
+    if(event.Type == CMlScriptEvent::Type::MouseOut && event.Control.HasClass("trigger_action")){
+        hoverEffect((event.Control as CMlLabel), False);
+    }
+        {/block}
 
     --></script>
 </manialink>

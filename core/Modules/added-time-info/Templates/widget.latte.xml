@@ -1,9 +1,10 @@
 {contentType text}
 {extends 'components.widget-base'}
+{php $dontHide = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}add-time{/block}
-    {block size}24 5.5{/block}
+    {block size}24 5{/block}
 
     {block content}
     <frame pos="22 -1.25" scale="0.6" z-index="2">
@@ -89,7 +90,6 @@
         {/block}
 
         {block pendingEvents}
-
         {if $localPlayer->hasAccess('time')}
             if(event.Control.HasClass("open-controls")){
                 timeLabel.Hide();
