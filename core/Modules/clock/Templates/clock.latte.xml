@@ -34,14 +34,14 @@
         HS_Hidden = True;
         AnimMgr.Add(widget, "<frame pos='" ^ (HS_POS[0]+8.0) ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
         AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(time, "<label scale='1.6' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(time, "<label scale='1.6' pos='34 -1.5' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
     Void show(){
         HS_Hidden = False;
         AnimMgr.Add(widget, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
         AnimMgr.Add(bg, "<quad opacity='" ^ originalOpacity ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(time, "<label scale='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(time, "<label scale='1.0' pos='34 -4' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
     Void hidescript(){

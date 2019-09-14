@@ -103,7 +103,7 @@ declare Integer slot__;
         declare newX = widget.RelativePosition_V3[0];
         {/if}
 
-        declare newY = 90.0 - heights - (gutter * count);
+        declare newY = 90.0 - heights - (gutter * count) - 2.5;
         HS_POS = <newX, newY>;
         if(widget.RelativePosition_V3[1] != newY){
             declare posString = newX ^ " " ^ newY;
