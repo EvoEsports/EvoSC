@@ -76,10 +76,6 @@ class MxMapDetails
      */
     public static function loadMxDetails(Map $map)
     {
-        if (!$map->mx_id) {
-            return null;
-        }
-
         $result = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$map->uid);
 
         if ($result->getStatusCode() != 200) {
@@ -92,9 +88,19 @@ class MxMapDetails
         Log::write('Received: '.$data, isVeryVerbose());
         $data = json_decode($data);
 
-        Cache::put('mx-details/'.$map->mx_id, $data[0]);
+        if(count($data) > 0){
+            if (!$map->mx_id) {
+                $map->update([
+                    'mx_id' => $data[0]->TrackID
+                ]);
+            }
 
-        return $data[0];
+            Cache::put('mx-details/'.$data[0]->TrackID, $data[0]);
+
+            return $data[0];
+        }
+
+        return null;
     }
 
     /**
