@@ -47,17 +47,24 @@
         {block loop}
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
+            {if $localPlayer->hasAccess('time')}
                 buttons.Hide();
+            {/if}
                 wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+            {if $localPlayer->hasAccess('time')}
+                sleep(200);
                 buttons.Show();
+            {/if}
             }
 
+            {if $localPlayer->hasAccess('time')}
             if(icon2.Value != "" && !MouseRightButton){
                 icon2.Value = "";
             }
             if(icon2.Value != "" && MouseRightButton){
                 icon2.Value = "";
             }
+            {/if}
 
             if(currentAddedTime != AddedTimeR){
                 currentAddedTime = AddedTimeR;
@@ -83,6 +90,7 @@
         {/block}
 
         {block pendingEvents}
+            {if $localPlayer->hasAccess('time')}
             if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
                 declare value = event.Control.DataAttributeGet("value");
                 if(MouseRightButton){
@@ -91,6 +99,7 @@
                     TriggerPageAction("time.vote," ^ value);
                 }
             }
+            {/if}
         {/block}
     --></script>
 </manialink>
