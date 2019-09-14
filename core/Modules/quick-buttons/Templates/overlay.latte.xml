@@ -1,6 +1,5 @@
 {contentType text}
 {extends 'components.widget-base'}
-{php $dontHide = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}QuickButtons{/block}

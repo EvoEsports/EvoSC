@@ -20,6 +20,7 @@ class AddedTimeInfo
         Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
         Hook::add('MatchSettingsLoaded', [self::class, 'resetAddedTimeInfo']);
 
+        ManiaLinkEvent::add('time.vote', [self::class, 'voteTime'], 'time');
         ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
     }
 
@@ -37,12 +38,27 @@ class AddedTimeInfo
     public static function showWidget(Player $player)
     {
         $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
-        Template::showAll('added-time-info.update', compact('addedTime'));
-        Template::show($player, 'added-time-info.widget');
+        Template::show($player, 'added-time-info.update', compact('addedTime'));
+
+        $timeLimitInMinutes = CountdownController::getOriginalTimeLimit() / 60;
+
+        $buttons = [
+            round($timeLimitInMinutes / 4, 1),
+            round($timeLimitInMinutes / 2, 1),
+            round($timeLimitInMinutes, 1),
+            round($timeLimitInMinutes * 2, 1),
+        ];
+
+        Template::show($player, 'added-time-info.widget', compact('buttons'));
     }
 
-    public static function addTime(Player $player, float $time)
+    public static function voteTime(Player $player, $time)
     {
-        CountdownController::addTime(round($time * 60), $player);
+        Votes::askMoreTime($player, floatval($time));
+    }
+
+    public static function addTime(Player $player, $time)
+    {
+        CountdownController::addTime(floatval($time) * 60, $player);
     }
 }

@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        QuickButtons::showButtons($player);
+        AddedTimeInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

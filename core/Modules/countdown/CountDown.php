@@ -14,16 +14,10 @@ class CountDown
     public function __construct()
     {
         Hook::add('PlayerConnect', [self::class, 'showCountdown']);
-        Hook::add('BeginMap', [self::class, 'showCountdownAll']);
-    }
-
-    public static function showCountdownAll()
-    {
-        Template::showAll('countdown.widget2');
     }
 
     public static function showCountdown(Player $player)
     {
-        Template::show($player, 'countdown.widget2');
+        Template::show($player, 'countdown.widget');
     }
 }
