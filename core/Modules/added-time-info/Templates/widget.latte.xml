@@ -35,6 +35,7 @@
         {block bootScript}
             declare Real AddedTimeR for This = 0.0;
             declare Real currentAddedTime = -1.0;
+            declare buttons <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare icon2 <=> (Page.MainFrame.GetFirstChild("icon2") as CMlLabel);
             declare Text sign = "";
@@ -46,7 +47,9 @@
         {block loop}
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
+                buttons.Hide();
                 wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+                buttons.Show();
             }
 
             if(icon2.Value != "" && !MouseRightButton){
