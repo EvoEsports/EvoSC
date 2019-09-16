@@ -18,12 +18,16 @@ class RemoveMxDetailsFromMapsTable extends Migration
      */
     public function up(Builder $schemaBuilder)
     {
-        if(!File::dirExists(cacheDir('mx-details'))){
+        if (!File::dirExists(cacheDir('mx-details'))) {
             File::makeDir(cacheDir('mx-details'));
         }
-        if(!File::dirExists(cacheDir('mx-wr'))){
+        if (!File::dirExists(cacheDir('mx-wr'))) {
             File::makeDir(cacheDir('mx-wr'));
         }
+
+        $schemaBuilder->table('maps', function (Blueprint $schema) {
+            $schema->integer('mx_id')->nullable();
+        });
 
         Map::all()->each(function (Map $map) {
             if (isset($map->mx_details->TrackID)) {
@@ -74,10 +78,10 @@ class RemoveMxDetailsFromMapsTable extends Migration
             }
         });
 
-        if(File::dirExists(cacheDir('mx-details'))){
+        if (File::dirExists(cacheDir('mx-details'))) {
             File::delete(cacheDir('mx-details'));
         }
-        if(File::dirExists(cacheDir('mx-wr'))){
+        if (File::dirExists(cacheDir('mx-wr'))) {
             File::delete(cacheDir('mx-wr'));
         }
     }
