@@ -198,8 +198,10 @@ class ChatController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');

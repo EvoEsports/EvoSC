@@ -517,8 +517,10 @@ class MapController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);

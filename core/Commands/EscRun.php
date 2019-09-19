@@ -156,7 +156,7 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
-        ControllerController::loadControllers('TimeAttack.Script.txt');
+        ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         //TODO: Collection Transform
         $logins = [];

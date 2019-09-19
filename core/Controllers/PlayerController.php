@@ -361,8 +361,10 @@ class PlayerController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);

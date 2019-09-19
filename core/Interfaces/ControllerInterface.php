@@ -11,7 +11,9 @@ interface ControllerInterface
     public static function init();
 
     /**
-     * @param string $mode
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed
      */
-    public static function start($mode);
+    public static function start(string $mode, bool $isBoot);
 }

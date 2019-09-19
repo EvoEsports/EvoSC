@@ -45,8 +45,9 @@ class MatchSettingsController implements ControllerInterface
         infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
         Log::info($player.' loads matchsettings '.$matchSettingsFile);
 
-        $mode = self::getModeScript($matchSettingsFile);
+        $mode = Server::getScriptName()['NextValue'];
 
+        HookController::init();
         ChatCommand::removeAll();
         Timer::destroyAll();
         ManiaLinkEvent::removeAll();
@@ -363,8 +364,10 @@ class MatchSettingsController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
         ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
             'map_add');

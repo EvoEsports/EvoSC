@@ -288,7 +288,12 @@ class SetupController implements ControllerInterface
     {
     }
 
-    public static function start($mode)
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
     {
     }
 }

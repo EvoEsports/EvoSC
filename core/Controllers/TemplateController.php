@@ -166,8 +166,10 @@ class TemplateController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
         ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
     }

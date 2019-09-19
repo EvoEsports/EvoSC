@@ -88,8 +88,13 @@ class HookController implements ControllerInterface
 
     /**
      * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
      */
-    public static function start($mode)
+    public static function start(string $mode, bool $isBoot)
     {
+        if (!$isBoot) {
+            self::init();
+        }
     }
 }
