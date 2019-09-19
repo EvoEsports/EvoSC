@@ -56,23 +56,23 @@ class Template
     /**
      * Hide a manialink with the given id for everyone.
      *
-     * @param  string  $index
+     * @param  string  $id
      */
-    public static function hideAll(string $index)
+    public static function hideAll(string $id)
     {
         Server::sendDisplayManialinkPage('','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$index.'" id="'.$index.'"></manialink>');
+<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
     }
 
     /**
      * Hide a manialink with the given id for a single player.
      *
-     * @param  string  $index
+     * @param  string  $id
      */
-    public static function hide(Player $player, string $index)
+    public static function hide(Player $player, string $id)
     {
         Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$index.'" id="'.$index.'"></manialink>');
+<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
     }
 
     /**

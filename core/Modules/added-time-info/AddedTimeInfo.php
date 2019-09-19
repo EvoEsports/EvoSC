@@ -62,16 +62,15 @@ class AddedTimeInfo implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('AddedTimeChanged', [self::class, 'addedTimeChanged']);
-        Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
-        Hook::add('MatchSettingsLoaded', [self::class, 'resetAddedTimeInfo']);
-
         if($mode == 'TimeAttack.Script.txt'){
             if (!$isBoot) {
                 self::showWidget();
             }
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
+            Hook::add('AddedTimeChanged', [self::class, 'addedTimeChanged']);
+            Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
+            Hook::add('MatchSettingsLoaded', [self::class, 'resetAddedTimeInfo']);
 
             ManiaLinkEvent::add('time.vote', [self::class, 'voteTime'], 'time');
             ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');

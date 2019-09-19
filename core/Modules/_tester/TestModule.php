@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Template::hide($player, 'add-time');
+        MatchTracker::sendWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

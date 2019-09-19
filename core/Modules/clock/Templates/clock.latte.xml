@@ -76,7 +76,8 @@
                 show();
             }
         }
-    }--></script>
+    }
+    --></script>
     {/block}
 
 <script><!--

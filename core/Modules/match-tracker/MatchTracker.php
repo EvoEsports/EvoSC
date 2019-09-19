@@ -4,9 +4,11 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class MatchTracker implements ModuleInterface
 {
@@ -24,16 +26,38 @@ class MatchTracker implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if ($mode == 'Rounds.Script.txt') {
+            if (!$isBoot) {
+                Template::showAll('match-tracker.widget');
+            }
+
             self::$match = collect();
             Hook::add('PlayerConnect', [self::class, 'sendWidget']);
             Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+            Hook::add('Maniaplanet.StartRound_Start', [self::class, 'resetTracker']);
+            Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'resetTracker']);
+        } else {
+            if (!$isBoot) {
+                Template::hideAll('match-tracker-widget');
+            }
         }
     }
 
     public static function sendWidget(Player $player)
     {
-        Template::show($player, 'match-tracker.widget');
+        $points = Server::getRoundCustomPoints();
+
+        if (!$points) {
+            $points = [10, 8, 6, 4, 2, 1];
+        }
+
+        Template::show($player, 'match-tracker.widget', compact('points'));
+    }
+
+    public static function resetTracker()
+    {
+        $trackers = '[]';
+        Template::showAll('match-tracker.update', compact('trackers'));
     }
 
     public static function playerCheckpoint(Player $player, int $score, int $cp, bool $isFinish)
@@ -46,7 +70,7 @@ class MatchTracker implements ModuleInterface
             $tracker->points = 0;
         }
 
-        $tracker->cp = $cp;
+        $tracker->cp = $cp + 1;
         $tracker->finished = $isFinish;
         $tracker->score = $score;
 
@@ -65,6 +89,7 @@ class MatchTracker implements ModuleInterface
                 $tracker->points = 0;
             }
 
+            $tracker->cp = -1;
             $tracker->score = -1;
 
             self::$match->put($player->id, $tracker);
@@ -74,7 +99,9 @@ class MatchTracker implements ModuleInterface
 
     private static function updateWidget()
     {
-        $trackers = self::$match->values()->toJson();
+        $trackers = self::$match->values()->groupBy('cp')->map(function (Collection $data) {
+            return $data->sortBy('score');
+        })->toJson();
 
         Template::showAll('match-tracker.update', compact('trackers'));
     }
