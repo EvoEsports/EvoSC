@@ -137,7 +137,7 @@ class ManiaLinkEvent
         }
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
-            warningMessage('Access denied.')->send($ply);
+            warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
             Log::write('Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
                     $event->callback));
 

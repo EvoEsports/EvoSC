@@ -51,8 +51,9 @@ class CPRecords implements ModuleInterface
      * Called when the module is loaded
      *
      * @param  string  $mode
+     * @param  bool  $isBoot
      */
-    public static function start(string $mode)
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);

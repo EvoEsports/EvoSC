@@ -8,10 +8,9 @@
 
     {block content}
     <frame pos="20.5 -1.25" z-index="2">
-        <label class="open-controls" id="time" z-index="2" size="20 5" text="added_time" textsize="1"
+        <label class="open-controls" id="time" z-index="2" size="20 5" text="+0 min." textsize="1"
                halign="center" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
     </frame>
-    {if $localPlayer->hasAccess('time')}
     <frame pos="0.5 -4" scale="0.6" id="buttons">
         {foreach $buttons as $i => $button}
         <label class="add" data-value="{$button}" pos="{$i * 10 + 5} -2.75" z-index="0" size="10 5.5" text="+{$button}" textsize="0.9" halign="center"
@@ -22,7 +21,6 @@
                valign="center" scriptevents="1" focusareacolor1="fffb" focusareacolor2="fffb" textcolor="111c"
                textfont="{config('colors.ui.font')|noescape}"/>
     </frame>
-    {/if}
     {/block}
 
     <script><!--
@@ -47,24 +45,18 @@
         {block loop}
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
-            {if $localPlayer->hasAccess('time')}
                 buttons.Hide();
-            {/if}
                 wait(UI.UISequence != CUIConfig::EUISequence::Podium);
-            {if $localPlayer->hasAccess('time')}
                 sleep(200);
                 buttons.Show();
-            {/if}
             }
 
-            {if $localPlayer->hasAccess('time')}
             if(icon2.Value != "" && !MouseRightButton){
                 icon2.Value = "";
             }
             if(icon2.Value != "" && MouseRightButton){
                 icon2.Value = "";
             }
-            {/if}
 
             if(currentAddedTime != AddedTimeR){
                 currentAddedTime = AddedTimeR;
@@ -90,7 +82,6 @@
         {/block}
 
         {block pendingEvents}
-            {if $localPlayer->hasAccess('time')}
             if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
                 declare value = event.Control.DataAttributeGet("value");
                 if(MouseRightButton){
@@ -99,7 +90,6 @@
                     TriggerPageAction("time.vote," ^ value);
                 }
             }
-            {/if}
         {/block}
     --></script>
 </manialink>

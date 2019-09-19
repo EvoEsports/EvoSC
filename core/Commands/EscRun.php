@@ -171,7 +171,7 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        ModuleController::startModules('TimeAttack.Script.txt');
+        ModuleController::startModules(Server::getScriptName()['CurrentValue']);
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);

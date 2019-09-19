@@ -28,8 +28,8 @@ class Template
     /**
      * Template constructor.
      *
-     * @param string $index
-     * @param string $template
+     * @param  string  $index
+     * @param  string  $template
      */
     public function __construct(string $index, string $template)
     {
@@ -40,8 +40,8 @@ class Template
     /**
      * Show the template to everyone.
      *
-     * @param string     $index
-     * @param array|null $values
+     * @param  string  $index
+     * @param  array|null  $values
      */
     public static function showAll(string $index, array $values = null)
     {
@@ -56,34 +56,32 @@ class Template
     /**
      * Hide a manialink with the given id for everyone.
      *
-     * @param string $index
+     * @param  string  $index
      */
     public static function hideAll(string $index)
     {
-        Server::sendDisplayManialinkPage('',
-            sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>',
-                $index));
+        Server::sendDisplayManialinkPage('','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" name="ESC:'.$index.'" id="'.$index.'"></manialink>');
     }
 
     /**
      * Hide a manialink with the given id for a single player.
      *
-     * @param string $index
+     * @param  string  $index
      */
     public static function hide(Player $player, string $index)
     {
-        Server::sendDisplayManialinkPage($player->Login,
-            sprintf('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><manialink id="%s" version="3"></manialink>',
-                $index));
+        Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" name="ESC:'.$index.'" id="'.$index.'"></manialink>');
     }
 
     /**
      * Render and send a template to a player.
      *
-     * @param Player $player
-     * @param string $index
-     * @param null   $values
-     * @param bool   $multicall
+     * @param  Player  $player
+     * @param  string  $index
+     * @param  null  $values
+     * @param  bool  $multicall
      */
     public static function show(Player $player, string $index, $values = null, bool $multicall = false)
     {
@@ -134,8 +132,8 @@ class Template
     /**
      * Render the template and get the xml as string.
      *
-     * @param string     $index
-     * @param array|null $values
+     * @param  string  $index
+     * @param  array|null  $values
      *
      * @return string
      */
