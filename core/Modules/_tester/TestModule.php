@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchTracker::sendWidget($player);
+        CpPositionTracker::showManialink($player);
     }
 
     public static function sendTestManialink(Player $player)

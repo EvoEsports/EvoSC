@@ -1,6 +1,8 @@
 {
-  "pos"    : "-116 89",
-  "scale"  : 0.85,
+  "ui": {
+    "position": "left",
+    "slot": 3
+  },
   "show"   : 16,
-  "enabled": false
+  "enabled": true
 }

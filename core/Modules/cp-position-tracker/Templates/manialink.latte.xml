@@ -1,5 +1,12 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:CpPositionTracker" id="CpPositionTracker" version="3">
+<manialink version="3">
+    {block id}cp-position-tracker{/block}
+    {block size}44 35{/block}
+
+    {block content}
     <framemodel id="record">
         <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
         <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
@@ -7,8 +14,9 @@
         <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
     </framemodel>
 
-    <frame id="widget" pos="{config('cp-pos-tracker.pos')}" size="40 60" scale="{config('cp-pos-tracker.scale')}">
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="{config('colors.ui.font')|noescape}" />
+    <frame id="widget" pos="{config('cp-pos-tracker.pos')}">
+        <quad id="bg" size="44 35" pos="0 0" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
+        <label pos="2 -2.5" valign="center" textsize="0.5" text=" CP Position Tracker" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('cp-pos-tracker.show'); $i++}
@@ -16,19 +24,10 @@
             {/for}
         </frame>
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    #Struct Position {
-        Integer cp;
-        Integer time;
-        Text login;
-        Text nick;
-    }
-
-    declare Position[Text] positions;
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -68,6 +67,47 @@
         }
 
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void hide(){
+        HS_Hidden = True;
+        AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void show(){
+        HS_Hidden = False;
+        AnimMgr.Add(bg, "<quad opacity='{config('colors.ui.widget.bg.opacity') - 0.15}' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        if(HS_Target == Null){
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+        }
+
+        declare UISettings settings for This;
+        declare hideSpeed = settings.speed;
+
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
+
+        declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+        if(mapFinished){
+            if(!HS_Hidden){
+                hide();
+            }
+        }else{
+            declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+
+            if(overHidespeed && playerIsRacing && !HS_Hidden){
+                hide();
+            }
+            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+                show();
+            }
+        }
     }
 
     Position[Integer][Integer] getTable(){
@@ -132,13 +172,32 @@
         positions[login] = Position{ cp = cp, time = time, login = login, nick = nick };
         updateView();
     }
+    --></script>
+    {/block}
 
-    main(){
+    <script><!--
+    {block globals}
+    #Struct Position {
+        Integer cp;
+        Integer time;
+        Text login;
+        Text nick;
+    }
+
+    declare Vec2 HS_POS;
+    declare CMlFrame HS_Target;
+    declare Boolean HS_Hidden;
+    declare Position[Text] positions;
+    {/block}
+
+    {block bootScript}
         positions = Position[Text];
 
-        while(True){
-            yield;
+        left__ = {config('cp-pos-tracker.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('cp-pos-tracker.ui.slot')};
+    {/block}
 
+    {block loop}
             foreach(event in RaceEvents){
                 if(event.Type == CTmRaceClientEvent::EType::Respawn){
                     if(event.Player.CurRace.Time == -1){
@@ -151,8 +210,11 @@
                     handleWayPoint(event.Player, event.CheckpointInLap, event.LapTime);
                 }
             }
-        }
-    }
 
-    --></script>
+            hidescript();
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>
