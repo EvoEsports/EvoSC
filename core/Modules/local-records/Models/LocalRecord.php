@@ -4,6 +4,11 @@ namespace esc\Models;
 
 use Illuminate\Support\Collection;
 
+/**
+ * Class LocalRecord
+ * @package esc\Models
+ * @property Player $player;
+ */
 class LocalRecord extends \Illuminate\Database\Eloquent\Model
 {
     protected $table = 'local-records';

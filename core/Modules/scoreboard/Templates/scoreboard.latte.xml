@@ -1,0 +1,7 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    <frame pos="0 0">
+        <label textsize="10" text="test" />
+    </frame>
+</manialink>

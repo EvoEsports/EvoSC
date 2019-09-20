@@ -23,46 +23,97 @@ class LocalRecords implements ModuleInterface
     private static $records;
 
     /**
-     * @var string
-     */
-    private static $localsJson;
-
-    /**
      * @var Collection
      */
-    private static $playerIdScoreMap;
+    private static $playerIdRankMap;
+
+    private static $showTop;
+    private static $show;
 
     /**
-     * LocalRecords constructor.
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
      */
-    public function __construct()
+    public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('PlayerConnect', [self::class, 'showManialink']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'initialize']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMap', [self::class, 'fixRanks']);
 
         AccessRight::createIfMissing('local_delete', 'Delete local-records.');
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
+
+        self::$showTop = config('locals.showtop');
+        self::$show = config('locals.rows');
     }
 
-    //Called on PlayerConnect
+    public static function beginMap(Map $map)
+    {
+        self::fixRanks($map);
+
+        self::$records = $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->keyBy('Player');
+        $localsMap = self::$records->pluck('Rank', 'Player');
+
+        self::$playerIdRankMap = onlinePlayers()->mapWithKeys(function (Player $player) use ($localsMap) {
+            return [$player->id => $localsMap->get($player->id)];
+        })->filter();
+
+        onlinePlayers()->each([self::class, 'sendLocalsChunk']);
+    }
+
+    public static function fixRanks(Map $map)
+    {
+        Database::getConnection()->statement('SET @rank=0');
+        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
+    }
+
+    public static function sendLocalsChunk(Player $player)
+    {
+        $showTop = self::$showTop;
+        $show = self::$show - $showTop;
+        $baseRank = self::$playerIdRankMap->get($player->id);
+
+        $sortedRecords = self::$records->sortBy('Score');
+        $records = $sortedRecords->take($showTop);
+
+        if (!$baseRank) {
+            $records = $records->merge(MapController::getCurrentMap()->locals()->orderByDesc('Score')->take($show)->get()->sortBy('Score'));
+        } else {
+            if ($baseRank <= $showTop) {
+                $records = $sortedRecords->take(self::$show);
+            } else {
+                $startRank = $baseRank - floor($show * 0.7);
+                $endRank = $baseRank + floor($show * 0.3);
+                $records = $records->merge($sortedRecords->slice($startRank, $endRank));
+            }
+        }
+
+        $records = $records->values()->map(function (LocalRecord $record) {
+            return [
+                'name' => $record->player->NickName,
+                'rank' => $record->Rank,
+                'score' => $record->Score,
+                'online' => onlinePlayers()->contains('id', $record->Player)
+            ];
+        });
+
+        Template::show($player, 'local-records.update', compact('records'));
+    }
+
+    public static function playerConnect(Player $player)
+    {
+        self::sendLocalsChunk($player);
+        self::showManialink($player);
+    }
+
     public static function showManialink(Player $player)
     {
-        $localsJson = self::$localsJson;
-
-        Template::show($player, 'local-records.update', compact('localsJson'));
         Template::show($player, 'local-records.manialink');
-    }
-
-    public static function showLocalsTable(Player $player)
-    {
-        $map = MapController::getCurrentMap();
-        $records = $map->locals()->orderBy('Score')->get();
-
-        RecordsTable::show($player, $map, $records, 'Local Records');
     }
 
     //Called on PlayerFinish
@@ -74,8 +125,8 @@ class LocalRecords implements ModuleInterface
         }
 
         $playerId = $player->id;
-        if (self::$playerIdScoreMap->has($playerId)) {
-            if (self::$playerIdScoreMap->get($playerId) <= $score) {
+        if (self::$records->has($playerId)) {
+            if (self::$records->get($playerId)->Score <= $score) {
                 return;
             }
         }
@@ -107,7 +158,7 @@ class LocalRecords implements ModuleInterface
             $oldRecord->Rank = $newRank;
             $oldRecord->save();
 
-            self::$playerIdScoreMap->put($playerId, $score);
+            self::$playerIdRankMap->put($playerId, $newRank);
             self::$records->put($playerId, $oldRecord);
 
             $diff = $oldScore - $score;
@@ -116,7 +167,7 @@ class LocalRecords implements ModuleInterface
                 $chatMessage->setParts($player, ' secured his/her ', $oldRecord,
                     ' ('.$oldRank.'. -'.formatScore($diff).')');
             } else {
-                self::incrementRanksAboveScore($map, $score);
+                self::incrementRanksAboveScore($map, $score, $oldScore);
                 $chatMessage->setParts($player, ' gained the ', $oldRecord, ' ('.$oldRank.'. -'.formatScore($diff).')');
             }
 
@@ -136,7 +187,7 @@ class LocalRecords implements ModuleInterface
             $newRecord->Rank = $newRank;
             $newRecord->save();
 
-            self::$playerIdScoreMap->put($playerId, $score);
+            self::$playerIdRankMap->put($playerId, $newRank);
             self::$records->put($playerId, $newRecord);
             self::incrementRanksAboveScore($map, $score);
 
@@ -151,7 +202,7 @@ class LocalRecords implements ModuleInterface
             }
         }
 
-        self::cacheAndSendLocals();
+        onlinePlayers()->each([self::class, 'sendLocalsChunk']);
         Hook::fire('PlayerLocal', $player, $newRecord);
     }
 
@@ -161,59 +212,15 @@ class LocalRecords implements ModuleInterface
         $map = MapController::getCurrentMap();
         $map->locals()->where('Rank', $localRank)->delete();
         warningMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
-        self::initialize($map);
+        onlinePlayers()->each([self::class, 'sendLocalsChunk']);
     }
 
-    public static function initialize(Map $map)
+    public static function showLocalsTable(Player $player)
     {
-        self::$playerIdScoreMap = collect();
-        self::$localsJson = "[]";
-        self::fixRanks($map);
-        self::$records = $map->locals()->orderBy('Score')->limit(config('locals.limit'))->get()->keyBy('Player');
-        self::cacheAndSendLocals();
-    }
+        $map = MapController::getCurrentMap();
+        $records = $map->locals()->orderBy('Score')->get();
 
-    /**
-     * Assign ranks to records of a certain map
-     *
-     * @param  Map  $map
-     */
-    public static function fixRanks(Map $map)
-    {
-        Database::getConnection()->statement('SET @rank=0');
-        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
-    }
-
-    /**
-     * Cache the locals and send them to everyone
-     */
-    private static function cacheAndSendLocals()
-    {
-        $localsJson = self::createJsonFromLocals(self::$records);
-        self::$playerIdScoreMap = self::$records->pluck('Score', 'Player');
-        self::$localsJson = $localsJson;
-        Template::showAll('local-records.update', compact('localsJson'));
-    }
-
-    /**
-     * Get the JSON send to to the player from a collection of locals
-     *
-     * @param  Collection  $locals
-     * @return string
-     */
-    private static function createJsonFromLocals(Collection $locals)
-    {
-        $playerIds = $locals->pluck('Player');
-        $players = Player::whereIn('id', $playerIds)->get()->keyBy('id');
-
-        return $locals->sortBy('Rank')->transform(function (LocalRecord $local) use ($players) {
-            return [
-                'r' => $local->Rank,
-                's' => $local->Score,
-                'n' => $players->get($local->Player)->NickName,
-                'l' => $players->get($local->Player)->Login
-            ];
-        })->values()->toJson();
+        RecordsTable::show($player, $map, $records, 'Local Records');
     }
 
     /**
@@ -221,15 +228,25 @@ class LocalRecords implements ModuleInterface
      *
      * @param  Map  $map
      * @param  int  $score
+     * @param  int  $oldScore
      */
-    private static function incrementRanksAboveScore(Map $map, int $score)
+    private static function incrementRanksAboveScore(Map $map, int $score, int $oldScore = 0)
     {
-        self::$records->where('Score', '>', $score)->transform(function (LocalRecord $record) {
-            $record->Rank++;
-            return $record;
-        });
+        if($oldScore > 0){
+            self::$records->where('Score', '>', $score)->where('Score', '<=', $oldScore)->transform(function (LocalRecord $record) {
+                $record->Rank++;
+                return $record;
+            });
 
-        $map->locals()->where('Score', '>', $score)->increment('Rank');
+            $map->locals()->where('Score', '>', $score)->where('Score', '<=', $oldScore)->increment('Rank');
+        }else{
+            self::$records->where('Score', '>', $score)->transform(function (LocalRecord $record) {
+                $record->Rank++;
+                return $record;
+            });
+
+            $map->locals()->where('Score', '>', $score)->increment('Rank');
+        }
     }
 
     /**
@@ -253,16 +270,5 @@ class LocalRecords implements ModuleInterface
         }
 
         return 1;
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }
