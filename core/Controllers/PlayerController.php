@@ -11,6 +11,7 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
+use esc\Models\Pb;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
@@ -266,9 +267,10 @@ class PlayerController implements ControllerInterface
      * Called on players finish
      *
      * @param  Player  $player
-     * @param        $score
+     * @param  int  $score
+     * @param  string  $checkpoints
      */
-    public static function playerFinish(Player $player, $score)
+    public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($player->isSpectator()) {
             //Leave spec when reset is pressed
@@ -282,6 +284,18 @@ class PlayerController implements ControllerInterface
             $player->Score = $score;
             $player->save();
             Log::info($player." finished with time ($score) ".$player->getTime());
+
+            $map = MapController::getCurrentMap();
+            var_dump($score);
+            if (!Pb::whereMapId($map->id)->wherePlayerId($player->id)->where('score', '<=', $score)->exists()) {
+                Pb::updateOrInsert([
+                    'map_id' => $map->id,
+                    'player_id' => $player->id
+                ], [
+                    'score' => $score,
+                    'checkpoints' => $checkpoints
+                ]);
+            }
         }
     }
 

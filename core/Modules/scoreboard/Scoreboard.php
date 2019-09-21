@@ -24,9 +24,9 @@ class Scoreboard implements ModuleInterface
 
     public static function sendScoreboard(Player $player)
     {
-        $scoreboard = Template::toString('scoreboard.scoreboard');
+//        $scoreboard = Template::toString('scoreboard.scoreboard');
 
-        Template::show($player, 'scoreboard.bootstrap', compact('scoreboard'));
+        Template::show($player, 'scoreboard.scoreboard');
 //        echo Template::toString('scoreboard.bootstrap', compact('scoreboard'));
     }
 }

@@ -9,6 +9,7 @@ use esc\Controllers\MapController;
 use esc\Models\Dedi;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
+use esc\Models\Pb;
 use esc\Models\Player;
 
 class PBRecords
@@ -30,7 +31,8 @@ class PBRecords
         Hook::add('BeginMatch', [self::class, 'beginMap']);
         Hook::add('PlayerLocal', [self::class, 'playerMadeLocal']);
 
-        ChatCommand::add('/target', [self::class, 'setTargetCommand'], 'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
+        ChatCommand::add('/target', [self::class, 'setTargetCommand'],
+            'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
         ChatCommand::add('/pb', [self::class, 'getPersonalBest'], 'Get your best time on this map.');
 
         self::$targets = collect();
@@ -63,9 +65,11 @@ class PBRecords
         }
 
         if ($target instanceof LocalRecord) {
-            $targetString = sprintf('%d. Local  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+            $targetString = sprintf('%d. Local  %s$z', $target->Rank,
+                $target->player->NickName ?? $target->player->Login);
         } elseif ($target instanceof Dedi) {
-            $targetString = sprintf('%d. Dedi  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+            $targetString = sprintf('%d. Dedi  %s$z', $target->Rank,
+                $target->player->NickName ?? $target->player->Login);
         } else {
             $targetString = 'unknown';
         }
@@ -85,18 +89,20 @@ class PBRecords
         $map = MapController::getCurrentMap();
 
         if ($map->locals()->count() > 0) {
-            $defaultTarget = $map->locals()->where('Rank', '<=', config('locals.limit'))->orderByDesc('Score')->get()->first();
+            $defaultTarget = $map->locals()->where('Rank', '<=',
+                config('locals.limit'))->orderByDesc('Score')->get()->first();
         } else {
             $defaultTarget = $map->dedis()->orderByDesc('Score')->first();
         }
 
         if ($defaultTarget) {
-            $targetString        = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank, $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
+            $targetString = sprintf('%d. Dedi  %s$z', $defaultTarget->Rank,
+                $defaultTarget->player->NickName ?? $defaultTarget->player->Login);
             self::$defaultTarget = $defaultTarget;
         } else {
             self::$defaultTarget = null;
-            $checkpoints         = '-1';
-            $targetString        = 'No records available.';
+            $checkpoints = '-1';
+            $targetString = 'No records available.';
             Template::showAll('pb-records.set-times', compact('checkpoints', 'targetString'));
 
             return;
@@ -106,22 +112,24 @@ class PBRecords
         Template::showAll('pb-records.set-times', compact('checkpoints', 'targetString'));
 
         $onlinePlayers = onlinePlayers();
-        $playerIds     = $onlinePlayers->pluck('id');
-        $locals        = $map->locals()->whereIn('Player', $playerIds)->get()->keyBy('Player');
-        $dedis         = $map->dedis()->whereIn('Player', $playerIds)->get()->keyBy('Player');
+        $playerIds = $onlinePlayers->pluck('id');
+        $locals = $map->locals()->whereIn('Player', $playerIds)->get()->keyBy('Player');
+        $dedis = $map->dedis()->whereIn('Player', $playerIds)->get()->keyBy('Player');
 
         $onlinePlayers->each(function (Player $player) use ($map, $locals, $dedis, $defaultTarget) {
-            $target       = null;
+            $target = null;
             $targetString = null;
 
             if ($locals->has($player->id)) {
-                $target       = $locals->get($player->id);
-                $targetString = sprintf('%d. Local  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+                $target = $locals->get($player->id);
+                $targetString = sprintf('%d. Local  %s$z', $target->Rank,
+                    $target->player->NickName ?? $target->player->Login);
             }
 
             if (!$target && $dedis->has($player->id)) {
-                $target       = $dedis->get($player->id);
-                $targetString = sprintf('%d. Dedi  %s$z', $target->Rank, $target->player->NickName ?? $target->player->Login);
+                $target = $dedis->get($player->id);
+                $targetString = sprintf('%d. Dedi  %s$z', $target->Rank,
+                    $target->player->NickName ?? $target->player->Login);
             }
 
             if ($targetString) {
@@ -136,14 +144,21 @@ class PBRecords
     /**
      * Chat-command: /pb (Display personal best)
      *
-     * @param \esc\Models\Player $player
+     * @param  \esc\Models\Player  $player
      * @param                    $cmd
      */
     public static function getPersonalBest(Player $player, $cmd)
     {
-        $map   = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
+        $pb = Pb::wherePlayerId($player->id)->whereMapId($map->id)->get();
+
+        if ($pb) {
+            infoMessage('Your PB is ', secondary(formatScore($pb->score)))->send($player);
+            return;
+        }
+
         $local = $map->locals()->wherePlayer($player->id)->first();
-        $dedi  = $map->dedis()->wherePlayer($player->id)->first();
+        $dedi = $map->dedis()->wherePlayer($player->id)->first();
 
         $record = null;
 
@@ -184,7 +199,8 @@ class PBRecords
     public static function setTargetCommand(Player $player, $cmd, $dediOrLocal = null, $recordId = null)
     {
         if (!$dediOrLocal) {
-            infoMessage('You must specify ', secondary('local'), ', ', secondary('dedi'), ', ', secondary('wr'), ', ', secondary('me'), ' as first and the id of the record as second parameter.')
+            infoMessage('You must specify ', secondary('local'), ', ', secondary('dedi'), ', ', secondary('wr'), ', ',
+                secondary('me'), ' as first and the id of the record as second parameter.')
                 ->send($player);
 
             return;
