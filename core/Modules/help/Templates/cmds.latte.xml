@@ -122,6 +122,9 @@ Void updatePageInfo(){
     updatePageInfo();
 {/block}
 
+        {block loop}
+        {/block}
+
 {block pendingEvents}
     if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
         currentPage = currentPage - 1;

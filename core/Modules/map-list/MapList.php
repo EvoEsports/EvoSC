@@ -40,6 +40,12 @@ class MapList implements ModuleInterface
         self::sendRecordsJson($player);
         self::sendManialink($player);
     }
+    public static function playerConnectNew(Player $player)
+    {
+        $favorites = self::getMapFavoritesJson($player);
+        $ignoreCooldown = $player->hasAccess('queue.recent');
+        Template::show($player, 'map-list.map-list-new', compact('favorites', 'ignoreCooldown'));
+    }
 
     private static function getMapFavoritesJson(Player $player): string
     {

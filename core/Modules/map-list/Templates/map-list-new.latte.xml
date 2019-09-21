@@ -1,0 +1,754 @@
+{contentType text}
+{extends 'components.tabbed-window'}
+{php $window_width = 156;}
+{php $window_height = 110;}
+{php $doNotStop = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}map-list{/block}
+    {block title}{$window_title ?? 'Maps'}{/block}
+    {block icon}{/block}
+
+    {block navbar}
+    {include 'components.tabs', tabs => [
+    ' Maps'=>'',
+    ' Jukebox'=>'maplist.jukebox',
+    ]
+    }
+    {/block}
+
+    {block content}
+    <framemodel id="Map">
+        <quad valign="center" pos="-2 0" size="200 4.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0"/>
+        <label pos="1 0" valign="center" size="40 3" text="map name lol asdfasdasdsad" textcolor="{config('colors.ui.window.text.primary')}"
+               textsize="0.6" z-index="1" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="52 0" valign="center" size="30 3" text="map author name comes here" textcolor="{config('colors.ui.window.text.primary')}"
+               textsize="0.6" z-index="1" textfont="{config('colors.ui.font')|noescape}"
+               ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}3"
+               class="filter-author"/>
+        <label pos="88 0" valign="center" size="30 3" halign="center" text="local" textcolor="{config('colors.ui.window.text.primary')}" textsize="0.6"
+               z-index="1" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textcolor="{config('colors.ui.window.text.primary')}" textsize="0.6"
+               z-index="1" textfont="{config('colors.ui.font')|noescape}"/>
+        <label class="fav" pos="115.5 0" valign="center" size="3 3" text="" textcolor="{config('colors.ui.window.text.primary')}" textsize="0.6"
+               z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textcolor="{config('colors.ui.window.text.primary')}" textsize="0.6"
+               z-index="1" textfont="{config('colors.ui.font')|noescape}"/>
+
+        <frame id="buttons" pos="120 0" z-index="5">
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn juke" data-tab="01" size="11 3" text=" Juke" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn info" data-tab="012" size="10 3" text=" Info" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            {if $localPlayer->hasAccess('map_disable')}
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn disable" data-tab="01" size="4 3" text="" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"/>
+            {/if}
+            {if $localPlayer->hasAccess('map_delete')}
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn delete" data-tab="01" size="4 3" text="" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}"
+                   valign="center" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009"/>
+            {/if}
+        </frame>
+    </framemodel>
+
+    <frame id="map-list-window" pos="0 -12" z-index="300">
+        <frame id="maps-all" pos="0 -2" z-index="2">
+            <label pos="1  1" textsize="1" text="Name" scale="0.8" textcolor="{config('colors.ui.window.header.color')}"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            <label pos="52 1" textsize="1" text="Author" scale="0.8" textcolor="{config('colors.ui.window.header.color')}"
+                   textfont="{config('colors.ui.font')|noescape}"/>
+            <label pos="88 1" textsize="1" text="Local" halign="center" scale="0.8"
+                   textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}"/>
+            <label pos="96 1" textsize="1" text="Dedi" halign="center" scale="0.8"
+                   textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}"/>
+            <label pos="106 1" textsize="1" text="Karma" halign="center" scale="0.8"
+                   textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}"/>
+            <label pos="117 1" textsize="1" text="Favorite" halign="center" scale="0.8"
+                   textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}"/>
+
+            <frame id="sorting-controls" pos="-1 5.25">
+                <quad valign="center" pos="-1" size="200 6" textcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity') - 0.1}" z-index="-1"/>
+                <label pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                       textfont="{config('colors.ui.font')|noescape}" valign="center"/>
+
+                <label class="filter-btn" data-sort=" " pos="20" size="13 4" textsize="0.7" text="Show All"
+                       scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                       textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                       focusareacolor1="{config('colors.ui.window.header.color')}3"
+                       focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+
+                <label class="filter-btn" data-sort="favorites" pos="31" size="13 4" textsize="0.7" text="Favorites"
+                       scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                       textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                       focusareacolor1="{config('colors.ui.window.header.color')}3"
+                       focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+
+                <frame pos="10.75">
+                    <label class="filter-btn" data-sort="nofinish" pos="32" size="15 4" textsize="0.7"
+                           text="No Finish" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+
+                    <label pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}3"/>
+                    <label class="filter-btn" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8"
+                           textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+                    <label class="filter-btn" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+
+                    <label pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}3"/>
+                    <label class="filter-btn" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+                    <label class="filter-btn" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+
+                    <label pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}3"/>
+                    <label class="filter-btn" data-sort="best_karma" pos="82" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+                    <label class="filter-btn" data-sort="worst_karma" pos="85.4" size="4 4" textsize="0.7" text=""
+                           scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                           textfont="{config('colors.ui.font')|noescape}" valign="center" halign="center" ScriptEvents="1"
+                           focusareacolor1="{config('colors.ui.window.header.color')}3"
+                           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+                </frame>
+            </frame>
+
+            <frame id="map-list" pos="0 -3">
+                {for $i = 0; $i<20; $i++}
+                <frameinstance pos="0 {$i * -4 - 2}" modelid="Map" hidden="0"/>
+                {/for}
+            </frame>
+
+            <frame id="pagination" pos="2 -86.5" scale="0.9">
+                <entry id="page-input" class="page-input" pos="6 0" size="8 3.5" valign="center" halign="center"
+                       text="1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1" textcolor="{config('colors.ui.window.text.primary')}"
+                       hidden="1"/>
+                <label id="page-info" class="enable-page-input" pos="6 0" size="8 3.5" valign="center"
+                       halign="center" text="1/1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" textcolor="{config('colors.ui.window.text.primary')}"
+                       ScriptEvents="1"/>
+                <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+                       textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" textcolor="{config('colors.ui.window.text.primary')}"
+                       focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+                <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+                       textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" textcolor="{config('colors.ui.window.text.primary')}"
+                       focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+            </frame>
+
+            <frame id="search-frame" pos="124 -86.5" scale="0.9">
+                <label textfont="{config('colors.ui.font')|noescape}" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
+                <entry textfont="{config('colors.ui.font')|noescape}" id="search-input" class="search-input" pos="26.5 0" size="25 3.5" textcolor="{config('colors.ui.window.text.primary')}"
+                       halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
+                <label textfont="{config('colors.ui.font')|noescape}" id="clear-search" class="clear-search" pos="0 0" size="3.5 3.5" textcolor="{config('colors.ui.window.text.primary')}"
+                       halign="center" valign="center" textsize="0.25" text="" focusareacolor1="f003"
+                       focusareacolor2="f009" ScriptEvents="1" hidden="1"/>
+            </frame>
+        </frame>
+    </frame>
+    {/block}
+
+    {block scriptDeclarations}
+    <script><!--
+declare Integer[] favorites;
+declare Text[Text][] maps;
+declare Text[Text][Integer] mapAuthors;
+declare Text[Text][] currentMapPool;
+declare Integer lastMapQueueLength;
+declare Integer currentPage;
+declare Real buttonsWidth;
+declare CMlFrame mapListFrame;
+declare Text currentMapUid;
+declare Integer cooldown;
+declare Text[Text] currentMap;
+declare Boolean inSearch;
+declare Boolean userCanDrop;
+    --></script>
+    {/block}
+
+    {block functions}
+    <script><!--
+
+Text[Text] getAuthor(Text id){
+    return mapAuthors[TL::ToInteger(id)];
+}
+
+Text[Text] findMapByUid(Text Uid){
+    foreach(map in maps){
+        if(!map.existskey("uid")){
+            log("[Maps] findMapById Error " ^ Uid);
+            return Text[Text];
+        }
+
+        if(map["uid"] == Uid){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Text[Text] findMapById(Text id){
+    foreach(map in maps){
+        if(!map.existskey("id")){
+            log("[Maps] findMapById Error " ^ id);
+            return Text[Text];
+        }
+
+        if(map["id"] == id){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Void rearrangeButtons(){
+    declare Text listId = "";
+    declare Text buttonsId = "";
+        listId = "map-list";
+        buttonsId = "buttons";
+    declare mapList <=> (Page.MainFrame.GetFirstChild(listId) as CMlFrame);
+    declare Real padding;
+
+    buttonsWidth = 0.0;
+
+    foreach(control in mapList.Controls){
+        declare buttonsFrame = ((control as CMlFrame).GetFirstChild(buttonsId) as CMlFrame);
+        padding = 0.0;
+
+        foreach(button in buttonsFrame.Controls){
+            if(!button.Visible){
+                continue;
+            }
+
+            declare Real width = button.Size[0];
+            declare offset = width / 2.0 + padding;
+            button.RelativePosition_V3 = <offset, 0.0>;
+            padding = offset + width / 2.0 + 1.0;
+        }
+
+        if(padding > buttonsWidth){
+            buttonsWidth = padding;
+        }
+    }
+
+    //resizeWindow();
+}
+
+Boolean hasLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+    return Locals.existskey(mapId);
+}
+
+Boolean hasDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+    return Dedis.existskey(mapId);
+}
+
+Boolean hasRecord(Text mapId){
+    return (hasLocal(mapId) || hasDedi(mapId));
+}
+
+Text getLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+
+    if(Locals.existskey(mapId)){
+        return TL::ToText(Locals[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+
+    if(Dedis.existskey(mapId)){
+        return TL::ToText(Dedis[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getStarString(Real rating){
+    if(rating == -1){
+        return "$666";
+    }
+
+    declare Text starString = "";
+    declare Real stars = rating / 20.0;
+    declare Integer full = ML::FloorInteger(stars);
+    declare Real left = stars - full;
+
+    for(i, 0, full - 1){
+        starString = starString ^ "${config('colors.ui.window.text.primary')|noescape}";
+    }
+
+    if(left >= 0.5){
+        starString = starString ^ "${config('colors.ui.window.text.primary')|noescape}";
+        full = full + 1;
+    }
+
+    for(i, full + 1, 5){
+        starString = starString ^ "$666";
+    }
+
+    return starString;
+}
+
+Void updateView(Text[Text][] mapPool, Integer page){
+    declare mapsFrame = (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare pageInfo = (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    declare Integer start = page * 20;
+    declare Integer rowsFilled = 0;
+
+    for(i, 0, 19){
+        declare Integer id = start + i;
+
+        if(id >= mapPool.count){
+            break;
+        }
+
+        declare Text[Text] map = mapPool[id];
+
+        if(!map.existskey("a") || !map.existskey("id")){
+            log("[Maps] Update view Error");
+            log(map);
+            continue;
+        }
+
+        declare Text[Text] author = getAuthor(map["a"]);
+
+        declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
+        mapFrame.DataAttributeSet("map-id", map["id"]);
+        mapFrame.DataAttributeSet("map-uid", map["uid"]);
+        (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
+        (mapFrame.Controls[2] as CMlLabel).SetText(author["nick"]);
+        (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
+        (mapFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
+
+        {if !$ignoreCooldown}
+        if(TL::ToInteger(map["c"]) < cooldown){
+            (mapFrame.Controls[1] as CMlLabel).Opacity = 0.15;
+            (mapFrame.Controls[2] as CMlLabel).Opacity = 0.15;
+        }else{
+            (mapFrame.Controls[1] as CMlLabel).Opacity = 1.0;
+            (mapFrame.Controls[2] as CMlLabel).Opacity = 1.0;
+        }
+        {/if}
+
+        if(favorites.exists(TL::ToInteger(map["id"]))){
+            (mapFrame.Controls[5] as CMlLabel).SetText("");
+        }else{
+            (mapFrame.Controls[5] as CMlLabel).SetText("");
+        }
+
+        (mapFrame.Controls[6] as CMlLabel).SetText(getStarString(TL::ToReal(map["r"])));
+        mapFrame.Show();
+
+        rowsFilled = rowsFilled + 1;
+    }
+
+    if(rowsFilled < 19){
+        for(i, rowsFilled, 19){
+            (mapsFrame.Controls[i] as CMlFrame).Hide();
+        }
+    }
+
+    pageInfo.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(mapPool.count / 20.0));
+}
+
+Void search(){
+    declare Text[Text][] mapsFound = Text[Text][];
+    declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+    declare clearSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
+    declare search = TL::Trim(input.Value);
+
+    switch(search){
+        case "":{
+            currentMapPool = maps;
+            updateView(currentMapPool, 0);
+            clearSearch.Hide();
+            return;
+        }
+
+        case "nofinish":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasRecord(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "favorites":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(favorites.exists(TL::ToInteger(map["id"]))){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "best":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] localsAsc = Text[];
+
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                localsAsc.add(mapId);
+            }
+
+            declare Text[] localsDesc = localsAsc;
+
+            for(i, 0, localsAsc.count - 1){
+                localsDesc[localsAsc.count - i - 1] = localsAsc[i];
+            }
+
+            foreach(mapId in localsDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "best_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] dedisAsc = Text[];
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                dedisAsc.add(mapId);
+            }
+
+            declare Text[] dedisDesc = dedisAsc;
+
+            for(i, 0, dedisAsc.count - 1){
+                dedisDesc[dedisAsc.count - i - 1] = dedisAsc[i];
+            }
+
+            foreach(mapId in dedisDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "best_karma":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["r"] != "0.0"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst_karma":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Text[Text][] reverse = Text[Text][];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["r"] != "0.0"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    reverse.add(selected[mapId]);
+                }
+            }
+
+            for(i, 0, reverse.count - 1){
+                mapsFound.add(reverse[reverse.count - i - 1]);
+            }
+        }
+
+        default: {
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+
+                if(!map.existskey("a")){
+                    log("[Maps] Null author for map " ^ map["id"]);
+                    continue;
+                }
+
+                declare Text[Text] author = getAuthor(map["a"]);
+                declare searchString = map["name"]^author["nick"]^author["login"];
+                if(TL::Find(input.Value, searchString, False, False)){
+                    mapsFound.add(map);
+                }
+            }
+        }
+    }
+
+    currentPage = 0;
+    currentMapPool = mapsFound;
+    updateView(mapsFound, 0);
+    clearSearch.Show();
+}
+
+Void checkMapSearchQuery(){
+    declare Text MapSearchQuery for LocalUser;
+    if(MapSearchQuery != ""){
+        declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+
+        input.SetText(TL::Trim(MapSearchQuery), True);
+        window.Show();
+        MapSearchQuery = "";
+    }
+}
+
+Void buttonPressed(CMlFrame mapFrame, CMlControl control){
+    if(control.HasClass("juke")){
+        TriggerPageAction("map.queue," ^ mapFrame.DataAttributeGet("map-uid"));
+        return;
+    }
+
+    if(control.HasClass("drop")){
+        TriggerPageAction("map.drop," ^ mapFrame.DataAttributeGet("map-uid"));
+        return;
+    }
+
+    if(control.HasClass("info")){
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-id"));
+        return;
+    }
+
+    if(control.HasClass("disable")){
+        if(confirm("Disable map?")){
+            TriggerPageAction("maplist.disable," ^ mapFrame.DataAttributeGet("map-uid"));
+        }
+    }
+
+    if(control.HasClass("delete")){
+        if(confirm("Delete map and all associated data?")){
+            TriggerPageAction("maplist.delete," ^ mapFrame.DataAttributeGet("map-uid"));
+        }
+    }
+}--></script>
+    {/block}
+
+    <script><!--
+    {block bootScript}
+        inSearch = False;
+        currentPage = 0;
+        userCanDrop = {($localPlayer->hasAccess('queue_drop') ? 'True' : 'False')|noescape};
+        cooldown = {config('server.map-cooldown')};
+        favorites = {$favorites|noescape};
+
+        mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
+        declare Text[Text][] Maps for LocalUser;
+        declare Text[Text][Integer] MapAuthors for LocalUser;
+        declare Integer MapUpdateTime for LocalUser = 0;
+        declare lastMapUpdate = 0;
+
+        rearrangeButtons();
+    {/block}
+
+    {block pendingEvents}
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            declare mapFrame = (event.Control.Parent as CMlFrame);
+            buttonPressed(mapFrame, event.Control);
+        }
+
+        if(event.Control.HasClass("enable-page-input") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+            declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+            pageInfo.Hide();
+            pageInput.Value = "";
+            pageInput.Show();
+            pageInput.Focus();
+            continue;
+        }
+
+        if(event.Control.HasClass("clear-search") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText("", True);
+            continue;
+        }
+
+        if(event.Control.HasClass("page-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+            declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+            declare page = TL::ToInteger(pageInput.Value);
+
+            if(page != -1){
+                currentPage = page - 1;
+
+                if(currentPage < 0){
+                    currentPage = 0;
+                }
+                if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
+                    currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                }
+
+                updateView(currentMapPool, currentPage);
+            }
+
+            pageInfo.Show();
+            pageInput.Hide();
+
+            continue;
+        }
+
+        if(event.Control.HasClass("search-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+            search();
+            continue;
+        }
+
+        if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage = currentPage - 1;
+            if(currentPage < 0){
+                currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+            }
+            updateView(currentMapPool, currentPage);
+            continue;
+        }
+
+        if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage = currentPage + 1;
+            if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
+                currentPage = 0;
+            }
+            updateView(currentMapPool, currentPage);
+            continue;
+        }
+
+        if(event.Control.HasClass("filter-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText(event.Control.DataAttributeGet("sort"), True);
+            mapListFrame.Show();
+        }
+
+        if(event.Control.HasClass("filter-author") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare mapId = event.Control.Parent.DataAttributeGet("map-id");
+            declare id = findMapById(mapId)["a"];
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText(mapAuthors[TL::ToInteger(id)]["login"], True);
+        }
+
+        if(event.Control.HasClass("btn")){
+            declare mapFrame = (event.Control.Parent.Parent as CMlFrame);
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                buttonPressed(mapFrame, event.Control);
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOver){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.5;
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOut){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                continue;
+            }
+        }
+    {/block}
+
+    {block loop}
+        if(MapUpdateTime != 0 && lastMapUpdate != MapUpdateTime){
+            lastMapUpdate = MapUpdateTime;
+            mapAuthors = MapAuthors;
+            maps = Maps;
+            currentMapPool = maps;
+
+            updateView(currentMapPool, currentPage);
+
+            log("[EvoSC:update-map-list] Loaded " ^ Maps.count ^ " maps from " ^ MapAuthors.count ^ " authors.");
+        }
+
+        checkMapSearchQuery();
+    {/block}
+--></script>
+</manialink>

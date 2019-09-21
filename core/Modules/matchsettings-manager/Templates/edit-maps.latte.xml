@@ -149,6 +149,9 @@
     loadPage(currentPage);
     {/block}
 
+    {block loop}
+    {/block}
+
     {block pendingEvents}
         if(event.Control.HasClass("toggle") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare parent = event.Control.Parent;

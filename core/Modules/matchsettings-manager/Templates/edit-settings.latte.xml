@@ -125,6 +125,9 @@
         }
     {/block}
 
+    {block loop}
+    {/block}
+
     {block pendingEvents}
         if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
             save();

@@ -62,6 +62,9 @@
     {block bootScript}
     {/block}
 
+    {block loop}
+    {/block}
+
     {block pendingEvents}
     {/block}
 --></script>
