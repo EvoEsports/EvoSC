@@ -36,14 +36,22 @@ class ChatController implements ControllerInterface
     public static function init()
     {
         self::$mutedPlayers = collect();
-        /*
+
+        AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
+        AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
+
+        if (!isWindows()) {
+            //unix systems use chat router process
+            return;
+        }
+
         self::$routingEnabled = config('server.enable-chat-routing');
 
         if (self::$routingEnabled) {
             Log::write('Enabling manual chat routing.');
             $routingEnabled = false;
 
-            while (!$routingEnabled){
+            while (!$routingEnabled) {
                 try {
                     Server::chatEnableManualRouting(false, false);
                     $routingEnabled = true;
@@ -56,10 +64,6 @@ class ChatController implements ControllerInterface
         } else {
             Server::chatEnableManualRouting(false, false);
         }
-        */
-
-        AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
-        AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
     }
 
     /**
@@ -173,7 +177,8 @@ class ChatController implements ControllerInterface
     public static function playerChat(Player $player, $text)
     {
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
-            warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
+            warningMessage('Invalid chat-command entered. See ', secondary('/help'),
+                ' for all commands.')->send($player);
 
             return;
         }
@@ -186,6 +191,24 @@ class ChatController implements ControllerInterface
         }
 
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
+
+        if (isWindows()) {
+            $nick = $player->NickName;
+
+            if ($player->isSpectator()) {
+                $nick = '$eee📷 '.$nick;
+            }
+
+            $prefix = $player->group->chat_prefix;
+            $color = $player->group->color ?? config('colors.chat');
+            $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
+
+            if ($prefix) {
+                $chatText = '$'.$color.$prefix.' '.$chatText;
+            }
+
+            Server::ChatSendServerMessage($chatText);
+        }
     }
 
     /**

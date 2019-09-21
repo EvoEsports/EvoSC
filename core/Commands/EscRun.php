@@ -50,18 +50,20 @@ class EscRun extends Command
     {
         global $serverName;
 
-        switch (pcntl_fork()) {
-            case -1:
-                $output->writeln('Starting char router failed.');
-                break;
+        if (!isWindows()) {
+            switch (pcntl_fork()) {
+                case -1:
+                    $output->writeln('Starting char router failed.');
+                    break;
 
-            case 0:
-                $output->writeln('Starting chat router.');
-                pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
-                exit(0);
+                case 0:
+                    $output->writeln('Starting chat router.');
+                    pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
+                    exit(0);
 
-            default:
-                //parent
+                default:
+                    //parent
+            }
         }
 
         Log::setOutput($output);
