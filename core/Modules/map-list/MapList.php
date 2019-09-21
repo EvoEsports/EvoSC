@@ -40,11 +40,19 @@ class MapList implements ModuleInterface
         self::sendRecordsJson($player);
         self::sendManialink($player);
     }
+
     public static function playerConnectNew(Player $player)
     {
         $favorites = self::getMapFavoritesJson($player);
         $ignoreCooldown = $player->hasAccess('queue.recent');
         Template::show($player, 'map-list.map-list-new', compact('favorites', 'ignoreCooldown'));
+    }
+
+    public static function sendFavorites(Player $player)
+    {
+        $favorites = self::getMapFavoritesJson($player);
+
+        Template::show($player, 'map-list.update-favorites', compact('favorites'));
     }
 
     private static function getMapFavoritesJson(Player $player): string
@@ -79,6 +87,7 @@ class MapList implements ModuleInterface
     public static function favAdd(Player $player, string $mapId)
     {
         $player->favorites()->attach($mapId);
+        self::sendFavorites($player);
     }
 
     /**
@@ -90,6 +99,7 @@ class MapList implements ModuleInterface
     public static function favRemove(Player $player, string $mapId)
     {
         $player->favorites()->detach($mapId);
+        self::sendFavorites($player);
     }
 
     /**

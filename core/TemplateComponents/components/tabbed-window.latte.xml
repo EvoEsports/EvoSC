@@ -38,6 +38,7 @@ declare Real lastScale__;
 --></script>
 
 {include 'scripts.drag'}
+{include 'scripts.mle'}
 {include 'dialogues.confirm'}
 {include functions}
 

@@ -219,9 +219,6 @@
             }
     {/block}
 
-    {block loop}
-    {/block}
-
     {block pendingEvents}
                 if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
                     TriggerPageAction("dedis.show");
