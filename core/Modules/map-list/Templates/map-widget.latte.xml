@@ -1,0 +1,156 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $doNotPause = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}maps{/block}
+    {block size}44 8{/block}
+
+    {block content}
+    <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+    <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+
+    <label id="map-name" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Map name" halign="right" textcolor="eeee" textsize="1.4"
+           textfont="{config('colors.ui.font')|noescape}"/>
+    <label id="author-name" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Author name" halign="right" textcolor="dddd" valign="center"
+           textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
+
+    <label pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text="" textcolor="{config('colors.ui.widget.text.primary')}"
+           textfont="{config('colors.ui.font')|noescape}"/>
+
+    <frame id="controls" pos="5 -8.5" z-index="10">
+        <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.bg.color')|noescape}6" z-index="-1"/>
+        <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.header.color')}6" z-index="-2"/>
+
+        <frame pos="1 -4">
+            <label class="map-control details" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
+                   valign="center" ScriptEvents="1" focusareacolor1="0000"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Details"
+                   z-index="1" halign="center" valign="center"/>
+        </frame>
+
+        <frame pos="19 -4">
+            <label class="map-control list" textsize="1.5" size="24 8" text="" z-index="0" halign="center"
+                   valign="center" ScriptEvents="1" focusareacolor1="0000"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Maps" z-index="1"
+                   halign="center" valign="center"/>
+        </frame>
+    </frame>
+    {/block}
+
+    {block script}
+    {include 'scripts.drag'}
+
+    <script><!--
+
+declare Text[Text][] maps;
+declare Text[Text][Integer] mapAuthors;
+declare Text currentMapUid;
+declare Text[Text] currentMap;
+
+Text[Text] getAuthor(Text id){
+    return mapAuthors[TL::ToInteger(id)];
+}
+
+Text[Text] findMapByUid(Text Uid){
+    foreach(map in maps){
+        if(!map.existskey("uid")){
+            log("[Maps] findMapByUid Error " ^ Uid);
+            return Text[Text];
+        }
+
+        if(map["uid"] == Uid){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Void updateWidget(Text[Text] map){
+    if(!map.existskey("a")){
+        log("[Maps] update Widget Error");
+        log(map);
+        return;
+    }
+
+    declare author = getAuthor(map["a"]);
+    (Page.MainFrame.GetFirstChild("map-name") as CMlLabel).SetText(map["name"]);
+    (Page.MainFrame.GetFirstChild("author-name") as CMlLabel).SetText(author["nick"]);
+}
+--></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
+        declare controlsVisible = False;
+        declare Text[Text][] Maps for LocalUser;
+        declare Text[Text][Integer] MapAuthors for LocalUser;
+        declare Text MapSearchQuery for LocalUser;
+        declare Integer MapUpdateTime for LocalUser = 0;
+        declare lastMapUpdate = 0;
+
+        while(Maps.count == 0){
+            yield;
+            hidescript();
+        }
+
+        left__ = {config('map-list.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('map-list.ui.slot')};
+    {/block}
+
+    {block loop}
+        if(MapUpdateTime != 0 && lastMapUpdate != MapUpdateTime){
+            lastMapUpdate = MapUpdateTime;
+            mapAuthors = MapAuthors;
+            maps = Maps;
+        }
+
+        if(currentMapUid != Map.MapInfo.MapUid && maps.count > 0){
+            currentMapUid = Map.MapInfo.MapUid;
+            currentMap = findMapByUid(currentMapUid);
+            updateWidget(currentMap);
+        }
+
+        declare x_min = widget.RelativePosition_V3[0];
+        declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);
+        declare y_min = widget.RelativePosition_V3[1];
+        declare y_max = widget.RelativePosition_V3[1] - (widget.Size[1] * widget.RelativeScale);
+        declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
+        declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
+
+        if(!(xInBounds && yInBounds) && controlsVisible){
+            controlsVisible = False;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 -8.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
+        if((xInBounds && yInBounds) && !controlsVisible){
+            controlsVisible = True;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
+    {/block}
+
+    {block pendingEvents}
+            if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(!currentMap.existskey("id")){
+                    return;
+                }
+                TriggerPageAction("mx.details," ^ currentMap["id"]);
+                continue;
+            }
+
+            if(event.Control.HasClass("list") && event.Type == CMlScriptEvent::Type::MouseClick){
+                MapSearchQuery = " ";
+                continue;
+            }
+    {/block}
+    --></script>
+</manialink>

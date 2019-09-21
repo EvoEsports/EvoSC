@@ -200,6 +200,8 @@ Void playRandomSong(){
 
         left__ = {config('music.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('music.ui.slot')};
+
+        AnimMgr.Add(widgetControls, " <frame pos='5.0 -8.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
     {/block}
 
     {block loop}

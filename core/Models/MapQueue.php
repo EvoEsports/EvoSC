@@ -7,6 +7,10 @@ use esc\Classes\Hook;
 use esc\Controllers\QueueController;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class MapQueue
+ * @package esc\Models
+ */
 class MapQueue extends Model
 {
     protected $table = 'map-queue';
