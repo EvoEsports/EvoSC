@@ -77,19 +77,17 @@ class LocalRecords implements ModuleInterface
         $showTop = self::$showTop;
         $show = self::$show - $showTop;
         $baseRank = self::$playerIdRankMap->get($player->id);
-
         $sortedRecords = self::$records->sortBy('Score');
-        $records = $sortedRecords->take($showTop);
 
         if (!$baseRank) {
-            $records = $records->merge(MapController::getCurrentMap()->locals()->orderByDesc('Score')->take($show)->get()->sortBy('Score'));
+            $records = $sortedRecords->take($showTop)
+                ->merge($sortedRecords->slice(-$show));
         } else {
-            if ($baseRank <= $showTop) {
+            if ($baseRank <= self::$show) {
                 $records = $sortedRecords->take(self::$show);
             } else {
-                $startRank = $baseRank - floor($show * 0.7);
-                $endRank = $baseRank + floor($show * 0.3);
-                $records = $records->merge($sortedRecords->slice($startRank, $endRank));
+                $records = $sortedRecords->take($showTop)
+                    ->merge($sortedRecords->slice($baseRank - $show / 2, $baseRank + $show / 2));
             }
         }
 
@@ -232,14 +230,16 @@ class LocalRecords implements ModuleInterface
      */
     private static function incrementRanksAboveScore(Map $map, int $score, int $oldScore = 0)
     {
-        if($oldScore > 0){
-            self::$records->where('Score', '>', $score)->where('Score', '<=', $oldScore)->transform(function (LocalRecord $record) {
+        if ($oldScore > 0) {
+            self::$records->where('Score', '>', $score)->where('Score', '<=', $oldScore)->transform(function (
+                LocalRecord $record
+            ) {
                 $record->Rank++;
                 return $record;
             });
 
             $map->locals()->where('Score', '>', $score)->where('Score', '<=', $oldScore)->increment('Rank');
-        }else{
+        } else {
             self::$records->where('Score', '>', $score)->transform(function (LocalRecord $record) {
                 $record->Rank++;
                 return $record;
