@@ -60,6 +60,11 @@ class LocalRecords implements ModuleInterface
 
         $map = MapController::getCurrentMap();
         $localsCount = $map->locals()->count();
+
+        if ($localsCount > self::$limit) {
+            $localsCount = self::$limit;
+        }
+
         $showTop = self::$showTop;
         $show = self::$show - $showTop;
 
@@ -76,6 +81,7 @@ class LocalRecords implements ModuleInterface
                         $records = $map->locals()
                             ->where('Rank', '>', $localsCount - $show)
                             ->orderBy('Rank')
+                            ->limit($show)
                             ->get()
                     )->sortBy('Rank');
             } else {
@@ -254,8 +260,11 @@ class LocalRecords implements ModuleInterface
      */
     private static function getNextBetterRank(Player $player, Map $map, int $score)
     {
-        $nextBetterRecord = $map->locals()->where('Score', '<=', $score)
-            ->orderByDesc('Rank')->first();
+        $nextBetterRecord = $map->locals()
+            ->where('Score', '<=', $score)
+            ->where('Rank', '<=', self::$limit)
+            ->orderByDesc('Rank')
+            ->first();
 
         if ($nextBetterRecord) {
             if ($nextBetterRecord->Player == $player->id) {
