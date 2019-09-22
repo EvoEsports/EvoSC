@@ -286,7 +286,6 @@ class PlayerController implements ControllerInterface
             Log::info($player." finished with time ($score) ".$player->getTime());
 
             $map = MapController::getCurrentMap();
-            var_dump($score);
             if (!Pb::whereMapId($map->id)->wherePlayerId($player->id)->where('score', '<=', $score)->exists()) {
                 Pb::updateOrInsert([
                     'map_id' => $map->id,

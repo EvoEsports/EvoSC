@@ -19,6 +19,7 @@ use stdClass;
  *
  * @package esc\Models
  *
+ * @property string $id
  * @property string $uid
  * @property string $filename
  * @property Player $author

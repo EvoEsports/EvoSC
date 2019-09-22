@@ -21,6 +21,7 @@ class MapList implements ModuleInterface
         self::sendFavorites($player);
         self::sendUpdatedMaplist($player);
         self::mapQueueUpdated(MapQueue::all());
+        self::sendRecordsJson($player);
         Template::show($player, 'map-list.map-queue');
         Template::show($player, 'map-list.map-widget');
         Template::show($player, 'map-list.map-list');
