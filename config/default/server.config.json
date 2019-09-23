@@ -12,6 +12,7 @@
   "afk-timeout": 5,
   "controller-interval": 100,
   "enable-chat-routing": true,
+  "use-chat-router-process": false,
   "echoes": {
     "join": true,
     "leave": true

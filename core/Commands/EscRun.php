@@ -50,6 +50,9 @@ class EscRun extends Command
     {
         global $serverName;
 
+        Log::setOutput($output);
+        ConfigController::init();
+
         if (!isWindows()) {
             switch (pcntl_fork()) {
                 case -1:
@@ -65,9 +68,6 @@ class EscRun extends Command
                     //parent
             }
         }
-
-        Log::setOutput($output);
-        ConfigController::init();
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));

@@ -51,6 +51,9 @@ class ChatRouter extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $players = collect();
+        $mutedPlayers = collect(Server::getIgnoreList());
+
+        $i = 0;
 
         while (true) {
             foreach (Server::executeCallbacks() as $callback) {
@@ -58,10 +61,17 @@ class ChatRouter extends Command
                     $login = $callback[1][1];
                     $text = trim($callback[1][2]);
 
+                    if ($text == '') {
+                        continue;
+                    }
+
                     if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
                         continue;
                     }
                     if (preg_match('/^([+\-]){1,3}$/', $text)) {
+                        continue;
+                    }
+                    if ($mutedPlayers->contains('login', $login)) {
                         continue;
                     }
 
@@ -73,6 +83,11 @@ class ChatRouter extends Command
                 } elseif ($callback[0] == 'ManiaPlanet.PlayerDisconnect') {
                     $players->forget($callback[1][0]);
                 }
+            }
+
+            if ($i++ > 5) {
+                $i = 0;
+                $mutedPlayers = collect(Server::getIgnoreList());
             }
 
             usleep(100000);

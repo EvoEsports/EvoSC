@@ -76,6 +76,7 @@ class ChatController implements ControllerInterface
     {
         if (!self::isPlayerMuted($target)) {
             Server::ignore($target->Login);
+//            Server::echo('ESC.UpdateMutedPlayers', 'yo');
         }
         infoMessage($admin, ' muted ', $target)->sendAll();
     }
