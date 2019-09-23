@@ -369,6 +369,10 @@ class MapController implements ControllerInterface
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
                         Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         continue;
                     }
@@ -380,6 +384,10 @@ class MapController implements ControllerInterface
                     if ($map->filename != $filename) {
                         Log::write("Filename changed for map: (".$map->filename." -> $filename)",
                             isVerbose());
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         $map->update(['filename' => $filename,]);
                     }
@@ -388,6 +396,10 @@ class MapController implements ControllerInterface
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
                         Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         continue;
                     }
