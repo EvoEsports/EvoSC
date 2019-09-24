@@ -103,7 +103,7 @@ class Statistics
         $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled',
             1)->take(6)->pluck('last_played', 'name');
         $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
-            function (Carbon $last_played) {
+            function ($last_played) {
                 return $last_played ? $last_played->diffForHumans() : 'never';
             }, true, true, $popularMaps));
 
