@@ -104,7 +104,7 @@ class Statistics
             1)->take(6)->pluck('last_played', 'name');
         $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
             function (Carbon $last_played) {
-                return $last_played->diffForHumans();
+                return $last_played ? $last_played->diffForHumans() : 'never';
             }, true, true, $popularMaps));
 
         Template::showAll('statistics.widgets', compact('statCollection'));
