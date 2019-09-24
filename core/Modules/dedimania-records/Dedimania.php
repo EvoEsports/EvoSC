@@ -238,19 +238,11 @@ class Dedimania extends DedimaniaApi
         $nextBetterRecord = $map->dedis()->where('Score', '<=', $score)->orderByDesc('Score')->first();
         $newRank = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
 
-        $maxRank = self::$maxRank;
-        if ($maxRank > 100) {
-            $maxRank = 100;
-        }
-        $saveRecord = $newRank <= $maxRank;
+        $saveRecord = $newRank <= elf::$maxRank;
 
         if (!$saveRecord && $player->MaxRank > self::$maxRank) {
             //check for dedimania premium
-            $maxRank = $player->MaxRank;
-            if ($maxRank > 100) {
-                $maxRank = 100;
-            }
-            $saveRecord = $newRank <= $maxRank;
+            $saveRecord = $newRank <= $player->MaxRank;
         }
 
         if (!$saveRecord) {
@@ -304,7 +296,9 @@ class Dedimania extends DedimaniaApi
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' ('.$oldRank.'. -'.formatScore($diff).')');
             }
 
-            $chatMessage->sendAll();
+            if ($newRank <= 100) {
+                $chatMessage->sendAll();
+            }
 
             self::cacheDedis($map);
             self::cacheDedisJson();
@@ -327,10 +321,12 @@ class Dedimania extends DedimaniaApi
                 self::saveGhostReplay($newRecord);
             }
 
-            chatMessage($player, ' gained the ', $newRecord)
-                ->setIcon('')
-                ->setColor(config('colors.dedi'))
-                ->sendAll();
+            if ($newRank <= 100) {
+                chatMessage($player, ' gained the ', $newRecord)
+                    ->setIcon('')
+                    ->setColor(config('colors.dedi'))
+                    ->sendAll();
+            }
 
             self::cacheDedis($map);
             self::cacheDedisJson();
