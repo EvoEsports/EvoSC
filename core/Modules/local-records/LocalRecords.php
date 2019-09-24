@@ -3,6 +3,7 @@
 namespace esc\Modules\LocalRecords;
 
 use esc\Classes\Database;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
@@ -30,6 +31,11 @@ class LocalRecords implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$showTop = config('locals.showtop');
+        self::$show = config('locals.rows');
+        self::$limit = config('locals.limit');
+        self::$echoTop = config('locals.echo-top');
+
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
@@ -38,15 +44,11 @@ class LocalRecords implements ModuleInterface
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
-
-        self::$showTop = config('locals.showtop');
-        self::$show = config('locals.rows');
-        self::$limit = config('locals.limit');
-        self::$echoTop = config('locals.echo-top');
     }
 
     public static function beginMap(Map $map)
     {
+        Template::showAll('local-records.manialink');
         self::sendLocalsChunk();
     }
 
@@ -65,52 +67,53 @@ class LocalRecords implements ModuleInterface
             $localsCount = self::$limit;
         }
 
+        $onlinePlayers = onlinePlayers();
+        $playerMap = Player::whereIn('id', DB::table('local-records')->where('Map', '=', $map->id)->pluck('Player'))
+            ->pluck('NickName', 'id');
         $showTop = self::$showTop;
         $show = self::$show - $showTop;
 
         foreach ($players as $player) {
-            $baseRecord = $map->locals()->wherePlayer($player->id)->first();
+            $baseRecord = DB::table('local-records')
+                ->where('Map', '=', $map->id)
+                ->where('Player', '=', $player->id)->first();
+
             $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
 
-            if (!$baseRank || $baseRank >= $localsCount - $show) {
-                $records = $map->locals()
-                    ->where('Rank', '<=', $showTop)
-                    ->orderBy('Rank')
-                    ->get()
-                    ->merge(
-                        $records = $map->locals()
-                            ->where('Rank', '>', $localsCount - $show)
-                            ->orderBy('Rank')
-                            ->limit($show)
-                            ->get()
-                    )->sortBy('Rank');
+            $selectRanks = [];
+            for ($i = 1; $i <= $showTop; $i++) {
+                array_push($selectRanks, $i);
+            }
+
+            var_dump($localsCount - $show);
+
+            if (!$baseRank || $baseRank > $localsCount - $show) {
+                for ($i = $localsCount - $show + 1; $i <= $localsCount; $i++) {
+                    array_push($selectRanks, $i);
+                }
             } else {
                 if ($baseRank <= self::$show) {
-                    $records = $map->locals()
-                        ->where('Rank', '<=', self::$show)
-                        ->orderBy('Rank')
-                        ->get();
+                    for ($i = $showTop + 1; $i < self::$show; $i++) {
+                        array_push($selectRanks, $i);
+                    }
                 } else {
-                    $records = $map->locals()
-                        ->where('Rank', '<=', $showTop)
-                        ->orderBy('Rank')
-                        ->get()
-                        ->merge(
-                            $records = $map->locals()
-                                ->where('Rank', '>', $baseRank - $show / 2)
-                                ->where('Rank', '<', $baseRank + $show / 2)
-                                ->orderBy('Rank')
-                                ->get()
-                        )->sortBy('Rank');
+                    for ($i = ceil($baseRank - $show / 2); ceil($i < $baseRank + $show / 2); $i++) {
+                        array_push($selectRanks, $i);
+                    }
                 }
             }
 
-            $records = $records->values()->map(function (LocalRecord $record) {
+            $records = DB::table('local-records')->where('Map', '=', $map->id)->whereIn('Rank', $selectRanks)
+                ->select(['Player', 'Map', 'Score', 'Rank'])
+                ->orderBy('Rank')
+                ->get();
+
+            $records = $records->values()->map(function ($record) use ($onlinePlayers, $playerMap) {
                 return [
-                    'name' => $record->player->NickName,
+                    'name' => $playerMap->get($record->Player),
                     'rank' => $record->Rank,
                     'score' => $record->Score,
-                    'online' => onlinePlayers()->contains('id', $record->Player)
+                    'online' => $onlinePlayers->contains('id', $record->Player)
                 ];
             });
 
