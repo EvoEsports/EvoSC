@@ -211,7 +211,7 @@ function baseDir(string $filename = ''): string
  */
 function onlinePlayers(bool $withSpectators = true): Collection
 {
-    $logins = collect(Server::getPlayerList())->pluck('login');
+    $logins = array_column(Server::getPlayerList(), 'login');
 
     return Player::whereIn('Login', $logins)->get();
 }

@@ -29,7 +29,7 @@ class PBRecords
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMap']);
-        Hook::add('PlayerLocal', [self::class, 'playerMadeLocal']);
+        Hook::add('PlayerLocal', [self::class, 'playerLocal']);
 
         ChatCommand::add('/target', [self::class, 'setTargetCommand'],
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
@@ -38,16 +38,19 @@ class PBRecords
         self::$targets = collect();
     }
 
-    public static function playerMadeLocal(Player $player, $record)
+    public static function playerLocal(Player $player, int $rank, int $score, string $checkpoints)
     {
-        if (self::$targets->has($player->id) && self::$targets->get($player->id)->Score <= $record->Score) {
+        if (self::$targets->has($player->id) && self::$targets->get($player->id)->Score <= $score) {
             //Keep better target until the player beats it.
 
             return;
         }
 
-        self::$targets->put($player->id, $record);
-        self::sendUpdatedTimes(MapController::getCurrentMap(), $player);
+        $o = new \stdClass();
+        $o->Score = $score;
+        self::$targets->put($player->id, $o);
+        $targetString = sprintf('%d. Local  %s$z', $rank, $player->NickName);
+        Template::show($player, 'pb-records.set-times', compact('checkpoints', 'targetString'));
     }
 
     public static function playerConnect(Player $player)

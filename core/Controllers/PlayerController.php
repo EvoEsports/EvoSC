@@ -4,6 +4,7 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -286,8 +287,9 @@ class PlayerController implements ControllerInterface
             Log::info($player." finished with time ($score) ".$player->getTime());
 
             $map = MapController::getCurrentMap();
-            if (!Pb::whereMapId($map->id)->wherePlayerId($player->id)->where('score', '<=', $score)->exists()) {
-                Pb::updateOrInsert([
+            if (!DB::table('pbs')->where('map_id', '=', $map->id)->where('player_id', '=', $player->id)->where('score',
+                '<=', $score)->exists()) {
+                DB::table('pbs')->updateOrInsert([
                     'map_id' => $map->id,
                     'player_id' => $player->id
                 ], [
