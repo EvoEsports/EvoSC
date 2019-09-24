@@ -49,7 +49,6 @@ class LocalRecords implements ModuleInterface
     public static function beginMap(Map $map)
     {
         self::fixRanks($map);
-        Template::showAll('local-records.manialink');
         self::sendLocalsChunk();
     }
 
