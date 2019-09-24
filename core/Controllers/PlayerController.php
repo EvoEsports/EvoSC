@@ -282,8 +282,6 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            $player->Score = $score;
-            $player->save();
             Log::info($player." finished with time ($score) ".$player->getTime());
 
             $map = MapController::getCurrentMap();
@@ -296,6 +294,8 @@ class PlayerController implements ControllerInterface
                     'score' => $score,
                     'checkpoints' => $checkpoints
                 ]);
+
+                Hook::fire('PlayerPb', $player, $score, $checkpoints);
             }
         }
     }

@@ -153,7 +153,7 @@ class PBRecords
     public static function getPersonalBest(Player $player, $cmd)
     {
         $map = MapController::getCurrentMap();
-        $pb = Pb::wherePlayerId($player->id)->whereMapId($map->id)->get();
+        $pb = Pb::wherePlayerId($player->id)->whereMapId($map->id)->first();
 
         if ($pb) {
             infoMessage('Your PB is ', secondary(formatScore($pb->score)))->send($player);

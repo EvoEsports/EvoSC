@@ -10,11 +10,9 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\RecordsTable;
-use Illuminate\Support\Collection;
 
 class LocalRecords implements ModuleInterface
 {
@@ -37,7 +35,7 @@ class LocalRecords implements ModuleInterface
         self::$echoTop = config('locals.echo-top');
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerPb', [self::class, 'playerFinish'], false, Hook::PRIORITY_HIGH);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         AccessRight::createIfMissing('local_delete', 'Delete local-records.');
