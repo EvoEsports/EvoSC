@@ -10,9 +10,11 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\RecordsTable;
+use Illuminate\Support\Collection;
 
 class LocalRecords implements ModuleInterface
 {
@@ -20,6 +22,11 @@ class LocalRecords implements ModuleInterface
     private static $show;
     private static $limit;
     private static $echoTop;
+
+    /**
+     * @var Collection
+     */
+    private static $records;
 
     /**
      * Called when the module is loaded
@@ -35,7 +42,7 @@ class LocalRecords implements ModuleInterface
         self::$echoTop = config('locals.echo-top');
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerPb', [self::class, 'playerFinish'], false, Hook::PRIORITY_HIGH);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish'], false, Hook::PRIORITY_HIGH);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         AccessRight::createIfMissing('local_delete', 'Delete local-records.');
@@ -47,6 +54,15 @@ class LocalRecords implements ModuleInterface
     public static function beginMap(Map $map)
     {
         self::fixRanks($map);
+
+        self::$records = DB::table('local-records')
+            ->where('Map', '=', $map->id)
+            ->orderBy('Rank')
+            ->select(['id', 'Player', 'Score', 'Rank'])
+            ->limit(self::$limit)
+            ->get()
+            ->keyBy('Player');
+
         self::sendLocalsChunk();
     }
 
@@ -66,45 +82,32 @@ class LocalRecords implements ModuleInterface
         }
 
         $onlinePlayers = onlinePlayers();
-        $playerMap = Player::whereIn('id', DB::table('local-records')->where('Map', '=', $map->id)->pluck('Player'))
-            ->pluck('NickName', 'id');
+        $playerMap = Player::whereIn('id',
+            DB::table('local-records')->where('Map', '=', $map->id)->pluck('Player'))->pluck('NickName', 'id');
         $showTop = self::$showTop;
         $show = self::$show - $showTop;
 
-        foreach ($players as $player) {
-            $baseRecord = DB::table('local-records')
-                ->where('Map', '=', $map->id)
-                ->where('Player', '=', $player->id)->first();
+        $topIds = range(1, $showTop);
 
+        foreach ($players as $player) {
+            $baseRecord = self::$records->get($player->id);
             $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
 
-            $selectRanks = [];
-            for ($i = 1; $i <= $showTop; $i++) {
-                array_push($selectRanks, $i);
-            }
-
             if (!$baseRank || $baseRank > $localsCount - $show) {
-                for ($i = $localsCount - $show + 1; $i <= $localsCount; $i++) {
-                    array_push($selectRanks, $i);
-                }
+                $bottomIds = range($localsCount - $show + 1, $localsCount);
             } else {
                 if ($baseRank <= self::$show) {
-                    for ($i = $showTop + 1; $i < self::$show + 1; $i++) {
-                        array_push($selectRanks, $i);
-                    }
+                    $bottomIds = range($showTop + 1, self::$show);
                 } else {
-                    for ($i = ceil($baseRank - $show / 2); ceil($i < $baseRank + $show / 2); $i++) {
-                        array_push($selectRanks, $i);
-                    }
+                    $bottomIds = range(ceil($baseRank - $show / 2) + 1, ceil($baseRank + $show / 2));
                 }
             }
 
-            $records = DB::table('local-records')->where('Map', '=', $map->id)->whereIn('Rank', $selectRanks)
-                ->select(['Player', 'Map', 'Score', 'Rank'])
-                ->orderBy('Rank')
-                ->get();
+            $selectRanks = array_merge($topIds, $bottomIds);
+            $records = DB::table('local-records')->where('Map', '=', $map->id)
+                ->whereIn('Rank', $selectRanks)->orderBy('Rank')->get();
 
-            $records = $records->values()->map(function ($record) use ($onlinePlayers, $playerMap) {
+            $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
                 return [
                     'name' => $playerMap->get($record->Player),
                     'rank' => $record->Rank,
@@ -140,18 +143,18 @@ class LocalRecords implements ModuleInterface
 
         $map = MapController::getCurrentMap();
         $playerId = $player->id;
-        if (DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=', $playerId)->where('Score',
-            '<=', $score)->exists()) {
-            return;
+        if (self::$records->has($playerId)) {
+            if (self::$records->get($playerId)->Score <= $score) {
+                return;
+            }
         }
 
-        $newRank = self::getNextBetterRank($player, $map, $score);
+        $oldRecord = self::$records->get($playerId);
+        $newRank = self::getNextBetterRank($player, $score);
 
         if ($newRank > self::$limit) {
             return;
         }
-
-        $oldRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=', $playerId)->first();
 
         if ($oldRecord) {
             $chatMessage = chatMessage()
@@ -181,14 +184,26 @@ class LocalRecords implements ModuleInterface
                 $chatMessage->setParts($player, ' gained the ', self::toString($newRank, $score),
                     ' ('.$oldRecord->Rank.'. -'.formatScore($diff).')');
             }
+
+            self::$records->where('id', $oldRecord->id)->transform(function ($record) use ($score, $newRank) {
+                $record->Score = $score;
+                $record->Rank = $newRank;
+
+                return $record;
+            });
         } else {
-            DB::table('local-records')->insert([
+            $localId = DB::table('local-records')->insertGetId([
                 'Map' => $map->id,
                 'Player' => $playerId,
                 'Score' => $score,
                 'Checkpoints' => $checkpoints,
                 'Rank' => $newRank
             ]);
+
+            $record = DB::table('local-records')->where('id', '=', $localId)->select([
+                'id', 'Player', 'Score', 'Rank'
+            ])->first();
+            self::$records->put($playerId, $record);
 
             self::incrementRanksAboveScore($map, $score);
 
@@ -227,6 +242,13 @@ class LocalRecords implements ModuleInterface
     public static function showLocalsTable(Player $player)
     {
         $map = MapController::getCurrentMap();
+
+        var_dump(self::$records->pluck('Rank'));
+
+        $records = self::$records->sortBy('Rank')->map(function ($record) {
+            return new LocalRecord(get_object_vars($record));
+        });
+
         $records = $map->locals()->orderBy('Rank')->get();
 
         RecordsTable::show($player, $map, $records, 'Local Records');
@@ -244,8 +266,24 @@ class LocalRecords implements ModuleInterface
         if ($oldScore > 0) {
             DB::table('local-records')->where('Map', '=', $map->id)->where('Score', '>', $score)->where('Score', '<=',
                 $oldScore)->increment('Rank');
+
+            self::$records->transform(function ($record) use ($score) {
+                if ($record->Score <= $score || $record->Score > $score) {
+                    $record->Score++;
+                }
+
+                return $record;
+            });
         } else {
             DB::table('local-records')->where('Map', '=', $map->id)->where('Score', '>', $score)->increment('Rank');
+
+            self::$records->transform(function ($record) use ($score) {
+                if ($record->Score > $score) {
+                    $record->Score++;
+                }
+
+                return $record;
+            });
         }
     }
 
@@ -253,18 +291,12 @@ class LocalRecords implements ModuleInterface
      * Get the rank for given score
      *
      * @param  Player  $player
-     * @param  Map  $map
      * @param  int  $score
      * @return int|mixed
      */
-    private static function getNextBetterRank(Player $player, Map $map, int $score)
+    private static function getNextBetterRank(Player $player, int $score)
     {
-        $nextBetterRecord = DB::table('local-records')
-            ->where('Map', '=', $map->id)
-            ->where('Score', '<=', $score)
-            ->where('Rank', '<=', self::$limit)
-            ->orderByDesc('Rank')
-            ->first();
+        $nextBetterRecord = self::$records->where('Score', '<=', $score)->sortByDesc('Rank')->first();
 
         if ($nextBetterRecord) {
             if ($nextBetterRecord->Player == $player->id) {

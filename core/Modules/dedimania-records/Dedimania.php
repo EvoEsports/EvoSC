@@ -75,8 +75,6 @@ class Dedimania extends DedimaniaApi
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
 
-        Log::write('call');
-
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
