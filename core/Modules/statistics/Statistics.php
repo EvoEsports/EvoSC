@@ -114,7 +114,6 @@ class Statistics
         /**
          * Calculate scores
          */
-        $start = time() + microtime(true);
         $players = $players->sortBy('bestracetime');
         $enabledMaps = DB::table('maps')->where('enabled', '=', 1)->pluck('id');
         $limit = config('locals.limit');
@@ -133,9 +132,6 @@ class Statistics
                 'Locals' => $localsCount
             ]);
         }
-
-        $end = time() + microtime(true);
-        printf("Updating scores took %.3fs\n", $end - $start);
 
         self::$totalRankedPlayers = DB::table('stats')->where('Score', '>', 0)->count();
         DB::table('players')->where('Score', '>', 0)->update([

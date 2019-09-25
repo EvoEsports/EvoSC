@@ -18,11 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $players = Player::all()->random(100)->map(function (Player $player) {
-            $player->login = $player->Login;
-            return $player;
-        });
-        Statistics::showScores($players);
+        MapList::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

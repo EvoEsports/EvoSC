@@ -20,7 +20,7 @@
         confirmDialogFrame.Show();
 
         //Set question text
-        (confirmDialogFrame.Controls[2] as CMlLabel).SetText(question);
+        (confirmDialogFrame.Controls[2] as CMlLabel).Value = question;
 
         while(!decided){
             yield;
