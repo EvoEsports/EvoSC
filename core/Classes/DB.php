@@ -14,4 +14,13 @@ class DB
     {
         return Database::getConnection()->table($tableName);
     }
+
+    /**
+     * @param  string  $query
+     * @return bool
+     */
+    public static function raw(string $query)
+    {
+        return Database::getConnection()->statement($query);
+    }
 }

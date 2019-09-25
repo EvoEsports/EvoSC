@@ -5,6 +5,7 @@ namespace esc\Modules;
 use Carbon\Carbon;
 use esc\Classes\ChatCommand;
 use esc\Classes\Database;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\StatisticWidget;
@@ -16,6 +17,7 @@ use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
+use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class Statistics
 {
@@ -95,16 +97,16 @@ class Statistics
         }
 
         //Popular Maps
-        $popularMaps = Map::orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
+        $popularMaps = DB::table('maps')->orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
         $statCollection->push(new StatisticWidget('PopularMaps', " Most played maps", '', ' plays', null, true, true,
             $popularMaps));
 
         //Least recently played tracks
-        $popularMaps = Map::orderBy('last_played')->whereNotNull('name')->where('enabled',
+        $popularMaps = DB::table('maps')->orderBy('last_played')->whereNotNull('name')->where('enabled',
             1)->take(6)->pluck('last_played', 'name');
         $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
             function ($last_played) {
-                return $last_played ? $last_played->diffForHumans() : 'never';
+                return $last_played ? (new Carbon($last_played))->diffForHumans() : 'never';
             }, true, true, $popularMaps));
 
         Template::showAll('statistics.widgets', compact('statCollection'));
@@ -112,25 +114,34 @@ class Statistics
         /**
          * Calculate scores
          */
-
+        $start = time() + microtime(true);
         $players = $players->sortBy('bestracetime');
-
-        $disabledMapIds = Map::whereEnabled(0)->pluck('id');
+        $enabledMaps = DB::table('maps')->where('enabled', '=', 1)->pluck('id');
         $limit = config('locals.limit');
-        $players->each(function ($player_) use ($limit, $disabledMapIds) {
-            $player = player($player_->login, true);
-            $localsCount = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=', $limit)->count();
-            $rankSum = $player->locals()->whereNotIn('Map', $disabledMapIds)->where('Rank', '<=',
-                $limit)->select('Rank')->get()->sum('Rank');
-            $player->stats()->update([
-                'Score' => $limit * $localsCount - $rankSum,
+
+        $playerIds = DB::table('players')->whereIn('Login', $players->pluck('login')->toArray())->pluck('id', 'Login');
+
+        foreach ($players as $player_) {
+            $playerId = $playerIds->get($player_->login);
+            $ranks = DB::table('local-records')->where('Player', '=', $playerId)->whereIn('Map',
+                $enabledMaps)->where('Rank', '<=', $limit)->select('Rank')->get();
+
+            $localsCount = $ranks->count();
+
+            DB::table('stats')->where('Player', '=', $playerId)->update([
+                'Score' => $limit * $localsCount - $ranks->sum('Rank'),
                 'Locals' => $localsCount
             ]);
-        });
+        }
 
-        self::$totalRankedPlayers = Stats::where('Score', '>', 0)->count();
+        $end = time() + microtime(true);
+        printf("Updating scores took %.3fs\n", $end - $start);
+
+        self::$totalRankedPlayers = DB::table('stats')->where('Score', '>', 0)->count();
+        DB::table('players')->where('Score', '>', 0)->update([
+            'Score' => 0
+        ]);
         self::updatePlayerRanks($players);
-        Player::where('Score', '>', 0)->update(['Score' => 0]);
     }
 
     /**
@@ -140,25 +151,27 @@ class Statistics
      */
     private static function updatePlayerRanks(Collection $players)
     {
-        Log::write('Updating player-ranks.', isVeryVerbose());
+        DB::raw('SET @rank=0');
+        DB::raw('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
-        Database::getConnection()->statement('SET @rank=0');
-        Database::getConnection()->statement('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
-
-        Log::write('Updating player-ranks finished.', isVeryVerbose());
-
-        $playerIds = Player::whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
-        $playerScores = Stats::select(['Player', 'Rank', 'Score'])->whereIn('Player',
+        $playerIds = DB::table('players')->whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
+        $playerScores = DB::table('stats')->select(['Player', 'Rank', 'Score'])->whereIn('Player',
             $playerIds->keys())->get()->keyBy('Player');
 
         $playerScores->each(function ($score) use ($playerIds) {
-            $login = $playerIds->get($score->Player);
-            infoMessage('Your server rank is ',
-                secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($login);
+            try {
+                $login = $playerIds->get($score->Player);
+                infoMessage('Your server rank is ',
+                    secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($login);
+            } catch (Exception $e) {
+            }
         });
 
         $players->pluck('login')->diff($playerIds->values())->each(function ($player) {
-            infoMessage('You need at least one local record before receiving a rank.')->send($player->login);
+            try {
+                infoMessage('You need at least one local record before receiving a rank.')->send($player->login);
+            } catch (Exception $e) {
+            }
         });
     }
 

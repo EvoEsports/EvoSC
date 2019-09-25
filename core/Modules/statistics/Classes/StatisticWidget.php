@@ -2,8 +2,6 @@
 
 namespace esc\Classes;
 
-use esc\Models\Stats;
-
 class StatisticWidget
 {
     public $stat;
@@ -25,9 +23,9 @@ class StatisticWidget
 
         if (!$collection) {
             if ($sortAsc) {
-                $this->records = Stats::orderBy($stat)->where($stat, '>', 0)->limit($this->show)->get();
+                $this->records = DB::table('stats')->orderBy($stat)->where($stat, '>', 0)->limit($this->show)->get();
             } else {
-                $this->records = Stats::orderByDesc($stat)->where($stat, '>', 0)->limit($this->show)->get();
+                $this->records = DB::table('stats')->orderByDesc($stat)->where($stat, '>', 0)->limit($this->show)->get();
             }
 
             //Get records as nickname => value
