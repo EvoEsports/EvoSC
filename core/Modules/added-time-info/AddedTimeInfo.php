@@ -72,7 +72,7 @@ class AddedTimeInfo implements ModuleInterface
             Hook::add('EndMatch', [self::class, 'resetAddedTimeInfo']);
             Hook::add('MatchSettingsLoaded', [self::class, 'resetAddedTimeInfo']);
 
-            ManiaLinkEvent::add('time.vote', [self::class, 'voteTime'], 'time');
+            ManiaLinkEvent::add('time.vote', [self::class, 'voteTime']);
             ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'time');
         }else{
             Template::hideAll('add-time');
