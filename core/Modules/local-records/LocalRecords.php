@@ -267,9 +267,9 @@ class LocalRecords implements ModuleInterface
             DB::table('local-records')->where('Map', '=', $map->id)->where('Score', '>', $score)->where('Score', '<=',
                 $oldScore)->increment('Rank');
 
-            self::$records->transform(function ($record) use ($score) {
-                if ($record->Score <= $score || $record->Score > $score) {
-                    $record->Score++;
+            self::$records->transform(function ($record) use ($score, $oldScore) {
+                if ($record->Score <= $oldScore && $record->Score > $score) {
+                    $record->Rank++;
                 }
 
                 return $record;
@@ -279,7 +279,7 @@ class LocalRecords implements ModuleInterface
 
             self::$records->transform(function ($record) use ($score) {
                 if ($record->Score > $score) {
-                    $record->Score++;
+                    $record->Rank++;
                 }
 
                 return $record;

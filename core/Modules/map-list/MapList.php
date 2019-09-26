@@ -135,11 +135,9 @@ class MapList implements ModuleInterface
 
     public static function disableMapEvent(Player $player, $mapUid)
     {
-        echo "disable $mapUid\n";
         $map = Map::whereUid($mapUid)->get()->last();
 
         if (!$map) {
-            echo "no map D;\n";
             return;
         }
 
