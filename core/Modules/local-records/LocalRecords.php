@@ -311,8 +311,8 @@ class LocalRecords implements ModuleInterface
 
     public static function fixRanks(Map $map)
     {
-        Database::getConnection()->statement('SET @rank=0');
-        Database::getConnection()->statement('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
+        DB::raw('SET @rank=0');
+        DB::raw('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
         DB::table('local-records')->where('Map', '=', $map->id)->where('Rank', '>', self::$limit)->delete();
     }
 }

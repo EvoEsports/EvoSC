@@ -41,8 +41,8 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.',
-                false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
+            ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -120,8 +120,12 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $migrate = $this->getApplication()->find('migrate');
-        $migrate->execute($input, $output);
+        if ($input->getOption('skip_migrate') !== false) {
+            $output->writeln('Skipping migrations.');
+        }else{
+            $migrate = $this->getApplication()->find('migrate');
+            $migrate->execute($input, $output);
+        }
 
         global $_onlinePlayers;
         global $_restart;
