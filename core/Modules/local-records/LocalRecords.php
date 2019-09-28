@@ -49,6 +49,8 @@ class LocalRecords implements ModuleInterface
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
+
+        Template::showAll('local-records.manialink');
     }
 
     public static function beginMap(Map $map)
@@ -124,8 +126,8 @@ class LocalRecords implements ModuleInterface
 
     public static function playerConnect(Player $player)
     {
-        self::sendLocalsChunk($player);
         self::showManialink($player);
+        self::sendLocalsChunk($player);
     }
 
     public static function showManialink(Player $player)
