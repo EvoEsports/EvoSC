@@ -104,7 +104,6 @@ class ModeScriptEventController implements ControllerInterface
                 return;
 
             default:
-                echo $callback . " -> " . count($arguments) . "\n";
                 Hook::fire($callback, $arguments);
                 Log::write('Calling unhandled ' . $callback, isVerbose());
         }
