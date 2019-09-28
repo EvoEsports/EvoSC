@@ -25,22 +25,22 @@ class MatchTracker implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if ($mode == 'Rounds.Script.txt') {
-            if (!$isBoot) {
-                Template::showAll('match-tracker.widget');
-            }
-
-            self::$match = collect();
-            Hook::add('PlayerConnect', [self::class, 'sendWidget']);
-            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-            Hook::add('Maniaplanet.StartRound_Start', [self::class, 'resetTracker']);
-            Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'resetTracker']);
-        } else {
-            if (!$isBoot) {
-                Template::hideAll('match-tracker-widget');
-            }
-        }
+//        if ($mode == 'Rounds.Script.txt') {
+//            if (!$isBoot) {
+//                Template::showAll('match-tracker.widget');
+//            }
+//
+//            self::$match = collect();
+//            Hook::add('PlayerConnect', [self::class, 'sendWidget']);
+//            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+//            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+//            Hook::add('Maniaplanet.StartRound_Start', [self::class, 'resetTracker']);
+//            Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'resetTracker']);
+//        } else {
+//            if (!$isBoot) {
+//                Template::hideAll('match-tracker-widget');
+//            }
+//        }
     }
 
     public static function sendWidget(Player $player)
@@ -90,7 +90,6 @@ class MatchTracker implements ModuleInterface
             }
 
             $tracker->cp = -1;
-            $tracker->score = -1;
 
             self::$match->put($player->id, $tracker);
             self::updateWidget();

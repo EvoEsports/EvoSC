@@ -273,7 +273,9 @@ function echoPlayers(): Collection
  */
 function finishPlayers(): Collection
 {
-    return Player::where('Score', '>', 0)->get();
+    return collect(Server::getCurrentRanking(1000, 0))->transform(function ($player) {
+        return player($player->login);
+    });
 }
 
 /**

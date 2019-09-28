@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MapList::playerConnect($player);
+        LiveRankingsRounds::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

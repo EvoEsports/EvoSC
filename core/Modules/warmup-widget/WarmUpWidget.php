@@ -43,8 +43,16 @@ class WarmUpWidget implements ModuleInterface
     public static function skipWarmUp(Player $player)
     {
         Server::setWarmUp(false);
-        Server::forceEndRound(); //TODO -> Fix: Error: Not in Rounds or Laps mode.
+        self::setWarmUpLimit(0);
         infoMessage($player, ' skips warm-up.')->setColor('f90')->sendAll();
         self::hideWarmUpWidget();
+        self::setWarmUpLimit(90); //TODO: reset to original
+    }
+
+    public static function setWarmUpLimit(int $seconds)
+    {
+        $settings = Server::getModeScriptSettings();
+        $settings['S_WarmUpDuration'] = $seconds;
+        Server::setModeScriptSettings($settings);
     }
 }

@@ -23,6 +23,7 @@
     {block script}
     <script><!--
     declare Integer[] Points;
+    declare Text[] finished;
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -118,19 +119,18 @@
                 }
                 declare controls <=> (dataFrame.Controls[i] as CMlFrame);
                 (controls.Controls[0] as CMlLabel).SetText(set["nick"]);
-                if(set["score"] == "-1"){
+                if(set["cp"] == "-1" && set["finished"] == "False"){
                     (controls.Controls[1] as CMlLabel).SetText("DNF");
                 }else{
-                    if(set["finished"] == "True"){
-                        declare prefix = "";
-                        if(i < Points.count - 1){
-                            prefix = "$fc0+" ^ Points[i] ^ " ";
-                        }
-
-                        (controls.Controls[1] as CMlLabel).SetText(prefix ^ "$fff"^ formatScoreCorrect(TL::ToInteger(set["score"]), True));
+                    declare prefix = "";
+                    if(set["finished"] == "True" && i < Points.count - 1 && set["score"] != "-1"){
+                        prefix = "$fc0+" ^ Points[i];
+                        log(set["score"]);
                     }else{
-                        (controls.Controls[1] as CMlLabel).SetText("$888CP" ^ set["cp"] ^ " $fff"  ^ formatScoreCorrect(TL::ToInteger(set["score"]), True));
+                        prefix = "$888CP" ^ set["cp"];
                     }
+
+                    (controls.Controls[1] as CMlLabel).SetText(prefix ^ " $fff"^ formatScoreCorrect(TL::ToInteger(set["score"]), True));
                 }
                 controls.Show();
                 i += 1;
