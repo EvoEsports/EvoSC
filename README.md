@@ -27,9 +27,8 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | --- |
 ###### Updating a github installation
 1. Go to the EvoSC directory you want to update and run `git pull`. 
-```diff
-Please stay on the master branch if you are not a developer, the changes in the develop-branch can be unstable and we can not give support at all times.
-```
+
+:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
 
 ### Music server installation
 Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
@@ -44,6 +43,7 @@ Get all available commands `php esc list`
 | --------- | -------------------------------------------- |
 | Run EvoSC | In terminal type `php esc run (-v/-vv/-vvv/-s/-f)`. -v/vv/vvv for verbosity. -f will skip map verification on start. -s will skip migrations on start.|
 | Import data from UASECO | In terminal type `php esc import:uaseco {host} {database} {user} {password}` optionally add `{table_prefix}` |
+| Import data from PyPlanet | In terminal type `php esc import:pyplanet {host} {database} {user} {password}` optionally add `{table_prefix}` |
 | Fix player scores and ranking | Run `php esc fix:scores` to re-calculate all scores and fix the player ranks. |
 | Creating a database migration | Run `php esc make:migration <MigrationClassName>`. The migration is saved to to /Migrations. Copy it to your module if necessary. |
 
