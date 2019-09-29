@@ -285,8 +285,14 @@ class PlayerController implements ControllerInterface
             Log::info($player." finished with time ($score) ".$player->getTime());
 
             $map = MapController::getCurrentMap();
-            if (!DB::table('pbs')->where('map_id', '=', $map->id)->where('player_id', '=', $player->id)->where('score',
-                '<=', $score)->exists()) {
+
+            $hasBetterTime = DB::table('pbs')
+                ->where('map_id', '=', $map->id)
+                ->where('player_id', '=', $player->id)
+                ->where('score', '<=', $score)
+                ->exists();
+
+            if (!$hasBetterTime) {
                 DB::table('pbs')->updateOrInsert([
                     'map_id' => $map->id,
                     'player_id' => $player->id

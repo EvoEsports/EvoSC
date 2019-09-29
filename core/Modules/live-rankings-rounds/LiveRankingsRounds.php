@@ -79,7 +79,7 @@ class LiveRankingsRounds implements ModuleInterface
 
     public static function updateWidget()
     {
-        $trackers = self::$tracker->values()->groupBy('cp')->map(function (Collection $data) {
+        $trackers = self::$tracker->values()->groupBy('cp')->sortKeysDesc()->map(function (Collection $data) {
             return $data->sortBy('score');
         })->toJson();
 

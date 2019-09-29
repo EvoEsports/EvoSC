@@ -346,7 +346,7 @@ function info(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.76.0';
+    return '0.77.0';
 }
 
 /**

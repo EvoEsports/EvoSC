@@ -5,6 +5,12 @@ namespace esc\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
+/**
+ * Class Dedi
+ * @package esc\Models
+ * @property Player $player
+ * @property Map $map
+ */
 class Dedi extends Model
 {
     protected $table = 'dedi-records';

@@ -43,7 +43,7 @@ class LocalRecords implements ModuleInterface
         self::$echoTop = config('locals.echo-top');
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish'], false, Hook::PRIORITY_HIGH);
+        Hook::add('PlayerPb', [self::class, 'playerFinish'], false, Hook::PRIORITY_HIGH);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         AccessRight::createIfMissing('local_delete', 'Delete local-records.');
