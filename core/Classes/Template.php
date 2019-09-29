@@ -7,6 +7,7 @@ use esc\Controllers\TemplateController;
 use esc\Controllers\TemplateControllerTwig;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 /**
  * Class Template
@@ -60,7 +61,7 @@ class Template
      */
     public static function hideAll(string $id)
     {
-        Server::sendDisplayManialinkPage('','<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        Server::sendDisplayManialinkPage('', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
     }
 
@@ -121,12 +122,23 @@ class Template
         }
 
         self::$multiCalls->each(function ($xml, $login) {
-            Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
+            try {
+                Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
+            } catch (Exception $e) {
+                $id = uniqid(str_slug($e->getMessage())).'.xml';
+                Log::warning('Failed to render template for '.$login.'. Saving to as '.$id);
+                Cache::put($id, $xml);
+            }
         });
 
-        Server::executeMulticall();
+        self::$multiCalls = null;
 
-        self::$multiCalls = collect();
+        try {
+            Server::executeMulticall();
+        } catch (Exception $e) {
+            Log::error('Multicall failed: '.$e->getMessage());
+            Log::warning($e->getTraceAsString());
+        }
     }
 
     /**
