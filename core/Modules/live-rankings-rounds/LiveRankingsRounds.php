@@ -170,6 +170,10 @@ class LiveRankingsRounds implements ModuleInterface
                 Hook::add('PlayerFinish', [self::class, 'playerFinish']);
                 self::$scores = collect();
                 self::$match = collect();
+                break;
+
+            default:
+                break;
         }
     }
 }

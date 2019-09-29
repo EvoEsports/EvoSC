@@ -327,12 +327,16 @@ class MapController implements ControllerInterface
     /**
      * Loads maps from server directory
      */
-    public static function loadMaps()
+    public static function loadMaps(string $matchSettings = null)
     {
         Log::write('Loading maps...');
 
         //Get loaded matchsettings maps
-        $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
+        if($matchSettings){
+            $maps = MatchSettingsController::getMapFilenamesFrom($matchSettings);
+        }else{
+            $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
+        }
 
         foreach ($maps as $mapInfo) {
             $filename = $mapInfo->file;

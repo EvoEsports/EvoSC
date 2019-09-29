@@ -56,7 +56,9 @@ class MatchSettingsController implements ControllerInterface
         }
 
         ControllerController::loadControllers($mode);
+        MapController::loadMaps($matchSettingsFile);
         ModuleController::startModules($mode);
+        Hook::fire('MapPoolUpdated');
     }
 
     public static function getModeScript(string $matchSettings): string

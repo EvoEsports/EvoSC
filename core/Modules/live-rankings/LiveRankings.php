@@ -28,6 +28,10 @@ class LiveRankings implements ModuleInterface
                     Template::showAll('live-rankings.widget');
                 }
                 Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+                break;
+
+            default:
+                break;
         }
     }
 }
