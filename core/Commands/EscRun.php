@@ -53,10 +53,15 @@ class EscRun extends Command
         Log::setOutput($output);
         ConfigController::init();
 
+        if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
+            SetupController::startSetup($input, $output, $this->getHelper('question'));
+            return;
+        }
+
         if (!isWindows()) {
             switch (pcntl_fork()) {
                 case -1:
-                    $output->writeln('Starting char router failed.');
+                    $output->writeln('Starting chat router failed.');
                     break;
 
                 case 0:
@@ -67,10 +72,6 @@ class EscRun extends Command
                 default:
                     //parent
             }
-        }
-
-        if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
-            SetupController::startSetup($input, $output, $this->getHelper('question'));
         }
 
         if ($input->getOption('skip_map_check') !== false) {

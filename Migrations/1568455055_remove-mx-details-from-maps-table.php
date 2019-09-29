@@ -26,8 +26,8 @@ class RemoveMxDetailsFromMapsTable extends Migration
         }
 
         $schemaBuilder->table('maps', function (Blueprint $schema) {
-            $schema->dropIfExists('mx_details');
-            $schema->dropIfExists('mx_world_record');
+            $schema->dropColumn('mx_details');
+            $schema->dropColumn('mx_world_record');
             $schema->integer('mx_id')->nullable();
         });
     }
