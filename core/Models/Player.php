@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
  * Class Player
  *
  * @package esc\Models
+ * @property int $id
  * @property string $Login
  * @property string $NickName
  * @property mixed $Score

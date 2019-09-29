@@ -19,7 +19,11 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        LocalRecords::sendLocalsChunk($player, true);
+        $players = onlinePlayers()->map(function(Player $player){
+            $player->login = $player->Login;
+            return $player;
+        });
+        Statistics::showScores($players);
     }
 
     public static function sendTestManialink(Player $player)

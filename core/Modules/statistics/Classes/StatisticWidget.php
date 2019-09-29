@@ -13,23 +13,36 @@ class StatisticWidget
     public $suffix;
     public $nameLeft;
 
-    public function __construct(string $stat, string $title, string $prefix = '', string $suffix = '', $function = null, $sortAsc = false, $nameLeft = true, $collection = null)
-    {
-        $this->stat  = $stat;
+    public function __construct(
+        string $stat,
+        string $title,
+        string $prefix = '',
+        string $suffix = '',
+        $function = null,
+        $sortAsc = false,
+        $nameLeft = true,
+        $collection = null
+    ) {
+        $this->stat = $stat;
         $this->title = $title;
-        $this->pos   = config('statistics.' . $stat . '.pos');
-        $this->show  = config('statistics.' . $stat . '.show');
-        $this->scale = config('statistics.' . $stat . '.scale');
+        $this->pos = config('statistics.'.$stat.'.pos');
+        $this->show = config('statistics.'.$stat.'.show');
+        $this->scale = config('statistics.'.$stat.'.scale');
 
         if (!$collection) {
+            $queryBuilder = DB::table('stats')
+                ->join('players', 'players.id', '=', 'stats.Player')
+                ->where($stat, '>', 0)
+                ->select(['NickName', $stat]);
+
             if ($sortAsc) {
-                $this->records = DB::table('stats')->orderBy($stat)->where($stat, '>', 0)->limit($this->show)->get();
+                $this->records = $queryBuilder->orderBy($stat)->take($this->show)->get();
             } else {
-                $this->records = DB::table('stats')->orderByDesc($stat)->where($stat, '>', 0)->limit($this->show)->get();
+                $this->records = $queryBuilder->orderByDesc($stat)->take($this->show)->get();
             }
 
             //Get records as nickname => value
-            $this->records = $this->records->pluck($stat, 'player');
+            $this->records = $this->records->pluck($stat, 'NickName');
         } else {
             $this->records = $collection;
         }
@@ -39,8 +52,8 @@ class StatisticWidget
             $this->records = $this->records->transform($function);
         }
 
-        $this->prefix   = $prefix;
-        $this->suffix   = $suffix;
+        $this->prefix = $prefix;
+        $this->suffix = $suffix;
         $this->nameLeft = $nameLeft;
     }
 }
