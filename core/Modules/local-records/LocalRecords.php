@@ -2,6 +2,7 @@
 
 namespace esc\Modules\LocalRecords;
 
+use esc\Classes\Cache;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Hook;
@@ -68,7 +69,7 @@ class LocalRecords implements ModuleInterface
         self::sendLocalsChunk();
     }
 
-    public static function sendLocalsChunk(Player $player = null)
+    public static function sendLocalsChunk(Player $player = null, bool $saveToCache = false)
     {
         if (!$player) {
             $players = onlinePlayers();
@@ -117,6 +118,11 @@ class LocalRecords implements ModuleInterface
                     'online' => $onlinePlayers->contains('id', $record->Player)
                 ];
             });
+
+            if($saveToCache){
+                $xml = Template::toString('local-records.update', compact('records'));
+                Cache::put('local_records.xml', $xml);
+            }
 
             Template::show($player, 'local-records.update', compact('records'), true);
         }

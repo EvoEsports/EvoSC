@@ -7,6 +7,7 @@ namespace esc\Modules;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
+use esc\Modules\LocalRecords\LocalRecords;
 
 class TestModule
 {
@@ -18,7 +19,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        LiveRankingsRounds::playerConnect($player);
+        LocalRecords::sendLocalsChunk($player, true);
     }
 
     public static function sendTestManialink(Player $player)
