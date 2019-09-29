@@ -53,7 +53,7 @@ main(){
 
     wait(UI.UISequence != CUIConfig::EUISequence::Podium);
 
-    //mainFrame.Hide();
+    mainFrame.Hide();
 }
         -->
     </script>

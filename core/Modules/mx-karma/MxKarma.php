@@ -133,7 +133,9 @@ class MxKarma extends MXK
 
         $onlinePlayers = onlinePlayers();
         $playerIds = $onlinePlayers->pluck('id');
-        $ratings = DB::table('mx-karma')->whereIn('Player', $playerIds)->pluck('Rating', 'Player');
+        $ratings = DB::table('mx-karma')->where('Map', '=', $map->id)->whereIn('Player', $playerIds)
+            ->select(['Rating', 'Player'])
+            ->pluck('Rating', 'Player');
 
         foreach ($onlinePlayers as $player) {
             if ($ratings->has($player->id)) {

@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Template;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 use esc\Modules\LocalRecords\LocalRecords;
@@ -19,11 +20,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $players = onlinePlayers()->map(function(Player $player){
-            $player->login = $player->Login;
-            return $player;
-        });
-        Statistics::showScores($players);
+        var_dump(MxKarma::playerCanVote($player, MapController::getCurrentMap()));
     }
 
     public static function sendTestManialink(Player $player)
