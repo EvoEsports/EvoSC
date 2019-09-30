@@ -10,6 +10,9 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
 | --- |
 
+:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
+
+
 ### Requirements
 * PHP 7.2+
 * MySql or MariaDB Server
@@ -27,9 +30,6 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | --- |
 ###### Updating a github installation
 1. Go to the EvoSC directory you want to update and run `git pull`. 
-
-:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
-
 ### Music server installation
 Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
 
