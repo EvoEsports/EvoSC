@@ -114,14 +114,15 @@ class Statistics
         /**
          * Calculate scores
          */
-
-        $start = time() + microtime(true);
         $limit = config('locals.limit');
+
         $data = DB::table('local-records')
             ->join('players', 'local-records.Player', '=', 'players.id')
             ->join('maps', 'local-records.Map', '=', 'maps.id')
             ->selectRaw('Player as id, Login, SUM(Rank) as rank_sum, COUNT(Rank) as locals')
             ->where('maps.enabled', '=', 1)
+            ->whereIn('Login', $players->pluck('login'))
+            ->groupBy('Login')
             ->get();
 
         foreach ($data as $stat) {
@@ -132,10 +133,8 @@ class Statistics
                 'Locals' => $stat->locals
             ]);
         }
-        $end = time() + microtime(true);
-        Log::info(sprintf("Calculating player scores took %.3fs\n", $end - $start));
 
-        self::$totalRankedPlayers = $data->count();
+        self::$totalRankedPlayers = DB::table('stats')->where('Score', '>', 0)->count();
         self::updatePlayerRanks($players);
     }
 
