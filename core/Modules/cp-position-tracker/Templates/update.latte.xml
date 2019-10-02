@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-cp-positions" id="update-cp-positions" version="3">
+    <script><!--
+    main() {
+        declare Integer ESC_LastCpPosUpdate for This;
+        declare Text ESC_CpPos for This;
+
+        ESC_LastCpPosUpdate = GameTime;
+        ESC_CpPos = """{$data->toJson()|noescape}""";
+    }
+    --></script>
+</manialink>

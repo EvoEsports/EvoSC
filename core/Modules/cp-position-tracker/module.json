@@ -1,6 +1,5 @@
 {
   "name"   : "CP Position Tracker",
   "author" : "brakerb",
-  "version": "1.0",
-  "enabled": true
+  "enabled": false
 }

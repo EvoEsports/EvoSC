@@ -110,5 +110,8 @@
             }
         }
     {/block}
+
+    {block loop}
+    {/block}
     --></script>
 </manialink>

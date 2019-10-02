@@ -5,7 +5,6 @@ namespace esc\Classes;
 
 
 use esc\Controllers\MapController;
-use esc\Modules\MxDownload;
 
 class MxMap implements \Serializable
 {
