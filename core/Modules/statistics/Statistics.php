@@ -114,29 +114,28 @@ class Statistics
         /**
          * Calculate scores
          */
-        $players = $players->sortBy('bestracetime');
-        $enabledMaps = DB::table('maps')->where('enabled', '=', 1)->pluck('id');
+
+        $start = time() + microtime(true);
         $limit = config('locals.limit');
+        $data = DB::table('local-records')
+            ->join('players', 'local-records.Player', '=', 'players.id')
+            ->join('maps', 'local-records.Map', '=', 'maps.id')
+            ->selectRaw('Player as id, Login, SUM(Rank) as rank_sum, COUNT(Rank) as locals')
+            ->where('maps.enabled', '=', 1)
+            ->get();
 
-        $playerIds = DB::table('players')->whereIn('Login', $players->pluck('login')->toArray())->pluck('id', 'Login');
-
-        foreach ($players as $player_) {
-            $playerId = $playerIds->get($player_->login);
-            $ranks = DB::table('local-records')->where('Player', '=', $playerId)->whereIn('Map',
-                $enabledMaps)->where('Rank', '<=', $limit)->select('Rank')->get();
-
-            $localsCount = $ranks->count();
-
-            DB::table('stats')->where('Player', '=', $playerId)->update([
-                'Score' => $limit * $localsCount - $ranks->sum('Rank'),
-                'Locals' => $localsCount
+        foreach ($data as $stat) {
+            DB::table('stats')->updateOrInsert([
+                'Player' => $stat->id
+            ], [
+                'Score' => $limit * $stat->locals - intval($stat->rank_sum),
+                'Locals' => $stat->locals
             ]);
         }
+        $end = time() + microtime(true);
+        Log::info(sprintf("Calculating player scores took %.3fs\n", $end - $start));
 
-        self::$totalRankedPlayers = DB::table('stats')->where('Score', '>', 0)->count();
-        DB::table('players')->where('Score', '>', 0)->update([
-            'Score' => 0
-        ]);
+        self::$totalRankedPlayers = $data->count();
         self::updatePlayerRanks($players);
     }
 
@@ -145,30 +144,37 @@ class Statistics
      *
      * @param  \Illuminate\Support\Collection  $players
      */
-    private static function updatePlayerRanks(Collection $players)
+    public static function updatePlayerRanks(Collection $players)
     {
         DB::raw('SET @rank=0');
         DB::raw('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
 
-        $playerIds = DB::table('players')->whereIn('Login', $players->pluck('login')->toArray())->pluck('Login', 'id');
-        $playerScores = DB::table('stats')->select(['Player', 'Rank', 'Score'])->whereIn('Player',
-            $playerIds->keys())->get()->keyBy('Player');
+        $playerLogins = $players->pluck('login')->toArray();
 
-        $playerScores->each(function ($score) use ($playerIds) {
+        $scores = DB::table('players')
+            ->join('stats', 'players.id', '=', 'stats.Player')
+            ->whereIn('Login', $playerLogins)
+            ->select(['Login', 'Player', 'Rank', 'stats.Score'])
+            ->get();
+
+        foreach ($scores as $score) {
             try {
-                $login = $playerIds->get($score->Player);
                 infoMessage('Your server rank is ',
-                    secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($login);
+                    secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($score->Login);
             } catch (Exception $e) {
+                Log::warning($e->getMessage());
             }
-        });
+        }
 
-        $players->pluck('login')->diff($playerIds->values())->each(function ($player) {
+        $playersWithoutScores = onlinePlayers()->whereNotIn('Login', $scores->pluck('Login'));
+
+        foreach ($playersWithoutScores as $player) {
             try {
-                infoMessage('You need at least one local record before receiving a rank.')->send($player->login);
+                infoMessage('You need at least one local record before receiving a rank.')->send($player->Login);
             } catch (Exception $e) {
+                Log::warning($e->getMessage());
             }
-        });
+        }
     }
 
     public static function showRank(Player $player)
