@@ -25,16 +25,27 @@ ScriptEvents="1" class="confirm"/>
 <label pos="100 0" size="116 3" text="TitlePack" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
 <quad pos="60 -3.5" size="56 0.2" bgcolor="fff9" />
 
-{php $i=0}
-{foreach $trackList as $map}
-<label pos="60 {$i * -3.5 - 5}" size="19 3" text="{$map->GbxMapName}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="80 {$i * -3.5 - 5}" size="19 3" text="{$map->Username}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="100 {$i * -3.5 - 5}" size="19 3" text="{$map->TitlePack}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-{php $i++}
-{/foreach}
+<frame pos="102 -71">
+{include 'components.pagination'}
+</frame>
+
+<frame id="frames">
+    {foreach collect($trackList)->chunk(18) as $x => $chunk}
+    <frame hidden="{$x}" pos="0 {$x * 3.5 * 18}">
+        {foreach $chunk as  $i => $map}
+        <label pos="60 {$i * -3.5 - 5}" size="19 3" text="{$map->GbxMapName}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="80 {$i * -3.5 - 5}" size="19 3" text="{$map->Username}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="100 {$i * -3.5 - 5}" size="19 3" text="{$map->TitlePack}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+        {/foreach}
+    </frame>
+    {/foreach}
+</frame>
 {/block}
 
+<script><!--
 {block globals}
+declare Integer maxPage;
+declare Integer currentPage;
 {/block}
 
 {block pendingEvents}
@@ -44,4 +55,41 @@ if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::Mous
 
     return;
 }
+if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+    currentPage -= 1;
+    if(currentPage < 0){
+        currentPage = maxPage - 1;
+    }
+    (Page.MainFrame.GetFirstChild("page-info") as CMlLabel).Value = (currentPage + 1) ^ "/" ^ maxPage;
+    declare frames <=> (Page.MainFrame.GetFirstChild("frames") as CMlFrame);
+    foreach(frame in frames.Controls){
+        frame.Hide();
+    }
+    frames.Controls[currentPage].Show();
+}
+if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+    currentPage += 1;
+    if(currentPage >= maxPage){
+        currentPage = 0;
+    }
+    (Page.MainFrame.GetFirstChild("page-info") as CMlLabel).Value = (currentPage + 1) ^ "/" ^ maxPage;
+    declare frames <=> (Page.MainFrame.GetFirstChild("frames") as CMlFrame);
+    foreach(frame in frames.Controls){
+        frame.Hide();
+    }
+    frames.Controls[currentPage].Show();
+}
 {/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+currentPage = 0;
+maxPage = {ceil(count($trackList)/18)};
+(Page.MainFrame.GetFirstChild("page-info") as CMlLabel).Value = (currentPage + 1) ^ "/" ^ maxPage;
+{/block}
+
+{block loop}
+{/block}
+--></script>

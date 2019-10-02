@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CpPositionTracker::showManialink($player);
+        MxPackLoader::showAddMapPack($player, '', '100');
     }
 
     public static function sendTestManialink(Player $player)
