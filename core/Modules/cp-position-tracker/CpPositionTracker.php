@@ -25,7 +25,10 @@ class CpPositionTracker implements ModuleInterface
 
     public static function sendTrackerData()
     {
-        $data = self::$tracker->groupBy('cp')->sortKeysDesc();
+        $data = self::$tracker->groupBy('cp')->sortKeysDesc()->map(function (Collection $group) {
+            return $group->sortBy('score');
+        });
+
         Template::showAll('cp-position-tracker.update', compact('data'));
     }
 
@@ -36,20 +39,18 @@ class CpPositionTracker implements ModuleInterface
         self::sendTrackerData();
     }
 
-    public static function playerFinish(Player $player, int $score, string $checkpoints)
+    public static function trackerResetPlayer(Player $player)
     {
-        if ($score == 0) {
-            self::$tracker->forget($player->id);
-
-            self::sendTrackerData();
-        }
+        self::$tracker->forget($player->id);
+        self::sendTrackerData();
     }
 
     public static function playerCheckpoint(Player $player, int $score, int $cp, bool $isFinish)
     {
         $o = new \stdClass();
+        $o->name = $player->NickName;
         $o->score = $score;
-        $o->cp = $cp;
+        $o->cp = $cp + 1;
         $o->finish = $isFinish;
 
         self::$tracker->put($player->id, $o);
@@ -66,7 +67,7 @@ class CpPositionTracker implements ModuleInterface
     {
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
         Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerStartCountdown', [self::class, 'trackerResetPlayer']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
     }
 }

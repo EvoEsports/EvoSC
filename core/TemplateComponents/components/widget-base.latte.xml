@@ -45,7 +45,7 @@ declare Integer slot__;
         declare UISettings settings for This;
         declare Real scale = settings.scale;
 
-        if(scale < 0.1){
+        if(scale < 0.75){
             scale = 1.0;
         }
         if(scale > 1.2){
@@ -68,7 +68,7 @@ declare Integer slot__;
 
         declare heights = 0.0;
         declare widths = 0.0;
-        declare count = 1;
+        declare count = 0;
 
         for(i, 1, slot__ - 1){
             if(!column.existskey(i)){
@@ -109,7 +109,6 @@ declare Integer slot__;
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
         }
-        sleep(500);
         if(widget.RelativePosition_V3[0] != newX){
             widget.RelativePosition_V3[0] = newX;
         }

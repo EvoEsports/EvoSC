@@ -1,7 +1,7 @@
 {
   "ui": {
     "position": "left",
-    "slot": 3
+    "slot": 1
   },
   "show"   : 16,
   "enabled": false
