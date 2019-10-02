@@ -140,16 +140,15 @@ class QueueController implements ControllerInterface
     {
         if (MapQueue::whereMapUid($mapUid)->exists()) {
             MapQueue::whereMapUid($mapUid)->delete();
+
+            if (Server::getNextMapInfo()->uId == $mapUid) {
+                Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
+            }
+
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
 
-    /**
-     * ManiaLinkEvent: queue map
-     *
-     * @param  Player  $player
-     * @param                    $mapUid
-     */
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
         $map = Map::whereUid($mapUid)->get()->last();
