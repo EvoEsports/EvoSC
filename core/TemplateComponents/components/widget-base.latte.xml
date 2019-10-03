@@ -109,6 +109,7 @@ declare Integer slot__;
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
         }
+        sleep(50);
         if(widget.RelativePosition_V3[0] != newX){
             widget.RelativePosition_V3[0] = newX;
         }

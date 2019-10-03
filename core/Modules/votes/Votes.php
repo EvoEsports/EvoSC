@@ -165,9 +165,9 @@ class Votes
 
         $time = floatval($time);
 
-        if($time > 0){
+        if ($time > 0) {
             $secondsToAdd = floatval($time) * 60;
-        }else{
+        } else {
             $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         }
         $question = 'Add '.round($secondsToAdd / 60, 1).' minutes?';
