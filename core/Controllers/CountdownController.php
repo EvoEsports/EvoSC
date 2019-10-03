@@ -202,7 +202,7 @@ class CountdownController implements ControllerInterface
      */
     public static function getOriginalTimeLimit()
     {
-        return self::$originalTimeLimit;
+        return self::$originalTimeLimit ?? 600;
     }
 
     /**

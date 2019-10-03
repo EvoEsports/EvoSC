@@ -44,7 +44,6 @@ class AddAdmin extends Command
 
         $player = Player::find($login);
 
-
         if ($player === null) {
             $output->writeln("No player found with login '{$login}'.");
             exit(1);
