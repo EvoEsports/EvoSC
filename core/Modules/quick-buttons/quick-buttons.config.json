@@ -1,4 +1,7 @@
 {
   "enabled": true,
-  "pos": "162 -40"
+  "ui": {
+    "position": "right",
+    "slot": 11
+  }
 }

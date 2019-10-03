@@ -48,39 +48,27 @@ class MapController implements ControllerInterface
      */
     public static function init()
     {
+        global $_skipMapCheck;
+
         if (!File::dirExists(cacheDir('gbx'))) {
             File::makeDir(cacheDir('gbx'));
         }
 
         self::$mapsPath = Server::getMapsDirectory();
-        self::loadMaps();
 
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
-
-        AccessRight::createIfNonExistent('map_skip', 'Skip map instantly.');
-        AccessRight::createIfNonExistent('map_add', 'Add map permanently.');
-        AccessRight::createIfNonExistent('map_delete', 'Delete map (and all records) permanently.');
-        AccessRight::createIfNonExistent('map_disable', 'Disable map.');
-        AccessRight::createIfNonExistent('map_replay', 'Force a replay.');
-        AccessRight::createIfNonExistent('map_reset', 'Reset round.');
-        AccessRight::createIfNonExistent('matchsettings_load', 'Load matchsettings.');
-        AccessRight::createIfNonExistent('matchsettings_edit', 'Edit matchsettings.');
-        AccessRight::createIfNonExistent('time', 'Change the countdown time.');
-
-        ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
-        ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
-        ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-
-        ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
-        ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
-        ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
-
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-            // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
-            // QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+        if (!$_skipMapCheck) {
+            self::loadMaps();
         }
+
+        AccessRight::createIfMissing('map_skip', 'Skip map instantly.');
+        AccessRight::createIfMissing('map_add', 'Add map permanently.');
+        AccessRight::createIfMissing('map_delete', 'Delete map (and all records) permanently.');
+        AccessRight::createIfMissing('map_disable', 'Disable map.');
+        AccessRight::createIfMissing('map_replay', 'Force a replay.');
+        AccessRight::createIfMissing('map_reset', 'Reset round.');
+        AccessRight::createIfMissing('matchsettings_load', 'Load matchsettings.');
+        AccessRight::createIfMissing('matchsettings_edit', 'Edit matchsettings.');
+        AccessRight::createIfMissing('time', 'Change the countdown time.');
     }
 
 
@@ -138,17 +126,11 @@ class MapController implements ControllerInterface
                 Log::write('Failed to chooseNextMap '.$request->map->filename);
             }
 
-            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
+//            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
             self::$nextMap = $request->map;
         } else {
             self::$nextMap = Map::where('uid', $mapUid)->first();
-            $chatMessage = chatMessage('Upcoming map ', secondary(self::$nextMap));
         }
-
-        NextMap::showNextMap(self::$nextMap);
-
-        $chatMessage->setIcon('')
-            ->sendAll();
     }
 
     /**
@@ -193,11 +175,9 @@ class MapController implements ControllerInterface
         if ($deleted) {
             try {
                 $map->delete();
-                Log::write('MapController',
-                    $player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
+                Log::write($player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
             } catch (Exception $e) {
-                Log::write('MapController',
-                    'Failed to remove map "'.$map->uid.'" from database: '.$e->getMessage(), isVerbose());
+                Log::write('Failed to remove map "'.$map->uid.'" from database: '.$e->getMessage(), isVerbose());
             }
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -208,8 +188,7 @@ class MapController implements ControllerInterface
 
             QueueController::preCacheNextMap();
         } else {
-            Log::write('MapController', 'Failed to delete map "'.$map->filename.'": '.$e->getMessage(),
-                isVerbose());
+            Log::write('Failed to delete map "'.$map->filename.'": '.$e->getMessage(), isVerbose());
         }
     }
 
@@ -230,8 +209,7 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::write('MapController',
-            $player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
+        Log::write($player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
 
         $map->update(['enabled' => 0]);
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -257,8 +235,11 @@ class MapController implements ControllerInterface
     public static function skip(Player $player = null)
     {
         if ($player) {
+            $map = MapController::getCurrentMap();
             infoMessage($player, ' skips map')->sendAll();
         }
+
+        Log::write($map.' ['.$map->uid.'] was skipped by the server.');
 
         MapController::goToNextMap();
     }
@@ -346,12 +327,16 @@ class MapController implements ControllerInterface
     /**
      * Loads maps from server directory
      */
-    public static function loadMaps()
+    public static function loadMaps(string $matchSettings = null)
     {
         Log::write('Loading maps...');
 
         //Get loaded matchsettings maps
-        $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
+        if($matchSettings){
+            $maps = MatchSettingsController::getMapFilenamesFrom($matchSettings);
+        }else{
+            $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
+        }
 
         foreach ($maps as $mapInfo) {
             $filename = $mapInfo->file;
@@ -381,13 +366,17 @@ class MapController implements ControllerInterface
                 if ($map->uid != $uid) {
                     $map->update([
                         'filename' => '_'.$map->filename,
-                        'enabled' => false
+                        'enabled' => 0
                     ]);
 
                     try {
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
                         Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         continue;
                     }
@@ -397,8 +386,12 @@ class MapController implements ControllerInterface
                     $map = Map::whereUid($uid)->first();
 
                     if ($map->filename != $filename) {
-                        Log::write('MapController', "Filename changed for map: (".$map->filename." -> $filename)",
+                        Log::write("Filename changed for map: (".$map->filename." -> $filename)",
                             isVerbose());
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         $map->update(['filename' => $filename,]);
                     }
@@ -407,6 +400,10 @@ class MapController implements ControllerInterface
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
                         Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        if (isVerbose()) {
+                            Log::warning($e->getMessage());
+                            Log::warning($e->getTraceAsString());
+                        }
 
                         continue;
                     }
@@ -441,15 +438,15 @@ class MapController implements ControllerInterface
         echo "\n";
 
         //get array with the uids
-        $enabledMapsuids = $maps->pluck('uId');
+        $enabledMapsuids = $maps->pluck('ident');
 
         //Enable loaded maps
         Map::whereIn('uid', $enabledMapsuids)
-            ->update(['enabled' => true]);
+            ->update(['enabled' => 1]);
 
         //Disable maps
         Map::whereNotIn('uid', $enabledMapsuids)
-            ->update(['enabled' => false]);
+            ->update(['enabled' => 0]);
     }
 
     /**
@@ -486,7 +483,7 @@ class MapController implements ControllerInterface
         $map->uid = $uid;
         $map->author = $authorId;
         $map->filename = $filename;
-        $map->enabled = false;
+        $map->enabled = 0;
         $map->name = $gbx->Name;
         $map->environment = $gbx->Environment;
         $map->title_id = $gbx->TitleId;
@@ -517,5 +514,45 @@ class MapController implements ControllerInterface
     public static function setCurrentMap(Map $currentMap): void
     {
         self::$currentMap = $currentMap;
+    }
+
+    /**
+     * @return Map
+     */
+    public static function getNextMap(): Map
+    {
+        return self::$nextMap;
+    }
+
+    public static function resetRound(Player $player)
+    {
+        infoMessage($player, ' resets the round.')->sendAll();
+
+        Server::restartMap();
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
+
+        ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
+        ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
+        ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+
+        ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
+        ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
+        ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
+
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+            // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
+        }
     }
 }

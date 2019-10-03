@@ -5,12 +5,21 @@
         main(){
             declare Text[Text][] Maps for LocalUser;
             declare Text[Text][Integer] MapAuthors for LocalUser;
-            declare Integer MapUpdateTime for LocalUser = 0;
-            declare Text mapsJson = """{$maps|noescape}""";
+            declare Integer MapUpdateTime for LocalUser;
             declare Text mapAuthorsJson = """{$mapAuthors|noescape}""";
-
             MapAuthors.fromjson(mapAuthorsJson);
-            Maps.fromjson(mapsJson);
+
+            declare Text[Text][] MapsTemp;
+            declare Text[Text][] MapsTemp2;
+
+            {foreach $maps as $chunk}
+            MapsTemp2.fromjson("""{$chunk->values()->toJson()|noescape}""");
+            foreach(map in MapsTemp2){
+                MapsTemp.add(map);
+            }
+            {/foreach}
+
+            Maps = MapsTemp;
             MapUpdateTime = GameTime;
         }
         -->

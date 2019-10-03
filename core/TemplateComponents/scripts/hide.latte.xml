@@ -8,9 +8,9 @@ Void hs_hide(){
     HS_Hidden = True;
     declare Real x;
     if(HS_POS[0] < 0.0){
-        x = (HS_Target.Size[0] * -HS_Target.RelativeScale) - 160.0;
+        x = (HS_Target.Size[0] * -HS_Target.RelativeScale) - 160.5;
     }else{
-        x = 160.0;
+        x = 160.5;
     }
     AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
@@ -46,7 +46,7 @@ Void hidescript(){
             hs_hide();
 
             {if !isset($doNotPause)}
-            wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
             {/if}
         }
         if((!overHidespeed || !playerIsRacing) && HS_Hidden){

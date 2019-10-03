@@ -5,7 +5,6 @@ namespace esc\Classes;
 
 
 use esc\Controllers\MapController;
-use esc\Modules\MxDownload;
 
 class MxMap implements \Serializable
 {
@@ -31,6 +30,11 @@ class MxMap implements \Serializable
         }
 
         $mapFolder = MapController::getMapsPath();
+
+        if (!File::dirExists($mapFolder.$targetDirectory)) {
+            File::makeDir($mapFolder.$targetDirectory);
+        }
+
         File::rename($mapFolder.$this->getFilename(), $mapFolder.$targetDirectory.$this->filename);
 
         if (!File::exists($mapFolder.$targetDirectory.$this->filename)) {

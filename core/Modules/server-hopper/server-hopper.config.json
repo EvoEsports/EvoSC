@@ -2,7 +2,7 @@
   "enabled": false,
   "ui": {
     "position": "left",
-    "slot": 3
+    "slot": 99
   },
   "servers": [
     {

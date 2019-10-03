@@ -4,6 +4,7 @@ namespace esc\Controllers;
 
 use esc\Classes\Log;
 use esc\Interfaces\ControllerInterface;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use ReflectionMethod;
@@ -31,8 +32,8 @@ class ModuleController implements ControllerInterface
     /**
      * [Bugging] reload a module
      *
-     * @param Player $callee
-     * @param string $moduleName
+     * @param  Player  $callee
+     * @param  string  $moduleName
      */
     public static function reloadModule(Player $callee, string $moduleName)
     {
@@ -61,41 +62,34 @@ class ModuleController implements ControllerInterface
      */
     public static function outputModuleInformation($module)
     {
-        $name    = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        $author  = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $name = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
+        $author = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
         // $version = str_pad(sprintf('%.1f', floatval($module->version)), 12, ' ', STR_PAD_RIGHT);
         $version = str_pad(getEscVersion(), 12, ' ', STR_PAD_RIGHT);
 
-        Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
+        Log::getOutput()->writeln('<fg=green>'."$name$version$author".'</>');
     }
 
     //Load the module information.
     private static function loadModulesInformation(Collection $moduleDirectories)
     {
         $moduleDirectories->each(function ($moduleDirectory) {
-            $moduleJson = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/' . $moduleDirectory . '/module.json');
+            $moduleJson = __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/'.$moduleDirectory.'/module.json');
             if (file_exists($moduleJson)) {
-                $json              = file_get_contents($moduleJson);
+                $json = file_get_contents($moduleJson);
                 $moduleInformation = json_decode($json);
                 self::$loadedModules->push($moduleInformation);
             }
         });
     }
 
-    /**
-     * Load all modules.
-     */
-    public static function bootModules()
+    private static function loadModules(bool $silent = false)
     {
         $classes = classes();
 
         //Get modules from classes
         $moduleClasses = $classes->filter(function ($class) {
-            if (preg_match('/^esc.Modules./', $class->namespace)) {
-                return true;
-            }
-
-            return false;
+            return preg_match('/^esc.Modules./', $class->namespace);
         });
 
         //Get module directories
@@ -106,17 +100,26 @@ class ModuleController implements ControllerInterface
         self::loadModulesInformation($modules);
 
         //Output loaded modules
-        Log::getOutput()->writeln("");
-        Log::getOutput()->writeln('<fg=green>Name                          Version     Author</>');
-        Log::getOutput()->writeln('<fg=green>------------------------------------------------------------------------</>');
-        self::$loadedModules->each([ModuleController::class, 'outputModuleInformation']);
-        Log::getOutput()->writeln("");
+        if (!$silent) {
+            Log::getOutput()->writeln("");
+            Log::getOutput()->writeln('<fg=green>Name                          Version     Author</>');
+            Log::getOutput()->writeln('<fg=green>------------------------------------------------------------------------</>');
+            self::$loadedModules->each([ModuleController::class, 'outputModuleInformation']);
+            Log::getOutput()->writeln("");
+        }
+
+        return $moduleClasses;
+    }
+
+    public static function startModules(string $mode)
+    {
+        $moduleClasses = self::loadModules(true);
 
         //Boot modules
-        Log::write('Booting modules...');
+        Log::write('Starting modules...');
 
-        $moduleClasses->each(function ($module) {
-            $files    = scandir(dirname($module->file));
+        $moduleClasses->each(function ($module) use ($mode) {
+            $files = scandir(dirname($module->file));
             $configId = null;
             foreach ($files as $file) {
                 if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
@@ -125,26 +128,45 @@ class ModuleController implements ControllerInterface
             }
 
             if ($configId == null) {
-                Log::warning('Missing config: ' . $module->class, isDebug());
+                Log::warning('Missing config: '.$module->class, isDebug());
             } else {
-                $enabled = ConfigController::getConfig($configId . '.enabled');
+                $enabled = ConfigController::getConfig($configId.'.enabled');
                 if (!is_null($enabled) && $enabled == false) {
                     return;
                 }
             }
 
-            if(isVeryVerbose()){
-                Log::info('Loading ' . $module->namespace);
+            if (isVeryVerbose()) {
+                Log::info('Starting '.$module->namespace);
             }
 
-            if (method_exists($module->namespace, '__construct')) {
+            $reflectionClass = new \ReflectionClass($module->namespace);
+
+            if ($reflectionClass->hasMethod('__construct')) {
                 $reflectionMethod = new ReflectionMethod($module->namespace, '__construct');
 
                 if ($reflectionMethod->getNumberOfRequiredParameters() == 0) {
                     //Boot the module
-                    $class = new $module->namespace;
+                    new $module->namespace();
                 }
             }
+
+            if ($reflectionClass->implementsInterface(ModuleInterface::class)) {
+                $module->namespace::start($mode);
+            }
         });
+
+        //Boot modules
+        Log::write('Finished starting modules.');
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        // TODO: Implement start() method.
     }
 }

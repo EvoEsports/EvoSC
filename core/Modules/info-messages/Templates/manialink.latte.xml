@@ -1,51 +1,52 @@
+{contentType text}
+{extends 'components.window'}
+{php $window_height = 40;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:InfoMessages" id="InfoMessages" version="3">
-    <frame id="settings" pos="-60 30">
-        <quad id="handle" data-id="infomsgs" size="115 5" z-index="5" />
-        <quad size="120 5" bgcolor="{config('colors.ui.window.header.color')}9" z-index="-1" />
-        <quad size="120 {$messages->count() * 4 + 16}" bgcolor="000c" z-index="-1" />
-        <label textfont="{config('colors.ui.font')|noescape}" pos="1.5 -2.5" valign="center" textsize="0.5" textprefix="$s" text="Info Messages" />
-        <label textfont="{config('colors.ui.font')|noescape}" class="close" pos="117.5 -2.5" size="5 5" valign="center" halign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0001" />
+<manialink version="3">
+    {block id}help-window{/block}
+    {block icon}{/block}
+    {block title}Info-Messages{/block}
 
-        <label class="create" textfont="{config('colors.ui.font')|noescape}" pos="8 -8.5" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" />
+    {block content}
+    <frame id="settings" pos="-1 6">
+        <label class="create" textfont="{config('colors.ui.font')|noescape}" pos="8 -8.5" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" />
 
         <label text="Messages" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" pos="9 -12" />
-        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" halign="right" pos="118 -12" />
+        <label text="Display every" textsize="0.5" textprefix="$s" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" halign="right" pos="116 -12" />
 
         {foreach $messages as $message}
-        <label class="delete" data-id="{$message->id}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="f006" focusareacolor2="f00c" />
-        <label class="edit" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="6.5 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" />
-        <label text="{$message->text}" textprefix="${config('colors.ui.window.header.color')}" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
-        <label text="{$message->delay} minutes" halign="right" textsize="0.5" pos="118 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="delete" data-id="{$message->id}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}c" />
+        <label class="edit" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="6.5 {$iterator->counter * -4 - 13}" valign="center" halign="center" size="4 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" />
+        <label text="{$message->text}" textprefix="${config('colors.ui.window.header.color')}" size="94 4" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
+        <label text="{$message->delay} minutes" halign="right" textsize="0.5" pos="116 {$iterator->counter * -4 - 12}" textfont="{config('colors.ui.font')|noescape}" />
         {/foreach}
+
+        <frame id="edit" pos="1 -6" z-index="20" hidden="1">
+            <quad size="116 23" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-2" />
+            <quad size="116 23" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
+
+            <label text="Message:" textsize="0.5" pos="2 -2" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+            <entry textsize="0.5" pos="2 -5" size="112 4" textfont="{config('colors.ui.font')|noescape}" textprefix="${config('colors.info')}" />
+
+            <label text="Show every (minutes):" textsize="0.5" pos="2 -9" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+            <entry textsize="0.5" pos="2 -12" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+
+            <label class="add" pos="8 -19" size="15 4" text="ADD" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" textfont="{config('colors.ui.font')|noescape}" />
+            <label class="cancel" pos="23 -19" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}c" textfont="{config('colors.ui.font')|noescape}" />
+        </frame>
     </frame>
-
-    <frame id="edit" pos="-30 8" z-index="20000" hidden="1">
-        <quad size="60 23" bgcolor="000c" z-index="-1" />
-
-        <label text="Message:" textcolor="{config('colors.ui.window.header.color')}" textsize="0.5" pos="2 -2" size="58 4" textfont="{config('colors.ui.font')|noescape}" />
-        <entry textsize="0.5" pos="2 -5" size="56 4" textfont="{config('colors.ui.font')|noescape}" textprefix="${config('colors.info')}" />
-
-        <label text="Show every (minutes):" textcolor="{config('colors.ui.window.header.color')}" textsize="0.5" pos="2 -9" size="58 4" textfont="{config('colors.ui.font')|noescape}" />
-        <entry textsize="0.5" pos="2 -12" size="56 4" textfont="{config('colors.ui.font')|noescape}" />
-
-        <label class="add" pos="8 -19" size="15 4" text="ADD" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="cancel" pos="23 -19" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="f006" focusareacolor2="f00c" textfont="{config('colors.ui.font')|noescape}" />
-
-        <quad size="60 23" bgcolor="{config('colors.ui.window.header.color')}c" z-index="-2" />
-    </frame>
+    {/block}
 
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
+    {block globals}
+    {/block}
 
-    {(new esc\Classes\ManiaLinkDrag())|noescape}
-
+    {block functions}
     Void createMessage(Text message, Text pause, Text id){
         declare editFrame <=> (Page.MainFrame.GetFirstChild("edit") as CMlFrame);
-        declare messageInput = (editFrame.Controls[2] as CMlEntry);
-        declare pauseInput = (editFrame.Controls[4] as CMlEntry);
-        declare okButton = (editFrame.Controls[5] as CMlLabel);
+        declare messageInput = (editFrame.Controls[3] as CMlEntry);
+        declare pauseInput = (editFrame.Controls[5] as CMlEntry);
+        declare okButton = (editFrame.Controls[6] as CMlLabel);
 
         if(id == "-1"){
             okButton.SetText("ADD");
@@ -67,10 +68,9 @@
                 if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
                     editFrame.Hide();
                     if(id == "-1"){
-                        TriggerPageAction("info.add," ^ pauseInput.Value ^ "," ^ messageInput.Value);
+                        ManiaLinkEvent("info.add", pauseInput.Value ^ "," ^ messageInput.Value);
                     }else{
-                        TriggerPageAction("info.update," ^ id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
-                        log("info.update," ^ id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
+                        ManiaLinkEvent("info.update", id ^ "," ^ pauseInput.Value ^ "," ^ messageInput.Value);
                     }
                     run = False;
                 }
@@ -81,38 +81,37 @@
             }
         }
     }
+    {/block}
 
-    main(){
-        while(True){
-            yield;
+    {block bootScript}
+    {/block}
 
-            foreach(event in PendingEvents){
-                if(event.Control == Null) continue;
-
-                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    (Page.MainFrame.GetFirstChild("settings") as CMlFrame).Hide();
-                }
-
-                if(event.Control.HasClass("create") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    createMessage("", "", "-1");
-                }
-
-                if(event.Control.HasClass("edit") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare message = event.Control.DataAttributeGet("message");
-                    declare pause = event.Control.DataAttributeGet("pause");
-                    declare id = event.Control.DataAttributeGet("id");
-                    createMessage(message, pause, id);
-                }
-
-                if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare id = event.Control.DataAttributeGet("id");
-                    TriggerPageAction("info.delete," ^ id);
-                }
-            }
-
-            maniaLinkDrag();
+    {block pendingEvents}
+        if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+            (Page.MainFrame.GetFirstChild("settings") as CMlFrame).Hide();
         }
-    }
 
+        if(event.Control.HasClass("create") && event.Type == CMlScriptEvent::Type::MouseClick){
+            createMessage("", "", "-1");
+        }
+
+        if(event.Control.HasClass("edit") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare message = event.Control.DataAttributeGet("message");
+            declare pause = event.Control.DataAttributeGet("pause");
+            declare id = event.Control.DataAttributeGet("id");
+            createMessage(message, pause, id);
+        }
+
+        if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare id = event.Control.DataAttributeGet("id");
+
+            if(confirm("Do you really want to delete this message?")){
+                ManiaLinkEvent("info.delete", id);
+            }
+        }
+    {/block}
+
+    {block loop}
+    {/block}
     --></script>
 </manialink>

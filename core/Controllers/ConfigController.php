@@ -198,4 +198,14 @@ class ConfigController implements ControllerInterface
 
         return $paths;
     }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        // TODO: Implement start() method.
+    }
 }

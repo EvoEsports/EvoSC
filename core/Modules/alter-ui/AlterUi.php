@@ -3,21 +3,22 @@
 namespace esc\Modules;
 
 use esc\Classes\Server;
+use esc\Interfaces\ModuleInterface;
 
-class AlterUi
+class AlterUi implements ModuleInterface
 {
-    public function __construct()
-    {
-        self::setUiProperties();
-    }
-
-    //https://github.com/maniaplanet/script-xmlrpc/blob/master/XmlRpcListing.md#trackmaniauisetproperties
-    public static function setUiProperties()
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         $properties = '
  	<!--
  	  Each node is optional and can be omitted.
- 	  If it\'s the case then the previous value will be kept.
+ 	  If it is the case then the previous value will be kept.
  	-->
  	<ui_properties>
  		<!-- The map name and author displayed in the top right of the screen when viewing the scores table -->
@@ -37,9 +38,9 @@ class AlterUi
  		<!-- Time of the players at the current checkpoint displayed at the bottom of the screen -->
  		<checkpoint_list visible="false" pos="48. -52. 5." />
  		<!-- Small scores table displayed at the end of race of the round based modes (Rounds, Cup, ...) on the right of the screen -->
- 		<round_scores visible="true" pos="-158.5 40. 150." />
+ 		<round_scores visible="false" pos="-158.5 40. 150." />
  		<!-- Race time left displayed at the bottom right of the screen -->
- 		<countdown visible="true" pos="155 -20 5." />
+ 		<countdown visible="false" pos="155 -20 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->
  		<go visible="true" />
  		<!-- Current race chrono displayed at the bottom center of the screen -->
@@ -55,7 +56,7 @@ class AlterUi
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->
  		<chat_avatar visible="false" />
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
- 		<warmup visible="true" pos="153. 13. 0." />
+ 		<warmup visible="false" pos="153. 13. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
  		<endmap_ladder_recap visible="false" />
  		<!-- Laps count displayed on the right of the screen on multilaps map -->

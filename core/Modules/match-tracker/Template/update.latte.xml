@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-match-widget" id="update-match-widget" version="3">
+    <script><!--
+    main() {
+        declare Integer LastMatchTrackerUpdate for This;
+        declare Text MatchTrackerJson for This;
+
+        LastMatchTrackerUpdate = GameTime;
+        MatchTrackerJson = """{$trackers|noescape}""";
+    }
+    --></script>
+</manialink>

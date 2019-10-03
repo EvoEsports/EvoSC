@@ -4,6 +4,7 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -11,6 +12,7 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
+use esc\Models\Pb;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
@@ -38,32 +40,25 @@ class PlayerController implements ControllerInterface
      */
     public static function init()
     {
-        //Add already connected players to the playerlist
-        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
-            $player = Player::firstOrCreate(['Login' => $playerInfo->login], [
-                'NickName' => $playerInfo->nickName,
-            ]);
+        //Add already connected players to the player-list
+        self::cacheConnectedPlayers();
 
-            $player->spectator_status = $playerInfo->spectatorStatus;
-            $player->player_id = $playerInfo->playerId;
+        AccessRight::createIfMissing('player_kick', 'Kick players.');
+        AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
+        AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
+    }
+
+    public static function cacheConnectedPlayers()
+    {
+        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
+                'NickName' => $playerInfo->nickName,
+                'spectator_status' => $playerInfo->spectatorStatus,
+                'player_id' => $playerInfo->playerId
+            ]);
 
             return $player;
         })->keyBy('Login');
-
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        AccessRight::createIfNonExistent('player_kick', 'Kick players.');
-        AccessRight::createIfNonExistent('player_fake', 'Add/Remove fake player(s).');
-        AccessRight::createIfNonExistent('override_join_msg', 'Always announce join/leave.');
-
-        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
-
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
-            'Set the server password, leave empty to clear it.', 'ma');
-        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
     }
 
     /**
@@ -71,8 +66,10 @@ class PlayerController implements ControllerInterface
      * @param  string  $cmd
      * @param  string  $pw
      */
-    public static function setServerPassword(Player $player, $cmd, $pw)
+    public static function setServerPassword(Player $player, $cmd, ...$pw)
     {
+        $pw = trim(implode(' ', $pw));
+
         if (Server::setServerPassword($pw)) {
             if ($pw == '') {
                 infoMessage($player, ' cleared the server password.')->sendAll();
@@ -134,8 +131,7 @@ class PlayerController implements ControllerInterface
     {
         $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::write('PlayerController',
-            $player." [".$player->Login."] left the server after $playtime playtime.");
+        Log::write($player." [".$player->Login."] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {
@@ -146,7 +142,7 @@ class PlayerController implements ControllerInterface
 
         $player->update([
             'last_visit' => now(),
-            'player_id'  => 0,
+            'player_id' => 0,
         ]);
 
         self::$players = self::$players->forget($player->Login);
@@ -160,7 +156,7 @@ class PlayerController implements ControllerInterface
     public static function beginMap(Map $map)
     {
         Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
-            'player_id'        => 0,
+            'player_id' => 0,
             'spectator_status' => 0,
         ]);
     }
@@ -272,9 +268,10 @@ class PlayerController implements ControllerInterface
      * Called on players finish
      *
      * @param  Player  $player
-     * @param        $score
+     * @param  int  $score
+     * @param  string  $checkpoints
      */
-    public static function playerFinish(Player $player, $score)
+    public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($player->isSpectator()) {
             //Leave spec when reset is pressed
@@ -285,9 +282,27 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            $player->Score = $score;
-            $player->save();
             Log::info($player." finished with time ($score) ".$player->getTime());
+
+            $map = MapController::getCurrentMap();
+
+            $hasBetterTime = DB::table('pbs')
+                ->where('map_id', '=', $map->id)
+                ->where('player_id', '=', $player->id)
+                ->where('score', '<=', $score)
+                ->exists();
+
+            if (!$hasBetterTime) {
+                DB::table('pbs')->updateOrInsert([
+                    'map_id' => $map->id,
+                    'player_id' => $player->id
+                ], [
+                    'score' => $score,
+                    'checkpoints' => $checkpoints
+                ]);
+
+                Hook::fire('PlayerPb', $player, $score, $checkpoints);
+            }
         }
     }
 
@@ -350,4 +365,39 @@ class PlayerController implements ControllerInterface
         return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
+    public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
+    {
+        for ($i = 0; $i < intval($count); $i++) {
+            Hook::fire('PlayerConnect', Server::connectFakePlayer());
+        }
+
+        infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
+    }
+
+    public static function resetUserSettings(Player $player, string $cmd)
+    {
+        $player->settings()->delete();
+        infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
+            'Set the server password, leave empty to clear it.', 'ma');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
+        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
+    }
 }

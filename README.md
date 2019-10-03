@@ -11,6 +11,9 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
 | --- |
 
+:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
+
+
 ### Requirements
 * PHP 7.2+
 * MySQL or MariaDB Server
@@ -27,8 +30,7 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | ⚠ If the cache and log folder are not created automatically, you need to create them and restart the controller. |
 | --- |
 ###### Updating a github installation
-1. Go to the EvoSC directory you want to update and run `git pull`.
-
+1. Go to the EvoSC directory you want to update and run `git pull`. 
 ### Music server installation
 Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
 
@@ -40,8 +42,9 @@ Get all available commands `php esc list`
 
 | Action | Description |
 | --------- | -------------------------------------------- |
-| Run EvoSC | In terminal type `php esc run (-v&#124;-vv&#124;-vvv)` |
+| Run EvoSC | In terminal type `php esc run (-v/-vv/-vvv/-s/-f)`. -v/vv/vvv for verbosity. -f will skip map verification on start. -s will skip migrations on start.|
 | Import data from UASECO | In terminal type `php esc import:uaseco {host} {database} {user} {password}` optionally add `{table_prefix}` |
+| Import data from PyPlanet | In terminal type `php esc import:pyplanet {host} {database} {user} {password}` optionally add `{table_prefix}` |
 | Fix player scores and ranking | Run `php esc fix:scores` to re-calculate all scores and fix the player ranks. |
 | Creating a database migration | Run `php esc make:migration <MigrationClassName>`. The migration is saved to to /Migrations. Copy it to your module if necessary. |
 

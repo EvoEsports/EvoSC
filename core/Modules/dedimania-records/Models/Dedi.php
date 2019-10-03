@@ -3,7 +3,14 @@
 namespace esc\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
+/**
+ * Class Dedi
+ * @package esc\Models
+ * @property Player $player
+ * @property Map $map
+ */
 class Dedi extends Model
 {
     protected $table = 'dedi-records';
@@ -45,8 +52,17 @@ class Dedi extends Model
         return null;
     }
 
+    public function getCpsAttribute(): Collection
+    {
+        $cps = collect(explode(',', $this->Checkpoints))->transform(function($cp){
+            return intval($cp);
+        });
+
+        return $cps;
+    }
+
     public function __toString()
     {
-        return secondary($this->Rank . '.$') . config('colors.dedi') . ' dedimania record ' . secondary(formatScore($this->Score));
+        return secondary($this->Rank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($this->Score));
     }
 }

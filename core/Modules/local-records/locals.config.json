@@ -5,6 +5,6 @@
   "echo-top": 100,
   "ui": {
     "position": "left",
-    "slot": 1
+    "slot": 10
   }
 }

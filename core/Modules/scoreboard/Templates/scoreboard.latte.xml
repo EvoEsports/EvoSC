@@ -1,0 +1,13 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" layer="ScoreTable" id="ScoreTable" name="ScoreTable">
+    <frame pos="10 0">
+        <label textsize="5" text="test" />
+    </frame>
+
+    <script><!--
+    main(){
+        log(UI.UILayers);
+        }
+    --></script>
+</manialink>

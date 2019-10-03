@@ -1,5 +1,7 @@
 <?php
 
+use esc\Classes\Server;
+
 $classes = collect([]);
 
 function getClassesInDirectory(&$classes, $path)
@@ -97,6 +99,26 @@ function classes(): \Illuminate\Support\Collection
     return $classes;
 }
 
+function shutdown()
+{
+    global $_restart;
+
+    if ($_restart) {
+        switch (pcntl_fork()) {
+            case 0:
+                echo "Child is starting.\n";
+                pcntl_exec('/usr/bin/php', $_SERVER['argv']);
+                exit(0);
+
+            default:
+                Server::chatEnableManualRouting(false, false);
+                echo "Parent is exiting.\n";
+                exit(0);
+        }
+    }
+}
+
 buildClassMap();
 
 spl_autoload_register('esc_class_loader');
+register_shutdown_function('shutdown');

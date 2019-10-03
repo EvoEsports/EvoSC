@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:music-lib" id="music-lib" version="3">
+    <script><!--
+    #Struct Song {
+        Text title;
+        Text artist;
+        Text album;
+        Text file;
+        Text length;
+    }
+
+    #Struct MusicLibrary {
+        Song[] songs;
+        Text server;
+    }
+
+    main() {
+        declare MusicLibrary musicLib for This;
+        declare Song[] MusicLibTemp;
+        declare Song[] tempLib;
+
+        {foreach $music as $chunk}
+        tempLib.fromjson("""{$chunk->values()->toJson()|noescape}""");
+        foreach(song in tempLib){
+            MusicLibTemp.add(song);
+        }
+        {/foreach}
+
+        musicLib.songs = MusicLibTemp;
+        musicLib.server = "{$server|noescape}";
+    }
+    --></script>
+</manialink>

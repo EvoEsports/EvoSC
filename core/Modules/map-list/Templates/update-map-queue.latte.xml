@@ -3,10 +3,11 @@
     <script>
         <!--
         main(){
-            declare Text[Text][] MapQueue for LocalUser;
-            declare Text mapQueueJson = """{$mapQueue|noescape}""";
+            declare Text[Text][] MapQueue for This;
+            declare Integer lastMapQueueUpdate for This = 0;
 
-            MapQueue.fromjson(mapQueueJson);
+            MapQueue.fromjson("""{$mapQueue|noescape}""");
+            lastMapQueueUpdate = GameTime;
         }
         -->
     </script>

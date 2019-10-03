@@ -114,4 +114,13 @@ class PlanetsController implements ControllerInterface
         $bill = new Bill($player, $billId, $amount, Carbon::now(), $label, $successFunction, $failFunction);
         self::$openBills->push($bill);
     }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+    }
 }

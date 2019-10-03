@@ -70,12 +70,10 @@ class Dedimania extends DedimaniaApi
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerPb', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
-
-        Log::write('call');
 
         //Check if session is still valid each 5 seconds
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
@@ -137,9 +135,10 @@ class Dedimania extends DedimaniaApi
 
     public static function showDedisTable(Player $player)
     {
-        $records = MapController::getCurrentMap()->dedis()->orderBy('Score')->get();
+        $map = MapController::getCurrentMap();
+        $records = $map->dedis()->orderBy('Score')->get();
 
-        RecordsTable::show($player, $records, 'Dedimania Records');
+        RecordsTable::show($player, $map, $records, 'Dedimania Records');
     }
 
     public static function sendUpdatedDedis()
@@ -183,12 +182,9 @@ class Dedimania extends DedimaniaApi
 
             $insert = $records->transform(function ($record) use ($map) {
                 $player = Player::updateOrCreate(['Login' => $record->login], [
+                    'NickName' => $record->nickname,
                     'MaxRank' => $record->max_rank,
                 ]);
-
-                if ($player->NickName == $player->Login || $player->NickName == 'unset') {
-                    $player->update(['NickName' => $record->nickname]);
-                }
 
                 return [
                     'Map' => $map->id,
@@ -242,9 +238,13 @@ class Dedimania extends DedimaniaApi
 
         $saveRecord = $newRank <= self::$maxRank;
 
-        if (!$saveRecord) {
+        if (!$saveRecord && $player->MaxRank > self::$maxRank) {
             //check for dedimania premium
             $saveRecord = $newRank <= $player->MaxRank;
+        }
+
+        if (!$saveRecord) {
+            return;
         }
 
         if (self::$dedis->has($player->id)) {
@@ -294,16 +294,14 @@ class Dedimania extends DedimaniaApi
                 $chatMessage->setParts($player, ' gained the ', $newRecord, ' ('.$oldRank.'. -'.formatScore($diff).')');
             }
 
-            $chatMessage->sendAll();
+            if ($newRank <= 100) {
+                $chatMessage->sendAll();
+            }
 
             self::cacheDedis($map);
             self::cacheDedisJson();
             self::sendUpdatedDedis();
         } else {
-            if (!$saveRecord) {
-                return;
-            }
-
             $map->dedis()->updateOrCreate(['Player' => $player->id], [
                 'Score' => $score,
                 'Checkpoints' => $checkpoints,
@@ -321,10 +319,12 @@ class Dedimania extends DedimaniaApi
                 self::saveGhostReplay($newRecord);
             }
 
-            chatMessage($player, ' gained the ', $newRecord)
-                ->setIcon('')
-                ->setColor(config('colors.dedi'))
-                ->sendAll();
+            if ($newRank <= 100) {
+                chatMessage($player, ' gained the ', $newRecord)
+                    ->setIcon('')
+                    ->setColor(config('colors.dedi'))
+                    ->sendAll();
+            }
 
             self::cacheDedis($map);
             self::cacheDedisJson();

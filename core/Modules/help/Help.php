@@ -12,8 +12,6 @@ class Help implements ModuleInterface
 {
     public function __construct()
     {
-        self::start('TimeAttack');
-
         ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
         ManiaLinkEvent::add('help.show_cmds', [Help::class, 'showCommandsHelp']);
         ManiaLinkEvent::add('help.show_about', [Help::class, 'showAbout']);
@@ -52,14 +50,15 @@ class Help implements ModuleInterface
      * Called when the module is loaded
      *
      * @param  string  $mode
+     * @param  bool  $isBoot
      */
-    public static function start(string $mode)
+    public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
         ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
 
         switch ($mode){
-            case 'TimeAttack':
+            case 'TimeAttack.Script.txt':
         }
     }
 }

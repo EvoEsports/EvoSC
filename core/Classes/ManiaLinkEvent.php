@@ -20,6 +20,11 @@ class ManiaLinkEvent
      */
     private static $maniaLinkEvents;
 
+    /**
+     * @var Collection
+     */
+    private static $extendedMLE;
+
     public $id;
 
     /**
@@ -33,9 +38,11 @@ class ManiaLinkEvent
      */
     public static function init()
     {
-        self::$maniaLinkEvents = new Collection();
+        self::$maniaLinkEvents = collect();
+        self::$extendedMLE = collect();
 
         Hook::add('PlayerManialinkPageAnswer', [self::class, 'call']);
+        ManiaLinkEvent::add('mle', [self::class, 'maniaLinkExtended']);
     }
 
     /**
@@ -83,6 +90,20 @@ class ManiaLinkEvent
         $maniaLinkEvents->push($event);
     }
 
+    public static function maniaLinkExtended(Player $player, $gameTime, $action, $i, $isFinished, ...$body)
+    {
+        if (!self::$extendedMLE->has($gameTime)) {
+            self::$extendedMLE->put($gameTime, collect());
+        }
+
+        self::$extendedMLE->get($gameTime)->put($i, implode(',', $body));
+
+        if ($isFinished == '1') {
+            self::call($player, $action.','.self::$extendedMLE->get($gameTime)->implode(''));
+            self::$extendedMLE->forget($gameTime);
+        }
+    }
+
     /**
      * Handle an ingoing mania-link event.
      *
@@ -91,6 +112,12 @@ class ManiaLinkEvent
      */
     public static function call(Player $ply, string $action)
     {
+        $action = trim($action);
+
+        if ($action == '') {
+            return;
+        }
+
         if (isVerbose()) {
             Log::write("$action", false);
         }
@@ -110,9 +137,8 @@ class ManiaLinkEvent
         }
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
-            warningMessage('Access denied.')->send($ply);
-            Log::write('Access',
-                'Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
+            warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
+            Log::write('Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
                     $event->callback));
 
             return;
@@ -127,5 +153,15 @@ class ManiaLinkEvent
         }
 
         call_user_func($event->callback, $ply);
+    }
+
+    public static function removeAll()
+    {
+        self::$maniaLinkEvents = collect();
+    }
+
+    public function __toString()
+    {
+        return $this->id.'('.serialize($this->callback).')';
     }
 }

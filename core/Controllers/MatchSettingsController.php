@@ -8,14 +8,18 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
+use esc\Classes\Timer;
+use esc\Interfaces\ControllerInterface;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
-class MatchSettingsController
+class MatchSettingsController implements ControllerInterface
 {
     /**
      * @var string
@@ -29,13 +33,40 @@ class MatchSettingsController
     {
         self::$currentMatchSettingsFile = config('server.default-matchsettings');
 
-        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
-            'map_add');
-
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
             Log::error('MatchSettings "'.self::getPath(self::$currentMatchSettingsFile).'" not found.');
             exit(1);
         }
+    }
+
+    public static function loadMatchSettings(Player $player, string $matchSettingsFile)
+    {
+        Server::loadMatchSettings('MatchSettings/'.$matchSettingsFile);
+        infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
+        Log::info($player.' loads matchsettings '.$matchSettingsFile);
+
+        $mode = Server::getScriptName()['NextValue'];
+
+        HookController::init();
+        ChatCommand::removeAll();
+        Timer::destroyAll();
+        ManiaLinkEvent::removeAll();
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::removeAll();
+        }
+
+        ControllerController::loadControllers($mode);
+        MapController::loadMaps($matchSettingsFile);
+        ModuleController::startModules($mode);
+        Hook::fire('MapPoolUpdated');
+    }
+
+    public static function getModeScript(string $matchSettings): string
+    {
+        $file = self::getPath($matchSettings);
+        $settings = new SimpleXMLElement(File::get($file));
+
+        return $settings->gameinfos->script_name[0];
     }
 
     /**
@@ -96,7 +127,7 @@ class MatchSettingsController
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write("Failed to add map ($map) to $matchSettings.");
+            Log::error("Failed to add map \"$map\" to \"$matchSettings\"");
         }
     }
 
@@ -143,7 +174,7 @@ class MatchSettingsController
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::write("Failed to shuffle map-list.");
+            Log::error("Failed to shuffle map-list: " . $e->getMessage());
         }
     }
 
@@ -256,6 +287,46 @@ class MatchSettingsController
         self::addMap(self::$currentMatchSettingsFile, $map);
     }
 
+    public static function updateSetting(string $matchSettingsFile, string $setting, $value)
+    {
+        $file = self::getPath($matchSettingsFile);
+        $settings = new SimpleXMLElement(File::get($file));
+
+        $root = explode('.', $setting)[0];
+
+        if ($root == 'script_settings') {
+            foreach ($settings->script_settings->setting as $setting_) {
+                if($setting_['name'] == explode('.', $setting)[1]){
+                    $setting_['value'] = $value;
+                }
+            }
+        } else if ($root == 'mode_script_settings') {
+            foreach ($settings->mode_script_settings->setting as $setting_) {
+                if($setting_['name'] == explode('.', $setting)[1]){
+                    $setting_['value'] = $value;
+                }
+            }
+        } else {
+            $nodePath = collect(explode('.', $setting))->transform(function ($node) {
+                return "{$node}";
+            })->implode('->');
+
+            eval('$settings->'.$nodePath.' = $value;');
+        }
+
+
+        $domDocument = new \DOMDocument("1.0");
+        $domDocument->preserveWhiteSpace = false;
+        $domDocument->formatOutput = true;
+        $domDocument->loadXML($settings->asXML());
+        File::put($file, $domDocument->saveXML());
+    }
+
+    public static function rename(string $oldName, string $newName)
+    {
+        File::rename(self::getPath($oldName), self::getPath($newName));
+    }
+
     /**
      * @param  string  $matchSettingsFile
      *
@@ -291,5 +362,16 @@ class MatchSettingsController
         }
 
         self::saveMatchSettings($file, $settings);
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
+            'map_add');
     }
 }

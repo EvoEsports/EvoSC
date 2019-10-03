@@ -1,0 +1,106 @@
+{contentType text}
+{extends 'components.tabbed-window'}
+{php $window_width = 180;}
+{php $window_height = 90;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}records-table{/block}
+    {block title}{$window_title ?? 'Graph'}{/block}
+    {block icon}🏆{/block}
+
+    {block navbar}
+    {include 'components.tabs', tabs => [
+    ' Records'=>($window_title=='Local Records' ? 'locals.show' : 'dedis.show'),
+    ' Graph'=>'',
+    ]
+    }
+    {/block}
+
+    {block content}
+    <frame pos="0 -7">
+        <quad size="176 50" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
+        {php $hMin = $diffs->min() - 100;}
+        {php $hMax = $diffs->max() + 100;}
+        {php $wMax = ($record->Score > $myRecord->Score ? $record->Score : $myRecord->Score) + 1000;}
+        <graph pos="-3 -4" size="179 42" min="-1000 {$hMin}" max="{$wMax} {$hMax}" z-index="2">
+            <curve color="333" width="0.3">
+                <point coords="0 {$hMin}" />
+                <point coords="{$wMax} {$hMin}" />
+            </curve>
+            <curve color="333" width="0.3">
+                <point coords="0 {$hMax}" />
+                <point coords="{$wMax} {$hMax}" />
+            </curve>
+            {foreach $diffs as $i => $diff}
+            <curve color="{$diff == 0 ? '36e' : ($diff < 0 ? '3c3' : 'c33')}9" style="thin">
+                <point coords="{$recordCps[$i]} {$hMin}" />
+                <point coords="{$recordCps[$i] + 1} {$hMax}" />
+            </curve>
+            {/foreach}
+            <curve color="999" width="0.15">
+                <point coords="0 0" />
+                <point coords="{$myRecord->Score} 0" />
+            </curve>
+            <curve color="{$diffs->first() == 0 ? '36e' : ($diffs->first() < 0 ? '3c3' : 'c33')}" width="0.5">
+                <point coords="0 0" />
+                <point coords="{$recordCps[0]} {$diffs->first()}" />
+            </curve>
+            {foreach $diffs as $i => $diff}
+            <curve color="{$diff == 0 ? '36e' : ($diff < 0 ? '3c3' : 'c33')}" width="0.5">
+                {if !$iterator->first}
+                <point coords="{$recordCps[$i - 1]} {$diffs->get($i - 1)}" />
+                <point coords="{$recordCps[$i]} {$diff}" />
+                {/if}
+            </curve>
+            {/foreach}
+        </graph>
+
+        <label halign="right" pos="174 -2" valign="center" size="20 5" textsize="0.4" text="+{$hMax}ms" textfont="{config('colors.ui.font')|noescape}" textcolor="666" />
+        <label halign="right" pos="174 -47.75" valign="center" size="20 5" textsize="0.4" text="{$hMin}ms" textfont="{config('colors.ui.font')|noescape}" textcolor="666" />
+
+        <frame pos="1 -54">
+            <quad pos="0.5 -0.25" size="2 2" bgcolor="999" valign="center" />
+            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{str_replace('"', "''", $localPlayer->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
+            <label pos="4 -4" valign="center" textsize="2" text="{formatScore($myRecord->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
+        </frame>
+
+        <frame pos="1 -64">
+            <quad pos="0.5 -0.25" size="2 2" bgcolor="fff" valign="center" />
+            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{str_replace('"', "''", $record->player->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+            <label pos="4 -4" valign="center" textsize="2" text="{formatScore($record->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+        </frame>
+
+        <frame pos="30 -54">
+            {for $i=0; $i<count($recordCps); $i++}
+            <frame pos="{floor($i/6)*40} {$i%6*-3.5}">
+                <label valign="center" textsize="1" text="{$i + 1}." textfont="{config('colors.ui.font')|noescape}" />
+                <label pos="14 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($myCps[$i], true)}" textfont="{config('colors.ui.font')|noescape}"  textcolor="999" />
+                <label pos="24 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($recordCps[$i], true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+                {php $diff = $diffs->get($i);}
+                <label pos="34 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($diff, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="{$diff == 0 ? '36e' : ($diff < 0 ? '3e3' : 'e33')}" />
+            </frame>
+            {/for}
+        </frame>
+    </frame>
+    {/block}
+
+    <script><!--
+    {block scriptDeclarations}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block globals}
+    {/block}
+
+    {block bootScript}
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
+</manialink>

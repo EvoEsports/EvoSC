@@ -26,9 +26,7 @@ class BansController implements ControllerInterface
      */
     public static function init()
     {
-        AccessRight::createIfNonExistent('player_ban', 'Ban and unban players.');
-
-        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
+        AccessRight::createIfMissing('player_ban', 'Ban and unban players.');
     }
 
     /**
@@ -56,5 +54,15 @@ class BansController implements ControllerInterface
         Server::unBan($toUnban->Login);
         infoMessage($admin, ' unbanned ', $toUnban)->sendAll();
         $toUnban->update(['banned' => 0]);
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
 }

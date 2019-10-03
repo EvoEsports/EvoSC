@@ -39,8 +39,6 @@ class EventController implements ControllerInterface
             $name = $callback[0];
             $arguments = $callback[1];
 
-            // Log::write("$name", isVeryVerbose());
-
             switch ($name) {
                 case 'ManiaPlanet.PlayerInfoChanged':
                     self::mpPlayerInfoChanged($arguments);
@@ -132,12 +130,17 @@ class EventController implements ControllerInterface
                 return;
             }
 
-            if (ChatController::getRoutingEnabled()) {
-                try {
-                    Hook::fire('PlayerChat', player($login), $text, false);
-                } catch (Exception $e) {
-                    Log::write("Error: " . $e->getMessage());
-                }
+            if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
+                warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send(player($login));
+
+                return;
+            }
+
+            try {
+                Hook::fire('PlayerChat', player($login), $text);
+                ChatController::playerChat(player($login), $text);
+            } catch (Exception $e) {
+                Log::write("Error: ".$e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -154,8 +157,8 @@ class EventController implements ControllerInterface
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
             $details = Server::getDetailedPlayerInfo($playerInfo[0]);
             $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
-                'NickName'  => $details->nickName,
-                'path'      => $details->path,
+                'NickName' => $details->nickName,
+                'path' => $details->path,
                 'player_id' => $details->playerId,
             ]);
 
@@ -200,7 +203,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('BeginMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::write("Error: ".$e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -226,7 +229,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('EndMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::write("Error: ".$e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -244,7 +247,7 @@ class EventController implements ControllerInterface
             try {
                 ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::write("Error: ".$e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -258,5 +261,15 @@ class EventController implements ControllerInterface
     {
         $file = cacheDir('round_start_time.txt');
         File::put($file, time());
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        // TODO: Implement start() method.
     }
 }

@@ -1,97 +1,95 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $dontHide = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:add-time" id="add-time" version="3">
-    <frame pos="145 -34.5">
-        <frame scale="0.6">
-            <label class="open-controls" id="time" pos="22.5 0" z-index="0" size="23 5" text="added_time" textsize="3" halign="right"
-                   valign="center" textfont="{config('colors.ui.font')|noescape}"
-                    scriptevents="1" focusareacolor1="0000" focusareacolor2="0000"/>
-        </frame>
-        <frame pos="-9 1.5" scale="0.6" size="40 5.5" hidden="1" id="buttons">
-            {if $localPlayer->hasAccess('time')}
-            <label action="time.add,0.5" pos="5 -2.75" z-index="0" size="10 5.5" text="+½" textsize="0.9" halign="center"
-                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
-                   textfont="{config('colors.ui.font')|noescape}"/>
-            <label action="time.add,2" pos="15 -2.75" z-index="0" size="10 5.5" text="+2" textsize="0.9" halign="center"
-                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
-                   textfont="{config('colors.ui.font')|noescape}"/>
-            <label action="time.add,5" pos="25 -2.75" z-index="0" size="10 5.5" text="+5" textsize="0.9" halign="center"
-                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
-                   textfont="{config('colors.ui.font')|noescape}"/>
-            <label action="time.add,10" pos="35 -2.75" z-index="0" size="10 5.5" text="+10" textsize="0.9" halign="center"
-                   valign="center" scriptevents="1" focusareacolor1="fff8" focusareacolor2="fffb" textcolor="111c"
-                   textfont="{config('colors.ui.font')|noescape}"/>
-            {/if}
-        </frame>
+<manialink version="3">
+    {block id}add-time{/block}
+    {block size}29 9{/block}
+
+    {block content}
+    <frame pos="20.5 -1.25" z-index="2">
+        <label class="open-controls" id="time" z-index="2" size="20 5" text="+0 min." textsize="1"
+               halign="center" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
     </frame>
+    <frame pos="0.5 -4" scale="0.6" id="buttons">
+        {foreach $buttons as $i => $button}
+        <label class="add" data-value="{$button}" pos="{$i * 10 + 5} -2.75" z-index="0" size="10 5.5" text="+{$button}" textsize="0.9" halign="center"
+               valign="center" scriptevents="1" focusareacolor1="fff5" focusareacolor2="fffa" textcolor="111c"
+               textfont="{config('colors.ui.font')|noescape}"/>
+        {/foreach}
+        <label id="icon2" pos="44 -2.75" z-index="0" size="8 5.5" text="" textsize="1.3" halign="center"
+               valign="center" scriptevents="1" focusareacolor1="fffb" focusareacolor2="fffb" textcolor="111c"
+               textfont="{config('colors.ui.font')|noescape}"/>
+    </frame>
+    {/block}
 
     <script><!--
-        #Include "MathLib" as ML
+        {block globals}
+        {/block}
 
-        main() {
+        {block script}
+        {/block}
+
+        {block bootScript}
             declare Real AddedTimeR for This = 0.0;
             declare Real currentAddedTime = -1.0;
-
-            declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare buttons <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
-
-            declare xMin = buttons.AbsolutePosition_V3[0];
-            declare yMin = buttons.AbsolutePosition_V3[1];
-            declare xMax = buttons.AbsolutePosition_V3[0] + buttons.Size[0];
-            declare yMax = buttons.AbsolutePosition_V3[1] - buttons.Size[1];
-
+            declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
+            declare icon2 <=> (Page.MainFrame.GetFirstChild("icon2") as CMlLabel);
             declare Text sign = "";
 
-            while(True){
-                yield;
+            left__ = {config('added-time-info.ui.position') == 'left' ? 'True' : 'False'};
+            slot__ = {config('added-time-info.ui.slot')};
+        {/block}
 
-                if(UI.UISequence == CUIConfig::EUISequence::Podium){
-                    buttons.Hide();
-                    timeLabel.Hide();
-                    wait(UI.UISequence != CUIConfig::EUISequence::Podium);
-                    buttons.Show();
-                }
-
-                if(currentAddedTime != AddedTimeR){
-                    currentAddedTime = AddedTimeR;
-
-                    if(currentAddedTime == 0){
-                        timeLabel.Hide();
-                        buttons.Show();
-                    }else{
-                        timeLabel.Show();
-
-                        if(currentAddedTime < 0){
-                            sign = "";
-                        }else{
-                            sign = "+";
-                        }
-
-                        if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
-                            timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
-                        }else{
-                            timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
-                        }
-
-                        buttons.Hide();
-                    }
-                }
-
-                {if $localPlayer->hasAccess('time')}
-                foreach(event in PendingEvents){
-                    if(event.Control == Null) continue;
-
-                    if(event.Control.HasClass("open-controls")){
-                        timeLabel.Hide();
-                        buttons.Show();
-
-                        wait(MouseX > xMax || MouseX < xMin || MouseY < yMax || MouseY > yMin);
-
-                        timeLabel.Show();
-                        buttons.Hide();
-                    }
-                }
-                {/if}
+        {block loop}
+            if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                timeLabel.Hide();
+                buttons.Hide();
+                wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+                sleep(200);
+                buttons.Show();
             }
-        }
+
+            if(icon2.Value != "" && !MouseRightButton){
+                icon2.Value = "";
+            }
+            if(icon2.Value != "" && MouseRightButton){
+                icon2.Value = "";
+            }
+
+            if(currentAddedTime != AddedTimeR){
+                currentAddedTime = AddedTimeR;
+
+                if(currentAddedTime == 0){
+                    timeLabel.Hide();
+                }else{
+                    if(currentAddedTime < 0){
+                        sign = "";
+                    }else{
+                        sign = "+";
+                    }
+
+                    if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
+                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                    }else{
+                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
+                    }
+
+                    timeLabel.Show();
+                }
+            }
+        {/block}
+
+        {block pendingEvents}
+            if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
+                declare value = event.Control.DataAttributeGet("value");
+                if(MouseRightButton){
+                    TriggerPageAction("time.add," ^ value);
+                }else{
+                    TriggerPageAction("time.vote," ^ value);
+                }
+            }
+        {/block}
     --></script>
 </manialink>

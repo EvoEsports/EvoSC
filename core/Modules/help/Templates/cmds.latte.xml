@@ -16,10 +16,9 @@ Help
 
 {block navbar}
     {include 'components.tabs', tabs => [
-        'Commands'=>'help.show_cmds',
+        'Commands'=>'',
         'About'=>'help.show_about'
-    ],
-        active => 'help.show_cmds'
+    ]
     }
 {/block}
 
@@ -107,6 +106,9 @@ Void updatePageInfo(){
 --></script>
 {/block}
 
+{block functions}
+{/block}
+
 {block bootScript}
     declare helpFrame <=> (Page.MainFrame.GetFirstChild("help") as CMlFrame);
 
@@ -119,6 +121,9 @@ Void updatePageInfo(){
     updateView();
     updatePageInfo();
 {/block}
+
+        {block loop}
+        {/block}
 
 {block pendingEvents}
     if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){

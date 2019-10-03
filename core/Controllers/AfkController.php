@@ -32,14 +32,6 @@ class AfkController implements ControllerInterface
     public static function init()
     {
         self::$pingTracker = collect();
-
-        Hook::add('PlayerConnect', [self::class, 'sendPinger']);
-        Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
-        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
-
-        ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
-
-        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
     }
 
     /**
@@ -93,8 +85,8 @@ class AfkController implements ControllerInterface
 
     private static function revivePlayer(Player $player)
     {
-        warningMessage('EvoSC detected you as offline and is now reconnecting you.')->send($player);
-        Hook::fire('PlayerConnect', $player);
+//        warningMessage('EvoSC detected you as offline and is now reconnecting you.')->send($player);
+//        Hook::fire('PlayerConnect', $player);
     }
 
     /**
@@ -137,5 +129,21 @@ class AfkController implements ControllerInterface
         Server::forceSpectator($player->Login, 3);
 
         infoMessage($player, ' was forced to spectators by ', $admin)->sendAll();
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerConnect', [self::class, 'sendPinger']);
+        Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
+        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
+
+        ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
+
+//        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
     }
 }

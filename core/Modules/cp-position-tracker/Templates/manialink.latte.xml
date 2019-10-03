@@ -1,34 +1,33 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:CpPositionTracker" id="CpPositionTracker" version="3">
+<manialink version="3">
+    {block id}cp-position-tracker{/block}
+    {block size}44 {config('cp-pos-tracker.show') * 2.5 + 5}{/block}
+
+    {block content}
     <framemodel id="record">
         <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" halign="right" pos="14 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" halign="right" pos="14 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="{config('colors.ui.font')|noescape}" />
+        <label z-index="2" valign="center" pos="15 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
     </framemodel>
 
-    <frame id="widget" pos="{config('cp-pos-tracker.pos')}" size="40 60" scale="{config('cp-pos-tracker.scale')}">
-        <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" CP Position Tracker" textfont="{config('colors.ui.font')|noescape}" />
+    <frame id="widget" pos="{config('cp-pos-tracker.pos')}">
+        <quad id="bg" size="44 100" pos="0 0" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
+        <label pos="2 -2.5" valign="center" textsize="0.5" text=" Checkpoint Tracker" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame id="ranking" pos="1 -7">
             {for $i=0; $i < config('cp-pos-tracker.show'); $i++}
-            <frameinstance modelid="record" pos="0 {$i * -3}" hidden="1"/>
+            <frameinstance modelid="record" pos="0 {$i * -2.5}" hidden="1"/>
             {/for}
         </frame>
     </frame>
+    {/block}
 
+    {block script}
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
-
-    #Struct Position {
-        Integer cp;
-        Integer time;
-        Text login;
-        Text nick;
-    }
-
-    declare Position[Text] positions;
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -70,45 +69,68 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Position[Integer][Integer] getTable(){
-        declare Integer max = 0;
-
-        foreach(pos in positions){
-            if(pos.cp > max){
-                max = pos.cp;
-            }
-        }
-
-        declare Position[Integer][Integer] table = Position[Integer][Integer];
-
-        for(i, 0, max){
-            table[max - i] = Position[Integer];
-        }
-
-        foreach(pos in positions){
-            table[pos.cp][pos.time] = pos;
-        }
-
-        return table;
+    Void hide(){
+        HS_Hidden = True;
+        AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
-    Void updateView(){
+    Void show(){
+        HS_Hidden = False;
+        AnimMgr.Add(bg, "<quad opacity='{config('colors.ui.widget.bg.opacity') - 0.15}' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        if(HS_Target == Null){
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+        }
+
+        declare UISettings settings for This;
+        declare hideSpeed = settings.speed;
+
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
+
+        declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+        if(mapFinished){
+            if(!HS_Hidden){
+                hide();
+            }
+        }else{
+            declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+
+            if(overHidespeed && playerIsRacing && !HS_Hidden){
+                hide();
+            }
+            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+                show();
+            }
+        }
+    }
+
+    Void updateView(Text dataJson){
         declare ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
-        declare table = getTable();
         declare Integer i = 0;
 
-        foreach(cp => group in table){
-            if(group.count > 0){
-                foreach(pos in group){
-                    if(i < {config('cp-pos-tracker.show')}){
-                        declare record = (ranking.Controls[i] as CMlFrame);
-                        (record.Controls[0] as CMlLabel).SetText((cp + 1) ^ ".");
-                        (record.Controls[1] as CMlLabel).SetText(formatScoreCorrect(pos.time, False));
-                        (record.Controls[2] as CMlLabel).SetText(formatScoreCorrect(pos.time, True));
-                        (record.Controls[3] as CMlLabel).SetText(pos.nick);
-                        record.Show();
-                        i = i + 1;
+        declare Text[Text][][Integer] groups;
+        groups.fromjson(dataJson);
+
+        foreach(group in groups){
+            foreach(pos in group){
+                if(i < {config('cp-pos-tracker.show')}){
+                    declare record = (ranking.Controls[i] as CMlFrame);
+                    if(pos["finish"] == "True"){
+                        (record.Controls[0] as CMlLabel).Value = "";
+                    }else{
+                        (record.Controls[0] as CMlLabel).Value = pos["cp"] ^ ".";
                     }
+                    (record.Controls[1] as CMlLabel).Value = formatScoreCorrect(TL::ToInteger(pos["score"]), False);
+                    (record.Controls[2] as CMlLabel).Value = formatScoreCorrect(TL::ToInteger(pos["score"]), True);
+                    (record.Controls[3] as CMlLabel).Value = pos["name"];
+                    record.Show();
+                    i = i + 1;
                 }
             }
         }
@@ -117,42 +139,46 @@
             (ranking.Controls[x] as CMlFrame).Hide();
         }
     }
+    --></script>
+    {/block}
 
-    Void remove(Text login){
-        if(positions.existskey(login)){
-            positions.removekey(login);
-        }
+    <script><!--
+    {block globals}
+    #Struct Position {
+        Integer cp;
+        Integer time;
+        Text login;
+        Text nick;
     }
 
-    Void handleWayPoint(CTmMlPlayer player, Integer cp, Integer time){
-        declare login = player.User.Login;
-        declare nick = player.User.Name;
+    declare Vec2 HS_POS;
+    declare CMlFrame HS_Target;
+    declare Boolean HS_Hidden;
+    declare Position[Text] positions;
+    {/block}
 
-        remove(login);
-        positions[login] = Position{ cp = cp, time = time, login = login, nick = nick };
-        updateView();
-    }
+    {block bootScript}
+        declare Integer ESC_LastCpPosUpdate for This;
+        declare Text ESC_CpPos for This;
+        declare lastUpdate = 0;
 
-    main(){
         positions = Position[Text];
 
-        while(True){
-            yield;
+        left__ = {config('cp-pos-tracker.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('cp-pos-tracker.ui.slot')};
+    {/block}
 
-            foreach(event in RaceEvents){
-                if(event.Type == CTmRaceClientEvent::EType::Respawn){
-                    if(event.Player.CurRace.Time == -1){
-                        declare login = event.Player.User.Login;
-                        remove(login);
-                        updateView();
-                    }
-                }
-                if(event.Type == CTmRaceClientEvent::EType::WayPoint){
-                    handleWayPoint(event.Player, event.CheckpointInLap, event.LapTime);
-                }
+    {block loop}
+            if(lastUpdate != ESC_LastCpPosUpdate){
+                lastUpdate = ESC_LastCpPosUpdate;
+                log("cps-> " ^ ESC_CpPos);
+                updateView(ESC_CpPos);
             }
-        }
-    }
 
-    --></script>
+            hidescript();
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
 </manialink>

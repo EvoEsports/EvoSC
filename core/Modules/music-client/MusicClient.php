@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Modules\MusicClient;
+namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
@@ -8,13 +8,12 @@ use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MusicClient
+class MusicClient implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -37,8 +36,11 @@ class MusicClient
         }
 
         try {
+            $timeout = 10;
+            Log::write('Loading music library ('.$timeout.'s timeout).');
+
             $response = RestClient::get($url, [
-                'connect_timeout' => 3
+                'connect_timeout' => $timeout
             ]);
         } catch (GuzzleException $e) {
             Log::error('Failed to fetch music list from '.$url);
@@ -58,7 +60,7 @@ class MusicClient
         self::$music = collect(json_decode($musicJson));
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('EndMap', [self::class, 'setNextSong']);
+        Hook::add('BeginMap', [self::class, 'setNextSong']);
 
         ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
@@ -72,15 +74,35 @@ class MusicClient
         });
     }
 
+    public static function searchMusic(Player $player, string $cmd, string $search = '')
+    {
+        Template::show($player, 'music-client.search-command', compact('search'));
+    }
+
     public static function setNextSong(Map $map = null)
     {
         self::$song = self::$music->random(1)->first();
         Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));
-        $song = json_encode(self::$song);
 
-        if ($song != 'null') {
-            Template::showAll('music-client.start-song', compact('song'));
+        if (self::$song) {
+            Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)]);
         }
+    }
+
+    public static function sendMusicLib(Player $player)
+    {
+        $server = config('music.url');
+        $chunks = self::$music->chunk(200);
+
+        Template::show($player, 'music-client.send-music', [
+            'server' => $server,
+            'music' => $chunks,
+        ]);
+    }
+
+    public static function showMusicList(Player $player)
+    {
+        Template::show($player, 'music-client.list');
     }
 
     /**
@@ -90,6 +112,8 @@ class MusicClient
      */
     public static function playerConnect(Player $player)
     {
+        self::sendMusicLib($player);
+        self::showMusicList($player);
         Template::show($player, 'music-client.music-client');
 
         $url = Server::getForcedMusic()->url;
@@ -102,19 +126,18 @@ class MusicClient
         }
 
         if ($song != 'null') {
-            Template::showAll('music-client.start-song', compact('song'));
+            Template::show($player, 'music-client.start-song', compact('song'));
         }
     }
 
-    public static function searchMusic(Player $player, $cmd, ...$arguments)
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
-        $query = implode(' ', $arguments);
-        Template::show($player, 'music-client.search-command', compact('query'));
-    }
-
-    public static function reload(Player $player)
-    {
-        TemplateController::loadTemplates();
-        self::playerConnect($player);
+        // TODO: Implement start() method.
     }
 }

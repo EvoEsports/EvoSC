@@ -11,17 +11,6 @@
 main(){
     declare label <=> (Page.MainFrame.GetFirstChild("test") as CMlLabel);
 
-  declare netread Integer Net_LibUI_SettingsUpdate for Teams[0];
-  declare netread Text[Text] Net_LibUI_Settings for Teams[0];
-
-  declare netread Net_LibUI_LiveEvent for UI = Text[Integer][Integer];
-  declare netread Net_LibUI_LiveEventUpdate for UI = Now;
-  declare netwrite Net_LibUI_LiveEventRead for UI = Integer[];
-
-    while(True){
-        yield;
-        log(Net_LibUI_LiveEvent);
-    }
     //System.ClipboardSet("");
 }
     --></script>

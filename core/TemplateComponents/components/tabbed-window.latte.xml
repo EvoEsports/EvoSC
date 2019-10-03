@@ -1,12 +1,13 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-<frame id="window" pos="{$window_width/-2.0 ?? -60} 0">
+<frame id="window" pos="{($window_width ?? 120)/-2.0} 0">
     <quad pos="0 0" size="{$window_width ?? 120} 11" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0.9" z-index="-3"/>
     <quad pos="0 -10.5" size="{$window_width ?? 120} 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="-1"/>
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
-    <quad id="bg" pos="0 0" size="{$window_width ?? 120} {$window_height ?? 88}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1" />
-    <label pos="2 -3" textsize="0.8" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+    <quad id="bg" pos="0 0" size="{$window_width ?? 120} {$window_height ?? 88}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.6" z-index="-1" />
+    <quad pos="0 0" size="{$window_width ?? 120} {$window_height ?? 88}" style="Bgs1" substyle="BgDialogBlur" opacity="0.9" z-index="-2" />
+    <label class="icon" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
     <label pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
     <label class="close" pos="{($window_width ?? 120) - 2.5} -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
@@ -20,15 +21,39 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Real scale;
+}
 --></script>
 
 {include scriptDeclarations}
 
+    <script><!--
+declare CMlFrame window;
+declare Boolean alertUnsavedChanges;
+declare Real lastScale__;
+--></script>
+
 {include 'scripts.drag'}
+{include 'scripts.mle'}
+{include 'dialogues.confirm'}
+{include functions}
 
 <script><!--
 main() {
-    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+    window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+    declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
+    declare UISettings settings for This;
+
+    if(settings.scale == 0.0){
+        settings.scale = 1.0;
+    }
+
+    window.Scale = settings.scale;
+    lastScale__ = settings.scale;
 
     {include bootScript}
 
@@ -36,17 +61,33 @@ main() {
         yield;
 
         foreach(event in PendingEvents){
+            if(event == Null) continue;
             if(event.Control == Null) continue;
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(alertUnsavedChanges == True){
+                    if(!confirm("You have unsaved changes, do you want to close without saving?")){
+                        continue;
+                    }
+                }
                 window.Hide();
+                {if !isset($doNotStop)}
                 return;
+                {/if}
             }
 
             {include pendingEvents}
         }
 
+        {include loop}
+
         maniaLinkDrag();
+
+        if(lastScale__ != settings.scale){
+            lastScale__ = settings.scale;
+            AnimMgr.Add(window, "<frame scale='" ^ lastScale__ ^ "' />", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
+            sleep(500);
+        }
     }
 }
     --></script>

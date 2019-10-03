@@ -28,14 +28,6 @@
 
     {block script}
     <script><!--
-    Text[] getOnlinePlayers(){
-        declare Text[] onlinePlayers = Text[];
-        foreach(player in Players){
-            onlinePlayers.add(player.User.Login);
-        }
-        return onlinePlayers;
-    }
-
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
         declare Text msString;
@@ -76,17 +68,7 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Integer getMyRank(Record[] records){
-        foreach(record in records){
-            if(record.l == LocalUser.Login){
-                return record.r;
-            }
-        }
-
-        return -1;
-    }
-
-    Void fillRecord(Integer index, Record record, Text[] onlinePlayers){
+    Void fillRecord(Integer index, Record record){
         declare records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
 
         if(index >= records.Controls.count){
@@ -94,11 +76,11 @@
         }
 
         declare recordsFrame = (records.Controls[index] as CMlFrame);
-        (recordsFrame.Controls[0] as CMlLabel).SetText(record.r ^ ".");
-        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.s, False));
-        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.s, True));
-        (recordsFrame.Controls[3] as CMlLabel).SetText(record.n);
-        if(onlinePlayers.exists(record.l)){
+        (recordsFrame.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
+        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
+        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
+        (recordsFrame.Controls[3] as CMlLabel).SetText(record.name);
+        if(record.online){
             (recordsFrame.Controls[0] as CMlLabel).TextColor = headerColor;
             (recordsFrame.Controls[4] as CMlLabel).Show();
         }else{
@@ -109,53 +91,17 @@
     }
 
     Void updateWidget(Record[] records){
-        declare myRank = getMyRank(records);
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare rows = {config('locals.rows')};
         declare filled = 0;
-        declare skipped = 0;
-        declare skip = 0;
-        declare showTop = {config('locals.showtop')};
-        declare max = {config('locals.rows')};
-        declare toFill = max - showTop;
-
-        if(myRank == -1){
-            skip = records.count - toFill - showTop;
-        }else{
-            skip = myRank - (max/2);
-
-            if(myRank + (max/2) > records.count){
-                skip = skip + records.count - (myRank + (max/2));
-            }
-        }
-
-        declare Text[] onlinePlayers = getOnlinePlayers();
 
         foreach(record in records){
-            if(filled < showTop){
-                fillRecord(filled, record, onlinePlayers);
-                filled = filled + 1;
-                continue;
-            }
-
-            if(skipped < skip){
-                skipped = skipped + 1;
-                continue;
-            }
-
-            fillRecord(filled, record, onlinePlayers);
-
-            filled = filled + 1;
+            fillRecord(filled, record);
+            filled += 1;
         }
 
-        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
-        declare skipFilled = 0;
-
-        foreach(frame in recordsFrame.Controls){
-            if(skipFilled < filled){
-                skipFilled = skipFilled + 1;
-                continue;
-            }
-
-            frame.Hide();
+        for(x, filled, rows - 1){
+            recordsFrame.Controls[x].Hide();
         }
     }
     --></script>
@@ -163,12 +109,12 @@
 
     <script><!--
     {block globals}
-    #Struct Record {
-        Integer r;
-        Integer s;
-        Text n;
-        Text l;
-    }
+        #Struct Record {
+            Integer rank;
+            Integer score;
+            Text name;
+            Boolean online;
+        }
 
     declare Integer currentPage;
     declare Integer maxPage;
@@ -176,10 +122,9 @@
     {/block}
 
     {block bootScript}
-        declare Record[] LocalRecords for LocalUser;
-        declare Integer LastLocalRecordsUpdate for LocalUser = 0;
+        declare Record[] ESC_Locals_ for This;
+        declare Integer LastLocalRecordsUpdate for This = 0;
         declare Integer lastUpdate = 0;
-        declare Integer playerCount = 0;
 
         currentPage = 0;
         maxPage = 0;
@@ -194,13 +139,7 @@
             if(LastLocalRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastLocalRecordsUpdate;
-                updateWidget(LocalRecords);
-            }
-
-            if(playerCount != Players.count){
-                sleep(150);
-                playerCount = Players.count;
-                updateWidget(LocalRecords);
+                updateWidget(ESC_Locals_);
             }
     {/block}
 

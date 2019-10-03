@@ -6,15 +6,17 @@ namespace esc\Controllers;
 use esc\Classes\File;
 
 use esc\Commands\Migrate;
+use esc\Interfaces\ControllerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class SetupController
+class SetupController implements ControllerInterface
 {
     /**
      * @var InputInterface
@@ -55,8 +57,27 @@ class SetupController
         self::doMxKarmaConfig();
         self::doMusicConfig();
 
-
         File::put(cacheDir('.setupfinished'), 1);
+
+        self::migrateAndRun();
+    }
+
+    private static function migrateAndRun()
+    {
+        self::printInfo('Running database migrate.');
+
+        $application = new Application();
+        $application->add(new Migrate());
+        try {
+            $application->find("migrate")
+                ->addArgument("run", InputArgument::OPTIONAL)
+                ->addOption("--setup", InputArgument::OPTIONAL)
+                ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
+                ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
+                ->run(self::$input, self::$output);
+        } catch (\Exception $e) {
+            self::printError($e->getMessage());
+        }
     }
 
     private static function doServerConfig()
@@ -125,20 +146,6 @@ class SetupController
 
         self::askBatch('database', $questions);
         self::printInfo('Configuration of database.config.json finished.');
-        self::printInfo('Running database migrate.');
-
-
-        $application = new Application();
-        $application->add(new Migrate());
-        try {
-            $application->find("migrate")
-                /** fixme: adding additional unused option and argument to run this command from setup controller  */
-                ->addArgument("run", InputArgument::OPTIONAL)
-                ->addOption("--setup", InputArgument::OPTIONAL)
-                ->run(self::$input, self::$output);
-        } catch (\Exception $e) {
-            self::printError($e->getMessage());
-        }
     }
 
     private static function doDedimaniaConfig()
@@ -280,5 +287,18 @@ class SetupController
                 ConfigController::saveConfig($id, $value);
             }
         }
+    }
+
+    public static function init()
+    {
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
     }
 }

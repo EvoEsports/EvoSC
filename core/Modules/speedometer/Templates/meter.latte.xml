@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
-    <frame id="speedometer" z-index="100">
+    <frame id="speedometer" z-index="10000">
         <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label id="label" pos="0.5 -1.5" text="Km/H" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label class="action" pos="-12.5 2.5" size="22.5 6.5" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}c" ScriptEvents="1" />
@@ -48,6 +48,28 @@
         settings.scale = 1.0;
     }
 
+    CTmMlPlayer GetOwner() {
+      if (GUIPlayer != Null) return GUIPlayer;
+      if (InputPlayer != Null) return InputPlayer;
+      return Null;
+    }
+
+    Void HideDuringIntro(CMlFrame _Frame) {
+      if (_Frame == Null) return;
+
+      declare IsIntro = (
+        UI.UISequence == CUIConfig::EUISequence::Intro ||
+        UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
+        UI.UISequence == CUIConfig::EUISequence::Outro
+      );
+
+      if (_Frame.Visible && IsIntro) {
+        _Frame.Visible = False;
+      } else if (!_Frame.Visible && !IsIntro) {
+        _Frame.Visible = True;
+      }
+    }
+
     main(){
         {if $settings}
         settings.fromjson("""{$settings|noescape}""");
@@ -55,7 +77,6 @@
         resetMeter();
         {/if}
 
-        declare player <=> InputPlayer;
         declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);
         declare labelDisabled <=> (Page.MainFrame.GetFirstChild("label-disabled") as CMlLabel);
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
@@ -67,6 +88,7 @@
         declare speed = 0;
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
+        declare PrevIsSpectator = !IsSpectator;
 
         speedometer.RelativeScale = settings.scale;
         labelLabel.Visible = settings.showLabel;
@@ -75,17 +97,22 @@
         while(True){
             yield;
 
-            wait(player != Null);
+            HideDuringIntro(speedometer);
+            declare Owner <=> GetOwner();
+            if (!PageIsVisible || Owner == Null) continue;
 
-            speedLabel.SetText("" ^ InputPlayer.DisplaySpeed);
+            if (PrevIsSpectator != IsSpectator) {
+              PrevIsSpectator = IsSpectator;
 
-            if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
-                speedometer.Hide();
-                hidden = True;
+              if (IsSpectator) {
+                speedometer.Visible = False;
+              } else {
+                speedometer.Visible = True;
+              }
             }
-            if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
-                speedometer.Show();
-                hidden = False;
+
+            if(speedometer.Visible){
+                speedLabel.Value = TL::ToText(Owner.DisplaySpeed);
             }
 
             if(!hidden){

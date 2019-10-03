@@ -36,30 +36,34 @@ class ChatController implements ControllerInterface
     public static function init()
     {
         self::$mutedPlayers = collect();
+
+        AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
+        AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
+
+        if (!isWindows()) {
+            //unix systems use chat router process
+            return;
+        }
+
         self::$routingEnabled = config('server.enable-chat-routing');
 
         if (self::$routingEnabled) {
             Log::write('Enabling manual chat routing.');
+            $routingEnabled = false;
 
-            try {
-                Server::call('ChatEnableManualRouting', [true, false]);
-            } catch (FaultException $e) {
-                $msg = $e->getMessage();
-                Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
-                exit(2);
+            while (!$routingEnabled) {
+                try {
+                    Server::chatEnableManualRouting(false, false);
+                    $routingEnabled = true;
+                } catch (FaultException $e) {
+                    $msg = $e->getMessage();
+                    Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
+                    sleep(1);
+                }
             }
         } else {
-            Server::call('ChatEnableManualRouting', [false, false]);
+            Server::chatEnableManualRouting(false, false);
         }
-
-        Hook::add('PlayerChat', [self::class, 'playerChat']);
-
-        AccessRight::createIfNonExistent('player_mute', 'Mute/unmute player.');
-        AccessRight::createIfNonExistent('admin_echoes', 'Receive admin messages.');
-
-        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
-        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
-        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 
     /**
@@ -72,6 +76,7 @@ class ChatController implements ControllerInterface
     {
         if (!self::isPlayerMuted($target)) {
             Server::ignore($target->Login);
+//            Server::echo('ESC.UpdateMutedPlayers', 'yo');
         }
         infoMessage($admin, ' muted ', $target)->sendAll();
     }
@@ -175,7 +180,6 @@ class ChatController implements ControllerInterface
         if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
             warningMessage('Invalid chat-command entered. See ', secondary('/help'),
                 ' for all commands.')->send($player);
-            warningMessage('We switched to a new server-controller, it is missing features you had before but we are working on it to give you the best user-experience.')->send($player);
 
             return;
         }
@@ -187,32 +191,25 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        Log::write('['.$player.'] '.$text, true);
+        Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
 
-        if (!self::$routingEnabled) {
-            return;
+        if (isWindows()) {
+            $nick = $player->NickName;
+
+            if ($player->isSpectator()) {
+                $nick = '$eee📷 '.$nick;
+            }
+
+            $prefix = $player->group->chat_prefix;
+            $color = $player->group->color ?? config('colors.chat');
+            $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
+
+            if ($prefix) {
+                $chatText = '$'.$color.$prefix.' '.$chatText;
+            }
+
+            Server::ChatSendServerMessage($chatText);
         }
-
-        $nick = $player->NickName;
-
-        if (preg_match('/([$]+)$/', $text, $matches)) {
-            //Escape dollar signs
-            $text .= $matches[0];
-        }
-
-        if ($player->isSpectator()) {
-            $nick = '$eee📷 '.$nick;
-        }
-
-        $prefix = $player->group->chat_prefix;
-        $color = $player->group->color ?? config('colors.chat');
-        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('colors.chat'), $text);
-
-        if ($prefix) {
-            $chatText = '$'.$color.$prefix.' '.$chatText;
-        }
-
-        Server::call('ChatSendServerMessage', [$chatText]);
     }
 
     /**
@@ -221,5 +218,17 @@ class ChatController implements ControllerInterface
     public static function getRoutingEnabled()
     {
         return self::$routingEnabled;
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
+        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
+        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 }

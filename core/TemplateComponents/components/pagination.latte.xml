@@ -1,0 +1,15 @@
+{contentType text}
+<frame id="pagination">
+    <entry id="page-input" class="page-input" pos="6 0" size="8 3.5" valign="center" halign="center"
+           text="1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" ScriptEvents="1" textcolor="{config('colors.ui.window.text.primary')}"
+           hidden="1"/>
+    <label id="page-info" class="enable-page-input" pos="6 0" size="8 3.5" valign="center"
+           halign="center" text="1/1" textsize="0.8" focusareacolor1="0000" focusareacolor2="0009" textcolor="{config('colors.ui.window.text.primary')}"
+           ScriptEvents="1"/>
+    <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴"
+           textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" textcolor="{config('colors.ui.window.text.primary')}"
+           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+    <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵"
+           textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" textcolor="{config('colors.ui.window.text.primary')}"
+           focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+</frame>

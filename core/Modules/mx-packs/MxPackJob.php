@@ -29,6 +29,8 @@ class MxPackJob
 
     public function __construct(Player $player, $packId)
     {
+        infoMessage('Downloading map pack ', secondary($packId), ' from Mania-Exchange.')->sendAdmin();
+
         $this->packsDir = MapController::getMapsPath('MXPacks');
 
         if (!is_dir($this->packsDir)) {
@@ -130,6 +132,7 @@ class MxPackJob
                     'author' => $authorId,
                     'mx_id' => $mx_id,
                     'enabled' => 1,
+                    'cooldown' => 999,
                     'name' => $gbx->Name,
                     'environment' => $gbx->Environment,
                     'title_id' => $gbx->TitleId

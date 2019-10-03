@@ -4,9 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
-use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Models\Player;
 
 class QuickButtons
@@ -25,9 +23,9 @@ class QuickButtons
             self::$buttons = collect();
         }
 
-        $button         = collect();
-        $button->icon   = $icon;
-        $button->text   = $text;
+        $button = collect();
+        $button->icon = $icon;
+        $button->text = $text;
         $button->action = $maniaLinkAction;
         $button->access = $access;
 
@@ -50,5 +48,10 @@ class QuickButtons
         })->implode(',');
 
         Template::show($player, 'quick-buttons.overlay', compact('buttons'));
+    }
+
+    public static function removeAll()
+    {
+        self::$buttons = collect();
     }
 }

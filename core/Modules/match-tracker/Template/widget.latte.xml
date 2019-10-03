@@ -1,0 +1,177 @@
+{contentType text}
+{extends 'components.widget-base'}
+{php $customHidescript = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}match-tracker-widget{/block}
+    {block size}44 35{/block}
+
+    {block content}
+    <quad id="bg" size="50 55" pos="0 0" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" />
+    <label pos="2 -2.5" valign="center" textsize="0.5" text=" Match" z-index="1" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" />
+
+    <frame id="data" pos="1 -7">
+        {for $i=0; $i<8; $i++}
+        <frame pos="0 {$i * -3.5}" hidden="1">
+            <label pos="0 -0.35" size="16 4" halign="left" valign="center" text="Player" textsize="1" scale="0.9" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+            <label pos="42 -0.35" size="16 4" halign="right" valign="center" text="Score" textsize="1" scale="0.9" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+        </frame>
+        {/for}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    declare Integer[] Points;
+    declare Text[] finished;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void hide(){
+        HS_Hidden = True;
+        AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void show(){
+        HS_Hidden = False;
+        AnimMgr.Add(bg, "<quad opacity='{config('colors.ui.widget.bg.opacity') - 0.15}' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        if(HS_Target == Null){
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+        }
+
+        declare UISettings settings for This;
+        declare hideSpeed = settings.speed;
+
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
+
+        declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+        if(mapFinished){
+            if(!HS_Hidden){
+                hide();
+            }
+        }else{
+            declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+
+            if(overHidespeed && playerIsRacing && !HS_Hidden){
+                hide();
+            }
+            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+                show();
+            }
+        }
+    }
+
+    Void updateWidget(Text data_){
+        declare dataFrame <=> (Page.MainFrame.GetFirstChild("data") as CMlFrame);
+        declare Text[Text][][Text] data;
+        data.fromjson(data_);
+        declare i = 0;
+
+        foreach(groups in data){
+            foreach(set in groups){
+                if(!dataFrame.Controls.existskey(i)){
+                    return;
+                }
+                declare controls <=> (dataFrame.Controls[i] as CMlFrame);
+                (controls.Controls[0] as CMlLabel).SetText(set["nick"]);
+                if(set["cp"] == "-1" && set["finished"] == "False"){
+                    (controls.Controls[1] as CMlLabel).SetText("DNF");
+                }else{
+                    declare prefix = "";
+                    if(set["finished"] == "True" && i < Points.count - 1 && set["score"] != "-1"){
+                        prefix = "$fc0+" ^ Points[i];
+                        log(set["score"]);
+                    }else{
+                        prefix = "$888CP" ^ set["cp"];
+                    }
+
+                    (controls.Controls[1] as CMlLabel).SetText(prefix ^ " $fff"^ formatScoreCorrect(TL::ToInteger(set["score"]), True));
+                }
+                controls.Show();
+                i += 1;
+            }
+        }
+
+        for(x, i, dataFrame.Controls.count - 1){
+            dataFrame.Controls[x].Hide();
+        }
+    }
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+        declare Vec2 HS_POS;
+        declare CMlFrame HS_Target;
+        declare Boolean HS_Hidden;
+    {/block}
+
+    {block bootScript}
+        declare Integer LastMatchTrackerUpdate for This;
+        declare Text MatchTrackerJson for This;
+        declare Integer lastUpdate = 0;
+
+        Points = [{implode(',', $points)}];
+
+        left__ = {config('match-tracker.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('match-tracker.ui.slot')};
+    {/block}
+
+    {block loop}
+            if(lastUpdate != LastMatchTrackerUpdate){
+                lastUpdate = LastMatchTrackerUpdate;
+                updateWidget(MatchTrackerJson);
+            }
+
+            hidescript();
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
+</manialink>

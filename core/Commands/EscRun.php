@@ -15,6 +15,7 @@ use esc\Controllers\AfkController;
 use esc\Controllers\BansController;
 use esc\Controllers\ChatController;
 use esc\Controllers\ConfigController;
+use esc\Controllers\ControllerController;
 use esc\Controllers\CountdownController;
 use esc\Controllers\EventController;
 use esc\Controllers\HookController;
@@ -40,6 +41,8 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
+            ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -52,6 +55,28 @@ class EscRun extends Command
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));
+            return;
+        }
+
+        if (!isWindows()) {
+            switch (pcntl_fork()) {
+                case -1:
+                    $output->writeln('Starting chat router failed.');
+                    break;
+
+                case 0:
+                    $output->writeln('Starting chat router.');
+                    pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
+                    exit(0);
+
+                default:
+                    //parent
+            }
+        }
+
+        if ($input->getOption('skip_map_check') !== false) {
+            global $_skipMapCheck;
+            $_skipMapCheck = true;
         }
 
         try {
@@ -94,21 +119,18 @@ class EscRun extends Command
         file_put_contents(baseDir(config('server.login').'_evosc.pid'), getmypid());
     }
 
-    private function migrate(InputInterface $input, OutputInterface $output)
-    {
-        try {
-            $this->getApplication()->find('migrate')->run($input, $output);
-        } catch (Exception $e) {
-            Log::error('Failed to migrate.');
-            exit(5);
-        }
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // $this->migrate($input, $output);
+        if ($input->getOption('skip_migrate') !== false) {
+            $output->writeln('Skipping migrations.');
+        }else{
+            $migrate = $this->getApplication()->find('migrate');
+            $migrate->execute($input, $output);
+        }
 
         global $_onlinePlayers;
+        global $_restart;
+        $_restart = false;
 
         $version = getEscVersion();
         $motd = "      ______           _____ ______
@@ -141,6 +163,7 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+        ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         //TODO: Collection Transform
         $logins = [];
@@ -155,7 +178,7 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        ModuleController::bootModules();
+        ModuleController::startModules(Server::getScriptName()['CurrentValue']);
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);
@@ -173,11 +196,16 @@ class EscRun extends Command
             ]);
         }
 
+        Server::cleanBlackList();
+        Server::cleanBanList();
+
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         Server::disableServiceAnnounces(true);
 
         $failedConnectionRequests = 0;
+
+        infoMessage(secondary('EvoSC v'.getEscVersion()), ' started.')->sendAdmin();
 
         //cycle-loop
         while (true) {
@@ -189,10 +217,13 @@ class EscRun extends Command
                 $pause = Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
 
+                if ($_restart) {
+                    return;
+                }
+
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('MPS',
-                    'Failed to fetch callbacks from dedicated-server. Failed attempts: '.$failedConnectionRequests.'/50');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: '.$failedConnectionRequests.'/50');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
@@ -215,4 +246,15 @@ class EscRun extends Command
             }
         }
     }
+
+//    private function restart(InputInterface $input, OutputInterface $output)
+//    {
+//        $output->writeln('<bg=cyan>Restarting</>');
+//
+//        Timer::destroyAll();
+//        HookController::init();
+//
+//        $this->initialize($input, $output);
+//        $this->execute($input, $output);
+//    }
 }

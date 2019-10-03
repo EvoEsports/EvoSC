@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
@@ -182,7 +183,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool setModeScriptSettingsAndCommands(object $struct, object $struct)
  * @method static object getModeScriptVariables()
  * @method static bool setModeScriptVariables(object $struct)
- * @method static bool triggerModeScriptEvent(string $string, string $string)
+ * @method static bool triggerModeScriptEvent(string $string, array $arrayWithString)
  * @method static bool triggerModeScriptEventArray(string $string, array $array)
  * @method static object getScriptCloudVariables(string $string, string $string)
  * @method static bool setScriptCloudVariables(string $string, string $string, object $struct)
@@ -245,8 +246,8 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool setNextMapIdent(string $string)
  * @method static bool jumpToMapIndex(int $int)
  * @method static bool jumpToMapIdent(string $string)
- * @method static object getCurrentMapInfo()
- * @method static object getNextMapInfo()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Map getCurrentMapInfo()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Map getNextMapInfo()
  * @method static object getMapInfo(string $filename)
  * @method static bool checkMapForCurrentServerParams(string $string)
  * @method static array getMapList(int $int = 0, int $int = 0)
@@ -309,6 +310,8 @@ class Server
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
 
+        ChatCommand::add('//restart', [self::class, 'restartController'], 'Restart EvoSC.', 'ma');
+
         //Hide all previously send manialinks
         // self::call('SendHideManialinkPage');
     }
@@ -331,8 +334,8 @@ class Server
     /**
      * Call an rpc-method.
      *
-     * @param string       $rpc_func
-     * @param null|mixed[] $args
+     * @param  string  $rpc_func
+     * @param  null|mixed[]  $args
      */
     public static function call(string $rpc_func, $args = null)
     {
@@ -348,5 +351,14 @@ class Server
         }
 
         return null;
+    }
+
+    public static function restartController(Player $player)
+    {
+        global $_restart;
+
+        warningMessage($player, ' restarted EvoSC.')->sendAdmin();
+
+        $_restart = true;
     }
 }

@@ -24,10 +24,6 @@ class MxDownload
 {
     public function __construct()
     {
-        if (!File::dirExists(cacheDir('mx'))) {
-            File::makeDir(cacheDir('mx'));
-        }
-
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>',
             'map_add');
 
@@ -42,11 +38,12 @@ class MxDownload
     public static function showAddMapInfo(Player $player, $cmd, string ...$arguments)
     {
         foreach ($arguments as $mxId) {
+            if (intval($mxId) == 0) {
+                continue;
+            }
+
             try {
                 $details = self::loadMxDetails($mxId);
-                //168063
-                //dd(Template::toString('mx-download.add-map-info', compact('details')));
-
 
                 Template::show($player, 'mx-download.add-map-info', compact('details'));
             } catch (\Exception $e) {
@@ -80,6 +77,9 @@ class MxDownload
                 $map->filename = $mxMap->getFilename();
             }
 
+            $map->name = $mxMap->gbx->Name;
+            $map->title_id = $mxMap->gbx->TitleId;
+            $map->environment = $mxMap->gbx->Environment;
             $map->enabled = true;
             $map->cooldown = 999;
             $map->saveOrFail();
@@ -97,7 +97,7 @@ class MxDownload
 
             $map->uid = $mxMap->uid;
             $map->author = self::getAuthorId($mxMap->gbx->AuthorLogin, $mxMap->gbx->AuthorNick);
-            $map->mx_details = json_encode($mxMap->mxDetails);
+            $map->mx_id = $mxMap->mxDetails->TrackID;
             $map->filename = $mxMap->getFilename();
             $map->enabled = true;
             $map->cooldown = 999;
@@ -192,8 +192,8 @@ class MxDownload
      */
     public static function loadMxDetails($mxId)
     {
-        if (Cache::has("mx/{$mxId}_details")) {
-            return Cache::get("mx/{$mxId}_details");
+        if (Cache::has("mx-details/{$mxId}")) {
+            return Cache::get("mx-details/{$mxId}");
         }
 
         $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$mxId);
@@ -209,7 +209,7 @@ class MxDownload
             throw new \Exception('Failed to parse mx-details: '.$detailsBody);
         }
 
-        Cache::put("mx/{$mxId}_details", $info[0], now()->addMinutes(2));
+        Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));
 
         return $info[0];
     }

@@ -5,18 +5,22 @@ namespace esc\Controllers;
 
 
 use Carbon\Carbon;
+use esc\Classes\Cache;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
+use esc\Classes\Timer;
+use esc\Interfaces\ControllerInterface;
+use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\KeyBinds;
 use Exception;
 use SimpleXMLElement;
 
-class CountdownController
+class CountdownController implements ControllerInterface
 {
     /**
      * @var int
@@ -38,22 +42,16 @@ class CountdownController
      */
     public static function init()
     {
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
-
-        if (File::exists(cacheDir('added_time.txt'))) {
-            self::$addedSeconds = intval(File::get(cacheDir('added_time.txt')));
+        if (Cache::has('added-time')) {
+            self::$addedSeconds = Cache::get('added-time');
         }
-        if (File::exists(cacheDir('round_start_time.txt'))) {
-            self::$matchStart = intval(File::get(cacheDir('round_start_time.txt')));
+        if (Cache::has('match-start')) {
+            self::$matchStart = Cache::get('match-start');
+        } else {
+            self::$matchStart = time();
         }
 
-        Hook::add('BeginMatch', [self::class, 'setMatchStart']);
-        Hook::add('EndMap', [self::class, 'endMap']);
-
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
-            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
-
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
+        AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
     }
 
     /**
@@ -61,32 +59,26 @@ class CountdownController
      */
     public static function setMatchStart()
     {
-        $time = time();
-        self::$matchStart = $time;
+        self::$matchStart = time();
         self::$addedSeconds = 0;
-
-        try {
-            $file = cacheDir('round_start_time.txt');
-            File::put($file, $time);
-        } catch (Exception $e) {
-            Log::write('Failed to save match start to cache-file.');
-        }
+        Cache::put('match-start', self::$matchStart);
     }
 
-    public static function endMap(Map $map){
+    public static function endMap(Map $map)
+    {
         self::resetTimeLimit();
     }
 
     public static function resetTimeLimit()
     {
         self::setTimeLimit(self::$originalTimeLimit);
+        Cache::put('added-time', 0);
+    }
 
-        try {
-            $file = cacheDir('added_time.txt');
-            File::put($file, 0);
-        } catch (Exception $e) {
-            Log::write('Failed to save added time to cache-file.');
-        }
+    public static function enableHuntMode(Player $player)
+    {
+        self::setTimeLimit(0);
+        infoMessage($player, ' enabled hunt mode.')->sendAll();
     }
 
     /**
@@ -114,12 +106,7 @@ class CountdownController
             }
         }
 
-        try {
-            $file = cacheDir('added_time.txt');
-            File::put($file, $addedTime);
-        } catch (Exception $e) {
-            Log::write('Failed to save added time to cache-file.');
-        }
+        Cache::put('added-time', $addedTime);
     }
 
     /**
@@ -159,7 +146,7 @@ class CountdownController
      */
     public static function getSecondsLeft(): int
     {
-        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 2;
+        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 3;
 
         $timeLeft = $calculatedProgressTime - time();
 
@@ -198,6 +185,10 @@ class CountdownController
         return 600;
     }
 
+    public static function beginMap(Map $map)
+    {
+    }
+
     /**
      * @return integer
      */
@@ -224,5 +215,25 @@ class CountdownController
         $settings = Server::getModeScriptSettings();
         $settings['S_TimeLimit'] = $seconds;
         Server::setModeScriptSettings($settings);
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'setMatchStart']);
+        Hook::add('EndMap', [self::class, 'endMap']);
+
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
+            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
+        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
+
+        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 }

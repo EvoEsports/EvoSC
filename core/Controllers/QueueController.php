@@ -34,25 +34,19 @@ class QueueController implements ControllerInterface
      */
     public static function init()
     {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
-
-        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
-        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
-
-        AccessRight::createIfNonExistent('map_queue_recent', 'Drop maps from queue.');
-        AccessRight::createIfNonExistent('queue_drop', 'Drop maps from queue.');
-        AccessRight::createIfNonExistent('queue_multiple', 'Queue more than one map.');
-        AccessRight::createIfNonExistent('queue_keep', 'Keep maps in queue if player leaves.');
+        AccessRight::createIfMissing('map_queue_recent', 'Drop maps from queue.');
+        AccessRight::createIfMissing('queue_drop', 'Drop maps from queue.');
+        AccessRight::createIfMissing('queue_multiple', 'Queue more than one map.');
+        AccessRight::createIfMissing('queue_keep', 'Keep maps in queue if player leaves.');
     }
 
     /**
-     * Queue a map.
+     * Queue a map
      *
      * @param  Player  $player
      * @param  Map  $map
      * @param  bool  $replay
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {
@@ -76,8 +70,9 @@ class QueueController implements ControllerInterface
             }
         }
 
-        if (!$map->mx_details) {
+        if ($map->mx_id) {
             MxMapDetails::loadMxDetails($map);
+            MxMapDetails::loadMxWordlRecord($map);
         }
 
         MapQueue::create([
@@ -145,16 +140,15 @@ class QueueController implements ControllerInterface
     {
         if (MapQueue::whereMapUid($mapUid)->exists()) {
             MapQueue::whereMapUid($mapUid)->delete();
+
+            if (Server::getNextMapInfo()->uId == $mapUid) {
+                Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
+            }
+
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
 
-    /**
-     * ManiaLinkEvent: queue map
-     *
-     * @param  Player  $player
-     * @param                    $mapUid
-     */
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
         $map = Map::whereUid($mapUid)->get()->last();
@@ -194,8 +188,7 @@ class QueueController implements ControllerInterface
                 MapQueue::whereMapUid($queueItem->map_uid)->delete();
                 infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player),
                     ' left.')->sendAll();
-                Log::write('QueueController',
-                    'Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
+                Log::write('Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
@@ -224,5 +217,20 @@ class QueueController implements ControllerInterface
         } else {
             Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
         }
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
+
+        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
+        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
     }
 }

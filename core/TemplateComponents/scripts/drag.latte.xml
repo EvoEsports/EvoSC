@@ -34,6 +34,23 @@ Void maniaLinkDrag(){
     declare framePos = handle.AbsolutePosition_V3;
     declare frameSize = handle.Size;
 
+    if(handle.Parent.DataAttributeGet("centered") != "centered"){
+        if(lastFramePosition.existskey(handleId)){
+            handle.Parent.RelativePosition_V3 = lastFramePosition[handleId];
+        }else{
+            handle.Parent.RelativePosition_V3 = <handle.Parent.Size[0]/-2.0, handle.Parent.Size[1]/2.0>;
+        }
+
+        if(handle.Parent.RelativePosition_V3[1] > 150){
+            handle.Parent.RelativePosition_V3 = <handle.Parent.RelativePosition_V3[0], handle.Parent.RelativePosition_V3[1] - 10>;
+        }
+        if(handle.Parent.RelativePosition_V3[1] < -150){
+            handle.Parent.RelativePosition_V3 = <handle.Parent.RelativePosition_V3[0], handle.Parent.RelativePosition_V3[1] + 10>;
+        }
+
+        handle.Parent.DataAttributeSet("centered", "centered");
+    }
+
     if(MouseLeftButton && !G_Drag_Active){
         if(MouseX >= framePos[0]){
             if(MouseY <= framePos[1]){

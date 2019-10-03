@@ -10,17 +10,21 @@ use esc\Commands\AddAdmin;
 use esc\Commands\FakeLocals;
 use esc\Commands\FixScores;
 use esc\Commands\ImportUaseco;
+use esc\Commands\ImportPyplanet;
 use esc\Commands\MakeMigration;
 use esc\Commands\Migrate;
+use esc\Commands\ChatRouter;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
 global $_isVerbose;
 global $_isVeryVerbose;
 global $_isDebug;
+global $_skipMapCheck;
 $_isVerbose = false;
 $_isVeryVerbose = false;
 $_isDebug = false;
+$_skipMapCheck = false;
 
 $input = new ArgvInput();
 if ($input->hasParameterOption('-vvv', true) ||
@@ -41,17 +45,17 @@ if ($input->hasParameterOption('-vvv', true) ||
     $_isVerbose = true;
 }
 
-
 $application = new Application();
 $application->add(new Migrate());
 $application->add(new MakeMigration());
 $application->add(new ImportUaseco());
+$application->add(new ImportPyplanet());
 $application->add(new FixScores());
 $application->add(new EscRun());
 $application->add(new FakeLocals());
+$application->add(new ChatRouter());
 $application->add(new AddAdmin());
 $application->setDefaultCommand("list");
-
 
 try {
     $application->run();

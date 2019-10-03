@@ -1,0 +1,12 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:scoreboard-bootstrap" id="scoreboard-bootstrap" version="3">
+    <script><!--
+    main(){
+        ClientUI.ScoreTableOnlyManialink = True;
+        ClientUI.ScoreTable = """
+            {$scoreboard|noescape}
+        """;
+    }
+    --></script>
+</manialink>

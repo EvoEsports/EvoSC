@@ -78,6 +78,14 @@ class ModeScriptEventController implements ControllerInterface
 
                 return;
 
+            case 'Trackmania.WarmUp.End':
+                Hook::fire('WarmUpEnd');
+                break;
+
+            case 'Trackmania.WarmUp.Start':
+                Hook::fire('WarmUpStart');
+                break;
+
             case 'Maniaplanet.EndRound_Start':
             case 'Maniaplanet.StartMap_Start':
             case 'Maniaplanet.EndMap_Start':
@@ -96,8 +104,8 @@ class ModeScriptEventController implements ControllerInterface
                 return;
 
             default:
-                Log::write('Calling unhandled ' . $callback, isVeryVerbose());
                 Hook::fire($callback, $arguments);
+                Log::write('Calling unhandled ' . $callback, isVerbose());
         }
     }
 
@@ -150,8 +158,8 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerCheckpoint',
             $player,
             $wayPoint->laptime,
-            ceil($wayPoint->checkpointinrace / $totalCps),
-            count($wayPoint->curlapcheckpoints) - 1
+            count($wayPoint->curlapcheckpoints) - 1,
+            $wayPoint->isendlap
         );
 
         //player finished
@@ -226,5 +234,15 @@ class ModeScriptEventController implements ControllerInterface
         $player     = player($playerData->login);
 
         Hook::fire('PlayerDisconnect', $player);
+    }
+
+    /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        // TODO: Implement start() method.
     }
 }

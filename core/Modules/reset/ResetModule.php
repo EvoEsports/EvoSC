@@ -13,7 +13,7 @@ class ResetModule
     public function __construct()
     {
         ChatCommand::add('/reset', [self::class, 'reset'], 'Reset the UI in case it broke.');
-        ChatCommand::add('//resetall', [self::class, 'resetAll'], 'Reset the UI in case it broke.', 'config');
+        ChatCommand::add('//resetall', [self::class, 'resetAll'], 'Reset the UI in case it broke.', 'ma');
     }
 
     public static function reset(Player $player)

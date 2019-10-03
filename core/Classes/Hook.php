@@ -131,7 +131,7 @@ class Hook
         try {
             HookController::add($event, $callback, $runOnce, $priority);
         } catch (Exception $e) {
-            Log::write(sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
+            Log::error(sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
         }
     }
 

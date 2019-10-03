@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:roundtime" id="roundtime" version="3">
-    <frame id="speedometer" z-index="100">
+    <frame id="roundtime" z-index="10000">
         <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label id="label" pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
         <label class="action" pos="-27 2.5" size="46 6.5" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}c" ScriptEvents="1" />
@@ -48,6 +48,28 @@
         settings.scale = 1.0;
     }
 
+    CTmMlPlayer GetOwner() {
+      if (GUIPlayer != Null) return GUIPlayer;
+      if (InputPlayer != Null) return InputPlayer;
+      return Null;
+    }
+
+    Void HideDuringIntro(CMlFrame _Frame) {
+      if (_Frame == Null) return;
+
+      declare IsIntro = (
+        UI.UISequence == CUIConfig::EUISequence::Intro ||
+        UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
+        UI.UISequence == CUIConfig::EUISequence::Outro
+      );
+
+      if (_Frame.Visible && IsIntro) {
+        _Frame.Visible = False;
+      } else if (!_Frame.Visible && !IsIntro) {
+        _Frame.Visible = True;
+      }
+    }
+
     main(){
         {if $settings}
         settings.fromjson("""{$settings|noescape}""");
@@ -55,36 +77,41 @@
         resetMeter();
         {/if}
 
-        declare player <=> InputPlayer;
         declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);
         declare labelDisabled <=> (Page.MainFrame.GetFirstChild("label-disabled") as CMlLabel);
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
         declare labelLabel <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
         declare wrench <=> (Page.MainFrame.GetFirstChild("wrench") as CMlLabel);
         declare scaleEntry <=> (Page.MainFrame.GetFirstChild("entry-scale") as CMlEntry);
-        declare speedometer <=> (Page.MainFrame.GetFirstChild("speedometer") as CMlFrame);
+        declare roundtime <=> (Page.MainFrame.GetFirstChild("roundtime") as CMlFrame);
         declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings") as CMlFrame);
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
+        declare PrevIsSpectator = !IsSpectator;
 
-        speedometer.RelativeScale = settings.scale;
+        roundtime.RelativeScale = settings.scale;
         labelLabel.Visible = settings.showLabel;
-        speedometer.RelativePosition_V3 = settings.position;
+        roundtime.RelativePosition_V3 = settings.position;
 
         while(True){
             yield;
 
-            wait(player != Null);
+            HideDuringIntro(roundtime);
+            declare Owner <=> GetOwner();
+            if (!PageIsVisible || Owner == Null) continue;
 
-            speedLabel.SetText(TL::TimeToText(player.CurLap.Time, True));
+            if (PrevIsSpectator != IsSpectator) {
+              PrevIsSpectator = IsSpectator;
 
-            if(!hidden && player.CurLap.Time == -1 && player.RaceState != CTmMlPlayer::ERaceState::BeforeStart){
-                speedometer.Hide();
-                hidden = True;
+              if (IsSpectator) {
+                roundtime.Visible = False;
+              } else {
+                roundtime.Visible = True;
+              }
             }
-            if((hidden && player.CurLap.Time != -1) || (hidden && player.RaceState == CTmMlPlayer::ERaceState::BeforeStart)){
-                speedometer.Show();
-                hidden = False;
+
+            if(roundtime.Visible){
+                speedLabel.Value = TL::TimeToText(Owner.CurLap.Time, True);
             }
 
             if(!hidden){
@@ -111,9 +138,9 @@
                     }
                     if(event.Control.HasClass("reset") && event.Type == CMlScriptEvent::Type::MouseClick){
                         resetMeter();
-                        speedometer.RelativeScale = settings.scale;
+                        roundtime.RelativeScale = settings.scale;
                         labelLabel.Visible = settings.showLabel;
-                        speedometer.RelativePosition_V3 = settings.position;
+                        roundtime.RelativePosition_V3 = settings.position;
                         TriggerPageAction("roundtime.reset");
                     }
                     if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -121,7 +148,7 @@
                     }
                     if(event.Control.HasClass("action") && event.Type == CMlScriptEvent::Type::MouseClick){
                         if(settingsVisible){
-                            declare startPos = speedometer.RelativePosition_V3;
+                            declare startPos = roundtime.RelativePosition_V3;
                             declare startX = MouseX;
                             declare startY = MouseY;
 
@@ -131,8 +158,8 @@
                                 declare newPosX = startPos[0] + (MouseX - startX);
                                 declare newPosY = startPos[1] + (MouseY - startY);
 
-                                speedometer.RelativePosition_V3 = <newPosX, newPosY>;
-                                settings.position = speedometer.RelativePosition_V3;
+                                roundtime.RelativePosition_V3 = <newPosX, newPosY>;
+                                settings.position = roundtime.RelativePosition_V3;
                             }
 
                             continue;
@@ -166,7 +193,7 @@
                         }
 
                         scaleEntry.SetText(settings.scale ^ "", False);
-                        speedometer.RelativeScale = settings.scale;
+                        roundtime.RelativeScale = settings.scale;
                     }
                 }
 
