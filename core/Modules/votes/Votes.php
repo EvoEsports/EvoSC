@@ -38,8 +38,11 @@ class Votes
         self::$voters = collect();
         self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
         self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimit() ?? 600;
-        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / ($originalTimeLimit * config('votes.time-multiplier', 1.0)));
+        $originalTimeLimit = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier', 1);
+        if ($originalTimeLimit == 0) {
+            $originalTimeLimit = 600;
+        }
+        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
 
         AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
         AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
