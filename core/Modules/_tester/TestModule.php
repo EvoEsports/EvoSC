@@ -18,12 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $players = onlinePlayers()->transform(function (Player $player) {
-            $player->login = $player->Login;
-            return $player;
-        });
-
-        Statistics::showScores($players);
+        Scoreboard::sendScoreboard($player);
     }
 
     public static function sendTestManialink(Player $player)

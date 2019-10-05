@@ -1,13 +1,19 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" layer="ScoreTable" id="ScoreTable" name="ScoreTable">
+<manialink version="3" layer="ScoresTable" id="ScoresTable" name="ScoresTable">
     <frame pos="10 0">
-        <label textsize="5" text="test" />
     </frame>
 
     <script><!--
     main(){
-        log(UI.UILayers);
+        declare Boolean ESC_Tab_Pressed for This;
+
+        while(True){
+            yield;
+
+            ESC_Tab_Pressed = PageIsVisible;
+            log(PageIsVisible);
         }
+    }
     --></script>
 </manialink>
