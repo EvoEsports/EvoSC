@@ -44,6 +44,7 @@ class PlayerController implements ControllerInterface
         self::cacheConnectedPlayers();
 
         AccessRight::createIfMissing('player_kick', 'Kick players.');
+        AccessRight::createIfMissing('player_warn', 'Warn a player.');
         AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
         AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
     }
@@ -282,7 +283,10 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player." finished with time ($score) ".$player->getTime());
+            Log::info($player." finished with time ($score) ".formatScore($score));
+
+            $player->Score = $score;
+            $player->save();
 
             $map = MapController::getCurrentMap();
 
@@ -368,7 +372,8 @@ class PlayerController implements ControllerInterface
     public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
     {
         for ($i = 0; $i < intval($count); $i++) {
-            Hook::fire('PlayerConnect', Server::connectFakePlayer());
+            $login = Server::connectFakePlayer();
+            Hook::fire('PlayerConnect', player($login));
         }
 
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
@@ -378,6 +383,23 @@ class PlayerController implements ControllerInterface
     {
         $player->settings()->delete();
         infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
+    }
+
+    public static function specPlayer(Player $player, $targetLogin)
+    {
+        Server::forceSpectator($player->Login, 3);
+        Server::forceSpectatorTarget($player->Login, $targetLogin, 1);
+    }
+
+    public static function muteLoginToggle(Player $player, $targetLogin)
+    {
+        $target = player($targetLogin);
+
+        if (ChatController::isPlayerMuted($target)) {
+            ChatController::unmute($player, $target);
+        } else {
+            ChatController::mute($player, $target);
+        }
     }
 
     /**
@@ -393,6 +415,8 @@ class PlayerController implements ControllerInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
+        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 
         ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
             'Set the server password, leave empty to clear it.', 'ma');

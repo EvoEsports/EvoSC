@@ -112,7 +112,7 @@ class LocalRecords implements ModuleInterface
 
             $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
                 return [
-                    'name' => $playerMap->get($record->Player),
+                    'name' => ml_escape($playerMap->get($record->Player)),
                     'rank' => $record->Rank,
                     'score' => $record->Score,
                     'online' => $onlinePlayers->contains('id', $record->Player)
@@ -250,8 +250,6 @@ class LocalRecords implements ModuleInterface
     public static function showLocalsTable(Player $player)
     {
         $map = MapController::getCurrentMap();
-
-        var_dump(self::$records->pluck('Rank'));
 
         $records = self::$records->sortBy('Rank')->map(function ($record) {
             return new LocalRecord(get_object_vars($record));

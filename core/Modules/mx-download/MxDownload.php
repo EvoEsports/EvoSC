@@ -156,7 +156,7 @@ class MxDownload
 
     public static function parseBB(string $bbEncoded): string
     {
-        $bbEncoded = str_replace('"', "'", $bbEncoded);
+        $bbEncoded = ml_escape($bbEncoded);
 
         //bbcode
         $bbEncoded = preg_replace('/\[b\](.+?)\[\/b\]/', '$o$1$z', $bbEncoded);

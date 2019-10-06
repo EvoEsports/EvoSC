@@ -1,18 +1,409 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="ScoresTable" name="ScoresTable">
-    <frame pos="10 0">
+    <framemodel id="player" size="95 13">
+        <quad size="95 13" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="{config('colors.ui.window.bg.opacity') / 1.1}" />
+
+        <quad class="avatar" pos="14.5 -1.5" size="10 10" z-index="1" />
+        <label pos="6.5 -5" valign="center" halign="center" textprefix="$s" text="pos" textsize="3.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.4" text="" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="name" textprefix="$s" pos="33 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <quad class="flag" pos="28 -6.25" bgcolor="6663" size="4 3" valign="center" z-index="1" />
+        <label text="Europe: 1" valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="    " textprefix="$ccc" opacity="0.8" valign="center" halign="center" pos="13 -6.5" textsize="0.8" scale="0.65" rot="90" z-index="3" />
+        <label text="$666 Joining Player" valign="center" pos="28.5 -2.5" textcolor="eee" opacity="0.9" textsize="0.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <quad size="0.1 13" pos="26" bgcolor="666" z-index="1" opacity="0.6" />
+        <quad size="26 13" pos="0" bgcolor="666" z-index="0" opacity="0.25" />
+        <label text="0:00.000" textcolor="fff3" textprefix="" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="2" />
+        <quad size="95 13" bgcolor="{config('colors.ui.window.header.color')}" z-index="-1" opacity="0" />
+
+        <label class="spec" pos="92 -2.1555" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
+        <label class="profile" pos="92 -6.5" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
+        <label hidden="1" class="pm" pos="92 -10.8" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
+
+        <frame pos="54 -0.5" z-index="2" scale="0.9">
+            {if $localPlayer->hasAccess('player_ban')}
+            <label class="btn ban" pos="0 -11" textprefix="" text=" BAN" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="{config('colors.ui.window.text.danger')|noescape}" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            {/if}
+            {if $localPlayer->hasAccess('player_kick')}
+            <label class="btn kick" pos="10 -11" textprefix="" text=" KICK" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="{config('colors.ui.window.text.warning')|noescape}" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            {/if}
+            {if $localPlayer->hasAccess('player_warn')}
+            <label class="btn warn" pos="20 -11" textprefix="" text=" WARN" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="{config('colors.ui.window.text.warning')|noescape}" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            {/if}
+            {if $localPlayer->hasAccess('player_mute')}
+            <label class="btn mute" pos="30 -11" textprefix="" text=" MUTE" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            {/if}
+        </frame>
+
+        <quad size="26 13" style="Bgs1" substyle="BgDialogBlur" z-index="-2" opacity="0" />
+        <quad pos="13 0" size="13 13" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="1" />
+        <quad pos="89 0" size="6 13" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.2" z-index="0" />
+    </framemodel>
+
+    <quad pos="-160 90" size="320 180" style="Bgs1" substyle="BgDialogBlur" opacity="0" z-index="-5" />
+
+    <frame pos="-96 43">
+        {if !empty($logoUrl)}
+        <quad pos="189.5 -6.5" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}" image="{$logoUrl|noescape}" />
+        {/if}
+        <label id="server-name" text="Server-Name" valign="center" pos="2 -3" opacity="1.0" textsize="4.5" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="mode-name" textprefix="Mode: " text="" valign="center" pos="2.5 -8" opacity="0.9" textsize="1.0" scale="0.8" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="player-count" textprefix="$s " text="1/16" valign="center" halign="left" pos="2.5 -11.5" opacity="1" textsize="2" textfont="{config('colors.ui.font')|noescape}" />
+
+        <label class="prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="page" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -104" opacity="0.95" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -104" opacity="0.95" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+
+        <label class="settings" textprefix="$s" text="" valign="center" halign="center" pos="188 -104" opacity="0.95" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+    </frame>
+
+    <frame id="list" pos="0 27">
+        {for $i=0; $i<6; $i++}
+        <frameinstance modelid="player" pos="-96 {$i*-14}" hidden="1" />
+        {/for}
+        {for $i=0; $i<6; $i++}
+        <frameinstance modelid="player" pos="1 {$i*-14}" hidden="1" />
+        {/for}
+        {for $i=0; $i<6; $i++}
+        <quad size="95 13" pos="-96 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
+        {/for}
+        {for $i=0; $i<6; $i++}
+        <quad size="95 13" pos="1 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
+        {/for}
     </frame>
 
     <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+    #Include "ColorLib" as CL
+
+    #Struct ESC_SB_Player {
+        Text login;
+        Text name;
+        Text group_prefix;
+        Text group_color;
+        Text group_name;
+        Integer score;
+        Boolean online;
+    }
+
+    declare Integer currentPage;
+    declare Integer perPage;
+    declare Integer[Text] scoreTracker;
+    declare ESC_SB_Player[] players;
+    declare CTmMlPlayer[Text] ctmPlayers;
+
+    --></script>
+
+    {include 'dialogues.confirm'}
+
+    <script><!--
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Text getStars(Integer count){
+        if(count == 0){
+            return "";
+        }
+
+        declare Text stars = "";
+        for(i, 0, count - 1){
+            stars = stars ^ " ";
+        }
+        return stars;
+    }
+
+    Void updatePlayerFrame(CMlFrame frame, Integer i, ESC_SB_Player sb_player){
+        declare CTmMlPlayer player;
+        declare Vec3 color;
+        declare online = sb_player.online;
+        declare login = sb_player.login;
+        declare name = sb_player.name;
+
+        if(ctmPlayers.existskey(sb_player.login)){
+            player <=> ctmPlayers[sb_player.login];
+            online = True;
+        }
+
+        (frame.Controls[1] as CMlQuad).ImageUrl = "file://Avatars/" ^ login ^ "/Default";
+        (frame.Controls[5] as CMlQuad).ImageUrl = "file://ZoneFlags/Login/" ^ login ^ "/country";
+        (frame.Controls[2] as CMlLabel).Value = TL::ToText(i + 1 + currentPage * perPage);
+        (frame.Controls[4] as CMlLabel).Value = name;
+
+        if(sb_player.score > 0){
+            (frame.Controls[7] as CMlLabel).Value = formatScoreCorrect(sb_player.score, True);
+            (frame.Controls[12] as CMlLabel).Value = formatScoreCorrect(sb_player.score, False);
+        }else{
+            if(scoreTracker.existskey(login) && scoreTracker[login] > 0){
+                declare score = scoreTracker[login];
+                (frame.Controls[7] as CMlLabel).Value = formatScoreCorrect(score, True);
+                (frame.Controls[12] as CMlLabel).Value = formatScoreCorrect(score, False);
+            }else{
+                (frame.Controls[7] as CMlLabel).Value = "";
+                (frame.Controls[12] as CMlLabel).Value = "";
+            }
+        }
+
+        (frame.Controls[14] as CMlLabel).Visible = (player != Null && player.IsSpawned); //spec button
+
+        if(online){
+            if(player != Null){
+                (frame.Controls[6] as CMlLabel).Value = player.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
+                (frame.Controls[8] as CMlLabel).Value = getStars(player.User.FameStars);
+            }
+
+            (frame.Controls[9] as CMlLabel).Value = sb_player.group_prefix ^ " " ^ sb_player.group_name;
+            color = CL::HexToRgb(sb_player.group_color);
+            (frame.Controls[9] as CMlLabel).TextColor = color;
+            (frame.Controls[10] as CMlQuad).BgColor = color;
+            (frame.Controls[11] as CMlQuad).BgColor = color;
+
+            if(player != Null && player.IsSpawned){
+                (frame.Controls[3] as CMlLabel).Value = "";
+            }else{
+                (frame.Controls[3] as CMlLabel).Value = "";
+            }
+        }else{
+            (frame.Controls[3] as CMlLabel).Value = "";
+            color = CL::HexToRgb("666");
+            (frame.Controls[9] as CMlLabel).TextColor = color;
+            (frame.Controls[10] as CMlQuad).BgColor = color;
+            (frame.Controls[11] as CMlQuad).BgColor = color;
+            (frame.Controls[6] as CMlLabel).Value = "Disconnected";
+            (frame.Controls[8] as CMlLabel).Value = "";
+        }
+
+        frame.DataAttributeSet("login", login);
+        frame.Show();
+    }
+
+    Void update(){
+        declare list <=> (Page.MainFrame.GetFirstChild("list") as CMlFrame);
+        declare i = 0;
+        declare skipped = 0;
+
+        (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
+        (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel).Value = CurrentServerModeName;
+        (Page.MainFrame.GetFirstChild("player-count") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = (currentPage + 1) ^ "/" ^ ML::CeilingInteger(players.count / (perPage * 1.0));
+
+        foreach(player in players){
+            if(skipped < currentPage * perPage){
+                skipped += 1;
+                continue;
+            }
+
+            if(ctmPlayers.existskey(player.login)){
+                foreach(p in Players){
+                    if(p.User.Login == player.login){
+                        ctmPlayers[player.login] <=> p;
+                    }
+                }
+            }
+
+            updatePlayerFrame((list.Controls[i] as CMlFrame), i, player);
+
+            i += 1;
+            if(i == perPage){
+                break;
+            }
+        }
+
+        for(x, i, 11){
+            (list.Controls[x] as CMlFrame).Hide();
+        }
+    }
+
+    Void findMe(){
+        declare list <=> (Page.MainFrame.GetFirstChild("list") as CMlFrame);
+        declare i = 0;
+
+        foreach(player in players){
+            i += 1;
+            if(player.login == LocalUser.Login){
+                break;
+            }
+        }
+
+        currentPage = i / perPage;
+        declare frame = (list.Controls[i - currentPage * perPage - 1] as CMlFrame);
+        declare highlight = (frame.Controls[13] as CMlQuad);
+        update();
+        AnimMgr.Add(highlight, "<quad opacity='1' />", 400, CAnimManager::EAnimManagerEasing::ExpInOut);
+        sleep(400);
+        AnimMgr.Add(highlight, "<quad opacity='0' />", 250, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
     main(){
         declare Boolean ESC_Tab_Pressed for This;
+        declare Text[Text][Text] ESC_Players for This;
+        declare ESC_SB_Player[] SB_players for This;
+        declare Integer ESC_SB_Update for This;
+        declare lastPlayersUpdate = 0;
+        declare currentMapId = Map.Id;
+        declare brake = 0;
+
+        foreach(score in Scores){
+            scoreTracker[score.User.Login] = score.BestLap.Time;
+        }
+
+        ctmPlayers = CTmMlPlayer[Text];
+        foreach(player in Players){
+            ctmPlayers[player.User.Login] <=> player;
+        }
+
+        currentPage = 0;
+        perPage = 12;
 
         while(True){
             yield;
 
             ESC_Tab_Pressed = PageIsVisible;
-            log(PageIsVisible);
+
+            if(ESC_SB_Update != lastPlayersUpdate){
+                lastPlayersUpdate = ESC_SB_Update;
+                players = SB_players;
+                update();
+            }
+
+            if(Map.Id != currentMapId){
+                currentMapId = Map.Id;
+                scoreTracker = Integer[Text];
+                ctmPlayers = CTmMlPlayer[Text];
+                foreach(player in Players){
+                    ctmPlayers[player.User.Login] <=> player;
+                }
+                update();
+            }
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+                if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage += 1;
+                    if(currentPage > players.count / perPage){
+                        currentPage = 0;
+                    }
+                    update();
+                    continue;
+                }
+                if(event.Control.HasClass("prev-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    currentPage -= 1;
+                    if(currentPage < 0){
+                        currentPage = ML::CeilingInteger(players.count / (perPage * 1.0)) - 1;
+                    }
+                    update();
+                    continue;
+                }
+                if(event.Control.HasClass("me") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    findMe();
+                    continue;
+                }
+                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOver){
+                    (event.Control as CMlLabel).Opacity = 1.0;
+                    continue;
+                }
+                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOut){
+                    (event.Control as CMlLabel).Opacity = 0.25;
+                    continue;
+                }
+                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare login = event.Control.Parent.Parent.DataAttributeGet("login");
+
+                    if(!ctmPlayers.existskey(login)){
+                        continue;
+                    }
+
+                    declare player <=> ctmPlayers[login];
+                    if(event.Control.HasClass("kick")){
+                        (event.Control as CMlLabel).Opacity = 0.25;
+                        if(confirm("Kick player " ^ player.User.Name ^ "?")){
+                            TriggerPageAction("kick," ^ login);
+                        }
+                        continue;
+                    }
+                    if(event.Control.HasClass("warn")){
+                        (event.Control as CMlLabel).Opacity = 0.25;
+                        if(confirm("Warn player " ^ player.User.Name ^ "?")){
+                            TriggerPageAction("warn," ^ login ^ ",");
+                        }
+                        continue;
+                    }
+                    if(event.Control.HasClass("ban")){
+                        (event.Control as CMlLabel).Opacity = 0.25;
+                        if(confirm("Ban player " ^ player.User.Name ^ "?")){
+                            TriggerPageAction("ban," ^ login ^ ",");
+                        }
+                        continue;
+                    }
+                    if(event.Control.HasClass("mute")){
+                        TriggerPageAction("mute,"^login);
+                        continue;
+                    }
+                }
+                if(event.Control.HasClass("spec") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    TriggerPageAction("spec," ^ event.Control.Parent.DataAttributeGet("login"));
+                    continue;
+                }
+                if(event.Control.HasClass("profile") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    TriggerPageAction("profile," ^ event.Control.Parent.DataAttributeGet("login"));
+                    continue;
+                }
+            }
+
+            foreach(event in RaceEvents){
+                if(event.IsEndLap == True){
+                    if(!scoreTracker.existskey(event.Player.User.Login) || scoreTracker[event.Player.User.Login] > event.LapTime){
+                        scoreTracker[event.Player.User.Login] = event.LapTime;
+                    }
+                    break;
+                }
+            }
+
+            brake += 1;
+            if(brake >= 80){
+                update();
+                brake = 0;
+            }
         }
     }
     --></script>

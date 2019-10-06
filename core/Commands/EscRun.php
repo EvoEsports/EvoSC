@@ -4,6 +4,7 @@ namespace esc\Commands;
 
 use Error;
 use esc\Classes\Database;
+use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
@@ -165,12 +166,7 @@ class EscRun extends Command
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
-        //TODO: Collection Transform
-        $logins = [];
-        foreach (Server::getPlayerList(500, 0) as $player) {
-            array_push($logins, $player->login);
-        }
-        Player::whereIn('Login', $logins)->get()->each(function (Player $player) use ($_onlinePlayers) {
+        onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
         });
 

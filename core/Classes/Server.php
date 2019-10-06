@@ -267,7 +267,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static PlayerInfo getPlayerInfo(string $string, int $int = 0)
  * @method static PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
- * @method static array getCurrentRanking(int $int, int $int)
+ * @method static \Maniaplanet\DedicatedServer\Structures\PlayerRanking[] getCurrentRanking(int $int = -1, int $int = 0)
  * @method static array getCurrentRankingForLogin(string $string)
  * @method static int getCurrentWinnerTeam()
  * @method static bool forceScores(array $array, bool $boolean)

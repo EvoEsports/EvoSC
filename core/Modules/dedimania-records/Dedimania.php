@@ -167,7 +167,7 @@ class Dedimania extends DedimaniaApi
             $records = $map->dedis->transform(function (Dedi $dedi) {
                 $record = collect();
                 $record->login = $dedi->player->Login;
-                $record->nickname = $dedi->player->NickName;
+                $record->nickname = ml_escape($dedi->player->NickName);
                 $record->score = $dedi->Score;
                 $record->rank = $dedi->Rank;
                 $record->max_rank = $dedi->player->MaxRank;

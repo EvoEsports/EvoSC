@@ -32,9 +32,9 @@ class BansController implements ControllerInterface
     /**
      * Ban a player
      *
-     * @param Player $toBan  The player to be banned
-     * @param Player $admin  The admin who is banning
-     * @param string $reason The reason
+     * @param  Player  $toBan  The player to be banned
+     * @param  Player  $admin  The admin who is banning
+     * @param  string  $reason  The reason
      */
     public static function ban(Player $toBan, Player $admin, string $reason = '')
     {
@@ -46,14 +46,19 @@ class BansController implements ControllerInterface
     /**
      * Unban a player
      *
-     * @param Player $toUnban The player to be unbanned
-     * @param Player $admin   The admin who is unbanning
+     * @param  Player  $toUnban  The player to be unbanned
+     * @param  Player  $admin  The admin who is unbanning
      */
     public static function unban(Player $toUnban, Player $admin)
     {
         Server::unBan($toUnban->Login);
         infoMessage($admin, ' unbanned ', $toUnban)->sendAll();
         $toUnban->update(['banned' => 0]);
+    }
+
+    public static function banPlayerEvent(Player $player, $targetLogin, $reason)
+    {
+        self::ban(player($targetLogin), $player, $reason);
     }
 
     /**

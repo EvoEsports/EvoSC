@@ -216,6 +216,11 @@ function onlinePlayers(bool $withSpectators = true): Collection
     return Player::whereIn('Login', $logins)->get();
 }
 
+function ml_escape(string $string)
+{
+    return str_replace('"', '\u0022', $string);
+}
+
 /**
  * @param  string  $login
  * @param  bool  $addToOnlineIfOffline

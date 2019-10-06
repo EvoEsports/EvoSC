@@ -46,6 +46,10 @@ Void hidescript(){
             hs_hide(1);
         }
 
+        if(InputPlayer == Null){
+            return;
+        }
+
         declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
         declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
 
