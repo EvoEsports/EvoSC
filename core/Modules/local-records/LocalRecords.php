@@ -6,6 +6,7 @@ use esc\Classes\Cache;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
@@ -93,38 +94,44 @@ class LocalRecords implements ModuleInterface
         $topIds = range(1, $showTop);
 
         foreach ($players as $player) {
-            $baseRecord = self::$records->get($player->id);
-            $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
+            try {
+                $baseRecord = self::$records->get($player->id);
+                $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
 
-            if (!$baseRank || $baseRank > $localsCount - $show) {
-                $bottomIds = range($localsCount - $show + 1, $localsCount);
-            } else {
-                if ($baseRank <= self::$show) {
-                    $bottomIds = range($showTop + 1, self::$show);
+                if (!$baseRank || $baseRank > $localsCount - $show) {
+                    $bottomIds = range($localsCount - $show + 1, $localsCount);
                 } else {
-                    $bottomIds = range(ceil($baseRank - $show / 2) + 1, ceil($baseRank + $show / 2));
+                    if ($baseRank <= self::$show) {
+                        $bottomIds = range($showTop + 1, self::$show);
+                    } else {
+                        $bottomIds = range(ceil($baseRank - $show / 2) + 1, ceil($baseRank + $show / 2));
+                    }
                 }
+
+                $selectRanks = array_merge($topIds, $bottomIds);
+                $records = DB::table('local-records')->where('Map', '=', $map->id)
+                    ->whereIn('Rank', $selectRanks)->orderBy('Rank')->get();
+
+                $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
+                    return [
+                        'name' => ml_escape($playerMap->get($record->Player)),
+                        'rank' => $record->Rank,
+                        'score' => $record->Score,
+                        'online' => $onlinePlayers->contains('id', $record->Player)
+                    ];
+                });
+
+                if ($saveToCache) {
+                    $xml = Template::toString('local-records.update', compact('records'));
+                    Cache::put('local_records.xml', $xml);
+                }
+
+                Template::show($player, 'local-records.update', compact('records'));
+            } catch (\Exception $e) {
+                Log::warning('Failed to create locals-chunk-xml for player ' .  $player . ' on map ' . $map->uid);
+                Log::write($e->getMessage());
+                Log::write($e->getTraceAsString());
             }
-
-            $selectRanks = array_merge($topIds, $bottomIds);
-            $records = DB::table('local-records')->where('Map', '=', $map->id)
-                ->whereIn('Rank', $selectRanks)->orderBy('Rank')->get();
-
-            $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
-                return [
-                    'name' => ml_escape($playerMap->get($record->Player)),
-                    'rank' => $record->Rank,
-                    'score' => $record->Score,
-                    'online' => $onlinePlayers->contains('id', $record->Player)
-                ];
-            });
-
-            if($saveToCache){
-                $xml = Template::toString('local-records.update', compact('records'));
-                Cache::put('local_records.xml', $xml);
-            }
-
-            Template::show($player, 'local-records.update', compact('records'));
         }
     }
 
