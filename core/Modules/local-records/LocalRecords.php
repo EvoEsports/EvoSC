@@ -124,10 +124,8 @@ class LocalRecords implements ModuleInterface
                 Cache::put('local_records.xml', $xml);
             }
 
-            Template::show($player, 'local-records.update', compact('records'), true);
+            Template::show($player, 'local-records.update', compact('records'));
         }
-
-        Template::executeMulticall();
     }
 
     public static function playerConnect(Player $player)
