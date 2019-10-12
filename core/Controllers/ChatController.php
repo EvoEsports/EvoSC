@@ -209,7 +209,8 @@ class ChatController implements ControllerInterface
             $nick = $player->NickName;
 
             if ($player->isSpectator()) {
-                $nick = '$eee📷 '.$nick;
+                //$nick = '$eee📷 '.$nick;
+                $nick = '$eee '.$nick;
             }
 
             $prefix = $player->group->chat_prefix;

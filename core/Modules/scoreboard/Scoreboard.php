@@ -134,6 +134,10 @@ class Scoreboard implements ModuleInterface
 
         self::$tracker->transform(function ($tracker) use ($player) {
             if ($tracker['login'] == $player->Login) {
+                $tracker['name'] = $player->NickName;
+                $tracker['group_prefix'] = $player->group->chat_prefix;
+                $tracker['group_color'] = $player->group->color;
+                $tracker['group_name'] = $player->group->Name;
                 $tracker['online'] = true;
             }
             return $tracker;
