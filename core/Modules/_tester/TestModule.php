@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        AddedTimeInfo::showWidget($player);
+        PM::mlePmDialog($player, 'brakerb');
     }
 
     public static function sendTestManialink(Player $player)

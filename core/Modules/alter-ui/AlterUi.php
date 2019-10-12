@@ -66,7 +66,7 @@ class AlterUi implements ModuleInterface
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
  		<viewers_count visible="true" pos="157. -40. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
- 		<scorestable alt_visible="true" visible="true" />
+ 		<scorestable alt_visible="false" visible="false" />
  	</ui_properties>';
 
         Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', [$properties]);

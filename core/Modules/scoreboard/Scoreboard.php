@@ -4,11 +4,10 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Cache;
 use esc\Classes\Hook;
-use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\PlayerController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -37,7 +36,7 @@ class Scoreboard implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         self::$logoUrl = config('scoreboard.logo-url');
-        self::$tracker = collect();
+        self::$tracker = collect(Cache::get('scoreboard'));
         self::$scores = collect();
 
         onlinePlayers()->where('Score', '>', 0)->each(function (Player $player) {
@@ -56,10 +55,10 @@ class Scoreboard implements ModuleInterface
             ]);
         });
 
-//        Hook::add('BeginMap', [self::class, 'beginMap']);
-//        Hook::add('PlayerConnect', [self::class, 'sendScoreboard']);
-//        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-//        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerConnect', [self::class, 'sendScoreboard']);
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
     }
 
     public static function beginMap(Map $map)
@@ -119,17 +118,27 @@ class Scoreboard implements ModuleInterface
             }
         }
 
-        $players = self::$tracker->where('score', '>', 0)->sortBy('score')->merge(self::$tracker->where('score', '=',
-            0))->values();
+        $finished = self::$tracker->where('score', '>', 0)->sortBy('score');
+        $noFinish = self::$tracker->where('score', '=', 0)->sortByDesc('online');
+        $players = $finished->merge($noFinish)->values();
 
         Template::showAll('scoreboard.update-player-infos', compact('players'));
+        Cache::put('scoreboard', self::$tracker);
     }
 
     public static function sendScoreboard(Player $player)
     {
         $logoUrl = self::$logoUrl;
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-        self::updatePlayerList();
         Template::show($player, 'scoreboard.scoreboard', compact('logoUrl', 'maxPlayers'));
+
+        self::$tracker->transform(function ($tracker) use ($player) {
+            if ($tracker['login'] == $player->Login) {
+                $tracker['online'] = true;
+            }
+            return $tracker;
+        });
+
+        self::updatePlayerList();
     }
 }

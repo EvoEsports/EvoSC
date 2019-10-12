@@ -20,7 +20,7 @@
 
         <label class="spec" pos="92 -2.1555" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
         <label class="profile" pos="92 -6.5" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
-        <label hidden="1" class="pm" pos="92 -10.8" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
+        <label class="pm" pos="92 -10.8" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
 
         <frame pos="54 -0.5" z-index="2" scale="0.9">
             {if $localPlayer->hasAccess('player_ban')}
@@ -92,7 +92,6 @@
 
     declare Integer currentPage;
     declare Integer perPage;
-    declare Integer[Text] scoreTracker;
     declare ESC_SB_Player[] players;
     declare CTmMlPlayer[Text] ctmPlayers;
 
@@ -142,10 +141,6 @@
     }
 
     Text getStars(Integer count){
-        if(count == 0){
-            return "";
-        }
-
         declare Text stars = "";
         for(i, 0, count - 1){
             stars = stars ^ " ";
@@ -174,20 +169,13 @@
             (frame.Controls[7] as CMlLabel).Value = formatScoreCorrect(sb_player.score, True);
             (frame.Controls[12] as CMlLabel).Value = formatScoreCorrect(sb_player.score, False);
         }else{
-            if(scoreTracker.existskey(login) && scoreTracker[login] > 0){
-                declare score = scoreTracker[login];
-                (frame.Controls[7] as CMlLabel).Value = formatScoreCorrect(score, True);
-                (frame.Controls[12] as CMlLabel).Value = formatScoreCorrect(score, False);
-            }else{
-                (frame.Controls[7] as CMlLabel).Value = "";
-                (frame.Controls[12] as CMlLabel).Value = "";
-            }
+            (frame.Controls[7] as CMlLabel).Value = "";
+            (frame.Controls[12] as CMlLabel).Value = "";
         }
-
-        (frame.Controls[14] as CMlLabel).Visible = (player != Null && player.IsSpawned); //spec button
 
         if(online){
             if(player != Null){
+                (frame.Controls[14] as CMlLabel).Visible = player.IsSpawned; //spec button
                 (frame.Controls[6] as CMlLabel).Value = player.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
                 (frame.Controls[8] as CMlLabel).Value = getStars(player.User.FameStars);
             }
@@ -233,7 +221,7 @@
                 continue;
             }
 
-            if(ctmPlayers.existskey(player.login)){
+            if(!ctmPlayers.existskey(player.login)){
                 foreach(p in Players){
                     if(p.User.Login == player.login){
                         ctmPlayers[player.login] <=> p;
@@ -280,17 +268,8 @@
         declare ESC_SB_Player[] SB_players for This;
         declare Integer ESC_SB_Update for This;
         declare lastPlayersUpdate = 0;
-        declare currentMapId = Map.Id;
+        declare Ident currentMapId;
         declare brake = 0;
-
-        foreach(score in Scores){
-            scoreTracker[score.User.Login] = score.BestLap.Time;
-        }
-
-        ctmPlayers = CTmMlPlayer[Text];
-        foreach(player in Players){
-            ctmPlayers[player.User.Login] <=> player;
-        }
 
         currentPage = 0;
         perPage = 12;
@@ -308,11 +287,7 @@
 
             if(Map.Id != currentMapId){
                 currentMapId = Map.Id;
-                scoreTracker = Integer[Text];
                 ctmPlayers = CTmMlPlayer[Text];
-                foreach(player in Players){
-                    ctmPlayers[player.User.Login] <=> player;
-                }
                 update();
             }
 
@@ -388,14 +363,9 @@
                     TriggerPageAction("profile," ^ event.Control.Parent.DataAttributeGet("login"));
                     continue;
                 }
-            }
-
-            foreach(event in RaceEvents){
-                if(event.IsEndLap == True){
-                    if(!scoreTracker.existskey(event.Player.User.Login) || scoreTracker[event.Player.User.Login] > event.LapTime){
-                        scoreTracker[event.Player.User.Login] = event.LapTime;
-                    }
-                    break;
+                if(event.Control.HasClass("pm") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    TriggerPageAction("pm.dialog," ^ event.Control.Parent.DataAttributeGet("login"));
+                    continue;
                 }
             }
 

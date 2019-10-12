@@ -161,11 +161,24 @@ class ChatController implements ControllerInterface
             return;
         }
 
+        self::pmTo($player, $target->Login, implode(' ', $message));
+    }
+
+    public static function pmTo(Player $player, $login, $message)
+    {
+        $target = player($login);
+
+        if ($target->id == $player->id) {
+            warningMessage('You can\'t PM yourself.')->send($player);
+
+            return;
+        }
+
         $from = sprintf(secondary('[from:').$player.secondary('] '));
         $to = sprintf(secondary('[to:').$target.secondary('] '));
 
-        chatMessage($from.implode(' ', $message))->setIcon('')->send($target);
-        chatMessage($to.implode(' ', $message))->setIcon('')->send($player);
+        chatMessage($from.$message)->setIcon('')->send($target);
+        chatMessage($to.$message)->setIcon('')->send($player);
     }
 
     /**
