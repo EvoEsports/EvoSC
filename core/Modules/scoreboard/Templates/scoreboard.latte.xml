@@ -187,11 +187,18 @@
         }
 
         if(online){
+            (frame.Controls[3] as CMlLabel).Value = "";
+
             foreach(ply in Players){
                 if(ply.User.Login == sb_player.login){
                     (frame.Controls[14] as CMlLabel).Visible = ply.IsSpawned; //spec button
                     (frame.Controls[6] as CMlLabel).Value = ply.User.LadderZoneName ^ ": " ^ ply.User.LadderRank;
                     (frame.Controls[8] as CMlLabel).Value = getStars(ply.User.FameStars);
+
+                    if(ply.IsSpawned){
+                        (frame.Controls[3] as CMlLabel).Value = "";
+                    }
+
                     break;
                 }
             }
@@ -201,12 +208,6 @@
             (frame.Controls[9] as CMlLabel).TextColor = color;
             (frame.Controls[10] as CMlQuad).BgColor = color;
             (frame.Controls[11] as CMlQuad).BgColor = color;
-
-            if(player != Null && player.IsSpawned){
-                (frame.Controls[3] as CMlLabel).Value = "";
-            }else{
-                (frame.Controls[3] as CMlLabel).Value = "";
-            }
         }else{
             (frame.Controls[3] as CMlLabel).Value = "";
             color = CL::HexToRgb("666");
