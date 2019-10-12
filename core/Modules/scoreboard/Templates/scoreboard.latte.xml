@@ -171,7 +171,6 @@
 
         if(ctmPlayers.existskey(sb_player.login)){
             player <=> ctmPlayers[sb_player.login];
-            online = True;
         }
 
         (frame.Controls[1] as CMlQuad).ImageUrl = "file://Avatars/" ^ login ^ "/Default";
