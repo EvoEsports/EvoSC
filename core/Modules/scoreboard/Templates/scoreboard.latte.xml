@@ -42,7 +42,7 @@
         <quad pos="89 0" size="6 13" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.2" z-index="0" />
     </framemodel>
 
-    <quad pos="-160 90" size="320 180" style="Bgs1" substyle="BgDialogBlur" opacity="0" z-index="-5" />
+    <quad id="bg-blur" pos="-160 90" size="320 180" style="Bgs1" substyle="BgDialogBlur" opacity="0" z-index="-5" />
 
     <frame pos="-96 43">
         {if !empty($logoUrl)}
@@ -58,6 +58,13 @@
         <label class="me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -104" opacity="0.95" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
 
         <label class="settings" textprefix="$s" text="" valign="center" halign="center" pos="188 -104" opacity="0.95" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+    </frame>
+
+    <frame id="settings" halign="right" pos="96 -57.5" size="0 8">
+        <quad size="38 8" pos="-38.09" bgcolor="0002" z-index="-1" />
+        <label class="blur" pos="-36 -3.9" size="26 3.3" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <label id="bg-blur-checkbox" pos="-35.5 -3.75" valign="center" text="" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
+        <label pos="-31.5 -3.75" valign="center" text="Blur background" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
     </frame>
 
     <frame id="list" pos="0 27">
@@ -88,6 +95,13 @@
         Text group_name;
         Integer score;
         Boolean online;
+    }
+
+    #Struct UISettings {
+        Boolean hide;
+        Integer speed;
+        Real scale;
+        Boolean sb_blur;
     }
 
     declare Integer currentPage;
@@ -262,7 +276,27 @@
         AnimMgr.Add(highlight, "<quad opacity='0' />", 250, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
+    Void setSettingsVisible(Boolean visible){
+        declare frame <=> (Page.MainFrame.GetFirstChild("settings") as CMlFrame);
+
+        if(visible){
+            AnimMgr.Add(frame, "<frame size='40 8' />", 350, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }else{
+            AnimMgr.Add(frame, "<frame size='0 8' />", 450, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }
+
+    Void SetBgBlurVisible(Boolean visible){
+        (Page.MainFrame.GetFirstChild("bg-blur") as CMlQuad).Visible = visible;
+        if(visible){
+            (Page.MainFrame.GetFirstChild("bg-blur-checkbox") as CMlLabel).Value = "$fff";
+        }else{
+            (Page.MainFrame.GetFirstChild("bg-blur-checkbox") as CMlLabel).Value = "$ccc";
+        }
+    }
+
     main(){
+        declare UISettings settings for This;
         declare Boolean ESC_Tab_Pressed for This;
         declare Text[Text][Text] ESC_Players for This;
         declare ESC_SB_Player[] SB_players for This;
@@ -270,9 +304,19 @@
         declare lastPlayersUpdate = 0;
         declare Ident currentMapId;
         declare brake = 0;
+        declare settingsVisible = False;
 
         currentPage = 0;
         perPage = 12;
+
+        sleep(250);
+
+        if(settings.scale == 0.0){
+            settings.scale = 1.0;
+            settings.sb_blur = True;
+        }
+
+        SetBgBlurVisible(settings.sb_blur);
 
         while(True){
             yield;
@@ -311,6 +355,17 @@
                 }
                 if(event.Control.HasClass("me") && event.Type == CMlScriptEvent::Type::MouseClick){
                     findMe();
+                    continue;
+                }
+                if(event.Control.HasClass("settings") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    settingsVisible = !settingsVisible;
+                    setSettingsVisible(settingsVisible);
+                    continue;
+                }
+                if(event.Control.HasClass("blur") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    settings.sb_blur = !settings.sb_blur;
+                    SetBgBlurVisible(settings.sb_blur);
+                    TriggerPageAction("ui.save," ^ settings.tojson());
                     continue;
                 }
                 if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOver){

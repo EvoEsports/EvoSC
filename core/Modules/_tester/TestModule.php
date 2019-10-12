@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        PM::mlePmDialog($player, 'brakerb');
+        Scoreboard::sendScoreboard($player);
     }
 
     public static function sendTestManialink(Player $player)

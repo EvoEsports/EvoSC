@@ -55,13 +55,13 @@ class Scoreboard implements ModuleInterface
             ]);
         });
 
-        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('PlayerConnect', [self::class, 'sendScoreboard']);
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMatch()
     {
         self::$tracker = collect();
         self::$scores = collect();

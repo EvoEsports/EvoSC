@@ -5,6 +5,7 @@
     Boolean hide;
     Integer speed;
     Real scale;
+    Boolean sb_blur;
 }
 
 main() {
