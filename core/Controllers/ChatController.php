@@ -74,9 +74,7 @@ class ChatController implements ControllerInterface
      */
     public static function mute(Player $admin, Player $target)
     {
-        if (!self::isPlayerMuted($target)) {
-            Server::ignore($target->Login);
-        }
+        Server::ignore($target->Login);
         infoMessage($admin, ' muted ', $target)->sendAll();
     }
 
@@ -88,10 +86,24 @@ class ChatController implements ControllerInterface
      */
     public static function unmute(Player $player, Player $target)
     {
-        if (!self::isPlayerMuted($target)) {
-            Server::unIgnore($target->Login);
-        }
+        Server::unIgnore($target->Login);
         infoMessage($player, ' unmuted ', $target)->sendAll();
+    }
+
+    /**
+     * Chat-command: unmute player.
+     *
+     * @param  Player  $player
+     * @param                    $cmd
+     * @param                    $nick
+     */
+    public static function cmdUnmute(Player $player, $cmd, $nick)
+    {
+        $target = PlayerController::findPlayerByName($player, $nick);
+
+        if ($target) {
+            self::unmute($player, $target);
+        }
     }
 
     /**
@@ -111,26 +123,6 @@ class ChatController implements ControllerInterface
         }
 
         self::mute($admin, $target);
-    }
-
-    /**
-     * Chat-command: unmute player.
-     *
-     * @param  Player  $player
-     * @param                    $cmd
-     * @param                    $nick
-     */
-    public static function cmdUnmute(Player $player, $cmd, $nick)
-    {
-        $target = PlayerController::findPlayerByName($player, $nick);
-
-        if (!$target) {
-            //No target found
-            return;
-        }
-
-        Server::unIgnore($target->Login);
-        infoMessage($player, ' unmuted ', $target)->sendAll();
     }
 
     public static function isPlayerMuted(Player $player)
