@@ -221,6 +221,12 @@ class PlayerController implements ControllerInterface
             return;
         }
 
+        if ($playerToBeKicked->Group < $player->Group) {
+            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
+            infoMessage($player, ' tried to kick you but was blocked.')->send($playerToBeKicked);
+            return;
+        }
+
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
@@ -245,6 +251,12 @@ class PlayerController implements ControllerInterface
             $toBeKicked = Player::find($login);
         } catch (\Exception $e) {
             $toBeKicked = $login;
+        }
+
+        if ($toBeKicked->Group < $player->Group) {
+            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
+            infoMessage($player, ' tried to kick you but was blocked.')->send($toBeKicked);
+            return;
         }
 
         try {

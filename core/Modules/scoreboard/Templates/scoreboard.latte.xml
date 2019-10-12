@@ -9,7 +9,7 @@
         <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.3" text="" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="name" textprefix="$s" pos="33 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <quad class="flag" pos="28 -6.25" bgcolor="6663" size="4 3" valign="center" z-index="1" />
-        <label text="Europe: 1" valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="Joining..." valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="" textprefix="$ccc" opacity="0.8" valign="center" halign="center" pos="13 -6.5" textsize="0.8" scale="0.65" rot="90" z-index="3" />
         <label text="$666 Joining Player" valign="center" pos="28.5 -2.5" textcolor="eee" opacity="0.9" textsize="0.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
