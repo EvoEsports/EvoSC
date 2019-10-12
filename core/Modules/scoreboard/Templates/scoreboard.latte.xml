@@ -187,10 +187,13 @@
         }
 
         if(online){
-            if(player != Null){
-                (frame.Controls[14] as CMlLabel).Visible = player.IsSpawned; //spec button
-                (frame.Controls[6] as CMlLabel).Value = player.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
-                (frame.Controls[8] as CMlLabel).Value = getStars(player.User.FameStars);
+            foreach(ply in Players){
+                if(ply.User.Login == sb_player.login){
+                    (frame.Controls[14] as CMlLabel).Visible = ply.IsSpawned; //spec button
+                    (frame.Controls[6] as CMlLabel).Value = ply.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
+                    (frame.Controls[8] as CMlLabel).Value = getStars(ply.User.FameStars);
+                    break;
+                }
             }
 
             (frame.Controls[9] as CMlLabel).Value = sb_player.group_prefix ^ " " ^ sb_player.group_name;
