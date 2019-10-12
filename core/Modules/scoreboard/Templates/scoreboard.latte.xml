@@ -190,7 +190,7 @@
             foreach(ply in Players){
                 if(ply.User.Login == sb_player.login){
                     (frame.Controls[14] as CMlLabel).Visible = ply.IsSpawned; //spec button
-                    (frame.Controls[6] as CMlLabel).Value = ply.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
+                    (frame.Controls[6] as CMlLabel).Value = ply.User.LadderZoneName ^ ": " ^ ply.User.LadderRank;
                     (frame.Controls[8] as CMlLabel).Value = getStars(ply.User.FameStars);
                     break;
                 }
