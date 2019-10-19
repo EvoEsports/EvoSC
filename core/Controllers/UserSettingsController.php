@@ -33,7 +33,7 @@ class UserSettingsController implements ControllerInterface
     {
         if (!is_object($data)) {
             if (count($data) > 1) {
-                $data = implode($data);
+                $data = implode(',', $data);
             }else{
                 $data = $data[0];
             }

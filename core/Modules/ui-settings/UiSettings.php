@@ -7,7 +7,6 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
 class UiSettings

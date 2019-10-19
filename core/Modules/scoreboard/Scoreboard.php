@@ -130,7 +130,8 @@ class Scoreboard implements ModuleInterface
     {
         $logoUrl = self::$logoUrl;
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-        Template::show($player, 'scoreboard.scoreboard', compact('logoUrl', 'maxPlayers'));
+        $settings = $player->setting('sb');
+        Template::show($player, 'scoreboard.scoreboard', compact('logoUrl', 'maxPlayers', 'settings'));
 
         self::$tracker->transform(function ($tracker) use ($player) {
             if ($tracker['login'] == $player->Login) {
