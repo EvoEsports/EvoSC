@@ -9,7 +9,7 @@
         <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.3" text="" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="name" textprefix="$s" pos="33 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <quad class="flag" pos="28 -6.25" bgcolor="6663" size="4 3" valign="center" z-index="1" />
-        <label text="Joining..." valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="" valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="" textprefix="$ccc" opacity="0.8" valign="center" halign="center" pos="13 -6.5" textsize="0.8" scale="0.65" rot="90" z-index="3" />
         <label text="$666 Joining Player" valign="center" pos="28.5 -2.5" textcolor="eee" opacity="0.9" textsize="0.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
@@ -97,21 +97,21 @@
         Boolean online;
     }
 
-    #Struct UISettings {
-        Boolean hide;
-        Integer speed;
-        Real scale;
-        Boolean sb_blur;
+    #Struct SBSettings {
+        Boolean transparent_bg;
+        Boolean grayscale;
     }
 
     declare Integer currentPage;
     declare Integer perPage;
     declare ESC_SB_Player[] players;
     declare CTmMlPlayer[Text] ctmPlayers;
+    declare Boolean grayscale;
 
     --></script>
 
     {include 'dialogues.confirm'}
+    {include 'scripts.mle'}
 
     <script><!--
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
@@ -290,16 +290,16 @@
     }
 
     Void SetBgBlurVisible(Boolean visible){
-        (Page.MainFrame.GetFirstChild("bg-blur") as CMlQuad).Visible = visible;
+        (Page.MainFrame.GetFirstChild("bg-blur") as CMlQuad).Visible = !visible;
         if(visible){
-            (Page.MainFrame.GetFirstChild("bg-blur-checkbox") as CMlLabel).Value = "$fff";
-        }else{
             (Page.MainFrame.GetFirstChild("bg-blur-checkbox") as CMlLabel).Value = "$ccc";
+        }else{
+            (Page.MainFrame.GetFirstChild("bg-blur-checkbox") as CMlLabel).Value = "$fff";
         }
     }
 
     main(){
-        declare UISettings settings for This;
+        declare SBSettings sb_settings for This;
         declare Boolean ESC_Tab_Pressed for This;
         declare Text[Text][Text] ESC_Players for This;
         declare ESC_SB_Player[] SB_players for This;
@@ -312,14 +312,7 @@
         currentPage = 0;
         perPage = 12;
 
-        sleep(250);
-
-        if(settings.scale == 0.0){
-            settings.scale = 1.0;
-            settings.sb_blur = True;
-        }
-
-        SetBgBlurVisible(settings.sb_blur);
+        SetBgBlurVisible(sb_settings.transparent_bg);
 
         while(True){
             yield;
@@ -366,9 +359,9 @@
                     continue;
                 }
                 if(event.Control.HasClass("blur") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    settings.sb_blur = !settings.sb_blur;
-                    SetBgBlurVisible(settings.sb_blur);
-                    TriggerPageAction("ui.save," ^ settings.tojson());
+                    sb_settings.transparent_bg = !sb_settings.transparent_bg;
+                    SetBgBlurVisible(sb_settings.transparent_bg);
+                    ManiaLinkEvent("user_setting_save", "sb", sb_settings.tojson());
                     continue;
                 }
                 if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOver){

@@ -22,4 +22,13 @@ Void ManiaLinkEvent(Text event, Text body){
         }
     }
 }
+Void ManiaLinkEvent(Text event, Text body1, Text body2){
+    ManiaLinkEvent(event, body1 ^ "," ^ body2);
+}
+Void ManiaLinkEvent(Text event, Text body1, Text body2, Text body3){
+    ManiaLinkEvent(event, body1 ^ "," ^ body2 ^ "," ^ body3);
+}
+Void ManiaLinkEvent(Text event, Text body1, Text body2, Text body3, Text body4){
+    ManiaLinkEvent(event, body1 ^ "," ^ body2 ^ "," ^ body3 ^ "," ^ body4);
+}
 --></script>

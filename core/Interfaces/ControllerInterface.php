@@ -11,9 +11,10 @@ interface ControllerInterface
     public static function init();
 
     /**
+     * Method called on controller start and mode change
+     *
      * @param  string  $mode
      * @param  bool  $isBoot
-     * @return mixed
      */
     public static function start(string $mode, bool $isBoot);
 }

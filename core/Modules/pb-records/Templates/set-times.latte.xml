@@ -9,8 +9,8 @@
 
             PbUpdateTime = GameTime;
             PbCheckpoints = "{$checkpoints|noescape}";
-            PbTargetString = "{$targetString|noescape}";
+            PbTargetString = "{$targetString|escape_quotes|noescape}";
         }
         -->
     </script>
-        </manialink>
+</manialink>
