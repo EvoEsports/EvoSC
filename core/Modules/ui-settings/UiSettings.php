@@ -6,6 +6,7 @@ namespace esc\Modules;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Classes\Timer;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -37,5 +38,10 @@ class UiSettings
     {
         $settings = $player->setting('ui');
         Template::show($player, 'ui-settings.update', compact('settings'));
+
+        Timer::create(uniqid('fix-ui'), function () use ($player, $settings) {
+            $settings = $player->setting('ui');
+            Template::show($player, 'ui-settings.update', compact('settings'));
+        }, '2s', false);
     }
 }
