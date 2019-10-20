@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:cp-diffs" id="cp-diffs" version="3">
+<manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
     <framemodel id="box" valign="center" halign="center">
         <quad pos="-7.5" halign="center" valign="center" size="5 4" bgcolor="000" opacity="0.5" z-index="-1" />
         <label pos="-7.5 0.25" text="0" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" valign="center" textsize="0.4" textfont="{config('colors.ui.font')|noescape}" />
@@ -9,10 +9,10 @@
         <label pos="0 0" text="+" halign="center" valign="center" textprefix="" textsize="0.5" opacity="1" textfont="{config('colors.ui.font')|noescape}" z-index="1" hidden="1" />
     </framemodel>
 
-    <frame pos="0 10" scale="0.9">
-        <label pos="0 -10" text="$s{$target->name}$z$s | {$target->score|score}" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
+    <frame pos="0 -65" scale="0.85">
+        <label id="target-label" pos="0 -10" opacity="0.99" text="$s{$target->name}$z$s | {$target->score|score}" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
 
-        <frame size="20 12" pos="-10">
+        <frame size="20 13" pos="-10 -10">
             <frame pos="10 -2.25">
                 <frame id="boxes">
                     {for $i=0;$i<100;$i++}
@@ -35,6 +35,12 @@
         }
 
         declare Target target;
+
+        CTmMlPlayer GetOwner() {
+          if (GUIPlayer != Null) return GUIPlayer;
+          if (InputPlayer != Null) return InputPlayer;
+          return Null;
+        }
 
         Text formatDiff(Integer diff){
             declare Text sign;
@@ -77,21 +83,24 @@
             if(diff > 0){
                 (boxFrame.Controls[2] as CMlQuad).BgColor = <1.0, 0.0, 0.0>;
                 (boxFrame.Controls[4] as CMlLabel).TextColor = <1.0, 0.0, 0.0>;
-                //(boxFrame.Controls[5] as CMlLabel).TextColor = <1.0, 0.0, 0.0>;
                 (boxFrame.Controls[5] as CMlLabel).Value = "+";
             }else{
                 if(diff == 0){
                     (boxFrame.Controls[2] as CMlQuad).BgColor = <0.0, 0.25, 0.8>;
                     (boxFrame.Controls[4] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
-                    //(boxFrame.Controls[5] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
                     (boxFrame.Controls[5] as CMlLabel).Value = "";
                 }else{
                     (boxFrame.Controls[2] as CMlQuad).BgColor = <0.1, 0.75, 0.2>;
                     (boxFrame.Controls[4] as CMlLabel).TextColor = <0.1, 0.75, 0.2>;
-                    //(boxFrame.Controls[5] as CMlLabel).TextColor = <0.1, 0.75, 0.2>;
                     (boxFrame.Controls[5] as CMlLabel).Value = "-";
                 }
             }
+
+            for(i, 0, 3){
+                boxFrame.Controls[i].Show();
+            }
+            boxFrame.Controls[4].Hide();
+            boxFrame.Controls[5].Hide();
 
             if(cpId > 0){
                 declare previousBox = (boxesFrame.Controls[cpId - 1] as CMlFrame);
@@ -107,26 +116,41 @@
         }
 
         Void respawn(){
-            (Page.MainFrame.GetFirstChild("boxes") as CMlFrame).RelativePosition_V3 = <0.0, 0.0>;
-        }
+            declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
+            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            boxesFrame.RelativePosition_V3 = <0.0, 0.0>;
+            targetLabel.Visible = True;
+            AnimMgr.Add(targetLabel, "<label opacity='1.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
 
-        Void wayPoint(CTmRaceClientEvent event){
-            fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+            foreach(box in boxesFrame.Controls){
+                box.Hide();
+            }
         }
 
         main(){
             target.fromjson("""{json_encode($target)|noescape}""");
+            declare CTmMlPlayer player <=> GetOwner();
+            declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
 
             while(True){
                 yield;
 
-                if(target.score > 0){
-                    foreach(event in RaceEvents){
-                        if(event.Player.User.Login == InputPlayer.User.Login){
-                            switch(event.Type){
-                                case CTmRaceClientEvent::EType::WayPoint: wayPoint(event);
-                                case CTmRaceClientEvent::EType::Respawn: respawn();
-                            }
+                if(player == Null){
+                    sleep(200);
+                    continue;
+                }
+
+                if(targetLabel.Visible && player.Distance > 10.0){
+                    AnimMgr.Add(targetLabel, "<label opacity='0.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+                    sleep(300);
+                    targetLabel.Visible = False;
+                }
+
+                foreach(event in RaceEvents){
+                    if(event.Player.User.Login == player.Login){
+                        switch(event.Type){
+                            case CTmRaceClientEvent::EType::WayPoint: fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+                            case CTmRaceClientEvent::EType::Respawn: respawn();
                         }
                     }
                 }

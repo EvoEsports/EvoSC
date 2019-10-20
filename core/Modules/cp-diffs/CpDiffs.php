@@ -10,11 +10,18 @@ use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
+use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class CpDiffs implements ModuleInterface
 {
+    /**
+     * @var Collection
+     */
+    private static $targets;
+
     /**
      * Called when the module is loaded
      *
@@ -24,6 +31,7 @@ class CpDiffs implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
         ChatCommand::add('/target', [self::class, 'cmdSetTarget'],
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
@@ -31,9 +39,32 @@ class CpDiffs implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
+        self::$targets = collect();
+
         foreach (onlinePlayers() as $player) {
             self::sendInitialCpDiff($player, $map);
         }
+    }
+
+    public static function playerFinish(Player $player, int $score, string $checkpoints)
+    {
+        if ($score == 0) {
+            return;
+        }
+
+        if (self::$targets->has($player->id)) {
+            if (self::$targets->get($player->id)->score <= $score) {
+                return;
+            }
+        }
+
+        $target = new \stdClass();
+        $target->score = $score;
+        $target->cps = explode(',', $checkpoints);
+        $target->name = ml_escape($player->NickName);
+
+        self::$targets->put($player->id, $target);
+        Template::show($player, 'cp-diffs.widget', compact('target'));
     }
 
     public static function sendInitialCpDiff(Player $player, Map $map)
@@ -46,12 +77,31 @@ class CpDiffs implements ModuleInterface
             $target->cps = explode(',', $pb->checkpoints);
             $target->name = ml_escape($player->NickName);
 
+            self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
+        } else {
+            $dedi = Dedi::whereMap($map->id)->orderByDesc('Score')->first();
+
+            if ($dedi) {
+                $target = new \stdClass();
+                $target->score = $dedi->Score;
+                $target->cps = explode(',', $dedi->Checkpoints);
+                $target->name = ml_escape($dedi->player->NickName);
+
+                self::$targets->put($player->id, $target);
+                Template::show($player, 'cp-diffs.widget', compact('target'));
+            }
         }
     }
 
-    public static function cmdSetTarget(Player $player, string $cmd, string $type, string $id = null)
+    public static function cmdSetTarget(Player $player, string $cmd, string $type = null, string $id = null)
     {
+        if ($type === null) {
+            warningMessage('Invalid target specified. See ', secondary('/help'),
+                ' for more information.')->send($player);
+            return;
+        }
+
         $map = MapController::getCurrentMap();
 
         switch ($type) {
@@ -79,6 +129,7 @@ class CpDiffs implements ModuleInterface
             $target->cps = explode(',', $record->Checkpoints);
             $target->name = ml_escape($targetPlayer->NickName);
 
+            self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
         } else {
             warningMessage('Invalid target specified. See ', secondary('/help'),
