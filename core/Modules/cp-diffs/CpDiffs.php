@@ -81,21 +81,25 @@ class CpDiffs implements ModuleInterface
             self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
         } else {
-            $target = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
+            $target = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
+                $player->id)->first();
 
-            if(!$target){
-                $target = Dedi::whereMap($map->id)->wherePlayer($player->id)->first();
+            if (!$target) {
+                $target = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
+                    $player->id)->first();
             }
 
-            if(!$target){
-                $target = Dedi::whereMap($map->id)->orderByDesc('Score')->first();
+            if (!$target) {
+                $target = DB::table('dedi-records')->where('Map', '=', $map->id)->orderByDesc('Score')->first();
             }
+
+            $player = DB::table('players')->where('id', '=', $target->Player)->first();
 
             if ($target) {
                 $target = new \stdClass();
                 $target->score = $target->Score;
                 $target->cps = explode(',', $target->Checkpoints);
-                $target->name = ml_escape($target->player->NickName);
+                $target->name = ml_escape($player->NickName);
 
                 self::$targets->put($player->id, $target);
                 Template::show($player, 'cp-diffs.widget', compact('target'));
