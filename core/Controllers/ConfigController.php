@@ -32,7 +32,7 @@ class ConfigController implements ControllerInterface
     /**
      * Get a config variable from cache
      *
-     * @param string $id
+     * @param  string  $id
      *
      * @return mixed|null
      */
@@ -48,7 +48,7 @@ class ConfigController implements ControllerInterface
     /**
      * Check if a config value is loaded
      *
-     * @param string $id
+     * @param  string  $id
      *
      * @return bool
      */
@@ -58,8 +58,8 @@ class ConfigController implements ControllerInterface
     }
 
     /**
-     * @param string                                      $id
-     * @param string|stdClass|array|int|float|double|bool $value
+     * @param  string  $id
+     * @param  string|stdClass|array|int|float|double|bool  $value
      */
     public static function saveConfig(string $id, $value)
     {
@@ -68,21 +68,21 @@ class ConfigController implements ControllerInterface
         $idParts = collect(explode('.', $id));
         $file = $idParts->shift();
 
-        $configFile = configDir($file . '.config.json');
+        $configFile = configDir($file.'.config.json');
         $jsonData = File::get($configFile, true);
         $path = $idParts->map(function ($part) {
             return sprintf("{'%s'}", $part);
         })->implode('->');
 
-        eval('$jsonData->' . $path . ' = $value;');
+        eval('$jsonData->'.$path.' = $value;');
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
         Log::write("Updated config $id", isVerbose());
     }
 
     /**
-     * @param string                                      $id
-     * @param string|stdClass|array|int|float|double|bool $value
+     * @param  string  $id
+     * @param  string|stdClass|array|int|float|double|bool  $value
      */
     public static function setConfig(string $id, $value)
     {
@@ -113,14 +113,14 @@ class ConfigController implements ControllerInterface
             }
         });
 
-        $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)->mapWithKeys(function ($configFile
-        ) {
-            $name = basename($configFile);
-            $name = preg_replace(self::$configFilePattern, '', $name);
-            $data = File::get($configFile, true);
+        $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)
+            ->mapWithKeys(function ($configFile) {
+                $name = basename($configFile);
+                $name = preg_replace(self::$configFilePattern, '', $name);
+                $data = File::get($configFile, true);
 
-            return [$name => $data];
-        });
+                return [$name => $data];
+            });
 
         self::createConfigCache($configFiles);
     }
@@ -158,6 +158,10 @@ class ConfigController implements ControllerInterface
 
         $config->each(function ($value, $base) use ($map) {
             self::createPathsRecursively($base, $value)->each(function ($value, $path) use ($map) {
+                if ($value === null) {
+                    $value = false;
+                }
+
                 $map->put($path, $value);
             });
         });
@@ -169,6 +173,8 @@ class ConfigController implements ControllerInterface
                 } else {
                     if (is_array($value)) {
                         $data = 'array';
+                    } elseif (is_bool($value)) {
+                        $data = $value ? 'true' : 'false';
                     } else {
                         $data = $value;
                     }
@@ -188,9 +194,9 @@ class ConfigController implements ControllerInterface
 
         foreach ($values as $key => $value) {
             if ($value instanceof stdClass) {
-                $paths = $paths->merge(self::createPathsRecursively($base . '.' . strtolower($key), $value));
+                $paths = $paths->merge(self::createPathsRecursively($base.'.'.strtolower($key), $value));
             } else {
-                $paths->put($base . '.' . strtolower($key), $value);
+                $paths->put($base.'.'.strtolower($key), $value);
             }
 
             $paths->put($base, $value);

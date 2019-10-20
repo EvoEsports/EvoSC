@@ -174,7 +174,7 @@ class MatchSettingsController implements ControllerInterface
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::error("Failed to shuffle map-list: " . $e->getMessage());
+            Log::error("Failed to shuffle map-list: ".$e->getMessage());
         }
     }
 
@@ -296,22 +296,24 @@ class MatchSettingsController implements ControllerInterface
 
         if ($root == 'script_settings') {
             foreach ($settings->script_settings->setting as $setting_) {
-                if($setting_['name'] == explode('.', $setting)[1]){
-                    $setting_['value'] = $value;
-                }
-            }
-        } else if ($root == 'mode_script_settings') {
-            foreach ($settings->mode_script_settings->setting as $setting_) {
-                if($setting_['name'] == explode('.', $setting)[1]){
+                if ($setting_['name'] == explode('.', $setting)[1]) {
                     $setting_['value'] = $value;
                 }
             }
         } else {
-            $nodePath = collect(explode('.', $setting))->transform(function ($node) {
-                return "{$node}";
-            })->implode('->');
+            if ($root == 'mode_script_settings') {
+                foreach ($settings->mode_script_settings->setting as $setting_) {
+                    if ($setting_['name'] == explode('.', $setting)[1]) {
+                        $setting_['value'] = $value;
+                    }
+                }
+            } else {
+                $nodePath = collect(explode('.', $setting))->transform(function ($node) {
+                    return "{$node}";
+                })->implode('->');
 
-            eval('$settings->'.$nodePath.' = $value;');
+                eval('$settings->'.$nodePath.' = $value;');
+            }
         }
 
 
@@ -334,7 +336,7 @@ class MatchSettingsController implements ControllerInterface
      */
     private static function getPath(string $matchSettingsFile)
     {
-        return Server::getMapsDirectory().config('server.matchsettings-directory').DIRECTORY_SEPARATOR.$matchSettingsFile;
+        return Server::getMapsDirectory().'MatchSettings'.DIRECTORY_SEPARATOR.$matchSettingsFile;
     }
 
     /**

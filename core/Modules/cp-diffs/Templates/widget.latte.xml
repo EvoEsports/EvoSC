@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:cp-diffs" id="cp-diffs" version="3">
+    <framemodel id="box" valign="center" halign="center">
+        <quad pos="-7.5" halign="center" valign="center" size="5 4" bgcolor="000" opacity="0.5" z-index="-1" />
+        <label pos="-7.5 0.25" text="0" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" valign="center" textsize="0.4" textfont="{config('colors.ui.font')|noescape}" />
+        <quad pos="2.5" halign="center" valign="center" size="15 4" bgcolor="f00" opacity="0.5" z-index="-1" />
+        <label pos="2.55 0.25" text="" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" />
+        <label pos="0 0" text="" halign="center" valign="center" textsize="1" opacity="0.5" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+        <label pos="0 0" text="+" halign="center" valign="center" textprefix="" textsize="0.5" opacity="1" textfont="{config('colors.ui.font')|noescape}" z-index="1" hidden="1" />
+    </framemodel>
+
+    <frame pos="0 10" scale="0.9">
+        <label pos="0 -10" text="$s{$target->name}$z$s | {$target->score|score}" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
+
+        <frame size="20 12" pos="-10">
+            <frame pos="10 -2.25">
+                <frame id="boxes">
+                    {for $i=0;$i<100;$i++}
+                    <frameinstance modelid="box" pos="0 {$i * 4.25}" size="10 10" hidden="1"></frameinstance>
+                    {/for}
+                </frame>
+            </frame>
+        </frame>
+    </frame>
+
+    <script>
+        <!--
+        #Include "MathLib" as ML
+        #Include "TextLib" as TL
+
+        #Struct Target {
+            Integer score;
+            Integer[] cps;
+            Text name;
+        }
+
+        declare Target target;
+
+        Text formatDiff(Integer diff){
+            declare Text sign;
+            declare Integer ms = diff;
+
+            if(ms < 0){
+                ms *= -1;
+            }
+
+            declare Integer minutes = ML::FloorInteger(ms / 60000.0);
+            ms -= minutes * 60000;
+            declare seconds = ML::FloorInteger(ms / 1000.0);
+            ms -= seconds * 1000;
+
+            if(diff < 0){
+                sign = "-";
+            }else{
+                sign = "+";
+            }
+
+            if(minutes > 0){
+                return sign ^ minutes ^ ":" ^ TL::FormatInteger(seconds, 2) ^ "." ^ TL::FormatInteger(ms, 3);
+            }
+
+            return sign ^ seconds ^ "." ^ TL::FormatInteger(ms, 3);
+        }
+
+        Void fillBox(Integer cpId, Integer score, Boolean finish){
+            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            declare boxFrame = (boxesFrame.Controls[cpId] as CMlFrame);
+            declare diff = score - target.cps[cpId];
+
+            if(finish){
+                (boxFrame.Controls[1] as CMlLabel).Value = "";
+            }else{
+                (boxFrame.Controls[1] as CMlLabel).Value = (cpId + 1) ^ "";
+            }
+            (boxFrame.Controls[3] as CMlLabel).Value = formatDiff(diff);
+
+            if(diff > 0){
+                (boxFrame.Controls[2] as CMlQuad).BgColor = <1.0, 0.0, 0.0>;
+                (boxFrame.Controls[4] as CMlLabel).TextColor = <1.0, 0.0, 0.0>;
+                //(boxFrame.Controls[5] as CMlLabel).TextColor = <1.0, 0.0, 0.0>;
+                (boxFrame.Controls[5] as CMlLabel).Value = "+";
+            }else{
+                if(diff == 0){
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = <0.0, 0.25, 0.8>;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
+                    //(boxFrame.Controls[5] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
+                    (boxFrame.Controls[5] as CMlLabel).Value = "";
+                }else{
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = <0.1, 0.75, 0.2>;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = <0.1, 0.75, 0.2>;
+                    //(boxFrame.Controls[5] as CMlLabel).TextColor = <0.1, 0.75, 0.2>;
+                    (boxFrame.Controls[5] as CMlLabel).Value = "-";
+                }
+            }
+
+            if(cpId > 0){
+                declare previousBox = (boxesFrame.Controls[cpId - 1] as CMlFrame);
+                for(i, 0, 3){
+                    previousBox.Controls[i].Hide();
+                }
+                previousBox.Controls[4].Show();
+                previousBox.Controls[5].Show();
+            }
+
+            boxFrame.Show();
+            AnimMgr.Add(boxesFrame, "<frame pos='0 " ^ (cpId * -4.25) ^ "' />", 450, CAnimManager::EAnimManagerEasing::QuintOut);
+        }
+
+        Void respawn(){
+            (Page.MainFrame.GetFirstChild("boxes") as CMlFrame).RelativePosition_V3 = <0.0, 0.0>;
+        }
+
+        Void wayPoint(CTmRaceClientEvent event){
+            fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+        }
+
+        main(){
+            target.fromjson("""{json_encode($target)|noescape}""");
+
+            while(True){
+                yield;
+
+                if(target.score > 0){
+                    foreach(event in RaceEvents){
+                        if(event.Player.User.Login == InputPlayer.User.Login){
+                            switch(event.Type){
+                                case CTmRaceClientEvent::EType::WayPoint: wayPoint(event);
+                                case CTmRaceClientEvent::EType::Respawn: respawn();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        -->
+    </script>
+</manialink>

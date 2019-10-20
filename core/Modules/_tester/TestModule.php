@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Template;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -18,7 +19,8 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Scoreboard::sendScoreboard($player);
+        $map = MapController::getCurrentMap();
+        CpDiffs::sendInitialCpDiff($player, $map);
     }
 
     public static function sendTestManialink(Player $player)

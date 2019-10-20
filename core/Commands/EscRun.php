@@ -42,7 +42,8 @@ class EscRun extends Command
     {
         $this->setName('run')
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.',
+                false)
             ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
             ->setDescription('Run Evo Server Controller');
     }
@@ -59,19 +60,18 @@ class EscRun extends Command
             return;
         }
 
-        if (!isWindows()) {
+        var_dump(config('server.use-external-router', false));
+
+        if (config('server.use-external-router', false)) {
             switch (pcntl_fork()) {
                 case -1:
                     $output->writeln('Starting chat router failed.');
-                    break;
+                    exit(1);
 
                 case 0:
                     $output->writeln('Starting chat router.');
                     pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
                     exit(0);
-
-                default:
-                    //parent
             }
         }
 
@@ -124,7 +124,7 @@ class EscRun extends Command
     {
         if ($input->getOption('skip_migrate') !== false) {
             $output->writeln('Skipping migrations.');
-        }else{
+        } else {
             $migrate = $this->getApplication()->find('migrate');
             $migrate->execute($input, $output);
         }
@@ -184,16 +184,13 @@ class EscRun extends Command
         Hook::fire('BeginMap', $map);
 
         //Set connected players online
-        $playerList = collect(Server::rpc()->getPlayerList());
+        $playerList = collect(Server::getPlayerList());
 
         foreach ($playerList as $maniaPlayer) {
-            Player::firstOrCreate(['Login' => $maniaPlayer->login], [
+            DB::table('players')->updateOrInsert(['Login' => $maniaPlayer->login], [
                 'NickName' => $maniaPlayer->nickName,
             ]);
         }
-
-        Server::cleanBlackList();
-        Server::cleanBanList();
 
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
@@ -242,15 +239,4 @@ class EscRun extends Command
             }
         }
     }
-
-//    private function restart(InputInterface $input, OutputInterface $output)
-//    {
-//        $output->writeln('<bg=cyan>Restarting</>');
-//
-//        Timer::destroyAll();
-//        HookController::init();
-//
-//        $this->initialize($input, $output);
-//        $this->execute($input, $output);
-//    }
 }

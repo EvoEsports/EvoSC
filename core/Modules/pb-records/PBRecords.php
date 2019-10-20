@@ -30,9 +30,6 @@ class PBRecords
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMap']);
         Hook::add('PlayerLocal', [self::class, 'playerLocal']);
-
-        ChatCommand::add('/target', [self::class, 'setTargetCommand'],
-            'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
         ChatCommand::add('/pb', [self::class, 'getPersonalBest'], 'Get your best time on this map.');
 
         self::$targets = collect();

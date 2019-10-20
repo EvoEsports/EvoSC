@@ -30,6 +30,9 @@ class ChatController implements ControllerInterface
     /** @var boolean */
     private static $routingEnabled;
 
+    /** @var boolean */
+    private static $externalRouter;
+
     /**
      * Initialize ChatController.
      */
@@ -40,21 +43,19 @@ class ChatController implements ControllerInterface
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
 
-        if (!isWindows()) {
-            //unix systems use chat router process
+        if(self::$externalRouter = config('server.use-external-router', false)){
             return;
         }
 
-        self::$routingEnabled = config('server.enable-chat-routing');
-
-        if (self::$routingEnabled) {
+        if ((self::$routingEnabled = config('server.enable-chat-routing', true)) && !self::$externalRouter) {
             Log::write('Enabling manual chat routing.');
             $routingEnabled = false;
 
             while (!$routingEnabled) {
                 try {
-                    Server::chatEnableManualRouting(false, false);
+                    Server::chatEnableManualRouting(true, false);
                     $routingEnabled = true;
+                    Log::info('Chat router started.');
                 } catch (FaultException $e) {
                     $msg = $e->getMessage();
                     Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
@@ -62,7 +63,7 @@ class ChatController implements ControllerInterface
                 }
             }
         } else {
-            Server::chatEnableManualRouting(false, false);
+            Server::chatEnableManualRouting(false, true);
         }
     }
 
@@ -181,23 +182,9 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
-            warningMessage('Invalid chat-command entered. See ', secondary('/help'),
-                ' for all commands.')->send($player);
-
-            return;
-        }
-
-        if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
-            //Player is muted
-            warningMessage('You are muted.')->send($player);
-
-            return;
-        }
-
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
 
-        if (isWindows()) {
+        if (!self::$externalRouter && self::$routingEnabled) {
             $nick = $player->NickName;
 
             if ($player->isSpectator()) {

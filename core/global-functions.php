@@ -139,7 +139,13 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
  */
 function config(string $id, $default = null)
 {
-    return ConfigController::getConfig(strtolower($id)) ?: $default;
+    $data = ConfigController::getConfig(strtolower($id));
+
+    if(!$data && is_bool($data)){
+        return false;
+    }
+
+    return $data ?: $default;
 }
 
 /**
