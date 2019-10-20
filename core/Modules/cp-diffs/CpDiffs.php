@@ -11,6 +11,7 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Dedi;
+use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
@@ -80,13 +81,21 @@ class CpDiffs implements ModuleInterface
             self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
         } else {
-            $dedi = Dedi::whereMap($map->id)->orderByDesc('Score')->first();
+            $target = LocalRecord::whereMap($map->id)->wherePlayer($player->id)->first();
 
-            if ($dedi) {
+            if(!$target){
+                $target = Dedi::whereMap($map->id)->wherePlayer($player->id)->first();
+            }
+
+            if(!$target){
+                $target = Dedi::whereMap($map->id)->orderByDesc('Score')->first();
+            }
+
+            if ($target) {
                 $target = new \stdClass();
-                $target->score = $dedi->Score;
-                $target->cps = explode(',', $dedi->Checkpoints);
-                $target->name = ml_escape($dedi->player->NickName);
+                $target->score = $target->Score;
+                $target->cps = explode(',', $target->Checkpoints);
+                $target->name = ml_escape($target->player->NickName);
 
                 self::$targets->put($player->id, $target);
                 Template::show($player, 'cp-diffs.widget', compact('target'));
