@@ -74,6 +74,11 @@ class ScoreController implements ControllerInterface
             self::$tracker->put($player->id, $tracker);
         }
 
-//        Hook::fire('ScoreTrackerUpdated', self::$tracker);
+        Hook::fire('ScoresUpdated', self::$tracker);
+    }
+
+    public static function getTracker(): Collection
+    {
+        return self::$tracker;
     }
 }

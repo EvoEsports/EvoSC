@@ -4,12 +4,11 @@
 namespace esc\Modules;
 
 
-use esc\Classes\Cache;
 use esc\Classes\Hook;
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Controllers\ScoreController;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -25,7 +24,7 @@ class Scoreboard implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $scores;
+    private static $playersOnline;
 
     /**
      * Called when the module is loaded
@@ -36,114 +35,72 @@ class Scoreboard implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         self::$logoUrl = config('scoreboard.logo-url');
-        self::$tracker = collect(Cache::get('scoreboard'));
-        self::$scores = collect();
+        self::$playersOnline = collect();
 
-        onlinePlayers()->where('Score', '>', 0)->each(function (Player $player) {
-            self::$scores->put($player->Login, $player->Score);
-        });
+        self::scoresUpdated(ScoreController::getTracker());
 
-        onlinePlayers()->each(function (Player $player) {
-            self::$tracker->put($player->Login, [
-                'login' => $player->Login,
-                'name' => $player->NickName,
-                'group_prefix' => $player->group->chat_prefix,
-                'group_color' => $player->group->color,
-                'group_name' => $player->group->Name,
-                'score' => self::$scores->get($player->Login) ?? 0,
-                'online' => true
-            ]);
-        });
-
-        Hook::add('BeginMatch', [self::class, 'beginMatch']);
-        Hook::add('PlayerConnect', [self::class, 'sendScoreboard']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('ScoresUpdated', [self::class, 'scoresUpdated']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
     }
 
     public static function beginMatch()
     {
         self::$tracker = collect();
-        self::$scores = collect();
         self::updatePlayerList();
     }
 
-    public static function playerFinish(Player $player, int $score, string $checkpoints)
+    public static function scoresUpdated(Collection $tracker)
     {
-        if ($score == 0 || self::$scores->has($player->Login) && self::$scores->get($player->Login) <= $score) {
-            return;
-        }
-
-        self::$scores->put($player->Login, $score);
+        self::$tracker = $tracker;
         self::updatePlayerList();
     }
 
     public static function playerDisconnect(Player $player)
     {
-        self::$tracker->transform(function ($tracker) use ($player) {
-            if ($tracker['login'] == $player->Login) {
-                $tracker['online'] = false;
-            }
-            return $tracker;
-        });
-
+        self::$playersOnline->put($player->id, false);
         self::updatePlayerList();
     }
 
-    public static function updatePlayerList()
-    {
-        $onlinePlayers = onlinePlayers();
-
-        self::$tracker->transform(function ($tracker) use ($onlinePlayers) {
-            if (!$onlinePlayers->contains('Login', $tracker['login'])) {
-                $tracker['online'] = false;
-            }
-
-            $tracker['score'] = self::$scores->get($tracker['login']) ?? 0;
-
-            return $tracker;
-        });
-
-        foreach ($onlinePlayers as $player) {
-            if (!self::$tracker->has($player->Login)) {
-                self::$tracker->put($player->Login, [
-                    'login' => $player->Login,
-                    'name' => $player->NickName,
-                    'group_prefix' => $player->group->chat_prefix,
-                    'group_color' => $player->group->color,
-                    'group_name' => $player->group->Name,
-                    'score' => self::$scores->get($player->Login) ?? 0,
-                    'online' => true
-                ]);
-            }
-        }
-
-        $finished = self::$tracker->where('score', '>', 0)->sortBy('score');
-        $noFinish = self::$tracker->where('score', '=', 0)->sortByDesc('online');
-        $players = $finished->merge($noFinish)->values();
-
-        Template::showAll('scoreboard.update-player-infos', compact('players'));
-        Cache::put('scoreboard', self::$tracker);
-    }
-
-    public static function sendScoreboard(Player $player)
+    public static function playerConnect(Player $player)
     {
         $logoUrl = self::$logoUrl;
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $settings = $player->setting('sb');
         Template::show($player, 'scoreboard.scoreboard', compact('logoUrl', 'maxPlayers', 'settings'));
 
-        self::$tracker->transform(function ($tracker) use ($player) {
-            if ($tracker['login'] == $player->Login) {
-                $tracker['name'] = $player->NickName;
-                $tracker['group_prefix'] = $player->group->chat_prefix;
-                $tracker['group_color'] = $player->group->color;
-                $tracker['group_name'] = $player->group->Name;
-                $tracker['online'] = true;
+        self::$playersOnline->put($player->id, true);
+        self::updatePlayerList();
+    }
+
+    public static function updatePlayerList()
+    {
+        $onlinePlayers = onlinePlayers()->keyBy('id');
+        $players = self::$playersOnline->map(function ($online, $playerId) use ($onlinePlayers) {
+            $player = $onlinePlayers->get($playerId);
+
+            $data = [
+                'login' => $player->Login,
+                'name' => $player->NickName,
+                'group_prefix' => $player->group->chat_prefix,
+                'group_color' => $player->group->color,
+                'group_name' => $player->group->Name,
+                'score' => 0,
+                'online' => $online
+            ];
+
+            if (self::$tracker->has($playerId)) {
+                $data['score'] = self::$tracker->get($playerId)->best_score;
             }
-            return $tracker;
+
+            return $data;
         });
 
-        self::updatePlayerList();
+        $finished = $players->where('score', '>', 0)->sortBy('score');
+        $noFinish = $players->where('score', '=', 0)->sortByDesc('online');
+        $players = $finished->merge($noFinish)->values();
+
+        Template::showAll('scoreboard.update-player-infos', compact('players'));
     }
 }
