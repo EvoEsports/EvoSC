@@ -80,6 +80,10 @@ class Scoreboard implements ModuleInterface
         $players = self::$playersOnline->map(function ($online, $playerId) use ($onlinePlayers) {
             $player = $onlinePlayers->get($playerId);
 
+            if (!$player) {
+                $player = Player::whereId($playerId)->first();
+            }
+
             $data = [
                 'login' => $player->Login,
                 'name' => $player->NickName,
