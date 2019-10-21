@@ -37,6 +37,10 @@ class Scoreboard implements ModuleInterface
         self::$logoUrl = config('scoreboard.logo-url');
         self::$playersOnline = collect();
 
+        foreach (onlinePlayers() as $player) {
+            self::$playersOnline->put($player->id, true);
+        }
+
         self::scoresUpdated(ScoreController::getTracker());
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
