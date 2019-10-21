@@ -72,7 +72,7 @@ class CpDiffs implements ModuleInterface
     {
         $pb = DB::table('pbs')->where('map_id', '=', $map->id)->where('player_id', '=', $player->id)->first();
 
-        if ($pb) {
+        if ($pb != null) {
             $target = new \stdClass();
             $target->score = $pb->score;
             $target->cps = explode(',', $pb->checkpoints);
@@ -81,25 +81,25 @@ class CpDiffs implements ModuleInterface
             self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
         } else {
-            $target = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
+            $targetRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
                 $player->id)->first();
 
-            if (!$target) {
-                $target = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
+            if (!$targetRecord) {
+                $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
                     $player->id)->first();
             }
 
-            if (!$target) {
-                $target = DB::table('dedi-records')->where('Map', '=', $map->id)->orderByDesc('Score')->first();
+            if (!$targetRecord) {
+                $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->orderByDesc('Score')->first();
             }
 
-            $player = DB::table('players')->where('id', '=', $target->Player)->first();
+            $targetPlayer = DB::table('players')->where('id', '=', $targetRecord->Player)->first();
 
-            if ($target) {
+            if ($targetRecord) {
                 $target = new \stdClass();
-                $target->score = $target->Score;
-                $target->cps = explode(',', $target->Checkpoints);
-                $target->name = ml_escape($player->NickName);
+                $target->score = $targetRecord->Score;
+                $target->cps = explode(',', $targetRecord->Checkpoints);
+                $target->name = ml_escape($targetPlayer->NickName);
 
                 self::$targets->put($player->id, $target);
                 Template::show($player, 'cp-diffs.widget', compact('target'));
