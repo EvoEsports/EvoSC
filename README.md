@@ -11,7 +11,7 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 | ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
 | --- |
 
-:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
+:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and resources to give support at all times. Safe updates are always pushed to the master-branch.
 
 
 ### Requirements
