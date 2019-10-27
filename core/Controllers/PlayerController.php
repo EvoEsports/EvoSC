@@ -383,12 +383,11 @@ class PlayerController implements ControllerInterface
 
     public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
     {
+        infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
+
         for ($i = 0; $i < intval($count); $i++) {
             $login = Server::connectFakePlayer();
-            Hook::fire('PlayerConnect', player($login));
         }
-
-        infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
     }
 
     public static function resetUserSettings(Player $player, string $cmd)

@@ -52,6 +52,11 @@ class Scoreboard implements ModuleInterface
     public static function beginMatch()
     {
         self::$tracker = collect();
+        $playersOnline = collect();
+        foreach (onlinePlayers() as $player) {
+            $playersOnline->put($player->id, true);
+        }
+        self::$playersOnline = $playersOnline;
         self::updatePlayerList();
     }
 
