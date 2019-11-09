@@ -19,8 +19,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $map = MapController::getCurrentMap();
-        CpDiffs::sendInitialCpDiff($player, $map);
+        LiveRankings::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

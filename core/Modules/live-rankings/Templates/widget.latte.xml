@@ -96,7 +96,7 @@
 
             i = i + 1;
 
-            if(i > 14){
+            if(i > {config('live-rankings.show', 14)}){
                 return;
             }
 
@@ -120,37 +120,33 @@
     {/block}
 
     {block bootScript}
+        declare Text[Text] LiveRankings__ for This;
+        declare Integer LiveRankingsUpdate for This;
+
         left__ = {config('live-rankings-rounds.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('live-rankings-rounds.ui.slot')};
 
         declare Text currentMapUid = Map.MapInfo.MapUid;
+        declare lastUpdate = 0;
 
         reset();
-        foreach(score in Scores){
-            declare time = score.BestLap.Time;
-            if(time > 0){
-                scores[score.User.Name] = time;
-            }
-        }
-
-        updateList();
     {/block}
 
     {block loop}
-        foreach(event in RaceEvents){
-            if(event.IsEndLap == True){
-                if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
-                    scores[event.Player.Name] = event.LapTime;
-                    updateList();
-                }
-                break;
+        if(lastUpdate != LiveRankingsUpdate){
+            lastUpdate = LiveRankingsUpdate;
+            log(LiveRankings__);
+            scores = Integer[Text];
+            foreach(score => nick in LiveRankings__){
+                scores[nick] = TL::ToInteger(score);
             }
+            updateList();
         }
 
-            if(currentMapUid != Map.MapInfo.MapUid){
-                currentMapUid = Map.MapInfo.MapUid;
-                reset();
-            }
+        if(currentMapUid != Map.MapInfo.MapUid){
+            currentMapUid = Map.MapInfo.MapUid;
+            reset();
+        }
     {/block}
 
     {block pendingEvents}
