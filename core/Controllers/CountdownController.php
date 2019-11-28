@@ -134,6 +134,8 @@ class CountdownController implements ControllerInterface
      */
     public static function getRoundStartTime(bool $getAsCarbon = false)
     {
+        var_dump("MATCH START", self::$matchStart);
+
         if ($getAsCarbon) {
             return Carbon::createFromTimestamp(self::$matchStart);
         } else {
@@ -149,6 +151,8 @@ class CountdownController implements ControllerInterface
         $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 3;
 
         $timeLeft = $calculatedProgressTime - time();
+
+        var_dump("SECONDS LEFT", $timeLeft < 0 ? 0 : $timeLeft);
 
         return $timeLeft < 0 ? 0 : $timeLeft;
     }
@@ -202,6 +206,8 @@ class CountdownController implements ControllerInterface
      */
     public static function getOriginalTimeLimit()
     {
+        var_dump("ORIGINAL TIMELIMIT", self::$originalTimeLimit ?? 600);
+
         return self::$originalTimeLimit ?? 600;
     }
 

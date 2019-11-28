@@ -91,7 +91,7 @@ class Votes
 
         $duration = config('votes.duration');
 
-        if ($secondsLeft <= $duration) {
+        if ($secondsLeft > 4 && $secondsLeft <= $duration) {
             $duration = $secondsLeft - 4;
         }
 
