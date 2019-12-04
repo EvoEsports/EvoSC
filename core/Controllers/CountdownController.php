@@ -170,11 +170,14 @@ class CountdownController implements ControllerInterface
     /**
      * Load the time limit from the default match-settings.
      *
+     * @param  string|null  $file
      * @return int
      */
-    private static function getTimeLimitFromMatchSettings(): int
+    private static function getTimeLimitFromMatchSettings(string $file = null): int
     {
-        $file = config('server.default-matchsettings');
+        if (!$file) {
+            $file = MatchSettingsController::getCurrentMatchSettingsFile();
+        }
 
         if ($file) {
             $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
@@ -186,11 +189,14 @@ class CountdownController implements ControllerInterface
             }
         }
 
+        Log::warning("Failed to get time limit from default match-settings.");
+
         return 600;
     }
 
-    public static function beginMap(Map $map)
+    public static function matchSettingsLoaded(string $matchSettingsFile)
     {
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings($matchSettingsFile);
     }
 
     /**
@@ -206,8 +212,6 @@ class CountdownController implements ControllerInterface
      */
     public static function getOriginalTimeLimit()
     {
-        var_dump("ORIGINAL TIMELIMIT", self::$originalTimeLimit ?? 600);
-
         return self::$originalTimeLimit ?? 600;
     }
 
@@ -232,9 +236,9 @@ class CountdownController implements ControllerInterface
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
 
-        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'setMatchStart']);
         Hook::add('EndMap', [self::class, 'endMap']);
+        Hook::add('MatchSettingsLoaded', [self::class, 'matchSettingsLoaded']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');

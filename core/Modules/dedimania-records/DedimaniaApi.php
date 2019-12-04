@@ -19,7 +19,7 @@ use SimpleXMLElement;
 class DedimaniaApi
 {
     protected static $enabled = false;
-    protected static $maxRank = 15;
+    protected static $maxRank = 30;
 
     /**
      * dedimania.OpenSession

@@ -83,6 +83,8 @@ class Votes
 
         $secondsLeft = CountdownController::getSecondsLeft();
 
+        var_dump($secondsLeft);
+
         if ($secondsLeft < 10 && !$player->hasAccess('vote_always')) {
             warningMessage('Sorry, it is too late to start a vote.')->send($player);
 
