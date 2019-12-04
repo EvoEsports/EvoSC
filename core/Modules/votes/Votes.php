@@ -83,18 +83,20 @@ class Votes
 
         $secondsLeft = CountdownController::getSecondsLeft();
 
-        var_dump($secondsLeft);
+        if($secondsLeft){
+            if ($secondsLeft < 10 && !$player->hasAccess('vote_always')) {
+                warningMessage('Sorry, it is too late to start a vote.')->send($player);
 
-        if ($secondsLeft < 10 && !$player->hasAccess('vote_always')) {
-            warningMessage('Sorry, it is too late to start a vote.')->send($player);
+                return false;
+            }
 
-            return false;
+            $secondsLeft = 0;
         }
 
         $duration = config('votes.duration');
 
-        if ($secondsLeft > 4 && $secondsLeft <= $duration) {
-            $duration = $secondsLeft - 4;
+        if ($secondsLeft > 0 && $secondsLeft <= $duration) {
+            $duration = $secondsLeft - 3;
         }
 
         self::$onlinePlayersCount = onlinePlayers()->count();
@@ -209,7 +211,7 @@ class Votes
 
     public static function askSkip(Player $player)
     {
-        $secondsPassed = CountdownController::getSecondsLeft();
+        $secondsPassed = time() - self::$lastSkipVote;
 
         if (!$player->hasAccess('vote_always')) {
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {

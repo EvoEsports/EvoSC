@@ -13,6 +13,8 @@ class ControllerController
      */
     public static function loadControllers(string $mode, bool $isBoot = false)
     {
+        HookController::init();
+
         foreach (classes() as $class) {
             if (!preg_match('/^esc.Controllers./', $class->namespace)) {
                 continue;

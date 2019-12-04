@@ -92,8 +92,5 @@ class HookController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
-        if (!$isBoot) {
-            self::init();
-        }
     }
 }

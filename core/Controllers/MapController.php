@@ -15,7 +15,6 @@ use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
 use esc\Models\Player;
 use esc\Modules\MxMapDetails;
-use esc\Modules\NextMap;
 use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
