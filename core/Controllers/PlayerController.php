@@ -45,6 +45,7 @@ class PlayerController implements ControllerInterface
 
         AccessRight::createIfMissing('player_kick', 'Kick players.');
         AccessRight::createIfMissing('player_warn', 'Warn a player.');
+        AccessRight::createIfMissing('player_force_spec', 'Force a player into spectator mode.');
         AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
         AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
     }
@@ -156,10 +157,19 @@ class PlayerController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
-        Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
-            'player_id' => 0,
-            'spectator_status' => 0,
-        ]);
+        DB::table('players')
+            ->where('player_id', '>', 0)
+            ->orWhere('spectator_status', '>', 0)
+            ->update([
+                'player_id' => 0,
+                'spectator_status' => 0,
+            ]);
+
+        DB::table('players')
+            ->where('Score', '>', 0)
+            ->update([
+                'Score' => 0,
+            ]);
     }
 
     /**
@@ -360,6 +370,12 @@ class PlayerController implements ControllerInterface
         return self::$players->put($player->Login, $player);
     }
 
+    public static function forceSpecEvent(Player $player, string $targetLogin)
+    {
+        Server::forceSpectator($targetLogin, 3);
+
+        infoMessage($player, ' forced ', player($targetLogin), ' into spectator mode.')->sendAll();
+    }
 
     private static function findClosestMatchingString(string $search, array $array)
     {
@@ -426,6 +442,7 @@ class PlayerController implements ControllerInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 

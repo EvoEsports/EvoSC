@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -70,10 +71,9 @@ class MapController implements ControllerInterface
         AccessRight::createIfMissing('time', 'Change the countdown time.');
     }
 
-
     /**
      * @param  Map  $map
-     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws Exception
      */
     public static function beginMap(Map $map)
@@ -81,8 +81,7 @@ class MapController implements ControllerInterface
         self::$nextMap = null;
         self::$currentMap = $map;
 
-        Map::where('id', '!=', $map->id)
-            ->where('cooldown', '<=', config('server.map-cooldown'))
+        Map::where('cooldown', '<=', config('server.map-cooldown'))
             ->increment('cooldown');
 
         $map->update([
@@ -92,12 +91,6 @@ class MapController implements ControllerInterface
         ]);
 
         MxMapDetails::loadMxDetails($map);
-
-        //TODO: move to player controller
-        Player::where('Score', '>', 0)
-            ->update([
-                'Score' => 0,
-            ]);
     }
 
     /**
@@ -125,7 +118,6 @@ class MapController implements ControllerInterface
                 Log::write('Failed to chooseNextMap '.$request->map->filename);
             }
 
-//            $chatMessage = chatMessage('Upcoming map ', secondary($request->map), ' requested by ', $request->player);
             self::$nextMap = $request->map;
         } else {
             self::$nextMap = Map::where('uid', $mapUid)->first();
@@ -345,8 +337,8 @@ class MapController implements ControllerInterface
             if (!File::exists(self::$mapsPath.$filename)) {
                 Log::error("File $filename not found.");
 
-                if (Map::whereFilename($filename)->exists()) {
-                    Map::whereFilename($filename)->update(['enabled' => 0]);
+                if (DB::table('maps')->where('filename', '=', $filename)->exists()) {
+                    DB::table('maps')->where('filename', '=', $filename)->update(['enabled' => 0]);
                 }
 
                 continue;
@@ -360,8 +352,8 @@ class MapController implements ControllerInterface
                 MatchSettingsController::setMapIdent(config('server.default-matchsettings'), $filename, $uid);
             }
 
-            if (Map::whereFilename($filename)->exists()) {
-                $map = Map::whereFilename($filename)->first();
+            if (DB::table('maps')->where('filename', '=', $filename)->exists()) {
+                $map = DB::table('maps')->where('filename', '=', $filename)->first();
 
                 if ($map->uid != $uid) {
                     $map->update([
@@ -382,8 +374,8 @@ class MapController implements ControllerInterface
                     }
                 }
             } else {
-                if (Map::whereUid($uid)->exists()) {
-                    $map = Map::whereUid($uid)->first();
+                if (DB::table('maps')->where('uid', '=', $uid)->exists()) {
+                    $map = DB::table('maps')->where('uid', '=', $uid)->first();
 
                     if ($map->filename != $filename) {
                         Log::write("Filename changed for map: (".$map->filename." -> $filename)",
@@ -393,7 +385,7 @@ class MapController implements ControllerInterface
                             Log::warning($e->getTraceAsString());
                         }
 
-                        $map->update(['filename' => $filename,]);
+                        $map->update(['filename' => $filename]);
                     }
                 } else {
                     try {
@@ -441,11 +433,11 @@ class MapController implements ControllerInterface
         $enabledMapsuids = $maps->pluck('ident');
 
         //Enable loaded maps
-        Map::whereIn('uid', $enabledMapsuids)
+        DB::table('maps')->whereIn('uid', $enabledMapsuids)
             ->update(['enabled' => 1]);
 
         //Disable maps
-        Map::whereNotIn('uid', $enabledMapsuids)
+        DB::table('maps')->whereNotIn('uid', $enabledMapsuids)
             ->update(['enabled' => 0]);
     }
 

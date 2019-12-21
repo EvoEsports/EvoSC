@@ -22,7 +22,7 @@
         <label class="profile" pos="92 -6.5" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
         <label class="pm" pos="92 -10.8" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
 
-        <frame pos="54 -0.5" z-index="2" scale="0.9">
+        <frame pos="48 -0.5" z-index="2" scale="0.9">
             {if $localPlayer->hasAccess('player_ban')}
             <label class="btn ban" pos="0 -11" textprefix="" text=" BAN" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="{config('colors.ui.window.text.danger')|noescape}" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
             {/if}
@@ -34,6 +34,9 @@
             {/if}
             {if $localPlayer->hasAccess('player_mute')}
             <label class="btn mute" pos="30 -11" textprefix="" text=" MUTE" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            {/if}
+            {if $localPlayer->hasAccess('player_force_spec')}
+            <label class="btn forcespec" pos="40 -11" textprefix="" text=" F-SPEC" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
             {/if}
         </frame>
 
@@ -440,6 +443,10 @@
                     }
                     if(event.Control.HasClass("mute")){
                         TriggerPageAction("mute,"^login);
+                        continue;
+                    }
+                    if(event.Control.HasClass("forcespec")){
+                        TriggerPageAction("forcespec,"^login);
                         continue;
                     }
                 }
