@@ -233,20 +233,21 @@ class MapController implements ControllerInterface
      */
     public static function skip(Player $player = null)
     {
+        $map = MapController::getCurrentMap();
+
         if ($player) {
-            $map = MapController::getCurrentMap();
             infoMessage($player, ' skips map')->sendAll();
         }
 
-        Log::write($map.' ['.$map->uid.'] was skipped by the server.');
+        Log::write($map.' ['.$map->uid.'] was skipped by '.($player ? "$player" : 'the server').'.');
+        $map->increment('skipped');
 
         MapController::goToNextMap();
     }
 
     /**
-     * Force replay a round at end of match
-     *
      * @param  Player  $player
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function forceReplay(Player $player)
     {
@@ -331,9 +332,9 @@ class MapController implements ControllerInterface
         Log::write('Loading maps...');
 
         //Get loaded matchsettings maps
-        if($matchSettings){
+        if ($matchSettings) {
             $maps = MatchSettingsController::getMapFilenamesFrom($matchSettings);
-        }else{
+        } else {
             $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
         }
 
