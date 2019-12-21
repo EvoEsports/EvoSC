@@ -7,6 +7,7 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
+use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
@@ -34,28 +35,31 @@ class CpDiffs implements ModuleInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
 
+        ManiaLinkEvent::add('request_cp_diffs', [self::class, 'requestCpDiffs']);
+
         ChatCommand::add('/target', [self::class, 'cmdSetTarget'],
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
+    }
+
+    public static function requestCpDiffs(Player $player)
+    {
+        self::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 
     public static function beginMap(Map $map)
     {
         self::$targets = collect();
-
-        foreach (onlinePlayers() as $player) {
-            self::sendInitialCpDiff($player, $map);
-        }
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score == 0) {
             return;
-        }
-
-        if (self::$targets->has($player->id)) {
-            if (self::$targets->get($player->id)->score <= $score) {
-                return;
+        } else {
+            if (self::$targets->has($player->id)) {
+                if (self::$targets->get($player->id)->score <= $score) {
+                    return;
+                }
             }
         }
 
@@ -81,19 +85,24 @@ class CpDiffs implements ModuleInterface
             self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
         } else {
-            $targetRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
+            $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
                 $player->id)->first();
 
             if (!$targetRecord) {
-                $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
+                $targetRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
                     $player->id)->first();
             }
 
             if (!$targetRecord) {
-                $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->orderByDesc('Score')->first();
+                infoMessage("You don't have a PB on this map yet.")->send($player);
+                return;
             }
 
-            $targetPlayer = DB::table('players')->where('id', '=', $targetRecord->Player)->first();
+            if ($targetRecord->Player == $player->id) {
+                $targetPlayer = $player;
+            } else {
+                $targetPlayer = DB::table('players')->where('id', '=', $targetRecord->Player)->first();
+            }
 
             if ($targetRecord) {
                 $target = new \stdClass();
@@ -124,7 +133,6 @@ class CpDiffs implements ModuleInterface
 
             case 'wr':
                 $id = 1;
-
             case 'dedi':
                 $record = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Rank', '=', $id)->first();
                 break;

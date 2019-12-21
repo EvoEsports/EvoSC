@@ -9,7 +9,7 @@
         <label pos="0 0" text="+" halign="center" valign="center" textprefix="" textsize="0.5" opacity="1" textfont="{config('colors.ui.font')|noescape}" z-index="1" hidden="1" />
     </framemodel>
 
-    <frame pos="0 -65" scale="0.85">
+    <frame id="cpdiffs" pos="0 -65" scale="0.85">
         <label id="target-label" pos="0 -10" opacity="0.99" text="$s{$target->name}$z$s | {$target->score|score}" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
 
         <frame size="20 13" pos="-10 -10">
@@ -131,11 +131,21 @@
             target.fromjson("""{json_encode($target)|noescape}""");
             declare CTmMlPlayer player <=> GetOwner();
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
+            declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
+            declare Ident currentMapUid = Map.Id;
 
             while(True){
                 yield;
 
-                if(player == Null){
+                cpDiffs.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
+
+                if(currentMapUid != Map.Id){
+                    sleep(500);
+                    TriggerPageAction("request_cp_diffs");
+                    return;
+                }
+
+                if(player == Null || !cpDiffs.Visible){
                     sleep(200);
                     continue;
                 }
