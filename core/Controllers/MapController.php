@@ -50,6 +50,11 @@ class MapController implements ControllerInterface
     {
         global $_skipMapCheck;
 
+        if (config('server.map-cooldown') == 0) {
+            Log::error('Map cooldown must be 1 or greater.');
+            exit(3); //Configuration error
+        }
+
         if (!File::dirExists(cacheDir('gbx'))) {
             File::makeDir(cacheDir('gbx'));
         }
@@ -133,7 +138,7 @@ class MapController implements ControllerInterface
     {
         if (!self::$currentMap) {
             Log::error('Current map is not set. Exiting...', true);
-            exit(2);
+            exit(4); //Runtime error
         }
 
         return self::$currentMap;

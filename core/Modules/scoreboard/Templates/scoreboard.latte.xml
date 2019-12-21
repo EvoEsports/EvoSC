@@ -36,7 +36,7 @@
             <label class="btn mute" pos="30 -11" textprefix="" text=" MUTE" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
             {/if}
             {if $localPlayer->hasAccess('player_force_spec')}
-            <label class="btn forcespec" pos="40 -11" textprefix="" text=" F-SPEC" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
+            <label class="btn forcespec" pos="40 -11" textprefix="" text=" F-SPEC" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="3bf" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
             {/if}
         </frame>
 
