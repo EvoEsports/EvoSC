@@ -101,18 +101,13 @@
             declare Owner <=> GetOwner();
             if (!PageIsVisible || Owner == Null) continue;
 
-            if (PrevIsSpectator != IsSpectator) {
-              PrevIsSpectator = IsSpectator;
-
-              if (IsSpectator) {
-                speedometer.Visible = False;
-              } else {
-                speedometer.Visible = True;
-              }
-            }
+            speedometer.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
             if(speedometer.Visible){
                 speedLabel.Value = TL::ToText(Owner.DisplaySpeed);
+            }else{
+                sleep(500);
+                continue;
             }
 
             if(!hidden){
