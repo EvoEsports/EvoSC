@@ -8,5 +8,6 @@
   },
   "rows": 16,
   "showtop": 3,
+  "echo-top": 100,
   "enabled": false
 }

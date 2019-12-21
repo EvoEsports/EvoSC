@@ -6,6 +6,7 @@ namespace esc\Modules;
 use Carbon\Carbon;
 use esc\Classes\Cache;
 use esc\Classes\File;
+use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
@@ -76,7 +77,7 @@ class DedimaniaApi
         if (isset($data->params->param->value->struct->member->name) && $data->params->param->value->struct->member->name == 'SessionId') {
             $sessionKey = $data->params->param->value->struct->member->value->string;
             if (self::setSessionKey($sessionKey)) {
-                Log::write('Session created and saved');
+                Log::write('Session created and saved.');
             }
 
             return true;
@@ -117,7 +118,7 @@ class DedimaniaApi
             return $data->params->param->value->boolean == "1";
         }
 
-        Log::write('Failed to check session at dedimania.');
+        Log::write('Failed to check session.');
 
         return false;
     }
@@ -206,7 +207,11 @@ class DedimaniaApi
             return null;
         }
 
-        self::$maxRank = intval($responseData->params->param->value->struct->children()[1]->value->int);
+        $maxRank = intval($responseData->params->param->value->struct->children()[1]->value->int);
+        if ($maxRank != self::$maxRank) {
+            self::$maxRank = $maxRank;
+            Log::info("Max-Rank changed to $maxRank.");
+        }
 
         $recordsXmlArray = $responseData->params->param->value->struct->children()[3]->value->array->data->value;
         $records = collect();
