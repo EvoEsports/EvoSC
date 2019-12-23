@@ -115,8 +115,13 @@ class ChatMessage
                 continue;
             }
 
-            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', $part)) {
-                $message .= secondary($part);
+            if ($part instanceof \stdClass) {
+                var_dump($part);
+                continue;
+            }
+
+            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', "$part")) {
+                $message .= secondary("$part");
                 continue;
             }
 

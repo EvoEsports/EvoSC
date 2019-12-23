@@ -71,7 +71,7 @@ class Dedimania extends DedimaniaApi
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerPb', [self::class, 'playerFinish']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
@@ -246,13 +246,17 @@ class Dedimania extends DedimaniaApi
         $playerHasDedi = self::$dedis->has($player->id);
 
         if (!$playerHasDedi) {
-            if ($newRank > self::$maxRank && $player->MaxRank > self::$maxRank) {
+            if ($newRank > self::$maxRank) {
+                var_dump("New rank is above server max rank.");
                 //check for dedimania premium
                 if ($newRank > $player->MaxRank) {
+                    var_dump("New rank is above player max rank.");
                     return;
                 }
             }
         }
+
+        var_dump("Proceed.");
 
         if ($playerHasDedi) {
             $oldRecord = self::$dedis->get($player->id);
@@ -283,9 +287,7 @@ class Dedimania extends DedimaniaApi
 
             self::fixRanks($map);
 
-            $newRecord = DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->where('Player', '=', $player->id)
+            $newRecord = $map->dedis()->where('Player', '=', $player->id)
                 ->first();
 
             $diff = $oldRecord->Score - $score;
@@ -295,11 +297,13 @@ class Dedimania extends DedimaniaApi
                 self::saveGhostReplay($newRecord);
             }
 
+
             if ($oldRank == $newRecord->Rank) {
                 $chatMessage->setParts($player, ' secured his/her ', $newRecord,
                     ' ('.$oldRank.'. -'.formatScore($diff).')');
             } else {
-                $chatMessage->setParts($player, ' gained the ', $newRecord, ' ('.$oldRank.'. -'.formatScore($diff).')');
+                $chatMessage->setParts($player, ' gained the ', $newRecord,
+                    ' ('.$oldRank.'. -'.formatScore($diff).')');
             }
 
             if ($newRecord->Rank <= config('dedimania.echo-top', 100)) {
@@ -310,20 +314,16 @@ class Dedimania extends DedimaniaApi
             self::cacheDedisJson();
             self::sendUpdatedDedis();
         } else {
-            DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->updateOrInsert(['Player' => $player->id], [
-                    'Score' => $score,
-                    'Checkpoints' => $checkpoints,
-                    'Rank' => $newRank,
-                    'New' => 1,
-                ]);
+            $map->dedis()->updateOrCreate(['Player' => $player->id], [
+                'Score' => $score,
+                'Checkpoints' => $checkpoints,
+                'Rank' => $newRank,
+                'New' => 1,
+            ]);
 
             self::fixRanks($map);
 
-            $newRecord = DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->where('Player', '=', $player->id)
+            $newRecord = $map->dedis()->where('Player', '=', $player->id)
                 ->first();
 
             if ($newRecord->Rank == 1) {
@@ -348,6 +348,11 @@ class Dedimania extends DedimaniaApi
     {
         Database::getConnection()->statement('SET @rank=0');
         Database::getConnection()->statement('UPDATE `dedi-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
+    }
+
+    private static function formatRecord(\stdClass $record): string
+    {
+
     }
 
     private static function saveGhostReplay(Model $dedi)
