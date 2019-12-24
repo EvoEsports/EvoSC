@@ -34,6 +34,7 @@ class CpDiffs implements ModuleInterface
     {
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerConnect', [self::class, 'requestCpDiffs']);
 
         ManiaLinkEvent::add('request_cp_diffs', [self::class, 'requestCpDiffs']);
 
@@ -63,13 +64,7 @@ class CpDiffs implements ModuleInterface
             }
         }
 
-        $target = new \stdClass();
-        $target->score = $score;
-        $target->cps = explode(',', $checkpoints);
-        $target->name = ml_escape($player->NickName);
-
-        self::$targets->put($player->id, $target);
-        Template::show($player, 'cp-diffs.widget', compact('target'));
+        self::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 
     public static function sendInitialCpDiff(Player $player, Map $map)
