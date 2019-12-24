@@ -47,46 +47,48 @@
 
     <quad id="bg-blur" pos="-160 90" size="320 180" style="Bgs1" substyle="BgDialogBlur" opacity="0" z-index="-5" />
 
-    <frame pos="-96 53">
-        {if !empty($logoUrl)}
-        <quad pos="189.5 -6.5" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}" image="{$logoUrl|noescape}" />
-        {/if}
-        <label id="server-name" text="Server-Name" valign="center" pos="2 -3" opacity="1.0" textsize="4.5" textfont="{config('colors.ui.font')|noescape}" />
-        <label id="mode-name" textprefix="Mode: " text="" valign="center" pos="2.5 -8" opacity="0.9" textsize="1.0" scale="0.8" textfont="{config('colors.ui.font')|noescape}" />
-        <label id="player-count" textprefix="$s " text="1/16" valign="center" halign="left" pos="2.5 -11.5" opacity="1" textsize="2" textfont="{config('colors.ui.font')|noescape}" />
+    <frame id="sb" scale="1.0">
+        <frame pos="-96 53">
+            {if !empty($logoUrl)}
+            <quad pos="189.5 -6.5" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}" image="{$logoUrl|noescape}" />
+            {/if}
+            <label id="server-name" text="Server-Name" valign="center" pos="2 -3" opacity="1.0" textsize="4.5" textfont="{config('colors.ui.font')|noescape}" />
+            <label id="mode-name" textprefix="Mode: " text="" valign="center" pos="2.5 -8" opacity="0.9" textsize="1.0" scale="0.8" textfont="{config('colors.ui.font')|noescape}" />
+            <label id="player-count" textprefix="$s " text="1/16" valign="center" halign="left" pos="2.5 -11.5" opacity="1" textsize="2" textfont="{config('colors.ui.font')|noescape}" />
 
-        <label class="prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label id="page" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -104" opacity="0.95" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -104" opacity="0.95" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+            <label class="prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+            <label id="page" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -104" opacity="0.95" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+            <label class="next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+            <label class="me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -104" opacity="0.95" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
 
-        <label rot="0" id="settings-btn" class="settings" textprefix="$s" text="" valign="center" halign="center" pos="188 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-    </frame>
+            <label rot="0" id="settings-btn" class="settings" textprefix="$s" text="" valign="center" halign="center" pos="188 -104" opacity="0.95" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        </frame>
 
-    <frame id="settings" halign="right" pos="96 -47.5" size="0 11">
-        <quad size="38 16" pos="-38.09" bgcolor="0002" z-index="-1" />
-        <label class="blur" pos="-36 -3.9" size="26 3.3" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-        <label id="bg-blur-checkbox" pos="-35.5 -3.75" valign="center" text="" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
-        <label pos="-31.5 -3.75" valign="center" text="Blur background" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
+        <frame id="settings" halign="right" pos="96 -47.5" size="0 11">
+            <quad size="38 16" pos="-38.09" bgcolor="0002" z-index="-1" />
+            <label class="blur" pos="-36 -3.9" size="26 3.3" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label id="bg-blur-checkbox" pos="-35.5 -3.75" valign="center" text="" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
+            <label pos="-31.5 -3.75" valign="center" text="Blur background" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
 
-        <label class="grayscale" pos="-36 -7.9" size="26 3.3" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-        <label id="grayscale-checkbox" pos="-35.5 -7.75" valign="center" text="$ccc" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
-        <label pos="-31.5 -7.75" valign="center" text="Use group colors" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
-    </frame>
+            <label class="grayscale" pos="-36 -7.9" size="26 3.3" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label id="grayscale-checkbox" pos="-35.5 -7.75" valign="center" text="$ccc" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
+            <label pos="-31.5 -7.75" valign="center" text="Use group colors" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" textprefix="$s" />
+        </frame>
 
-    <frame id="list" pos="0 37">
-        {for $i=0; $i<6; $i++}
-        <frameinstance modelid="player" pos="-96 {$i*-14}" hidden="1" />
-        {/for}
-        {for $i=0; $i<6; $i++}
-        <frameinstance modelid="player" pos="1 {$i*-14}" hidden="1" />
-        {/for}
-        {for $i=0; $i<6; $i++}
-        <quad size="95 13" pos="-96 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
-        {/for}
-        {for $i=0; $i<6; $i++}
-        <quad size="95 13" pos="1 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
-        {/for}
+        <frame id="list" pos="0 37">
+            {for $i=0; $i<6; $i++}
+            <frameinstance modelid="player" pos="-96 {$i*-14}" hidden="1" />
+            {/for}
+            {for $i=0; $i<6; $i++}
+            <frameinstance modelid="player" pos="1 {$i*-14}" hidden="1" />
+            {/for}
+            {for $i=0; $i<6; $i++}
+            <quad size="95 13" pos="-96 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
+            {/for}
+            {for $i=0; $i<6; $i++}
+            <quad size="95 13" pos="1 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
+            {/for}
+        </frame>
     </frame>
 
     <script><!--
@@ -332,6 +334,8 @@
         declare Ident currentMapId;
         declare brake = 0;
         declare settingsVisible = False;
+        declare sb <=> (Page.MainFrame.GetFirstChild("sb") as CMlFrame);
+        declare podium = False;
 
         currentPage = 0;
         perPage = 12;
@@ -342,8 +346,6 @@
         sb_settings.group_colors = True;
         sb_settings.transparent_bg = False;
         {/if}
-
-        log(sb_settings);
 
         SetUseGroupColors(sb_settings.group_colors);
         SetBgBlurVisible(sb_settings.transparent_bg);
@@ -363,6 +365,15 @@
                 currentMapId = Map.Id;
                 ctmPlayers = CTmMlPlayer[Text];
                 update();
+            }
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
+                podium = True;
+                AnimMgr.Add(sb, "<frame scale='0.8' pos='0 -10' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+            if(UI.UISequence != CUIConfig::EUISequence::Podium && podium){
+                podium = False;
+                AnimMgr.Add(sb, "<frame scale='1.0' pos='0 0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
 
             foreach(event in PendingEvents){
