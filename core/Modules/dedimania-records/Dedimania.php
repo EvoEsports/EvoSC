@@ -20,11 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Dedimania extends DedimaniaApi
 {
-    /**
-     * @var string
-     */
-    private static $dedisJson;
-
     private static $offlineMode;
 
     public function __construct()
@@ -117,40 +112,62 @@ class Dedimania extends DedimaniaApi
             warningMessage('Unfortunately Dedimania is offline, new records will not be visible before it comes online again.')->send($player);
         }
 
-        $dedisJson = self::$dedisJson;
-
-        Template::show($player, 'dedimania-records.update', compact('dedisJson'));
         Template::show($player, 'dedimania-records.manialink');
     }
 
-    public static function showDedisTable(Player $player)
+    public static function showRecords(Player $player)
     {
+        $top = config('dedimania.show-top', 3);
+        $fill = config('dedimania.rows', 15);
         $map = MapController::getCurrentMap();
-        $records = $map->dedis()->orderBy('Score')->get();
 
-        RecordsTable::show($player, $map, $records, 'Dedimania Records');
-    }
+        $record = DB::table('dedi-records')
+            ->where('Map', '=', $map->id)
+            ->where('Player', '=', $player->id)
+            ->first();
 
-    public static function sendUpdatedDedis()
-    {
-        $dedisJson = self::$dedisJson;
-        Template::showAll('dedimania-records.update', compact('dedisJson'));
-    }
+        if ($record) {
+            $start = $record->Rank - floor($fill / 2);
+            $end = $record->Rank + ceil($fill / 2);
 
-    private static function cacheDedisJson(Map $map = null)
-    {
-        $dedis = DB::table('dedi-records')
-            ->where('Map', '=', $map ? $map->id : MapController::getCurrentMap()->id)
-            ->orderBy('Score')
-            ->get()
-            ->keyBy('Player');
+            $records = DB::table('dedi-records')
+                ->where('Map', '=', $map->id)
+                ->whereBetween('Rank', [$start, $end])
+                ->get();
+
+            /*
+            if ($records->count() < $fill + $top) {
+                var_dump("Fill more.");
+
+                $fillMoreStart = $start - ($records->count() - $fill - $top);
+                $moreRecords = DB::table('dedi-records')
+                    ->where('Map', '=', $map->id)
+                    ->whereBetween('Rank', [$fillMoreStart, $start])
+                    ->get();
+
+                $records = $records->merge($moreRecords)->sortBy('Rank');
+            }
+            */
+        } else {
+            $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
+
+            $records = DB::table('dedi-records')
+                ->where('Map', '=', $map->id)
+                ->whereBetween('Rank', [$count - $fill, $count])
+                ->get();
+        }
+
+        $records = $records->merge(DB::table('dedi-records')
+            ->where('Map', '=', $map->id)
+            ->where('Rank', '<=', $top)
+            ->get());
 
         $players = DB::table('players')
-            ->whereIn('id', $dedis->pluck('Player'))
+            ->whereIn('id', $records->pluck('Player'))
             ->get()
             ->keyBy('id');
 
-        self::$dedisJson = $dedis->transform(function ($dedi) use ($players) {
+        $records->transform(function ($dedi) use ($players) {
             $checkpoints = collect(explode(',', $dedi->Checkpoints));
             $checkpoints = $checkpoints->transform(function ($time) {
                 return intval($time);
@@ -165,7 +182,24 @@ class Dedimania extends DedimaniaApi
                 'name' => str_replace('{', '\u007B', str_replace('}', '\u007D', $player->NickName)),
                 'login' => $player->Login,
             ];
-        })->toJson();
+        });
+
+        $dedisJson = $records->sortBy('rank')->toJson();
+
+        Template::show($player, 'dedimania-records.update', compact('dedisJson'));
+    }
+
+    public static function showDedisTable(Player $player)
+    {
+        $map = MapController::getCurrentMap();
+        $records = $map->dedis()->orderBy('Score')->get();
+
+        RecordsTable::show($player, $map, $records, 'Dedimania Records');
+    }
+
+    public static function sendUpdatedDedis()
+    {
+        onlinePlayers()->each([self::class, 'showRecords']);
     }
 
     public static function beginMap(Map $map)
@@ -210,7 +244,6 @@ class Dedimania extends DedimaniaApi
             DB::table('dedi-records')->insert($insert->toArray());
         }
 
-        self::cacheDedisJson();
         self::sendUpdatedDedis();
 
         Log::write("Loaded records for map $map #".$map->id);
@@ -312,7 +345,6 @@ class Dedimania extends DedimaniaApi
                 self::saveGhostReplay($map->dedis()->where('Player', '=', $player->id)->first());
             }
 
-            self::cacheDedisJson();
             self::sendUpdatedDedis();
         } else {
             DB::table('dedi-records')
@@ -344,7 +376,6 @@ class Dedimania extends DedimaniaApi
                     ->sendAll();
             }
 
-            self::cacheDedisJson();
             self::sendUpdatedDedis();
         }
     }

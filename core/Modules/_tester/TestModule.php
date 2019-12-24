@@ -20,7 +20,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CpDiffs::sendInitialCpDiff($player, MapController::getCurrentMap());
+        Dedimania::showRecords($player);
     }
 
     public static function sendTestManialink(Player $player)
