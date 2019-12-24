@@ -21,11 +21,6 @@ use Illuminate\Database\Eloquent\Model;
 class Dedimania extends DedimaniaApi
 {
     /**
-     * @var \Illuminate\Support\Collection
-     */
-    private static $dedis;
-
-    /**
      * @var string
      */
     private static $dedisJson;
@@ -142,21 +137,20 @@ class Dedimania extends DedimaniaApi
         Template::showAll('dedimania-records.update', compact('dedisJson'));
     }
 
-    private static function cacheDedis(Map $map)
+    private static function cacheDedisJson(Map $map = null)
     {
-        self::$dedis = DB::table('dedi-records')
-            ->where('Map', '=', $map->id)
+        $dedis = DB::table('dedi-records')
+            ->where('Map', '=', $map ? $map->id : MapController::getCurrentMap()->id)
             ->orderBy('Score')
             ->get()
             ->keyBy('Player');
-    }
 
-    private static function cacheDedisJson()
-    {
-        $playerIds = self::$dedis->pluck('Player');
-        $players = DB::table('players')->whereIn('id', $playerIds)->get()->keyBy('id');
+        $players = DB::table('players')
+            ->whereIn('id', $dedis->pluck('Player'))
+            ->get()
+            ->keyBy('id');
 
-        self::$dedisJson = self::$dedis->map(function ($dedi) use ($players) {
+        self::$dedisJson = $dedis->transform(function ($dedi) use ($players) {
             $checkpoints = collect(explode(',', $dedi->Checkpoints));
             $checkpoints = $checkpoints->transform(function ($time) {
                 return intval($time);
@@ -179,19 +173,16 @@ class Dedimania extends DedimaniaApi
         $records = self::getChallengeRecords($map);
 
         if (!$records && self::$offlineMode) {
-            $records = DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->get()
-                ->transform(function (Dedi $dedi) {
-                    $record = collect();
-                    $record->login = $dedi->player->Login;
-                    $record->nickname = ml_escape($dedi->player->NickName);
-                    $record->score = $dedi->Score;
-                    $record->rank = $dedi->Rank;
-                    $record->max_rank = $dedi->player->MaxRank;
-                    $record->checkpoints = $dedi->Checkpoints;
-                    return $record;
-                });
+            $records = $map->dedis->transform(function (Dedi $dedi) {
+                $record = collect();
+                $record->login = $dedi->player->Login;
+                $record->nickname = ml_escape($dedi->player->NickName);
+                $record->score = $dedi->Score;
+                $record->rank = $dedi->Rank;
+                $record->max_rank = $dedi->player->MaxRank;
+                $record->checkpoints = $dedi->Checkpoints;
+                return $record;
+            });
         }
 
         if ($records && $records->count() > 0) {
@@ -217,9 +208,6 @@ class Dedimania extends DedimaniaApi
             })->filter();
 
             DB::table('dedi-records')->insert($insert->toArray());
-            self::cacheDedis($map);
-        } else {
-            self::$dedis = collect();
         }
 
         self::cacheDedisJson();
@@ -243,116 +231,122 @@ class Dedimania extends DedimaniaApi
             ->first();
 
         $newRank = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
-        $playerHasDedi = self::$dedis->has($player->id);
+
+        $playerHasDedi = DB::table('dedi-records')
+            ->where('Map', '=', $map->id)
+            ->where('Player', '=', $player->id)
+            ->exists();
 
         if (!$playerHasDedi) {
             if ($newRank > self::$maxRank) {
-                var_dump("New rank is above server max rank.");
                 //check for dedimania premium
                 if ($newRank > $player->MaxRank) {
-                    var_dump("New rank is above player max rank.");
                     return;
                 }
             }
         }
 
-        var_dump("Proceed.");
-
         if ($playerHasDedi) {
-            $oldRecord = self::$dedis->get($player->id);
+            $oldRecord = DB::table('dedi-records')
+                ->where('Map', '=', $map->id)
+                ->where('Player', '=', $player->id)
+                ->first();
+
             $oldRank = $oldRecord->Rank;
 
             $chatMessage = chatMessage()
                 ->setIcon('')
                 ->setColor(config('colors.dedi'));
 
-            if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled his/her ', $oldRecord)->sendAll();
-
-                return;
-            }
-
             if ($oldRecord->Score < $score) {
                 return;
             }
 
+            if ($oldRecord->Score == $score) {
+                $chatMessage->setParts($player, ' equaled his/her ',
+                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)))->sendAll();
+
+                return;
+            }
+
+            $diff = $oldRecord->Score - $score;
+
+            if ($oldRank == $newRank) {
+                DB::table('dedi-records')
+                    ->updateOrInsert([
+                        'Map' => $map->id,
+                        'Player' => $player->id
+                    ], [
+                        'Score' => $score,
+                        'Checkpoints' => $checkpoints,
+                        'New' => 1,
+                    ]);
+
+                $chatMessage->setParts($player, ' secured his/her ',
+                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
+                    ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
+            } else {
+                DB::table('dedi-records')
+                    ->updateOrInsert([
+                        'Map' => $map->id,
+                        'Player' => $player->id
+                    ], [
+                        'Score' => $score,
+                        'Checkpoints' => $checkpoints,
+                        'Rank' => $newRank,
+                        'New' => 1,
+                    ]);
+
+                $chatMessage->setParts($player, ' gained the ',
+                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
+                    ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
+
+                DB::table('dedi-records')
+                    ->where('Map', '=', $map->id)
+                    ->whereBetween('Rank', [$oldRank, $newRank])
+                    ->increment('Rank');
+            }
+
+            if ($newRank == 1) {
+                //Ghost replay is needed for 1. dedi
+                self::saveGhostReplay($map->dedis()->where('Player', '=', $player->id)->first());
+            }
+
+            self::cacheDedisJson();
+            self::sendUpdatedDedis();
+        } else {
             DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->updateOrInsert(['Player' => $player->id], [
+                ->updateOrInsert([
+                    'Map' => $map->id,
+                    'Player' => $player->id
+                ], [
                     'Score' => $score,
                     'Checkpoints' => $checkpoints,
                     'Rank' => $newRank,
                     'New' => 1,
                 ]);
 
-            self::fixRanks($map);
-
-            $newRecord = $map->dedis()->where('Player', '=', $player->id)
-                ->first();
-
-            $diff = $oldRecord->Score - $score;
+            DB::table('dedi-records')
+                ->where('Map', '=', $map->id)
+                ->where('Rank', '>=', $newRank)
+                ->increment('Rank');
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
-                self::saveGhostReplay($newRecord);
-            }
-
-
-            if ($oldRank == $newRecord->Rank) {
-                $chatMessage->setParts($player, ' secured his/her ', $newRecord,
-                    ' ('.$oldRank.'. -'.formatScore($diff).')');
-            } else {
-                $chatMessage->setParts($player, ' gained the ', $newRecord,
-                    ' ('.$oldRank.'. -'.formatScore($diff).')');
-            }
-
-            if ($newRecord->Rank <= config('dedimania.echo-top', 100)) {
-                $chatMessage->sendAll();
-            }
-
-            self::cacheDedis($map);
-            self::cacheDedisJson();
-            self::sendUpdatedDedis();
-        } else {
-            $map->dedis()->updateOrCreate(['Player' => $player->id], [
-                'Score' => $score,
-                'Checkpoints' => $checkpoints,
-                'Rank' => $newRank,
-                'New' => 1,
-            ]);
-
-            self::fixRanks($map);
-
-            $newRecord = $map->dedis()->where('Player', '=', $player->id)
-                ->first();
-
-            if ($newRecord->Rank == 1) {
-                //Ghost replay is needed for 1. dedi
-                self::saveGhostReplay($newRecord);
+                self::saveGhostReplay($map->dedis()->where('Player', '=', $player->id)->first());
             }
 
             if ($newRank <= config('dedimania.echo-top', 100)) {
-                chatMessage($player, ' gained the ', $newRecord)
+                chatMessage($player, ' gained the ',
+                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)))
                     ->setIcon('')
                     ->setColor(config('colors.dedi'))
                     ->sendAll();
             }
 
-            self::cacheDedis($map);
             self::cacheDedisJson();
             self::sendUpdatedDedis();
         }
-    }
-
-    private static function fixRanks(Map $map)
-    {
-        Database::getConnection()->statement('SET @rank=0');
-        Database::getConnection()->statement('UPDATE `dedi-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = '.$map->id.' ORDER BY `Score`');
-    }
-
-    private static function formatRecord(\stdClass $record): string
-    {
-
     }
 
     private static function saveGhostReplay(Model $dedi)
