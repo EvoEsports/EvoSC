@@ -13,32 +13,37 @@ class LiveRankings implements ModuleInterface
 {
     private static $show;
 
+    private static $mode;
+
     public static function playerConnect(Player $player)
     {
-        $liveRankings = ScoreController::getTracker()->where('best_score', '>', 0)
-            ->sortBy('best_score')
-            ->take(self::$show)
-            ->transform(function ($score) {
-                $score->nick = ml_escape($score->player->NickName);
-                return $score;
-            })
-            ->pluck('nick', 'best_score');
-
-        Template::show($player, 'live-rankings.update', compact('liveRankings'));
+        self::scoresUpdated(ScoreController::getTracker());
         Template::show($player, 'live-rankings.widget');
     }
 
     public static function scoresUpdated(Collection $scores)
     {
-        $liveRankings = $scores->where('best_score', '>', 0)
-            ->sortBy('best_score')
-            ->take(self::$show)
-            ->transform(function ($score) {
-                $score->nick = ml_escape($score->player->NickName);
-                $score->score = $score->best_score . '';
-                return $score;
-            })
-            ->pluck('nick', 'score');
+        if (self::$mode == 'Rounds.Script.txt') {
+            $liveRankings = $scores->where('points', '>', 0)
+                ->sortByDesc('points')
+                ->take(self::$show)
+                ->transform(function ($score) {
+                    $score->nick = ml_escape($score->player->NickName);
+                    $score->score = $score->points.'';
+                    return $score;
+                })
+                ->pluck('nick', 'score');
+        } else {
+            $liveRankings = $scores->where('best_score', '>', 0)
+                ->sortBy('best_score')
+                ->take(self::$show)
+                ->transform(function ($score) {
+                    $score->nick = ml_escape($score->player->NickName);
+                    $score->score = $score->best_score.'';
+                    return $score;
+                })
+                ->pluck('nick', 'score');
+        }
 
         Template::showAll('live-rankings.update', compact('liveRankings'));
     }
@@ -52,17 +57,16 @@ class LiveRankings implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         self::$show = config('live-rankings.show', 14);
+        self::$mode = $mode;
 
         switch ($mode) {
+            default:
             case 'TimeAttack.Script.txt':
                 if (!$isBoot) {
                     Template::showAll('live-rankings.widget');
                 }
                 Hook::add('PlayerConnect', [self::class, 'playerConnect']);
                 Hook::add('ScoresUpdated', [self::class, 'scoresUpdated']);
-                break;
-
-            default:
                 break;
         }
     }

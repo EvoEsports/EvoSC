@@ -26,6 +26,8 @@ class Scoreboard implements ModuleInterface
      */
     private static $playersOnline;
 
+    private static $mode;
+
     /**
      * Called when the module is loaded
      *
@@ -36,12 +38,26 @@ class Scoreboard implements ModuleInterface
     {
         self::$logoUrl = config('scoreboard.logo-url');
         self::$playersOnline = collect();
+        self::$mode = $mode;
 
         foreach (onlinePlayers() as $player) {
             self::$playersOnline->put($player->id, true);
         }
 
         self::scoresUpdated(ScoreController::getTracker());
+
+        if (!$isBoot) {
+            $logoUrl = self::$logoUrl;
+            $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
+            $settings = $player->setting('sb');
+            $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
+            $mode = self::$mode;
+
+            foreach (onlinePlayers() as $player) {
+                Template::show($player, 'scoreboard.scoreboard',
+                    compact('logoUrl', 'maxPlayers', 'settings', 'pointLimitRounds', 'mode'));
+            }
+        }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
@@ -60,12 +76,6 @@ class Scoreboard implements ModuleInterface
         self::updatePlayerList();
     }
 
-    public static function scoresUpdated(Collection $tracker)
-    {
-        self::$tracker = $tracker;
-        self::updatePlayerList();
-    }
-
     public static function playerDisconnect(Player $player)
     {
         self::$playersOnline->put($player->id, false);
@@ -77,9 +87,18 @@ class Scoreboard implements ModuleInterface
         $logoUrl = self::$logoUrl;
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $settings = $player->setting('sb');
-        Template::show($player, 'scoreboard.scoreboard', compact('logoUrl', 'maxPlayers', 'settings'));
+        $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
+        $mode = self::$mode;
+        Template::show($player, 'scoreboard.scoreboard',
+            compact('logoUrl', 'maxPlayers', 'settings', 'pointLimitRounds', 'mode'));
 
         self::$playersOnline->put($player->id, true);
+        self::updatePlayerList();
+    }
+
+    public static function scoresUpdated(Collection $tracker)
+    {
+        self::$tracker = $tracker;
         self::updatePlayerList();
     }
 
@@ -100,18 +119,27 @@ class Scoreboard implements ModuleInterface
                 'group_color' => $player->group->color,
                 'group_name' => $player->group->Name,
                 'score' => 0,
+                'last_points_received' => 0,
+                'points' => 0,
                 'online' => $online
             ];
 
             if (self::$tracker->has($playerId)) {
                 $data['score'] = self::$tracker->get($playerId)->best_score;
+                $data['points'] = self::$tracker->get($playerId)->points;
+                $data['last_points_received'] = self::$tracker->get($playerId)->last_points_received;
             }
 
             return $data;
         });
 
-        $finished = $players->where('score', '>', 0)->sortBy('score');
-        $noFinish = $players->where('score', '=', 0)->sortByDesc('online');
+        if (self::$mode == 'Rounds.Script.txt') {
+            $finished = $players->where('score', '>', 0)->sortByDesc('points');
+            $noFinish = $players->where('score', '=', 0)->sortByDesc('online');
+        } else {
+            $finished = $players->where('score', '>', 0)->sortBy('score');
+            $noFinish = $players->where('score', '=', 0)->sortByDesc('online');
+        }
         $players = $finished->merge($noFinish)->values();
 
         Template::showAll('scoreboard.update-player-infos', compact('players'));

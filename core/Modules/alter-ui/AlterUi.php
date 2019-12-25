@@ -38,7 +38,7 @@ class AlterUi implements ModuleInterface
  		<!-- Time of the players at the current checkpoint displayed at the bottom of the screen -->
  		<checkpoint_list visible="false" pos="48. -52. 5." />
  		<!-- Small scores table displayed at the end of race of the round based modes (Rounds, Cup, ...) on the right of the screen -->
- 		<round_scores visible="false" pos="-158.5 40. 150." />
+ 		<round_scores visible="true" pos="100 -20 150." />
  		<!-- Race time left displayed at the bottom right of the screen -->
  		<countdown visible="false" pos="155 -20 5." />
  		<!-- 3, 2, 1, Go! message displayed on the middle of the screen when spawning -->

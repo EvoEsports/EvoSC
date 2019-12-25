@@ -140,9 +140,10 @@
                 cpDiffs.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
                 if(currentMapUid != Map.Id){
-                    sleep(500);
+                    currentMapUid = Map.Id;
                     TriggerPageAction("request_cp_diffs");
-                    return;
+                    wait(currentMapUid != Map.Id);
+                    continue;
                 }
 
                 if(player == Null || !cpDiffs.Visible){

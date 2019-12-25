@@ -129,25 +129,17 @@ class Dedimania extends DedimaniaApi
         if ($record) {
             $start = $record->Rank - floor($fill / 2);
             $end = $record->Rank + ceil($fill / 2);
+            $addAfter = 0;
+
+            if ($start <= $top) {
+                $start = $top + 1;
+                $addAfter += abs($top - $start);
+            }
 
             $records = DB::table('dedi-records')
                 ->where('Map', '=', $map->id)
-                ->whereBetween('Rank', [$start, $end])
+                ->whereBetween('Rank', [$start, $end + $addAfter])
                 ->get();
-
-            /*
-            if ($records->count() < $fill + $top) {
-                var_dump("Fill more.");
-
-                $fillMoreStart = $start - ($records->count() - $fill - $top);
-                $moreRecords = DB::table('dedi-records')
-                    ->where('Map', '=', $map->id)
-                    ->whereBetween('Rank', [$fillMoreStart, $start])
-                    ->get();
-
-                $records = $records->merge($moreRecords)->sortBy('Rank');
-            }
-            */
         } else {
             $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
 

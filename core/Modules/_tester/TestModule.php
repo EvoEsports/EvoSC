@@ -20,7 +20,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Dedimania::showRecords($player);
+        Scoreboard::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

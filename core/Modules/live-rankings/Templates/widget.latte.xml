@@ -76,8 +76,14 @@
 
         declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
         (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
-        (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
-        (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+
+        if(CurrentServerModeName == "Rounds"){
+            (frame.Controls[1] as CMlLabel).SetText("" ^ score);
+            (frame.Controls[2] as CMlLabel).SetText("" ^ score);
+        }else{
+            (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
+            (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+        }
         (frame.Controls[3] as CMlLabel).SetText(name);
         frame.Show();
     }

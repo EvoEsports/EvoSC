@@ -222,7 +222,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static object getRoundForcedLaps()
  * @method static bool setRoundPointsLimit(int $int)
  * @method static object getRoundPointsLimit()
- * @method static bool setRoundCustomPoints(array $array, bool $boolean)
+ * @method static bool setRoundCustomPoints(array $array, bool $boolean = false) Set the points used for the scores in rounds mode. Points is an array of decreasing integers for the players from the first to last. And you can add an optional boolean to relax the constraint checking on the scores. Only available to Admin.
  * @method static array getRoundCustomPoints()
  * @method static bool setUseNewRulesRound(bool $boolean)
  * @method static object getUseNewRulesRound()

@@ -9,6 +9,8 @@
         Text group_color;
         Text group_name;
         Integer score;
+        Integer points;
+        Integer last_points_received;
         Boolean online;
     }
 
