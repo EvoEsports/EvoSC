@@ -49,11 +49,11 @@ class Scoreboard implements ModuleInterface
         if (!$isBoot) {
             $logoUrl = self::$logoUrl;
             $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-            $settings = $player->setting('sb');
             $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
             $mode = self::$mode;
 
             foreach (onlinePlayers() as $player) {
+                $settings = $player->setting('sb');
                 Template::show($player, 'scoreboard.scoreboard',
                     compact('logoUrl', 'maxPlayers', 'settings', 'pointLimitRounds', 'mode'));
             }
