@@ -8,7 +8,7 @@
     <quad id="bg" pos="0 0" size="{$window_width ?? 120} {$window_height + 6 ?? 83}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1"/>
     <label class="icon" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
     <label pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-    <label class="close" pos="{($window_width ?? 120) - 2.5} -3" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+    <label class="close" pos="{($window_width ?? 120) - 2.5} -3" size="6 6" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
 
     <frame pos="2 -8" z-index="10">
