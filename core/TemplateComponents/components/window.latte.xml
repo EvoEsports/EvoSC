@@ -2,15 +2,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
 <frame id="window" pos="0 0" scale="1.0" hidden="{isset($startHidden) ? 1 : 0}">
-    <quad pos="0 0" size="{$window_width ?? 120} 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
-    <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
-    <quad id="bg" pos="0 -5" size="{$window_width ?? 120} {$window_height ?? 77}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1"/>
-    <label class="icon" pos="2 -2.5" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
-    <label pos="5.5 -2.5" textsize="0.8" text="{include title}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-    <label class="close" pos="{($window_width ?? 120) - 2.5} -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+    <quad pos="0 0" size="{$window_width ?? 120} 6" bgcolor="{config('colors.ui.window.header.color')|noescape}" opacity="0.9" z-index="-3"/>
+    <quad pos="0 -6" size="{$window_width ?? 120} 0.5" bgcolor="{config('colors.ui.window.header.color')|noescape}" z-index="-1"/>
+    <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 6" z-index="5"/>
+    <quad id="bg" pos="0 0" size="{$window_width ?? 120} {$window_height + 6 ?? 83}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.8" z-index="-1"/>
+    <label class="icon" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
+    <label pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="close" pos="{($window_width ?? 120) - 2.5} -3" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
 
-    <frame pos="2 -7" z-index="10">
+    <frame pos="2 -8" z-index="10">
         {include content}
     </frame>
 </frame>

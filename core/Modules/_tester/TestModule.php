@@ -20,7 +20,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Scoreboard::playerConnect($player);
+        MusicClient::showMusicList($player);
     }
 
     public static function sendTestManialink(Player $player)

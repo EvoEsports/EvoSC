@@ -1,6 +1,7 @@
 {contentType text}
 {extends 'components.window'}
 {php $window_width = 130;}
+{php $window_height = 89;}
 {php $doNotExit = true;}
 {php $startHidden = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -15,10 +16,10 @@
         <label valign="center" pos="40 0" size="39 3" textsize="0.7" text="Artist" textfont="{config('colors.ui.font')|noescape}" />
         <label valign="center" pos="80 0" size="34 3" textsize="0.7" text="Album" textfont="{config('colors.ui.font')|noescape}" />
         <label valign="center" pos="126 0" size="20 3" textsize="0.7" text="Length" halign="right" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="play" valign="center" pos="-2" size="130 3.45" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}0" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+        <label class="play" valign="center" pos="-2" size="130 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}0" focusareacolor2="{config('colors.ui.window.header.color')}9" />
     </framemodel>
 
-    <frame>
+    <frame pos="0 -1">
         <label pos="0 0" size="39 4" textsize="0.9" text="Title" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="40 0" size="39 4" textsize="0.9" text="Arist" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="80 0" size="34 4" textsize="0.9" text="Album" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
@@ -26,15 +27,15 @@
 
         <frame id="rows" pos="0 -5">
             {for $i=0; $i<19; $i++}
-            <frameinstance modelid="row" pos="0 {$i * -3.45}"></frameinstance>
+            <frameinstance modelid="row" pos="0 {$i * -4}"></frameinstance>
             {/for}
         </frame>
 
-        <frame pos="2 -72" scale="0.9">
+        <frame pos="2 -82.5" scale="0.9">
             {include 'components.pagination'}
         </frame>
 
-        <frame id="search-frame" pos="100 -72" scale="0.9">
+        <frame id="search-frame" pos="100 -82.5" scale="0.9">
             <label textfont="{config('colors.ui.font')|noescape}" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
             <entry textfont="{config('colors.ui.font')|noescape}" id="search-input" class="search-input" pos="26.5 0" size="25 3.5" textcolor="{config('colors.ui.window.text.primary')}"
                    halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
