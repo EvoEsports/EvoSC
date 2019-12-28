@@ -4,9 +4,7 @@
 namespace esc\Modules;
 
 
-use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -20,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        InputSetup::sendScript($player);
+        QuickButtons::showButtons($player);
     }
 
     public static function sendTestManialink(Player $player)

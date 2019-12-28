@@ -6,9 +6,13 @@ namespace esc\Modules;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class QuickButtons
 {
+    /**
+     * @var Collection
+     */
     private static $buttons;
 
     public function __construct()
@@ -42,10 +46,7 @@ class QuickButtons
 
             //Only get buttons the player has access to
             return $player->hasAccess($button->access);
-        })->transform(function ($button) {
-            //convert into maniascript format
-            return sprintf('["%s", "%s", "%s"]', $button->icon, $button->text, $button->action);
-        })->implode(',');
+        });
 
         Template::show($player, 'quick-buttons.overlay', compact('buttons'));
     }
