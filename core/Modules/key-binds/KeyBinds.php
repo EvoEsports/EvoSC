@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -26,8 +27,9 @@ class KeyBinds
         ManiaLinkEvent::add('show_key_bind_settings', [self::class, 'showSettings']);
         ManiaLinkEvent::add('bound_key_pressed', [self::class, 'keyPressed']);
         ManiaLinkEvent::add('update_keybinds', [self::class, 'sendScript']);
+        ManiaLinkEvent::add('update_bind', [self::class, 'updateBind']);
 
-        QuickButtons::addButton('', 'Keyboard Setup', 'show_key_bind_settings');
+        QuickButtons::addButton('🎮', 'Input-Setup', 'show_key_bind_settings');
     }
 
     public static function showSettings(Player $player)
@@ -46,11 +48,11 @@ class KeyBinds
     /**
      * Add a new key-bind
      *
-     * @param string      $id
-     * @param string      $description
-     * @param callable    $callback
-     * @param string      $defaultKey
-     * @param string|null $access
+     * @param  string  $id
+     * @param  string  $description
+     * @param  callable  $callback
+     * @param  string  $defaultKey
+     * @param  string|null  $access
      */
     public static function add(string $id, string $description, $callback, string $defaultKey, string $access = null)
     {
@@ -59,19 +61,92 @@ class KeyBinds
         }
 
         self::$binds->push([
-            'id'          => $id,
+            'id' => $id,
             'description' => $description,
-            'callback'    => $callback,
-            'default'     => $defaultKey,
-            'access'      => $access,
+            'callback' => $callback,
+            'default' => $defaultKey,
+            'code' => 0,
+            'access' => $access,
         ]);
+    }
+
+    /**
+     * Update a key-bind
+     *
+     * @param  Player  $player
+     * @param  mixed  ...$data
+     */
+    public static function updateBind(Player $player, ...$data)
+    {
+        $binds = DB::table('user-settings')
+            ->where('player_Login', '=', $player->Login)
+            ->where('name', '=', 'key-binds')
+            ->first();
+
+        if (!$binds) {
+            $binds = collect();
+        } else {
+            $binds = collect(json_decode($binds->value));
+        }
+
+        $data = json_decode(implode(',', $data));
+
+        if ($binds->isNotEmpty()) {
+            $binds = $binds->where('id', '!=', $data->id);
+        }
+
+        $binds->push($data);
+
+        DB::table('user-settings')
+            ->updateOrInsert([
+                'player_Login' => $player->Login,
+                'name' => 'key-binds'
+            ], [
+                'value' => $binds->toJson()
+            ]);
+    }
+
+    /**
+     * Send the key-bind script to the player
+     *
+     * @param  \esc\Models\Player  $player
+     */
+    public static function sendScript(Player $player)
+    {
+        $userBinds = $player->setting('key-binds', true);
+        $userBinds = collect($userBinds)->keyBy('id');
+
+        $binds = self::$binds->map(function ($bind) use ($player, $userBinds) {
+            if ($bind['access'] && !$player->hasAccess($bind['access'])) {
+                return null;
+            }
+
+            if ($userBinds->has($bind['id'])) {
+                $b = $userBinds->get($bind['id']);
+                return [
+                    'id' => $bind['id'],
+                    'code' => $b->code,
+                    'name' => $b->name,
+                    'def' => $bind['default'],
+                ];
+            }
+
+            return [
+                'id' => $bind['id'],
+                'code' => $bind['code'],
+                'name' => $userBinds->has($bind['id']) ?? $bind['default'],
+                'def' => $bind['default'],
+            ];
+        })->filter();
+
+        Template::show($player, 'key-binds.script', compact('binds'));
     }
 
     /**
      * Handle bound key presses
      *
-     * @param \esc\Models\Player $player
-     * @param string             $id
+     * @param  \esc\Models\Player  $player
+     * @param  string  $id
      */
     public static function keyPressed(Player $player, string $id)
     {
@@ -87,7 +162,7 @@ class KeyBinds
                 $func($player);
             } else {
                 if (is_callable($bind['callback'], false, $callableName)) {
-                    Log::write("Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
+                    Log::write("Execute: ".$bind['callback'][0]." ".$bind['callback'][1],
                         isVeryVerbose());
                     call_user_func($bind['callback'], $player);
                 } else {
@@ -95,26 +170,5 @@ class KeyBinds
                 }
             }
         });
-    }
-
-    /**
-     * Send the key-bind script to the player
-     *
-     * @param \esc\Models\Player $player
-     */
-    public static function sendScript(Player $player)
-    {
-        $binds = self::$binds->map(function ($bind) use ($player) {
-            if ($bind['access'] && !$player->hasAccess($bind['access'])) {
-                return null;
-            }
-
-            return sprintf('["id"=>"%s","description"=>"%s","default"=>"%s"]', $bind['id'], $bind['description'],
-                strtolower($bind['default']));
-        })->filter()->implode(',');
-
-        $binds = "[$binds]";
-
-        Template::show($player, 'key-binds.script', compact('binds'));
     }
 }

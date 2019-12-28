@@ -51,8 +51,8 @@
                 buttons.Show();
             }
 
-            if(icon2.Value != "" && !MouseRightButton){
-                icon2.Value = "";
+            if(icon2.Value != "" && !MouseRightButton){
+                icon2.Value = "";
             }
             if(icon2.Value != "" && MouseRightButton){
                 icon2.Value = "";

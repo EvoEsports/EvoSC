@@ -268,11 +268,16 @@ class Player extends Model
      *
      * @param  string  $settingName
      *
+     * @param  bool  $jsonDecode
      * @return mixed|null
      */
-    public function setting($settingName)
+    public function setting($settingName, $jsonDecode = false)
     {
         $setting = $this->settings()->whereName($settingName)->first();
+
+        if($jsonDecode){
+            return json_decode($setting->value ?? null);
+        }
 
         return $setting->value ?? null;
     }
