@@ -8,9 +8,10 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class KeyBinds
+class InputSetup implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -42,7 +43,7 @@ class KeyBinds
             return true;
         })->values();
 
-        Template::show($player, 'key-binds.settings', compact('binds'));
+        Template::show($player, 'input-setup.settings', compact('binds'));
     }
 
     /**
@@ -139,7 +140,7 @@ class KeyBinds
             ];
         })->filter();
 
-        Template::show($player, 'key-binds.script', compact('binds'));
+        Template::show($player, 'input-setup.script', compact('binds'));
     }
 
     /**
@@ -170,5 +171,12 @@ class KeyBinds
                 }
             }
         });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
     }
 }

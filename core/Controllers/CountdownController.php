@@ -16,7 +16,7 @@ use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
+use esc\Modules\InputSetup;
 use Exception;
 use SimpleXMLElement;
 
@@ -236,6 +236,6 @@ class CountdownController implements ControllerInterface
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
         ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
 
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
+        InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 }
