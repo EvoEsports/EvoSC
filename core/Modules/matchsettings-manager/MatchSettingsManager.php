@@ -55,7 +55,7 @@ class MatchSettingsManager implements ModuleInterface
         ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
+            QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
         }
     }
 

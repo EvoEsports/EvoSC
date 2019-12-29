@@ -3,8 +3,11 @@
     <frame pos="{($buttons->count() * 6) / -2 - 2.5} -51" halign="center" valign="center" scale="1">
         {foreach $buttons as $button}
         <frame pos="{$iterator->counter * 6} 0" data-action="{$button->action}">
-            <label size="5 5" valign="center" halign="center" textsize="1.25" text="{$button->icon}" textcolor="eeee" z-index="1" focusareacolor1="{config('colors.ui.window.bg.color')}0" focusareacolor2="{config('colors.ui.window.header.color')}9" ScriptEvents="1" />
-            <label pos="0 -5" valign="center" halign="center" textsize="0.7" text="{$button->text}" textfont="{config('colors.ui.font')|noescape}" textcolor="eeee" z-index="1" hidden="1" />
+            <label size="5.5 5.5" valign="center" halign="center" textsize="1.25" text="$s{$button->icon}" textcolor="fffe" z-index="1" focusareacolor1="0000" focusareacolor2="000c" ScriptEvents="1" />
+            <label pos="0 -5" valign="center" halign="center" textsize="0.7" text="$s{$button->text}" textfont="{config('colors.ui.font')|noescape}" textcolor="eeee" z-index="1" hidden="1" />
+            {if $button->access}
+            <label pos="1 -1" text="$s" textcolor="{config('colors.ui.window.header.color')}" valign="center" halign="center" textsize="1" scale="0.75" z-index="3" />
+            {/if}
         </frame>
         {/foreach}
     </frame>

@@ -18,7 +18,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        QuickButtons::showButtons($player);
+        MusicClient::showMusicList($player);
     }
 
     public static function sendTestManialink(Player $player)

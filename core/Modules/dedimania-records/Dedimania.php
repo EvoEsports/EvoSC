@@ -112,6 +112,7 @@ class Dedimania extends DedimaniaApi
             warningMessage('Unfortunately Dedimania is offline, new records will not be visible before it comes online again.')->send($player);
         }
 
+        self::showRecords($player);
         Template::show($player, 'dedimania-records.manialink');
     }
 
