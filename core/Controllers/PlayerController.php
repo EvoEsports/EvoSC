@@ -80,6 +80,8 @@ class PlayerController implements ControllerInterface
                 infoMessage($player, ' set the server password to "'.$pw.'".')->sendAdmin();
             }
         }
+
+        Server::setServerPasswordForSpectator($pw);
     }
 
     /**
