@@ -131,6 +131,7 @@ class EscRun extends Command
 
         global $_onlinePlayers;
         global $_restart;
+        global $serverName;
         $_restart = false;
 
         $version = getEscVersion();
@@ -150,7 +151,7 @@ class EscRun extends Command
         $_onlinePlayers = collect();
 
         Database::init();
-        RestClient::init(serverName());
+        RestClient::init($serverName);
         HookController::init();
         TemplateController::init();
         ChatController::init();
