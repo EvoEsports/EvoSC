@@ -104,6 +104,8 @@ function shutdown()
     global $_restart;
 
     if ($_restart) {
+        \esc\Classes\Log::warning('Automatic restarting disabled (unstable).');
+        /*
         switch (pcntl_fork()) {
             case 0:
                 echo "Child is starting.\n";
@@ -115,6 +117,7 @@ function shutdown()
                 echo "Parent is exiting.\n";
                 exit(0);
         }
+        */
     }
 }
 
