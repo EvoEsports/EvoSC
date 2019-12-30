@@ -369,19 +369,7 @@ class DedimaniaApi
         */
 
         $bestRecord = $sortedScores->first();
-
-        // Log::write('Best Record: ' . serialize($bestRecord), isVerbose());
-
-        try {
-            $VReplay = Server::getValidationReplay($bestRecord->player->Login);
-        } catch (\Exception $e) {
-            Log::write('Failed to get validation replay for player '.$bestRecord->player->Login.': '.$e->getMessage(),
-                true);
-            Log::write($e->getTraceAsString(), isVerbose());
-
-            $VReplay = '';
-        }
-
+        $VReplay = $bestRecord->v_replay;
         $VReplayChecks = $bestRecord->Checkpoints;
         $Top1GReplay = '';
 
@@ -422,11 +410,14 @@ class DedimaniaApi
 
                 if (isset($data->params->param->value->boolean)) {
                     //Success parameter is set
+                    Log::info('Dedis saved.');
 
                     if (!$data->params->param->value->boolean) {
                         //Request failed
 
                         Log::write('Failed to update dedis.', true);
+                    } else {
+                        $map->dedis()->whereNotNull('v_replay')->update(['v_replay' => null]);
                     }
                 }
             }

@@ -306,6 +306,7 @@ class Dedimania extends DedimaniaApi
                         'Score' => $score,
                         'Checkpoints' => $checkpoints,
                         'New' => 1,
+                        'v_replay' => Server::getValidationReplay($player->Login) ?? null
                     ]);
 
                 $chatMessage->setParts($player, ' secured his/her ',
@@ -321,6 +322,7 @@ class Dedimania extends DedimaniaApi
                         'Checkpoints' => $checkpoints,
                         'Rank' => $newRank,
                         'New' => 1,
+                        'v_replay' => Server::getValidationReplay($player->Login) ?? null
                     ]);
 
                 $chatMessage->setParts($player, ' gained the ',
@@ -349,6 +351,7 @@ class Dedimania extends DedimaniaApi
                     'Checkpoints' => $checkpoints,
                     'Rank' => $newRank,
                     'New' => 1,
+                    'v_replay' => Server::getValidationReplay($player->Login) ?? null
                 ]);
 
             DB::table('dedi-records')
