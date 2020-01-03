@@ -369,7 +369,7 @@ class DedimaniaApi
         */
 
         $bestRecord = $sortedScores->first();
-        $VReplay = $bestRecord->v_replay;
+        $VReplay = Cache::get('vreplays/'.$bestRecord->player->Login.'_'.$map->uid, false);
         $VReplayChecks = $bestRecord->Checkpoints;
         $Top1GReplay = '';
 
@@ -417,7 +417,7 @@ class DedimaniaApi
 
                         Log::write('Failed to update dedis.', true);
                     } else {
-                        $map->dedis()->whereNotNull('v_replay')->update(['v_replay' => null]);
+                        Cache::forget('vreplays/'.$bestRecord->player->Login.'_'.$map->uid);
                     }
                 }
             }

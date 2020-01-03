@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Cache;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\File;
@@ -57,6 +58,10 @@ class Dedimania extends DedimaniaApi
 
         //Session exists and is not expired
         self::$enabled = true;
+
+        if (!File::dirExists(cacheDir('vreplays'))) {
+            File::makeDir(cacheDir('vreplays'));
+        }
 
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
@@ -306,8 +311,9 @@ class Dedimania extends DedimaniaApi
                         'Score' => $score,
                         'Checkpoints' => $checkpoints,
                         'New' => 1,
-                        'v_replay' => Server::getValidationReplay($player->Login) ?? null
                     ]);
+
+                self::saveVReplay($player, $map);
 
                 $chatMessage->setParts($player, ' secured his/her ',
                     secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
@@ -322,8 +328,9 @@ class Dedimania extends DedimaniaApi
                         'Checkpoints' => $checkpoints,
                         'Rank' => $newRank,
                         'New' => 1,
-                        'v_replay' => Server::getValidationReplay($player->Login) ?? null
                     ]);
+
+                self::saveVReplay($player, $map);
 
                 $chatMessage->setParts($player, ' gained the ',
                     secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
@@ -351,8 +358,9 @@ class Dedimania extends DedimaniaApi
                     'Checkpoints' => $checkpoints,
                     'Rank' => $newRank,
                     'New' => 1,
-                    'v_replay' => Server::getValidationReplay($player->Login) ?? null
                 ]);
+
+            self::saveVReplay($player, $map);
 
             DB::table('dedi-records')
                 ->where('Map', '=', $map->id)
@@ -376,7 +384,17 @@ class Dedimania extends DedimaniaApi
         }
     }
 
-    private static function saveGhostReplay(Model $dedi)
+    private static function saveVReplay(Player $player, Map $map)
+    {
+        $login = $player->Login;
+        $vreplay = Server::getValidationReplay($login) ?? null;
+
+        if ($vreplay) {
+            Cache::put('vreplays/'.$login.'_'.$map->uid, $vreplay);
+        }
+    }
+
+    private static function saveGhostReplay($dedi)
     {
         $oldGhostReplay = $dedi->ghost_replay;
 

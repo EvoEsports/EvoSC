@@ -5,7 +5,6 @@ namespace esc\Modules;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -24,7 +23,7 @@ class CPRecords implements ModuleInterface
                 'name' => $tracker->player->NickName,
                 'time' => $tracker->time
             ];
-        });
+        })->sortBy('index');
 
         Template::show($player, 'cp-records.widget', compact('cps'));
     }
@@ -36,13 +35,13 @@ class CPRecords implements ModuleInterface
         }
 
         $o = new \stdClass();
-        $o->player = $player;
+        $o->nick = $player->NickName;
         $o->time = $time;
 
         self::$tracker->put($cpId, $o);
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMatch()
     {
         self::$tracker = collect();
     }
@@ -55,8 +54,10 @@ class CPRecords implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$tracker = collect();
+
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
     }
 }
