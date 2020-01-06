@@ -39,18 +39,13 @@ class Cache
      *
      * @param  string  $id
      *
-     * @param  bool  $jsonDecode
      * @return mixed
      */
-    public static function get(string $id, bool $jsonDecode = true)
+    public static function get(string $id)
     {
-        if ($jsonDecode) {
-            $cacheObject = File::get(cacheDir($id), true);
+        $cacheObject = File::get(cacheDir($id), true);
 
-            return $cacheObject->data;
-        }
-
-        return File::get(cacheDir($id), $jsonDecode);
+        return $cacheObject->data;
     }
 
     /**
@@ -84,11 +79,13 @@ class Cache
             $cacheObject->data = $data;
             $cacheObject->added = now();
             $cacheObject->expires = $expires;
-        } catch (\Exception $e) {
-            Log::write("Failed to save $id");
-        }
 
-        File::put(cacheDir($id), $cacheObject, true);
+            File::put(cacheDir($id), $cacheObject, true);
+        } catch (\Exception $e) {
+            Log::write("Failed to save $id.");
+            var_dump($e->getMessage());
+            var_dump($e->getTraceAsString());
+        }
     }
 
     public static function forget(string $string)

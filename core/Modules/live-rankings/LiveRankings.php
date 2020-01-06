@@ -25,13 +25,13 @@ class LiveRankings implements ModuleInterface
     {
         if (self::$mode == 'Rounds.Script.txt') {
             $liveRankings = $scores->where('points', '>', 0)
-                ->sortByDesc('points')
                 ->take(self::$show)
                 ->transform(function ($score) {
                     $score->nick = ml_escape($score->player->NickName);
                     $score->score = $score->points.'';
                     return $score;
                 })
+                ->sortByDesc('score')
                 ->pluck('nick', 'score');
         } else {
             $liveRankings = $scores->where('best_score', '>', 0)

@@ -369,7 +369,13 @@ class DedimaniaApi
         */
 
         $bestRecord = $sortedScores->first();
-        $VReplay = Cache::get('vreplays/'.$bestRecord->player->Login.'_'.$map->uid, false);
+
+        if (!file_exists(cacheDir('vreplays/'.$bestRecord->player->Login.'_'.$map->uid))) {
+            Log::error('Missing v-replay for '.$bestRecord->player->Login.'_'.$map->uid.', dedis not saved.');
+            return;
+        }
+
+        $VReplay = file_get_contents(cacheDir('vreplays/'.$bestRecord->player->Login.'_'.$map->uid));
         $VReplayChecks = $bestRecord->Checkpoints;
         $Top1GReplay = '';
 
@@ -400,10 +406,11 @@ class DedimaniaApi
 
             //Send the request
             $data = self::post($xml);
+            $time = time();
 
-            Log::write('Response:');
+            Log::write("Response ($time):");
             // Log::write($data->asXML());
-            $data->saveXML(cacheDir('dedimania_'.time()));
+            $data->saveXML(cacheDir('dedimania_'.$time));
 
             if ($data) {
                 //Got response
@@ -417,7 +424,7 @@ class DedimaniaApi
 
                         Log::write('Failed to update dedis.', true);
                     } else {
-                        Cache::forget('vreplays/'.$bestRecord->player->Login.'_'.$map->uid);
+//                        Cache::forget('vreplays/'.$bestRecord->player->Login.'_'.$map->uid);
                     }
                 }
             }

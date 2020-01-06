@@ -74,6 +74,7 @@ class MxKarma extends MXK
         ChatCommand::add('-', [MxKarma::class, 'voteMinus'], 'Rate the map playable', null, true);
         ChatCommand::add('--', [MxKarma::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
         ChatCommand::add('---', [MxKarma::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
+        ChatCommand::add('-----', [MxKarma::class, 'voteWorst'], 'Rate the map trash', null, true);
 
         ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
     }
@@ -477,5 +478,49 @@ class MxKarma extends MXK
     public static function voteMinusMinusMinus(Player $player)
     {
         self::vote($player, 0);
+    }
+
+    /**
+     * @param  Player  $player
+     */
+    public static function voteWorst(Player $player)
+    {
+        if (!$player) {
+            Log::warning("Null player tries to vote");
+
+            return;
+        }
+
+        $map = MapController::getCurrentMap();
+
+        if (!self::playerCanVote($player, $map)) {
+            //Prevent players from voting when they didnt finish
+            warningMessage('You need to finish the track before you can vote.')->send($player);
+
+            return;
+        }
+
+        $karma = $map->ratings()
+            ->wherePlayer($player->id)
+            ->get()
+            ->first();
+
+        if ($karma != null) {
+            $karma->update(['Rating' => 0]);
+        } else {
+            $karma = Karma::create([
+                'Player' => $player->id,
+                'Map' => $map->id,
+                'Rating' => 0,
+            ]);
+        }
+
+        self::$updatedVotesPlayerIds->push($player->id);
+
+        infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
+        Log::info($player." rated ".$map." @ 0|worst");
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+
+        self::sendUpdatedKarma();
     }
 }

@@ -108,6 +108,12 @@
 
             updateLabels(ranking, i, name, score);
         }
+
+        if(scores.count < max){
+            for(i, scores.count, max - 1){
+                (ranking.Controls[i] as CMlFrame).Hide();
+            }
+        }
     }
 
     Void reset(){

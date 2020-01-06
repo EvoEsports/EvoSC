@@ -338,7 +338,7 @@ class Dedimania extends DedimaniaApi
 
                 DB::table('dedi-records')
                     ->where('Map', '=', $map->id)
-                    ->whereBetween('Rank', [$oldRank, $newRank])
+                    ->whereBetween('Rank', [$oldRank, $newRank - 1])
                     ->increment('Rank');
             }
 
@@ -387,10 +387,10 @@ class Dedimania extends DedimaniaApi
     private static function saveVReplay(Player $player, Map $map)
     {
         $login = $player->Login;
-        $vreplay = Server::getValidationReplay($login) ?? null;
+        $vreplay = Server::getValidationReplay($login);
 
         if ($vreplay) {
-            Cache::put('vreplays/'.$login.'_'.$map->uid, $vreplay);
+            file_put_contents(cacheDir('vreplays/'.$login.'_'.$map->uid), $vreplay);
         }
     }
 
