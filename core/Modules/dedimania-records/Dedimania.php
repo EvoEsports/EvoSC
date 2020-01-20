@@ -320,6 +320,11 @@ class Dedimania extends DedimaniaApi
                     ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
             } else {
                 DB::table('dedi-records')
+                    ->where('Map', '=', $map->id)
+                    ->whereBetween('Rank', [$newRank, $oldRank])
+                    ->increment('Rank');
+
+                DB::table('dedi-records')
                     ->updateOrInsert([
                         'Map' => $map->id,
                         'Player' => $player->id
@@ -335,11 +340,6 @@ class Dedimania extends DedimaniaApi
                 $chatMessage->setParts($player, ' gained the ',
                     secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
                     ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
-
-                DB::table('dedi-records')
-                    ->where('Map', '=', $map->id)
-                    ->whereBetween('Rank', [$oldRank, $newRank - 1])
-                    ->increment('Rank');
             }
 
             if ($newRank == 1) {
@@ -349,6 +349,11 @@ class Dedimania extends DedimaniaApi
 
             self::sendUpdatedDedis();
         } else {
+            DB::table('dedi-records')
+                ->where('Map', '=', $map->id)
+                ->where('Rank', '>=', $newRank)
+                ->increment('Rank');
+
             DB::table('dedi-records')
                 ->updateOrInsert([
                     'Map' => $map->id,
@@ -361,11 +366,6 @@ class Dedimania extends DedimaniaApi
                 ]);
 
             self::saveVReplay($player, $map);
-
-            DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->where('Rank', '>=', $newRank)
-                ->increment('Rank');
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
