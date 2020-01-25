@@ -25,10 +25,12 @@
                         if(bind.code != 0){
                             if(event.KeyCode == bind.code){
                                 TriggerPageAction("bound_key_pressed," ^ bind.id);
+                                break;
                             }
                         }else{
                             if(event.KeyName == bind.def){
                                 TriggerPageAction("bound_key_pressed," ^ bind.id);
+                                break;
                             }
                         }
                     }

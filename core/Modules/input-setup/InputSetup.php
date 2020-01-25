@@ -135,7 +135,7 @@ class InputSetup implements ModuleInterface
             return [
                 'id' => $bind['id'],
                 'code' => $bind['code'],
-                'name' => $userBinds->has($bind['id']) ?? $bind['default'],
+                'name' => $bind['default'],
                 'def' => $bind['default'],
             ];
         })->filter();

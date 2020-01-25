@@ -19,6 +19,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
+        InputSetup::sendScript($player);
     }
 
     public static function sendTestManialink(Player $player)
