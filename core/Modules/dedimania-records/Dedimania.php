@@ -49,10 +49,10 @@ class Dedimania extends DedimaniaApi
                     //Failed to start session
                     self::$offlineMode = true;
                 } else {
-                    Log::info('Dedimania started. Session: '.self::getSessionLastUpdated().', Max-Rank: '.self::$maxRank.'.');
+                    Log::info('Dedimania started. Session: ' . self::getSessionLastUpdated() . ', Max-Rank: ' . self::$maxRank . '.');
                 }
             } else {
-                Log::info('Dedimania started. Session: '.self::getSessionLastUpdated().', Max-Rank: '.self::$maxRank.'.');
+                Log::info('Dedimania started. Session: ' . self::getSessionLastUpdated() . ', Max-Rank: ' . self::$maxRank . '.');
             }
         }
 
@@ -158,7 +158,8 @@ class Dedimania extends DedimaniaApi
         $records = $records->merge(DB::table('dedi-records')
             ->where('Map', '=', $map->id)
             ->where('Rank', '<=', $top)
-            ->get());
+            ->get())
+            ->unique();
 
         $players = DB::table('players')
             ->whereIn('id', $records->pluck('Player'))
@@ -244,7 +245,7 @@ class Dedimania extends DedimaniaApi
 
         self::sendUpdatedDedis();
 
-        Log::write("Loaded records for map $map #".$map->id);
+        Log::write("Loaded records for map $map #" . $map->id);
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)
@@ -295,7 +296,7 @@ class Dedimania extends DedimaniaApi
 
             if ($oldRecord->Score == $score) {
                 $chatMessage->setParts($player, ' equaled his/her ',
-                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)))->sendAll();
+                    secondary($newRank . '.$') . config('colors.dedi') . ' dedimania record ' . secondary(formatScore($score)))->sendAll();
 
                 return;
             }
@@ -316,8 +317,8 @@ class Dedimania extends DedimaniaApi
                 self::saveVReplay($player, $map);
 
                 $chatMessage->setParts($player, ' secured his/her ',
-                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
-                    ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
+                    secondary($newRank . '.$') . config('colors.dedi') . ' dedimania record ' . secondary(formatScore($score)),
+                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
             } else {
                 DB::table('dedi-records')
                     ->where('Map', '=', $map->id)
@@ -338,8 +339,8 @@ class Dedimania extends DedimaniaApi
                 self::saveVReplay($player, $map);
 
                 $chatMessage->setParts($player, ' gained the ',
-                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)),
-                    ' ('.$oldRank.'. -'.formatScore($diff).')')->sendAll();
+                    secondary($newRank . '.$') . config('colors.dedi') . ' dedimania record ' . secondary(formatScore($score)),
+                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
             }
 
             if ($newRank == 1) {
@@ -374,7 +375,7 @@ class Dedimania extends DedimaniaApi
 
             if ($newRank <= config('dedimania.echo-top', 100)) {
                 chatMessage($player, ' gained the ',
-                    secondary($newRank.'.$').config('colors.dedi').' dedimania record '.secondary(formatScore($score)))
+                    secondary($newRank . '.$') . config('colors.dedi') . ' dedimania record ' . secondary(formatScore($score)))
                     ->setIcon('')
                     ->setColor(config('colors.dedi'))
                     ->sendAll();
@@ -390,7 +391,7 @@ class Dedimania extends DedimaniaApi
         $vreplay = Server::getValidationReplay($login);
 
         if ($vreplay) {
-            file_put_contents(cacheDir('vreplays/'.$login.'_'.$map->uid), $vreplay);
+            file_put_contents(cacheDir('vreplays/' . $login . '_' . $map->uid), $vreplay);
         }
     }
 
@@ -405,13 +406,13 @@ class Dedimania extends DedimaniaApi
         $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($dedi->map->Name), $dedi->Score);
 
         try {
-            $saved = Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/'.$ghostFile);
+            $saved = Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
 
             if ($saved) {
                 $dedi->update(['ghost_replay' => $ghostFile]);
             }
         } catch (\Exception $e) {
-            Log::error('Could not save ghost: '.$e->getMessage());
+            Log::error('Could not save ghost: ' . $e->getMessage());
         }
     }
 
