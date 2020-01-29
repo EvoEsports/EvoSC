@@ -10,9 +10,9 @@
     <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
     <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
 
-    <label id="map-name" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Map name" halign="right" textcolor="eeee" textsize="1.4"
+    <label id="map-name" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Unknown Map" halign="right" textcolor="eeee" textsize="1.4"
            textfont="{config('colors.ui.font')|noescape}"/>
-    <label id="author-name" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Author name" halign="right" textcolor="dddd" valign="center"
+    <label id="author-name" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Unknown Author" halign="right" textcolor="dddd" valign="center"
            textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
 
     <label pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text="" textcolor="{config('colors.ui.widget.text.primary')}"

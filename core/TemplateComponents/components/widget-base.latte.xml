@@ -9,6 +9,7 @@
     Real height;
     Boolean visible;
     Real[Integer] widths;
+    Integer slot;
 }
 
 #Struct WidgetGrid {
@@ -79,8 +80,10 @@ declare Integer slot__;
                 continue;
             }
 
-            heights += column[i].height * scale;
-            count += 1;
+            if(column[i].slot != slot__){
+                heights += column[i].height * scale;
+                count += 1;
+            }
         }
 
         {if isset($slotHorizontal)}
@@ -128,6 +131,7 @@ declare Integer slot__;
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
+                wr.slot = slot__;
                 grid_.left[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
@@ -147,6 +151,7 @@ declare Integer slot__;
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
+                wr.slot = slot__;
                 grid_.right[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;

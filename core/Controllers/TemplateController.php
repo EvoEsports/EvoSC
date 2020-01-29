@@ -72,7 +72,7 @@ class TemplateController implements ControllerInterface
     /**
      * Render template with values
      *
-     * @param  string  $index
+     * @param string $index
      * @param        $values
      *
      * @return string
@@ -81,7 +81,7 @@ class TemplateController implements ControllerInterface
     {
         try {
             if (isVerbose()) {
-                Log::write('Rendering Template: '.$index);
+                Log::write('Rendering Template: ' . $index);
             }
 
             return self::$latte->renderToString($index, $values);
@@ -90,11 +90,11 @@ class TemplateController implements ControllerInterface
             $parameters = [];
             foreach ($values as $key => $value) {
                 array_push($parameters,
-                    "<options=bold>$key:</> <fg=yellow>".json_encode($value, JSON_PRETTY_PRINT)."</>");
+                    "<options=bold>$key:</> <fg=yellow>" . json_encode($value, JSON_PRETTY_PRINT) . "</>");
             }
             $vals = implode(', ', $parameters);
 
-            Log::write('Failed to render template: '.$index." [$vals]");
+            Log::write('Failed to render template: ' . $index . " [$vals]");
             var_dump($e->getTraceAsString());
         }
 
@@ -104,7 +104,7 @@ class TemplateController implements ControllerInterface
     /**
      * Load templates from all modules.
      *
-     * @param  null  $args
+     * @param null $args
      */
     public static function loadTemplates($args = null)
     {
@@ -115,22 +115,28 @@ class TemplateController implements ControllerInterface
         self::addCustomFilters();
 
         //Get all template files in core directory
-        self::$templates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/')
-            ->map(function (&$template) {
-                $templateObject = collect();
+        $coreTemplates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/');
+        $extModuleTemplates = File::getFilesRecursively(coreDir('../modules'), '/\.latte\.xml$/');
 
-                //Get path relative to core directory
-                $relativePath = str_replace(coreDir('/'), '', $template);
+        self::$templates = $coreTemplates->merge($extModuleTemplates)->map(function (&$template) {
+            $templateObject = collect();
 
-                //Generate template id from filename & path
-                $templateObject->id = self::getTemplateId($relativePath);
+            //Get path relative to core directory
+            $relativePath = str_replace(coreDir('/'), '', $template);
 
-                //Load template contents
-                $templateObject->template = file_get_contents($template);
+            //Generate template id from filename & path
+            $templateObject->id = self::getTemplateId($relativePath);
 
-                //Assign as new value
-                return $templateObject;
-            });
+            if (preg_match('/core\.{4}modules\.(.+)\.templates(\..+)/', $templateObject->id, $matches)) {
+                $templateObject->id = $matches[1] . $matches[2];
+            }
+
+            //Load template contents
+            $templateObject->template = file_get_contents($template);
+
+            //Assign as new value
+            return $templateObject;
+        });
 
         //Set id <=> template map as loader for latte
         $templateMap = self::$templates->pluck('template', 'id')->toArray();
@@ -158,7 +164,7 @@ class TemplateController implements ControllerInterface
 
         if (count($pathParts) > 0) {
             //Template is in sub-directory
-            $id .= implode('.', $pathParts).'.';
+            $id .= implode('.', $pathParts) . '.';
         }
 
         $id .= str_replace('.latte.xml', '', str_replace('.script.txt', '', $filename));
@@ -167,8 +173,8 @@ class TemplateController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
