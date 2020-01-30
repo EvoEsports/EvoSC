@@ -1,7 +1,5 @@
 <?php
 
-use esc\Classes\Server;
-
 $classes = collect([]);
 
 function getClassesInDirectory(&$classes, $path)
@@ -34,7 +32,7 @@ function buildClassMap()
     global $classes;
 
     $dirs = [
-        'Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations', '..' . DIRECTORY_SEPARATOR . 'modules'
+        'Interfaces', 'Classes', 'Commands', 'Controllers', 'Models', 'Modules', '..' . DIRECTORY_SEPARATOR . 'Migrations'
     ];
 
     if (is_dir(realpath('..' . DIRECTORY_SEPARATOR . 'modules'))) {
