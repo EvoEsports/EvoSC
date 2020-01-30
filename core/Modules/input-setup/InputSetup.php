@@ -138,7 +138,7 @@ class InputSetup implements ModuleInterface
                 'name' => $bind['default'],
                 'def' => $bind['default'],
             ];
-        })->filter();
+        })->filter()->values();
 
         Template::show($player, 'input-setup.script', compact('binds'));
     }
