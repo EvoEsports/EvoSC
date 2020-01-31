@@ -5,6 +5,7 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -26,6 +27,8 @@ class MatchSettingsController implements ControllerInterface
      */
     private static $currentMatchSettingsFile;
 
+    private static $lastMatchSettingsModification;
+
     /**
      *
      */
@@ -34,16 +37,18 @@ class MatchSettingsController implements ControllerInterface
         self::$currentMatchSettingsFile = config('server.default-matchsettings');
 
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
-            Log::error('MatchSettings "'.self::getPath(self::$currentMatchSettingsFile).'" not found.');
+            Log::error('MatchSettings "' . self::getPath(self::$currentMatchSettingsFile) . '" not found.');
             exit(1);
         }
     }
 
     public static function loadMatchSettings(Player $player, string $matchSettingsFile)
     {
-        Server::loadMatchSettings('MatchSettings/'.$matchSettingsFile);
+        Server::loadMatchSettings('MatchSettings/' . $matchSettingsFile);
         infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
-        Log::info($player.' loads matchsettings '.$matchSettingsFile);
+        Log::info($player . ' loads matchsettings ' . $matchSettingsFile);
+        self::$currentMatchSettingsFile = $matchSettingsFile;
+        self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
         $mode = Server::getScriptName()['NextValue'];
 
@@ -79,8 +84,8 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettings
-     * @param  string  $filename
+     * @param string $matchSettings
+     * @param string $filename
      *
      * @return bool
      */
@@ -96,8 +101,8 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettings
-     * @param  string  $uid
+     * @param string $matchSettings
+     * @param string $uid
      *
      * @return bool
      */
@@ -113,8 +118,8 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettings
-     * @param  Map  $map
+     * @param string $matchSettings
+     * @param Map $map
      */
     public static function addMap(string $matchSettings, Map $map)
     {
@@ -133,7 +138,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
@@ -157,8 +162,8 @@ class MatchSettingsController implements ControllerInterface
 
         foreach ($settings->map as $mapInfo) {
             $maps->push([
-                'file' => (string) $mapInfo->file,
-                'ident' => (string) $mapInfo->ident,
+                'file' => (string)$mapInfo->file,
+                'ident' => (string)$mapInfo->ident,
             ]);
         }
 
@@ -175,13 +180,13 @@ class MatchSettingsController implements ControllerInterface
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::error("Failed to shuffle map-list: ".$e->getMessage());
+            Log::error("Failed to shuffle map-list: " . $e->getMessage());
         }
     }
 
     /**
-     * @param  string  $matchSettings
-     * @param  string  $uid
+     * @param string $matchSettings
+     * @param string $uid
      */
     public static function removeByUid(string $matchSettings, string $uid)
     {
@@ -200,8 +205,8 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettings
-     * @param  string  $filename
+     * @param string $matchSettings
+     * @param string $filename
      */
     public static function removeByFilename(string $matchSettings, string $filename)
     {
@@ -220,7 +225,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettings
+     * @param string $matchSettings
      *
      * @return Collection
      */
@@ -245,7 +250,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $filename
+     * @param string $filename
      *
      * @return bool
      */
@@ -255,7 +260,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $uid
+     * @param string $uid
      *
      * @return bool
      */
@@ -265,7 +270,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $uid
+     * @param string $uid
      */
     public static function removeByUidFromCurrentMatchSettings(string $uid)
     {
@@ -273,7 +278,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $filename
+     * @param string $filename
      */
     public static function removeByFilenameFromCurrentMatchSettings(string $filename)
     {
@@ -281,7 +286,7 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  Map  $map
+     * @param Map $map
      */
     public static function addMapToCurrentMatchSettings(Map $map)
     {
@@ -313,7 +318,7 @@ class MatchSettingsController implements ControllerInterface
                     return "{$node}";
                 })->implode('->');
 
-                eval('$settings->'.$nodePath.' = $value;');
+                eval('$settings->' . $nodePath . ' = $value;');
             }
         }
 
@@ -331,18 +336,18 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param  string  $matchSettingsFile
+     * @param string $matchSettingsFile
      *
      * @return string
      */
     private static function getPath(string $matchSettingsFile)
     {
-        return Server::getMapsDirectory().'MatchSettings'.DIRECTORY_SEPARATOR.$matchSettingsFile;
+        return Server::getMapsDirectory() . 'MatchSettings' . DIRECTORY_SEPARATOR . $matchSettingsFile;
     }
 
     /**
-     * @param  string  $file
-     * @param  SimpleXMLElement  $matchSettings
+     * @param string $file
+     * @param SimpleXMLElement $matchSettings
      */
     private static function saveMatchSettings(string $file, SimpleXMLElement $matchSettings)
     {
@@ -367,14 +372,29 @@ class MatchSettingsController implements ControllerInterface
         self::saveMatchSettings($file, $settings);
     }
 
+    public static function detectMatchSettingsChanges()
+    {
+        clearstatcache();
+        if (self::$lastMatchSettingsModification != filemtime(self::getPath(self::getCurrentMatchSettingsFile()))) {
+            self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
+            infoMessage('MatchSettings was updated by external source, reloading.')->sendAll();
+            MapController::loadMaps(self::getCurrentMatchSettingsFile());
+            Hook::fire('MapPoolUpdated');
+        }
+    }
+
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
     {
         ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
             'map_add');
+
+        self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
+
+        Timer::create('detect_match_settings_changes', [self::class, 'detectMatchSettingsChanges'], '5s', true);
     }
 }
