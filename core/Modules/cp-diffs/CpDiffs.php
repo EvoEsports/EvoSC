@@ -27,8 +27,8 @@ class CpDiffs implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -40,6 +40,8 @@ class CpDiffs implements ModuleInterface
 
         ChatCommand::add('/target', [self::class, 'cmdSetTarget'],
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
+
+        ChatCommand::add('/pb', [self::class, 'showPb']);
     }
 
     public static function requestCpDiffs(Player $player)
@@ -65,6 +67,20 @@ class CpDiffs implements ModuleInterface
         }
 
         self::sendInitialCpDiff($player, MapController::getCurrentMap());
+    }
+
+    public static function showPb(Player $player)
+    {
+        $pb = DB::table('pbs')
+            ->where('map_id', '=', MapController::getCurrentMap()->id)
+            ->where('player_id', '=', $player->id)
+            ->first();
+
+        if ($pb) {
+            infoMessage('Your PB is ', secondary($pb->score), ', checkpoints: ', secondary($pb->checkpoints))->send($player);
+        } else {
+            infoMessage('You don\'t have a PB on this map yet.')->send($player);
+        }
     }
 
     public static function sendInitialCpDiff(Player $player, Map $map)
