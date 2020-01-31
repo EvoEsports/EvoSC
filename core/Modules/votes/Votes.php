@@ -38,10 +38,7 @@ class Votes
         self::$voters = collect();
         self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
         self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier', 1);
-        if ($originalTimeLimit == 0) {
-            $originalTimeLimit = 600;
-        }
+        $originalTimeLimit = CountdownController::getOriginalTimeLimit();
         self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
 
         AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
@@ -83,9 +80,9 @@ class Votes
 
         $secondsLeft = CountdownController::getSecondsLeft();
 
-        if($secondsLeft){
-            if ($secondsLeft < 10 && !$player->hasAccess('vote_always')) {
-                warningMessage('Sorry, it is too late to start a vote.')->send($player);
+        if ($secondsLeft) {
+            if ($secondsLeft < 15 && !$player->hasAccess('vote_always')) {
+                warningMessage('It is too late to start a vote.')->send($player);
 
                 return false;
             }
@@ -165,7 +162,7 @@ class Votes
         $diffInSeconds = self::getSecondsSinceLastTimeVote();
         if ($diffInSeconds < config('votes.time.cooldown-in-seconds') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
-            warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
+            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                 ' before voting again.')->send($player);
 
             return;
@@ -178,7 +175,7 @@ class Votes
         } else {
             $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         }
-        $question = 'Add '.round($secondsToAdd / 60, 1).' minutes?';
+        $question = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
@@ -193,7 +190,7 @@ class Votes
             self::$lastTimeVote = time();
             self::$timeVotesThisRound++;
 
-            infoMessage($player, ' started a vote to ', secondary('add '.round($secondsToAdd / 60, 1).' minutes?'),
+            infoMessage($player, ' started a vote to ', secondary('add ' . round($secondsToAdd / 60, 1) . ' minutes?'),
                 '. Use ', secondary('F5/F6'), ' and ', secondary('/y'), ' or ', secondary('/n'),
                 ' to vote.')->setIcon('')->sendAll();
         }
@@ -216,14 +213,20 @@ class Votes
         if (!$player->hasAccess('vote_always')) {
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {
                 warningMessage('Please wait ',
-                    secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed).' seconds'),
+                    secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed) . ' seconds'),
                     ' before asking to skip the map.')->send($player);
 
                 return;
             }
 
             if (self::$skipVotesThisRound >= config('votes.skip.limit-votes')) {
-                warningMessage('The maximum of skip votes was reached, sorry.')->send($player);
+                warningMessage('The maximum of skip votes was reached.')->send($player);
+
+                return;
+            }
+
+            if (time() - CountdownController::getRoundStartTime() > 180) {
+                warningMessage('It is too late to skip the map.')->send($player);
 
                 return;
             }
@@ -231,7 +234,7 @@ class Votes
             $diffInSeconds = self::getSecondsSinceLastSkipVote();
             if ($diffInSeconds < config('votes.skip.cooldown-in-seconds')) {
                 $waitTime = config('votes.skip.cooldown-in-seconds') - $diffInSeconds;
-                warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
+                warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
 
                 return;

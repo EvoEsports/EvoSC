@@ -410,7 +410,7 @@ class DedimaniaApi
 
             Log::write("Response ($time):");
             // Log::write($data->asXML());
-            $data->saveXML(cacheDir('dedimania_'.$time));
+//            $data->saveXML(cacheDir('dedimania_'.$time));
 
             if ($data) {
                 //Got response

@@ -6,6 +6,7 @@ namespace esc\Modules;
 
 use esc\Classes\Server;
 use esc\Classes\Template;
+use esc\Controllers\CountdownController;
 use esc\Controllers\TemplateController;
 use esc\Models\Player;
 
@@ -19,7 +20,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        InputSetup::sendScript($player);
+        var_dump(CountdownController::getOriginalTimeLimit(), CountdownController::getSecondsLeft());
     }
 
     public static function sendTestManialink(Player $player)

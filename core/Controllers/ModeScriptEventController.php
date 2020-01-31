@@ -106,6 +106,9 @@ class ModeScriptEventController implements ControllerInterface
             default:
                 Hook::fire($callback, $arguments);
                 Log::write('Calling unhandled ' . $callback, isVerbose());
+                if (isDebug()) {
+                    var_dump($arguments);
+                }
         }
     }
 
@@ -120,7 +123,7 @@ class ModeScriptEventController implements ControllerInterface
             $scores = json_decode($arguments[0]);
 
             if ($scores->section == 'EndMap') {
-                if($scores->winnerplayer != ''){
+                if ($scores->winnerplayer != '') {
                     Hook::fire('AnnounceWinner', player($scores->winnerplayer));
                 }
                 Hook::fire('ShowScores', collect($scores->players));
@@ -150,7 +153,7 @@ class ModeScriptEventController implements ControllerInterface
         $wayPoint = json_decode($arguments[0]);
 
         $player = player($wayPoint->login);
-        $map    = MapController::getCurrentMap();
+        $map = MapController::getCurrentMap();
 
         $totalCps = $map->gbx->CheckpointsPerLaps;
 
@@ -231,14 +234,14 @@ class ModeScriptEventController implements ControllerInterface
     static function tmPlayerLeave($arguments)
     {
         $playerData = json_decode($arguments[0]);
-        $player     = player($playerData->login);
+        $player = player($playerData->login);
 
         Hook::fire('PlayerDisconnect', $player);
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)

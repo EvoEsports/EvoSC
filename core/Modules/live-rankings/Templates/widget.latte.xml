@@ -121,7 +121,6 @@
         foreach(control in ranking.Controls){
             control.Hide();
         }
-        scores = Integer[Text];
     }
     --></script>
     {/block}
@@ -134,11 +133,11 @@
     {block bootScript}
         declare Text[Text] LiveRankings__ for This;
         declare Integer LiveRankingsUpdate for This;
+        declare Ident currentMapUid = Map.Id;
 
         left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('live-rankings.ui.slot')};
 
-        declare Text currentMapUid = Map.MapInfo.MapUid;
         declare lastUpdate = 0;
 
         reset();
@@ -155,8 +154,8 @@
             updateList();
         }
 
-        if(currentMapUid != Map.MapInfo.MapUid){
-            currentMapUid = Map.MapInfo.MapUid;
+        if(currentMapUid != Map.Id){
+            currentMapUid = Map.Id;
             reset();
         }
     {/block}

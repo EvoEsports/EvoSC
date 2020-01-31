@@ -11,13 +11,11 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
-use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\InputSetup;
-use Exception;
 use SimpleXMLElement;
 
 class CountdownController implements ControllerInterface
@@ -46,6 +44,8 @@ class CountdownController implements ControllerInterface
     {
         self::$matchStart = time();
         self::$addedSeconds = 0;
+        Cache::put('added-time', 0);
+        Cache::put('match-start', self::$matchStart);
         self::setTimeLimit(self::getOriginalTimeLimit());
     }
 
@@ -76,6 +76,7 @@ class CountdownController implements ControllerInterface
         $addedTime += $seconds;
 
         Hook::fire('AddedTimeChanged', $addedTime);
+        Cache::put('added-time', $addedTime);
 
         self::$addedSeconds = $addedTime;
         self::setTimeLimit(self::getOriginalTimeLimit() + $addedTime);
@@ -227,6 +228,13 @@ class CountdownController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
+        if(Cache::has('match-start')){
+            self::$matchStart = Cache::get('match-start');
+        }
+        if(Cache::has('added-time')){
+            self::$addedSeconds = Cache::get('added-time');
+        }
 
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
