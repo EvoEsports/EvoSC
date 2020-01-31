@@ -77,7 +77,10 @@ class CpDiffs implements ModuleInterface
             ->first();
 
         if ($pb) {
-            infoMessage('Your PB is ', secondary($pb->score), ', checkpoints: ', secondary($pb->checkpoints))->send($player);
+            $cps = collect(explode(',', $pb->checkpoints))->map(function ($cp, $key) {
+                return '$666' . ($key + 1) . '|$fff' . formatScore($cp, true);
+            })->implode(', ');
+            infoMessage('Your PB is ', secondary(formatScore($pb->score, true)), ', checkpoints: ', secondary($cps))->send($player);
         } else {
             infoMessage('You don\'t have a PB on this map yet.')->send($player);
         }
