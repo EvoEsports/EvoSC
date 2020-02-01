@@ -53,7 +53,7 @@ class Log
     {
         $date = date("Y-m-d", time());
         $time = date("H:i:s", time());
-        $logFile = sprintf("logs/%s.txt", $date);
+        $logFile = logDir($date . '.txt');
 
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(false, 2);
