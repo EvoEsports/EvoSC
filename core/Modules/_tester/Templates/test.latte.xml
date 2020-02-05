@@ -7,11 +7,11 @@
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+#Include "Ml:EvoLib" as EL
 
 main(){
-    declare label <=> (Page.MainFrame.GetFirstChild("test") as CMlLabel);
-
-    //System.ClipboardSet("");
+    log("started");
+    EL.test();
 }
     --></script>
 </manialink>

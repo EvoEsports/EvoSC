@@ -202,6 +202,7 @@ class MatchSettingsController implements ControllerInterface
         }
 
         self::saveMatchSettings($file, $settings);
+        self::updateMatchSettingsModificationTime();
     }
 
     /**
@@ -222,6 +223,7 @@ class MatchSettingsController implements ControllerInterface
         }
 
         self::saveMatchSettings($file, $settings);
+        self::updateMatchSettingsModificationTime();
     }
 
     /**
@@ -291,6 +293,7 @@ class MatchSettingsController implements ControllerInterface
     public static function addMapToCurrentMatchSettings(Map $map)
     {
         self::addMap(self::$currentMatchSettingsFile, $map);
+        self::updateMatchSettingsModificationTime();
     }
 
     public static function updateSetting(string $matchSettingsFile, string $setting, $value)
@@ -376,11 +379,16 @@ class MatchSettingsController implements ControllerInterface
     {
         clearstatcache();
         if (self::$lastMatchSettingsModification != filemtime(self::getPath(self::getCurrentMatchSettingsFile()))) {
-            self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
+            self::updateMatchSettingsModificationTime();
             infoMessage('MatchSettings was updated by external source, reloading.')->sendAll();
             MapController::loadMaps(self::getCurrentMatchSettingsFile());
             Hook::fire('MapPoolUpdated');
         }
+    }
+
+    public static function updateMatchSettingsModificationTime()
+    {
+        self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
     }
 
     /**

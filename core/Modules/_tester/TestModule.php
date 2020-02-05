@@ -20,7 +20,8 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        var_dump(CountdownController::getOriginalTimeLimit(), CountdownController::getSecondsLeft());
+        Template::show($player, 'libs.evo');
+        self::sendTestManialink($player);
     }
 
     public static function sendTestManialink(Player $player)
