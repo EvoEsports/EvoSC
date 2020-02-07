@@ -34,7 +34,11 @@ class FunCommands
         ChatCommand::add('/me', function (Player $player, ...$message) {
             array_shift($message);
 
-            $message = implode(' ', $message);
+            $message = trim(implode(' ', $message));
+
+            if (stripAll($message) == '') {
+                return;
+            }
 
             if (preg_match_all('/\{(.+?)\}/', $message, $matches)) {
                 for ($i = 0; $i < count($matches[0]); $i++) {
