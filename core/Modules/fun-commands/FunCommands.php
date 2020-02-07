@@ -30,5 +30,19 @@ class FunCommands
             infoMessage($player, ' boots back to the real world!')->sendAll();
             Server::kick($player->Login, 'cya');
         }, 'Boot yourself back to the real world.');
+
+        ChatCommand::add('/asay', function (Player $player, ...$message) {
+            array_shift($message);
+
+            $message = implode(' ', $message);
+
+            if (preg_match_all('/\{(.+?)\}/', $message, $matches)) {
+                for ($i = 0; $i < count($matches[0]); $i++) {
+                    $message = str_replace($matches[0][$i], secondary($matches[1][$i]) . '$z$s$' . config('colors.info'), $message);
+                }
+            }
+
+            infoMessage($player, ' ', $message)->sendAll();
+        }, 'Mimic info output, put text into curly braces to make it secondary-color.', 'info_messages');
     }
 }
