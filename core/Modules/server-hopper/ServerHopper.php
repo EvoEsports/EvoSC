@@ -77,9 +77,6 @@ class ServerHopper
                 $server->hasPassword = $connection->getServerPassword() != false;
             } catch (\Exception $e) {
                 $server->online = false;
-
-                Log::error($e->getMessage());
-                Log::write($e->getTraceAsString(), isVerbose());
             }
 
             return $server;

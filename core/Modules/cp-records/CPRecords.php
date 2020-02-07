@@ -20,7 +20,7 @@ class CPRecords implements ModuleInterface
         $cps = self::$tracker->map(function ($tracker, $key) {
             return [
                 'index' => $key,
-                'name' => clone($tracker->player->NickName),
+                'name' => $tracker->player->NickName ?? 'disconnected',
                 'time' => $tracker->time
             ];
         })->sortBy('index');
@@ -49,8 +49,8 @@ class CPRecords implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
