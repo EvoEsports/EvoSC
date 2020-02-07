@@ -87,6 +87,6 @@ class InfoMessages implements ModuleInterface
         ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
         ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
 
-        Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '5s', true);
+        Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
     }
 }
