@@ -79,20 +79,15 @@ class Votes
         }
 
         $secondsLeft = CountdownController::getSecondsLeft();
+        $duration = config('votes.duration');
 
-        if ($secondsLeft) {
-            if ($secondsLeft < 15 && !$player->hasAccess('vote_always')) {
+        if ($secondsLeft && $secondsLeft <= $duration) {
+            if ($secondsLeft < 15) {
                 warningMessage('It is too late to start a vote.')->send($player);
 
                 return false;
             }
-
-            $secondsLeft = 0;
-        }
-
-        $duration = config('votes.duration');
-
-        if ($secondsLeft > 0 && $secondsLeft <= $duration) {
+            
             $duration = $secondsLeft - 3;
         }
 

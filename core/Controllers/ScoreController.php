@@ -47,7 +47,6 @@ class ScoreController implements ControllerInterface
             Server::setRoundCustomPoints(config('server.rounds.points'));
         }
 
-        //TODO: Check for round start & reset $finished
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
     }
@@ -55,6 +54,7 @@ class ScoreController implements ControllerInterface
     public static function beginMatch()
     {
         self::$tracker = collect();
+        Hook::fire('ScoresUpdated', self::$tracker);
     }
 
     private static function isRounds()

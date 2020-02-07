@@ -20,7 +20,7 @@ class CPRecords implements ModuleInterface
         $cps = self::$tracker->map(function ($tracker, $key) {
             return [
                 'index' => $key,
-                'name' => $tracker->player->NickName,
+                'name' => clone($tracker->player->NickName),
                 'time' => $tracker->time
             ];
         })->sortBy('index');

@@ -5,13 +5,14 @@
     </frame>
 
     <script><!--
+#RequireContext CManiaplanetPlugin
+
+#Include "Libs/Nadeo/System/Chat/ChatController.Script.txt" as ChatController
 #Include "MathLib" as ML
 #Include "TextLib" as TL
-#Include "Ml:EvoLib" as EL
 
 main(){
-    log("started");
-    EL.test();
+    log("tester started");
 }
     --></script>
 </manialink>

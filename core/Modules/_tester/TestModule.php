@@ -20,7 +20,6 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Template::show($player, 'libs.evo');
         self::sendTestManialink($player);
     }
 
