@@ -149,9 +149,11 @@ class ManiaLinkEvent
         $arguments[0] = $ply;
 
         if ($formValues) {
-            array_push($arguments, collect($formValues)->mapWithKeys(function ($value) {
-                return [$value['Name'] => $value['Value']];
-            }));
+            $formValuesObject = collect();
+            foreach ($formValues as $value) {
+                $formValuesObject->{$value['Name']} = $value['Value'];
+            }
+            array_push($arguments, $formValuesObject);
         }
 
         call_user_func_array($event->callback, $arguments);
