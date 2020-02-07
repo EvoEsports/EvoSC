@@ -2,17 +2,16 @@
 <manialink name="ESC:test-script" id="test-script" version="3">
     <frame>
         <label id="test" textsize="1" />
+        <entry name="value[1]" value="test" default="-1" />
+        <entry name="value[2]" value="test" default="-1" />
     </frame>
 
     <script><!--
-#RequireContext CManiaplanetPlugin
-
-#Include "Libs/Nadeo/System/Chat/ChatController.Script.txt" as ChatController
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
 main(){
-    log("tester started");
+    TriggerPageAction("asdf");
 }
     --></script>
 </manialink>

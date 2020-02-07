@@ -256,7 +256,7 @@ class EventController implements ControllerInterface
     {
         if (count($arguments) == 4 && is_string($arguments[1]) && is_string($arguments[2])) {
             try {
-                ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
+                ManiaLinkEvent::call(player($arguments[1]), $arguments[2], $arguments[3]);
             } catch (Exception $e) {
                 Log::write("Error: ".$e->getMessage());
             }
