@@ -31,7 +31,7 @@ class FunCommands
             Server::kick($player->Login, 'cya');
         }, 'Boot yourself back to the real world.');
 
-        ChatCommand::add('/asay', function (Player $player, ...$message) {
+        ChatCommand::add('/me', function (Player $player, ...$message) {
             array_shift($message);
 
             $message = implode(' ', $message);
@@ -43,6 +43,6 @@ class FunCommands
             }
 
             infoMessage($player, ' ', $message)->sendAll();
-        }, 'Mimic info output, put text into curly braces to make it secondary-color.', 'info_messages');
+        }, 'Mimic info output, put text into curly braces to make it secondary-color.');
     }
 }
