@@ -18,7 +18,7 @@ class InfoMessages implements ModuleInterface
 {
     public static function displayInfoMessages()
     {
-        $messages = DB::table('info-messages')->select('text')->whereRaw('UNIX_TIMESTAMP() % delay = 0')->get();
+        $messages = DB::table('info-messages')->select('text')->whereRaw('ROUND(UNIX_TIMESTAMP()/60) % delay = 0')->get();
         foreach ($messages as $message) {
             infoMessage($message->text)->sendAll();
         }
