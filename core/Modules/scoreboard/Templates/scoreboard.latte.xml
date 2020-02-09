@@ -189,6 +189,8 @@
 
         if(ctmPlayers.existskey(sb_player.login)){
             player <=> ctmPlayers[sb_player.login];
+        }else{
+            player <=> Null;
         }
 
         (frame.Controls[1] as CMlQuad).ImageUrl = "file://Avatars/" ^ login ^ "/Default";
@@ -222,15 +224,16 @@
         }
 
         declare ladderPointsLabel <=> (frame.Controls[15] as CMlLabel);
-        if(player != Null && player.Score.LadderScore != -1.0 && player.Score.LadderScore > 0){
-            ladderPointsLabel.Value = TL::FormatReal(player.Score.LadderScore, 1, False, False) ^ " LP";
-            ladderPointsLabel.Show();
-        }else{
-            ladderPointsLabel.Hide();
-        }
 
         if(online){
             if(player != Null){
+                if( player.Score.LadderScore != -1.0 && player.Score.LadderScore > 0){
+                    ladderPointsLabel.Value = TL::FormatReal(player.Score.LadderScore, 1, False, False) ^ " LP";
+                    ladderPointsLabel.Show();
+                }else{
+                    ladderPointsLabel.Hide();
+                }
+
                 (frame.Controls[3] as CMlLabel).Value = "";
                 (frame.Controls[14] as CMlLabel).Visible = player.IsSpawned; //spec button
                 (frame.Controls[6] as CMlLabel).Value = player.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
@@ -258,6 +261,7 @@
             (frame.Controls[11] as CMlQuad).BgColor = color;
             (frame.Controls[6] as CMlLabel).Value = "Disconnected";
             (frame.Controls[8] as CMlLabel).Value = "";
+            ladderPointsLabel.Hide();
         }
 
         frame.DataAttributeSet("login", login);
@@ -284,6 +288,7 @@
                 foreach(p in Players){
                     if(p.User.Login == player.login){
                         ctmPlayers[player.login] <=> p;
+                        break;
                     }
                 }
             }
@@ -408,10 +413,7 @@
 
             if(currentUiSequence != UI.UISequence){
                 currentUiSequence = UI.UISequence;
-
-                if(currentUiSequence == CUIConfig::EUISequence::Podium){
-                    update();
-                }
+                update();
             }
 
             foreach(event in PendingEvents){
@@ -514,7 +516,7 @@
             }
 
             brake += 1;
-            if(brake >= 120){
+            if(brake >= 80){
                 update(); //update disconnected players
                 brake = 0;
             }
