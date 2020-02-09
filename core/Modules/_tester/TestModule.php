@@ -22,7 +22,7 @@ class TestModule
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        InfoMessages::showCreate($player);
+        Scoreboard::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

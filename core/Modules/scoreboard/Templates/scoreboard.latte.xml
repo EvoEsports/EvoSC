@@ -1,23 +1,24 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" layer="ScoresTable" id="ScoresTable" name="ScoresTable">
+<manialink version="3" layer="ScoresTable" id="ScoresTable" name="ESC:ScoresTable">
     <framemodel id="player" size="95 13">
         <quad size="95 13" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="{config('colors.ui.window.bg.opacity') / 1.1}" />
 
         <quad class="avatar" pos="14.5 -1.5" size="10 10" z-index="1" />
         <label pos="6.5 -5" valign="center" halign="center" textprefix="$s" text="pos" textsize="3.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.6" text="" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
-        <label text="name" textprefix="$s" pos="33 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
-        <quad class="flag" pos="28 -6.25" bgcolor="6663" size="4 3" valign="center" z-index="1" />
-        <label text="" valign="center" pos="28 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
-        <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="name" textprefix="$s" pos="28 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <quad class="flag" pos="28 -10.4" bgcolor="6663" size="2.7 2" valign="center" z-index="1" />
+        <label text="" valign="center" pos="31.5 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87.5 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="" textprefix="$ccc" opacity="0.8" valign="center" halign="center" pos="13 -6.5" textsize="0.8" scale="0.65" rot="90" z-index="3" />
         <label text="" valign="center" pos="28.5 -2.5" textcolor="eee" opacity="0.9" textsize="0.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <quad size="0.1 13" pos="26" bgcolor="666" z-index="1" opacity="0.6" />
         <quad size="26 13" pos="0" bgcolor="666" z-index="0" opacity="0.25" />
-        <label text="0:00.000" textcolor="fff3" textprefix="" valign="center" halign="right" pos="87 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="2" />
+        <label text="0:00.000" textcolor="fff3" textprefix="" valign="center" halign="right" pos="87.5 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="2" />
         <quad size="95 13" bgcolor="{config('colors.ui.window.header.color')}" z-index="-1" opacity="0" />
-        <label text="" textcolor="fc1" textprefix="$s" valign="center" halign="right" pos="87 -6.5" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="" textcolor="fc1" textprefix="$s" valign="center" halign="right" pos="87.1 -6.6" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="000.0 LP" textcolor="fc1" textprefix="+" valign="center" halign="right" pos="87.1 -6.6" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
 
         <label class="spec" pos="92 -2.1555" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
         <label class="profile" pos="92 -6.5" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
@@ -82,10 +83,10 @@
 
         <frame id="list" pos="0 37">
             {for $i=0; $i<6; $i++}
-            <frameinstance modelid="player" pos="-96 {$i*-14}" hidden="1" />
+            <frameinstance modelid="player" pos="-96 {$i*-14}" hidden="0" />
             {/for}
             {for $i=0; $i<6; $i++}
-            <frameinstance modelid="player" pos="1 {$i*-14}" hidden="1" />
+            <frameinstance modelid="player" pos="1 {$i*-14}" hidden="0" />
             {/for}
             {for $i=0; $i<6; $i++}
             <quad size="95 13" pos="-96 {$i*-14}" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="0.1" />
@@ -220,33 +221,35 @@
             (frame.Controls[14] as CMlLabel).Value = "";
         }
 
+        declare ladderPointsLabel <=> (frame.Controls[15] as CMlLabel);
+        if(player != Null && player.Score.LadderScore != -1.0 && player.Score.LadderScore > 0){
+            ladderPointsLabel.Value = TL::FormatReal(player.Score.LadderScore, 1, False, False) ^ " LP";
+            ladderPointsLabel.Show();
+        }else{
+            ladderPointsLabel.Hide();
+        }
+
         if(online){
-            (frame.Controls[3] as CMlLabel).Value = "";
+            if(player != Null){
+                (frame.Controls[3] as CMlLabel).Value = "";
+                (frame.Controls[14] as CMlLabel).Visible = player.IsSpawned; //spec button
+                (frame.Controls[6] as CMlLabel).Value = player.User.LadderZoneName ^ ": " ^ player.User.LadderRank;
+                (frame.Controls[8] as CMlLabel).Value = getStars(player.User.FameStars);
 
-            foreach(ply in Players){
-                if(ply.User.Login == sb_player.login){
-                    (frame.Controls[14] as CMlLabel).Visible = ply.IsSpawned; //spec button
-                    (frame.Controls[6] as CMlLabel).Value = ply.User.LadderZoneName ^ ": " ^ ply.User.LadderRank;
-                    (frame.Controls[8] as CMlLabel).Value = getStars(ply.User.FameStars);
-
-                    if(ply.IsSpawned){
-                        (frame.Controls[3] as CMlLabel).Value = "$666";
-                    }
-
-                    break;
+                if(player.IsSpawned){
+                    (frame.Controls[3] as CMlLabel).Value = "$666";
                 }
+                (frame.Controls[9] as CMlLabel).Value = sb_player.group_prefix ^ " " ^ sb_player.group_name;
+                color = CL::HexToRgb(sb_player.group_color);
+                (frame.Controls[9] as CMlLabel).TextColor = color;
+
+                if(!sb_settings.group_colors){
+                    color = CL::HexToRgb("666");
+                }
+
+                (frame.Controls[10] as CMlQuad).BgColor = color;
+                (frame.Controls[11] as CMlQuad).BgColor = color;
             }
-
-            (frame.Controls[9] as CMlLabel).Value = sb_player.group_prefix ^ " " ^ sb_player.group_name;
-            color = CL::HexToRgb(sb_player.group_color);
-            (frame.Controls[9] as CMlLabel).TextColor = color;
-
-            if(!sb_settings.group_colors){
-                color = CL::HexToRgb("666");
-            }
-
-            (frame.Controls[10] as CMlQuad).BgColor = color;
-            (frame.Controls[11] as CMlQuad).BgColor = color;
         }else{
             (frame.Controls[3] as CMlLabel).Value = "";
             color = CL::HexToRgb("666");
@@ -361,6 +364,7 @@
         declare settingsVisible = False;
         declare sb <=> (Page.MainFrame.GetFirstChild("sb") as CMlFrame);
         declare podium = False;
+        declare currentUiSequence = UI.UISequence;
         pointLimitRounds = {$pointLimitRounds};
 
         currentPage = 0;
@@ -400,6 +404,14 @@
             if(UI.UISequence != CUIConfig::EUISequence::Podium && podium){
                 podium = False;
                 AnimMgr.Add(sb, "<frame scale='1.0' pos='0 0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+
+            if(currentUiSequence != UI.UISequence){
+                currentUiSequence = UI.UISequence;
+
+                if(currentUiSequence == CUIConfig::EUISequence::Podium){
+                    update();
+                }
             }
 
             foreach(event in PendingEvents){
@@ -502,8 +514,8 @@
             }
 
             brake += 1;
-            if(brake >= 80){
-                update();
+            if(brake >= 120){
+                update(); //update disconnected players
                 brake = 0;
             }
         }
