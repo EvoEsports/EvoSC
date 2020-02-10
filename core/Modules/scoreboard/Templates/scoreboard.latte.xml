@@ -2,29 +2,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="ScoresTable" name="ESC:ScoresTable">
     <framemodel id="player" size="95 13">
-        <quad size="95 13" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="{config('colors.ui.window.bg.opacity') / 1.1}" />
+        <quad class="slot" size="95 13" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="{config('colors.ui.window.bg.opacity') / 1.1}" ScriptEvents="1" />
 
         <quad class="avatar" pos="14.5 -1.5" size="10 10" z-index="1" />
         <label pos="6.5 -5" valign="center" halign="center" textprefix="$s" text="pos" textsize="3.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
-        <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.6" text="" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label pos="6.5 -9.25" valign="center" halign="center" textprefix="" opacity="0.6" text="JOINING" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="name" textprefix="$s" pos="28 -6" size="40 6" valign="center" textsize="2.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <quad class="flag" pos="28 -10.4" bgcolor="6663" size="2.7 2" valign="center" z-index="1" />
         <label text="" valign="center" pos="31.5 -10.25" textcolor="bbb" opacity="1" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="0:00.000" textcolor="eeef" textprefix="$s" valign="center" halign="right" pos="87.5 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <label text="" textprefix="$ccc" opacity="0.8" valign="center" halign="center" pos="13 -6.5" textsize="0.8" scale="0.65" rot="90" z-index="3" />
-        <label text="" valign="center" pos="28.5 -2.5" textcolor="eee" opacity="0.9" textsize="0.3" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="group_name" valign="center" pos="28.25 -2.5" textcolor="eee" opacity="0.6" textsize="0.15" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
         <quad size="0.1 13" pos="26" bgcolor="666" z-index="1" opacity="0.6" />
         <quad size="26 13" pos="0" bgcolor="666" z-index="0" opacity="0.25" />
         <label text="0:00.000" textcolor="fff3" textprefix="" valign="center" halign="right" pos="87.5 -3" textsize="2" textfont="{config('colors.ui.font')|noescape}" z-index="2" />
         <quad size="95 13" bgcolor="{config('colors.ui.window.header.color')}" z-index="-1" opacity="0" />
         <label text="" textcolor="fc1" textprefix="$s" valign="center" halign="right" pos="87.1 -6.6" textsize="1" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
-        <label text="000.0 LP" textcolor="fc1" textprefix="+" valign="center" halign="right" pos="87.1 -6.6" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" />
+        <label text="000.0 LP" textcolor="fc1" textprefix="+" valign="center" halign="right" pos="87.1 -6.6" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" z-index="3" hidden="1" />
 
         <label class="spec" pos="92 -2.1555" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
         <label class="profile" pos="92 -6.5" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
         <label class="pm" pos="92 -10.8" textprefix="$bbb" opacity="1" text="" valign="center" halign="center" size="6 4.333" textsize="0.5" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0004" />
 
-        <frame pos="48 -0.5" z-index="2" scale="0.9">
+        <frame id="admin-buttons" pos="48 -0.5" z-index="2" scale="0.9" hidden="1">
             {if $localPlayer->hasAccess('player_ban')}
             <label class="btn ban" pos="0 -11" textprefix="" text=" BAN" valign="center" opacity="0.25" halign="center" size="10 3" textsize="0.2" textcolor="{config('colors.ui.window.text.danger')|noescape}" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="0000" focusareacolor2="0000" />
             {/if}
@@ -102,6 +102,11 @@
     #Include "TextLib" as TL
     #Include "ColorLib" as CL
 
+    #Struct ESC_PlayerAssignment {
+        CTmMlPlayer player;
+        Integer id;
+    }
+
     #Struct ESC_SB_Player {
         Text login;
         Text name;
@@ -123,7 +128,7 @@
     declare Integer perPage;
     declare Integer pointLimitRounds;
     declare ESC_SB_Player[] players;
-    declare CTmMlPlayer[Text] ctmPlayers;
+    declare ESC_PlayerAssignment[Text] ctmPlayers;
 
     --></script>
 
@@ -188,7 +193,11 @@
         declare name = sb_player.name;
 
         if(ctmPlayers.existskey(sb_player.login)){
-            player <=> ctmPlayers[sb_player.login];
+            player <=> ctmPlayers[sb_player.login].player;
+
+            if(!Players.existskey(ctmPlayers[sb_player.login].id)){
+                player <=> Null;
+            }
         }else{
             player <=> Null;
         }
@@ -285,9 +294,12 @@
             }
 
             if(!ctmPlayers.existskey(player.login)){
-                foreach(p in Players){
+                foreach(id => p in Players){
                     if(p.User.Login == player.login){
-                        ctmPlayers[player.login] <=> p;
+                        declare ESC_PlayerAssignment assignment;
+                        assignment.id = id;
+                        assignment.player <=> p;
+                        ctmPlayers[player.login] = assignment;
                         break;
                     }
                 }
@@ -368,6 +380,7 @@
         declare brake = 0;
         declare settingsVisible = False;
         declare sb <=> (Page.MainFrame.GetFirstChild("sb") as CMlFrame);
+        declare adminButtons <=> (Page.MainFrame.GetFirstChild("admin-buttons") as CMlFrame);
         declare podium = False;
         declare currentUiSequence = UI.UISequence;
         pointLimitRounds = {$pointLimitRounds};
@@ -398,7 +411,7 @@
 
             if(Map.Id != currentMapId){
                 currentMapId = Map.Id;
-                ctmPlayers = CTmMlPlayer[Text];
+                ctmPlayers = ESC_PlayerAssignment[Text];
                 update();
             }
 
@@ -438,6 +451,75 @@
                     findMe();
                     continue;
                 }
+                if(event.Control.HasClass("slot")){
+                    declare slot <=> (event.Control.Parent as CMlFrame);
+                    declare adminButtons <=> (slot.GetFirstChild("admin-buttons") as CMlFrame);
+
+                    if(event.Type == CMlScriptEvent::Type::MouseOver){
+                        declare Vec2 start = slot.AbsolutePosition_V3;
+                        declare width = slot.Size[0];
+                        declare height = slot.Size[1];
+                        declare CMlControl lastActiveControl;
+                        adminButtons.Show();
+                        while(MouseX > start[0] && MouseX < (start[0] + width) && MouseY < start[1] && MouseY > (start[1] - height)){
+                            yield;
+                            foreach(event1 in PendingEvents){
+                                if(event1.Control == Null) continue;
+                                lastActiveControl = event1.Control;
+                                if(event1.Control.HasClass("btn") && event1.Type == CMlScriptEvent::Type::MouseOver){
+                                    (event1.Control as CMlLabel).Opacity = 1.0;
+                                    continue;
+                                }
+                                if(event1.Control.HasClass("btn") && event1.Type == CMlScriptEvent::Type::MouseOut){
+                                    (event1.Control as CMlLabel).Opacity = 0.25;
+                                    continue;
+                                }
+                                if(event1.Control.HasClass("btn") && event1.Type == CMlScriptEvent::Type::MouseClick){
+                                    (lastActiveControl as CMlLabel).Opacity = 0.25;
+                                    declare login = event1.Control.Parent.Parent.DataAttributeGet("login");
+
+                                    if(!ctmPlayers.existskey(login)){
+                                        continue;
+                                    }
+
+                                    declare player <=> ctmPlayers[login].player;
+                                    if(event1.Control.HasClass("kick")){
+                                        (event1.Control as CMlLabel).Opacity = 0.25;
+                                        if(confirm("Kick player " ^ player.User.Name ^ "?")){
+                                            TriggerPageAction("kick," ^ login);
+                                        }
+                                        continue;
+                                    }
+                                    if(event1.Control.HasClass("warn")){
+                                        (event1.Control as CMlLabel).Opacity = 0.25;
+                                        if(confirm("Warn player " ^ player.User.Name ^ "?")){
+                                            TriggerPageAction("warn," ^ login ^ ",");
+                                        }
+                                        continue;
+                                    }
+                                    if(event1.Control.HasClass("ban")){
+                                        (event1.Control as CMlLabel).Opacity = 0.25;
+                                        if(confirm("Ban player " ^ player.User.Name ^ "?")){
+                                            TriggerPageAction("ban," ^ login ^ ",");
+                                        }
+                                        continue;
+                                    }
+                                    if(event1.Control.HasClass("mute")){
+                                        TriggerPageAction("mute,"^login);
+                                        continue;
+                                    }
+                                    if(event1.Control.HasClass("forcespec")){
+                                        TriggerPageAction("forcespec,"^login);
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                        adminButtons.Hide();
+                    }
+
+                    continue;
+                }
                 if(event.Control.HasClass("settings") && event.Type == CMlScriptEvent::Type::MouseClick){
                     settingsVisible = !settingsVisible;
                     setSettingsVisible(settingsVisible);
@@ -454,52 +536,6 @@
                     SetUseGroupColors(sb_settings.group_colors);
                     ManiaLinkEvent("user_setting_save", "sb", sb_settings.tojson());
                     continue;
-                }
-                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOver){
-                    (event.Control as CMlLabel).Opacity = 1.0;
-                    continue;
-                }
-                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseOut){
-                    (event.Control as CMlLabel).Opacity = 0.25;
-                    continue;
-                }
-                if(event.Control.HasClass("btn") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare login = event.Control.Parent.Parent.DataAttributeGet("login");
-
-                    if(!ctmPlayers.existskey(login)){
-                        continue;
-                    }
-
-                    declare player <=> ctmPlayers[login];
-                    if(event.Control.HasClass("kick")){
-                        (event.Control as CMlLabel).Opacity = 0.25;
-                        if(confirm("Kick player " ^ player.User.Name ^ "?")){
-                            TriggerPageAction("kick," ^ login);
-                        }
-                        continue;
-                    }
-                    if(event.Control.HasClass("warn")){
-                        (event.Control as CMlLabel).Opacity = 0.25;
-                        if(confirm("Warn player " ^ player.User.Name ^ "?")){
-                            TriggerPageAction("warn," ^ login ^ ",");
-                        }
-                        continue;
-                    }
-                    if(event.Control.HasClass("ban")){
-                        (event.Control as CMlLabel).Opacity = 0.25;
-                        if(confirm("Ban player " ^ player.User.Name ^ "?")){
-                            TriggerPageAction("ban," ^ login ^ ",");
-                        }
-                        continue;
-                    }
-                    if(event.Control.HasClass("mute")){
-                        TriggerPageAction("mute,"^login);
-                        continue;
-                    }
-                    if(event.Control.HasClass("forcespec")){
-                        TriggerPageAction("forcespec,"^login);
-                        continue;
-                    }
                 }
                 if(event.Control.HasClass("spec") && event.Type == CMlScriptEvent::Type::MouseClick){
                     TriggerPageAction("spec," ^ event.Control.Parent.DataAttributeGet("login"));
