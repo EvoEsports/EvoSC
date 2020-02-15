@@ -13,6 +13,7 @@ use esc\Classes\Server;
 use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
@@ -46,7 +47,7 @@ class DedimaniaApi
         $params = $xml->addChild('params');
 
         foreach (['login', 'key'] as $necessaryConfig) {
-            if (config('dedimania.'.$necessaryConfig) == "") {
+            if (config('dedimania.' . $necessaryConfig) == "") {
                 Log::write(sprintf('Necessary config value %s is not set, dedimania stays disabled.',
                     $necessaryConfig));
 
@@ -142,7 +143,7 @@ class DedimaniaApi
      * . Checks: checkpoints times of the associated record.
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
-     * @param  \esc\Models\Map  $map
+     * @param \esc\Models\Map $map
      *
      * @return null|Collection
      */
@@ -158,7 +159,7 @@ class DedimaniaApi
         $params->addChild('param')->addChild('value', self::getSessionKey());
 
         if (!$map->gbx) {
-            Log::write('Error: No gbx info available for map '.$map);
+            Log::write('Error: No gbx info available for map ' . $map);
 
             return null;
         }
@@ -197,7 +198,15 @@ class DedimaniaApi
 
         self::paramAddArray($params->addChild('param'), $players->toArray());
 
-        $responseData = self::post($xml);
+        try {
+            $responseData = self::post($xml);
+        } catch (GuzzleException $e) {
+            return null;
+        }
+
+        if ($responseData == null) {
+            return null;
+        }
 
         if (isset($responseData->fault)) {
             //Error
@@ -234,7 +243,7 @@ class DedimaniaApi
     /**
      * Update connected players
      *
-     * @param  Map  $map
+     * @param Map $map
      *
      * @return null|SimpleXMLElement
      */
@@ -293,7 +302,7 @@ class DedimaniaApi
     /**
      * Send new records
      *
-     * @param  Map  $map
+     * @param Map $map
      */
     static function setChallengeTimes(Map $map)
     {
@@ -370,12 +379,12 @@ class DedimaniaApi
 
         $bestRecord = $sortedScores->first();
 
-        if (!file_exists(cacheDir('vreplays/'.$bestRecord->player->Login.'_'.$map->uid))) {
-            Log::error('Missing v-replay for '.$bestRecord->player->Login.'_'.$map->uid.', dedis not saved.');
+        if (!file_exists(cacheDir('vreplays/' . $bestRecord->player->Login . '_' . $map->uid))) {
+            Log::error('Missing v-replay for ' . $bestRecord->player->Login . '_' . $map->uid . ', dedis not saved.');
             return;
         }
 
-        $VReplay = file_get_contents(cacheDir('vreplays/'.$bestRecord->player->Login.'_'.$map->uid));
+        $VReplay = file_get_contents(cacheDir('vreplays/' . $bestRecord->player->Login . '_' . $map->uid));
         $VReplayChecks = $bestRecord->Checkpoints;
         $Top1GReplay = '';
 
@@ -385,7 +394,7 @@ class DedimaniaApi
                 $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
 
                 if ($Top1GReplay == '') {
-                    Log::write('Failed to get ghost replay for player '.$bestRecord->player, isVerbose());
+                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
                 }
             }
 
@@ -429,7 +438,7 @@ class DedimaniaApi
                 }
             }
         } catch (\Exception $e) {
-            Log::error('Error saving dedis: '.$e->getMessage(), true);
+            Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
     }
 
@@ -441,7 +450,7 @@ class DedimaniaApi
      * . OptionsEnabled: true if tool options can be stored for the player,
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
-     * @param  \esc\Models\Player  $player
+     * @param \esc\Models\Player $player
      *
      * @return null|\SimpleXMLElement
      */
@@ -480,7 +489,7 @@ class DedimaniaApi
             $playerData = $responseData->params->param->value->struct;
 
             $player->update([
-                'MaxRank' => (int) $playerData->member[1]->value->string,
+                'MaxRank' => (int)$playerData->member[1]->value->string,
                 'Banned' => ($playerData->member[2]->value->int != "0"),
             ]);
 
@@ -500,8 +509,8 @@ class DedimaniaApi
     /**
      * Convert array to struct and attach it to given param
      *
-     * @param  SimpleXMLElement  $param
-     * @param  array  $data
+     * @param SimpleXMLElement $param
+     * @param array $data
      */
     protected static function paramAddStruct(SimpleXMLElement $param, array $data)
     {
@@ -554,8 +563,8 @@ class DedimaniaApi
     /**
      * Adds array to given param
      *
-     * @param  SimpleXMLElement  $param
-     * @param  array  $data
+     * @param SimpleXMLElement $param
+     * @param array $data
      */
     protected static function paramAddArray(SimpleXMLElement $param, array $data)
     {
@@ -618,14 +627,14 @@ class DedimaniaApi
                 'connect_timeout' => 1.5,
             ]);
         } catch (RequestException $e) {
-            Log::write('DedimaniaAp::post failed: '.$e->getMessage());
+            Log::write('DedimaniaAp::post failed: ' . $e->getMessage());
             Log::write($e->getTraceAsString(), isVerbose());
 
             return null;
         }
 
         if ($response->getStatusCode() != 200) {
-            Log::warning("Connection to dedimania failed: ".$response->getReasonPhrase());
+            Log::warning("Connection to dedimania failed: " . $response->getReasonPhrase());
 
             return null;
         }

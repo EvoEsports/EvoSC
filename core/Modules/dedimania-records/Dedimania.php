@@ -207,9 +207,10 @@ class Dedimania extends DedimaniaApi
             $records = self::getChallengeRecords($map);
         } catch (Exception $e) {
             Log::error($e->getMessage(), true);
+            $records = null;
         }
 
-        if (!$records && self::$offlineMode) {
+        if($records == null){
             $records = $map->dedis->transform(function (Dedi $dedi) {
                 $record = collect();
                 $record->login = $dedi->player->Login;
