@@ -236,9 +236,13 @@
 
         if(online){
             if(player != Null){
-                if( player.Score.LadderScore != -1.0 && player.Score.LadderScore > 0){
-                    ladderPointsLabel.Value = TL::FormatReal(player.Score.LadderScore, 1, False, False) ^ " LP";
-                    ladderPointsLabel.Show();
+                if(player.Score != Null){
+                    if(player.Score.LadderScore != -1.0 && player.Score.LadderScore > 0){
+                        ladderPointsLabel.Value = TL::FormatReal(player.Score.LadderScore, 1, False, False) ^ " LP";
+                        ladderPointsLabel.Show();
+                    }else{
+                        ladderPointsLabel.Hide();
+                    }
                 }else{
                     ladderPointsLabel.Hide();
                 }
