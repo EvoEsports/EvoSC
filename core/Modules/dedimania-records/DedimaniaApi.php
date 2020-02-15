@@ -601,9 +601,9 @@ class DedimaniaApi
     /**
      * Send a request to dedimania
      *
-     * @param  SimpleXMLElement  $xml
-     *
-     * @return null|SimpleXMLElement
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private static function post(SimpleXMLElement $xml): ?SimpleXMLElement
     {
@@ -615,6 +615,7 @@ class DedimaniaApi
                 ],
                 'decode_content' => 'gzip',
                 'body' => $xml->asXML(),
+                'connect_timeout' => 1.5,
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             Log::write('DedimaniaAp::post failed: '.$e->getMessage());
