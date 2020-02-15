@@ -16,6 +16,7 @@ use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use stdClass;
 
 class MxKarma extends MXK
@@ -49,6 +50,8 @@ class MxKarma extends MXK
      */
     private static $updatedVotesPlayerIds;
 
+    private static $offline = false;
+
     public function __construct()
     {
         if (!config('mx-karma.enabled')) {
@@ -62,7 +65,13 @@ class MxKarma extends MXK
             'base_uri' => 'https://karma.mania-exchange.com/api2/',
         ]);
 
-        MxKarma::startSession();
+        try {
+            MxKarma::startSession();
+        } catch (ConnectException $e) {
+            Log::error($e->getMessage(), true);
+            self::$offline = true;
+            return;
+        }
 
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
@@ -80,7 +89,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  \esc\Models\Map|null  $map
+     * @param \esc\Models\Map|null $map
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -97,7 +106,7 @@ class MxKarma extends MXK
             return;
         }
 
-        Log::write($ratings->count().' new map ratings:', isVerbose());
+        Log::write($ratings->count() . ' new map ratings:', isVerbose());
         Log::write($ratings->toJson(), isVeryVerbose());
 
         $ratings->transform(function (Karma $rating) {
@@ -124,7 +133,7 @@ class MxKarma extends MXK
         try {
             self::$mapKarma = self::call(MXK::getMapRating, $map);
         } catch (\Exception $e) {
-            Log::error('Failed to get MxKarma ratings for '.$map, isVerbose());
+            Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
             self::$mapKarma = 50.0;
         }
 
@@ -222,9 +231,9 @@ class MxKarma extends MXK
     /**
      * Call MX Karma method
      *
-     * @param  int  $method
-     * @param  Map|null  $map
-     * @param  array|null  $votes
+     * @param int $method
+     * @param Map|null $map
+     * @param array|null $votes
      *
      * @return null|stdClass
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -237,7 +246,7 @@ class MxKarma extends MXK
 
                 $query = [
                     'serverLogin' => config('server.login'),
-                    'applicationIdentifier' => 'EvoSC v'.getEscVersion(),
+                    'applicationIdentifier' => 'EvoSC v' . getEscVersion(),
                     'testMode' => 'false',
                 ];
 
@@ -249,7 +258,7 @@ class MxKarma extends MXK
 
                 $query = [
                     'sessionKey' => self::$session->sessionKey,
-                    'activationHash' => hash("sha512", (self::$apiKey.self::$session->sessionSeed)),
+                    'activationHash' => hash("sha512", (self::$apiKey . self::$session->sessionSeed)),
                 ];
 
                 $function = 'activateSession';
@@ -305,11 +314,12 @@ class MxKarma extends MXK
             ->request($requestMethod, $function, [
                 'query' => $query ?? null,
                 'json' => $json ?? null,
+                'timeout' => 1.5
             ]);
 
         //Check if request was successful
         if ($response->getStatusCode() != 200) {
-            Log::warning('Connection to MX failed: '.$response->getReasonPhrase());
+            Log::warning('Connection to MX failed: ' . $response->getReasonPhrase());
 
             return null;
         }
@@ -426,14 +436,14 @@ class MxKarma extends MXK
         self::$updatedVotesPlayerIds->push($player->id);
 
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
-        Log::info($player." rated ".$map." @ $rating|".self::$ratings[$rating]);
+        Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
         Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
 
         self::sendUpdatedKarma();
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function votePlus(Player $player)
     {
@@ -441,7 +451,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function votePlusPlus(Player $player)
     {
@@ -449,7 +459,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function votePlusPlusPlus(Player $player)
     {
@@ -457,7 +467,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function voteMinus(Player $player)
     {
@@ -465,7 +475,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function voteMinusMinus(Player $player)
     {
@@ -473,7 +483,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function voteMinusMinusMinus(Player $player)
     {
@@ -481,7 +491,7 @@ class MxKarma extends MXK
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function voteWorst(Player $player)
     {
@@ -518,7 +528,7 @@ class MxKarma extends MXK
         self::$updatedVotesPlayerIds->push($player->id);
 
         infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
-        Log::info($player." rated ".$map." @ 0|worst");
+        Log::info($player . " rated " . $map . " @ 0|worst");
         Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
 
         self::sendUpdatedKarma();

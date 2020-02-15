@@ -18,6 +18,7 @@ use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Model;
+use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class Dedimania extends DedimaniaApi
 {
@@ -41,7 +42,6 @@ class Dedimania extends DedimaniaApi
             }
         } else {
             //Session exists
-
             if (!self::checkSession()) {
                 //session expired
 
@@ -203,7 +203,11 @@ class Dedimania extends DedimaniaApi
 
     public static function beginMap(Map $map)
     {
-        $records = self::getChallengeRecords($map);
+        try {
+            $records = self::getChallengeRecords($map);
+        } catch (Exception $e) {
+            Log::error($e->getMessage(), true);
+        }
 
         if (!$records && self::$offlineMode) {
             $records = $map->dedis->transform(function (Dedi $dedi) {

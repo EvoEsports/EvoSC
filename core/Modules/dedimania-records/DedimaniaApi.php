@@ -617,11 +617,6 @@ class DedimaniaApi
                 'body' => $xml->asXML(),
                 'connect_timeout' => 1.5,
             ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            Log::write('DedimaniaAp::post failed: '.$e->getMessage());
-            Log::write($e->getTraceAsString(), isVerbose());
-
-            return null;
         } catch (RequestException $e) {
             Log::write('DedimaniaAp::post failed: '.$e->getMessage());
             Log::write($e->getTraceAsString(), isVerbose());
