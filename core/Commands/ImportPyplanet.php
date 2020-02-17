@@ -5,8 +5,8 @@ namespace esc\Commands;
 
 
 use esc\Classes\Database;
+use esc\Classes\DB;
 use esc\Classes\Log;
-use esc\Classes\MXK;
 use esc\Controllers\ConfigController;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
@@ -144,7 +144,7 @@ class ImportPyplanet extends Command
             $map = Map::whereUid($rating->uid)->first();
 
             if ($player && $map) {
-                MXK::insert([
+                DB::table('mx-karma')->insert([
                     'Player' => $player->id,
                     'Map' => $map->id,
                     'Rating' => ($rating->score == 1 ? 100 : 0)
