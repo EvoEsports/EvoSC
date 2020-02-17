@@ -6,12 +6,12 @@ namespace esc\Commands;
 
 use esc\Classes\Database;
 use esc\Classes\Log;
+use esc\Classes\MXK;
 use esc\Controllers\ConfigController;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\LocalRecords\LocalRecords;
-use esc\Modules\MxKarma;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -144,7 +144,7 @@ class ImportPyplanet extends Command
             $map = Map::whereUid($rating->uid)->first();
 
             if ($player && $map) {
-                MxKarma::insert([
+                MXK::insert([
                     'Player' => $player->id,
                     'Map' => $map->id,
                     'Rating' => ($rating->score == 1 ? 100 : 0)
