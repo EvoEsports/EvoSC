@@ -78,7 +78,7 @@
         </frame>
 
         {if $mode == 'Rounds.Script.txt'}
-        <label textprefix="$sPoint limit: " text="{$pointLimitRounds}" valign="center" halign="center" pos="0 -51" opacity="0.95" textsize="2.5" size="30 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label textprefix="$sPoint limit: " text="{$pointLimitRounds}" valign="center" halign="center" pos="0 42" opacity="0.95" textsize="2.5" size="30 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
         {/if}
 
         <frame id="list" pos="0 37">

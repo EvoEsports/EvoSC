@@ -13,6 +13,7 @@ use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\LocalRecords\LocalRecords;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -109,6 +110,10 @@ class ImportPyplanet extends Command
                     $authorId = $author->id;
                 }
 
+                if (DB::table('maps')->where('filename', '=', $map->file)->exists()) {
+                    DB::table('maps')->where('filename', '=', $map->file)->delete();
+                }
+
                 Map::insert([
                     'name' => $map->name,
                     'environment' => $map->environment,
@@ -127,13 +132,14 @@ class ImportPyplanet extends Command
 
 
         $output->writeln('<info>Transfering map karmas.</>');
-        $bar = new ProgressBar($output, $pyplanet->table('map')->count());
-        $bar->start();
 
         $karma = $pyplanet->table('karma')
             ->join('map', 'karma.map_id', '=', 'map.id')
             ->join('player', 'karma.player_id', '=', 'player.id')
             ->get();
+
+        $bar = new ProgressBar($output, $karma->count());
+        $bar->start();
 
         foreach ($karma as $rating) {
             $player = Player::firstOrCreate([
@@ -144,11 +150,14 @@ class ImportPyplanet extends Command
             $map = Map::whereUid($rating->uid)->first();
 
             if ($player && $map) {
-                DB::table('mx-karma')->insert([
-                    'Player' => $player->id,
-                    'Map' => $map->id,
-                    'Rating' => ($rating->score == 1 ? 100 : 0)
-                ]);
+                try {
+                    DB::table('mx-karma')->insert([
+                        'Player' => $player->id,
+                        'Map' => $map->id,
+                        'Rating' => ($rating->score == 1 ? 100 : 0)
+                    ]);
+                } catch (\Exception $e) {
+                }
             }
 
             $bar->advance();
@@ -159,12 +168,13 @@ class ImportPyplanet extends Command
 
 
         $output->writeln('<info>Transfering local records.</>');
-        $bar = new ProgressBar($output, $pyplanet->table('localrecord')->select('map_id')->get()->unique()->count());
-        $bar->start();
 
         $playerIds = $pyplanet->table('player')->pluck('login', 'id');
         $mapIds = collect();
         $locals = $pyplanet->table('localrecord')->get();
+        $bar = new ProgressBar($output, $locals->count());
+        $bar->start();
+
         foreach ($locals as $record) {
             if (!$mapIds->has($record->map_id)) {
                 $uid = $pyplanet->table('map')->whereId($record->map_id)->first()->uid;
@@ -180,10 +190,17 @@ class ImportPyplanet extends Command
                     'Checkpoints' => $record->checkpoints,
                     'Score' => $record->score,
                     'Map' => $mapIds->get($record->map_id),
-                    'Player' => Player::whereLogin($playerIds->get($record->player_id))->first()->id
+                    'Player' => Player::whereLogin($playerIds->get($record->player_id))->first()->id,
+                    'Rank' => 100
                 ]);
             }
         }
+
+        $bar->finish();
+        echo "\n";
+        $output->writeln('<info>Calculating local record ranks.</>');
+        $bar = new ProgressBar($output, $mapIds->count());
+        $bar->start();
 
         foreach ($mapIds as $id => $mappedId) {
             LocalRecords::fixRanks(Map::find($mappedId));
