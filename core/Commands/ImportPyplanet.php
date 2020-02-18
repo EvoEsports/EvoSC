@@ -194,6 +194,8 @@ class ImportPyplanet extends Command
                     'Rank' => 100
                 ]);
             }
+
+            $bar->advance();
         }
 
         $bar->finish();
@@ -204,6 +206,7 @@ class ImportPyplanet extends Command
 
         foreach ($mapIds as $id => $mappedId) {
             LocalRecords::fixRanks(Map::find($mappedId));
+            $bar->advance();
         }
 
         $bar->finish();
