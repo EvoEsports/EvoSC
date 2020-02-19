@@ -77,7 +77,7 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * @param  Map  $map
+     * @param Map $map
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws Exception
      */
@@ -112,7 +112,7 @@ class MapController implements ControllerInterface
                 try {
                     Server::addMap($request->map->filename);
                 } catch (Exception $e) {
-                    Log::write('Adding map to selection failed: '.$e->getMessage());
+                    Log::write('Adding map to selection failed: ' . $e->getMessage());
                 }
             }
 
@@ -120,7 +120,7 @@ class MapController implements ControllerInterface
             $chosen = Server::chooseNextMap($request->map->filename);
 
             if (!$chosen) {
-                Log::write('Failed to chooseNextMap '.$request->map->filename);
+                Log::write('Failed to chooseNextMap ' . $request->map->filename);
             }
 
             self::$nextMap = $request->map;
@@ -147,8 +147,8 @@ class MapController implements ControllerInterface
     /**
      * Remove a map
      *
-     * @param  Player  $player
-     * @param  Map  $map
+     * @param Player $player
+     * @param Map $map
      */
     public static function deleteMap(Player $player, Map $map)
     {
@@ -166,14 +166,14 @@ class MapController implements ControllerInterface
             ->delete();
         MapFavorite::whereMapId($map->id)
             ->delete();
-        $deleted = File::delete(self::$mapsPath.$map->filename);
+        $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
             try {
                 $map->delete();
-                Log::write($player.'('.$player->Login.') deleted map '.$map.' ['.$map->uid.']');
+                Log::write($player . '(' . $player->Login . ') deleted map ' . $map . ' [' . $map->uid . ']');
             } catch (Exception $e) {
-                Log::write('Failed to remove map "'.$map->uid.'" from database: '.$e->getMessage(), isVerbose());
+                Log::write('Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
             }
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -184,15 +184,15 @@ class MapController implements ControllerInterface
 
             QueueController::preCacheNextMap();
         } else {
-            Log::write('Failed to delete map "'.$map->filename.'": '.$e->getMessage(), isVerbose());
+            Log::write('Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
         }
     }
 
     /**
      * Disable a map and remove it from the current selection.
      *
-     * @param  Player  $player
-     * @param  Map  $map
+     * @param Player $player
+     * @param Map $map
      */
     public static function disableMap(Player $player, Map $map)
     {
@@ -205,7 +205,7 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::write($player.'('.$player->Login.') disabled map '.$map.' ['.$map->uid.']');
+        Log::write($player . '(' . $player->Login . ') disabled map ' . $map . ' [' . $map->uid . ']');
 
         $map->update(['enabled' => 0]);
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -226,7 +226,7 @@ class MapController implements ControllerInterface
     /**
      * Admins skip method
      *
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function skip(Player $player = null)
     {
@@ -236,14 +236,14 @@ class MapController implements ControllerInterface
             infoMessage($player, ' skips map')->sendAll();
         }
 
-        Log::write($map.' ['.$map->uid.'] was skipped by '.($player ? "$player" : 'the server').'.');
+        Log::write($map . ' [' . $map->uid . '] was skipped by ' . ($player ? "$player" : 'the server') . '.');
         $map->increment('skipped');
 
         MapController::goToNextMap();
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function forceReplay(Player $player)
@@ -257,12 +257,12 @@ class MapController implements ControllerInterface
      *
      * @param $filename
      *
-     * @param  bool  $asString
+     * @param bool $asString
      * @return string|stdClass|null
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        $mapFile = Server::GameDataDirectory().'Maps'.DIRECTORY_SEPARATOR.$filename;
+        $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
         $data = new GBXChallMapFetcher(true);
 
         try {
@@ -299,7 +299,7 @@ class MapController implements ControllerInterface
         $gbx->ClassName = 'CGameCtnChallenge';
         $gbx->ClassId = '03043000';
 
-        Log::write('Get GBX information: '.$filename, isVerbose());
+        Log::write('Get GBX information: ' . $filename, isVerbose());
 
         if (!$gbx->Name) {
             $gbx = self::getGbxInformationByExecutable($filename);
@@ -314,9 +314,9 @@ class MapController implements ControllerInterface
 
     private static function getGbxInformationByExecutable($filename)
     {
-        $mps = Server::GameDataDirectory().(isWindows() ? DIRECTORY_SEPARATOR : '').'..'.DIRECTORY_SEPARATOR.'ManiaPlanetServer';
-        $mapFile = Server::GameDataDirectory().'Maps'.DIRECTORY_SEPARATOR.$filename;
-        $cmd = $mps.sprintf(' /parsegbx="%s"', $mapFile);
+        $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
+        $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
+        $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
 
         return json_decode(shell_exec($cmd));
     }
@@ -339,7 +339,7 @@ class MapController implements ControllerInterface
             $filename = $mapInfo->file;
             $uid = $mapInfo->ident;
 
-            if (!File::exists(self::$mapsPath.$filename)) {
+            if (!File::exists(self::$mapsPath . $filename)) {
                 Log::error("File $filename not found.");
 
                 if (DB::table('maps')->where('filename', '=', $filename)->exists()) {
@@ -361,15 +361,15 @@ class MapController implements ControllerInterface
                 $map = DB::table('maps')->where('filename', '=', $filename)->first();
 
                 if ($map->uid != $uid) {
-                    $map->update([
-                        'filename' => '_'.$map->filename,
+                    DB::table('maps')->where('filename', '=', $filename)->update([
+                        'filename' => '_' . $map->filename,
                         'enabled' => 0
                     ]);
 
                     try {
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
-                        Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        Log::error('Failed to create map ' . $filename . ' with uid: ' . $uid);
                         if (isVerbose()) {
                             Log::warning($e->getMessage());
                             Log::warning($e->getTraceAsString());
@@ -383,20 +383,20 @@ class MapController implements ControllerInterface
                     $map = DB::table('maps')->where('uid', '=', $uid)->first();
 
                     if ($map->filename != $filename) {
-                        Log::write("Filename changed for map: (".$map->filename." -> $filename)",
+                        Log::write("Filename changed for map: (" . $map->filename . " -> $filename)",
                             isVerbose());
                         if (isVerbose()) {
                             Log::warning($e->getMessage());
                             Log::warning($e->getTraceAsString());
                         }
 
-                        $map->update(['filename' => $filename]);
+                        DB::table('maps')->where('uid', '=', $uid)->update(['filename' => $filename]);
                     }
                 } else {
                     try {
                         $map = self::createMap($filename, $uid, $gbx);
                     } catch (\Throwable $e) {
-                        Log::error('Failed to create map '.$filename.' with uid: '.$uid);
+                        Log::error('Failed to create map ' . $filename . ' with uid: ' . $uid);
                         if (isVerbose()) {
                             Log::warning($e->getMessage());
                             Log::warning($e->getTraceAsString());
@@ -408,19 +408,19 @@ class MapController implements ControllerInterface
             }
 
             if (!$map->name) {
-                $map->update([
+                DB::table('maps')->where('uid', '=', $uid)->update([
                     'name' => $gbx->Name
                 ]);
             }
 
             if (!$map->environment) {
-                $map->update([
+                DB::table('maps')->where('uid', '=', $uid)->update([
                     'environment' => $gbx->Environment
                 ]);
             }
 
             if (!$map->title_id) {
-                $map->update([
+                DB::table('maps')->where('uid', '=', $uid)->update([
                     'title_id' => $gbx->TitleId
                 ]);
             }
@@ -449,9 +449,9 @@ class MapController implements ControllerInterface
     /**
      * Create map and retrieve object
      *
-     * @param  string  $filename
-     * @param  string  $uid
-     * @param  stdClass  $gbx
+     * @param string $filename
+     * @param string $uid
+     * @param stdClass $gbx
      * @return Map|null
      * @throws \Throwable
      */
@@ -492,21 +492,21 @@ class MapController implements ControllerInterface
     /**
      * Get the maps directory-path, optionally add the filename at the end.
      *
-     * @param  string|null  $fileName
+     * @param string|null $fileName
      *
      * @return string
      */
     public static function getMapsPath(string $fileName = null): string
     {
         if ($fileName) {
-            return self::$mapsPath.$fileName;
+            return self::$mapsPath . $fileName;
         }
 
         return self::$mapsPath;
     }
 
     /**
-     * @param  Map  $currentMap
+     * @param Map $currentMap
      */
     public static function setCurrentMap(Map $currentMap): void
     {
@@ -529,8 +529,8 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
