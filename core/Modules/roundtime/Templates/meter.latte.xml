@@ -43,8 +43,8 @@
     {(new esc\Classes\ManiaLinkDrag())|noescape}
 
     Void resetMeter(){
-        settings.showLabel = True;
-        settings.position = <80.0, -86.0>;
+        settings.showLabel = False;
+        settings.position = <11.833,-85.3333>;
         settings.scale = 1.0;
     }
 
