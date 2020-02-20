@@ -44,8 +44,8 @@
 
     Void resetMeter(){
         settings.showLabel = True;
-        settings.position = <80.0, -79.5>;
-        settings.scale = 1.0;
+        settings.position = <158.5,-82.1667>;
+        settings.scale = 2.0;
     }
 
     CTmMlPlayer GetOwner() {
