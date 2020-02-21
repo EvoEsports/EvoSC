@@ -31,19 +31,19 @@ class FixRanks extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $maps = Map::all();
+        $maps = Map::whereEnabled(1)->get();
         $bar = new ProgressBar($output, $maps->count());
         $bar->start();
 
         foreach ($maps as $map) {
-            LocalRecords::fixRanks($map);
+            $this->fixRanks($map);
             $bar->advance();
         }
 
         $bar->finish();
     }
 
-    private static function fixRanks(Map $map)
+    private function fixRanks(Map $map)
     {
         DB::raw('SET @rank=0');
         DB::raw('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $map->id . ' ORDER BY `Score`');
