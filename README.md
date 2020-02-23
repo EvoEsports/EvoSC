@@ -5,7 +5,7 @@
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
 
-A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 support.
+A server controller for Trackmania² with ManiaPlanet 4.1 support.
 
 | ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
 | --- |
@@ -14,8 +14,8 @@ A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 suppo
 
 
 ### Requirements
-* PHP 7.2+
-* MySql or MariaDB Server
+* PHP 7.4
+* MySql/MariaDB Server
 
 ### Installation
 [Wiki: Installation](https://github.com/EvoTM/EvoSC/wiki/Installation)

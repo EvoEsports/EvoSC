@@ -19,5 +19,8 @@
     "psr-4": {
       "esc\\": "core/"
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   }
 }

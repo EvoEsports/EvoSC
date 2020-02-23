@@ -9,3 +9,4 @@ cache/
 config/*
 !config/default
 *.pid
+.phpunit.result.cache
