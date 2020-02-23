@@ -5,7 +5,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
-use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;

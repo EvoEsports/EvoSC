@@ -5,7 +5,6 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
-use esc\Controllers\PlayerController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 

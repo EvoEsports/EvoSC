@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
-use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
@@ -48,7 +47,7 @@ class ChatController implements ControllerInterface
         }
 
         if ((self::$routingEnabled = config('server.enable-chat-routing', true)) && !self::$externalRouter) {
-            Log::write('Enabling manual chat routing.');
+            Log::info('Enabling manual chat routing.', isVerbose());
             $routingEnabled = false;
 
             while (!$routingEnabled) {
@@ -58,7 +57,7 @@ class ChatController implements ControllerInterface
                     Log::info('Chat router started.');
                 } catch (FaultException $e) {
                     $msg = $e->getMessage();
-                    Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
+                    Log::error("$msg There might already be a running instance of EvoSC.");
                     sleep(1);
                 }
             }

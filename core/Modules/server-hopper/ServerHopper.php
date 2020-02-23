@@ -4,7 +4,6 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
-use esc\Classes\Log;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Interfaces\ModuleInterface;

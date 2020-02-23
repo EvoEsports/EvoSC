@@ -2,10 +2,10 @@
 
 namespace esc\Modules;
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Interfaces\ModuleInterface;

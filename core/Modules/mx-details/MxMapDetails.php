@@ -79,7 +79,7 @@ class MxMapDetails implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid, ['timeout' => 1.5]);
+            $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid, ['timeout' => 5]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;

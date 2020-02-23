@@ -8,7 +8,6 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Controllers\MatchSettingsController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 

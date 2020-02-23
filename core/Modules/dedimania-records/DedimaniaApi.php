@@ -6,11 +6,9 @@ namespace esc\Modules;
 use Carbon\Carbon;
 use esc\Classes\Cache;
 use esc\Classes\File;
-use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
@@ -575,9 +573,9 @@ class DedimaniaApi
 
             if (isVerbose()) {
                 if (gettype($value) == 'array') {
-                    Log::write(sprintf('paramAddArray %s => [%s]', $key, implode(', ', $value)), true);
+                    Log::write(sprintf('paramAddArray %s => [%s]', $key, implode(', ', $value)), isDebug());
                 } else {
-                    Log::write(sprintf('paramAddArray %s => %s', $key, $value), true);
+                    Log::write(sprintf('paramAddArray %s => %s', $key, $value), isDebug());
                 }
             }
 

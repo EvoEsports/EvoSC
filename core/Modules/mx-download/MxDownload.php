@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Cache;
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -11,7 +12,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MxMap;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Classes\ChatCommand;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\MatchSettingsController;

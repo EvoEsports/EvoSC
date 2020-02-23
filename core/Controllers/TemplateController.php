@@ -37,8 +37,6 @@ class TemplateController implements ControllerInterface
      */
     public static function init()
     {
-        Log::write('Starting...');
-
         self::loadTemplates();
     }
 
@@ -108,7 +106,7 @@ class TemplateController implements ControllerInterface
      */
     public static function loadTemplates($args = null)
     {
-        Log::write('Loading templates...');
+        Log::info('Loading templates...');
 
         self::$templates = collect();
         self::$latte = new Engine();

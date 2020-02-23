@@ -5,8 +5,6 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
-use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 

@@ -1,19 +1,18 @@
 <?php declare(strict_types=1);
 
-use esc\Classes\Database;
-use esc\Classes\Log;
-use esc\Controllers\ConfigController;
+require '../../../global-functions.php';
+
 use esc\Modules\Dedimania;
 use PHPUnit\Framework\TestCase;
 
 final class DedimaniaTest extends TestCase
 {
+    public function testOfflineModeIsBool(): void {
+        $this->assertIsBool(Dedimania::isOfflineMode());
+    }
+
     public function testGetDisplayRanksRange(): void
     {
-        ConfigController::init();
-        Database::init();
-        var_dump(Dedimania::getRanksRange(11));
-
         $this->assertIsBool(true);
     }
 }

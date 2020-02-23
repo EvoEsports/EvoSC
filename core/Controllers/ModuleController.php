@@ -77,9 +77,11 @@ class ModuleController implements ControllerInterface
         $moduleClasses = File::getFilesRecursively(__DIR__ . '/../Modules', '/^[A-Z].+\.php$/')
             ->mapWithKeys(function ($file) {
                 return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname(realpath($file))];
+            })->reject(function ($moduleDir, $moduleClass) {
+                return preg_match('/[a-z\-_]+\/[A-Z][a-z]+$/', $moduleDir);
             });
 
-        Log::write('Loading module information.');
+        Log::info('Loading module information.');
 
         foreach ($moduleClasses as $moduleDirectory) {
             $moduleJson = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/' . $moduleDirectory . '/module.json');
@@ -107,19 +109,9 @@ class ModuleController implements ControllerInterface
         $moduleClasses = self::loadModules(true);
 
         //Boot modules
-        Log::write('Starting modules...');
+        Log::info('Starting modules...');
 
         $moduleClasses->each(function ($moduleDir, $moduleClass) use ($mode) {
-            if (!class_exists($moduleClass)) {
-                return;
-            }
-
-            $reflectionClass = new \ReflectionClass($moduleClass);
-            if (!$reflectionClass->implementsInterface(ModuleInterface::class)) {
-                Log::write("$moduleClass is not a Module.", true);
-                return;
-            }
-
             $files = scandir($moduleDir);
             $configId = null;
             foreach ($files as $file) {
@@ -137,10 +129,13 @@ class ModuleController implements ControllerInterface
                 }
             }
 
-            if (isVeryVerbose()) {
-                Log::info('Starting ' . $moduleClass);
-            }
+            Log::info("Starting $moduleClass.", isVeryVerbose());
 
+            $reflectionClass = new \ReflectionClass($moduleClass);
+            if (!$reflectionClass->implementsInterface(ModuleInterface::class)) {
+                Log::write("$moduleClass is not a Module.", isDebug());
+                return;
+            }
 
             if ($reflectionClass->hasMethod('__construct')) {
                 $reflectionMethod = new ReflectionMethod($moduleClass, '__construct');

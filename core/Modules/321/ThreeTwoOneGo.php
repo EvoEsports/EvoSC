@@ -4,8 +4,6 @@
 namespace esc\Modules;
 
 
-use esc\Classes\Hook;
-use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;

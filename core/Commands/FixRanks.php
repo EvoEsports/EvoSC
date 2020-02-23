@@ -7,7 +7,6 @@ use esc\Classes\DB;
 use esc\Classes\Log;
 use esc\Controllers\ConfigController;
 use esc\Models\Map;
-use esc\Models\Player;
 use esc\Modules\LocalRecords\LocalRecords;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;

@@ -3,8 +3,6 @@
 namespace esc\Modules;
 
 
-use esc\Classes\Cache;
-use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -18,20 +16,17 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Database\Eloquent\Model;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class Dedimania extends DedimaniaApi implements ModuleInterface
 {
-    private static $offlineMode;
+    private static $offlineMode = false;
 
     public function __construct()
     {
         if (!config('dedimania.enabled')) {
             return;
         }
-
-        self::$offlineMode = false;
 
         //Check for session key
         if (!self::getSessionKey()) {

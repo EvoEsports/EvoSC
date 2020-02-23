@@ -4,12 +4,9 @@ namespace esc\Models;
 
 
 use esc\Classes\Cache;
-use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
-use esc\Modules\MxMapDetails;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use stdClass;

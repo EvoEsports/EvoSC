@@ -4,7 +4,6 @@ namespace esc\Modules;
 
 
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\ChatCommand;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;

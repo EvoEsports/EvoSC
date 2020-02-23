@@ -13,7 +13,6 @@ use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\LocalRecords\LocalRecords;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;

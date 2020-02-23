@@ -2,13 +2,13 @@
 
 namespace esc\Modules;
 
+use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
@@ -309,7 +309,7 @@ class MxKarma implements ModuleInterface
                 break;
 
             default:
-                \esc\Classes\Log::error('Invalid MX Record method called.');
+                Log::error('Invalid MX Record method called.');
 
                 return null;
         }
@@ -319,7 +319,7 @@ class MxKarma implements ModuleInterface
             ->request($requestMethod, $function, [
                 'query' => $query ?? null,
                 'json' => $json ?? null,
-                'timeout' => 1.5
+                'timeout' => 5
             ]);
 
         //Check if request was successful

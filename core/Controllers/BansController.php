@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;

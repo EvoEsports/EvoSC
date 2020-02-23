@@ -4,7 +4,6 @@ namespace esc\Modules;
 
 use Carbon\Carbon;
 use esc\Classes\ChatCommand;
-use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -13,8 +12,6 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Karma;
-use esc\Models\LocalRecord;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;

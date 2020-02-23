@@ -12,7 +12,6 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
-use esc\Models\Pb;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;

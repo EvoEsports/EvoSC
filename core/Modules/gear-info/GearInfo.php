@@ -3,8 +3,8 @@
 namespace esc\Modules;
 
 
-use esc\Classes\Template;
 use esc\Classes\ChatCommand;
+use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 

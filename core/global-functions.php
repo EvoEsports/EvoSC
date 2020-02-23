@@ -7,10 +7,8 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Controllers\ConfigController;
 use esc\Controllers\PlayerController;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
-use Symfony\Component\Process\Process;
 
 /**
  * @param  mixed  ...$message
@@ -299,7 +297,7 @@ function isDebug(): bool
 {
     global $_isDebug;
 
-    return $_isDebug;
+    return $_isDebug ?? false;
 }
 
 /**

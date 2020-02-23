@@ -7,7 +7,6 @@ use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface as ModuleInterfaceAlias;
 use esc\Models\AccessRight;
 use esc\Models\Group;
