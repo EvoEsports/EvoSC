@@ -47,7 +47,7 @@ main() {
 
     declare width = {floor(count($values) / 5) * 25 + 50}.0;
     window.Size = <width, window.Size[1]>;
-    window.RelativePosition_V3 = <width / -2.0, window.RelativePosition_V3[1]>;
+    window.RelativePosition_V3 = <width / -2.0, window.Size[1] / 2.0>;
     handle.Size = <width - 30.0, handle.Size[1]>;
     close.RelativePosition_V3 = <width - 2.5, close.RelativePosition_V3[1]>;
 

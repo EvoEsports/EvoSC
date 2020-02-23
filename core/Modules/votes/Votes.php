@@ -11,11 +11,12 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class Votes
+class Votes implements ModuleInterface
 {
     /**
      * @var Collection
@@ -38,7 +39,8 @@ class Votes
         self::$voters = collect();
         self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
         self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / (CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier')));
+        $originalTimeLimit = CountdownController::getOriginalTimeLimit();
+        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
 
         AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
         AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
@@ -55,8 +57,8 @@ class Votes
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
 
-        KeyBinds::add('vote_yes', 'Vote yes in a vote.', [self::class, 'voteYes'], 'F5');
-        KeyBinds::add('vote_no', 'Vote no in a vote.', [self::class, 'voteNo'], 'F6');
+        InputSetup::add('vote_yes', 'Vote yes in a vote.', [self::class, 'voteYes'], 'F5');
+        InputSetup::add('vote_no', 'Vote no in a vote.', [self::class, 'voteNo'], 'F6');
 
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
@@ -78,17 +80,16 @@ class Votes
         }
 
         $secondsLeft = CountdownController::getSecondsLeft();
-
-        if ($secondsLeft < 10) {
-            warningMessage('Sorry, it is too late to start a vote.')->send($player);
-
-            return false;
-        }
-
         $duration = config('votes.duration');
 
-        if ($secondsLeft <= $duration) {
-            $duration = $secondsLeft - 4;
+        if ($secondsLeft && $secondsLeft <= $duration) {
+            if ($secondsLeft < 15) {
+                warningMessage('It is too late to start a vote.')->send($player);
+
+                return false;
+            }
+            
+            $duration = $secondsLeft - 3;
         }
 
         self::$onlinePlayersCount = onlinePlayers()->count();
@@ -157,7 +158,7 @@ class Votes
         $diffInSeconds = self::getSecondsSinceLastTimeVote();
         if ($diffInSeconds < config('votes.time.cooldown-in-seconds') && !$player->hasAccess('vote_always')) {
             $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
-            warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
+            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                 ' before voting again.')->send($player);
 
             return;
@@ -165,12 +166,12 @@ class Votes
 
         $time = floatval($time);
 
-        if($time > 0){
+        if ($time > 0) {
             $secondsToAdd = floatval($time) * 60;
-        }else{
+        } else {
             $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         }
-        $question = 'Add '.round($secondsToAdd / 60, 1).' minutes?';
+        $question = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
@@ -185,7 +186,7 @@ class Votes
             self::$lastTimeVote = time();
             self::$timeVotesThisRound++;
 
-            infoMessage($player, ' started a vote to ', secondary('add '.round($secondsToAdd / 60, 1).' minutes?'),
+            infoMessage($player, ' started a vote to ', secondary('add ' . round($secondsToAdd / 60, 1) . ' minutes?'),
                 '. Use ', secondary('F5/F6'), ' and ', secondary('/y'), ' or ', secondary('/n'),
                 ' to vote.')->setIcon('')->sendAll();
         }
@@ -203,19 +204,25 @@ class Votes
 
     public static function askSkip(Player $player)
     {
-        $secondsPassed = CountdownController::getSecondsLeft();
+        $secondsPassed = time() - self::$lastSkipVote;
 
         if (!$player->hasAccess('vote_always')) {
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {
                 warningMessage('Please wait ',
-                    secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed).' seconds'),
+                    secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed) . ' seconds'),
                     ' before asking to skip the map.')->send($player);
 
                 return;
             }
 
             if (self::$skipVotesThisRound >= config('votes.skip.limit-votes')) {
-                warningMessage('The maximum of skip votes was reached, sorry.')->send($player);
+                warningMessage('The maximum of skip votes was reached.')->send($player);
+
+                return;
+            }
+
+            if (time() - CountdownController::getRoundStartTime() > 180) {
+                warningMessage('It is too late to skip the map.')->send($player);
 
                 return;
             }
@@ -223,7 +230,7 @@ class Votes
             $diffInSeconds = self::getSecondsSinceLastSkipVote();
             if ($diffInSeconds < config('votes.skip.cooldown-in-seconds')) {
                 $waitTime = config('votes.skip.cooldown-in-seconds') - $diffInSeconds;
-                warningMessage('There already was a vote recently, please ', secondary('wait '.$waitTime.' seconds'),
+                warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
 
                 return;
@@ -386,5 +393,13 @@ class Votes
     private static function getSecondsSinceLastSkipVote()
     {
         return time() - self::$lastSkipVote;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

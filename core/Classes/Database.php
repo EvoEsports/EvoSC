@@ -48,7 +48,7 @@ class Database
 
         if ($capsule->getConnection() == null) {
             Log::error("Database connection failed. Exiting.");
-            exit(2);
+            exit(2); //IO-Error
         }
 
         self::$capsule = $capsule;

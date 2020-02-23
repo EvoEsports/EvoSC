@@ -1,4 +1,10 @@
 {
+  "enabled": true,
+  "buttons": [
+    5,
+    10,
+    15
+  ],
   "ui": {
     "position": "right",
     "slot": 10

@@ -64,7 +64,7 @@ class MusicClient implements ModuleInterface
 
         ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
-        KeyBinds::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
+        InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
     }
 
     private function enableMusicDisabledNotice()

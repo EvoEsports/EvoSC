@@ -2,11 +2,10 @@
 
 namespace esc\Commands;
 
+use esc\Classes\Database;
 use esc\Classes\Log;
-use esc\Classes\Server;
 use esc\Controllers\ConfigController;
 use esc\Models\Group;
-use esc\Classes\Database;
 use esc\Models\Player;
 use Exception;
 use Maniaplanet\DedicatedServer\Connection;
@@ -43,7 +42,6 @@ class AddAdmin extends Command
 
 
         $player = Player::find($login);
-
 
         if ($player === null) {
             $output->writeln("No player found with login '{$login}'.");

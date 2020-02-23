@@ -1,6 +1,5 @@
 {contentType text}
 {extends 'components.widget-base'}
-{php $dontHide = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}add-time{/block}
@@ -13,7 +12,7 @@
     </frame>
     <frame pos="0.5 -4" scale="0.6" id="buttons">
         {foreach $buttons as $i => $button}
-        <label class="add" data-value="{$button}" pos="{$i * 10 + 5} -2.75" z-index="0" size="10 5.5" text="+{$button}" textsize="0.9" halign="center"
+        <label class="add" data-value="{$button}" pos="{(count($buttons) - $i) * -10 + 44.9} -2.75" z-index="0" size="10 5.5" text="+{$button}" textsize="0.9" halign="center"
                valign="center" scriptevents="1" focusareacolor1="fff5" focusareacolor2="fffa" textcolor="111c"
                textfont="{config('colors.ui.font')|noescape}"/>
         {/foreach}
@@ -51,8 +50,8 @@
                 buttons.Show();
             }
 
-            if(icon2.Value != "" && !MouseRightButton){
-                icon2.Value = "";
+            if(icon2.Value != "" && !MouseRightButton){
+                icon2.Value = "";
             }
             if(icon2.Value != "" && MouseRightButton){
                 icon2.Value = "";

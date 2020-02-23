@@ -7,13 +7,27 @@
     "password": ""
   },
   "default-matchsettings": "",
-  "matchsettings-directory": "MatchSettings",
   "map-cooldown": 10,
   "afk-timeout": 5,
   "controller-interval": 100,
   "enable-chat-routing": true,
+  "use-external-router": false,
   "echoes": {
     "join": true,
     "leave": true
+  },
+  "rounds": {
+    "points": [
+      10,
+      9,
+      8,
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ]
   }
 }

@@ -4,35 +4,21 @@
 [![GitHub](https://img.shields.io/github/license/EvoTM/EvoSC.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
-[![Paypal](https://img.shields.io/badge/PAYPAL-Donate-169BD7.svg?style=for-the-badge&link=http://google.com/)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QCLGR6A7KVS22&source=url)
 
-A server controller for Trackmania² based on PHP 7.2 with Maniaplanet 4.1 support.
+A server controller for Trackmania² with ManiaPlanet 4.1 support.
 
 | ⚠ WARNING: The controller is not ready to run _stable_ on a live server in its current state. |
 | --- |
 
-:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and resources to give support at all times. Safe updates are always pushed to the master-branch.
+:no_entry: **Do not use the develop-branch unless you are a developer.** The branch can be unstable and we do not have the time and ressources to give support at all times. Safe updates are always pushed to the master-branch.
 
 
 ### Requirements
-* PHP 7.2+
-* MySQL or MariaDB Server
+* PHP 7.4
+* MySql/MariaDB Server
 
-### Installation (From GitHub)
-###### Requirements
-* Composer
-###### Clean installation
-1. Clone project `git clone https://github.com/EvoTM/EvoSC.git`.
-2. Switch to the new directory.
-3. Install required packages with `composer install`.
-4. Run EvoSC with `php esc run`.
-
-| ⚠ If the cache and log folder are not created automatically, you need to create them and restart the controller. |
-| --- |
-###### Updating a github installation
-1. Go to the EvoSC directory you want to update and run `git pull`. 
-### Music server installation
-Download the [music-server](https://github.com/EvoTM/EvoSC/raw/master/core/Modules/music-client/music-server.zip) and extract it to your webserver with the ogg-files. Copy the `music.config.json` from the music-client-module directory to your config directory and set `url` to the URL of your webserver.
+### Installation
+[Wiki: Installation](https://github.com/EvoTM/EvoSC/wiki/Installation)
 
 ___
 
@@ -66,5 +52,5 @@ Each module must contain a base class in the `esc\Modules` namespace and a `modu
   "version": 1.0
 }
 ```
-Modules can contain Templates, Classes, Models and Database-Migrations. The constructor of the base class is called on controller start, after all controllers have been started.
+Modules can contain Templates, Classes, Models and Database-Migrations. The constructor of the base class is called on controller start, after all controllers have beeb started.
 Configs are in json format and are located at the base directory of your module. Name it as your-config-file.config.json, it will automatically be loaded on controller-start.

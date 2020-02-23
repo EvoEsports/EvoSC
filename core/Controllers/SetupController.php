@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\File;
-
 use esc\Commands\Migrate;
 use esc\Interfaces\ControllerInterface;
 use Symfony\Component\Console\Application;

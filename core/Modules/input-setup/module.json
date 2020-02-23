@@ -1,0 +1,6 @@
+{
+  "name"       : "InputSetup",
+  "description": "Bind actions to keys",
+  "author"     : "brakerb",
+  "version"    : "2.0"
+}

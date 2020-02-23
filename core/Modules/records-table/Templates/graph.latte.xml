@@ -60,13 +60,13 @@
 
         <frame pos="1 -54">
             <quad pos="0.5 -0.25" size="2 2" bgcolor="999" valign="center" />
-            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{str_replace('"', "''", $localPlayer->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
+            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{ml_escape($localPlayer->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
             <label pos="4 -4" valign="center" textsize="2" text="{formatScore($myRecord->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
         </frame>
 
         <frame pos="1 -64">
             <quad pos="0.5 -0.25" size="2 2" bgcolor="fff" valign="center" />
-            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{str_replace('"', "''", $record->player->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{ml_escape($record->player->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
             <label pos="4 -4" valign="center" textsize="2" text="{formatScore($record->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
         </frame>
 

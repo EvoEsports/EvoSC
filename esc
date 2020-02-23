@@ -1,13 +1,13 @@
 <?php
 
 require 'vendor/autoload.php';
-require 'core/autoload.php';
 require 'core/global-functions.php';
 require 'core/gbxdatafetcher/gbxdatafetcher.inc.php';
 
 use esc\Commands\EscRun;
 use esc\Commands\AddAdmin;
 use esc\Commands\FakeLocals;
+use esc\Commands\FixRanks;
 use esc\Commands\FixScores;
 use esc\Commands\ImportUaseco;
 use esc\Commands\ImportPyplanet;
@@ -50,6 +50,7 @@ $application->add(new Migrate());
 $application->add(new MakeMigration());
 $application->add(new ImportUaseco());
 $application->add(new ImportPyplanet());
+$application->add(new FixRanks());
 $application->add(new FixScores());
 $application->add(new EscRun());
 $application->add(new FakeLocals());

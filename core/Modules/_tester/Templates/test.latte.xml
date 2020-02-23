@@ -2,6 +2,8 @@
 <manialink name="ESC:test-script" id="test-script" version="3">
     <frame>
         <label id="test" textsize="1" />
+        <entry name="value[1]" value="test" default="-1" />
+        <entry name="value[2]" value="test" default="-1" />
     </frame>
 
     <script><!--
@@ -9,9 +11,7 @@
 #Include "TextLib" as TL
 
 main(){
-    declare label <=> (Page.MainFrame.GetFirstChild("test") as CMlLabel);
-
-    //System.ClipboardSet("");
+    TriggerPageAction("asdf");
 }
     --></script>
 </manialink>

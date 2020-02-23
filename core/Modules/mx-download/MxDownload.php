@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Cache;
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -11,16 +12,16 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MxMap;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
-use esc\Classes\ChatCommand;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\MatchSettingsController;
 use esc\Controllers\QueueController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MxDownload
+class MxDownload implements ModuleInterface
 {
     public function __construct()
     {
@@ -156,7 +157,7 @@ class MxDownload
 
     public static function parseBB(string $bbEncoded): string
     {
-        $bbEncoded = str_replace('"', "'", $bbEncoded);
+        $bbEncoded = ml_escape($bbEncoded);
 
         //bbcode
         $bbEncoded = preg_replace('/\[b\](.+?)\[\/b\]/', '$o$1$z', $bbEncoded);
@@ -212,5 +213,13 @@ class MxDownload
         Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));
 
         return $info[0];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

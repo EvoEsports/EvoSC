@@ -1,121 +1,49 @@
-{contentType text}
-{extends 'components.widget-base'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3">
-    {block id}QuickButtons{/block}
-    {block size}23 100{/block}
-
-    {block content}
-    <framemodel id="button">
-        <label valign="center" halign="center" textsize="0.75" text="" textcolor="eeee" />
-        <label valign="center" size="23 2" textsize="1" text="button-text button-text" hidden="1" textcolor="eeee" scale="0.75" textfont="{config('colors.ui.font')|noescape}" />
-        <quad size="5.5 4" bgcolor="{config('colors.ui.window.bg.color')}6" />
-        <label class="trigger_action" size="25 4" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}e" />
-    </framemodel>
-
-    <frame id="cp" pos="24.75 0" ScriptEvents="1" scale="0.9">
-        {for $i=0; $i<20; $i++}
-        <frameinstance modelid="button" />
-        {/for}
+<manialink version="3" layer="ScoresTable" id="QuickButtons" name="ESC:QuickButtons">
+    <frame id="buttons" pos="{($buttons->count() * 6) / -2 - 2.5} -51" halign="center" valign="center" scale="1">
+        {foreach $buttons as $button}
+        <frame pos="{$iterator->counter * 6} 0" data-action="{$button->action}">
+            <label size="5.5 5.5" valign="center" halign="center" textsize="1.25" text="$s{$button->icon}" textcolor="fffe" z-index="1" focusareacolor1="0000" focusareacolor2="000c" ScriptEvents="1" />
+            <label pos="0 -5" valign="center" halign="center" textsize="0.7" text="$s{$button->text}" textfont="{config('colors.ui.font')|noescape}" textcolor="eeee" z-index="1" hidden="1" />
+            {if $button->access}
+            <label pos="1 -1" text="$s" textcolor="{config('colors.ui.window.header.color')}" valign="center" halign="center" textsize="1" scale="0.75" z-index="3" />
+            {/if}
+        </frame>
+        {/foreach}
     </frame>
-    {/block}
 
-    {block script}
     <script><!--
-    Void setupFrameInstances(CMlFrame cp, Boolean alignLeft){
-        declare Integer i = 0;
+    main(){
+        declare buttons <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+        declare podium = False;
 
-        foreach(control in cp.Controls){
-            declare frame = (control as CMlFrame);
+        while(True){
+            yield;
 
-            if(alignLeft){
-                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <4.5, -1.75>;
-                (frame.Controls[1] as CMlLabel).RelativePosition_V3 = <8.5, -1.75>;
-                frame.Controls[1].HorizontalAlign = CMlControl::AlignHorizontal::Left;
-                frame.Controls[2].HorizontalAlign = CMlControl::AlignHorizontal::Left;
-                frame.Controls[2].RelativePosition_V3 = <1.75, 0.0>;
-                frame.Controls[3].HorizontalAlign = CMlControl::AlignHorizontal::Left;
-                frame.Controls[3].RelativePosition_V3 = <1.75, 0.0>;
-            }else{
-                (frame.Controls[0] as CMlLabel).RelativePosition_V3 = <-4.25, -1.75>;
-                (frame.Controls[1] as CMlLabel).RelativePosition_V3 = <-8.5, -1.75>;
-                frame.Controls[1].HorizontalAlign = CMlControl::AlignHorizontal::Right;
-                frame.Controls[2].HorizontalAlign = CMlControl::AlignHorizontal::Right;
-                frame.Controls[2].RelativePosition_V3 = <-1.75, 0.0>;
-                frame.Controls[3].HorizontalAlign = CMlControl::AlignHorizontal::Right;
-                frame.Controls[3].RelativePosition_V3 = <-1.75, 0.0>;
+            if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
+                podium = True;
+                AnimMgr.Add(buttons, "<frame scale='0.85' pos='"^buttons.RelativePosition_V3[0]^" -56' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+            if(UI.UISequence != CUIConfig::EUISequence::Podium && podium){
+                podium = False;
+                AnimMgr.Add(buttons, "<frame scale='1.0' pos='"^buttons.RelativePosition_V3[0]^" -51' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
 
-            frame.RelativePosition_V3 = <0.0, i * -4.0>;
-
-            i = i + 1;
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseOver){
+                    declare parent = (event.Control.Parent as CMlFrame);
+                    (parent.Controls[1] as CMlLabel).Show();
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseOut){
+                    declare parent = (event.Control.Parent as CMlFrame);
+                    (parent.Controls[1] as CMlLabel).Hide();
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare parent = (event.Control.Parent as CMlFrame);
+                    TriggerPageAction(parent.DataAttributeGet("action"));
+                }
+            }
         }
     }
-
-    Void fillButtons(CMlFrame cp, Text[][] values){
-        declare c = 0;
-
-        foreach(button in values){
-            declare frame = (cp.Controls[c] as CMlFrame);
-            (frame.Controls[0] as CMlLabel).SetText(button[0]);
-            (frame.Controls[1] as CMlLabel).SetText(button[1]);
-
-            (frame.Controls[3] as CMlLabel).DataAttributeSet("action", button[2]);
-            c = c  + 1;
-        }
-
-        for(i, values.count, 20 - 1){
-            (cp.Controls[i] as CMlFrame).Hide();
-        }
-    }
-
-    Void hoverEffect(CMlLabel label, Boolean hoverActive){
-        if(hoverActive){
-            label.Parent.Controls[1].Show();
-        }else{
-            label.Parent.Controls[1].Hide();
-        }
-    }
-    --></script>
-    {/block}
-
-    <script><!--
-        {block globals}
-        {/block}
-
-        {block bootScript}
-    declare cp <=> (Page.MainFrame.GetFirstChild("cp") as CMlFrame);
-    declare Boolean alignLeft = cp.RelativePosition_V3[0] < 0.0;
-
-    setupFrameInstances(cp, alignLeft);
-
-    declare Text[][] buttons = [
-    {$buttons|noescape}
-    ];
-
-    fillButtons(cp, buttons);
-
-        left__ = {config('quick-buttons.ui.position') == 'left' ? 'True' : 'False'};
-        slot__ = {config('quick-buttons.ui.slot')};
-        {/block}
-
-        {block loop}
-        {/block}
-
-        {block pendingEvents}
-    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("trigger_action")){
-        declare action = event.Control.DataAttributeGet("action");
-        TriggerPageAction(action);
-    }
-
-    if(event.Type == CMlScriptEvent::Type::MouseOver && event.Control.HasClass("trigger_action")){
-        hoverEffect((event.Control as CMlLabel), True);
-    }
-
-    if(event.Type == CMlScriptEvent::Type::MouseOut && event.Control.HasClass("trigger_action")){
-        hoverEffect((event.Control as CMlLabel), False);
-    }
-        {/block}
-
     --></script>
 </manialink>

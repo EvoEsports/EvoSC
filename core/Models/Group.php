@@ -5,6 +5,14 @@ namespace esc\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Group
+ * @package esc\Models
+ * @property int $id;
+ * @property string $Name;
+ * @property string $chat_prefix;
+ * @property string $color;
+ */
 class Group extends Model
 {
     protected $table = 'groups';

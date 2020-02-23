@@ -10,12 +10,14 @@ use Illuminate\Support\Collection;
  * @package esc\Models
  * @property Player $player
  * @property Map $map
+ * @property string $ghost_replay
+ * @property string $v_replay
  */
 class Dedi extends Model
 {
     protected $table = 'dedi-records';
 
-    protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints', 'ghost_replay', 'New'];
+    protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints', 'ghost_replay', 'v_replay', 'New'];
 
     public $timestamps = false;
 

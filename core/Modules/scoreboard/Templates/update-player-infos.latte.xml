@@ -1,0 +1,25 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-player-infos" name="ESC:update-player-infos">
+    <script><!--
+    #Struct ESC_SB_Player {
+        Text login;
+        Text name;
+        Text group_prefix;
+        Text group_color;
+        Text group_name;
+        Integer score;
+        Integer points;
+        Integer last_points_received;
+        Boolean online;
+    }
+
+    main(){
+        declare ESC_SB_Player[] SB_players for This;
+        declare Integer ESC_SB_Update for This;
+
+        SB_players.fromjson("""{$players->toJson()|noescape}""");
+        ESC_SB_Update = GameTime;
+    }
+    --></script>
+</manialink>

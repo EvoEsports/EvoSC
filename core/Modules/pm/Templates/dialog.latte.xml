@@ -1,0 +1,52 @@
+{contentType text}
+{extends 'components.window'}
+
+{php $window_width = '100';}
+{php $window_height = '21';}
+
+{block id}
+pm-dialog
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Personal Message
+{/block}
+
+{block content}
+<label pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<entry id="login" pos="11 -1" size="86 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<entry id="text" pos="11 -4" size="86 8" textsize="0.6" halign="left" textfont="{config('colors.ui.font')|noescape}"/>
+
+<label class="send" pos="17 -15" size="12 4" textsize="0.6" halign="center" text=" Send" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+{/block}
+
+{include 'scripts.mle'}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+{/block}
+
+{block pendingEvents}
+if(event.Control.HasClass("send") && event.Type == CMlScriptEvent::Type::MouseClick){
+    declare login = (Page.MainFrame.GetFirstChild("login") as CMlEntry).Value;
+    declare text = (Page.MainFrame.GetFirstChild("text") as CMlEntry).Value;
+    ManiaLinkEvent("pm", login ^ "," ^ text);
+    window.Hide();
+    return;
+}
+{/block}
+--></script>

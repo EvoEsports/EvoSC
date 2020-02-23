@@ -1,0 +1,41 @@
+{contentType text}
+{extends 'components.window'}
+{php $window_height = 29;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}info-msg-window{/block}
+    {block icon}{/block}
+    {block title}{$id != null ? 'Edit' : 'Create'} Info-Message{/block}
+
+    {block content}
+    <frame id="settings" pos="0 1" scale="1.2">
+        <entry name="id" pos="-1000" default="{$id}" />
+
+        <label text="Message:" textsize="0.5" pos="2 -2" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+        <entry name="message" textsize="0.5" pos="2 -5" size="92 4" textfont="{config('colors.ui.font')|noescape}" textprefix="${config('colors.info')}" default="{$message}" />
+
+        <label text="Show every (minutes):" textsize="0.5" pos="2 -9" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+        <entry name="interval" textsize="0.5" pos="2 -12" size="92 4" textfont="{config('colors.ui.font')|noescape}" default="{$interval}" />
+
+        <label action="info.update" class="add" pos="8 -19" size="15 4" text="{$id == null ? 'ADD' : 'UPDATE'}" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" textfont="{config('colors.ui.font')|noescape}" />
+        <label action="info.show" class="cancel" pos="23 -19" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}c" textfont="{config('colors.ui.font')|noescape}" />
+    </frame>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+
+    {block loop}
+    {/block}
+    --></script>
+</manialink>

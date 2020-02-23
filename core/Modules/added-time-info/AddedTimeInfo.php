@@ -26,14 +26,7 @@ class AddedTimeInfo implements ModuleInterface
     public static function showWidget(Player $player = null)
     {
         $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
-        $timeLimitInMinutes = CountdownController::getOriginalTimeLimit() / 60;
-
-        $buttons = [
-            round($timeLimitInMinutes / 4, 1),
-            round($timeLimitInMinutes / 2, 1),
-            round($timeLimitInMinutes, 1),
-            round($timeLimitInMinutes * 2, 1),
-        ];
+        $buttons = config('added-time-info.buttons');
 
         if($player){
             Template::show($player, 'added-time-info.update', compact('addedTime'));

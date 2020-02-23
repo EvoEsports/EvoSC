@@ -654,13 +654,14 @@ Void setCooldownToZero(Text uid){
 
         declare Integer[] ESC_Map_Favorites for This;
         declare Integer ESC_Last_Map_Favorites_Update for This;
+        declare Boolean MapQueueShow for This = False;
         declare lastFavoritesUpdate = 0;
 
         mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
         declare Text[Text][] Maps for LocalUser;
         declare Text[Text][Integer] MapAuthors for LocalUser;
-        declare Boolean showQueue for This = False;
         declare Integer MapUpdateTime for LocalUser = 0;
+        declare Boolean showQueue for This = False;
         declare lastMapUpdate = 0;
         declare lastUid = Map.Id;
 
@@ -831,6 +832,12 @@ Void setCooldownToZero(Text uid){
             lastFavoritesUpdate = ESC_Last_Map_Favorites_Update;
             favorites = ESC_Map_Favorites;
             updateView(currentMapPool, currentPage);
+        }
+
+        if(MapQueueShow){
+            log("show");
+            window.Show();
+            MapQueueShow = False;
         }
 
         if(queueVisible && mapListVisible){

@@ -4,9 +4,10 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Clock
+class Clock implements ModuleInterface
 {
     public function __construct()
     {
@@ -27,5 +28,13 @@ class Clock
                 Template::show($player, 'clock.clock', compact('clock'));
             });
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

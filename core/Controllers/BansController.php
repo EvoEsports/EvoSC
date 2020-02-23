@@ -3,7 +3,6 @@
 namespace esc\Controllers;
 
 
-use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
@@ -32,12 +31,18 @@ class BansController implements ControllerInterface
     /**
      * Ban a player
      *
-     * @param Player $toBan  The player to be banned
-     * @param Player $admin  The admin who is banning
-     * @param string $reason The reason
+     * @param  Player  $toBan  The player to be banned
+     * @param  Player  $admin  The admin who is banning
+     * @param  string  $reason  The reason
      */
     public static function ban(Player $toBan, Player $admin, string $reason = '')
     {
+        if ($toBan->Group < $admin->Group) {
+            warningMessage('You can not kick players with a higher group-rank than yours.')->send($admin);
+            infoMessage($admin, ' tried to kick you but was blocked.')->send($toBan);
+            return;
+        }
+
         Server::banAndBlackList($toBan->Login, $reason, true);
         warningMessage($admin, ' banned ', $toBan, ', reason: ', secondary($reason))->sendAll();
         $toBan->update(['banned' => 1]);
@@ -46,14 +51,19 @@ class BansController implements ControllerInterface
     /**
      * Unban a player
      *
-     * @param Player $toUnban The player to be unbanned
-     * @param Player $admin   The admin who is unbanning
+     * @param  Player  $toUnban  The player to be unbanned
+     * @param  Player  $admin  The admin who is unbanning
      */
     public static function unban(Player $toUnban, Player $admin)
     {
         Server::unBan($toUnban->Login);
         infoMessage($admin, ' unbanned ', $toUnban)->sendAll();
         $toUnban->update(['banned' => 0]);
+    }
+
+    public static function banPlayerEvent(Player $player, $targetLogin, $reason)
+    {
+        self::ban(player($targetLogin), $player, $reason);
     }
 
     /**

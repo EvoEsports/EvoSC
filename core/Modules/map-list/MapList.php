@@ -2,10 +2,10 @@
 
 namespace esc\Modules;
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
 use esc\Interfaces\ModuleInterface;
@@ -178,6 +178,11 @@ class MapList implements ModuleInterface
         Template::showAll('map-list.update-map-queue', compact('mapQueue'));
     }
 
+    public static function showMapQueue(Player $player)
+    {
+        Template::show($player, 'map-list.show-queue', null, false);
+    }
+
     /**
      * Called when the module is loaded
      *
@@ -197,7 +202,10 @@ class MapList implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'playerConnect']);
 
-        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list/favorites/queue.')
+        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
             ->addAlias('/list');
+        ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
+            ->addAlias('/queue')
+            ->addAlias('/jb');
     }
 }

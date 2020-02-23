@@ -7,10 +7,8 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Classes\Timer;
-use esc\Models\Player;
 use esc\Interfaces\ControllerInterface;
-use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
+use esc\Models\Player;
 
 /**
  * Class AfkController

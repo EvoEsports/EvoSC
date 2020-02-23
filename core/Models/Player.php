@@ -4,6 +4,7 @@ namespace esc\Models;
 
 
 use Carbon\Carbon;
+use esc\Controllers\UserSettingsController;
 use esc\Modules\MxKarma;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -259,28 +260,7 @@ class Player extends Model
      */
     public function setSetting($settingName, $value)
     {
-        $setting = $this->settings()->whereName($settingName)->first();
-
-        if (is_bool($value)) {
-            $value = $value ? 'True' : 'False';
-        }
-        if (is_float($value)) {
-            $value = sprintf('%.1f', $value);
-        }
-        if (is_integer($value)) {
-            $value = sprintf('%d', $value);
-        }
-
-        if ($setting) {
-            $setting->update(['value' => $value]);
-
-            return;
-        }
-
-        $this->settings()->create([
-            'name' => $settingName,
-            'value' => $value,
-        ]);
+        UserSettingsController::saveUserSetting($this, $settingName, $value);
     }
 
     /**
@@ -288,17 +268,18 @@ class Player extends Model
      *
      * @param  string  $settingName
      *
+     * @param  bool  $jsonDecode
      * @return mixed|null
      */
-    public function setting($settingName)
+    public function setting($settingName, $jsonDecode = false)
     {
         $setting = $this->settings()->whereName($settingName)->first();
 
-        if ($setting) {
-            return $setting->value;
+        if($jsonDecode){
+            return json_decode($setting->value ?? null);
         }
 
-        return null;
+        return $setting->value ?? null;
     }
 
     /**

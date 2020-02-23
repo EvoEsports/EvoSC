@@ -8,18 +8,19 @@ use esc\Interfaces\ControllerInterface;
 class ControllerController
 {
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function loadControllers(string $mode, bool $isBoot = false)
     {
-        foreach (classes() as $class) {
-            if (!preg_match('/^esc.Controllers./', $class->namespace)) {
-                continue;
-            }
+        HookController::init();
+        $classes = get_declared_classes();
 
-            if (new $class->namespace instanceof ControllerInterface) {
-                $class->namespace::start($mode, $isBoot);
+        foreach ($classes as $class) {
+            if (preg_match('/^esc.Controllers./', $class)) {
+                if (new $class instanceof ControllerInterface) {
+                    $class::start($mode, $isBoot);
+                }
             }
         }
     }

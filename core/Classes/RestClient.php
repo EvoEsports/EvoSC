@@ -36,7 +36,7 @@ class RestClient
     {
         self::$client = new Client();
 
-        self::$serverName = stripStyle(stripColors($serverName));
+        self::$serverName = stripAll($serverName);
     }
 
     /**

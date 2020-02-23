@@ -122,6 +122,10 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text = $data[2];
 
+            if($login === config('server.login')){
+                return;
+            }
+
             $parts = explode(' ', $text);
 
             if (ChatCommand::has($parts[0])) {
@@ -130,15 +134,22 @@ class EventController implements ControllerInterface
                 return;
             }
 
-            if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
+            if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '//') {
                 warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send(player($login));
 
                 return;
             }
 
+            if (collect(Server::getIgnoreList())->contains('login', $login)) {
+                //Player is muted
+                warningMessage('You are muted.')->send(player($login));
+
+                return;
+            }
+
             try {
-                Hook::fire('PlayerChat', player($login), $text);
                 ChatController::playerChat(player($login), $text);
+                Hook::fire('PlayerChat', player($login), $text);
             } catch (Exception $e) {
                 Log::write("Error: ".$e->getMessage());
             }
@@ -245,7 +256,7 @@ class EventController implements ControllerInterface
     {
         if (count($arguments) == 4 && is_string($arguments[1]) && is_string($arguments[2])) {
             try {
-                ManiaLinkEvent::call(player($arguments[1]), $arguments[2]);
+                ManiaLinkEvent::call(player($arguments[1]), $arguments[2], $arguments[3]);
             } catch (Exception $e) {
                 Log::write("Error: ".$e->getMessage());
             }

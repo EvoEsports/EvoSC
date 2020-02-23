@@ -23,7 +23,7 @@ class Log
      *
      * @return OutputInterface|null
      */
-    public static function getOutput(): OutputInterface
+    public static function getOutput(): ?OutputInterface
     {
         return self::$output;
     }
@@ -31,11 +31,15 @@ class Log
     /**
      * Write a line to the cli.
      *
-     * @param  string  $line
+     * @param string $line
      */
     private static function writeLn(string $line)
     {
-        self::getOutput()->writeln(stripAll($line));
+        $output = self::getOutput();
+
+        if ($output) {
+            self::getOutput()->writeln(stripAll($line));
+        }
     }
 
     /**
@@ -45,22 +49,22 @@ class Log
      * - isDebug() (-vvv)
      * to manage output to cli (all lines will be added to the log-file, independent from verbosity-level).
      *
-     * @param  string  $string
-     * @param  bool  $echo
-     * @param  null  $caller
+     * @param string $string
+     * @param bool $echo
+     * @param null $caller
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
         $date = date("Y-m-d", time());
         $time = date("H:i:s", time());
-        $logFile = sprintf("logs/%s.txt", $date);
+        $logFile = logDir($date . '.txt');
 
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(false, 2);
         }
 
         if (isset($caller['class']) && isset($caller['type'])) {
-            $callingClass = $caller['class'].$caller['type'].$caller['function'];
+            $callingClass = $caller['class'] . $caller['type'] . $caller['function'];
         } else {
             $callingClass = $caller['function'];
         }
@@ -78,11 +82,11 @@ class Log
                     if (is_object($arg)) {
                         $add .= get_class($arg);
                     } else {
-                        $add .= '"'.$arg.'"';
+                        $add .= '"' . $arg . '"';
                     }
                 }
 
-                $callingClass .= $add.'</>';
+                $callingClass .= $add . '</>';
 
                 if ($key + 1 < count($caller['args'])) {
                     $callingClass .= ', ';
@@ -95,7 +99,7 @@ class Log
         }
 
         if (isDebug()) {
-            $callingClass .= "\nData: ".json_encode($caller['args']);
+            $callingClass .= "\nData: " . json_encode($caller['args']);
         }
 
         $line = sprintf("[%s] %s: %s", $time, $callingClass, $string);
@@ -112,45 +116,45 @@ class Log
      * Log a info-message.
      *
      * @param      $message
-     * @param  bool  $echo
+     * @param bool $echo
      */
     public static function info($message, bool $echo = true)
     {
 
         list($childClass, $caller) = debug_backtrace(false, 2);
-        self::write('<info>'.$message.'</>', $echo, $caller);
+        self::write('<info>' . $message . '</>', $echo, $caller);
     }
 
     /**
      * Log a error-message.
      *
      * @param      $message
-     * @param  bool  $echo
+     * @param bool $echo
      */
     public static function error($message, bool $echo = true)
     {
 
         list($childClass, $caller) = debug_backtrace(false, 2);
-        self::write('<error>'.$message.'</>', $echo, $caller);
+        self::write('<error>' . $message . '</>', $echo, $caller);
     }
 
     /**
      * Log a warning-message
      *
      * @param      $message
-     * @param  bool  $echo
+     * @param bool $echo
      */
     public static function warning($message, bool $echo = true)
     {
 
         list($childClass, $caller) = debug_backtrace(false, 2);
-        self::write('<fg=red>'.$message.'</>', $echo, $caller);
+        self::write('<fg=red>' . $message . '</>', $echo, $caller);
     }
 
     /**
      * Do not use (internal function). Set the output interface.
      *
-     * @param  OutputInterface  $output
+     * @param OutputInterface $output
      */
     public static function setOutput(OutputInterface $output)
     {

@@ -48,9 +48,9 @@ class ManiaLinkEvent
     /**
      * ManiaLinkEvent constructor.
      *
-     * @param  string  $id
-     * @param  callable|array  $callback
-     * @param  string  $access
+     * @param string $id
+     * @param callable|array $callback
+     * @param string $access
      */
     private function __construct(string $id, $callback, string $access = null)
     {
@@ -72,9 +72,9 @@ class ManiaLinkEvent
     /**
      * Add a manialink event. Callback must be of type [MyClass::class, 'methodToCall'].
      *
-     * @param  string  $id
-     * @param  callable|array  $callback
-     * @param  string|null  $access
+     * @param string $id
+     * @param callable|array $callback
+     * @param string|null $access
      */
     public static function add(string $id, $callback, string $access = null)
     {
@@ -99,7 +99,7 @@ class ManiaLinkEvent
         self::$extendedMLE->get($gameTime)->put($i, implode(',', $body));
 
         if ($isFinished == '1') {
-            self::call($player, $action.','.self::$extendedMLE->get($gameTime)->implode(''));
+            self::call($player, $action . ',' . self::$extendedMLE->get($gameTime)->implode(''));
             self::$extendedMLE->forget($gameTime);
         }
     }
@@ -107,10 +107,11 @@ class ManiaLinkEvent
     /**
      * Handle an ingoing mania-link event.
      *
-     * @param  Player  $ply
-     * @param  string  $action
+     * @param Player $ply
+     * @param string $action
+     * @param array|null $formValues
      */
-    public static function call(Player $ply, string $action)
+    public static function call(Player $ply, string $action, array $formValues = null)
     {
         $action = trim($action);
 
@@ -138,21 +139,24 @@ class ManiaLinkEvent
 
         if ($event->access != null && !$ply->hasAccess($event->access)) {
             warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
-            Log::write('Player '.$ply.' tried to access forbidden ManiaLinkEvent: '.$event->id.' -> '.implode('::',
+            Log::write('Player ' . $ply . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::',
                     $event->callback));
 
             return;
         }
 
-        if (strlen($event->id) < strlen($action)) {
-            $arguments = explode(',', $action);
-            $arguments[0] = $ply;
-            call_user_func_array($event->callback, $arguments);
+        $arguments = explode(',', $action);
+        $arguments[0] = $ply;
 
-            return;
+        if ($formValues) {
+            $formValuesObject = collect();
+            foreach ($formValues as $value) {
+                $formValuesObject->{$value['Name']} = $value['Value'];
+            }
+            array_push($arguments, $formValuesObject);
         }
 
-        call_user_func($event->callback, $ply);
+        call_user_func_array($event->callback, $arguments);
     }
 
     public static function removeAll()
@@ -162,6 +166,6 @@ class ManiaLinkEvent
 
     public function __toString()
     {
-        return $this->id.'('.serialize($this->callback).')';
+        return $this->id . '(' . serialize($this->callback) . ')';
     }
 }

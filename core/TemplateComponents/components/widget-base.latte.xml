@@ -9,6 +9,7 @@
     Real height;
     Boolean visible;
     Real[Integer] widths;
+    Integer slot;
 }
 
 #Struct WidgetGrid {
@@ -20,6 +21,7 @@
     Boolean hide;
     Integer speed;
     Real scale;
+    Boolean sb_blur;
 }
 
 {include globals}
@@ -78,8 +80,10 @@ declare Integer slot__;
                 continue;
             }
 
-            heights += column[i].height * scale;
-            count += 1;
+            if(column[i].slot != slot__){
+                heights += column[i].height * scale;
+                count += 1;
+            }
         }
 
         {if isset($slotHorizontal)}
@@ -109,6 +113,7 @@ declare Integer slot__;
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpInOut);
         }
+        sleep(50);
         if(widget.RelativePosition_V3[0] != newX){
             widget.RelativePosition_V3[0] = newX;
         }
@@ -126,6 +131,7 @@ declare Integer slot__;
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
+                wr.slot = slot__;
                 grid_.left[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;
@@ -145,6 +151,7 @@ declare Integer slot__;
                 declare WidgetRow wr;
                 wr.height = 0.0;
                 wr.visible = True;
+                wr.slot = slot__;
                 grid_.right[slot__] = wr;
             }
             declare height = widget.Size[1] * widget.RelativeScale;

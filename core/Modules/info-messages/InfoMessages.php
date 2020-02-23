@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Timer;
@@ -11,52 +12,31 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\InfoMessage;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class InfoMessages implements ModuleInterface
 {
-    private static $startTime;
-
-    public function __construct()
-    {
-        self::$startTime = time();
-    }
-
-    private static function minutesSinceStart()
-    {
-        return (time() - self::$startTime) / 60;
-    }
-
     public static function displayInfoMessages()
     {
-        $minutesSinceStart = self::minutesSinceStart();
-        $messages          = InfoMessage::all();
-
+        $messages = DB::table('info-messages')->select('text')->whereRaw('ROUND(UNIX_TIMESTAMP()/60) % delay = 0')->get();
         foreach ($messages as $message) {
-            if ($minutesSinceStart % $message->delay == 0) {
-                infoMessage($message->text)->sendAll();
-            }
+            infoMessage($message->text)->sendAll();
         }
     }
 
-    public static function add(Player $player, $pause, ...$messageParts)
+    public static function update(Player $player, Collection $formData)
     {
-        $message = implode(',', $messageParts);
+        $interval = $formData->interval;
 
-        InfoMessage::create([
-            'text'  => $message,
-            'delay' => $pause,
-        ]);
+        if ($interval < 1) {
+            $interval = 1;
+        }
 
-        self::showSettings($player);
-    }
-
-    public static function update(Player $player, $id, $pause, ...$messageParts)
-    {
-        $message = implode(',', $messageParts);
-
-        InfoMessage::whereId($id)->update([
-            'text'  => $message,
-            'delay' => $pause,
+        InfoMessage::updateOrCreate([
+            'id' => $formData->id
+        ], [
+            'text' => $formData->message,
+            'delay' => $interval,
         ]);
 
         self::showSettings($player);
@@ -75,11 +55,25 @@ class InfoMessages implements ModuleInterface
         Template::show($player, 'info-messages.manialink', compact('messages'));
     }
 
+    public static function showCreate(Player $player, $id = null)
+    {
+        $message = '';
+        $interval = '';
+
+        if ($id) {
+            $infoMessage = InfoMessage::find($id);
+            $message = $infoMessage->text;
+            $interval = $infoMessage->delay;
+        }
+
+        Template::show($player, 'info-messages.edit', compact('id', 'message', 'interval'));
+    }
+
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -88,9 +82,10 @@ class InfoMessages implements ModuleInterface
 
         ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
 
-        ManiaLinkEvent::add('info.add', [self::class, 'add'], 'info_messages');
+        ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
         ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
+        ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
 
         Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
     }

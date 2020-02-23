@@ -4,7 +4,7 @@ declare Vec2 HS_POS;
 declare CMlFrame HS_Target;
 declare Boolean HS_Hidden;
 
-Void hs_hide(){
+Void hs_hide(Integer duration){
     HS_Hidden = True;
     declare Real x;
     if(HS_POS[0] < 0.0){
@@ -12,12 +12,12 @@ Void hs_hide(){
     }else{
         x = 160.5;
     }
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ HS_POS[1] ^ "' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
-Void hs_show(){
+Void hs_show(Integer duration){
     HS_Hidden = False;
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
 Void hidescript(){
@@ -26,6 +26,7 @@ Void hidescript(){
     }
 
     declare UISettings settings for This;
+    declare Boolean ESC_Tab_Pressed for This;
     declare hideSpeed = settings.speed;
 
     if(hideSpeed == -1 || InputPlayer == Null){
@@ -36,21 +37,31 @@ Void hidescript(){
 
     if(mapFinished){
         if(!HS_Hidden){
-            hs_hide();
+            hs_hide(800);
         }
     }else{
+        if(ESC_Tab_Pressed == True){
+            hs_show(1);
+            wait(ESC_Tab_Pressed == False);
+            hs_hide(1);
+        }
+
+        if(InputPlayer == Null){
+            return;
+        }
+
         declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
         declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
 
         if(overHidespeed && playerIsRacing && !HS_Hidden){
-            hs_hide();
+            hs_hide(800);
 
             {if !isset($doNotPause)}
-            wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            //wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
             {/if}
         }
         if((!overHidespeed || !playerIsRacing) && HS_Hidden){
-            hs_show();
+            hs_show(600);
         }
     }
 }

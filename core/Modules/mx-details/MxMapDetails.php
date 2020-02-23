@@ -9,10 +9,12 @@ use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
+use GuzzleHttp\Exception\ConnectException;
 
-class MxMapDetails
+class MxMapDetails implements ModuleInterface
 {
     public function __construct()
     {
@@ -70,32 +72,37 @@ class MxMapDetails
     }
 
     /**
-     * @param  Map  $map
+     * @param Map $map
      * @return \stdClass|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function loadMxDetails(Map $map)
     {
-        $result = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$map->uid);
+        try {
+            $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid, ['timeout' => 5]);
+        } catch (ConnectException $e) {
+            Log::error($e->getMessage(), true);
+            return null;
+        }
 
         if ($result->getStatusCode() != 200) {
-            Log::write('Failed to fetch MX details: '.$result->getReasonPhrase(), isVerbose());
+            Log::write('Failed to fetch MX details: ' . $result->getReasonPhrase(), isVerbose());
 
             return null;
         }
 
         $data = $result->getBody()->getContents();
-        Log::write('Received: '.$data, isVeryVerbose());
+        Log::write('Received: ' . $data, isVeryVerbose());
         $data = json_decode($data);
 
-        if(count($data) > 0){
+        if (count($data) > 0) {
             if (!$map->mx_id) {
                 $map->update([
                     'mx_id' => $data[0]->TrackID
                 ]);
             }
 
-            Cache::put('mx-details/'.$data[0]->TrackID, $data[0]);
+            Cache::put('mx-details/' . $data[0]->TrackID, $data[0]);
 
             return $data[0];
         }
@@ -104,7 +111,7 @@ class MxMapDetails
     }
 
     /**
-     * @param  Map  $map
+     * @param Map $map
      * @return \stdClass|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -114,17 +121,25 @@ class MxMapDetails
             return null;
         }
 
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/'.$map->mx_details->TrackID);
+        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
 
         if ($result->getStatusCode() != 200) {
-            Log::write('Failed to fetch MX world record: '.$result->getReasonPhrase());
+            Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
 
             return null;
         }
 
         $data = json_decode($result->getBody()->getContents());
-        Cache::put('mx-wr/'.$map->mx_id, $data);
+        Cache::put('mx-wr/' . $map->mx_id, $data);
 
         return $data;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

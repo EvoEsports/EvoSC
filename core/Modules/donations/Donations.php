@@ -8,9 +8,10 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\PlanetsController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Donations
+class Donations implements ModuleInterface
 {
     public function __construct()
     {
@@ -47,5 +48,13 @@ class Donations
     {
         $player->stats()->increment('Donations', $amount);
         infoMessage($player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!')->sendAll();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

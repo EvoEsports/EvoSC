@@ -12,7 +12,6 @@ use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
-use esc\Models\Pb;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
@@ -44,6 +43,8 @@ class PlayerController implements ControllerInterface
         self::cacheConnectedPlayers();
 
         AccessRight::createIfMissing('player_kick', 'Kick players.');
+        AccessRight::createIfMissing('player_warn', 'Warn a player.');
+        AccessRight::createIfMissing('player_force_spec', 'Force a player into spectator mode.');
         AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
         AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
     }
@@ -75,9 +76,11 @@ class PlayerController implements ControllerInterface
                 infoMessage($player, ' cleared the server password.')->sendAll();
             } else {
                 infoMessage($player, ' set a server password.')->sendAll();
-                infoMessage($player, ' set a server password to "'.$pw.'".')->sendAdmin();
+                infoMessage($player, ' set the server password to "'.$pw.'".')->sendAdmin();
             }
         }
+
+        Server::setServerPasswordForSpectator($pw);
     }
 
     /**
@@ -155,10 +158,19 @@ class PlayerController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
-        Player::where('player_id', '>', 0)->orWhere('spectator_status', '>', 0)->update([
-            'player_id' => 0,
-            'spectator_status' => 0,
-        ]);
+        DB::table('players')
+            ->where('player_id', '>', 0)
+            ->orWhere('spectator_status', '>', 0)
+            ->update([
+                'player_id' => 0,
+                'spectator_status' => 0,
+            ]);
+
+        DB::table('players')
+            ->where('Score', '>', 0)
+            ->update([
+                'Score' => 0,
+            ]);
     }
 
     /**
@@ -220,6 +232,12 @@ class PlayerController implements ControllerInterface
             return;
         }
 
+        if ($playerToBeKicked->Group < $player->Group) {
+            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
+            infoMessage($player, ' tried to kick you but was blocked.')->send($playerToBeKicked);
+            return;
+        }
+
         try {
             $reason = implode(" ", $message);
             Server::kick($playerToBeKicked->Login, $reason);
@@ -244,6 +262,12 @@ class PlayerController implements ControllerInterface
             $toBeKicked = Player::find($login);
         } catch (\Exception $e) {
             $toBeKicked = $login;
+        }
+
+        if ($toBeKicked->Group < $player->Group) {
+            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
+            infoMessage($player, ' tried to kick you but was blocked.')->send($toBeKicked);
+            return;
         }
 
         try {
@@ -282,7 +306,10 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player." finished with time ($score) ".$player->getTime());
+            Log::info($player." finished with time ($score) ".formatScore($score));
+
+            $player->Score = $score;
+            $player->save();
 
             $map = MapController::getCurrentMap();
 
@@ -344,6 +371,12 @@ class PlayerController implements ControllerInterface
         return self::$players->put($player->Login, $player);
     }
 
+    public static function forceSpecEvent(Player $player, string $targetLogin)
+    {
+        Server::forceSpectator($targetLogin, 3);
+
+        infoMessage($player, ' forced ', player($targetLogin), ' into spectator mode.')->sendAll();
+    }
 
     private static function findClosestMatchingString(string $search, array $array)
     {
@@ -367,17 +400,34 @@ class PlayerController implements ControllerInterface
 
     public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
     {
-        for ($i = 0; $i < intval($count); $i++) {
-            Hook::fire('PlayerConnect', Server::connectFakePlayer());
-        }
-
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
+
+        for ($i = 0; $i < intval($count); $i++) {
+            $login = Server::connectFakePlayer();
+        }
     }
 
     public static function resetUserSettings(Player $player, string $cmd)
     {
         $player->settings()->delete();
         infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
+    }
+
+    public static function specPlayer(Player $player, $targetLogin)
+    {
+        Server::forceSpectator($player->Login, 3);
+        Server::forceSpectatorTarget($player->Login, $targetLogin, 1);
+    }
+
+    public static function muteLoginToggle(Player $player, $targetLogin)
+    {
+        $target = player($targetLogin);
+
+        if (ChatController::isPlayerMuted($target)) {
+            ChatController::unmute($player, $target);
+        } else {
+            ChatController::mute($player, $target);
+        }
     }
 
     /**
@@ -393,6 +443,9 @@ class PlayerController implements ControllerInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
+        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
+        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 
         ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
             'Set the server password, leave empty to clear it.', 'ma');

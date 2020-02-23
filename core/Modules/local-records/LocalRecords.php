@@ -1,11 +1,11 @@
 <?php
 
-namespace esc\Modules\LocalRecords;
+namespace esc\Modules;
 
 use esc\Classes\Cache;
-use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Hook;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
@@ -14,7 +14,6 @@ use esc\Models\AccessRight;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\RecordsTable;
 use Illuminate\Support\Collection;
 
 class LocalRecords implements ModuleInterface
@@ -93,41 +92,45 @@ class LocalRecords implements ModuleInterface
         $topIds = range(1, $showTop);
 
         foreach ($players as $player) {
-            $baseRecord = self::$records->get($player->id);
-            $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
+            try {
+                $baseRecord = self::$records->get($player->id);
+                $baseRank = !empty($baseRecord) ? $baseRecord->Rank : null;
 
-            if (!$baseRank || $baseRank > $localsCount - $show) {
-                $bottomIds = range($localsCount - $show + 1, $localsCount);
-            } else {
-                if ($baseRank <= self::$show) {
-                    $bottomIds = range($showTop + 1, self::$show);
+                if (!$baseRank || $baseRank > $localsCount - $show) {
+                    $bottomIds = range($localsCount - $show + 1, $localsCount);
                 } else {
-                    $bottomIds = range(ceil($baseRank - $show / 2) + 1, ceil($baseRank + $show / 2));
+                    if ($baseRank <= self::$show) {
+                        $bottomIds = range($showTop + 1, self::$show);
+                    } else {
+                        $bottomIds = range(ceil($baseRank - $show / 2) + 1, ceil($baseRank + $show / 2));
+                    }
                 }
+
+                $selectRanks = array_merge($topIds, $bottomIds);
+                $records = DB::table('local-records')->where('Map', '=', $map->id)
+                    ->whereIn('Rank', $selectRanks)->orderBy('Rank')->get();
+
+                $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
+                    return [
+                        'name' => ml_escape($playerMap->get($record->Player)),
+                        'rank' => $record->Rank,
+                        'score' => $record->Score,
+                        'online' => $onlinePlayers->contains('id', $record->Player)
+                    ];
+                });
+
+                if ($saveToCache) {
+                    $xml = Template::toString('local-records.update', compact('records'));
+                    Cache::put('local_records.xml', $xml);
+                }
+
+                Template::show($player, 'local-records.update', compact('records'));
+            } catch (\Exception $e) {
+                Log::warning('Failed to create locals-chunk-xml for player ' .  $player . ' on map ' . $map->uid);
+                Log::write($e->getMessage());
+                Log::write($e->getTraceAsString());
             }
-
-            $selectRanks = array_merge($topIds, $bottomIds);
-            $records = DB::table('local-records')->where('Map', '=', $map->id)
-                ->whereIn('Rank', $selectRanks)->orderBy('Rank')->get();
-
-            $records->transform(function ($record) use ($onlinePlayers, $playerMap) {
-                return [
-                    'name' => $playerMap->get($record->Player),
-                    'rank' => $record->Rank,
-                    'score' => $record->Score,
-                    'online' => $onlinePlayers->contains('id', $record->Player)
-                ];
-            });
-
-            if($saveToCache){
-                $xml = Template::toString('local-records.update', compact('records'));
-                Cache::put('local_records.xml', $xml);
-            }
-
-            Template::show($player, 'local-records.update', compact('records'), true);
         }
-
-        Template::executeMulticall();
     }
 
     public static function playerConnect(Player $player)
@@ -250,8 +253,6 @@ class LocalRecords implements ModuleInterface
     public static function showLocalsTable(Player $player)
     {
         $map = MapController::getCurrentMap();
-
-        var_dump(self::$records->pluck('Rank'));
 
         $records = self::$records->sortBy('Rank')->map(function ($record) {
             return new LocalRecord(get_object_vars($record));

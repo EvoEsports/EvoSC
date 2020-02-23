@@ -3,19 +3,17 @@
 namespace esc\Modules;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\File;
-use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
-use esc\Classes\ChatCommand;
 use esc\Controllers\MatchSettingsController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use Illuminate\Support\Collection;
 
 class MatchSettingsManager implements ModuleInterface
 {
@@ -55,7 +53,7 @@ class MatchSettingsManager implements ModuleInterface
         ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'ms_edit');
 
         if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
+            QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
         }
     }
 

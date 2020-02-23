@@ -1,0 +1,42 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:key-binds" id="key-binds" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct Bind {
+        Integer code;
+        Text name;
+        Text def;
+        Text id;
+    }
+
+    main(){
+        declare Bind[] KeyBinds;
+        KeyBinds.fromjson("""{$binds->toJson()|noescape}""");
+
+        while (True) {
+            yield;
+
+            foreach (event in PendingEvents) {
+                if(event.Type == CMlScriptEvent::Type::KeyPress){
+                    foreach(bind in KeyBinds){
+                        if(bind.code != 0){
+                            if(event.KeyCode == bind.code){
+                                TriggerPageAction("bound_key_pressed," ^ bind.id);
+                                break;
+                            }
+                        }else{
+                            if(event.KeyName == bind.def){
+                                TriggerPageAction("bound_key_pressed," ^ bind.id);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>

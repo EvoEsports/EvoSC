@@ -7,10 +7,8 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Controllers\ConfigController;
 use esc\Controllers\PlayerController;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
-use Symfony\Component\Process\Process;
 
 /**
  * @param  mixed  ...$message
@@ -69,54 +67,6 @@ function formatScore(int $score, bool $cutZero = false): string
 }
 
 /**
- * @return string
- */
-function serverName(): string
-{
-    global $serverName;
-
-    return $serverName;
-}
-
-/**
- * @param  int  $score
- *
- * @return string
- */
-function formatScoreNoMinutes(int $score): string
-{
-    $seconds = floor($score / 1000);
-    $ms = $score - ($seconds * 1000);
-
-    return sprintf('%d.%03d', $seconds, $ms);
-}
-
-/**
- * @param  string|null  $colored
- *
- * @return string
- */
-function stripColors(?string $colored): string
-{
-    return preg_replace('/\${0}\${1}(?:[a-f0-9]{1,3})/i', '', $colored);
-}
-
-/**
- * @param  string|null  $styled
- * @param  bool  $keepLinks
- *
- * @return string
- */
-function stripStyle(?string $styled = '', bool $keepLinks = false): string
-{
-    if ($keepLinks) {
-        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1})/i', '', $styled);
-    }
-
-    return preg_replace('/(?<![$])\${1}(?:l(?:\[.+?\])|[iwngosz]{1})/i', '', $styled);
-}
-
-/**
  * @param  string|null  $styled
  * @param  bool  $keepLinks
  *
@@ -139,7 +89,13 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
  */
 function config(string $id, $default = null)
 {
-    return ConfigController::getConfig(strtolower($id)) ?: $default;
+    $data = ConfigController::getConfig(strtolower($id));
+
+    if(!$data && is_bool($data)){
+        return false;
+    }
+
+    return $data ?: $default;
 }
 
 /**
@@ -216,6 +172,11 @@ function onlinePlayers(bool $withSpectators = true): Collection
     return Player::whereIn('Login', $logins)->get();
 }
 
+function ml_escape(string $string)
+{
+    return str_replace('"', '\u0022', $string);
+}
+
 /**
  * @param  string  $login
  * @param  bool  $addToOnlineIfOffline
@@ -269,32 +230,12 @@ function echoPlayers(): Collection
 }
 
 /**
- * @return Collection
- */
-function finishPlayers(): Collection
-{
-    return collect(Server::getCurrentRanking(1000, 0))->transform(function ($player) {
-        return player($player->login);
-    });
-}
-
-/**
  * @return Carbon
  * @throws Exception
  */
 function now(): Carbon
 {
     return (new Carbon())->now();
-}
-
-/**
- * @param  string  $formattedScore
- *
- * @return string
- */
-function cutZeroes(string $formattedScore): string
-{
-    return preg_replace('/^[0\:\.]+/', '', $formattedScore);
 }
 
 /**
@@ -310,61 +251,11 @@ function secondary(string $str = ""): string
 }
 
 /**
- * get primary color
- *
- * @param  string  $str
- *
- * @return string
- */
-function primary(string $str = ""): string
-{
-    return '$'.config('colors.primary').$str;
-}
-
-/**
- * @param  string  $str
- *
- * @return string
- */
-function warning(string $str = ""): string
-{
-    return '$'.config('colors.warning').$str;
-}
-
-/**
- * @param  string  $str
- *
- * @return string
- */
-function info(string $str = ""): string
-{
-    return '$'.config('colors.info').$str;
-}
-
-/**
  * @return string
  */
 function getEscVersion(): string
 {
-    return '0.77.0';
-}
-
-/**
- * @return mixed
- */
-function maps()
-{
-    return Map::whereEnabled(true)->get();
-}
-
-/**
- * @param  string|null  $filename
- *
- * @return string
- */
-function matchSettings(string $filename = null)
-{
-    return Server::getMapsDirectory().'/MatchSettings/'.($filename);
+    return '0.80.x';
 }
 
 /**
@@ -374,25 +265,6 @@ function dd($object)
 {
     var_dump($object);
     exit(0);
-}
-
-/**
- * @param  string  $filename
- *
- * @return mixed|null
- */
-function getMapInfoFromFile(string $filename)
-{
-    $mps = config('server.mps');
-    $maps = config('server.maps').'/';
-    if (file_exists($maps.$filename) && file_exists($mps)) {
-        $process = new Process([$mps, ' /parsegbx='.$maps.$filename]);
-        $process->run();
-
-        return json_decode($process->getOutput());
-    }
-
-    return null;
 }
 
 /**
@@ -425,7 +297,7 @@ function isDebug(): bool
 {
     global $_isDebug;
 
-    return $_isDebug;
+    return $_isDebug ?? false;
 }
 
 /**
@@ -436,6 +308,14 @@ function isWindows(): bool
     return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 }
 
+/**
+ * Translation function
+ *
+ * @param  string  $id
+ * @param  array  $vars
+ * @param  string  $language
+ * @return Object|string|string[]|null
+ */
 function __(string $id, array $vars = [], string $language = 'en')
 {
     $parts = explode('.', $id);

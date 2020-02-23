@@ -11,13 +11,11 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
-use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\KeyBinds;
-use Exception;
+use esc\Modules\InputSetup;
 use SimpleXMLElement;
 
 class CountdownController implements ControllerInterface
@@ -37,31 +35,18 @@ class CountdownController implements ControllerInterface
      */
     private static $originalTimeLimit;
 
-    /**
-     *
-     */
     public static function init()
     {
-        if (Cache::has('added-time')) {
-            self::$addedSeconds = Cache::get('added-time');
-        }
-        if (Cache::has('match-start')) {
-            self::$matchStart = Cache::get('match-start');
-        } else {
-            self::$matchStart = time();
-        }
-
         AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
     }
 
-    /**
-     *
-     */
-    public static function setMatchStart()
+    public static function beginMatch()
     {
         self::$matchStart = time();
         self::$addedSeconds = 0;
+        Cache::put('added-time', 0);
         Cache::put('match-start', self::$matchStart);
+        self::setTimeLimit(self::getOriginalTimeLimit());
     }
 
     public static function endMap(Map $map)
@@ -91,6 +76,7 @@ class CountdownController implements ControllerInterface
         $addedTime += $seconds;
 
         Hook::fire('AddedTimeChanged', $addedTime);
+        Cache::put('added-time', $addedTime);
 
         self::$addedSeconds = $addedTime;
         self::setTimeLimit(self::getOriginalTimeLimit() + $addedTime);
@@ -105,8 +91,6 @@ class CountdownController implements ControllerInterface
                     ' of playtime.')->sendAdmin();
             }
         }
-
-        Cache::put('added-time', $addedTime);
     }
 
     /**
@@ -144,9 +128,15 @@ class CountdownController implements ControllerInterface
     /**
      * @return int
      */
-    public static function getSecondsLeft(): int
+    public static function getSecondsLeft(): ?int
     {
-        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds + 3;
+        $roundStart = self::getRoundStartTime();
+
+        if (!$roundStart) {
+            return null;
+        }
+
+        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds;
 
         $timeLeft = $calculatedProgressTime - time();
 
@@ -166,27 +156,40 @@ class CountdownController implements ControllerInterface
     /**
      * Load the time limit from the default match-settings.
      *
+     * @param  string|null  $file
      * @return int
      */
-    private static function getTimeLimitFromMatchSettings(): int
+    private static function getTimeLimitFromMatchSettings(string $file = null): int
     {
-        $file = config('server.default-matchsettings');
+        if (!$file) {
+            $file = MatchSettingsController::getCurrentMatchSettingsFile();
+        }
 
         if ($file) {
             $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
             $xml = new SimpleXMLElement($matchSettings);
-            foreach ($xml->mode_script_settings->children() as $child) {
+
+            if (isset($xml->mode_script_settings)) {
+                $node = $xml->mode_script_settings;
+            } else {
+                $node = $xml->script_settings;
+            }
+
+            foreach ($node->children() as $child) {
                 if ($child->attributes()['name'] == 'S_TimeLimit') {
                     return intval($child->attributes()['value']);
                 }
             }
         }
 
+        Log::warning("Failed to get time limit from default match-settings.");
+
         return 600;
     }
 
-    public static function beginMap(Map $map)
+    public static function matchSettingsLoaded(string $matchSettingsFile)
     {
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings($matchSettingsFile);
     }
 
     /**
@@ -226,14 +229,21 @@ class CountdownController implements ControllerInterface
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
 
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('BeginMatch', [self::class, 'setMatchStart']);
+        if(Cache::has('match-start')){
+            self::$matchStart = Cache::get('match-start');
+        }
+        if(Cache::has('added-time')){
+            self::$addedSeconds = Cache::get('added-time');
+        }
+
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('EndMap', [self::class, 'endMap']);
+        Hook::add('MatchSettingsLoaded', [self::class, 'matchSettingsLoaded']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
             'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
         ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
 
-        KeyBinds::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
+        InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
     }
 }

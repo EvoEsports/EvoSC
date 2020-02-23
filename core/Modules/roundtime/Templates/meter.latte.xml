@@ -100,18 +100,13 @@
             declare Owner <=> GetOwner();
             if (!PageIsVisible || Owner == Null) continue;
 
-            if (PrevIsSpectator != IsSpectator) {
-              PrevIsSpectator = IsSpectator;
-
-              if (IsSpectator) {
-                roundtime.Visible = False;
-              } else {
-                roundtime.Visible = True;
-              }
-            }
+            roundtime.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
             if(roundtime.Visible){
                 speedLabel.Value = TL::TimeToText(Owner.CurLap.Time, True);
+            }else{
+                sleep(500);
+                continue;
             }
 
             if(!hidden){

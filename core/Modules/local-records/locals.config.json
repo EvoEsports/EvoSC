@@ -1,4 +1,5 @@
 {
+  "enabled": true,
   "rows": 16,
   "showtop": 3,
   "limit": 200,

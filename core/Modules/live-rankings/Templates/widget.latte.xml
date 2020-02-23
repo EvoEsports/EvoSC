@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}liverankings{/block}
-    {block size}44 {config('live-rankings-rounds.show') * 3 + 6}{/block}
+    {block size}44 {config('live-rankings.show',14) * 3 + 6}{/block}
 
     {block content}
     <quad id="header" pos="0 0" size="44 5" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
@@ -19,7 +19,7 @@
     </framemodel>
 
     <frame id="ranking" pos="1 -7">
-        {for $i=0; $i < config('live-rankings-rounds.show'); $i++}
+        {for $i=0; $i < config('live-rankings.show',14); $i++}
         <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
         {/for}
     </frame>
@@ -76,15 +76,21 @@
 
         declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
         (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
-        (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
-        (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+
+        if(CurrentServerModeName == "Rounds"){
+            (frame.Controls[1] as CMlLabel).SetText("" ^ score);
+            (frame.Controls[2] as CMlLabel).SetText("" ^ score);
+        }else{
+            (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
+            (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
+        }
         (frame.Controls[3] as CMlLabel).SetText(name);
         frame.Show();
     }
 
     Void updateList(){
         declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
-        declare Integer max = {config('live-rankings-rounds.show')};
+        declare Integer max = {config('live-rankings.show',14)};
         declare Integer i = 0;
 
         scores = scores.sort();
@@ -96,11 +102,17 @@
 
             i = i + 1;
 
-            if(i > 14){
+            if(i > {config('live-rankings.show', 14)}){
                 return;
             }
 
             updateLabels(ranking, i, name, score);
+        }
+
+        if(scores.count < max){
+            for(i, scores.count, max - 1){
+                (ranking.Controls[i] as CMlFrame).Hide();
+            }
         }
     }
 
@@ -109,7 +121,6 @@
         foreach(control in ranking.Controls){
             control.Hide();
         }
-        scores = Integer[Text];
     }
     --></script>
     {/block}
@@ -120,37 +131,33 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('live-rankings-rounds.ui.position') == 'left' ? 'True' : 'False'};
-        slot__ = {config('live-rankings-rounds.ui.slot')};
+        declare Text[Text] LiveRankings__ for This;
+        declare Integer LiveRankingsUpdate for This;
+        declare Ident currentMapUid = Map.Id;
 
-        declare Text currentMapUid = Map.MapInfo.MapUid;
+        left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('live-rankings.ui.slot')};
+
+        declare lastUpdate = 0;
 
         reset();
-        foreach(score in Scores){
-            declare time = score.BestLap.Time;
-            if(time > 0){
-                scores[score.User.Name] = time;
-            }
-        }
-
-        updateList();
     {/block}
 
     {block loop}
-        foreach(event in RaceEvents){
-            if(event.IsEndLap == True){
-                if(!scores.existskey(event.Player.Name) || scores[event.Player.Name] > event.LapTime){
-                    scores[event.Player.Name] = event.LapTime;
-                    updateList();
-                }
-                break;
+        if(lastUpdate != LiveRankingsUpdate){
+            lastUpdate = LiveRankingsUpdate;
+            log(LiveRankings__);
+            scores = Integer[Text];
+            foreach(score => nick in LiveRankings__){
+                scores[nick] = TL::ToInteger(score);
             }
+            updateList();
         }
 
-            if(currentMapUid != Map.MapInfo.MapUid){
-                currentMapUid = Map.MapInfo.MapUid;
-                reset();
-            }
+        if(currentMapUid != Map.Id){
+            currentMapUid = Map.Id;
+            reset();
+        }
     {/block}
 
     {block pendingEvents}

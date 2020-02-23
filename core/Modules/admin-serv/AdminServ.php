@@ -5,8 +5,9 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Interfaces\ModuleInterface;
 
-class AdminServ
+class AdminServ implements ModuleInterface
 {
     public function __construct()
     {
@@ -22,5 +23,13 @@ class AdminServ
     public static function mapDeleted(...$arguments)
     {
         Log::write(json_encode($arguments));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

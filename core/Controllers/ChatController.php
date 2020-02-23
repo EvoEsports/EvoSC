@@ -4,7 +4,6 @@ namespace esc\Controllers;
 
 
 use esc\Classes\ChatCommand;
-use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
@@ -30,6 +29,9 @@ class ChatController implements ControllerInterface
     /** @var boolean */
     private static $routingEnabled;
 
+    /** @var boolean */
+    private static $externalRouter;
+
     /**
      * Initialize ChatController.
      */
@@ -40,29 +42,27 @@ class ChatController implements ControllerInterface
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
 
-        if (!isWindows()) {
-            //unix systems use chat router process
+        if(self::$externalRouter = config('server.use-external-router', false)){
             return;
         }
 
-        self::$routingEnabled = config('server.enable-chat-routing');
-
-        if (self::$routingEnabled) {
-            Log::write('Enabling manual chat routing.');
+        if ((self::$routingEnabled = config('server.enable-chat-routing', true)) && !self::$externalRouter) {
+            Log::info('Enabling manual chat routing.', isVerbose());
             $routingEnabled = false;
 
             while (!$routingEnabled) {
                 try {
-                    Server::chatEnableManualRouting(false, false);
+                    Server::chatEnableManualRouting(true, false);
                     $routingEnabled = true;
+                    Log::info('Chat router started.');
                 } catch (FaultException $e) {
                     $msg = $e->getMessage();
-                    Log::getOutput()->writeln("<error>$msg There might already be a running instance of EvoSC.</error>");
+                    Log::error("$msg There might already be a running instance of EvoSC.");
                     sleep(1);
                 }
             }
         } else {
-            Server::chatEnableManualRouting(false, false);
+            Server::chatEnableManualRouting(false, true);
         }
     }
 
@@ -74,10 +74,7 @@ class ChatController implements ControllerInterface
      */
     public static function mute(Player $admin, Player $target)
     {
-        if (!self::isPlayerMuted($target)) {
-            Server::ignore($target->Login);
-//            Server::echo('ESC.UpdateMutedPlayers', 'yo');
-        }
+        Server::ignore($target->Login);
         infoMessage($admin, ' muted ', $target)->sendAll();
     }
 
@@ -89,10 +86,24 @@ class ChatController implements ControllerInterface
      */
     public static function unmute(Player $player, Player $target)
     {
-        if (!self::isPlayerMuted($target)) {
-            Server::unIgnore($target->Login);
-        }
+        Server::unIgnore($target->Login);
         infoMessage($player, ' unmuted ', $target)->sendAll();
+    }
+
+    /**
+     * Chat-command: unmute player.
+     *
+     * @param  Player  $player
+     * @param                    $cmd
+     * @param                    $nick
+     */
+    public static function cmdUnmute(Player $player, $cmd, $nick)
+    {
+        $target = PlayerController::findPlayerByName($player, $nick);
+
+        if ($target) {
+            self::unmute($player, $target);
+        }
     }
 
     /**
@@ -112,26 +123,6 @@ class ChatController implements ControllerInterface
         }
 
         self::mute($admin, $target);
-    }
-
-    /**
-     * Chat-command: unmute player.
-     *
-     * @param  Player  $player
-     * @param                    $cmd
-     * @param                    $nick
-     */
-    public static function cmdUnmute(Player $player, $cmd, $nick)
-    {
-        $target = PlayerController::findPlayerByName($player, $nick);
-
-        if (!$target) {
-            //No target found
-            return;
-        }
-
-        Server::unIgnore($target->Login);
-        infoMessage($player, ' unmuted ', $target)->sendAll();
     }
 
     public static function isPlayerMuted(Player $player)
@@ -162,11 +153,24 @@ class ChatController implements ControllerInterface
             return;
         }
 
+        self::pmTo($player, $target->Login, implode(' ', $message));
+    }
+
+    public static function pmTo(Player $player, $login, $message)
+    {
+        $target = player($login);
+
+        if ($target->id == $player->id) {
+            warningMessage('You can\'t PM yourself.')->send($player);
+
+            return;
+        }
+
         $from = sprintf(secondary('[from:').$player.secondary('] '));
         $to = sprintf(secondary('[to:').$target.secondary('] '));
 
-        chatMessage($from.implode(' ', $message))->setIcon('')->send($target);
-        chatMessage($to.implode(' ', $message))->setIcon('')->send($player);
+        chatMessage($from.$message)->setIcon('')->send($target);
+        chatMessage($to.$message)->setIcon('')->send($player);
     }
 
     /**
@@ -177,27 +181,14 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '/') {
-            warningMessage('Invalid chat-command entered. See ', secondary('/help'),
-                ' for all commands.')->send($player);
-
-            return;
-        }
-
-        if (self::$mutedPlayers->where('id', $player->id)->isNotEmpty()) {
-            //Player is muted
-            warningMessage('You are muted.')->send($player);
-
-            return;
-        }
-
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
 
-        if (isWindows()) {
+        if (!self::$externalRouter && self::$routingEnabled) {
             $nick = $player->NickName;
 
             if ($player->isSpectator()) {
-                $nick = '$eee📷 '.$nick;
+                //$nick = '$eee📷 '.$nick;
+                $nick = '$eee '.$nick;
             }
 
             $prefix = $player->group->chat_prefix;
