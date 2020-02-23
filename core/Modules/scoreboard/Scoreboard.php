@@ -31,8 +31,8 @@ class Scoreboard implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -44,9 +44,11 @@ class Scoreboard implements ModuleInterface
             self::$playersOnline->put($player->id, true);
         }
 
-        self::scoresUpdated(ScoreController::getTracker());
+        $tracker = ScoreController::getTracker();
 
         if (!$isBoot) {
+            self::scoresUpdated($tracker);
+
             $logoUrl = self::$logoUrl;
             $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
             $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
@@ -87,7 +89,6 @@ class Scoreboard implements ModuleInterface
         $logoUrl = self::$logoUrl;
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $settings = $player->setting('sb');
-        var_dump(Server::getRoundPointsLimit());
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
         $mode = self::$mode;
         Template::show($player, 'scoreboard.scoreboard',

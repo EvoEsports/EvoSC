@@ -122,7 +122,7 @@ class MxKarma implements ModuleInterface
             ];
         });
 
-        $response = self::call(MXK::saveVotes, $map, $ratings->toArray());
+        $response = self::call(self::saveVotes, $map, $ratings->toArray());
 
         if ($response instanceof stdClass && !$response->updated) {
             Log::warning('Could not update MX Karma.');
@@ -136,7 +136,7 @@ class MxKarma implements ModuleInterface
         $mapUid = $map->uid;
 
         try {
-            self::$mapKarma = self::call(MXK::getMapRating, $map);
+            self::$mapKarma = self::call(self::getMapRating, $map);
         } catch (\Exception $e) {
             Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
             self::$mapKarma = 50.0;
@@ -182,7 +182,7 @@ class MxKarma implements ModuleInterface
         $mapUid = $map->uid;
 
         if (self::$currentMap != $mapUid) {
-            self::$mapKarma = self::call(MXK::getMapRating);
+            self::$mapKarma = self::call(self::getMapRating);
             self::$currentMap = $mapUid;
         }
 
@@ -246,7 +246,7 @@ class MxKarma implements ModuleInterface
     public static function call(int $method, Map $map = null, array $votes = null): ?stdClass
     {
         switch ($method) {
-            case MXK::startSession:
+            case self::startSession:
                 $requestMethod = 'GET';
 
                 $query = [
@@ -258,7 +258,7 @@ class MxKarma implements ModuleInterface
                 $function = 'startSession';
                 break;
 
-            case MXK::activateSession:
+            case self::activateSession:
                 $requestMethod = 'GET';
 
                 $query = [
@@ -269,7 +269,7 @@ class MxKarma implements ModuleInterface
                 $function = 'activateSession';
                 break;
 
-            case MXK::getMapRating:
+            case self::getMapRating:
                 $requestMethod = 'POST';
 
                 $query = [
@@ -287,7 +287,7 @@ class MxKarma implements ModuleInterface
                 $function = 'getMapRating';
                 break;
 
-            case MXK::saveVotes:
+            case self::saveVotes:
                 $requestMethod = 'POST';
 
                 $query = [
@@ -374,17 +374,18 @@ class MxKarma implements ModuleInterface
 
     /**
      * Starts MX Karma session
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function startSession()
     {
         Log::info("Starting MX Karma session...");
 
-        $auth = self::call(MXK::startSession);
+        $auth = self::call(self::startSession);
 
         if ($auth) {
             self::$session = $auth;
 
-            $mxResponse = self::call(MXK::activateSession);
+            $mxResponse = self::call(self::activateSession);
 
             if (!$mxResponse->activated || !isset($mxResponse->activated)) {
                 Log::warning('Could not activate session @ MX Karma.');

@@ -1,9 +1,8 @@
 <?php
 
-namespace esc\Modules\LocalRecords;
+namespace esc\Modules;
 
 use esc\Classes\Cache;
-use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -15,7 +14,6 @@ use esc\Models\AccessRight;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\RecordsTable;
 use Illuminate\Support\Collection;
 
 class LocalRecords implements ModuleInterface

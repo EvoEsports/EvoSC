@@ -81,7 +81,7 @@ class ModuleController implements ControllerInterface
 
         Log::write('Loading module information.');
 
-        foreach ($moduleClasses->values() as $moduleDirectory) {
+        foreach ($moduleClasses as $moduleDirectory) {
             $moduleJson = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/' . $moduleDirectory . '/module.json');
             if (file_exists($moduleJson)) {
                 $json = file_get_contents($moduleJson);
@@ -110,8 +110,7 @@ class ModuleController implements ControllerInterface
         Log::write('Starting modules...');
 
         $moduleClasses->each(function ($moduleDir, $moduleClass) use ($mode) {
-            if(!class_exists($moduleClass)){
-                Log::write("Class $moduleClass not found!", true);
+            if (!class_exists($moduleClass)) {
                 return;
             }
 
@@ -153,6 +152,7 @@ class ModuleController implements ControllerInterface
             }
 
             $moduleClass::start($mode);
+            Log::info("Module $moduleClass started.", isVeryVerbose());
         });
 
         //Boot modules

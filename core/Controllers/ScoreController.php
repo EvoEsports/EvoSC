@@ -34,8 +34,8 @@ class ScoreController implements ControllerInterface
     /**
      * Method called on controller start and mode change
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot)
     {
@@ -63,7 +63,7 @@ class ScoreController implements ControllerInterface
     }
 
     /**
-     * @param  int  $playerId
+     * @param int $playerId
      * @return ScoreTracker
      */
     private static function getScoreTracker(int $playerId)
@@ -110,6 +110,6 @@ class ScoreController implements ControllerInterface
 
     public static function getTracker(): Collection
     {
-        return self::$tracker;
+        return self::$tracker ?: collect();
     }
 }
