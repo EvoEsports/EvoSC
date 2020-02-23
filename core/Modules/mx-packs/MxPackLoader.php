@@ -10,10 +10,11 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\MxPackJob;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MxPackLoader
+class MxPackLoader implements ModuleInterface
 {
     /**
      * @var MxPackJob
@@ -96,5 +97,13 @@ class MxPackLoader
 
         self::$activeJob = new MxPackJob($player, $mapPackId);
         self::$activeJob = null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

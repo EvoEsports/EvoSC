@@ -1,7 +1,6 @@
 <?php
 
 require 'vendor/autoload.php';
-require 'core/autoload.php';
 require 'core/global-functions.php';
 require 'core/gbxdatafetcher/gbxdatafetcher.inc.php';
 

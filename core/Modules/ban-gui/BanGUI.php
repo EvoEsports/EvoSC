@@ -9,10 +9,11 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\BansController;
+use esc\Interfaces\ModuleInterface as ModuleInterfaceAlias;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 
-class BanGUI
+class BanGUI implements ModuleInterfaceAlias
 {
     public function __construct()
     {
@@ -79,5 +80,13 @@ class BanGUI
             warningMessage($e->getMessage())->send($player);
             Log::write('Failed to ban & blacklist: ' . $login);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

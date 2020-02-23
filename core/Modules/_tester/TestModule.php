@@ -7,10 +7,11 @@ namespace esc\Modules;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class TestModule
+class TestModule implements ModuleInterface
 {
     public function __construct()
     {
@@ -33,5 +34,13 @@ class TestModule
     public static function sendaction_for_Controller(Player $player, Collection $formData = null)
     {
         var_dump($player->Login, $formData);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

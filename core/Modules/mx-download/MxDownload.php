@@ -16,11 +16,12 @@ use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\MatchSettingsController;
 use esc\Controllers\QueueController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MxDownload
+class MxDownload implements ModuleInterface
 {
     public function __construct()
     {
@@ -212,5 +213,13 @@ class MxDownload
         Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));
 
         return $info[0];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

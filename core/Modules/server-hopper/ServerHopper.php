@@ -7,10 +7,11 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 
-class ServerHopper
+class ServerHopper implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -83,5 +84,13 @@ class ServerHopper
         });
 
         self::sendUpdatedServerInformations();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

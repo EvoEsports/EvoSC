@@ -11,11 +11,12 @@ use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class Votes
+class Votes implements ModuleInterface
 {
     /**
      * @var Collection
@@ -392,5 +393,13 @@ class Votes
     private static function getSecondsSinceLastSkipVote()
     {
         return time() - self::$lastSkipVote;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

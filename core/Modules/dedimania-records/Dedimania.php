@@ -14,13 +14,14 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\MapController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Database\Eloquent\Model;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
-class Dedimania extends DedimaniaApi
+class Dedimania extends DedimaniaApi implements ModuleInterface
 {
     private static $offlineMode;
 
@@ -121,10 +122,32 @@ class Dedimania extends DedimaniaApi
         Template::show($player, 'dedimania-records.manialink');
     }
 
+    public static function getRanksRange(int $rank = null): array
+    {
+        $map = MapController::getCurrentMap();
+        $top = config('dedimania.show-top', 3);
+        $rows = config('dedimania.rows', 16);
+
+        if ($rank) {
+            $fill1 = ceil(($rows - $top) / 2);
+            $fill2 = clone $fill1;
+            if ($fill1 + $fill2 > $rows) {
+                $fill2--;
+            } else if ($fill1 + $fill2 < $rows) {
+                $fill2++;
+            }
+            $fill1--;
+            return array_merge(range(1, $top), range($rank - $fill1, $rank + $fill2));
+        } else {
+            $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
+            return array_merge(range(1, $top), range($count - $rows, $count));
+        }
+    }
+
     public static function showRecords(Player $player)
     {
         $top = config('dedimania.show-top', 3);
-        $fill = config('dedimania.rows', 15);
+        $fill = config('dedimania.rows', 16);
         $map = MapController::getCurrentMap();
 
         $record = DB::table('dedi-records')
@@ -210,7 +233,7 @@ class Dedimania extends DedimaniaApi
             $records = null;
         }
 
-        if($records == null){
+        if ($records == null) {
             $records = $map->dedis->transform(function (Dedi $dedi) {
                 $record = collect();
                 $record->login = $dedi->player->Login;
@@ -427,5 +450,13 @@ class Dedimania extends DedimaniaApi
     public static function isOfflineMode(): bool
     {
         return self::$offlineMode;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

@@ -8,11 +8,12 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface as ModuleInterfaceAlias;
 use esc\Models\AccessRight;
 use esc\Models\Group;
 use esc\Models\Player;
 
-class GroupManager
+class GroupManager implements ModuleInterfaceAlias
 {
     public function __construct()
     {
@@ -187,5 +188,13 @@ class GroupManager
                 infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
             }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

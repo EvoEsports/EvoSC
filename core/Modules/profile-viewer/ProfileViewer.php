@@ -6,10 +6,11 @@ namespace esc\Modules;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 
-class ProfileViewer
+class ProfileViewer implements ModuleInterface
 {
     public function __construct()
     {
@@ -45,5 +46,13 @@ class ProfileViewer
         } else {
             warningMessage('Player with login ', secondary($targetLogin), ' not found.')->send($player);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

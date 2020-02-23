@@ -7,9 +7,10 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Controllers\TemplateController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Speedometer
+class Speedometer implements ModuleInterface
 {
     public function __construct()
     {
@@ -34,5 +35,13 @@ class Speedometer
     public static function resetSettings(Player $player)
     {
         $player->settings()->where('name', 'speedo')->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

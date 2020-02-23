@@ -8,9 +8,10 @@ use esc\Classes\Template;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
 use esc\Controllers\PlanetsController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Pay2Play
+class Pay2Play implements ModuleInterface
 {
     private static $priceAddTime;
     private static $priceSkip;
@@ -70,5 +71,13 @@ class Pay2Play
     {
         infoMessage($player, ' paid ', $amount, ' to skip map.')->sendAll();
         MapController::skip($player);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

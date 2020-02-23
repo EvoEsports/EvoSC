@@ -6,12 +6,12 @@ use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MXK;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\ChatCommand;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -19,8 +19,13 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use stdClass;
 
-class MxKarma extends MXK
+class MxKarma implements ModuleInterface
 {
+    const startSession = 1;
+    const activateSession = 2;
+    const getMapRating = 3;
+    const saveVotes = 4;
+
     private static $apiKey;
     private static $mapKarma;
     private static $updatedVotesAverage;
@@ -532,5 +537,13 @@ class MxKarma extends MXK
         Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
 
         self::sendUpdatedKarma();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

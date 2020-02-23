@@ -11,6 +11,7 @@ use esc\Classes\Log;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Karma;
 use esc\Models\LocalRecord;
 use esc\Models\Map;
@@ -19,7 +20,7 @@ use esc\Models\Stats;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
-class Statistics
+class Statistics implements ModuleInterface
 {
     /**
      * @var \Illuminate\Support\Collection
@@ -266,5 +267,13 @@ class Statistics
     public static function beginMap(...$args)
     {
         self::$scores = collect();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

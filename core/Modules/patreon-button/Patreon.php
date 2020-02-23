@@ -5,9 +5,10 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Patreon
+class Patreon implements ModuleInterface
 {
     public function __construct()
     {
@@ -19,5 +20,13 @@ class Patreon
     public static function show(Player $player)
     {
         Template::show($player, 'patreon-button.widget');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

@@ -7,9 +7,10 @@ use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Server;
 use esc\Controllers\ChatController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class FunCommands
+class FunCommands implements ModuleInterface
 {
     public function __construct()
     {
@@ -48,5 +49,13 @@ class FunCommands
 
             infoMessage($player, ' ', $message)->sendAll();
         }, 'Mimic info output, put text into curly braces to make it secondary-color.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

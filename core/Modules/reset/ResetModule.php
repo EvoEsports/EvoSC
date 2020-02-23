@@ -6,9 +6,10 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Controllers\PlayerController;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class ResetModule
+class ResetModule implements ModuleInterface
 {
     public function __construct()
     {
@@ -26,5 +27,13 @@ class ResetModule
         onlinePlayers()->each(function (Player $player) {
             Hook::fire('PlayerConnect', $player);
         });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

@@ -5,9 +5,10 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class SpectatorInfo
+class SpectatorInfo implements ModuleInterface
 {
     private static $specTargets;
 
@@ -51,5 +52,13 @@ class SpectatorInfo
         } else {
             Template::show($player, 'spec-info.hide');
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }

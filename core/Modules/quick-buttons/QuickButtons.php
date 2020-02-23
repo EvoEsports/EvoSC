@@ -5,10 +5,11 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Template;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class QuickButtons
+class QuickButtons implements ModuleInterface
 {
     /**
      * @var Collection
@@ -54,5 +55,13 @@ class QuickButtons
     public static function removeAll()
     {
         self::$buttons = collect();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        // TODO: Implement start() method.
     }
 }
