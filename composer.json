@@ -17,7 +17,8 @@
   },
   "autoload": {
     "classmap": [
-      "core/"
+      "core/",
+      "modules/"
     ]
   },
   "require-dev": {

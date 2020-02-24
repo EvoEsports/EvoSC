@@ -26,6 +26,7 @@ use esc\Controllers\ModuleController;
 use esc\Controllers\PlanetsController;
 use esc\Controllers\PlayerController;
 use esc\Controllers\QueueController;
+use esc\Controllers\ScoreController;
 use esc\Controllers\SetupController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
@@ -59,8 +60,6 @@ class EscRun extends Command
             SetupController::startSetup($input, $output, $this->getHelper('question'));
             return;
         }
-
-        var_dump(config('server.use-external-router', false));
 
         if (config('server.use-external-router', false)) {
             switch (pcntl_fork()) {
@@ -165,6 +164,7 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+        ScoreController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {

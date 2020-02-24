@@ -43,10 +43,6 @@ class ScoreController implements ControllerInterface
         self::$tracker = collect();
         self::$points = config('server.rounds.points');
 
-        if (self::isRounds()) {
-            Server::setRoundCustomPoints(config('server.rounds.points'));
-        }
-
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
     }
