@@ -270,7 +270,7 @@ class MapController implements ControllerInterface
         } catch (Exception $e) {
             Log::write($e->getMessage(), isVerbose());
 
-            return null;
+            return self::getGbxInformationByExecutable($filename);
         }
 
         $gbx = new stdClass();
