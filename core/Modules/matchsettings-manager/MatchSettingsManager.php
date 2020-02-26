@@ -227,7 +227,7 @@ class MatchSettingsManager implements ModuleInterface
 
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
-        MatchSettingsController::loadMatchSettings($player, $matchsettingsFile.'.txt');
+        MatchSettingsController::loadMatchSettings(true, $player, $matchsettingsFile.'.txt');
     }
 
     public static function getMatchsettings()

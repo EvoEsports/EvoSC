@@ -41,27 +41,39 @@ class MatchSettingsController implements ControllerInterface
         }
     }
 
-    public static function loadMatchSettings(Player $player, string $matchSettingsFile)
+    public static function loadMatchSettings(bool $rebootClasses = false, Player $player = null, string $matchSettingsFile = null)
     {
+        if ($player) {
+            infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
+            Log::info($player . ' loads matchsettings ' . $matchSettingsFile);
+        } else {
+            Log::info('Automatically loading matchsettings ' . $matchSettingsFile);
+        }
+
+        if (!$matchSettingsFile) {
+            $matchSettingsFile = self::getCurrentMatchSettingsFile();
+        }
+
         Server::loadMatchSettings('MatchSettings/' . $matchSettingsFile);
-        infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
-        Log::info($player . ' loads matchsettings ' . $matchSettingsFile);
         self::$currentMatchSettingsFile = $matchSettingsFile;
         self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
-        $mode = Server::getScriptName()['NextValue'];
+        if($rebootClasses){
+            $mode = Server::getScriptName()['NextValue'];
 
-        HookController::init();
-        ChatCommand::removeAll();
-        Timer::destroyAll();
-        ManiaLinkEvent::removeAll();
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::removeAll();
+            HookController::init();
+            ChatCommand::removeAll();
+            Timer::destroyAll();
+            ManiaLinkEvent::removeAll();
+            if (config('quick-buttons.enabled')) {
+                QuickButtons::removeAll();
+            }
+
+            ControllerController::loadControllers($mode);
+            ModuleController::startModules($mode);
         }
 
-        ControllerController::loadControllers($mode);
-        MapController::loadMaps($matchSettingsFile);
-        ModuleController::startModules($mode);
+        MapController::loadMaps();
         Hook::fire('MapPoolUpdated');
         Hook::fire('MatchSettingsLoaded', $matchSettingsFile);
     }
@@ -380,8 +392,7 @@ class MatchSettingsController implements ControllerInterface
         if (self::$lastMatchSettingsModification != filemtime(self::getPath(self::getCurrentMatchSettingsFile()))) {
             self::updateMatchSettingsModificationTime();
             infoMessage('MatchSettings was updated by external source, reloading.')->sendAll();
-            MapController::loadMaps(self::getCurrentMatchSettingsFile());
-            Hook::fire('MapPoolUpdated');
+            self::loadMatchSettings();
         }
     }
 

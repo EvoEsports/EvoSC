@@ -324,126 +324,55 @@ class MapController implements ControllerInterface
     /**
      * Loads maps from server directory
      */
-    public static function loadMaps(string $matchSettings = null)
+    public static function loadMaps()
     {
         Log::write('Loading maps...');
 
-        //Get loaded matchsettings maps
-        if ($matchSettings) {
-            $maps = MatchSettingsController::getMapFilenamesFrom($matchSettings);
-        } else {
-            $maps = MatchSettingsController::getMapFilenamesFromCurrentMatchSettings();
-        }
+        DB::table('maps')
+            ->where('enabled', '=', 1)
+            ->update(['enabled' => 0]);
 
-        foreach ($maps as $mapInfo) {
-            $filename = $mapInfo->file;
-            $uid = $mapInfo->ident;
+        foreach (Server::getMapList() as $map) {
+            /** @var $map \Maniaplanet\DedicatedServer\Structures\Map */
 
-            if (!File::exists(self::$mapsPath . $filename)) {
-                Log::error("File $filename not found.");
+            Log::info('Loading ' . $map->fileName, isVerbose());
 
-                if (DB::table('maps')->where('filename', '=', $filename)->exists()) {
-                    DB::table('maps')->where('filename', '=', $filename)->update(['enabled' => 0]);
-                }
+            $author = DB::table('players')->where('Login', '=', $map->author)->first();
+            $gbx = null;
 
-                continue;
-            }
+            if ($author) {
+                $authorId = $author->id;
+            } else {
+                $authorId = DB::table('players')->insertGetId([
+                    'Login' => $map->author,
+                    'NickName' => $map->author
+                ]);
 
-            $gbx = self::getGbxInformation($filename, false);
-
-            if (!$uid || ($uid && $uid != $gbx->MapUid)) {
-                $uid = $gbx->MapUid;
-
-                MatchSettingsController::setMapIdent(config('server.default-matchsettings'), $filename, $uid);
-            }
-
-            if (DB::table('maps')->where('filename', '=', $filename)->exists()) {
-                $map = DB::table('maps')->where('filename', '=', $filename)->first();
-
-                if ($map->uid != $uid) {
-                    DB::table('maps')->where('filename', '=', $filename)->update([
-                        'filename' => '_' . $map->filename,
-                        'enabled' => 0
+                try {
+                    $gbx = self::getGbxInformation($map->fileName);
+                    DB::table('players')->where('Login', '=', $map->author)->update([
+                        'NickName' => $gbx->AuthorNick
                     ]);
-
-                    try {
-                        $map = self::createMap($filename, $uid, $gbx);
-                    } catch (\Throwable $e) {
-                        Log::error('Failed to create map ' . $filename . ' with uid: ' . $uid);
-                        if (isVerbose()) {
-                            Log::warning($e->getMessage());
-                            Log::warning($e->getTraceAsString());
-                        }
-
-                        continue;
-                    }
-                }
-            } else {
-                if (DB::table('maps')->where('uid', '=', $uid)->exists()) {
-                    $map = DB::table('maps')->where('uid', '=', $uid)->first();
-
-                    if ($map->filename != $filename) {
-                        Log::write("Filename changed for map: (" . $map->filename . " -> $filename)",
-                            isVerbose());
-                        if (isVerbose()) {
-                            Log::warning($e->getMessage());
-                            Log::warning($e->getTraceAsString());
-                        }
-
-                        DB::table('maps')->where('uid', '=', $uid)->update(['filename' => $filename]);
-                    }
-                } else {
-                    try {
-                        $map = self::createMap($filename, $uid, $gbx);
-                    } catch (\Throwable $e) {
-                        Log::error('Failed to create map ' . $filename . ' with uid: ' . $uid);
-                        if (isVerbose()) {
-                            Log::warning($e->getMessage());
-                            Log::warning($e->getTraceAsString());
-                        }
-
-                        continue;
-                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to load GBX information for: ' . $map->fileName, isVerbose());
                 }
             }
 
-            if (!$map->name) {
-                DB::table('maps')->where('uid', '=', $uid)->update([
-                    'name' => $gbx->Name
-                ]);
-            }
+            DB::table('maps')->updateOrInsert([
+                'uid' => $map->uId
+            ], [
+                'author' => $authorId,
+                'filename' => $map->fileName,
+                'name' => $map->name,
+                'environment' => $map->environnement,
+                'enabled' => 1,
+                'cooldown' => config('server.map-cooldown', 10)
+            ]);
 
-            if (!$map->environment) {
-                DB::table('maps')->where('uid', '=', $uid)->update([
-                    'environment' => $gbx->Environment
-                ]);
-            }
-
-            if (!$map->title_id) {
-                DB::table('maps')->where('uid', '=', $uid)->update([
-                    'title_id' => $gbx->TitleId
-                ]);
-            }
-
-            if (isVerbose()) {
-                printf("Loaded: %60s -> %s\n", $mapInfo->fileName, stripAll($map->name));
-            } else {
-                echo ".";
-            }
+            echo '.';
         }
 
         echo "\n";
-
-        //get array with the uids
-        $enabledMapsuids = $maps->pluck('ident');
-
-        //Enable loaded maps
-        DB::table('maps')->whereIn('uid', $enabledMapsuids)
-            ->update(['enabled' => 1]);
-
-        //Disable maps
-        DB::table('maps')->whereNotIn('uid', $enabledMapsuids)
-            ->update(['enabled' => 0]);
     }
 
     /**
