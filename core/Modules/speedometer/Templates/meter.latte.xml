@@ -44,7 +44,7 @@
 
     Void resetMeter(){
         settings.showLabel = True;
-        settings.position = <80.0, -79.5>;
+        settings.position = <{config('speedometer.default-pos.x')|noescape}, {config('speedometer.default-pos.y')|noescape}>;
         settings.scale = 1.0;
     }
 
