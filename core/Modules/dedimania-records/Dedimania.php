@@ -118,28 +118,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         Template::show($player, 'dedimania-records.manialink');
     }
 
-    public static function getRanksRange(int $rank = null): array
-    {
-        $map = MapController::getCurrentMap();
-        $top = config('dedimania.show-top', 3);
-        $rows = config('dedimania.rows', 16);
-
-        if ($rank) {
-            $fill1 = ceil(($rows - $top) / 2);
-            $fill2 = clone $fill1;
-            if ($fill1 + $fill2 > $rows) {
-                $fill2--;
-            } else if ($fill1 + $fill2 < $rows) {
-                $fill2++;
-            }
-            $fill1--;
-            return array_merge(range(1, $top), range($rank - $fill1, $rank + $fill2));
-        } else {
-            $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
-            return array_merge(range(1, $top), range($count - $rows, $count));
-        }
-    }
-
     public static function showRecords(Player $player)
     {
         $top = config('dedimania.show-top', 3);
@@ -189,7 +167,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
                 'rank' => $dedi->Rank,
                 'cps' => $checkpoints,
                 'score' => $dedi->Score,
-                'name' => str_replace('{', '\u007B', str_replace('}', '\u007D', $player->NickName)),
+                'name' => ml_escape($player->NickName),
                 'login' => $player->Login,
             ];
         });

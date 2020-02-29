@@ -184,7 +184,8 @@ function onlinePlayers(bool $withSpectators = true): Collection
 
 function ml_escape(string $string)
 {
-    return str_replace('"', '\u0022', $string);
+    $out = str_replace('{', '\u007B', str_replace('}', '\u007D', $string));
+    return str_replace('"', '\u0022', $out);
 }
 
 /**
