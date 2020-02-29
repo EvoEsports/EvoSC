@@ -53,6 +53,13 @@ class EscRun extends Command
     {
         global $serverName;
 
+        $required_directories = [cacheDir(), logDir(), modulesDir()];
+        foreach ($required_directories as $dir) {
+            if (!is_dir($dir)) {
+                mkdir($dir);
+            }
+        }
+
         Log::setOutput($output);
         ConfigController::init();
 
@@ -116,7 +123,7 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        file_put_contents(baseDir(config('server.login').'_evosc.pid'), getmypid());
+        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -199,7 +206,7 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        infoMessage(secondary('EvoSC v'.getEscVersion()), ' started.')->sendAdmin();
+        infoMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAdmin();
 
         //cycle-loop
         while (true) {
@@ -217,7 +224,7 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: '.$failedConnectionRequests.'/50');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
@@ -230,12 +237,12 @@ class EscRun extends Command
                 sleep(5);
             } catch (Error $e) {
                 $errorClass = get_class($e);
-                $output->writeln("<error>$errorClass in ".$e->getFile()." on Line ".$e->getLine()."</error>");
-                $output->writeln("<fg=white;bg=red;options=bold>".$e->getMessage()."</>");
+                $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
+                $output->writeln("<fg=white;bg=red;options=bold>" . $e->getMessage() . "</>");
                 $output->writeln("<error>===============================================================================</error>");
-                $output->writeln("<error>".$e->getTraceAsString()."</error>");
+                $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
 
-                Log::write('EvoSC encountered an error: '.$e->getMessage(), false);
+                Log::write('EvoSC encountered an error: ' . $e->getMessage(), false);
                 Log::write($e->getTraceAsString(), false);
             }
         }

@@ -123,6 +123,16 @@ function logDir(string $filename = ''): string
  *
  * @return string
  */
+function modulesDir(string $filename = ''): string
+{
+    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../modules/'.$filename);
+}
+
+/**
+ * @param  string  $filename
+ *
+ * @return string
+ */
 function ghost(string $filename = ''): string
 {
     return Server::GameDataDirectory().str_replace('/', DIRECTORY_SEPARATOR,
