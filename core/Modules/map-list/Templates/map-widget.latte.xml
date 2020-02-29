@@ -23,6 +23,15 @@
         <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.header.color')}6" z-index="-2"/>
 
         <frame pos="1 -4">
+            <label class="map-control fav" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
+                   valign="center" ScriptEvents="1" focusareacolor1="0000"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Add"
+                   z-index="1" halign="center" valign="center"/>
+        </frame>
+
+        <frame pos="13 -4">
             <label class="map-control details" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
                    valign="center" ScriptEvents="1" focusareacolor1="0000"
                    focusareacolor2="{config('colors.ui.window.header.color')}9"/>
@@ -31,8 +40,8 @@
                    z-index="1" halign="center" valign="center"/>
         </frame>
 
-        <frame pos="19 -4">
-            <label class="map-control list" textsize="1.5" size="24 8" text="" z-index="0" halign="center"
+        <frame pos="25 -4">
+            <label class="map-control list" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
                    valign="center" ScriptEvents="1" focusareacolor1="0000"
                    focusareacolor2="{config('colors.ui.window.header.color')}9"/>
             <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
@@ -139,6 +148,25 @@ Void updateWidget(Text[Text] map){
     {/block}
 
     {block pendingEvents}
+            if(event.Control.HasClass("fav") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(!currentMap.existskey("id")){
+                    return;
+                }
+                declare label = (event.Control.Parent.Controls[1] as CMlLabel);
+                declare text = (event.Control.Parent.Controls[2] as CMlLabel);
+                declare isFavorite = label.Value == "";
+                if(isFavorite){
+                    TriggerPageAction("map.fav.remove," ^ currentMap["id"]);
+                    label.Value = "";
+                    text.Value = "Add";
+                }else{
+                    TriggerPageAction("map.fav.add," ^ currentMap["id"]);
+                    label.Value = "";
+                    text.Value = "Remove";
+                }
+                continue;
+            }
+
             if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
                 if(!currentMap.existskey("id")){
                     return;

@@ -23,7 +23,7 @@ class TestModule implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Dedimania::showRecords($player);
+        Template::show($player, 'map-list.map-widget');
     }
 
     public static function sendTestManialink(Player $player)

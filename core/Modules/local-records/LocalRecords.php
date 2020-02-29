@@ -2,10 +2,8 @@
 
 namespace esc\Modules;
 
-use esc\Classes\Cache;
 use esc\Classes\DB;
 use esc\Classes\Hook;
-use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Classes\Utlity;
