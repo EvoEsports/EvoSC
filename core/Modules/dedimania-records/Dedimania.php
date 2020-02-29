@@ -11,6 +11,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
+use esc\Classes\Utlity;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Dedi;
@@ -144,6 +145,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         $top = config('dedimania.show-top', 3);
         $fill = config('dedimania.rows', 16);
         $map = MapController::getCurrentMap();
+        $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
 
         $record = DB::table('dedi-records')
             ->where('Map', '=', $map->id)
@@ -151,33 +153,24 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             ->first();
 
         if ($record) {
-            $start = $record->Rank - floor($fill / 2);
-            $end = $record->Rank + ceil($fill / 2);
-            $addAfter = 0;
-
-            if ($start <= $top) {
-                $start = $top + 1;
-                $addAfter += abs($top - $start);
-            }
-
-            $records = DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->whereBetween('Rank', [$start, $end + $addAfter])
-                ->get();
+            $baseRank = $record->Rank;
         } else {
-            $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
-
-            $records = DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->whereBetween('Rank', [$count - $fill, $count])
-                ->get();
+            $baseRank = $count;
         }
 
-        $records = $records->merge(DB::table('dedi-records')
+        $range = Utlity::getRankRange($baseRank, $top, $fill, $count);
+
+        $bottom = DB::table('dedi-records')
+            ->where('Map', '=', $map->id)
+            ->WhereBetween('Rank', $range)
+            ->get();
+
+        $top = DB::table('dedi-records')
             ->where('Map', '=', $map->id)
             ->where('Rank', '<=', $top)
-            ->get())
-            ->unique();
+            ->get();
+
+        $records = $top->merge($bottom);
 
         $players = DB::table('players')
             ->whereIn('id', $records->pluck('Player'))

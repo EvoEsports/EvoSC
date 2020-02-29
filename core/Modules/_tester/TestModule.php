@@ -23,7 +23,7 @@ class TestModule implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Scoreboard::playerConnect($player);
+        Dedimania::showRecords($player);
     }
 
     public static function sendTestManialink(Player $player)
