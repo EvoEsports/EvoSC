@@ -69,14 +69,6 @@ class Map extends Model
     /**
      * @return HasMany
      */
-    public function locals()
-    {
-        return $this->hasMany(LocalRecord::class, 'Map');
-    }
-
-    /**
-     * @return HasMany
-     */
     public function dedis()
     {
         return $this->hasMany(Dedi::class, 'Map');

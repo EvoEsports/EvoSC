@@ -15,6 +15,8 @@ use esc\Models\Map;
 use esc\Models\MapFavorite;
 use esc\Models\MapQueue;
 use esc\Models\Player;
+use esc\Modules\Dedimania;
+use esc\Modules\LocalRecords;
 use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
 use Exception;
@@ -160,12 +162,9 @@ class MapController implements ControllerInterface
             }
         }
 
-        $map->locals()
-            ->delete();
-        $map->dedis()
-            ->delete();
-        MapFavorite::whereMapId($map->id)
-            ->delete();
+        DB::table(LocalRecords::TABLE)->where('Map', '=', $map->id)->delete();
+        DB::table(Dedimania::TABLE)->where('Map', '=', $map->id)->delete();
+        MapFavorite::whereMapId($map->id)->delete();
         $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
@@ -445,9 +444,11 @@ class MapController implements ControllerInterface
     /**
      * @return Map
      */
-    public static function getNextMap(): Map
+    public static function getNextMap(): stdClass
     {
-        return self::$nextMap;
+        return DB::table('maps')
+            ->where('uid', '=', Server::getNextMapInfo()->uId)
+            ->first();
     }
 
     public static function resetRound(Player $player)

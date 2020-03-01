@@ -21,6 +21,8 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class Dedimania extends DedimaniaApi implements ModuleInterface
 {
+    const TABLE = 'dedi-records';
+
     private static $offlineMode = false;
 
     public function __construct()

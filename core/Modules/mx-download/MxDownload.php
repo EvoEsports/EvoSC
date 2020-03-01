@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 use esc\Classes\Cache;
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
@@ -90,7 +91,7 @@ class MxDownload implements ModuleInterface
 
             if (Map::whereFilename($mxMap->getFilename())->exists()) {
                 $map = Map::whereFilename($mxMap->getFilename())->first();
-                $map->locals()->delete();
+                DB::table(LocalRecords::TABLE)->where('Map', '=', $map->id)->delete();
                 $map->ratings()->delete();
             } else {
                 $map = new Map();

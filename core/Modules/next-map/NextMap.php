@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
@@ -15,8 +16,8 @@ class NextMap implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -26,8 +27,9 @@ class NextMap implements ModuleInterface
     public static function showNextMap()
     {
         $map = MapController::getNextMap();
+        $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
 
         infoMessage('Upcoming map ', secondary($map))->setIcon('')->sendAll();
-        Template::showAll('next-map.widget', compact('map'));
+        Template::showAll('next-map.widget', compact('map', 'author'));
     }
 }

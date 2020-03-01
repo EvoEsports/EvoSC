@@ -3,11 +3,10 @@
 namespace esc\Modules;
 
 
+use esc\Classes\DB;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Dedi;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
@@ -17,8 +16,8 @@ class RecordsTable implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -38,19 +37,24 @@ class RecordsTable implements ModuleInterface
     public static function showGraph(Player $player, $mapId, $window_title, $recordId)
     {
         if ($window_title == 'Local Records') {
-            $record = LocalRecord::whereId($recordId)->first();
+            $record = DB::table(LocalRecords::TABLE)->where('id', '=', $recordId)->first();
         } else {
-            $record = Dedi::whereId($recordId)->first();
+            $record = DB::table(Dedimania::TABLE)->first();
         }
 
         if (!$record) {
             return;
         }
 
-        $myRecord = Dedi::whereMap($record->Map)->wherePlayer($player->id)->first();
+        $myRecord = DB::table(Dedimania::TABLE)
+            ->where('Map', '=', $record->Map)
+            ->where('Player', '=', $player->id)
+            ->first();
 
         if (!$myRecord) {
-            $myRecord = LocalRecord::whereMap($record->Map)->wherePlayer($player->id)->first();
+            $myRecord = DB::table(LocalRecords::TABLE)
+                ->where('Map', '=', $record->Map)
+                ->where('Player', '=', $player->id)->first();
         }
 
         if (!$myRecord) {

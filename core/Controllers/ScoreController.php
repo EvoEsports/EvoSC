@@ -6,7 +6,6 @@ namespace esc\Controllers;
 
 use esc\Classes\Hook;
 use esc\Classes\ScoreTracker;
-use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;

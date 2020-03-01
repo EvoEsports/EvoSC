@@ -8,10 +8,8 @@ use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Log;
 use esc\Controllers\ConfigController;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
-use esc\Modules\LocalRecords\LocalRecords;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -185,7 +183,7 @@ class ImportPyplanet extends Command
             }
 
             if ($mapIds->has($record->map_id)) {
-                LocalRecord::insert([
+                DB::table('local-records')->insert([
                     'Checkpoints' => $record->checkpoints,
                     'Score' => $record->score,
                     'Map' => $mapIds->get($record->map_id),

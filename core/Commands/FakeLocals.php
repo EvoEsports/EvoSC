@@ -3,11 +3,11 @@
 namespace esc\Commands;
 
 use esc\Classes\Database;
+use esc\Classes\DB;
 use esc\Classes\Log;
 use esc\Controllers\ConfigController;
 use esc\Models\Map;
-use esc\Models\Player;
-use esc\Modules\LocalRecords\LocalRecords;
+use esc\Modules\LocalRecords;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,12 +35,12 @@ class FakeLocals extends Command
         $bar->start();
 
         foreach ($maps as $map) {
-            $localCount = $map->locals()->count();
-            $local = $map->locals()->first();
+            $localCount = DB::table(LocalRecords::TABLE)->count();
+            $local = DB::table(LocalRecords::TABLE)->where('Map', '=', $map->id)->first();
 
             for ($i = $localCount; $i < 100; $i++) {
-                $playerId = Player::inRandomOrder()->first()->id;
-                $map->locals()->insert([
+                $playerId = DB::table('players')->inRandomOrder()->first()->id;
+                DB::table(LocalRecords::TABLE)->insert([
                     'Player' => $playerId,
                     'Map' => $map->id,
                     'Score' => ($local->Score ?? rand(55000, 9000)) + rand(1, 100),

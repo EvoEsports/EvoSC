@@ -131,21 +131,6 @@ class Player extends Model
     }
 
     /**
-     * Get players locals.
-     *
-     * ->locals() = query builder
-     * ->locals = fetches all locals of that player and returns collection
-     *
-     * ->locals()->get() = ->locals
-     *
-     * @return HasMany
-     */
-    public function locals()
-    {
-        return $this->hasMany(LocalRecord::class, 'Player', 'id');
-    }
-
-    /**
      * Get players dedis, like locals.
      *
      * @return HasMany

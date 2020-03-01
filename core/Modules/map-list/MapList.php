@@ -3,6 +3,7 @@
 namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Template;
@@ -36,8 +37,8 @@ class MapList implements ModuleInterface
 
     public static function sendRecordsJson(Player $player)
     {
-        $locals = $player->locals()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
-        $dedis = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $locals = DB::table(LocalRecords::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $dedis = DB::table(Dedimania::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }

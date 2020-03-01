@@ -13,7 +13,7 @@
 <label pos="40 -4" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="NEXT" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
 
 <label pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="{$map->name}" halign="right" textcolor="eeee" textsize="1.4" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="{$map->author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="{$author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
 {/block}
 
 {block script}

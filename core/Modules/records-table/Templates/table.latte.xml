@@ -26,10 +26,10 @@
             <label z-index="1" valign="center" halign="right" pos="3 0" size="3.5 2" textprefix="$s" textsize="0.3" text="{$record->Rank}." textfont="{config('colors.ui.font')|noescape}"/>
             <label z-index="0" valign="center" halign="right" pos="14 0" size="10 2" textsize="0.6" text="{formatScore($record->Score)}" textcolor="eee4" textfont="{config('colors.ui.font')|noescape}"/>
             <label z-index="1" valign="center" halign="right" pos="14 0" size="10 2" textsize="0.6" text="{formatScore($record->Score, true)}" textcolor="eee" textfont="{config('colors.ui.font')|noescape}"/>
-            <label z-index="1" valign="center" pos="15 0" size="16 2" textsize="0.4" textprefix="$s" text="{ml_escape($record->player->NickName)}" textfont="{config('colors.ui.font')|noescape}"/>
+            <label z-index="1" valign="center" pos="15 0" size="16 2" textsize="0.4" textprefix="$s" text="{ml_escape($record->NickName)}" textfont="{config('colors.ui.font')|noescape}"/>
             <label z-index="1" valign="center" halign="center" pos="33.5 0" size="3.5 2.5" textsize="0.1" textprefix="" text="" textcolor="fffe" textfont="{config('colors.ui.font')|noescape}" action="records.graph,{$map->id},{$window_title ?? 'Records'},{$record->id}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}e"/>
-            <label z-index="1" valign="center" halign="center" pos="37 0" size="3.5 2.5" textsize="0.1" textprefix="" text="" textcolor="fffe" textfont="{config('colors.ui.font')|noescape}" action="profile,{$record->player->Login}"  focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}e"/>
-            {if $onlineLogins->contains($record->player->Login)}
+            <label z-index="1" valign="center" halign="center" pos="37 0" size="3.5 2.5" textsize="0.1" textprefix="" text="" textcolor="fffe" textfont="{config('colors.ui.font')|noescape}" action="profile,{$record->Login}"  focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}e"/>
+            {if $onlineLogins->contains($record->Login)}
             {if $record->Player == $localPlayer->id}
             <quad pos="-1 1.35" size="41 3" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.8" z-index="-1" />
             {else}

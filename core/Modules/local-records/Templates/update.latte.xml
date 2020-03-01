@@ -11,11 +11,11 @@
         }
 
         main(){
-            declare Record[Integer] LocalRecords_ for LocalUser;
-            declare Integer LastLocalRecordsUpdate for LocalUser;
+            declare Record[] LocalRecords for This;
+            declare Integer LastLocalRecordsUpdate for This;
             declare Text localsJson = """{$localsJson|noescape}""";
 
-            LocalRecords_.fromjson(localsJson);
+            LocalRecords.fromjson(localsJson);
             LastLocalRecordsUpdate = GameTime;
         }
         -->
