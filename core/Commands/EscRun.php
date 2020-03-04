@@ -53,13 +53,6 @@ class EscRun extends Command
     {
         global $serverName;
 
-        $required_directories = [cacheDir(), logDir(), modulesDir()];
-        foreach ($required_directories as $dir) {
-            if (!is_dir($dir)) {
-                mkdir($dir);
-            }
-        }
-
         Log::setOutput($output);
         ConfigController::init();
 

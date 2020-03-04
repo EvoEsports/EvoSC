@@ -15,7 +15,7 @@ class Utlity
      * @param $total
      * @return array
      */
-    public static function getRankRange($baseRank, $showTop, $showTotal, $total)
+    public static function getRankRange(int $baseRank, int $showTop, int $showTotal, int $total)
     {
         if ($total <= $showTop) {
             return [4, $total];
