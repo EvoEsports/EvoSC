@@ -24,7 +24,7 @@ class TestModule implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        var_dump(MapController::getNextMap());
+        MxDownload::showAddMapInfo($player, null, 68442);
     }
 
     public static function sendTestManialink(Player $player)

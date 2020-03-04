@@ -375,49 +375,6 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * Create map and retrieve object
-     *
-     * @param string $filename
-     * @param string $uid
-     * @param stdClass $gbx
-     * @return Map|null
-     * @throws \Throwable
-     */
-    private static function createMap(string $filename, string $uid, stdClass $gbx): ?Map
-    {
-        $authorLogin = $gbx->AuthorLogin;
-
-        if (Player::where('Login', $authorLogin)->exists()) {
-            $author = Player::find($authorLogin);
-
-            if ($author->Login == $author->NickName) {
-                $author->update([
-                    'NickName' => $gbx->AuthorNick
-                ]);
-            }
-
-            $authorId = $author->id;
-        } else {
-            $authorId = Player::insertGetId([
-                'Login' => $authorLogin,
-                'NickName' => $gbx->AuthorNick,
-            ]);
-        }
-
-        $map = new Map();
-        $map->uid = $uid;
-        $map->author = $authorId;
-        $map->filename = $filename;
-        $map->enabled = 0;
-        $map->name = $gbx->Name;
-        $map->environment = $gbx->Environment;
-        $map->title_id = $gbx->TitleId;
-        $map->saveOrFail();
-
-        return $map;
-    }
-
-    /**
      * Get the maps directory-path, optionally add the filename at the end.
      *
      * @param string|null $fileName

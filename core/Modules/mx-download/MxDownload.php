@@ -33,9 +33,9 @@ class MxDownload implements ModuleInterface
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      * @param $cmd
-     * @param  string  ...$arguments
+     * @param string ...$arguments
      */
     public static function showAddMapInfo(Player $player, $cmd, string ...$arguments)
     {
@@ -65,6 +65,8 @@ class MxDownload implements ModuleInterface
         } catch (\Exception $e) {
             Log::write($e->getMessage());
         }
+
+        dump($mxMap->gbx);
 
         if (Map::whereUid($mxMap->uid)->exists()) {
             //Map with uid found
@@ -113,7 +115,7 @@ class MxDownload implements ModuleInterface
             try {
                 Server::addMap($map->filename);
             } catch (\Exception $e) {
-                Log::write('Adding map to selection failed: '.$e->getMessage());
+                Log::write('Adding map to selection failed: ' . $e->getMessage());
 
                 if (!Server::isFilenameInSelection($map->filename)) {
                     $map->enabled = false;
@@ -132,7 +134,7 @@ class MxDownload implements ModuleInterface
 
             infoMessage($player, ' added map ', $map)->sendAll();
 
-            Log::write($player.'('.$player->Login.') added map '.$map.' ['.$map->uid.']');
+            Log::write($player . '(' . $player->Login . ') added map ' . $map . ' [' . $map->uid . ']');
 
             //Send updated map-list
             Hook::fire('MapPoolUpdated');
@@ -162,6 +164,11 @@ class MxDownload implements ModuleInterface
 
         //bbcode
         $bbEncoded = preg_replace('/\[b\](.+?)\[\/b\]/', '$o$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[b\](.+?)\n/', '$o$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[i\](.+?)\[\/i\]/', '$i$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[i\](.+?)\n/', '$i$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[u\](.+?)\[\/u\]/', '$1', $bbEncoded);
+        $bbEncoded = preg_replace('/\[u\](.+?)\n/', '$1', $bbEncoded);
         $bbEncoded = preg_replace('/\[url=(.+?)\](.+?)\[\/url\]/', '$l[$1]$2', $bbEncoded);
         $bbEncoded = preg_replace('/\[youtube\](.+?)\[\/youtube\]/', '$l[$1]Video', $bbEncoded);
 
@@ -178,10 +185,10 @@ class MxDownload implements ModuleInterface
         $bbEncoded = str_replace(':undone:', '', $bbEncoded);
         $bbEncoded = str_replace(':build:', '🔨', $bbEncoded);
         $bbEncoded = str_replace(':wait:', '', $bbEncoded);
-        $bbEncoded = str_replace(':bronze:', '$c73🏆$z', $bbEncoded);
-        $bbEncoded = str_replace(':silver:', '$999🏆$z', $bbEncoded);
-        $bbEncoded = str_replace(':gold:', '$fd0🏆$z', $bbEncoded);
-        $bbEncoded = str_replace(':award:', '$fe0🏆$z', $bbEncoded);
+        $bbEncoded = str_replace(':bronze:', '$c73🏆$fff', $bbEncoded);
+        $bbEncoded = str_replace(':silver:', '$999🏆$fff', $bbEncoded);
+        $bbEncoded = str_replace(':gold:', '$fd0🏆$fff', $bbEncoded);
+        $bbEncoded = str_replace(':award:', '$fe0🏆$fff', $bbEncoded);
 
         return $bbEncoded;
     }
@@ -198,17 +205,17 @@ class MxDownload implements ModuleInterface
             return Cache::get("mx-details/{$mxId}");
         }
 
-        $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/'.$mxId);
+        $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
         if ($infoResponse->getStatusCode() != 200) {
-            throw new \Exception('Failed to get mx-details: '.$infoResponse->getReasonPhrase());
+            throw new \Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());
         }
 
         $detailsBody = $infoResponse->getBody()->getContents();
         $info = json_decode($detailsBody);
 
         if (!$info || isset($info->StatusCode)) {
-            throw new \Exception('Failed to parse mx-details: '.$detailsBody);
+            throw new \Exception('Failed to parse mx-details: ' . $detailsBody);
         }
 
         Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));

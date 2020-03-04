@@ -11,7 +11,7 @@ use esc\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
- * @param  mixed  ...$message
+ * @param mixed ...$message
  *
  * @return ChatMessage
  */
@@ -21,7 +21,7 @@ function chatMessage(...$message)
 }
 
 /**
- * @param  mixed  ...$message
+ * @param mixed ...$message
  *
  * @return ChatMessage
  */
@@ -31,7 +31,7 @@ function infoMessage(...$message)
 }
 
 /**
- * @param  mixed  ...$message
+ * @param mixed ...$message
  *
  * @return ChatMessage
  */
@@ -41,7 +41,7 @@ function warningMessage(...$message)
 }
 
 /**
- * @param  int  $score
+ * @param int $score
  *
  * @return string
  */
@@ -60,15 +60,15 @@ function formatScore(int $score, bool $cutZero = false): string
     $seconds -= $minutes * 60;
 
     if ($cutZero) {
-        return $sign.preg_replace('/^0:0?/', '', sprintf('%d:%02d.%03d', $minutes, $seconds, $ms));
+        return $sign . preg_replace('/^0:0?/', '', sprintf('%d:%02d.%03d', $minutes, $seconds, $ms));
     }
 
-    return $sign.sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
+    return $sign . sprintf('%d:%02d.%03d', $minutes, $seconds, $ms);
 }
 
 /**
- * @param  string|null  $styled
- * @param  bool  $keepLinks
+ * @param string|null $styled
+ * @param bool $keepLinks
  *
  * @return string
  */
@@ -82,8 +82,8 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 }
 
 /**
- * @param  string  $id
- * @param  null  $default
+ * @param string $id
+ * @param null $default
  *
  * @return null
  */
@@ -91,7 +91,7 @@ function config(string $id, $default = null)
 {
     $data = ConfigController::getConfig(strtolower($id));
 
-    if(!$data && is_bool($data)){
+    if (!$data && is_bool($data)) {
         return false;
     }
 
@@ -99,78 +99,78 @@ function config(string $id, $default = null)
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../cache/'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function logDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../logs/'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function modulesDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../modules/'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename);
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function ghost(string $filename = ''): string
 {
-    return Server::GameDataDirectory().str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/'.$filename.'.Replay.Gbx');
+    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
+            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function coreDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function configDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../config/'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
 }
 
 /**
- * @param  string  $filename
+ * @param string $filename
  *
  * @return string
  */
 function baseDir(string $filename = ''): string
 {
-    return __DIR__.str_replace('/', DIRECTORY_SEPARATOR, '/../'.$filename);
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
 }
 
 /**
- * @param  bool  $withSpectators
+ * @param bool $withSpectators
  *
  * @return Collection
  * @todo implement $withSpectators
@@ -189,8 +189,8 @@ function ml_escape(string $string)
 }
 
 /**
- * @param  string  $login
- * @param  bool  $addToOnlineIfOffline
+ * @param string $login
+ * @param bool $addToOnlineIfOffline
  *
  * @return Player
  */
@@ -203,7 +203,7 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
     $player = Player::find($login);
 
     if (!$player || !isset($player->Login)) {
-        Log::write('Failed to find player: '.$login);
+        Log::write('Failed to find player: ' . $login);
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {
@@ -252,13 +252,13 @@ function now(): Carbon
 /**
  * get secondary color
  *
- * @param  string  $str
+ * @param string $str
  *
  * @return string
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$'.config('colors.secondary').$str;
+    return '$z$s$' . config('colors.secondary') . $str;
 }
 
 /**
@@ -270,12 +270,20 @@ function getEscVersion(): string
 }
 
 /**
- * @param $object
+ * @param mixed ...$objects
  */
-function dd($object)
+function dd(...$objects)
 {
-    var_dump($object);
+    var_dump(...$objects);
     exit(0);
+}
+
+/**
+ * @param mixed ...$objects
+ */
+function dump(...$objects)
+{
+    var_dump(...$objects);
 }
 
 /**
@@ -322,19 +330,19 @@ function isWindows(): bool
 /**
  * Translation function
  *
- * @param  string  $id
- * @param  array  $vars
- * @param  string  $language
+ * @param string $id
+ * @param array $vars
+ * @param string $language
  * @return Object|string|string[]|null
  */
 function __(string $id, array $vars = [], string $language = 'en')
 {
     $parts = explode('.', $id);
     $base = array_shift($parts);
-    $file = coreDir('Dictionary/'.$language.'/'.$base.'.json');
+    $file = coreDir('Dictionary/' . $language . '/' . $base . '.json');
 
     if (!File::exists($file)) {
-        $file = coreDir('Dictionary/en/'.$base.'.json');
+        $file = coreDir('Dictionary/en/' . $base . '.json');
 
         if (!File::exists($file)) {
             return $id;
@@ -353,7 +361,7 @@ function __(string $id, array $vars = [], string $language = 'en')
     }
 
     foreach ($vars as $key => $var) {
-        $root = str_replace(':'.$key, $var, $root);
+        $root = str_replace(':' . $key, $var, $root);
     }
 
     return $root;
