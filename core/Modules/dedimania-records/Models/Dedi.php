@@ -15,7 +15,9 @@ use Illuminate\Support\Collection;
  */
 class Dedi extends Model
 {
-    protected $table = 'dedi-records';
+    const TABLE = 'dedi-records';
+
+    protected $table = self::TABLE;
 
     protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints', 'ghost_replay', 'v_replay', 'New'];
 

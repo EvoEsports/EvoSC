@@ -32,10 +32,12 @@ use stdClass;
  */
 class Map extends Model
 {
+    const TABLE = 'maps';
+
     /**
      * @var string
      */
-    protected $table = 'maps';
+    protected $table = self::TABLE;
 
     /**
      * @var array

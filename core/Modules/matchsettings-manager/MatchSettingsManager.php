@@ -76,7 +76,7 @@ class MatchSettingsManager implements ModuleInterface
         $map = Map::find($mapId);
 
         if ($map) {
-            MatchSettingsController::addMap("$matchSettingsName.txt", $map);
+            MatchSettingsController::addMap("$matchSettingsName.txt", $map->filename, $map->uid);
             Log::info($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
         }
     }

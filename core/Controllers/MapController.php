@@ -333,34 +333,12 @@ class MapController implements ControllerInterface
 
         foreach (Server::getMapList() as $map) {
             /** @var $map \Maniaplanet\DedicatedServer\Structures\Map */
-
             Log::info('Loading ' . $map->fileName, isVerbose());
-
-            $author = DB::table('players')->where('Login', '=', $map->author)->first();
-            $gbx = null;
-
-            if ($author) {
-                $authorId = $author->id;
-            } else {
-                $authorId = DB::table('players')->insertGetId([
-                    'Login' => $map->author,
-                    'NickName' => $map->author
-                ]);
-
-                try {
-                    $gbx = self::getGbxInformation($map->fileName);
-                    DB::table('players')->where('Login', '=', $map->author)->update([
-                        'NickName' => $gbx->AuthorNick
-                    ]);
-                } catch (\Exception $e) {
-                    Log::error('Failed to load GBX information for: ' . $map->fileName, isVerbose());
-                }
-            }
 
             DB::table('maps')->updateOrInsert([
                 'uid' => $map->uId
             ], [
-                'author' => $authorId,
+                'author' => self::createOrGetAuthor($map->author),
                 'filename' => $map->fileName,
                 'name' => $map->name,
                 'environment' => $map->environnement,
@@ -372,6 +350,31 @@ class MapController implements ControllerInterface
         }
 
         echo "\n";
+    }
+
+    public static function createOrGetAuthor(string $login)
+    {
+        $author = DB::table('players')->where('Login', '=', $login)->first();
+
+        if ($author) {
+            $authorId = $author->id;
+        } else {
+            $authorId = DB::table('players')->insertGetId([
+                'Login' => $map->author,
+                'NickName' => $map->author
+            ]);
+
+            try {
+                $gbx = self::getGbxInformation($map->fileName);
+                DB::table('players')->where('Login', '=', $map->author)->update([
+                    'NickName' => $gbx->AuthorNick
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to load GBX information for: ' . $map->fileName, isVerbose());
+            }
+        }
+
+        return $authorId;
     }
 
     /**

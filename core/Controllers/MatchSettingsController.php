@@ -58,7 +58,7 @@ class MatchSettingsController implements ControllerInterface
         self::$currentMatchSettingsFile = $matchSettingsFile;
         self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
-        if($rebootClasses){
+        if ($rebootClasses) {
             $mode = Server::getScriptName()['NextValue'];
 
             HookController::init();
@@ -130,21 +130,22 @@ class MatchSettingsController implements ControllerInterface
 
     /**
      * @param string $matchSettings
-     * @param Map $map
+     * @param string $filename
+     * @param string $uid
      */
-    public static function addMap(string $matchSettings, Map $map)
+    public static function addMap(string $matchSettings, string $filename, string $uid)
     {
         $file = self::getPath($matchSettings);
         $settings = new SimpleXMLElement(File::get($file));
 
         $node = $settings->addChild('map');
-        $node->addChild('file', $map->filename);
-        $node->addChild('ident', $map->uid);
+        $node->addChild('file', $filename);
+        $node->addChild('ident', $uid);
 
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::error("Failed to add map \"$map\" to \"$matchSettings\"");
+            Log::error("Failed to add map \"$filename\" to \"$matchSettings\"");
         }
     }
 
@@ -299,11 +300,12 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param Map $map
+     * @param string $filename
+     * @param string $uid
      */
-    public static function addMapToCurrentMatchSettings(Map $map)
+    public static function addMapToCurrentMatchSettings(string $filename, string $uid)
     {
-        self::addMap(self::$currentMatchSettingsFile, $map);
+        self::addMap(self::$currentMatchSettingsFile, $filename, $uid);
         self::updateMatchSettingsModificationTime();
     }
 
