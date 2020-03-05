@@ -44,7 +44,7 @@ class MapList extends Module implements ModuleInterface
         Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
     }
 
-    public static function searchMap(Player $player, $query = "")
+    public static function searchMap(Player $player, $cmd, $query = "")
     {
         Template::show($player, 'map-list.update-search-query', compact('query'));
     }
