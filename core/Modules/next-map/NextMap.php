@@ -22,6 +22,7 @@ class NextMap implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'showNextMap']);
+        Hook::add('BeginMatch', [self::class, 'hideNextMap']);
     }
 
     public static function showNextMap()
@@ -29,7 +30,12 @@ class NextMap implements ModuleInterface
         $map = MapController::getNextMap();
         $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
 
-        infoMessage('Upcoming map ', secondary($map))->setIcon('')->sendAll();
+        infoMessage('Upcoming map ', secondary($map->name))->setIcon('')->sendAll();
         Template::showAll('next-map.widget', compact('map', 'author'));
+    }
+
+    public static function hideNextMap()
+    {
+        Template::hideAll('next-map.widget');
     }
 }

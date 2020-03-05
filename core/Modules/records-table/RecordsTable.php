@@ -39,7 +39,7 @@ class RecordsTable implements ModuleInterface
         if ($window_title == 'Local Records') {
             $record = DB::table(LocalRecords::TABLE)->where('id', '=', $recordId)->first();
         } else {
-            $record = DB::table(Dedimania::TABLE)->first();
+            $record = DB::table(Dedimania::TABLE)->where('id', '=', $recordId)->first();
         }
 
         if (!$record) {
@@ -64,8 +64,8 @@ class RecordsTable implements ModuleInterface
         }
 
         $diffs = collect();
-        $recordCps = $record->cps->toArray();
-        $myCps = $myRecord->cps->toArray();
+        $recordCps = explode(',', $record->Checkpoints);
+        $myCps = explode(',', $myRecord->Checkpoints);
 
         for ($i = 0; $i < count($recordCps); $i++) {
             $baseCp = $myCps[$i];
@@ -74,6 +74,8 @@ class RecordsTable implements ModuleInterface
             $diffs->push($compareToCp - $baseCp);
         }
 
-        Template::show($player, 'records-table.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps'));
+        $target = DB::table('players')->where('id', '=', $record->Player)->first();
+
+        Template::show($player, 'records-table.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps', 'target'));
     }
 }

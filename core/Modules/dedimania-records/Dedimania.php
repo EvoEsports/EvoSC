@@ -182,7 +182,13 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function showDedisTable(Player $player)
     {
         $map = MapController::getCurrentMap();
-        $records = $map->dedis()->orderBy('Score')->get();
+
+        $records = DB::table(self::TABLE)
+            ->select(['Rank', 'dedi-records.Score as Score', 'NickName', 'Login', 'Player', 'players.id as id'])
+            ->where('Map', '=', $map->id)
+            ->leftJoin('players', 'players.id', '=', 'dedi-records.Player')
+            ->orderBy('Rank')
+            ->get();
 
         RecordsTable::show($player, $map, $records, 'Dedimania Records');
     }
@@ -194,25 +200,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        try {
-            $records = self::getChallengeRecords($map);
-        } catch (Exception $e) {
-            Log::error($e->getMessage(), true);
-            $records = null;
-        }
-
-        if ($records == null) {
-            $records = $map->dedis->transform(function (Dedi $dedi) {
-                $record = collect();
-                $record->login = $dedi->player->Login;
-                $record->nickname = ml_escape($dedi->player->NickName);
-                $record->score = $dedi->Score;
-                $record->rank = $dedi->Rank;
-                $record->max_rank = $dedi->player->MaxRank;
-                $record->checkpoints = $dedi->Checkpoints;
-                return $record;
-            });
-        }
+        $records = self::getChallengeRecords($map);
 
         if ($records && $records->count() > 0) {
             //Wipe all dedis for current map

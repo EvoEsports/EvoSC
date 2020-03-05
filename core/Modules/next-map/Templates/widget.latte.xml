@@ -28,6 +28,8 @@
         slot__ = {config('next-map.ui.slot')};
 
         declare uid = Map.MapInfo.MapUid;
+
+        widget.RelativePosition_V3 = <0.0, 69.5>;
     {/block}
 
     {block loop}

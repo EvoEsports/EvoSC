@@ -247,7 +247,7 @@ class LocalRecords implements ModuleInterface
         $map = MapController::getCurrentMap();
 
         $records = DB::table(self::TABLE)
-            ->select(['Rank', 'local-records.Score as Score', 'NickName', 'Login', 'Player'])
+            ->select(['Rank', 'local-records.Score as Score', 'NickName', 'Login', 'Player', 'players.id as id'])
             ->where('Map', '=', $map->id)
             ->leftJoin('players', 'players.id', '=', 'local-records.Player')
             ->orderBy('Rank')
