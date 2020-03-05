@@ -13,7 +13,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\QuickButtons;
 use Exception;

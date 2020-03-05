@@ -171,12 +171,10 @@ function baseDir(string $filename = ''): string
 }
 
 /**
- * @param bool $withSpectators
- *
  * @return Collection
  * @todo implement $withSpectators
  */
-function onlinePlayers(bool $withSpectators = true): Collection
+function onlinePlayers(): Collection
 {
     $logins = array_column(Server::getPlayerList(), 'login');
 
@@ -265,7 +263,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.81.x';
+    return '0.82.x';
 }
 
 /**
@@ -370,7 +368,7 @@ function __(string $id, array $vars = [], string $language = 'en')
  * @param $title
  * @return string
  */
-function str_slug($title)
+function evo_str_slug($title)
 {
     return Str::slug($title, '-', 'en');
 }

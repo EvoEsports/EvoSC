@@ -12,11 +12,9 @@ use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Karma;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 class Statistics extends Module implements ModuleInterface
 {
@@ -233,10 +231,9 @@ class Statistics extends Module implements ModuleInterface
     }
 
     /**
-     * @param  Player  $player
-     * @param  Karma  $karma
+     * @param Player $player
      */
-    public static function playerRateMap(Player $player, Karma $karma)
+    public static function playerRateMap(Player $player)
     {
         $player->Ratings = $player->ratings()->count();
         $player->save();
@@ -252,9 +249,8 @@ class Statistics extends Module implements ModuleInterface
     }
 
     /**
-     * @param  mixed  ...$args
      */
-    public static function beginMap(...$args)
+    public static function beginMap()
     {
         self::$scores = collect();
     }

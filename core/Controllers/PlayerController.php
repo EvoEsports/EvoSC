@@ -11,13 +11,10 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Models\Stats;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
-use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
 /**
  * Class PlayerController
@@ -61,11 +58,10 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
-     * @param  string  $cmd
-     * @param  string  $pw
+     * @param Player $player
+     * @param mixed ...$pw
      */
-    public static function setServerPassword(Player $player, $cmd, ...$pw)
+    public static function setServerPassword(Player $player, ...$pw)
     {
         $pw = trim(implode(' ', $pw));
 
@@ -152,9 +148,8 @@ class PlayerController implements ControllerInterface
     /**
      * Reset player ids on begin map
      *
-     * @param  Map  $map
      */
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
         DB::table('players')
             ->where('player_id', '>', 0)
@@ -217,12 +212,11 @@ class PlayerController implements ControllerInterface
     /**
      * Kick a player.
      *
-     * @param  Player  $player
-     * @param        $cmd
+     * @param Player $player
      * @param        $nick
-     * @param  mixed  ...$message
+     * @param mixed ...$message
      */
-    public static function kickPlayer(Player $player, $cmd, $nick, ...$message)
+    public static function kickPlayer(Player $player, $nick, ...$message)
     {
         $playerToBeKicked = self::findPlayerByName($player, $nick);
 
@@ -387,7 +381,7 @@ class PlayerController implements ControllerInterface
         return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
-    public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
+    public static function addFakePlayer(Player $player, string $count = '1')
     {
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
 
@@ -396,7 +390,7 @@ class PlayerController implements ControllerInterface
         }
     }
 
-    public static function resetUserSettings(Player $player, string $cmd)
+    public static function resetUserSettings(Player $player)
     {
         $player->settings()->delete();
         infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);

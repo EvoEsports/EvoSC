@@ -35,7 +35,7 @@ class RecordsTable extends Module implements ModuleInterface
             compact('records', 'pages', 'onlineLogins', 'window_title', 'map'));
     }
 
-    public static function showGraph(Player $player, $mapId, $window_title, $recordId)
+    public static function showGraph(Player $player, $window_title, $recordId)
     {
         if ($window_title == 'Local Records') {
             $record = DB::table(LocalRecords::TABLE)->where('id', '=', $recordId)->first();

@@ -36,7 +36,7 @@ class MxPackLoader extends Module implements ModuleInterface
         ManiaLinkEvent::add('mappack.aprove', [self::class, 'downloadMapPack'], 'map_add');
     }
 
-    public static function showAddMapPack(Player $player, string $cmd, string $packId, string $secret = null)
+    public static function showAddMapPack(Player $player, string $packId, string $secret = null)
     {
         $cacheIdInfo = 'map-packs/'.$packId.'_info';
         $cacheIdTracks = 'map-packs/'.$packId.'_trackslist';

@@ -28,7 +28,7 @@ class Donations extends Module implements ModuleInterface
         Template::show($player, 'donations.widget');
     }
 
-    public static function donateCmd(Player $player, $cmd, $amount)
+    public static function donateCmd(Player $player, $amount)
     {
         self::donate($player, intval($amount));
     }

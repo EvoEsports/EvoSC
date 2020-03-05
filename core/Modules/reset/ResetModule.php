@@ -22,7 +22,7 @@ class ResetModule extends Module implements ModuleInterface
         Hook::fire('PlayerConnect', $player);
     }
 
-    public static function resetAll(Player $player)
+    public static function resetAll()
     {
         onlinePlayers()->each(function (Player $player) {
             Hook::fire('PlayerConnect', $player);

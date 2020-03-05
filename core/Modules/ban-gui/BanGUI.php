@@ -57,7 +57,7 @@ class BanGUI extends Module implements ModuleInterfaceAlias
         Template::show($player, 'ban-gui.add', compact('results', 'search'));
     }
 
-    public static function cmdBanPlayer(Player $player, $cmd, $name = null)
+    public static function cmdBanPlayer(Player $player, $name = null)
     {
         if ($name) {
             self::mleSearchPlayerAndShowResults($player, $name);

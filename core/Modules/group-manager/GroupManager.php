@@ -114,7 +114,7 @@ class GroupManager extends Module implements ModuleInterface
         Template::show($player, 'group-manager.edit', compact('group'));
     }
 
-    public static function groupAllow(Player $player, string $groupId, string $rightId)
+    public static function groupAllow(string $groupId, string $rightId)
     {
         $group = Group::find($groupId);
         $right = AccessRight::find($rightId);
@@ -124,7 +124,7 @@ class GroupManager extends Module implements ModuleInterface
         }
     }
 
-    public static function groupDeny(Player $player, string $groupId, string $rightId)
+    public static function groupDeny(string $groupId, string $rightId)
     {
         $group = Group::find($groupId);
         $right = AccessRight::find($rightId);

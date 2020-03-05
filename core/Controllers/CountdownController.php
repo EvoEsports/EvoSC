@@ -13,7 +13,6 @@ use esc\Classes\Log;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\InputSetup;
 use SimpleXMLElement;
@@ -49,7 +48,7 @@ class CountdownController implements ControllerInterface
         self::setTimeLimit(self::getOriginalTimeLimit());
     }
 
-    public static function endMap(Map $map)
+    public static function endMap()
     {
         self::resetTimeLimit();
     }
@@ -94,13 +93,12 @@ class CountdownController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
-     * @param  string  $cmd
-     * @param  float  $amount
+     * @param Player $player
+     * @param string $amount
      */
-    public static function addTimeManually(Player $player, $cmd, float $amount)
+    public static function addTimeManually(Player $player, string $cmd, string $amount)
     {
-        self::addTime(round($amount * 60), $player);
+        self::addTime(round(floatval($amount) * 60), $player);
     }
 
     /**

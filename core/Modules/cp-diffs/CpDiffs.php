@@ -49,12 +49,12 @@ class CpDiffs extends Module implements ModuleInterface
         self::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
         self::$targets = collect();
     }
 
-    public static function playerFinish(Player $player, int $score, string $checkpoints)
+    public static function playerFinish(Player $player, int $score)
     {
         if ($score == 0) {
             return;
@@ -130,7 +130,7 @@ class CpDiffs extends Module implements ModuleInterface
         }
     }
 
-    public static function cmdSetTarget(Player $player, string $cmd, string $type = null, string $id = null)
+    public static function cmdSetTarget(Player $player, string $type = null, string $id = null)
     {
         if ($type === null) {
             warningMessage('Invalid target specified. See ', secondary('/help'),

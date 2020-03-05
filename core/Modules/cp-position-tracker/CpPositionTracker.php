@@ -7,7 +7,6 @@ use esc\Classes\Hook;
 use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use stdClass;
@@ -34,7 +33,7 @@ class CpPositionTracker extends Module implements ModuleInterface
         Template::showAll('cp-position-tracker.update', compact('data'));
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
         self::$tracker = collect();
 

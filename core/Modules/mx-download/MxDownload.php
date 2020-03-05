@@ -38,10 +38,9 @@ class MxDownload extends Module implements ModuleInterface
 
     /**
      * @param Player $player
-     * @param $cmd
      * @param string ...$arguments
      */
-    public static function showAddMapInfo(Player $player, $cmd, string ...$arguments)
+    public static function showAddMapInfo(Player $player, string ...$arguments)
     {
         foreach ($arguments as $mxId) {
             if (intval($mxId) == 0) {

@@ -102,9 +102,8 @@ class TemplateController implements ControllerInterface
     /**
      * Load templates from all modules.
      *
-     * @param null $args
      */
-    public static function loadTemplates($args = null)
+    public static function loadTemplates()
     {
         Log::info('Loading templates...');
 

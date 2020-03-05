@@ -277,7 +277,7 @@ class GBXBaseFetcher
 	}
 
 	// XML parser functions
-	private function startTag($parser, $name, $attribs)
+	private function startTag($name, $attribs)
 	{
 		foreach ($attribs as $key => &$val)
 			$val = utf8_decode($val);
@@ -291,7 +291,7 @@ class GBXBaseFetcher
 		}
 	}
 
-	private function charData($parser, $data)
+	private function charData($data)
 	{
 		//echo 'charData: ' . $data . "\n";
 		if (count($this->_parsestack) == 3)
@@ -300,7 +300,7 @@ class GBXBaseFetcher
 			$this->debugLog('XML chunk nested too deeply: ' . print_r($this->_parsestack, true));
 	}
 
-	private function endTag($parser, $name)
+	private function endTag()
 	{
 		//echo 'endTag: ' . $name . "\n";
 		array_pop($this->_parsestack);

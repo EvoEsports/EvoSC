@@ -21,6 +21,11 @@ class ConfigController implements ControllerInterface
     protected static $configFilePattern = '/\.config\.json$/';
 
     /**
+     * @var Collection
+     */
+    private static $rawConfigs;
+
+    /**
      * Method called on controller boot.
      */
     public static function init()
@@ -31,12 +36,19 @@ class ConfigController implements ControllerInterface
     /**
      * Get a config variable from cache
      *
-     * @param  string  $id
+     * @param string $id
      *
+     * @param bool $getRaw
      * @return mixed|null
      */
-    public static function getConfig(string $id)
+    public static function getConfig(string $id, bool $getRaw = false)
     {
+        if ($getRaw) {
+            if (self::$rawConfigs->has($id)) {
+                return self::$rawConfigs->get($id);
+            }
+        }
+
         if (self::$config->has($id)) {
             return self::$config->get($id);
         }
@@ -47,7 +59,7 @@ class ConfigController implements ControllerInterface
     /**
      * Check if a config value is loaded
      *
-     * @param  string  $id
+     * @param string $id
      *
      * @return bool
      */
@@ -57,8 +69,8 @@ class ConfigController implements ControllerInterface
     }
 
     /**
-     * @param  string  $id
-     * @param  string|stdClass|array|int|float|double|bool  $value
+     * @param string $id
+     * @param string|stdClass|array|int|float|double|bool $value
      */
     public static function saveConfig(string $id, $value)
     {
@@ -67,21 +79,21 @@ class ConfigController implements ControllerInterface
         $idParts = collect(explode('.', $id));
         $file = $idParts->shift();
 
-        $configFile = configDir($file.'.config.json');
+        $configFile = configDir($file . '.config.json');
         $jsonData = File::get($configFile, true);
         $path = $idParts->map(function ($part) {
             return sprintf("{'%s'}", $part);
         })->implode('->');
 
-        eval('$jsonData->'.$path. ' = $value;/** @noinspection PhpUndefinedVariableInspection */');
+        eval('$jsonData->' . $path . ' = $value;/** @noinspection PhpUndefinedVariableInspection */');
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
         Log::write("Updated config $id", isVerbose());
     }
 
     /**
-     * @param  string  $id
-     * @param  string|stdClass|array|int|float|double|bool  $value
+     * @param string $id
+     * @param string|stdClass|array|int|float|double|bool $value
      */
     public static function setConfig(string $id, $value)
     {
@@ -94,10 +106,8 @@ class ConfigController implements ControllerInterface
     private static function loadConfigurationFiles()
     {
         $defaultConfigFiles = File::getFilesRecursively(configDir('default'), self::$configFilePattern);
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'),
-            self::$configFilePattern));
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('../modules'),
-            self::$configFilePattern));
+        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern));
+        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(modulesDir(), self::$configFilePattern));
 
         $defaultConfigFiles->each(function ($configFile) {
             $name = basename($configFile);
@@ -114,6 +124,7 @@ class ConfigController implements ControllerInterface
 
         $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)
             ->mapWithKeys(function ($configFile) {
+                $configFile = realpath($configFile);
                 $name = basename($configFile);
                 $name = preg_replace(self::$configFilePattern, '', $name);
                 $data = File::get($configFile, true);
@@ -121,7 +132,8 @@ class ConfigController implements ControllerInterface
                 return [$name => $data];
             });
 
-        self::createConfigCache($configFiles);
+        self::$rawConfigs = $configFiles;
+        self::createConfigCache();
     }
 
     private static function copyAttributesRecursively($sourceJson, $targetJson)
@@ -151,11 +163,11 @@ class ConfigController implements ControllerInterface
         return $targetJson;
     }
 
-    private static function createConfigCache(Collection $config)
+    private static function createConfigCache()
     {
         $map = collect();
 
-        $config->each(function ($value, $base) use ($map) {
+        self::$rawConfigs->each(function ($value, $base) use ($map) {
             self::createPathsRecursively($base, $value)->each(function ($value, $path) use ($map) {
                 if ($value === null) {
                     $value = false;
@@ -193,9 +205,9 @@ class ConfigController implements ControllerInterface
 
         foreach ($values as $key => $value) {
             if ($value instanceof stdClass) {
-                $paths = $paths->merge(self::createPathsRecursively($base.'.'.strtolower($key), $value));
+                $paths = $paths->merge(self::createPathsRecursively($base . '.' . strtolower($key), $value));
             } else {
-                $paths->put($base.'.'.strtolower($key), $value);
+                $paths->put($base . '.' . strtolower($key), $value);
             }
 
             $paths->put($base, $value);
@@ -205,8 +217,8 @@ class ConfigController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)

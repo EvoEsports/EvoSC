@@ -10,7 +10,6 @@ use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
@@ -77,12 +76,12 @@ class MusicClient extends Module implements ModuleInterface
         });
     }
 
-    public static function searchMusic(Player $player, string $cmd, string $search = '')
+    public static function searchMusic(Player $player, string $search = '')
     {
         Template::show($player, 'music-client.search-command', compact('search'));
     }
 
-    public static function setNextSong(Map $map = null)
+    public static function setNextSong()
     {
         self::$song = self::$music->random(1)->first();
         Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));

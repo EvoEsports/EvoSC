@@ -195,7 +195,7 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
-    public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
+    public static function startVoteQuestion(Player $player, ...$questionArray)
     {
         $question = implode(' ', $questionArray);
 

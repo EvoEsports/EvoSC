@@ -125,7 +125,7 @@ class Template
             try {
                 Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
             } catch (Exception $e) {
-                $id = uniqid(str_slug($e->getMessage())).'.xml';
+                $id = uniqid(evo_str_slug($e->getMessage())).'.xml';
                 Log::warning('Failed to render template for '.$login.'. Saving to as '.$id);
                 Cache::put($id, $xml);
             }

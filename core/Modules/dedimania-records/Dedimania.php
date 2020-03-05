@@ -24,12 +24,29 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     private static $offlineMode = false;
 
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        dump("start", $mode);
+
+        //Add hooks
+        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'showManialink']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
+
+        //Check if session is still valid each 5 seconds
+        Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
+        Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
+
+        ManiaLinkEvent::add('dedis.show', [self::class, 'showDedisTable']);
+    }
+
     public function __construct()
     {
-        if (!config('dedimania.enabled')) {
-            return;
-        }
-
         //Check for session key
         if (!self::getSessionKey()) {
             //There is no existing session
@@ -60,19 +77,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         if (!File::dirExists(cacheDir('vreplays'))) {
             File::makeDir(cacheDir('vreplays'));
         }
-
-        //Add hooks
-        Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
-        Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
-
-        //Check if session is still valid each 5 seconds
-        Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
-        Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
-
-        ManiaLinkEvent::add('dedis.show', [self::class, 'showDedisTable']);
     }
 
     public static function reportConnectedPlayers()
@@ -405,13 +409,5 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function isOfflineMode(): bool
     {
         return self::$offlineMode;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

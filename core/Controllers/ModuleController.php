@@ -4,12 +4,9 @@ namespace esc\Controllers;
 
 use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Interfaces\ControllerInterface;
-use esc\Interfaces\ModuleInterface;
-use esc\Models\Player;
 use Illuminate\Support\Collection;
-use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * Class ModuleController
@@ -24,27 +21,20 @@ class ModuleController implements ControllerInterface
     private static $loadedModules;
 
     /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+    }
+
+    /**
      * Initialize ModuleController.
      */
     public static function init()
     {
         self::$loadedModules = new Collection();
-    }
-
-    /**
-     * [Bugging] reload a module
-     *
-     * @param Player $callee
-     * @param string $moduleName
-     */
-    public static function reloadModule(Player $callee, string $moduleName)
-    {
-        $module = self::getModules()->where('name', $moduleName)->first();
-
-        if ($module) {
-            $module->load($callee);
-            infoMessage($callee, ' reloads module ', $module)->sendAll();
-        }
     }
 
     /**
@@ -57,113 +47,68 @@ class ModuleController implements ControllerInterface
         return self::$loadedModules;
     }
 
-    /**
-     * Print module information to the cli (used on boot).
-     *
-     * @param $module
-     */
-    public static function outputModuleInformation($module)
-    {
-        $name = str_pad($module->name ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        $author = str_pad($module->author ?? 'n/a', 30, ' ', STR_PAD_RIGHT);
-        // $version = str_pad(sprintf('%.1f', floatval($module->version)), 12, ' ', STR_PAD_RIGHT);
-        $version = str_pad(getEscVersion(), 12, ' ', STR_PAD_RIGHT);
-
-        Log::getOutput()->writeln('<fg=green>' . "$name$version$author" . '</>');
-    }
-
-    private static function loadModules(bool $silent = false): Collection
-    {
-        //Get modules from classes
-        $moduleClasses = File::getFilesRecursively(__DIR__ . '/../Modules', '/^[A-Z].+\.php$/')
-            ->mapWithKeys(function ($file) {
-                return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname(realpath($file))];
-            })->reject(function ($moduleDir, $moduleClass) {
-                return preg_match('/[a-z\-_]+\/[A-Z][a-z]+$/', $moduleDir);
-            });
-
-        Log::info('Loading module information.');
-
-        foreach ($moduleClasses as $moduleDirectory) {
-            $moduleJson = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../Modules/' . $moduleDirectory . '/module.json');
-            if (file_exists($moduleJson)) {
-                $json = file_get_contents($moduleJson);
-                $moduleInformation = json_decode($json);
-                self::$loadedModules->push($moduleInformation);
-            }
-        }
-
-        //Output loaded modules
-        if (!$silent) {
-            Log::getOutput()->writeln("");
-            Log::getOutput()->writeln('<fg=green>Name                          Version     Author</>');
-            Log::getOutput()->writeln('<fg=green>------------------------------------------------------------------------</>');
-            self::$loadedModules->each([ModuleController::class, 'outputModuleInformation']);
-            Log::getOutput()->writeln("");
-        }
-
-        return $moduleClasses;
-    }
-
     public static function startModules(string $mode)
     {
-        $moduleClasses = self::loadModules(true);
-
         //Boot modules
         Log::info('Starting modules...');
 
-        $moduleClasses->each(function ($moduleDir, $moduleClass) use ($mode) {
-            $files = scandir($moduleDir);
-            $configId = null;
-            $config = null;
+        $coreModules = File::getFilesRecursively(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
+        $allModules = $coreModules->merge(File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/'));
 
-            foreach ($files as $file) {
-                if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
-                    $configId = $matches[1];
+        $moduleClasses = $allModules
+            ->reject(function ($file) {
+                return preg_match('/\/[Mm]odules\/[a-z\-]+\/.+\/[A-Z].+/', $file);
+            })
+            ->mapWithKeys(function ($file) {
+                $file = realpath($file);
+                return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname($file)];
+            })
+            ->unique()
+            ->map(function ($moduleDir, $moduleClass) use ($mode) {
+                $files = scandir($moduleDir);
+                $configId = null;
+                $config = null;
+
+                foreach ($files as $file) {
+                    if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
+                        $configId = $matches[1];
+                    }
                 }
-            }
 
-            if ($configId == null) {
-                Log::warning('Missing config: ' . $moduleClass, isDebug());
-            } else {
-                $config = config($configId);
-                if (!is_null($config->enabled) && $config->enabled == false) {
-                    return;
+                if ($configId == null) {
+                    Log::error('Missing config for module: ' . $moduleClass, true);
+                    return null;
+                } else {
+                    $config = ConfigController::getConfig($configId, true);
+                    $enabled = isset($config->enabled) ? $config->enabled : true;
+                    if (!is_null($enabled) && $enabled == false) {
+                        return null;
+                    }
                 }
-            }
 
-            Log::info("Starting $moduleClass.", isVeryVerbose());
+                Log::info("Starting $moduleClass.", isVeryVerbose());
 
-            $reflectionClass = new ReflectionClass($moduleClass);
-            if (!$reflectionClass->implementsInterface(ModuleInterface::class)) {
-                Log::write("$moduleClass is not a Module.", isDebug());
-                return;
-            }
+                $instance = new $moduleClass();
 
-            if ($reflectionClass->hasMethod('__construct')) {
-                $reflectionMethod = new ReflectionMethod($moduleClass, '__construct');
-
-                if ($reflectionMethod->getNumberOfRequiredParameters() == 0) {
-                    //Boot the module
-                    new $moduleClass();
+                if (!($instance instanceof Module)) {
+                    Log::error("$moduleClass is not a module, but should be.", true);
+                    return null;
                 }
-            }
 
-            $moduleClass::start($mode);
-            Log::info("Module $moduleClass started.", isVeryVerbose());
-        });
+                /** @var $moduleClass Module */
+                $instance::start($mode);
+                $instance->setConfig($config);
+                $instance->setDirectory($moduleDir);
+                $instance->setNamespace($moduleClass);
+                Log::info("Module $moduleClass started.", isVeryVerbose());
+
+                return $instance;
+            })
+            ->filter();
 
         //Boot modules
         Log::write('Finished starting modules.');
-    }
 
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        // TODO: Implement start() method.
+        self::$loadedModules = $moduleClasses;
     }
 }
