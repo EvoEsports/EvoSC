@@ -72,17 +72,17 @@ class LocalRecords extends Module implements ModuleInterface
 
             $range = Utlity::getRankRange($baseRank, $top, $fill, $count);
 
-            $bottom = DB::table(self::TABLE)
+            $bottomRecords = DB::table(self::TABLE)
                 ->where('Map', '=', $map->id)
                 ->WhereBetween('Rank', $range)
                 ->get();
 
-            $top = DB::table(self::TABLE)
+            $topRecords = DB::table(self::TABLE)
                 ->where('Map', '=', $map->id)
                 ->where('Rank', '<=', $top)
                 ->get();
 
-            $records = $top->merge($bottom);
+            $records = $topRecords->merge($bottomRecords);
 
             $players = DB::table('players')
                 ->whereIn('id', $records->pluck('Player'))

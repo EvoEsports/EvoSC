@@ -117,7 +117,7 @@ class Template
      */
     public static function executeMulticall()
     {
-        if (!self::$multiCalls) {
+        if (!isset(self::$multiCalls)) {
             return;
         }
 
