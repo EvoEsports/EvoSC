@@ -3,16 +3,18 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class MatchTracker implements ModuleInterface
+class MatchTracker extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $match;
 
@@ -64,7 +66,7 @@ class MatchTracker implements ModuleInterface
         if (self::$match->has($player->id)) {
             $tracker = self::$match->get($player->id);
         } else {
-            $tracker = new \stdClass();
+            $tracker = new stdClass();
             $tracker->nick = $player->NickName;
             $tracker->points = 0;
         }
@@ -83,7 +85,7 @@ class MatchTracker implements ModuleInterface
             if (self::$match->has($player->id)) {
                 $tracker = self::$match->get($player->id);
             } else {
-                $tracker = new \stdClass();
+                $tracker = new stdClass();
                 $tracker->nick = $player->NickName;
                 $tracker->points = 0;
             }

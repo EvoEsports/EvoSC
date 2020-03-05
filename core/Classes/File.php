@@ -101,7 +101,7 @@ class File
      * @param string      $path
      * @param string|null $filterPattern
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
@@ -124,7 +124,7 @@ class File
      * @param string $baseDirectory
      * @param string $filterPattern
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {

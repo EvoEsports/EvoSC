@@ -5,14 +5,14 @@ namespace esc\Modules;
 
 
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
-use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class TestModule implements ModuleInterface
+class TestModule extends Module implements ModuleInterface
 {
     public function __construct()
     {

@@ -51,15 +51,9 @@ class ChatController implements ControllerInterface
             $routingEnabled = false;
 
             while (!$routingEnabled) {
-                try {
-                    Server::chatEnableManualRouting(true, false);
-                    $routingEnabled = true;
-                    Log::info('Chat router started.');
-                } catch (FaultException $e) {
-                    $msg = $e->getMessage();
-                    Log::error("$msg There might already be a running instance of EvoSC.");
-                    sleep(1);
-                }
+                Server::chatEnableManualRouting(true, false);
+                $routingEnabled = true;
+                Log::info('Chat router started.');
             }
         } else {
             Server::chatEnableManualRouting(false, true);

@@ -5,13 +5,14 @@ namespace esc\Modules;
 
 use esc\Classes\DB;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class RecordsTable implements ModuleInterface
+class RecordsTable extends Module implements ModuleInterface
 {
     /**
      * Called when the module is loaded

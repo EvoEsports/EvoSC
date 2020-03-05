@@ -10,6 +10,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -19,9 +20,11 @@ use esc\Controllers\QueueController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Throwable;
 
-class MxDownload implements ModuleInterface
+class MxDownload extends Module implements ModuleInterface
 {
     /**
      * @inheritDoc
@@ -49,7 +52,7 @@ class MxDownload implements ModuleInterface
                 $details = self::loadMxDetails($mxId);
 
                 Template::show($player, 'mx-download.add-map-info', compact('details'));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::write($e->getMessage());
             } catch (GuzzleException $e) {
                 Log::write($e->getMessage());
@@ -61,29 +64,29 @@ class MxDownload implements ModuleInterface
      * @param int $mxId
      * @return string|string[]|null
      * @throws GuzzleException
-     * @throws \Exception
+     * @throws Exception
      */
     private static function downloadMapAndGetFilename(int $mxId)
     {
         if (!$mxId || $mxId == 0) {
-            throw new \Exception("Requested map with invalid id: $mxId");
+            throw new Exception("Requested map with invalid id: $mxId");
         }
 
         $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
 
         if ($download->getStatusCode() != 200) {
-            throw new \Exception("Download $mxId failed: " . $download->getReasonPhrase());
+            throw new Exception("Download $mxId failed: " . $download->getReasonPhrase());
         }
 
         Log::write("Request $mxId finished.", isVeryVerbose());
 
         if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
-            throw new \Exception('File is not a valid GBX.');
+            throw new Exception('File is not a valid GBX.');
         }
 
         $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
         $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
-        $filename = preg_replace('/[^a-z0-9\-\_\#\ \.]/i', '', $filename);
+        $filename = preg_replace('/[^a-z0-9\-_# .]/i', '', $filename);
         $filename = preg_replace('/\s/i', '_', $filename);
 
         Log::write('Saving new map as ' . MapController::getMapsPath($filename), isVerbose());
@@ -91,7 +94,7 @@ class MxDownload implements ModuleInterface
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
 
         if (!File::exists(MapController::getMapsPath($filename))) {
-            throw new \Exception('Map download failed, map does not exist.');
+            throw new Exception('Map download failed, map does not exist.');
         }
 
         return $filename;
@@ -103,7 +106,7 @@ class MxDownload implements ModuleInterface
      * @param Player $player
      * @param $mxId
      * @throws GuzzleException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public static function addMap(Player $player, $mxId)
     {
@@ -142,7 +145,7 @@ class MxDownload implements ModuleInterface
         if (!Server::isFilenameInSelection($filename)) {
             try {
                 Server::addMap($filename);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool')->send($player);
                 Log::write('Adding map to selection failed: ' . $e->getMessage());
 
@@ -181,14 +184,14 @@ class MxDownload implements ModuleInterface
         $bbEncoded = ml_escape($bbEncoded);
 
         //bbcode
-        $bbEncoded = preg_replace('/\[b\](.+?)\[\/b\]/', '$o$1$z', $bbEncoded);
-        $bbEncoded = preg_replace('/\[b\](.+?)\n/', '$o$1$z', $bbEncoded);
-        $bbEncoded = preg_replace('/\[i\](.+?)\[\/i\]/', '$i$1$z', $bbEncoded);
-        $bbEncoded = preg_replace('/\[i\](.+?)\n/', '$i$1$z', $bbEncoded);
-        $bbEncoded = preg_replace('/\[u\](.+?)\[\/u\]/', '$1', $bbEncoded);
-        $bbEncoded = preg_replace('/\[u\](.+?)\n/', '$1', $bbEncoded);
-        $bbEncoded = preg_replace('/\[url=(.+?)\](.+?)\[\/url\]/', '$l[$1]$2', $bbEncoded);
-        $bbEncoded = preg_replace('/\[youtube\](.+?)\[\/youtube\]/', '$l[$1]Video', $bbEncoded);
+        $bbEncoded = preg_replace('/\[b](.+?)\[\/b]/', '$o$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[b](.+?)\n/', '$o$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[i](.+?)\[\/i]/', '$i$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[i](.+?)\n/', '$i$1$z', $bbEncoded);
+        $bbEncoded = preg_replace('/\[u](.+?)\[\/u]/', '$1', $bbEncoded);
+        $bbEncoded = preg_replace('/\[u](.+?)\n/', '$1', $bbEncoded);
+        $bbEncoded = preg_replace('/\[url=(.+?)](.+?)\[\/url]/', '$l[$1]$2', $bbEncoded);
+        $bbEncoded = preg_replace('/\[youtube](.+?)\[\/youtube]/', '$l[$1]Video', $bbEncoded);
 
         //smileys
         $bbEncoded = str_replace(':)', '', $bbEncoded);
@@ -217,8 +220,8 @@ class MxDownload implements ModuleInterface
      *
      * @param $mxId
      * @return string
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Exception
+     * @throws GuzzleException
+     * @throws Exception
      */
     public static function loadMxDetails($mxId)
     {
@@ -229,14 +232,14 @@ class MxDownload implements ModuleInterface
         $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
 
         if ($infoResponse->getStatusCode() != 200) {
-            throw new \Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());
+            throw new Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());
         }
 
         $detailsBody = $infoResponse->getBody()->getContents();
         $info = json_decode($detailsBody);
 
         if (!$info || isset($info->StatusCode)) {
-            throw new \Exception('Failed to parse mx-details: ' . $detailsBody);
+            throw new Exception('Failed to parse mx-details: ' . $detailsBody);
         }
 
         Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));

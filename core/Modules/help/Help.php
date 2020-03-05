@@ -4,11 +4,12 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Help implements ModuleInterface
+class Help extends Module implements ModuleInterface
 {
     public function __construct()
     {

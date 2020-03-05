@@ -7,14 +7,17 @@ use esc\Classes\Cache;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
+use stdClass;
 
-class MxMapDetails implements ModuleInterface
+class MxMapDetails extends Module implements ModuleInterface
 {
     public function __construct()
     {
@@ -73,8 +76,8 @@ class MxMapDetails implements ModuleInterface
 
     /**
      * @param Map $map
-     * @return \stdClass|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return stdClass|null
+     * @throws GuzzleException
      */
     public static function loadMxDetails(Map $map)
     {
@@ -112,8 +115,8 @@ class MxMapDetails implements ModuleInterface
 
     /**
      * @param Map $map
-     * @return \stdClass|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return stdClass|null
+     * @throws GuzzleException
      */
     public static function loadMxWordlRecord(Map $map)
     {

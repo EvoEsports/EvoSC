@@ -5,6 +5,7 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
@@ -12,16 +13,18 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Collection;
+use stdClass;
 
-class MusicClient implements ModuleInterface
+class MusicClient extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $music;
 
     /**
-     * @var \stdClass
+     * @var stdClass
      */
     private static $song;
 

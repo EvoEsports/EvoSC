@@ -290,11 +290,11 @@ class Player extends Model
 
     public function getNameAttribute()
     {
-        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\]))/i', '', $this->NickName);
+        return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?]))/i', '', $this->NickName);
     }
 
     public function getNameBlankAttribute()
     {
-        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
+        return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
     }
 }

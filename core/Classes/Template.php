@@ -133,12 +133,7 @@ class Template
 
         self::$multiCalls = null;
 
-        try {
-            Server::executeMulticall();
-        } catch (Exception $e) {
-            Log::error('Multicall failed: '.$e->getMessage());
-            Log::warning($e->getTraceAsString());
-        }
+        Server::executeMulticall();
     }
 
     /**

@@ -7,6 +7,7 @@ use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\CountdownController;
@@ -15,11 +16,14 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Collection;
 use stdClass;
 
-class MxKarma implements ModuleInterface
+class MxKarma extends Module implements ModuleInterface
 {
     const startSession = 1;
     const activateSession = 2;
@@ -51,7 +55,7 @@ class MxKarma implements ModuleInterface
     private static $ratings;
 
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $updatedVotesPlayerIds;
 
@@ -94,9 +98,9 @@ class MxKarma implements ModuleInterface
     }
 
     /**
-     * @param \esc\Models\Map|null $map
+     * @param Map|null $map
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public static function endMap(Map $map)
     {
@@ -137,7 +141,7 @@ class MxKarma implements ModuleInterface
 
         try {
             self::$mapKarma = self::call(self::getMapRating, $map);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
             self::$mapKarma = 50.0;
         }
@@ -241,7 +245,7 @@ class MxKarma implements ModuleInterface
      * @param array|null $votes
      *
      * @return null|stdClass
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public static function call(int $method, Map $map = null, array $votes = null): ?stdClass
     {
@@ -374,7 +378,7 @@ class MxKarma implements ModuleInterface
 
     /**
      * Starts MX Karma session
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public static function startSession()
     {

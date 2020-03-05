@@ -7,14 +7,17 @@ use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
+use Exception;
+use Illuminate\Support\Collection;
 
-class InputSetup implements ModuleInterface
+class InputSetup extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $binds;
 
@@ -110,7 +113,7 @@ class InputSetup implements ModuleInterface
     /**
      * Send the key-bind script to the player
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      */
     public static function sendScript(Player $player)
     {
@@ -146,7 +149,7 @@ class InputSetup implements ModuleInterface
     /**
      * Handle bound key presses
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      * @param  string  $id
      */
     public static function keyPressed(Player $player, string $id)
@@ -167,7 +170,7 @@ class InputSetup implements ModuleInterface
                         isVeryVerbose());
                     call_user_func($bind['callback'], $player);
                 } else {
-                    throw new \Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
+                    throw new Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
                 }
             }
         });

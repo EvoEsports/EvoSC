@@ -3,13 +3,14 @@
 namespace esc\Modules;
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\ScoreController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class LiveRankings implements ModuleInterface
+class LiveRankings extends Module implements ModuleInterface
 {
     private static $show;
 

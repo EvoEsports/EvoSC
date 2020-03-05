@@ -8,6 +8,7 @@ use esc\Controllers\MapController;
 use esc\Controllers\MatchSettingsController;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use ZipArchive;
@@ -45,7 +46,7 @@ class MxPackJob
 
         try {
             $this->loadFiles();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
         } catch (GuzzleException $e) {
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
@@ -54,7 +55,7 @@ class MxPackJob
 
     /**
      * @param $info
-     * @throws \GuzzleHttp\Exception\GuzzleException|\Exception
+     * @throws GuzzleException|Exception
      */
     private function loadFiles()
     {
@@ -80,7 +81,7 @@ class MxPackJob
 
     /**
      * @param  string  $path
-     * @throws \Exception
+     * @throws Exception
      */
     private function unpackFiles(string $path)
     {
@@ -98,7 +99,7 @@ class MxPackJob
             $zip->extractTo($dir);
             $zip->close();
         } else {
-            throw new \Exception('Failed to unzip archive.');
+            throw new Exception('Failed to unzip archive.');
         }
 
         $this->addFiles(File::getFiles($dir));
@@ -149,7 +150,7 @@ class MxPackJob
 
             try {
                 Server::addMap($filename);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::write($e->getMessage());
             }
         });

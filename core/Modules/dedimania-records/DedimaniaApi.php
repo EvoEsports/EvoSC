@@ -7,16 +7,18 @@ use Carbon\Carbon;
 use esc\Classes\Cache;
 use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
-class DedimaniaApi
+class DedimaniaApi extends Module
 {
     protected static $enabled = false;
     protected static $maxRank = 30;
@@ -37,6 +39,7 @@ class DedimaniaApi
      *
      * Return struct {'SessionId': string, 'Error': string}
      * . If successful SessionId is the value to be used it other methods, if not it is empty and a message is in Error.
+     * @throws GuzzleException
      */
     protected static function openSession(): bool
     {
@@ -141,7 +144,7 @@ class DedimaniaApi
      * . Checks: checkpoints times of the associated record.
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
-     * @param \esc\Models\Map $map
+     * @param Map $map
      *
      * @return null|Collection
      */
@@ -435,7 +438,7 @@ class DedimaniaApi
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
     }
@@ -448,9 +451,9 @@ class DedimaniaApi
      * . OptionsEnabled: true if tool options can be stored for the player,
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
-     * @param \esc\Models\Player $player
+     * @param Player $player
      *
-     * @return null|\SimpleXMLElement
+     * @return null|SimpleXMLElement
      */
     public static function playerConnect(Player $player)
     {
@@ -610,7 +613,7 @@ class DedimaniaApi
      *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     private static function post(SimpleXMLElement $xml): ?SimpleXMLElement
     {
@@ -641,7 +644,7 @@ class DedimaniaApi
 
         try {
             return new SimpleXMLElement($data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

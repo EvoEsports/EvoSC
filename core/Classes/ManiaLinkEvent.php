@@ -123,7 +123,7 @@ class ManiaLinkEvent
             Log::write("$action", false);
         }
 
-        if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
+        if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 
             if (!$event) {

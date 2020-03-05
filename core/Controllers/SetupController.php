@@ -6,6 +6,7 @@ namespace esc\Controllers;
 use esc\Classes\File;
 use esc\Commands\Migrate;
 use esc\Interfaces\ControllerInterface;
+use Exception;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -74,7 +75,7 @@ class SetupController implements ControllerInterface
                 ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
                 ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
                 ->run(self::$input, self::$output);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             self::printError($e->getMessage());
         }
     }

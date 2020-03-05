@@ -52,13 +52,11 @@ class PlayerController implements ControllerInterface
     public static function cacheConnectedPlayers()
     {
         self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
-            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
+            return Player::updateOrCreate(['Login' => $playerInfo->login], [
                 'NickName' => $playerInfo->nickName,
                 'spectator_status' => $playerInfo->spectatorStatus,
                 'player_id' => $playerInfo->playerId
             ]);
-
-            return $player;
         })->keyBy('Login');
     }
 
@@ -188,7 +186,7 @@ class PlayerController implements ControllerInterface
 
         foreach ($online->all() as $player) {
             $nicknamesByLogin[$player->Login] = stripAll($player->NickName);
-        };
+        }
 
         $fuzzyLogin = self::findClosestMatchingString($nick, $nicknamesByLogin);
 
@@ -238,15 +236,10 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        try {
-            $reason = implode(" ", $message);
-            Server::kick($playerToBeKicked->Login, $reason);
-            warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
-                secondary($reason))->setIcon('')->sendAll();
-        } catch (InvalidArgumentException $e) {
-            Log::write('Failed to kick player: '.$e->getMessage(), true);
-            Log::write(''.$e->getTraceAsString(), false);
-        }
+        $reason = implode(" ", $message);
+        Server::kick($playerToBeKicked->Login, $reason);
+        warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
+            secondary($reason))->setIcon('')->sendAll();
     }
 
     /**
@@ -270,11 +263,7 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        try {
-            $kicked = Server::kick($login, $reason);
-        } catch (Exception $e) {
-            $kicked = Server::disconnectFakePlayer($login);
-        }
+        $kicked = Server::kick($login, $reason);
 
         if (!$kicked) {
             return;

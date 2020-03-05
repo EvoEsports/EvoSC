@@ -6,6 +6,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
@@ -15,7 +16,7 @@ use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class MapList implements ModuleInterface
+class MapList extends Module implements ModuleInterface
 {
     public static function playerConnect(Player $player)
     {
@@ -161,7 +162,7 @@ class MapList implements ModuleInterface
     /**
      * Send updated map queue to everyone
      *
-     * @param  \Illuminate\Support\Collection  $queueItems
+     * @param Collection $queueItems
      */
     public static function mapQueueUpdated(Collection $queueItems)
     {

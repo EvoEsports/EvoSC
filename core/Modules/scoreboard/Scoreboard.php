@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\ScoreController;
@@ -12,7 +13,7 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class Scoreboard implements ModuleInterface
+class Scoreboard extends Module implements ModuleInterface
 {
     private static $logoUrl;
 

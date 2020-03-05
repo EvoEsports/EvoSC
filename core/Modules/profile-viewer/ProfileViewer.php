@@ -5,11 +5,12 @@ namespace esc\Modules;
 
 use esc\Classes\DB;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class ProfileViewer implements ModuleInterface
+class ProfileViewer extends Module implements ModuleInterface
 {
     public static function showProfile(Player $player, string $targetLogin)
     {

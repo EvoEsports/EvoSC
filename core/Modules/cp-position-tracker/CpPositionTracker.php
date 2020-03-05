@@ -4,13 +4,15 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class CpPositionTracker implements ModuleInterface
+class CpPositionTracker extends Module implements ModuleInterface
 {
     /**
      * @var Collection
@@ -47,7 +49,7 @@ class CpPositionTracker implements ModuleInterface
 
     public static function playerCheckpoint(Player $player, int $score, int $cp, bool $isFinish)
     {
-        $o = new \stdClass();
+        $o = new stdClass();
         $o->name = $player->NickName;
         $o->score = $score;
         $o->cp = $cp + 1;

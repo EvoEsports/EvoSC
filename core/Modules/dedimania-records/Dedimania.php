@@ -14,10 +14,9 @@ use esc\Classes\Timer;
 use esc\Classes\Utlity;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Dedi;
 use esc\Models\Map;
 use esc\Models\Player;
-use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
+use Exception;
 
 class Dedimania extends DedimaniaApi implements ModuleInterface
 {
@@ -395,7 +394,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             if ($saved) {
                 $dedi->update(['ghost_replay' => $ghostFile]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Could not save ghost: ' . $e->getMessage());
         }
     }

@@ -5,6 +5,8 @@ namespace esc\Classes;
 
 
 use Carbon\Carbon;
+use Exception;
+use stdClass;
 
 class Cache
 {
@@ -29,7 +31,7 @@ class Cache
             }
 
             return (new Carbon($cacheObject->expires))->isFuture();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -59,7 +61,7 @@ class Cache
 
         try {
             return (new Carbon($cacheObject->expires));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
 
         return null;
@@ -70,18 +72,18 @@ class Cache
      *
      * @param                     $id
      * @param                     $data
-     * @param  \Carbon\Carbon|null  $expires
+     * @param Carbon|null  $expires
      */
     public static function put($id, $data, Carbon $expires = null)
     {
         try {
-            $cacheObject = new \stdClass();
+            $cacheObject = new stdClass();
             $cacheObject->data = $data;
             $cacheObject->added = now();
             $cacheObject->expires = $expires;
 
             File::put(cacheDir($id), $cacheObject, true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::write("Failed to save $id.");
             var_dump($e->getMessage());
             var_dump($e->getTraceAsString());

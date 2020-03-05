@@ -5,6 +5,7 @@ namespace esc\Modules;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Classes\Utlity;
 use esc\Controllers\MapController;
@@ -13,7 +14,7 @@ use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
 
-class LocalRecords implements ModuleInterface
+class LocalRecords extends Module implements ModuleInterface
 {
     const TABLE = 'local-records';
 

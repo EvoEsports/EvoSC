@@ -4,12 +4,13 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class QuickButtons implements ModuleInterface
+class QuickButtons extends Module implements ModuleInterface
 {
     /**
      * @var Collection

@@ -5,9 +5,10 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Interfaces\ModuleInterface;
 
-class AdminServ implements ModuleInterface
+class AdminServ extends Module implements ModuleInterface
 {
     public function __construct()
     {

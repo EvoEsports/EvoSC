@@ -2,10 +2,11 @@
 
 namespace esc\Modules;
 
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Interfaces\ModuleInterface;
 
-class AlterUi implements ModuleInterface
+class AlterUi extends Module implements ModuleInterface
 {
     /**
      * Called when the module is loaded

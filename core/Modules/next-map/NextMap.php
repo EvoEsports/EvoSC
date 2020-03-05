@@ -5,11 +5,12 @@ namespace esc\Modules;
 
 use esc\Classes\DB;
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 
-class NextMap implements ModuleInterface
+class NextMap extends Module implements ModuleInterface
 {
     private static $isRounds;
 

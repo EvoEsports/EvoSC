@@ -10,6 +10,8 @@ use esc\Classes\Log;
 use esc\Controllers\ConfigController;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\LocalRecords;
+use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -72,7 +74,7 @@ class ImportPyplanet extends Command
                 if ($player->level == 3) {
                     $group = 1;
                 }
-                if ($player->level == 2 || $player->level == 2) {
+                if ($player->level == 2) {
                     $group = 2;
                 }
 
@@ -153,7 +155,7 @@ class ImportPyplanet extends Command
                         'Map' => $map->id,
                         'Rating' => ($rating->score == 1 ? 100 : 0)
                     ]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                 }
             }
 

@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
@@ -11,7 +12,7 @@ use esc\Controllers\PlanetsController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Pay2Play implements ModuleInterface
+class Pay2Play extends Module implements ModuleInterface
 {
     private static $priceAddTime;
     private static $priceSkip;

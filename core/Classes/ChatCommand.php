@@ -3,6 +3,7 @@
 namespace esc\Classes;
 
 
+use Closure;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
@@ -59,7 +60,7 @@ class ChatCommand
      * @param  string|null  $access
      * @param  bool  $hidden
      *
-     * @return \esc\Classes\ChatCommand
+     * @return ChatCommand
      */
     public static function add(
         string $command,
@@ -89,7 +90,7 @@ class ChatCommand
      *
      * @param  string  $alias
      *
-     * @return \esc\Classes\ChatCommand
+     * @return ChatCommand
      */
     public function addAlias(string $alias): ChatCommand
     {
@@ -116,7 +117,7 @@ class ChatCommand
      *
      * @param  string  $command
      *
-     * @return \esc\Classes\ChatCommand
+     * @return ChatCommand
      */
     public static function get(string $command): ChatCommand
     {
@@ -126,7 +127,7 @@ class ChatCommand
     /**
      * Get a collection of all active chat-commands
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getCommands(): Collection
     {
@@ -136,7 +137,7 @@ class ChatCommand
     /**
      * Method is called when a chat-command is detected by {@see ChatController::playerChat()}
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      * @param  string  $text
      */
     public function execute(Player $player, string $text)
@@ -167,7 +168,7 @@ class ChatCommand
         //Set calling player as first argument
         array_unshift($arguments, $player);
 
-        if ($this->callback instanceof \Closure) {
+        if ($this->callback instanceof Closure) {
             $callback = $this->callback;
             $callback(...$arguments);
         } else {

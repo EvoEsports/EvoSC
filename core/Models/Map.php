@@ -6,6 +6,7 @@ namespace esc\Models;
 use esc\Classes\Cache;
 use esc\Classes\Log;
 use esc\Controllers\MapController;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -118,7 +119,7 @@ class Map extends Model
 
     /**
      * @return mixed|stdClass|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function getMxDetailsAttribute()
     {
@@ -135,7 +136,7 @@ class Map extends Model
 
     /**
      * @return mixed|stdClass|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function getMxWorldRecordAttribute()
     {

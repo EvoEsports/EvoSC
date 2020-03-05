@@ -4,11 +4,12 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class CountDown implements ModuleInterface
+class CountDown extends Module implements ModuleInterface
 {
     public function __construct()
     {

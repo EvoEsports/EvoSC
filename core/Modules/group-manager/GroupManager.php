@@ -6,13 +6,14 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
-use esc\Interfaces\ModuleInterface as ModuleInterfaceAlias;
+use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Group;
 use esc\Models\Player;
 
-class GroupManager implements ModuleInterfaceAlias
+class GroupManager extends Module implements ModuleInterface
 {
     public function __construct()
     {

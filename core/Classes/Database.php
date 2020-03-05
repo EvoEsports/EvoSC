@@ -59,7 +59,7 @@ class Database
     /**
      * Get the database-connection
      *
-     * @return \Illuminate\Database\Connection
+     * @return Connection
      */
     public static function getConnection(): Connection
     {

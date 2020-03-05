@@ -8,14 +8,16 @@ use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class CpDiffs implements ModuleInterface
+class CpDiffs extends Module implements ModuleInterface
 {
     /**
      * @var Collection
@@ -89,7 +91,7 @@ class CpDiffs implements ModuleInterface
         $pb = DB::table('pbs')->where('map_id', '=', $map->id)->where('player_id', '=', $player->id)->first();
 
         if ($pb != null) {
-            $target = new \stdClass();
+            $target = new stdClass();
             $target->score = $pb->score;
             $target->cps = explode(',', $pb->checkpoints);
             $target->name = ml_escape($player->NickName);
@@ -117,7 +119,7 @@ class CpDiffs implements ModuleInterface
             }
 
             if ($targetRecord) {
-                $target = new \stdClass();
+                $target = new stdClass();
                 $target->score = $targetRecord->Score;
                 $target->cps = explode(',', $targetRecord->Checkpoints);
                 $target->name = ml_escape($targetPlayer->NickName);
@@ -157,7 +159,7 @@ class CpDiffs implements ModuleInterface
         if (isset($record)) {
             $targetPlayer = Player::whereId($record->Player)->first();
 
-            $target = new \stdClass();
+            $target = new stdClass();
             $target->score = $record->Score;
             $target->cps = explode(',', $record->Checkpoints);
             $target->name = ml_escape($targetPlayer->NickName);

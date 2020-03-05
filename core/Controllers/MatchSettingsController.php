@@ -4,6 +4,7 @@
 namespace esc\Controllers;
 
 
+use DOMDocument;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -339,7 +340,7 @@ class MatchSettingsController implements ControllerInterface
         }
 
 
-        $domDocument = new \DOMDocument("1.0");
+        $domDocument = new DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;
         $domDocument->formatOutput = true;
         $domDocument->loadXML($settings->asXML());
@@ -367,7 +368,7 @@ class MatchSettingsController implements ControllerInterface
      */
     private static function saveMatchSettings(string $file, SimpleXMLElement $matchSettings)
     {
-        $domDocument = new \DOMDocument("1.0");
+        $domDocument = new DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;
         $domDocument->formatOutput = true;
         $domDocument->loadXML($matchSettings->asXML());

@@ -21,6 +21,7 @@ use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
+use GuzzleHttp\Exception\GuzzleException;
 use stdClass;
 
 /**
@@ -80,7 +81,7 @@ class MapController implements ControllerInterface
 
     /**
      * @param Map $map
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws Exception
      */
     public static function beginMap(Map $map)
@@ -183,7 +184,7 @@ class MapController implements ControllerInterface
 
             QueueController::preCacheNextMap();
         } else {
-            Log::write('Failed to delete map "' . $map->filename . '": ' . $e->getMessage(), isVerbose());
+            Log::write('Failed to delete map "' . $map->filename);
         }
     }
 
@@ -243,7 +244,7 @@ class MapController implements ControllerInterface
 
     /**
      * @param Player $player
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public static function forceReplay(Player $player)
     {
@@ -352,6 +353,10 @@ class MapController implements ControllerInterface
         echo "\n";
     }
 
+    /**
+     * @param string $login
+     * @return int|mixed
+     */
     public static function createOrGetAuthor(string $login)
     {
         $author = DB::table('players')->where('Login', '=', $login)->first();
@@ -360,18 +365,9 @@ class MapController implements ControllerInterface
             $authorId = $author->id;
         } else {
             $authorId = DB::table('players')->insertGetId([
-                'Login' => $map->author,
-                'NickName' => $map->author
+                'Login' => $login,
+                'NickName' => $login
             ]);
-
-            try {
-                $gbx = self::getGbxInformation($map->fileName);
-                DB::table('players')->where('Login', '=', $map->author)->update([
-                    'NickName' => $gbx->AuthorNick
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to load GBX information for: ' . $map->fileName, isVerbose());
-            }
         }
 
         return $authorId;

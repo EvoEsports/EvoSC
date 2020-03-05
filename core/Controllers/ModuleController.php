@@ -8,6 +8,7 @@ use esc\Interfaces\ControllerInterface;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use ReflectionClass;
 use ReflectionMethod;
 
 /**
@@ -114,6 +115,8 @@ class ModuleController implements ControllerInterface
         $moduleClasses->each(function ($moduleDir, $moduleClass) use ($mode) {
             $files = scandir($moduleDir);
             $configId = null;
+            $config = null;
+
             foreach ($files as $file) {
                 if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
                     $configId = $matches[1];
@@ -123,15 +126,15 @@ class ModuleController implements ControllerInterface
             if ($configId == null) {
                 Log::warning('Missing config: ' . $moduleClass, isDebug());
             } else {
-                $enabled = ConfigController::getConfig($configId . '.enabled');
-                if (!is_null($enabled) && $enabled == false) {
+                $config = config($configId);
+                if (!is_null($config->enabled) && $config->enabled == false) {
                     return;
                 }
             }
 
             Log::info("Starting $moduleClass.", isVeryVerbose());
 
-            $reflectionClass = new \ReflectionClass($moduleClass);
+            $reflectionClass = new ReflectionClass($moduleClass);
             if (!$reflectionClass->implementsInterface(ModuleInterface::class)) {
                 Log::write("$moduleClass is not a Module.", isDebug());
                 return;

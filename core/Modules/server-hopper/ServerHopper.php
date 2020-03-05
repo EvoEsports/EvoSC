@@ -4,16 +4,19 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
+use Exception;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Connection;
 
-class ServerHopper implements ModuleInterface
+class ServerHopper extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $servers;
 
@@ -75,7 +78,7 @@ class ServerHopper implements ModuleInterface
                 $server->maxPlayers  = $connection->getMaxPlayers()['CurrentValue'];
                 $server->titlePack   = $connection->getVersion()->titleId;
                 $server->hasPassword = $connection->getServerPassword() != false;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $server->online = false;
             }
 

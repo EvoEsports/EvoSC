@@ -6,8 +6,12 @@ namespace esc\Classes;
 use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
+use Maniaplanet\DedicatedServer\Structures\Map;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
+use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
+use Maniaplanet\DedicatedServer\Structures\ServerOptions;
+use Maniaplanet\DedicatedServer\Structures\Version;
 
 /**
  * Class Server
@@ -20,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool changeAuthPassword(string $string, string $string)
  * @method static bool enableCallbacks(bool $boolean)
  * @method static bool setApiVersion(string $string)
- * @method static \Maniaplanet\DedicatedServer\Structures\Version getVersion()
+ * @method static Version getVersion()
  * @method static object getStatus()
  * @method static bool quitGame()
  * @method static bool callVote(string $string)
@@ -154,7 +158,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool setVehicleNetQuality(int $int)
  * @method static object getVehicleNetQuality()
  * @method static bool setServerOptions(object $struct)
- * @method static \Maniaplanet\DedicatedServer\Structures\ServerOptions getServerOptions()
+ * @method static ServerOptions getServerOptions()
  * @method static bool setForcedTeams(bool $boolean)
  * @method static bool getForcedTeams()
  * @method static bool setForcedMods(bool $boolean, array $array)
@@ -246,8 +250,8 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static bool setNextMapIdent(string $string)
  * @method static bool jumpToMapIndex(int $int)
  * @method static bool jumpToMapIdent(string $string)
- * @method static \Maniaplanet\DedicatedServer\Structures\Map getCurrentMapInfo()
- * @method static \Maniaplanet\DedicatedServer\Structures\Map getNextMapInfo()
+ * @method static Map getCurrentMapInfo()
+ * @method static Map getNextMapInfo()
  * @method static object getMapInfo(string $filename)
  * @method static bool checkMapForCurrentServerParams(string $string)
  * @method static array getMapList(int $int = 0, int $int = 0)
@@ -267,7 +271,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
  * @method static PlayerInfo getPlayerInfo(string $string, int $int = 0)
  * @method static PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)
- * @method static \Maniaplanet\DedicatedServer\Structures\PlayerRanking[] getCurrentRanking(int $int = -1, int $int = 0)
+ * @method static PlayerRanking[] getCurrentRanking(int $int = -1, int $int = 0)
  * @method static array getCurrentRankingForLogin(string $string)
  * @method static int getCurrentWinnerTeam()
  * @method static bool forceScores(array $array, bool $boolean)

@@ -13,6 +13,7 @@ use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
 use esc\Modules\MxMapDetails;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 
 /**
@@ -46,7 +47,7 @@ class QueueController implements ControllerInterface
      * @param  Player  $player
      * @param  Map  $map
      * @param  bool  $replay
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public static function queueMap(Player $player, Map $map, bool $replay = false)
     {

@@ -3,10 +3,12 @@
 namespace esc\Modules;
 
 
+use Error;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\CountdownController;
@@ -15,8 +17,9 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class Votes implements ModuleInterface
+class Votes extends Module implements ModuleInterface
 {
     /**
      * @var Collection
@@ -276,7 +279,7 @@ class Votes implements ModuleInterface
 
     public static function voteYes(Player $player)
     {
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = 'true';
         self::$voters->put($player->Login, $vote);
@@ -287,7 +290,7 @@ class Votes implements ModuleInterface
 
     public static function voteNo(Player $player)
     {
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = 'false';
         self::$voters->put($player->Login, $vote);
@@ -302,7 +305,7 @@ class Votes implements ModuleInterface
             return;
         }
 
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = null;
         self::$voters->put($player->Login, $vote);
@@ -329,7 +332,7 @@ class Votes implements ModuleInterface
 
         try {
             $action(true);
-        } catch (\Error $e) {
+        } catch (Error $e) {
             Log::write($e->getMessage());
         }
 
@@ -347,7 +350,7 @@ class Votes implements ModuleInterface
 
         try {
             $action(false);
-        } catch (\Error $e) {
+        } catch (Error $e) {
             Log::write($e->getMessage());
         }
 
@@ -366,7 +369,7 @@ class Votes implements ModuleInterface
 
             try {
                 $action(false);
-            } catch (\Error $e) {
+            } catch (Error $e) {
                 Log::write($e->getMessage());
             }
 

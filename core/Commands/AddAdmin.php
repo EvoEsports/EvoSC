@@ -63,21 +63,18 @@ class AddAdmin extends Command
 
         }
 
-        try {
-            if (is_numeric($groupId)) {
-                $groupId = intval($groupId);
-            } else {
-                $output->writeln("Group id must be numeric and integer.");
-                exit(1);
-            }
-
-            $groupName = Group::findOrFail($groupId)->Name;
-            $player->group = $groupId;
-            $player->save();
-            $output->writeln("Successfully added '{$login}' to {$groupName} group.");
-        } catch (Exception $e) {
-            $output->writeln("Error while adding player {$login} to group. ".$e->getMessage());
+        if (is_numeric($groupId)) {
+            $groupId = intval($groupId);
+        } else {
+            $output->writeln("Group id must be numeric and integer.");
+            exit(1);
         }
+
+        $groupName = Group::findOrFail($groupId)->Name;
+        $player->group = $groupId;
+        $player->save();
+        $output->writeln("Successfully added '{$login}' to {$groupName} group.");
+
         try {
             $server = Connection::factory(
                 config('server.ip'),

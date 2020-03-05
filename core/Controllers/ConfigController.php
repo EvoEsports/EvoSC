@@ -73,7 +73,7 @@ class ConfigController implements ControllerInterface
             return sprintf("{'%s'}", $part);
         })->implode('->');
 
-        eval('$jsonData->'.$path.' = $value;');
+        eval('$jsonData->'.$path. ' = $value;/** @noinspection PhpUndefinedVariableInspection */');
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
         Log::write("Updated config $id", isVerbose());

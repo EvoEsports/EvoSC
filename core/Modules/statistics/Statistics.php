@@ -7,6 +7,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Classes\StatisticWidget;
 use esc\Classes\Template;
 use esc\Classes\Timer;
@@ -17,10 +18,10 @@ use esc\Models\Stats;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
-class Statistics implements ModuleInterface
+class Statistics extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $scores;
 
@@ -139,7 +140,7 @@ class Statistics implements ModuleInterface
     /**
      * Set ranks for players
      *
-     * @param  \Illuminate\Support\Collection  $players
+     * @param Collection $players
      */
     public static function updatePlayerRanks(Collection $players)
     {
@@ -155,22 +156,14 @@ class Statistics implements ModuleInterface
             ->get();
 
         foreach ($scores as $score) {
-            try {
-                infoMessage('Your server rank is ',
-                    secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($score->Login);
-            } catch (Exception $e) {
-                Log::warning($e->getMessage());
-            }
+            infoMessage('Your server rank is ',
+                secondary($score->Rank.'/'.self::$totalRankedPlayers.' (Score: '.$score->Score.')'))->send($score->Login);
         }
 
         $playersWithoutScores = onlinePlayers()->whereNotIn('Login', $scores->pluck('Login'));
 
         foreach ($playersWithoutScores as $player) {
-            try {
-                infoMessage('You need at least one local record before receiving a rank.')->send($player->Login);
-            } catch (Exception $e) {
-                Log::warning($e->getMessage());
-            }
+            infoMessage('You need at least one local record before receiving a rank.')->send($player->Login);
         }
     }
 
@@ -189,7 +182,7 @@ class Statistics implements ModuleInterface
     /**
      * Announce the winner of the round and increment his win count
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      */
     public static function announceWinner(Player $player)
     {

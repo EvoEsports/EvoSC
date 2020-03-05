@@ -3,11 +3,12 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class SpectatorInfo implements ModuleInterface
+class SpectatorInfo extends Module implements ModuleInterface
 {
     private static $specTargets;
 
@@ -38,6 +39,8 @@ class SpectatorInfo implements ModuleInterface
             if ($target instanceof Player) {
                 return $target->Login == $player->Login;
             }
+
+            return false;
         })->take(10)->keys();
 
         $spectators = Player::whereIn('Login', $spectatorLogins)->get();

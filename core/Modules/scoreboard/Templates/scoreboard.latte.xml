@@ -1,5 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--suppress ALL -->
+
 <manialink version="3" layer="ScoresTable" id="ScoresTable" name="ESC:ScoresTable">
     <framemodel id="player" size="95 13">
         <quad class="slot" size="95 13" bgcolor="{config('colors.ui.window.bg.color')}" z-index="-2" opacity="{config('colors.ui.window.bg.opacity') / 1.1}" ScriptEvents="1" />

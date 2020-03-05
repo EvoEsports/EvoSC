@@ -9,6 +9,7 @@ use esc\Controllers\ConfigController;
 use esc\Controllers\PlayerController;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * @param mixed ...$message
@@ -78,7 +79,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
         return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}((l|h)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 /**
@@ -233,11 +234,9 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
  */
 function echoPlayers(): Collection
 {
-    $players = onlinePlayers()->filter(function (Player $player) {
+    return onlinePlayers()->filter(function (Player $player) {
         return $player->hasAccess('admin_echoes');
     });
-
-    return $players;
 }
 
 /**
@@ -365,4 +364,13 @@ function __(string $id, array $vars = [], string $language = 'en')
     }
 
     return $root;
+}
+
+/**
+ * @param $title
+ * @return string
+ */
+function str_slug($title)
+{
+    return Str::slug($title, '-', 'en');
 }

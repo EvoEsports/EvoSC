@@ -215,8 +215,7 @@ class GBXBaseFetcher
 				$this->errorOut(sprintf('Invalid string length %d (0x%04X) at pos 0x%04X',
 				                        $len, $len, $gbxptr), 3);
 		}
-		$data = $this->readData($len);
-		return $data;
+        return $this->readData($len);
 	}
 
 	// strip UTF-8 BOM from string
@@ -642,9 +641,6 @@ class GBXChallMapFetcher extends GBXBaseFetcher
 	 *        TMU/TMF or 512x512 pixels for MP
 	 * @param Boolean $debug
 	 *        If true, the fetcher prints debug logging to stderr
-	 * @return GBXChallMapFetcher
-	 *        If GBX data couldn't be extracted, an Exception is thrown with
-	 *        the error message & code
 	 */
 	public function __construct($parsexml = false, $tnimage = false, $debug = false)
 	{
