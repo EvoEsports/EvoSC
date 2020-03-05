@@ -24,7 +24,7 @@ class TestModule implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        NextMap::showNextMap();
+        Pay2Play::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
