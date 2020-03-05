@@ -17,16 +17,16 @@ class MxPackJob
 {
     private $id;
     private $files;
-    private $name;
-    private $path;
-    private $packsDir;
+    private string $name;
+    private string $path;
+    private string $packsDir;
     private $info;
-    private $i = 0;
+    private int $i = 0;
 
     /**
      * @var Player
      */
-    private $issuer;
+    private Player $issuer;
 
     public function __construct(Player $player, $packId)
     {
@@ -54,8 +54,7 @@ class MxPackJob
     }
 
     /**
-     * @param $info
-     * @throws GuzzleException|Exception
+     * @throws Exception
      */
     private function loadFiles()
     {

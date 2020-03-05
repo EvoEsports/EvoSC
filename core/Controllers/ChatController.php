@@ -23,21 +23,19 @@ class ChatController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $mutedPlayers;
+    private static Collection $mutedPlayers;
 
     /** @var boolean */
-    private static $routingEnabled;
+    private static bool $routingEnabled;
 
     /** @var boolean */
-    private static $externalRouter;
+    private static bool $externalRouter;
 
     /**
      * Initialize ChatController.
      */
     public static function init()
     {
-        self::$mutedPlayers = collect();
-
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
 

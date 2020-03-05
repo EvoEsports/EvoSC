@@ -42,9 +42,10 @@ class File
     /**
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
-     * @param string       $fileName
+     * @param string $fileName
      * @param string|mixed $content
      *
+     * @param bool $jsonEncode
      * @return bool
      */
     public static function put(string $fileName, $content, bool $jsonEncode = false): bool

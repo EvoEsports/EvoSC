@@ -3,6 +3,7 @@
 namespace esc\Commands;
 
 use Error;
+use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\File;
@@ -31,6 +32,8 @@ use esc\Controllers\SetupController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\InputSetup;
+use esc\Modules\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,6 +58,11 @@ class EscRun extends Command
 
         Log::setOutput($output);
         ConfigController::init();
+
+        ChatCommand::removeAll();
+        Timer::destroyAll();
+        QuickButtons::removeAll();
+        InputSetup::clearAll();
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));

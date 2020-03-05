@@ -20,8 +20,8 @@ use SimpleXMLElement;
 
 class DedimaniaApi extends Module
 {
-    protected static $enabled = false;
-    protected static $maxRank = 30;
+    protected static bool $enabled = false;
+    protected static int $maxRank = 30;
 
     /**
      * dedimania.OpenSession
@@ -247,6 +247,7 @@ class DedimaniaApi extends Module
      * @param Map $map
      *
      * @return null|SimpleXMLElement
+     * @throws GuzzleException
      */
     static function updateServerPlayers(Map $map)
     {
@@ -304,6 +305,7 @@ class DedimaniaApi extends Module
      * Send new records
      *
      * @param Map $map
+     * @throws GuzzleException
      */
     static function setChallengeTimes(Map $map)
     {
@@ -392,7 +394,7 @@ class DedimaniaApi extends Module
         try {
             //Check if there is top1 dedi
             if ($newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
+                $Top1GReplay = file_get_contents($bestRecord->ghost_replay) ?? '';
 
                 if ($Top1GReplay == '') {
                     Log::write('Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
@@ -433,8 +435,6 @@ class DedimaniaApi extends Module
                         //Request failed
 
                         Log::write('Failed to update dedis.', true);
-                    } else {
-//                        Cache::forget('vreplays/'.$bestRecord->player->Login.'_'.$map->uid);
                     }
                 }
             }
@@ -454,6 +454,7 @@ class DedimaniaApi extends Module
      * @param Player $player
      *
      * @return null|SimpleXMLElement
+     * @throws GuzzleException
      */
     public static function playerConnect(Player $player)
     {
@@ -529,10 +530,6 @@ class DedimaniaApi extends Module
             if ($key == 'Top1GReplay') {
                 $member->addChild('value')->addChild('base64', base64_encode($value));
                 continue;
-            }
-
-            if (isVerbose()) {
-                // Log::write(sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
             }
 
             switch (gettype($value)) {
@@ -613,7 +610,6 @@ class DedimaniaApi extends Module
      *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement|null
-     * @throws GuzzleException
      */
     private static function post(SimpleXMLElement $xml): ?SimpleXMLElement
     {

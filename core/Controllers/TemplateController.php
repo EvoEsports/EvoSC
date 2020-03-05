@@ -25,12 +25,12 @@ class TemplateController implements ControllerInterface
     /**
      * @var Engine
      */
-    private static $latte;
+    private static Engine $latte;
 
     /**
      * @var Collection
      */
-    private static $templates;
+    private static Collection $templates;
 
     /**
      * Initialize TemplateController

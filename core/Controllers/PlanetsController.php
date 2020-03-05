@@ -24,11 +24,11 @@ class PlanetsController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $openBills;
+    private static Collection $openBills;
     /**
      * @var string[]
      */
-    private static $billStates = [
+    private static array $billStates = [
         'CreatingTransaction',
         'Issued',
         'ValidatingPayement',

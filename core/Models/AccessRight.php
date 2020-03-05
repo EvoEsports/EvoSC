@@ -27,8 +27,8 @@ class AccessRight extends Model
      */
     public static function createIfMissing(string $name, string $description)
     {
-        if (self::whereName($name)->get()->isEmpty()) {
-            self::create([
+        if (AccessRight::whereName($name)->get()->isEmpty()) {
+            AccessRight::create([
                 'name'        => $name,
                 'description' => $description,
             ]);

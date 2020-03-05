@@ -21,7 +21,7 @@ class Statistics extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $scores;
+    private static Collection $scores;
 
     /**
      * @var int

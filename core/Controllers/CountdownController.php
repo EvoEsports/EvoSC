@@ -22,17 +22,17 @@ class CountdownController implements ControllerInterface
     /**
      * @var int
      */
-    private static $addedSeconds = 0;
+    private static int $addedSeconds = 0;
 
     /**
      * @var int
      */
-    private static $matchStart;
+    private static int $matchStart;
 
     /**
      * @var int
      */
-    private static $originalTimeLimit;
+    private static int $originalTimeLimit;
 
     public static function init()
     {
@@ -94,6 +94,7 @@ class CountdownController implements ControllerInterface
 
     /**
      * @param Player $player
+     * @param string $cmd
      * @param string $amount
      */
     public static function addTimeManually(Player $player, string $cmd, string $amount)

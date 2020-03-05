@@ -26,10 +26,10 @@ class PlayerController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $players;
+    private static Collection $players;
 
     /** @var int */
-    private static $stringEditDistanceThreshold = 8;
+    private static int $stringEditDistanceThreshold = 8;
 
     /**
      * Initialize PlayerController
@@ -386,7 +386,7 @@ class PlayerController implements ControllerInterface
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
 
         for ($i = 0; $i < intval($count); $i++) {
-            $login = Server::connectFakePlayer();
+            Server::connectFakePlayer();
         }
     }
 

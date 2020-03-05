@@ -22,7 +22,7 @@ class CpDiffs extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $targets;
+    private static Collection $targets;
 
     /**
      * Called when the module is loaded

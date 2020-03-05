@@ -18,7 +18,7 @@ class ModuleController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $loadedModules;
+    private static Collection $loadedModules;
 
     /**
      * @param string $mode

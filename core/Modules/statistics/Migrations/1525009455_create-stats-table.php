@@ -11,6 +11,7 @@ class CreateStatsTable extends Migration
     /**
      * Run the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function up(Builder $schemaBuilder)
@@ -33,6 +34,7 @@ class CreateStatsTable extends Migration
     /**
      * Reverse the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function down(Builder $schemaBuilder)

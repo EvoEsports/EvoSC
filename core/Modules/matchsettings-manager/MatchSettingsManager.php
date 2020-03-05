@@ -19,10 +19,10 @@ use SimpleXMLElement;
 
 class MatchSettingsManager extends Module implements ModuleInterface
 {
-    private static $path;
+    private static string $path;
     private static $objects;
 
-    private static $modes = [
+    private static array $modes = [
         'TimeAttack' => 'timeattack.xml',
         'Team' => 'team.xml',
         'Rounds' => 'rounds.xml',

@@ -20,12 +20,12 @@ class Scoreboard extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $tracker;
+    private static Collection $tracker;
 
     /**
      * @var Collection
      */
-    private static $playersOnline;
+    private static Collection $playersOnline;
 
     private static $mode;
 

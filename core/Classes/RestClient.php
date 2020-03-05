@@ -5,8 +5,6 @@ namespace esc\Classes;
 
 use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 
 /**
@@ -25,7 +23,7 @@ class RestClient
     /**
      * @var Client
      */
-    public static $client;
+    public static Client $client;
 
     /**
      * Initialize the client
@@ -52,13 +50,12 @@ class RestClient
     /**
      * Create a get-request.
      *
-     * @param string     $url
+     * @param string $url
      * @param array|null $options
      *
-     * @return Response
-     * @throws GuzzleException
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function get(string $url, array $options = null): Response
+    public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
         if (isDebug()) {
             Log::write('GET: ' . $url, isDebug());
@@ -70,13 +67,12 @@ class RestClient
     /**
      * Create a post-request.
      *
-     * @param string     $url
+     * @param string $url
      * @param array|null $options
      *
-     * @return Response
-     * @throws GuzzleException
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function post(string $url, array $options = null): Response
+    public static function post(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
         if (isDebug()) {
             Log::write('POST: ' . $url . ' with options: ' . json_encode($options),
@@ -89,13 +85,12 @@ class RestClient
     /**
      * Create a put-request.
      *
-     * @param string     $url
+     * @param string $url
      * @param array|null $options
      *
-     * @return Response
-     * @throws GuzzleException
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public static function put(string $url, array $options = null): Response
+    public static function put(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
         if (isDebug()) {
             Log::write('PUT: ' . $url . ' with options: ' . json_encode($options),

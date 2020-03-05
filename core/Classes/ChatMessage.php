@@ -16,7 +16,7 @@ use stdClass;
  */
 class ChatMessage
 {
-    private $parts;
+    private array $parts;
     private $color;
     private $icon;
 

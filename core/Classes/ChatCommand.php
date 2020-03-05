@@ -20,13 +20,13 @@ class ChatCommand
     /**
      * @var Collection
      */
-    private static $commands;
+    private static Collection $commands;
 
-    public $command;
+    public string $command;
     public $callback;
-    public $description;
-    public $access;
-    public $hidden;
+    public string $description;
+    public ?string $access;
+    public bool $hidden;
 
     /**
      * ChatCommand constructor.

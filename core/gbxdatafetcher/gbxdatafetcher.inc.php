@@ -36,14 +36,24 @@
  */
 class GBXBaseFetcher
 {
-	public $parseXml, $xml, $xmlParsed;
+    public bool $parseXml;
+    public string $xml;
+    public array $xmlParsed;
 
-	public $authorVer, $authorLogin, $authorNick, $authorZone, $authorEInfo;
+    public int $authorVer;
+    public string $authorLogin;
+    public string $authorNick;
+    public string $authorZone;
+    public string $authorEInfo;
 
-	private $_gbxdata, $_gbxlen, $_gbxptr, $_debug, $_error, $_endianess,
-	        $_lookbacks, $_parsestack;
+    private $_gbxdata, $_gbxlen, $_gbxptr,
+	        $_lookbacks;
+    private bool $_debug;
+    private string $_error;
+    private int $_endianess;
+    private array $_parsestack;
 
-	// supported class ID's
+    // supported class ID's
 	const GBX_CHALLENGE_TMF = 0x03043000;
 	const GBX_AUTOSAVE_TMF  = 0x03093000;
 	const GBX_CHALLENGE_TM  = 0x24003000;
@@ -326,12 +336,13 @@ class GBXBaseFetcher
 		unset($xml_parser); // for PHP7
 	}
 
-	/**
-	 * Check GBX header, main class ID & header block
-	 * @param Array $classes
-	 *              The main class IDs accepted for this GBX
-	 * @return Size of GBX header block
-	*/
+    /**
+     * Check GBX header, main class ID & header block
+     * @param Array $classes
+     *              The main class IDs accepted for this GBX
+     * @return Size of GBX header block
+     * @throws Exception
+     */
 	protected function checkHeader(array $classes)
 	{
 		// check magic header
@@ -357,14 +368,15 @@ class GBXBaseFetcher
 		return $headerSize;
 	}  // checkHeader
 
-	/**
-	 * Get list of chunks from GBX header block
-	 * @param Int $headerSize
-	 *        Size of header block (chunks list & chunks data)
-	 * @param array $chunks
-	 *        List of chunk IDs & names
-	 * @return List of chunk offsets & sizes
-	 */
+    /**
+     * Get list of chunks from GBX header block
+     * @param Int $headerSize
+     *        Size of header block (chunks list & chunks data)
+     * @param array $chunks
+     *        List of chunk IDs & names
+     * @return array of chunk offsets & sizes
+     * @throws Exception
+     */
 	protected function getChunksList($headerSize, array $chunks)
 	{
 		// get number of chunks
@@ -418,11 +430,12 @@ class GBXBaseFetcher
 		$this->clearLookbacks();
 	}
 
-	/**
-	 * Get XML chunk from GBX header block & optionally parse it
-	 * @param array $chunksList
-	 *        List of chunk offsets & sizes
-	 */
+    /**
+     * Get XML chunk from GBX header block & optionally parse it
+     * @param array $chunksList
+     *        List of chunk offsets & sizes
+     * @throws Exception
+     */
 	protected function getXMLChunk(array $chunksList)
 	{
 		if (!isset($chunksList['XML'])) return;
@@ -468,12 +481,12 @@ class GBXBaseFetcher
 		$this->getAuthorFields();
 	}  // getAuthorChunk
 
-	/**
-	 * Read Windows FileTime and convert to Unix timestamp
-	 * Filetime = 64-bit value with the number of 100-nsec intervals since Jan 1, 1601 (UTC)
-	 * Based on http://www.mysqlperformanceblog.com/2007/03/27/integers-in-php-running-with-scissors-and-portability/
-	 * @return Unix timestamp, or -1 on error
-	 */
+    /**
+     * Read Windows FileTime and convert to Unix timestamp
+     * Filetime = 64-bit value with the number of 100-nsec intervals since Jan 1, 1601 (UTC)
+     * Based on http://www.mysqlperformanceblog.com/2007/03/27/integers-in-php-running-with-scissors-and-portability/
+     * @return int timestamp, or -1 on error
+     */
 	protected function readFiletime()
 	{
 		// Unix epoch (1970-01-01) - Windows epoch (1601-01-01) in 100ns units
@@ -568,18 +581,51 @@ class GBXBaseFetcher
  */
 class GBXChallMapFetcher extends GBXBaseFetcher
 {
-	public $tnImage;
+    public bool $tnImage;
 
-	public $headerVersn, $bronzeTime, $silverTime, $goldTime, $authorTime,
-	       $cost, $multiLap, $type, $typeName, $authorScore, $simpleEdit, $ghostBlocks,
-	       $nbChecks, $nbLaps;
-	public $uid, $envir, $author, $name, $kind, $kindName, $password,
-	       $mood, $envirBg, $authorBg, $mapType, $mapStyle, $lightmap, $titleUid;
-	public $xmlVer, $exeVer, $exeBld, $validated, $songFile, $songUrl,
-	       $modName, $modFile, $modUrl, $vehicle;
-	public $thumbLen, $thumbnail, $comment;
+    public int $headerVersn;
+    public int $bronzeTime;
+    public int $silverTime;
+    public int $goldTime;
+    public int $authorTime;
+    public int $cost;
+    public bool $multiLap;
+    public int $type;
+    public string $typeName;
+    public int $authorScore;
+    public bool $simpleEdit;
+    public bool $ghostBlocks;
+    public int $nbChecks;
+    public int $nbLaps;
+    public string $uid;
+    public string $envir;
+    public string $author;
+    public string $name;
+    public int $kind;
+    public string $kindName;
+    public string $password;
+    public string $mood;
+    public string $envirBg;
+    public string $authorBg;
+    public string $mapType;
+    public string $mapStyle;
+    public int $lightmap;
+    public string $titleUid;
+    public string $xmlVer;
+    public string $exeVer;
+    public string $exeBld;
+    public bool $validated;
+    public string $songFile;
+    public string $songUrl;
+    public string $modName;
+    public string $modFile;
+    public string $modUrl;
+    public string $vehicle;
+    public int $thumbLen;
+    public string $thumbnail;
+    public string $comment;
 
-	const IMAGE_FLIP_HORIZONTAL = 1;
+    const IMAGE_FLIP_HORIZONTAL = 1;
 	const IMAGE_FLIP_VERTICAL   = 2;
 	const IMAGE_FLIP_BOTH       = 3;
 
@@ -1090,26 +1136,40 @@ class GBXChallMapFetcher extends GBXBaseFetcher
  */
 class GBXChallengeFetcher extends GBXChallMapFetcher
 {
-	public $authortm, $goldtm, $silvertm, $bronzetm, $ascore, $azone, $multi, $editor,
-	       $pub, $nblaps, $parsedxml, $xmlver, $exever, $exebld, $songfile, $songurl,
-	       $modname, $modfile, $modurl;
+    public int $authortm;
+    public int $goldtm;
+    public int $silvertm;
+    public int $bronzetm;
+    public int $ascore;
+    public string $azone;
+    public bool $multi;
+    public bool $editor;
+    public string $pub;
+    public int $nblaps;
+    public array $parsedxml;
+    public string $xmlver;
+    public string $exever;
+    public string $exebld;
+    public string $songfile;
+    public string $songurl;
+    public string $modname;
+    public string $modfile;
+    public string $modurl;
 
-	/**
-	 * Fetches a hell of a lot of data about a GBX challenge
-	 *
-	 * @param String $filename
-	 *        The challenge filename (must include full path)
-	 * @param Boolean $parsexml
-	 *        If true, the script also parses the XML block
-	 * @param Boolean $tnimage
-	 *        If true, the script also extracts the thumbnail image; if GD/JPEG
-	 *        libraries are present, image will be flipped upright, otherwise
-	 *        it will be in the original upside-down format
-	 *        Warning: this is binary data in JPEG format, 256x256 pixels for
-	 *        TMU/TMF or 512x512 pixels for MP
-	 * @return GBXChallengeFetcher
-	 *        If $uid is empty, GBX data couldn't be extracted
-	 */
+    /**
+     * Fetches a hell of a lot of data about a GBX challenge
+     *
+     * @param String $filename
+     *        The challenge filename (must include full path)
+     * @param Boolean $parsexml
+     *        If true, the script also parses the XML block
+     * @param Boolean $tnimage
+     *        If true, the script also extracts the thumbnail image; if GD/JPEG
+     *        libraries are present, image will be flipped upright, otherwise
+     *        it will be in the original upside-down format
+     *        Warning: this is binary data in JPEG format, 256x256 pixels for
+     *        TMU/TMF or 512x512 pixels for MP
+     */
 	public function __construct($filename, $parsexml = false, $tnimage = false)
 	{
 		parent::__construct($parsexml, $tnimage, false);
@@ -1155,21 +1215,31 @@ class GBXChallengeFetcher extends GBXChallMapFetcher
  */
 class GBXReplayFetcher extends GBXBaseFetcher
 {
-	public $uid, $envir, $author, $replay, $nickname, $login, $titleUid;
-	public $xmlVer, $exeVer, $exeBld, $respawns, $stuntScore, $validable,
-	       $cpsCur, $cpsLap, $vehicle;
+    public string $uid;
+    public string $envir;
+    public string $author;
+    public int $replay;
+    public string $nickname;
+    public string $login;
+    public string $titleUid;
+    public string $xmlVer;
+    public string $exeVer;
+    public string $exeBld;
+    public int $respawns;
+    public int $stuntScore;
+    public bool $validable;
+    public int $cpsCur;
+    public int $cpsLap;
+    public string $vehicle;
 
-	/**
-	 * Instantiate GBX replay fetcher
-	 *
-	 * @param Boolean $parsexml
-	 *        If true, the fetcher also parses the XML block
-	 * @param Boolean $debug
-	 *        If true, the fetcher prints debug logging to stderr
-	 * @return GBXReplayFetcher
-	 *        If GBX data couldn't be extracted, an Exception is thrown with
-	 *        the error message & code
-	 */
+    /**
+     * Instantiate GBX replay fetcher
+     *
+     * @param Boolean $parsexml
+     *        If true, the fetcher also parses the XML block
+     * @param Boolean $debug
+     *        If true, the fetcher prints debug logging to stderr
+     */
 	public function __construct($parsexml = false, $debug = false)
 	{
 		parent::__construct();
@@ -1332,21 +1402,31 @@ class GBXReplayFetcher extends GBXBaseFetcher
  */
 class GBXPackFetcher extends GBXBaseFetcher
 {
-	public $headerVersn, $flags, $headerMaxSz, $infoMlUrl, $downloadUrl, $creatDate, $comment,
-	       $titleId, $usageSubdir, $buildInfo, $authorUrl, $exeVer, $exeBld, $xmlDate,
-	       $nbPacks, $packHeaders;
+    public int $headerVersn;
+    public int $flags;
+    public int $headerMaxSz;
+    public string $infoMlUrl;
+    public string $downloadUrl;
+    public int $creatDate;
+    public string $comment;
+    public string $titleId;
+    public string $usageSubdir;
+    public string $buildInfo;
+    public string $authorUrl;
+    public string $exeVer;
+    public string $exeBld;
+    public string $xmlDate;
+    public int $nbPacks;
+    public array $packHeaders;
 
-	/**
-	 * Instantiate GBX pack fetcher
-	 *
-	 * @param Boolean $parsexml
-	 *        If true, the fetcher also parses the XML block
-	 * @param Boolean $debug
-	 *        If true, the fetcher prints debug logging to stderr
-	 * @return GBXPackFetcher
-	 *        If GBX data couldn't be extracted, an Exception is thrown with
-	 *        the error message & code
-	 */
+    /**
+     * Instantiate GBX pack fetcher
+     *
+     * @param Boolean $parsexml
+     *        If true, the fetcher also parses the XML block
+     * @param Boolean $debug
+     *        If true, the fetcher prints debug logging to stderr
+     */
 	public function __construct($parsexml = false, $debug = false)
 	{
 		parent::__construct();
@@ -1495,19 +1575,19 @@ class GBXPackFetcher extends GBXBaseFetcher
  */
 class GBXPackHeaderFetcher extends GBXBaseFetcher
 {
-	public $name, $infoMlUrl, $creatDate, $inclDepth;
+    public string $name;
+    public string $infoMlUrl;
+    public int $creatDate;
+    public int $inclDepth;
 
-	private $_headerVersn;
+    private int $_headerVersn;
 
-	/**
-	 * Instantiate GBX included pack header fetcher
-	 *
-	 * @param GBXPackFetcher $packGBX
-	 *        The pack class, needed for headerVersn & the overall base class
-	 * @return GBXPackHeaderFetcher
-	 *        If GBX data couldn't be extracted, an Exception is thrown with
-	 *        the error message & code
-	 */
+    /**
+     * Instantiate GBX included pack header fetcher
+     *
+     * @param GBXPackFetcher $packGBX
+     *        The pack class, needed for headerVersn & the overall base class
+     */
 	public function __construct(GBXPackFetcher $packGBX)
 	{
 		$this->name      = '';

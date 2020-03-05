@@ -15,15 +15,15 @@ class ConfigController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $config;
+    private static Collection $config;
 
     /** @var string */
-    protected static $configFilePattern = '/\.config\.json$/';
+    protected static string $configFilePattern = '/\.config\.json$/';
 
     /**
      * @var Collection
      */
-    private static $rawConfigs;
+    private static Collection $rawConfigs;
 
     /**
      * Method called on controller boot.

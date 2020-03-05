@@ -34,17 +34,17 @@ class MapController implements ControllerInterface
     /**
      * @var Map
      */
-    private static $currentMap;
+    private static Map $currentMap;
 
     /**
      * @var Map
      */
-    private static $nextMap;
+    private static ?Map $nextMap;
 
     /**
      * @var string
      */
-    private static $mapsPath;
+    private static string $mapsPath;
 
     /**
      * Initialize MapController
@@ -139,7 +139,7 @@ class MapController implements ControllerInterface
      */
     public static function getCurrentMap(): Map
     {
-        if (!self::$currentMap) {
+        if (!isset(self::$currentMap)) {
             Log::error('Current map is not set. Exiting...', true);
             exit(4); //Runtime error
         }
@@ -398,7 +398,7 @@ class MapController implements ControllerInterface
     }
 
     /**
-     * @return Map
+     * @return stdClass
      */
     public static function getNextMap(): stdClass
     {

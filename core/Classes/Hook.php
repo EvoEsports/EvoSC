@@ -32,10 +32,10 @@ class Hook
     const PRIORITY_LOW = -1;
     const PRIORITY_LOWEST = -2;
 
-    private $runOnce;
-    private $event;
+    private bool $runOnce;
+    private string $event;
     private $function;
-    private $priority;
+    private int $priority;
 
     /**
      * Hook constructor.

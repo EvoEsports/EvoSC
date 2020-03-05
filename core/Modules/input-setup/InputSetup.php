@@ -19,12 +19,12 @@ class InputSetup extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $binds;
+    private static Collection $binds;
 
     /**
-     * KeyBinds constructor.
+     * @inheritDoc
      */
-    public function __construct()
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'sendScript']);
 
@@ -52,11 +52,11 @@ class InputSetup extends Module implements ModuleInterface
     /**
      * Add a new key-bind
      *
-     * @param  string  $id
-     * @param  string  $description
-     * @param  callable  $callback
-     * @param  string  $defaultKey
-     * @param  string|null  $access
+     * @param string $id
+     * @param string $description
+     * @param callable $callback
+     * @param string $defaultKey
+     * @param string|null $access
      */
     public static function add(string $id, string $description, $callback, string $defaultKey, string $access = null)
     {
@@ -77,8 +77,8 @@ class InputSetup extends Module implements ModuleInterface
     /**
      * Update a key-bind
      *
-     * @param  Player  $player
-     * @param  mixed  ...$data
+     * @param Player $player
+     * @param mixed ...$data
      */
     public static function updateBind(Player $player, ...$data)
     {
@@ -150,7 +150,7 @@ class InputSetup extends Module implements ModuleInterface
      * Handle bound key presses
      *
      * @param Player $player
-     * @param  string  $id
+     * @param string $id
      */
     public static function keyPressed(Player $player, string $id)
     {
@@ -166,7 +166,7 @@ class InputSetup extends Module implements ModuleInterface
                 $func($player);
             } else {
                 if (is_callable($bind['callback'], false, $callableName)) {
-                    Log::write("Execute: ".$bind['callback'][0]." ".$bind['callback'][1],
+                    Log::write("Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
                         isVeryVerbose());
                     call_user_func($bind['callback'], $player);
                 } else {
@@ -176,10 +176,8 @@ class InputSetup extends Module implements ModuleInterface
         });
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
+    public static function clearAll()
     {
+        self::$binds = collect();
     }
 }

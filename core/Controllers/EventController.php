@@ -203,12 +203,7 @@ class EventController implements ControllerInterface
         if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
             $mapUid = $arguments[0]['UId'];
 
-            try {
-                $map = Map::whereUid($mapUid)->get()->last();
-            } catch (Exception $e) {
-                Log::write("Error: Map ($mapUid) not found!");
-            }
-
+            $map = Map::whereUid($mapUid)->get()->last();
             MapController::setCurrentMap($map);
 
             try {
@@ -231,11 +226,7 @@ class EventController implements ControllerInterface
         if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
             $mapUid = $arguments[0]['UId'];
 
-            try {
-                $map = Map::where('uid', $mapUid)->first();
-            } catch (Exception $e) {
-                Log::write("Error: Map ($mapUid) not found!");
-            }
+            $map = Map::where('uid', $mapUid)->last();
 
             try {
                 Hook::fire('EndMap', $map);

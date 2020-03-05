@@ -28,7 +28,7 @@ class QueueController implements ControllerInterface
     /**
      * @var bool
      */
-    private static $preCache = true;
+    private static bool $preCache = true;
 
     /**
      * Initialize QueueController

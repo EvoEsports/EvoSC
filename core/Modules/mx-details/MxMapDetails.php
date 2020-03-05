@@ -14,7 +14,6 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
 use esc\Models\Player;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use stdClass;
 
 class MxMapDetails extends Module implements ModuleInterface
@@ -77,7 +76,6 @@ class MxMapDetails extends Module implements ModuleInterface
     /**
      * @param Map $map
      * @return stdClass|null
-     * @throws GuzzleException
      */
     public static function loadMxDetails(Map $map)
     {
@@ -116,7 +114,6 @@ class MxMapDetails extends Module implements ModuleInterface
     /**
      * @param Map $map
      * @return stdClass|null
-     * @throws GuzzleException
      */
     public static function loadMxWordlRecord(Map $map)
     {

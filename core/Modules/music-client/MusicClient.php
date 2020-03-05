@@ -25,7 +25,7 @@ class MusicClient extends Module implements ModuleInterface
     /**
      * @var stdClass
      */
-    private static $song;
+    private static stdClass $song;
 
     public function __construct()
     {

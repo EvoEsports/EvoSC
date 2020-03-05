@@ -23,7 +23,7 @@ class AfkController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $pingTracker;
+    private static Collection $pingTracker;
 
     /**
      * Initialize

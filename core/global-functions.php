@@ -44,6 +44,7 @@ function warningMessage(...$message)
 /**
  * @param int $score
  *
+ * @param bool $cutZero
  * @return string
  */
 function formatScore(int $score, bool $cutZero = false): string

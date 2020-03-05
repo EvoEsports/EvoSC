@@ -21,7 +21,7 @@ class MxPackLoader extends Module implements ModuleInterface
     /**
      * @var MxPackJob
      */
-    private static $activeJob;
+    private static MxPackJob $activeJob;
 
     public function __construct()
     {

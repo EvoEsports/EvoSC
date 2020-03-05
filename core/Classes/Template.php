@@ -4,7 +4,6 @@ namespace esc\Classes;
 
 
 use esc\Controllers\TemplateController;
-use esc\Controllers\TemplateControllerTwig;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
@@ -18,13 +17,13 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
  */
 class Template
 {
-    public $index;
-    public $template;
+    public string $index;
+    public string $template;
 
     /**
      * @var Collection
      */
-    private static $multiCalls;
+    private static Collection $multiCalls;
 
     /**
      * Template constructor.
@@ -68,7 +67,8 @@ class Template
     /**
      * Hide a manialink with the given id for a single player.
      *
-     * @param  string  $id
+     * @param Player $player
+     * @param string $id
      */
     public static function hide(Player $player, string $id)
     {
@@ -101,7 +101,7 @@ class Template
 
         if ($xml != '') {
             if ($multicall) {
-                if (!self::$multiCalls) {
+                if (!isset(self::$multiCalls)) {
                     self::$multiCalls = collect();
                 }
 
@@ -131,7 +131,7 @@ class Template
             }
         });
 
-        self::$multiCalls = null;
+        self::$multiCalls = collect();
 
         Server::executeMulticall();
     }

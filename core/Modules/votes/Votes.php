@@ -21,20 +21,13 @@ use stdClass;
 
 class Votes extends Module implements ModuleInterface
 {
-    /**
-     * @var Collection
-     */
-    private static $vote;
-
-    /**
-     * @var Collection
-     */
-    private static $voters;
+    private static ?Collection $vote;
+    private static Collection $voters;
 
     private static $lastTimeVote;
     private static $lastSkipVote;
     private static $timeVotesThisRound = 0;
-    private static $skipVotesThisRound = 0;
+    private static int $skipVotesThisRound = 0;
     private static $onlinePlayersCount;
 
     public function __construct()
@@ -76,7 +69,7 @@ class Votes extends Module implements ModuleInterface
 
     public static function startVote(Player $player, string $question, $action, $successRatio = 0.5): bool
     {
-        if (self::$vote != null) {
+        if (isset(self::$vote)) {
             warningMessage('There is already a vote in progress.')->send($player);
 
             return false;
@@ -363,7 +356,7 @@ class Votes extends Module implements ModuleInterface
 
     public static function endMatch()
     {
-        if (self::$vote != null) {
+        if (isset(self::$vote)) {
             Timer::destroy('vote.check_state');
             $action = self::$vote['action'];
 

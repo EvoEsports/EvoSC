@@ -16,7 +16,7 @@ class MatchTracker extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $match;
+    private static Collection $match;
 
     /**
      * Called when the module is loaded

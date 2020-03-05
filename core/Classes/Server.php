@@ -315,9 +315,6 @@ class Server
         self::$rpc->enableCallbacks();
 
         ChatCommand::add('//restart', [self::class, 'restartController'], 'Restart EvoSC.', 'ma');
-
-        //Hide all previously send manialinks
-        // self::call('SendHideManialinkPage');
     }
 
     /**

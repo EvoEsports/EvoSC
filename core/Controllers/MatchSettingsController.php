@@ -24,7 +24,7 @@ class MatchSettingsController implements ControllerInterface
     /**
      * @var string
      */
-    private static $currentMatchSettingsFile;
+    private static string $currentMatchSettingsFile;
 
     private static $lastMatchSettingsModification;
 

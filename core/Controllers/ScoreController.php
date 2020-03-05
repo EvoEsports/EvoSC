@@ -15,13 +15,13 @@ class ScoreController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $tracker;
+    private static Collection $tracker;
 
     private static $mode;
 
     private static $points;
 
-    private static $finished = 0;
+    private static int $finished = 0;
 
     /**
      * Method called on controller boot.

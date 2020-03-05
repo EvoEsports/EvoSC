@@ -21,17 +21,17 @@ class SetupController implements ControllerInterface
     /**
      * @var InputInterface
      */
-    private static $input;
+    private static InputInterface $input;
 
     /**
      * @var OutputInterface
      */
-    private static $output;
+    private static OutputInterface $output;
 
     /**
      * @var QuestionHelper
      */
-    private static $helper;
+    private static QuestionHelper $helper;
 
     public static function startSetup(InputInterface $input, OutputInterface $output, QuestionHelper $helper)
     {
@@ -281,10 +281,10 @@ class SetupController implements ControllerInterface
                         continue;
                     }
 
+                    ConfigController::saveConfig($id, $value);
+
                     break;
                 }
-
-                ConfigController::saveConfig($id, $value);
             }
         }
     }

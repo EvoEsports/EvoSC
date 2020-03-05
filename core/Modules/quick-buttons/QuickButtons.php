@@ -15,9 +15,12 @@ class QuickButtons extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $buttons;
+    private static Collection $buttons;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'showButtons']);
         Hook::add('GroupChanged', [self::class, 'showButtons']);
@@ -56,13 +59,5 @@ class QuickButtons extends Module implements ModuleInterface
     public static function removeAll()
     {
         self::$buttons = collect();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

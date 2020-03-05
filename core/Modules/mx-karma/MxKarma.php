@@ -19,7 +19,6 @@ use esc\Models\Player;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use stdClass;
 
@@ -34,32 +33,21 @@ class MxKarma extends Module implements ModuleInterface
     private static $mapKarma;
     private static $updatedVotesAverage;
 
-    /**
-     * @var stdClass
-     */
-    private static $session;
-
-    /**
-     * @var Client
-     */
-    private static $client;
-
-    /**
-     * @var Map
-     */
-    private static $currentMap;
+    private static stdClass $session;
+    private static Client $client;
+    private static string $currentMapUid;
 
     /**
      * @var array
      */
-    private static $ratings;
+    private static array $ratings;
 
     /**
      * @var Collection
      */
     private static $updatedVotesPlayerIds;
 
-    private static $offline = false;
+    private static bool $offline = false;
 
     public function __construct()
     {
@@ -100,7 +88,6 @@ class MxKarma extends Module implements ModuleInterface
     /**
      * @param Map|null $map
      *
-     * @throws GuzzleException
      */
     public static function endMap(Map $map)
     {
@@ -146,7 +133,7 @@ class MxKarma extends Module implements ModuleInterface
             self::$mapKarma = 50.0;
         }
 
-        self::$currentMap = $mapUid;
+        self::$currentMapUid = $mapUid;
         self::updateVotesAverage();
         self::sendUpdatedKarma();
 
@@ -185,9 +172,9 @@ class MxKarma extends Module implements ModuleInterface
 
         $mapUid = $map->uid;
 
-        if (self::$currentMap != $mapUid) {
+        if (self::$currentMapUid != $mapUid) {
             self::$mapKarma = self::call(self::getMapRating);
-            self::$currentMap = $mapUid;
+            self::$currentMapUid = $mapUid;
         }
 
         self::updateVotesAverage();
@@ -245,7 +232,6 @@ class MxKarma extends Module implements ModuleInterface
      * @param array|null $votes
      *
      * @return null|stdClass
-     * @throws GuzzleException
      */
     public static function call(int $method, Map $map = null, array $votes = null): ?stdClass
     {
@@ -378,7 +364,6 @@ class MxKarma extends Module implements ModuleInterface
 
     /**
      * Starts MX Karma session
-     * @throws GuzzleException
      */
     public static function startSession()
     {
@@ -436,7 +421,7 @@ class MxKarma extends Module implements ModuleInterface
 
             $karma->update(['Rating' => $rating]);
         } else {
-            $karma = Karma::create([
+            Karma::create([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'Rating' => $rating,
@@ -528,7 +513,7 @@ class MxKarma extends Module implements ModuleInterface
         if ($karma != null) {
             $karma->update(['Rating' => 0]);
         } else {
-            $karma = Karma::create([
+            Karma::create([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'Rating' => 0,

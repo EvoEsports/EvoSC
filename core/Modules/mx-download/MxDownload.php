@@ -62,7 +62,6 @@ class MxDownload extends Module implements ModuleInterface
     /**
      * @param int $mxId
      * @return string|string[]|null
-     * @throws GuzzleException
      * @throws Exception
      */
     private static function downloadMapAndGetFilename(int $mxId)
@@ -219,7 +218,6 @@ class MxDownload extends Module implements ModuleInterface
      *
      * @param $mxId
      * @return string
-     * @throws GuzzleException
      * @throws Exception
      */
     public static function loadMxDetails($mxId)

@@ -18,20 +18,20 @@ class ManiaLinkEvent
     /**
      * @var Collection
      */
-    private static $maniaLinkEvents;
+    private static Collection $maniaLinkEvents;
 
     /**
      * @var Collection
      */
-    private static $extendedMLE;
+    private static Collection $extendedMLE;
 
-    public $id;
+    public string $id;
 
     /**
      * @var callable
      */
     public $callback;
-    public $access;
+    public ?string $access;
 
     /**
      * Initialize ManiaLinkEvent

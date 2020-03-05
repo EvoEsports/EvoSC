@@ -22,15 +22,13 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 {
     const TABLE = 'dedi-records';
 
-    private static $offlineMode = false;
+    private static bool $offlineMode = false;
 
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        dump("start", $mode);
-
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);
@@ -107,6 +105,9 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
     }
 
+    /**
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();

@@ -19,7 +19,7 @@ class Database
     /**
      * @var Capsule
      */
-    private static $capsule;
+    private static Capsule $capsule;
 
     /**
      * Start a keep-alive connection to the database and boot Eloquent.

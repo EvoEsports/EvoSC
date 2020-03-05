@@ -11,6 +11,7 @@ class CreateLocalRecordsTable extends Migration
     /**
      * Run the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function up(Builder $schemaBuilder)
@@ -28,6 +29,7 @@ class CreateLocalRecordsTable extends Migration
     /**
      * Reverse the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function down(Builder $schemaBuilder)

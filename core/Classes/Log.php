@@ -16,7 +16,7 @@ class Log
     /**
      * @var OutputInterface
      */
-    private static $output;
+    private static OutputInterface $output;
 
     /**
      * Get the output-interface

@@ -15,7 +15,7 @@ class CPRecords extends Module implements ModuleInterface
     /**
      * @var Collection
      */
-    private static $tracker;
+    private static Collection $tracker;
 
     public static function playerConnect(Player $player)
     {
