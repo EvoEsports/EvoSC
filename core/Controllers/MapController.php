@@ -343,8 +343,7 @@ class MapController implements ControllerInterface
                 'filename' => $map->fileName,
                 'name' => $map->name,
                 'environment' => $map->environnement,
-                'enabled' => 1,
-                'cooldown' => config('server.map-cooldown', 10)
+                'enabled' => 1
             ]);
 
             echo '.';
