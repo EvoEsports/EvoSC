@@ -22,6 +22,7 @@ use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Contracts\Queue\Queue;
 use stdClass;
 
 /**
@@ -179,10 +180,8 @@ class MapController implements ControllerInterface
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
             Hook::fire('MapPoolUpdated');
-
             warningMessage($player, ' deleted map ', $map)->sendAll();
-
-            QueueController::preCacheNextMap();
+            QueueController::dropMapSilent($map->uid);
         } else {
             Log::write('Failed to delete map "' . $map->filename);
         }
@@ -211,8 +210,7 @@ class MapController implements ControllerInterface
         MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
         Hook::fire('MapPoolUpdated');
-
-        QueueController::preCacheNextMap();
+        QueueController::dropMapSilent($map->uid);
     }
 
     /**
