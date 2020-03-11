@@ -394,10 +394,10 @@ class DedimaniaApi extends Module
         try {
             //Check if there is top1 dedi
             if ($newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = file_get_contents($bestRecord->ghost_replay) ?? '';
+                $Top1GReplay = File::get($bestRecord->ghost_replay, false);
 
-                if ($Top1GReplay == '') {
-                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
+                if ($Top1GReplay == null) {
+                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, true);
                 }
             }
 

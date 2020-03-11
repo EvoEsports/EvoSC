@@ -22,7 +22,7 @@ use esc\Modules\QuickButtons;
 use Exception;
 use GBXChallMapFetcher;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Support\Collection;
 use stdClass;
 
 /**
@@ -32,20 +32,10 @@ use stdClass;
  */
 class MapController implements ControllerInterface
 {
-    /**
-     * @var Map
-     */
     private static Map $currentMap;
-
-    /**
-     * @var Map
-     */
     private static ?Map $nextMap;
-
-    /**
-     * @var string
-     */
     private static string $mapsPath;
+    private static Collection $mapToDisable;
 
     /**
      * Initialize MapController
@@ -55,7 +45,7 @@ class MapController implements ControllerInterface
         global $_skipMapCheck;
 
         if (config('server.map-cooldown') == 0) {
-            Log::error('Map cooldown must be 1 or greater.');
+            Log::error('Map cooldown must be 1 or greater.', true);
             exit(3); //Configuration error
         }
 
@@ -64,6 +54,7 @@ class MapController implements ControllerInterface
         }
 
         self::$mapsPath = Server::getMapsDirectory();
+        self::$mapToDisable = collect();
 
         if (!$_skipMapCheck) {
             self::loadMaps();
@@ -78,6 +69,31 @@ class MapController implements ControllerInterface
         AccessRight::createIfMissing('matchsettings_load', 'Load matchsettings.');
         AccessRight::createIfMissing('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfMissing('time', 'Change the countdown time.');
+    }
+
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMatch', [self::class, 'processMapsToDisable']);
+        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
+
+        ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
+        ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
+        ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+
+        ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
+        ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
+        ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
+
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+        }
     }
 
     /**
@@ -204,13 +220,25 @@ class MapController implements ControllerInterface
         }
 
         infoMessage($player, ' disabled map ', secondary($map))->sendAll();
-        Log::write($player . '(' . $player->Login . ') disabled map ' . $map . ' [' . $map->uid . ']');
+        Log::write($player . '(' . $player->Login . ') queued disabling map ' . $map . ' [' . $map->uid . ']');
 
-        $map->update(['enabled' => 0]);
-        MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
-
-        Hook::fire('MapPoolUpdated');
         QueueController::dropMapSilent($map->uid);
+        self::$mapToDisable->push($map);
+        dump(self::$mapToDisable);
+    }
+
+    public static function processMapsToDisable()
+    {
+        dump(self::$mapToDisable);
+        foreach (self::$mapToDisable as $map) {
+            QueueController::dropMapSilent($map->uid);
+            $map->update(['enabled' => 0]);
+            MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
+            Hook::fire('MapPoolUpdated');
+            Log::info('Disabled map ' . $map->uid);
+        }
+
+        self::$mapToDisable = collect();
     }
 
     /**
@@ -409,30 +437,5 @@ class MapController implements ControllerInterface
         infoMessage($player, ' resets the round.')->sendAll();
 
         Server::restartMap();
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
-
-        ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
-        ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
-        ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
-
-        ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
-        ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
-        ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
-
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
-            // QuickButtons::addButton('', 'Replay Map', 'map.replay', 'map_replay');
-        }
     }
 }

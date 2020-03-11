@@ -289,6 +289,10 @@ class GBXBaseFetcher
 	// XML parser functions
 	private function startTag($name, $attribs)
 	{
+	    if(is_string($attribs)){
+	        return;
+        }
+
 		foreach ($attribs as $key => &$val)
 			$val = utf8_decode($val);
 		//echo 'startTag: ' . $name . "\n"; print_r($attribs);

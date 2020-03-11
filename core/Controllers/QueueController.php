@@ -200,23 +200,28 @@ class QueueController implements ControllerInterface
             $firstQueueItem = MapQueue::orderBy('created_at')->first();
 
             if (!$firstQueueItem) {
-                $map = Map::whereEnabled(1)->inRandomOrder()->first()->filename;
+                $map = Map::whereEnabled(1)->inRandomOrder()->first();
             } else {
                 $map = $firstQueueItem->map;
             }
 
         } else {
-            $map = Map::whereEnabled(1)->inRandomOrder()->first()->filename;
+            $map = Map::whereEnabled(1)->inRandomOrder()->first();
         }
 
-        if ($map && Server::getNextMapInfo()->uId != $map->uid) {
-            Log::write('QueueController', sprintf('Pre-caching map %s [%s]', $map->name, $map->uid));
+        /** @var \Maniaplanet\DedicatedServer\Structures\Map $nextMap */
+        $nextMap = Server::getNextMapInfo();
 
-            try {
-                Server::chooseNextMap($map->filename);
-            } catch (\Exception $e) {
-                Log::error('Failed to pre-cache map ' . $map->uid . ': ' . $e->getMessage(), true);
-                Log::write($e->getMessage(), isVerbose());
+        if ($map && $nextMap) {
+            if ($nextMap->uId != $map->uid && Server::isFilenameInSelection($map->filename)) {
+                Log::write('QueueController', sprintf('Pre-caching map %s [%s]', $map->name, $map->uid));
+
+                try {
+                    Server::chooseNextMap($map->filename);
+                } catch (\Exception $e) {
+                    Log::error('Failed to pre-cache map ' . $map->name . ': ' . $e->getMessage(), true);
+                    Log::write($e->getMessage(), isVerbose());
+                }
             }
         }
     }

@@ -106,8 +106,13 @@ class MxDownload extends Module implements ModuleInterface
      * @throws GuzzleException
      * @throws Throwable
      */
-    public static function addMap(Player $player, $mxId)
+    public static function addMap(Player $player, int $mxId)
     {
+        if ($mxId <= 0) {
+            warningMessage('MX-ID invalid.')->send($player);
+            return;
+        }
+
         $filename = self::downloadMapAndGetFilename(intval($mxId));
         $gbx = MapController::getGbxInformation($filename, false);
 
@@ -117,8 +122,8 @@ class MxDownload extends Module implements ModuleInterface
             if (File::exists(MapController::getMapsPath($oldMap->filename))) {
                 File::delete(MapController::getMapsPath($oldMap->filename));
             }
-        } else if (DB::table(Map::TABLE)->where('uid', '=', 'MX/' . $filename)->exists()) {
-            $oldMap = DB::table(Map::TABLE)->where('uid', '=', 'MX/' . $filename)->first();
+        } else if (DB::table(Map::TABLE)->where('filename', '=', 'MX/' . $filename)->exists()) {
+            $oldMap = DB::table(Map::TABLE)->where('filename', '=', 'MX/' . $filename)->first();
 
             DB::table('dedi-records')->where('Map', '=', $oldMap->id)->delete();
             DB::table('local-records')->where('Map', '=', $oldMap->id)->delete();
@@ -140,6 +145,11 @@ class MxDownload extends Module implements ModuleInterface
             'mx_id' => $mxId
         ]);
 
+        //Save the map to the matchsettings
+        if (!MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
+            MatchSettingsController::addMapToCurrentMatchSettings($filename, $gbx->MapUid);
+        }
+
         if (!Server::isFilenameInSelection($filename)) {
             try {
                 Server::addMap($filename);
@@ -153,11 +163,6 @@ class MxDownload extends Module implements ModuleInterface
 
                 return;
             }
-        }
-
-        //Save the map to the matchsettings
-        if (!MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
-            MatchSettingsController::addMapToCurrentMatchSettings($filename, $gbx->MapUid);
         }
 
         infoMessage($player, ' added map ', secondary($gbx->Name))->sendAll();

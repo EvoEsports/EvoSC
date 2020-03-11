@@ -6,6 +6,7 @@ namespace esc\Modules;
 use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Module;
+use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
@@ -31,8 +32,10 @@ class NextMap extends Module implements ModuleInterface
         $map = MapController::getNextMap();
         $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
 
-        infoMessage('Upcoming map ', secondary($map->name))->setIcon('')->sendAll();
-        Template::showAll('next-map.widget', compact('map', 'author'));
+        if (Server::isFilenameInSelection($map->filename)) {
+            infoMessage('Upcoming map ', secondary($map->name))->setIcon('')->sendAll();
+            Template::showAll('next-map.widget', compact('map', 'author'));
+        }
     }
 
     public static function hideNextMap()
