@@ -224,20 +224,18 @@ class MapController implements ControllerInterface
 
         QueueController::dropMapSilent($map->uid);
         self::$mapToDisable->push($map);
-        dump(self::$mapToDisable);
     }
 
     public static function processMapsToDisable()
     {
-        dump(self::$mapToDisable);
         foreach (self::$mapToDisable as $map) {
             QueueController::dropMapSilent($map->uid);
             $map->update(['enabled' => 0]);
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
-            Hook::fire('MapPoolUpdated');
             Log::info('Disabled map ' . $map->uid);
         }
 
+        Hook::fire('MapPoolUpdated');
         self::$mapToDisable = collect();
     }
 

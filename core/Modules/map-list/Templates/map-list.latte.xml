@@ -367,7 +367,7 @@ Void updateView(Text[Text][] mapPool, Integer page){
         rowsFilled = rowsFilled + 1;
     }
 
-    if(rowsFilled < 19){
+    if(rowsFilled <= 19){
         for(i, rowsFilled, 19){
             (mapsFrame.Controls[i] as CMlFrame).Hide();
         }
@@ -726,7 +726,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
             currentPage = currentPage - 1;
             if(currentPage < 0){
-                currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                currentPage = ML::FloorInteger(currentMapPool.count / 20.0);
             }
             updateView(currentMapPool, currentPage);
             continue;
