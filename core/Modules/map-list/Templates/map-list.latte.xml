@@ -316,6 +316,14 @@ Text getStarString(Real rating){
     return starString;
 }
 
+Integer ceil(Real value){
+    if(ML::NearestInteger(value) == value){
+        return ML::NearestInteger(value);
+    }
+
+    return ML::CeilingInteger(value);
+}
+
 Void updateView(Text[Text][] mapPool, Integer page){
     declare mapsFrame = (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
     declare pageInfo = (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
@@ -373,7 +381,11 @@ Void updateView(Text[Text][] mapPool, Integer page){
         }
     }
 
-    pageInfo.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(mapPool.count / 20.0));
+    log("map count: " ^ (mapPool.count));
+    log("map pages: " ^ (mapPool.count / 20.0));
+    log("rounded: " ^ ML::NearestInteger(mapPool.count / 20.0));
+    log("ceiled: " ^ ceil(mapPool.count / 20.0));
+    pageInfo.SetText((page + 1) ^ "/" ^ ceil(mapPool.count / 20.0));
 }
 
 Void search(){
@@ -705,8 +717,8 @@ Void setCooldownToZero(Text uid){
                 if(currentPage < 0){
                     currentPage = 0;
                 }
-                if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
-                    currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                if(currentPage >= ceil(currentMapPool.count / 20.0)){
+                    currentPage = ceil(currentMapPool.count / 20.0) - 1;
                 }
 
                 updateView(currentMapPool, currentPage);
@@ -726,7 +738,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
             currentPage = currentPage - 1;
             if(currentPage < 0){
-                currentPage = ML::FloorInteger(currentMapPool.count / 20.0);
+                currentPage = ceil(currentMapPool.count / 20.0) - 1;
             }
             updateView(currentMapPool, currentPage);
             continue;
@@ -734,7 +746,7 @@ Void setCooldownToZero(Text uid){
 
         if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
             currentPage = currentPage + 1;
-            if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
+            if(currentPage >= ceil(currentMapPool.count / 20.0)){
                 currentPage = 0;
             }
             updateView(currentMapPool, currentPage);
