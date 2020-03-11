@@ -166,7 +166,6 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         infoMessage($player, ' added map ', secondary($gbx->Name))->sendAll();
-
         Log::write($player . '(' . $player->Login . ') added map ' . $filename . ' [' . $gbx->MapUid . ']');
 
         //Send updated map-list
