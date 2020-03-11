@@ -125,8 +125,8 @@ class Map extends Model
             return null;
         }
 
-        if (Cache::has('mx-details/'.$this->mx_id)) {
-            return Cache::get('mx-details/'.$this->mx_id);
+        if (Cache::has('mx-details/' . $this->mx_id)) {
+            return Cache::get('mx-details/' . $this->mx_id);
         }
 
         return null;
@@ -141,8 +141,8 @@ class Map extends Model
             return null;
         }
 
-        if (Cache::has('mx-wr/'.$this->mx_id)) {
-            return Cache::get('mx-wr/'.$this->mx_id);
+        if (Cache::has('mx-wr/' . $this->mx_id)) {
+            return Cache::get('mx-wr/' . $this->mx_id);
         }
 
         return null;
@@ -153,7 +153,7 @@ class Map extends Model
      */
     public function getGbxAttribute()
     {
-        $cacheId = 'gbx/'.$this->uid;
+        $cacheId = 'gbx/' . $this->uid;
 
         if (Cache::has($cacheId)) {
             return Cache::get($cacheId);
@@ -166,20 +166,6 @@ class Map extends Model
     }
 
     /**
-     * @return bool
-     */
-    public function canBeJuked(): bool
-    {
-        $lastPlayedDate = $this->last_played;
-
-        if ($lastPlayedDate) {
-            return $this->last_played->diffInSeconds() > 1800;
-        }
-
-        return true;
-    }
-
-    /**
      * @return string
      */
     public function __toString()
@@ -187,7 +173,7 @@ class Map extends Model
         $gbx = $this->gbx;
 
         if (!$gbx) {
-            Log::write('Loading missing GBX for '.$this->filename);
+            Log::write('Loading missing GBX for ' . $this->filename);
             $gbx = MapController::getGbxInformation($this->filename);
             $this->gbx = $gbx;
             $this->save();
@@ -199,42 +185,12 @@ class Map extends Model
     }
 
     /**
-     * @param  string  $mapUid
+     * @param string $mapUid
      *
      * @return Map|null
      */
     public static function getByUid(string $mapUid): ?Map
     {
-        foreach (Map::all() as $map) {
-            if ($map->gbx->MapUid == $mapUid) {
-                return $map;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param  string  $mxId
-     *
-     * @return Map|null
-     */
-    public static function getByMxId(string $mxId): ?Map
-    {
-        if (config('database.type') == 'mysql') {
-            return Map::where('mx_details->TrackID', $mxId)
-                ->get()
-                ->first();
-        } else {
-            return Map::all()->filter(function (Map $map) use ($mxId) {
-                $details = $map->mx_details;
-
-                if (!$details) {
-                    return false;
-                }
-
-                return $details->TrackID == $mxId;
-            })->first();
-        }
+        return Map::whereUid($mapUid)->first();
     }
 }
