@@ -6,12 +6,12 @@ namespace esc\Interfaces;
 interface ControllerInterface
 {
     /**
-     * Method called on controller boot.
+     * Method called once on controller boot.
      */
     public static function init();
 
     /**
-     * Method called on controller start and mode change
+     * Method called after controller boot and at mode changes.
      *
      * @param  string  $mode
      * @param  bool  $isBoot
