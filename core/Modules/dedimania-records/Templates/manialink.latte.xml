@@ -194,7 +194,7 @@
     {/block}
 
     {block bootScript}
-        declare Record[Integer] DediRecords_ for LocalUser;
+        declare Record[] DediRecords for LocalUser;
         declare Integer LastDediRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
@@ -210,12 +210,12 @@
             if(LastDediRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastDediRecordsUpdate;
-                updateWidget(DediRecords_);
+                updateWidget(DediRecords);
             }
 
             if(playerCount != Players.count){
                 playerCount = Players.count;
-                updateWidget(DediRecords_);
+                updateWidget(DediRecords);
             }
     {/block}
 

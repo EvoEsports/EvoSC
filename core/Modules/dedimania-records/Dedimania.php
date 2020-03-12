@@ -178,7 +178,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             ];
         });
 
-        $dedisJson = $records->sortBy('rank')->toJson();
+        $dedisJson = $records->sortBy('rank')->values()->toJson();
 
         Template::show($player, 'dedimania-records.update', compact('dedisJson'));
     }
