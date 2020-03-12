@@ -170,18 +170,7 @@ class Map extends Model
      */
     public function __toString()
     {
-        $gbx = $this->gbx;
-
-        if (!$gbx) {
-            Log::write('Loading missing GBX for ' . $this->filename);
-            $gbx = MapController::getGbxInformation($this->filename);
-            $this->gbx = $gbx;
-            $this->save();
-
-            $gbx = json_decode($gbx);
-        }
-
-        return $gbx->Name;
+        return $this->name;
     }
 
     /**
