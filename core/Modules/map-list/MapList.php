@@ -31,7 +31,7 @@ class MapList extends Module implements ModuleInterface
 
     public static function sendFavorites(Player $player)
     {
-        $favorites = $player->favorites()->where('enabled', true)->pluck('id')->toJson();
+        $favorites = $player->favorites()->where('enabled', true)->pluck('uid')->toJson();
 
         Template::show($player, 'map-list.update-favorites', compact('favorites'));
     }
@@ -52,24 +52,24 @@ class MapList extends Module implements ModuleInterface
     /**
      * Player add favorite map
      *
-     * @param  Player  $player
-     * @param  string  $mapId
+     * @param Player $player
+     * @param string $mapUid
      */
-    public static function favAdd(Player $player, string $mapId)
+    public static function favAdd(Player $player, string $mapUid)
     {
-        $player->favorites()->attach($mapId);
+        $player->favorites()->attach(Map::getByUid($mapUid)->id);
         self::sendFavorites($player);
     }
 
     /**
      * Player remove favorite map
      *
-     * @param  Player  $player
-     * @param  string  $mapId
+     * @param Player $player
+     * @param string $mapUid
      */
-    public static function favRemove(Player $player, string $mapId)
+    public static function favRemove(Player $player, string $mapUid)
     {
-        $player->favorites()->detach($mapId);
+        $player->favorites()->detach(Map::getByUid($mapUid)->id);
         self::sendFavorites($player);
     }
 

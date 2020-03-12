@@ -30,9 +30,9 @@ class MxMapDetails extends Module implements ModuleInterface
         }
     }
 
-    public static function showDetails(Player $player, string $mapId)
+    public static function showDetails(Player $player, string $mapUid)
     {
-        $map = Map::find($mapId);
+        $map = Map::getByUid($mapUid);
 
         if (!$map) {
             return;
