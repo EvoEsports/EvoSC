@@ -94,7 +94,7 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Integer getMyRank(Record[Integer] records){
+    Integer getMyRank(Record[] records){
         foreach(record in records){
             if(record.login == LocalUser.Login){
                 return record.rank;
@@ -126,7 +126,7 @@
         recordsFrame.Show();
     }
 
-    Void updateWidget(Record[Integer] records){
+    Void updateWidget(Record[] records){
         declare myRank = getMyRank(records);
         declare filled = 0;
         declare skipped = 0;
