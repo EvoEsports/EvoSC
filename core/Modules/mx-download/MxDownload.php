@@ -156,11 +156,6 @@ class MxDownload extends Module implements ModuleInterface
             } catch (Exception $e) {
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool')->send($player);
                 Log::write('Adding map to selection failed: ' . $e->getMessage());
-
-                if (!Server::isFilenameInSelection($filename)) {
-                    DB::table('maps')->where('uid', '=', $gbx->MapUid)->update(['enabled' => 0]);
-                }
-
                 return;
             }
         }
@@ -172,7 +167,9 @@ class MxDownload extends Module implements ModuleInterface
         Hook::fire('MapPoolUpdated');
 
         //Queue the newly added map
-        QueueController::queueMap($player, Map::getByUid($gbx->MapUid));
+        if (QueueController::queueMapByUid($player, $gbx->MapUid)) {
+            infoMessage(secondary($player), ' queued map ', secondary($gbx->Name))->sendAll();
+        }
     }
 
     /**

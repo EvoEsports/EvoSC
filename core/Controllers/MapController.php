@@ -145,7 +145,7 @@ class MapController implements ControllerInterface
 
             self::$nextMap = $request->map;
         } else {
-            self::$nextMap = Map::where('uid', $mapUid)->first();
+            self::$nextMap = Map::getByUid($mapUid);
         }
     }
 

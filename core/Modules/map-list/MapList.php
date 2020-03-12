@@ -137,7 +137,7 @@ class MapList extends Module implements ModuleInterface
 
     public static function disableMapEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::whereUid($mapUid)->get()->first();
 
         if (!$map) {
             return;
@@ -149,7 +149,7 @@ class MapList extends Module implements ModuleInterface
 
     public static function deleteMapPermEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::whereUid($mapUid)->get()->first();
 
         if (!$map) {
             return;

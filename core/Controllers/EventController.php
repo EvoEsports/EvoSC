@@ -203,7 +203,7 @@ class EventController implements ControllerInterface
         if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
             $mapUid = $arguments[0]['UId'];
 
-            $map = Map::whereUid($mapUid)->get()->last();
+            $map = Map::whereUid($mapUid)->get()->first();
             MapController::setCurrentMap($map);
 
             try {
@@ -224,9 +224,7 @@ class EventController implements ControllerInterface
     private static function mpEndMap($arguments)
     {
         if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
-            $mapUid = $arguments[0]['UId'];
-
-            $map = Map::where('uid', $mapUid)->last();
+            $map = Map::getByUid($arguments[0]['UId']);
 
             try {
                 Hook::fire('EndMap', $map);

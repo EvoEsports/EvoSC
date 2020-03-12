@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -42,57 +43,58 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     * Queue a map
-     *
      * @param Player $player
-     * @param Map $map
-     * @param bool $replay
-     * @throws GuzzleException
+     * @param string $mapUid
+     * @param int $cooldown
+     * @return bool
      */
-    public static function queueMap(Player $player, Map $map, bool $replay = false)
+    public static function queueMapByUid(Player $player, string $mapUid, int $cooldown = 999): bool
     {
-        if ($map->cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
-            warningMessage('Can not queue recently played track. Please wait ' . secondary(config('server.map-cooldown') - $map->cooldown) . ' maps.')->send($player);
+        if ($cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
+            warningMessage('Can not queue recently played track. Please wait ' . secondary(config('server.map-cooldown') - $cooldown) . ' maps.')->send($player);
 
-            return;
+            return false;
         }
 
-        if (MapQueue::whereMapUid($map->uid)->count() > 0) {
-            warningMessage('The map ', secondary($map), ' is already in queue.')->send($player);
+        if (DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->count()) {
+            warningMessage('The map is already in the queue.')->send($player);
 
-            return;
+            return false;
         }
 
-        if (MapQueue::whereRequestingPlayer($player->Login)->count() > 0) {
+        if (DB::table(MapQueue::TABLE)->where('requesting_player', '=', $player->Login)->count()) {
             if (!$player->hasAccess('queue_multiple')) {
                 warningMessage('You are only allowed to queue one map at a time.')->send($player);
 
-                return;
+                return false;
             }
-        }
-
-        if ($map->mx_id) {
-            MxMapDetails::loadMxDetails($map);
-            MxMapDetails::loadMxWordlRecord($map);
         }
 
         MapQueue::create([
             'requesting_player' => $player->Login,
-            'map_uid' => $map->uid,
+            'map_uid' => $mapUid,
         ]);
 
-        if ($replay) {
-            infoMessage($player, ' queued map ', secondary($map), ' for replay.')->sendAll();
-        } else {
-            infoMessage($player, ' queued map ', secondary($map), '.')->sendAll();
-        }
-
-        Log::write($player . '(' . $player->Login . ') queued map ' . $map . ' [' . $map->uid . ']');
-
+        Log::write($player . '(' . $player->Login . ') queued map ' . $mapUid);
         Hook::fire('MapQueueUpdated', self::getMapQueue());
 
         if (self::$preCache) {
             self::preCacheNextMap();
+        }
+
+        return true;
+    }
+
+    /**
+     * Queue a map
+     *
+     * @param Player $player
+     * @param Map $map
+     */
+    public static function queueMap(Player $player, Map $map)
+    {
+        if (self::queueMapByUid($player, $map->uid)) {
+            infoMessage(secondary($player), ' queued map ', secondary($map->name))->sendAll();
         }
     }
 
@@ -148,7 +150,7 @@ class QueueController implements ControllerInterface
 
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::getByUid($mapUid);
 
         if ($map) {
             QueueController::queueMap($player, $map);
