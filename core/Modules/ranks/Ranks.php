@@ -26,6 +26,7 @@ class Ranks extends Module implements ModuleInterface
 
     public static function showRanks(Player $player, $page = 0)
     {
+        $page = intval($page);
         $perPage = 66;
         $total = DB::table('stats')->where('Score', '>', 0)->where('Rank', '>', 0)->count();
         $maxPage = ceil($total / $perPage);
