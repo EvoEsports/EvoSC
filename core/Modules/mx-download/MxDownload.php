@@ -86,9 +86,9 @@ class MxDownload extends Module implements ModuleInterface
         $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
         $filename = preg_replace('/[^a-z0-9\-_# .]/i', '', $filename);
         $filename = preg_replace('/\s/i', '_', $filename);
+        $filename = "MX/$filename";
 
-        Log::write('Saving new map as ' . MapController::getMapsPath($filename), isVerbose());
-
+        Log::write('Saving map as ' . MapController::getMapsPath($filename), isVerbose());
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
 
         if (!File::exists(MapController::getMapsPath($filename))) {
@@ -116,23 +116,15 @@ class MxDownload extends Module implements ModuleInterface
         $filename = self::downloadMapAndGetFilename(intval($mxId));
         $gbx = MapController::getGbxInformation($filename, false);
 
-        if (DB::table(Map::TABLE)->where('uid', '=', $gbx->MapUid)->exists()) {
-            $oldMap = DB::table(Map::TABLE)->where('uid', '=', $gbx->MapUid)->first();
-
-            if (File::exists(MapController::getMapsPath($oldMap->filename))) {
-                File::delete(MapController::getMapsPath($oldMap->filename));
-            }
-        } else if (DB::table(Map::TABLE)->where('filename', '=', 'MX/' . $filename)->exists()) {
-            $oldMap = DB::table(Map::TABLE)->where('filename', '=', 'MX/' . $filename)->first();
+        if (DB::table(Map::TABLE)->where('filename', '=', $filename)->where('uid', '!=', $gbx->MapUid)->exists()) {
+            $oldMap = DB::table(Map::TABLE)->where('filename', '=', $filename)->where('uid', '!=', $gbx->MapUid)->first();
 
             DB::table('dedi-records')->where('Map', '=', $oldMap->id)->delete();
             DB::table('local-records')->where('Map', '=', $oldMap->id)->delete();
+            $oldMap->delete();
         }
 
-        File::rename(MapController::getMapsPath($filename), MapController::getMapsPath('MX/' . $filename));
-        $filename = 'MX/' . $filename;
-
-        DB::table('maps')->updateOrInsert([
+        DB::table(Map::TABLE)->updateOrInsert([
             'uid' => $gbx->MapUid
         ], [
             'author' => MapController::createOrGetAuthor($gbx->AuthorLogin),
@@ -145,19 +137,20 @@ class MxDownload extends Module implements ModuleInterface
             'mx_id' => $mxId
         ]);
 
-        //Save the map to the matchsettings
-        if (!MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
-            MatchSettingsController::addMapToCurrentMatchSettings($filename, $gbx->MapUid);
-        }
-
         if (!Server::isFilenameInSelection($filename)) {
             try {
                 Server::addMap($filename);
+                Log::info("Added $filename to the selection.");
             } catch (Exception $e) {
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool')->send($player);
                 Log::write('Adding map to selection failed: ' . $e->getMessage());
                 return;
             }
+        }
+
+        //Save the map to the matchsettings
+        if (!MatchSettingsController::filenameExistsInCurrentMatchSettings($filename)) {
+            MatchSettingsController::addMapToCurrentMatchSettings($filename, $gbx->MapUid);
         }
 
         infoMessage($player, ' added map ', secondary($gbx->Name))->sendAll();
