@@ -8,7 +8,6 @@ foreach (['cache', 'logs', 'modules'] as $dir) {
 
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
-require 'core/gbxdatafetcher/gbxdatafetcher.inc.php';
 
 use esc\Commands\EscRun;
 use esc\Commands\AddAdmin;
