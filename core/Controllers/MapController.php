@@ -8,6 +8,7 @@ use esc\Classes\File;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\MPS_Map;
 use esc\Classes\Server;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
@@ -282,67 +283,23 @@ class MapController implements ControllerInterface
      * @param $filename
      *
      * @param bool $asString
-     * @return string|stdClass|null
+     * @return string|MPS_Map
      */
     public static function getGbxInformation($filename, bool $asString = true)
-    {
-        $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
-        $data = new GBXChallMapFetcher(true);
-
-        try {
-            $data->processFile($mapFile);
-        } catch (Exception $e) {
-            Log::write($e->getMessage(), isVerbose());
-
-            return self::getGbxInformationByExecutable($filename);
-        }
-
-        $gbx = new stdClass();
-        $gbx->CheckpointsPerLaps = $data->nbChecks;
-        $gbx->NbLaps = $data->nbLaps;
-        $gbx->DisplayCost = $data->cost;
-        $gbx->LightmapVersion = $data->lightmap;
-        $gbx->AuthorTime = $data->authorTime;
-        $gbx->GoldTime = $data->goldTime;
-        $gbx->SilverTime = $data->silverTime;
-        $gbx->BronzeTime = $data->bronzeTime;
-        $gbx->IsValidated = $data->validated;
-        $gbx->PasswordProtected = $data->password != '';
-        $gbx->MapStyle = $data->mapStyle;
-        $gbx->MapType = $data->mapType;
-        $gbx->Mod = $data->modName;
-        $gbx->Decoration = $data->mood;
-        $gbx->Environment = $data->envir;
-        $gbx->PlayerModel = 'Unassigned';
-        $gbx->MapUid = $data->uid;
-        $gbx->Comment = $data->comment;
-        $gbx->TitleId = Server::getVersion()->titleId;
-        $gbx->AuthorLogin = $data->authorLogin;
-        $gbx->AuthorNick = $data->authorNick;
-        $gbx->Name = $data->name;
-        $gbx->ClassName = 'CGameCtnChallenge';
-        $gbx->ClassId = '03043000';
-
-        Log::write('Get GBX information: ' . $filename, isVerbose());
-
-        if (!$gbx->Name) {
-            $gbx = self::getGbxInformationByExecutable($filename);
-        }
-
-        if ($asString) {
-            return json_encode($gbx);
-        }
-
-        return $gbx;
-    }
-
-    private static function getGbxInformationByExecutable($filename)
     {
         $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
         $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
+        $jsonString = shell_exec($cmd);
 
-        return json_decode(shell_exec($cmd));
+        if ($asString) {
+            return $jsonString;
+        }
+
+        $data = json_decode($jsonString);
+        $data->fileName = $filename;
+
+        return MPS_Map::fromObject($data);
     }
 
     /**

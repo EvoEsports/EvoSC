@@ -121,7 +121,7 @@ class MxPackJob
                     $authorId = Player::find($authorLogin)->id;
                 } else {
                     $authorId = Player::insertGetId([
-                        'NickName' => $gbx->AuthorNick,
+                        'NickName' => $authorLogin,
                         'Login' => $authorLogin
                     ]);
                 }
@@ -145,7 +145,7 @@ class MxPackJob
                 'enabled' => 1
             ]);
 
-            MatchSettingsController::addMapToCurrentMatchSettings($map);
+            MatchSettingsController::addMapToCurrentMatchSettings($filename, $map->uid);
 
             try {
                 Server::addMap($filename);

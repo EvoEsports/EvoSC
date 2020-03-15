@@ -13,7 +13,7 @@ class Cache
     /**
      * Checks if a cache object exists and is not expired
      *
-     * @param  string  $id
+     * @param string $id
      *
      * @return bool
      */
@@ -39,7 +39,7 @@ class Cache
     /**
      * Gets an cache object (may be outdated, do check with "has" first!)
      *
-     * @param  string  $id
+     * @param string $id
      *
      * @return mixed
      */
@@ -51,7 +51,7 @@ class Cache
     }
 
     /**
-     * @param  string  $id
+     * @param string $id
      *
      * @return Carbon|null
      */
@@ -72,7 +72,7 @@ class Cache
      *
      * @param                     $id
      * @param                     $data
-     * @param Carbon|null  $expires
+     * @param Carbon|null $expires
      */
     public static function put($id, $data, Carbon $expires = null)
     {
@@ -84,9 +84,9 @@ class Cache
 
             File::put(cacheDir($id), $cacheObject, true);
         } catch (Exception $e) {
-            Log::write("Failed to save $id.");
-            var_dump($e->getMessage());
-            var_dump($e->getTraceAsString());
+            Log::error("Failed to save $id.", true);
+            Log::write($e->getMessage());
+            Log::write($e->getTraceAsString());
         }
     }
 

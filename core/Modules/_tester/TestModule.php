@@ -7,8 +7,10 @@ namespace esc\Modules;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Template;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface;
+use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
@@ -24,7 +26,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MapList::playerConnect($player);
+        dd(MapController::getGbxInformation(Map::first()->filename, false));
     }
 
     public static function sendTestManialink(Player $player)
