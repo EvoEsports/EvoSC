@@ -51,8 +51,6 @@ class Ranks extends Module implements ModuleInterface
 
         $pageInfo = ($page + 1) . '/' . $maxPage;
 
-        dump($ranks);
-
         Template::show($player, 'ranks.window', compact('ranks', 'pageInfo', 'page'));
     }
 }
