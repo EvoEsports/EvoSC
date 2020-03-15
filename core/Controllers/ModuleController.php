@@ -86,9 +86,14 @@ class ModuleController implements ControllerInterface
                     }
                 }
 
-                Log::info("Starting $moduleClass.", isVeryVerbose());
+                Log::info("Starting $moduleClass.", isVerbose());
 
-                $instance = new $moduleClass();
+                try {
+                    $instance = new $moduleClass();
+                } catch (\Error $e) {
+                    Log::error($e->getMessage() . ', module not started.');
+                    return null;
+                }
 
                 if (!($instance instanceof Module)) {
                     Log::error("$moduleClass is not a module, but should be.", true);
