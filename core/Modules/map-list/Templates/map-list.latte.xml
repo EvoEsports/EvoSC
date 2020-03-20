@@ -604,7 +604,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-id"));
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-uid"));
         return;
     }
 }
