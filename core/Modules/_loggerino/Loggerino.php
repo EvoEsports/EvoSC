@@ -4,6 +4,7 @@
 namespace esc\Modules;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Module;
 use esc\Classes\Template;
@@ -26,7 +27,7 @@ class Loggerino extends Module implements ModuleInterface
         self::$lines = collect();
         self::$listeners = collect();
 
-        InputSetup::add('loggerino.start', 'Start live log.', [self::class, 'sendManialink'], 'F8', 'log');
+        ChatCommand::add('//log', [self::class, 'sendManialink'], 'Open live log.', 'log');
 
         Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromListeners']);
 
@@ -50,7 +51,7 @@ class Loggerino extends Module implements ModuleInterface
         }
     }
 
-    public static function sendManialink(Player $player)
+    public static function sendManialink(Player $player, $cmd = null)
     {
         Template::show($player, '_loggerino.window', ['rows' => self::$rows]);
         self::$listeners->put($player->Login, $player);
