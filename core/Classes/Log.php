@@ -2,6 +2,7 @@
 
 namespace esc\Classes;
 
+use esc\Modules\Loggerino;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -55,57 +56,39 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
-        $date = date("Y-m-d", time());
-        $time = date("H:i:s", time());
-        $logFile = logDir($date . '.txt');
 
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(false, 2);
         }
 
         if (isset($caller['class']) && isset($caller['type'])) {
-            $callingClass = $caller['class'] . $caller['type'] . $caller['function'];
+            $callerClassName = isVerbose() ? $caller['class'] : preg_replace('#^.+[\\\]#', '', $caller['class']);
+            $callingClass = $callerClassName . $caller['type'] . $caller['function'];
         } else {
             $callingClass = $caller['function'];
         }
 
-
-        if (isVerbose()) {
-            $callingClass .= '(';
-
-            foreach ($caller['args'] as $key => $arg) {
-                $add = '<fg=yellow>';
-
-                if (is_array($arg)) {
-                    $add .= 'Array';
-                } else {
-                    if (is_object($arg)) {
-                        $add .= get_class($arg);
-                    } else {
-                        $add .= '"' . $arg . '"';
-                    }
-                }
-
-                $callingClass .= $add . '</>';
-
-                if ($key + 1 < count($caller['args'])) {
-                    $callingClass .= ', ';
-                }
-            }
-
-            $callingClass .= ')';
-        } else {
+        if(count($caller['args']) > 0){
             $callingClass .= '(...)';
+        }else {
+            $callingClass .= '';
         }
 
         if (isDebug()) {
             $callingClass .= "\nData: " . json_encode($caller['args']);
         }
 
+        Loggerino::append(preg_replace('/<(?:error|info|fg=\w+|\/)>/', '', "$callingClass $string"));
+
+        $date = date("Y-m-d", time());
+        $time = date("H:i:s", time());
+        $logFile = logDir($date . '.txt');
+
         $line = sprintf("[%s] %s: %s", $time, $callingClass, $string);
+
         $line = stripAll($line);
 
-        if ($echo == true || isVeryVerbose()) {
+        if ($echo == true || isDebug()) {
             self::writeLn($line);
         }
 

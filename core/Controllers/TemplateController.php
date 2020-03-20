@@ -78,7 +78,7 @@ class TemplateController implements ControllerInterface
     public static function getTemplate(string $index, $values): string
     {
         try {
-            if (isVeryVerbose()) {
+            if (isDebug()) {
                 Log::write('Rendering Template: ' . $index);
             }
 
