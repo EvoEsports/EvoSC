@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\DB;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Template;
@@ -35,26 +36,27 @@ class RecordsTable extends Module implements ModuleInterface
             compact('records', 'pages', 'onlineLogins', 'window_title', 'map'));
     }
 
-    public static function showGraph(Player $player, $window_title, $recordId)
+    public static function showGraph(Player $player, $mapId, $window_title, $targetRecordRank)
     {
         if ($window_title == 'Local Records') {
-            $record = DB::table(LocalRecords::TABLE)->where('id', '=', $recordId)->first();
+            $record = DB::table(LocalRecords::TABLE)->where('Map', '=', $mapId)->where('Rank', '=', $targetRecordRank)->first();
         } else {
-            $record = DB::table(Dedimania::TABLE)->where('id', '=', $recordId)->first();
+            $record = DB::table(Dedimania::TABLE)->where('Map', '=', $mapId)->where('Rank', '=', $targetRecordRank)->first();
         }
 
         if (!$record) {
+            Log::info('Target record not found.');
             return;
         }
 
         $myRecord = DB::table(Dedimania::TABLE)
-            ->where('Map', '=', $record->Map)
+            ->where('Map', '=', $mapId)
             ->where('Player', '=', $player->id)
             ->first();
 
         if (!$myRecord) {
             $myRecord = DB::table(LocalRecords::TABLE)
-                ->where('Map', '=', $record->Map)
+                ->where('Map', '=', $mapId)
                 ->where('Player', '=', $player->id)->first();
         }
 
