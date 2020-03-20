@@ -14,7 +14,10 @@ use esc\Models\Player;
 
 class Donations extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'show']);
 
@@ -28,7 +31,7 @@ class Donations extends Module implements ModuleInterface
         Template::show($player, 'donations.widget');
     }
 
-    public static function donateCmd(Player $player, $amount)
+    public static function donateCmd(Player $player, $cmd, $amount)
     {
         self::donate($player, intval($amount));
     }
@@ -49,13 +52,5 @@ class Donations extends Module implements ModuleInterface
     {
         $player->stats()->increment('Donations', $amount);
         infoMessage($player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!')->sendAll();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }
