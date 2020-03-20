@@ -122,7 +122,7 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text = $data[2];
 
-            if($login === config('server.login')){
+            if ($login === config('server.login')) {
                 return;
             }
 
@@ -151,7 +151,7 @@ class EventController implements ControllerInterface
                 ChatController::playerChat(player($login), $text);
                 Hook::fire('PlayerChat', player($login), $text);
             } catch (Exception $e) {
-                Log::write("Error: ".$e->getMessage());
+                Log::write("Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -204,12 +204,17 @@ class EventController implements ControllerInterface
             $mapUid = $arguments[0]['UId'];
 
             $map = Map::whereUid($mapUid)->get()->first();
+
+            if ($map == null) {
+                Log::error("Map with UID $mapUid not found in database!");
+            }
+
             MapController::setCurrentMap($map);
 
             try {
                 Hook::fire('BeginMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: ".$e->getMessage());
+                Log::write("Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -229,7 +234,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('EndMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: ".$e->getMessage());
+                Log::write("Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -247,7 +252,7 @@ class EventController implements ControllerInterface
             try {
                 ManiaLinkEvent::call(player($arguments[1]), $arguments[2], $arguments[3]);
             } catch (Exception $e) {
-                Log::write("Error: ".$e->getMessage());
+                Log::write("Error: " . $e->getMessage());
             }
         } else {
             throw new Exception('Malformed callback');
@@ -264,8 +269,8 @@ class EventController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
