@@ -18,6 +18,8 @@ class LocalRecords extends Module implements ModuleInterface
 {
     const TABLE = 'local-records';
 
+    private static int $echoTop;
+
     /**
      * Called when the module is loaded
      *
@@ -161,7 +163,12 @@ class LocalRecords extends Module implements ModuleInterface
 
             if ($oldRecord->Score == $score) {
                 $chatMessage->setParts($player, ' equaled his/her ',
-                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)))->sendAll();
+                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)));
+                if ($newRank <= config('locals.echo-top', 100)) {
+                    $chatMessage->sendAll();
+                } else {
+                    $chatMessage->send($player);
+                }
 
                 return;
             }
@@ -180,7 +187,13 @@ class LocalRecords extends Module implements ModuleInterface
 
                 $chatMessage->setParts($player, ' secured his/her ',
                     secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
+                    ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+
+                if ($newRank <= config('locals.echo-top', 100)) {
+                    $chatMessage->sendAll();
+                } else {
+                    $chatMessage->send($player);
+                }
             } else {
                 DB::table(self::TABLE)
                     ->where('Map', '=', $map->id)
@@ -199,7 +212,13 @@ class LocalRecords extends Module implements ModuleInterface
 
                 $chatMessage->setParts($player, ' gained the ',
                     secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
+                    ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+
+                if ($newRank <= config('locals.echo-top', 100)) {
+                    $chatMessage->sendAll();
+                } else {
+                    $chatMessage->send($player);
+                }
             }
 
             self::sendLocalsChunk();
@@ -219,12 +238,15 @@ class LocalRecords extends Module implements ModuleInterface
                     'Rank' => $newRank,
                 ]);
 
+            $chatMessage = chatMessage($player, ' gained the ',
+                secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)))
+                ->setIcon('')
+                ->setColor(config('colors.local'));
+
             if ($newRank <= config('locals.echo-top', 100)) {
-                chatMessage($player, ' gained the ',
-                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)))
-                    ->setIcon('')
-                    ->setColor(config('colors.local'))
-                    ->sendAll();
+                $chatMessage->sendAll();
+            } else {
+                $chatMessage->send($player);
             }
 
             self::sendLocalsChunk();

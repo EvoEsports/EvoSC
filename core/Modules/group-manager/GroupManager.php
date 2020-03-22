@@ -17,7 +17,10 @@ use Illuminate\Support\Collection;
 
 class GroupManager extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
 
@@ -186,13 +189,5 @@ class GroupManager extends Module implements ModuleInterface
                 infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
             }
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }
