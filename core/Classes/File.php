@@ -18,7 +18,7 @@ class File
      * Get the contents of a file and optionally json decode them.
      *
      * @param string|null $fileName
-     * @param bool        $json_decode
+     * @param bool $json_decode
      *
      * @return null|string|Object
      */
@@ -51,7 +51,7 @@ class File
     public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
-        $dir      = str_replace(basename($fileName), '', $fileName);
+        $dir = str_replace(basename($fileName), '', $fileName);
 
         if (!is_dir(realpath($dir))) {
             mkdir(realpath($dir));
@@ -99,7 +99,7 @@ class File
     /**
      * Gets all files in the directory, you can optionally filter them with a RegEx-pattern.
      *
-     * @param string      $path
+     * @param string $path
      * @param string|null $filterPattern
      *
      * @return Collection
@@ -235,6 +235,10 @@ class File
         $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
+        if (!is_dir(baseDir($targetFile))) {
+            mkdir(is_dir(baseDir($targetFile)));
+        }
+
         rename($sourceFile, $targetFile);
     }
 
@@ -242,6 +246,10 @@ class File
     {
         $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
         $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
+
+        if (!is_dir(baseDir($target))) {
+            mkdir(is_dir(baseDir($target)));
+        }
 
         copy($source, $target);
     }
