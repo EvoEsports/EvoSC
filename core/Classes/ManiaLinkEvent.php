@@ -149,7 +149,7 @@ class ManiaLinkEvent
         $arguments[0] = $ply;
 
         if ($formValues) {
-            $formValuesObject = collect();
+            $formValuesObject = new \stdClass();
             foreach ($formValues as $value) {
                 $formValuesObject->{$value['Name']} = $value['Value'];
             }

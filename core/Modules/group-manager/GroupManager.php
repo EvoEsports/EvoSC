@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
@@ -12,6 +13,7 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Group;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 class GroupManager extends Module implements ModuleInterface
 {
@@ -24,13 +26,12 @@ class GroupManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('group.delete', [self::class, 'groupDelete'], 'group');
         ManiaLinkEvent::add('group.edit_access', [self::class, 'groupEditAccess'], 'group');
         ManiaLinkEvent::add('group.edit_group', [self::class, 'groupEdit'], 'group');
-        ManiaLinkEvent::add('group.allow', [self::class, 'groupAllow'], 'group');
-        ManiaLinkEvent::add('group.deny', [self::class, 'groupDeny'], 'group');
         ManiaLinkEvent::add('group.update', [self::class, 'groupUpdate'], 'group');
         ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group');
         ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group');
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
+        ManiaLinkEvent::add('group.rights_update', [self::class, 'groupRightsUpdate'], 'group');
 
         AccessRight::createIfMissing('group_edit', 'Add/delete/update groups.');
         AccessRight::createIfMissing('group_change', 'Change player group.');
@@ -38,6 +39,23 @@ class GroupManager extends Module implements ModuleInterface
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
+    }
+
+    public function groupRightsUpdate(Player $player, $formData)
+    {
+        $groupId = $formData->group_id;
+        DB::table('access_right_group')->where('group_id', '=', $groupId)->delete();
+
+        collect($formData)->forget('group_id')->each(function ($value, $key) use ($groupId) {
+            if ($value != "0") {
+                DB::table('access_right_group')->insert([
+                    'group_id' => $groupId,
+                    'access_right_id' => $key
+                ]);
+            }
+        });
+
+        self::showOverview($player);
     }
 
     public static function showOverview(Player $player)
@@ -75,7 +93,7 @@ class GroupManager extends Module implements ModuleInterface
         if ($group) {
             $group->update([
                 'chat_prefix' => $prefix,
-                'color'       => $color,
+                'color' => $color,
             ]);
 
             self::showOverview($player);
@@ -101,7 +119,7 @@ class GroupManager extends Module implements ModuleInterface
 
     public static function groupEditAccess(Player $player, string $groupId)
     {
-        $group        = Group::find($groupId);
+        $group = Group::find($groupId);
         $accessRights = AccessRight::all();
 
         Template::show($player, 'group-manager.edit_access', compact('group', 'accessRights'));
@@ -112,26 +130,6 @@ class GroupManager extends Module implements ModuleInterface
         $group = Group::find($groupId);
 
         Template::show($player, 'group-manager.edit', compact('group'));
-    }
-
-    public static function groupAllow(string $groupId, string $rightId)
-    {
-        $group = Group::find($groupId);
-        $right = AccessRight::find($rightId);
-
-        if ($group && $right) {
-            $group->accessRights()->attach($right->id);
-        }
-    }
-
-    public static function groupDeny(string $groupId, string $rightId)
-    {
-        $group = Group::find($groupId);
-        $right = AccessRight::find($rightId);
-
-        if ($group && $right) {
-            $group->accessRights()->detach($right->id);
-        }
     }
 
     public static function groupMembers(Player $player, string $groupId)
@@ -157,7 +155,7 @@ class GroupManager extends Module implements ModuleInterface
 
     public static function groupMemberAddForm(Player $player, string $groupId)
     {
-        $players     = onlinePlayers();
+        $players = onlinePlayers();
         $playerCount = $players->count();
 
         Template::show($player, 'group-manager.add', compact('players', 'groupId', 'playerCount'));

@@ -289,7 +289,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player." finished with time ($score) ".formatScore($score));
+            Log::info($player."\$z finished with time ($score) ".formatScore($score));
 
             $player->Score = $score;
             $player->save();

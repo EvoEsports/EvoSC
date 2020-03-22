@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:GroupsManagerEditor" id="GroupsManager" version="3">
-
     <frame id="overview" pos="-60 {ceil($accessRights->count()/2) * 3}">
-        <quad size="120 {ceil($accessRights->count()/2) * 6 + 2}" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
+        <quad size="120 {ceil($accessRights->count()/2) * 6 + 10}" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
         <quad size="120 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.95" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Edit: {$group->Name}'s access rights" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="close" pos="117 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.text.primary')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+
+        <entry name="group_id" hidden="1" default="{$group->id}" />
 
         {foreach $accessRights as $right}
         <frame pos="{$iterator->counter > ceil($accessRights->count() / 2) ? 62 : 2} {$iterator->counter * -6 - 4 + ($iterator->counter > ceil($accessRights->count() / 2) ? $accessRights->count() * 3 : 0)}">
@@ -14,8 +14,12 @@
             <label pos="5 1.5" textsize="1" text="{$right}" valign="center" textfont="{config('colors.ui.font')|noescape}" />
             <label pos="5 -1" textsize="1" scale="0.7" text="{$right->description}" valign="center" textcolor="aaaf" textfont="{config('colors.ui.font')|noescape}" />
             <label class="toggle" pos="-2 3" size="60 6" ScriptEvents="1" focusareacolor1="0000" data-id="{$right->id}" textfont="{config('colors.ui.font')|noescape}" />
+            <entry name="{$right->id}" hidden="1" default="{$group->hasAccess($right) ? 1 : 0}" />
         </frame>
         {/foreach}
+
+        <label action="group.rights_update" class="add" pos="52 -{ceil($accessRights->count()/2) * 6 + 12}" size="15 4" text="UPDATE" textsize="0.5" scale="1" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" textfont="{config('colors.ui.font')|noescape}" />
+        <label action="group.overview" class="add" pos="68 -{ceil($accessRights->count()/2) * 6 + 12}" size="15 4" text="CANCEL" textsize="0.5" scale="1" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.default')}9" focusareacolor2="{config('colors.ui.window.btn.default')}c" textfont="{config('colors.ui.font')|noescape}" />
     </frame>
 
     <script><!--
@@ -24,27 +28,22 @@
 
     main(){
         declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
-        declare groupId = {$group->id};
 
         while(True){
             yield;
 
             foreach(event in PendingEvents){
-                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
-                    TriggerPageAction("group.overview");
-                    continue;
-                }
-
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("toggle")){
                     declare rightId = event.Control.DataAttributeGet("id");
                     declare checkbox <=> (event.Control.Parent.Controls[0] as CMlLabel);
+                    declare entry <=> (event.Control.Parent.Controls[5] as CMlEntry);
 
                     if(checkbox.Visible){
-                        TriggerPageAction("group.deny," ^ groupId ^ "," ^ rightId);
                         checkbox.Hide();
+                        entry.Value = "0";
                     }else{
-                        TriggerPageAction("group.allow," ^ groupId ^ "," ^ rightId);
                         checkbox.Show();
+                        entry.Value = "1";
                     }
 
                     continue;

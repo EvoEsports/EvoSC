@@ -24,7 +24,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Loggerino::sendManialink($player);
+        GroupManager::groupEditAccess($player, 2);
     }
 
     public static function sendTestManialink(Player $player)
