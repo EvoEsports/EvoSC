@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:asay" id="asay" version="3">
+    <label id="text" opacity="1.0" textprefix="$s" textcolor="{config('colors.warning')|noescape}f" textfont="{config('colors.ui.font')|noescape}" halign="center" valign="center" size="80 100" textsize="1.0" autonewline="1" text={$text} pos={config('asay.pos')} />
+
+    <script><!--
+    main() {
+        declare textLabel <=> (Page.MainFrame.GetFirstChild("text") as CMlLabel);
+        declare hidden = False;
+
+        while(True){
+            yield;
+
+            if(InputPlayer == Null) continue;
+            if(InputPlayer.DisplaySpeed > 1 && !hidden){
+                hidden = True;
+                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}3' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                continue;
+            }
+            if(InputPlayer.DisplaySpeed < 1 && hidden){
+                hidden = False;
+                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                continue;
+            }
+
+            if(textLabel.Value == ""){
+                textLabel.Hide();
+                return;
+            }
+        }
+    }
+    --></script>
+</manialink>

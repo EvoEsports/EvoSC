@@ -21,7 +21,6 @@ use esc\Modules\LocalRecords;
 use esc\Modules\MxMapDetails;
 use esc\Modules\QuickButtons;
 use Exception;
-use GBXChallMapFetcher;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use stdClass;

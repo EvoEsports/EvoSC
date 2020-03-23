@@ -17,6 +17,27 @@ use Illuminate\Support\Collection;
 
 class InfoMessages extends Module implements ModuleInterface
 {
+    /**
+     * Called when the module is loaded
+     *
+     * @param string $mode
+     * @param bool $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+
+        AccessRight::createIfMissing('info_messages', 'Add/edit/remove reccuring info-messages.');
+
+        ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
+
+        ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages');
+        ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
+        ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
+        ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
+
+        Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
+    }
+
     public static function displayInfoMessages()
     {
         $messages = DB::table('info-messages')->select('text')->whereRaw('ROUND(UNIX_TIMESTAMP()/60) % delay = 0')->get();
@@ -68,26 +89,5 @@ class InfoMessages extends Module implements ModuleInterface
         }
 
         Template::show($player, 'info-messages.edit', compact('id', 'message', 'interval'));
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param string $mode
-     * @param bool $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-
-        AccessRight::createIfMissing('info_messages', 'Add/edit/remove reccuring info-messages.');
-
-        ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
-
-        ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages');
-        ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
-        ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
-        ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
-
-        Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
     }
 }
