@@ -7,24 +7,23 @@
         declare textLabel <=> (Page.MainFrame.GetFirstChild("text") as CMlLabel);
         declare hidden = False;
 
+        if(textLabel.Value == ""){
+            return;
+        }
+
         while(True){
             yield;
 
             if(InputPlayer == Null) continue;
-            if(InputPlayer.DisplaySpeed > 1 && !hidden){
+            if(InputPlayer.DisplaySpeed > 50 && !hidden){
                 hidden = True;
-                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}3' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;
             }
-            if(InputPlayer.DisplaySpeed < 1 && hidden){
+            if(InputPlayer.DisplaySpeed < 50 && hidden){
                 hidden = False;
                 AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;
-            }
-
-            if(textLabel.Value == ""){
-                textLabel.Hide();
-                return;
             }
         }
     }

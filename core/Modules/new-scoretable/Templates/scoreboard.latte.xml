@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:ScoreTable" id="ScoreTable" version="3">
+    <stylesheet>
+        <style class="label" textfont="{config('colors.ui.font')|noescape}" textsize="1" />
+        <style class="red" textcolor="f00" />
+
+        <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')|noescape}" />
+    </stylesheet>
+
+    <framemodel id="box" hidden="1">
+        <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
+            <quad pos="-3 5" size="50 7" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" rot="-45" z-index="-2" opacity="0.65" />
+            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="666" />
+        </frame> <!-- Badge -->
+        <label class="label" pos="6.75 -5.5" textprefix="$s" size="10 10" textsize="1.1" scale="2" halign="center" valign="center" text="9" /> <!-- Rank -->
+        <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff" /> <!-- Name -->
+        <label class="label" pos="25 -7" scale="1" textcolor="fff" /> <!-- Score -->
+        <quad pos="15 -6" valign="center" size="8 8" /> <!-- Avatar -->
+        <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" /> <!-- Flag -->
+        <label class="label" pos="66.25 -3.8" scale="0.9" textcolor="fff" valign="center" opacity="0.75" text="Region: Rank" /> <!-- Region -->
+        <label class="label" pos="64.25 -7.5" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center" text="$f35" opacity="0.85" /> <!-- Group -->
+        <label class="label" pos="66.25 -7.5" scale="0.9" textcolor="fff" valign="center" text="Masteradmin" opacity="0.75" /> <!-- Group -->
+        <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s" text="" opacity="0.85" z-index="2" /> <!-- Fame Stars -->
+
+        <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12" opacity="0" /> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="86 12" z-index="-10" opacity="0.6" /> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15" /> <!-- Rank BG -->
+    </framemodel>
+
+    <frame id="main-frame" pos="-86 37">
+        <frame id="boxes-frame">
+            {for $i=0;$i<6;$i++}
+            <frameinstance modelid="box" pos="0 {$i * -13}"></frameinstance>
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Const SB_Update_Interval 250
+
+    declare CMlFrame mainFrame;
+    declare CMlFrame[] boxes;
+
+    Text getStars(Integer count){
+        declare Text stars = "";
+        for(i, 0, count - 1){
+            stars = stars ^ " ";
+        }
+        return stars;
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateBox(CMlFrame box, CTmScore score){
+        declare CUser user <=> score.User;
+        declare badgeQuad <=> ((box.Controls[0] as CMlFrame).Controls[0] as CMlQuad);
+        declare badgeLabel <=> ((box.Controls[0] as CMlFrame).Controls[1] as CMlLabel);
+        declare rankLabel <=> (box.Controls[1] as CMlLabel);
+        declare nameLabel <=> (box.Controls[2] as CMlLabel);
+        declare scoreLabel <=> (box.Controls[3] as CMlLabel);
+        declare avatarQuad <=> (box.Controls[4] as CMlQuad);
+        declare flagQuad <=> (box.Controls[5] as CMlQuad);
+        declare regionLabel <=> (box.Controls[6] as CMlLabel);
+        declare groupIconLabel <=> (box.Controls[7] as CMlLabel);
+        declare groupLabel <=> (box.Controls[8] as CMlLabel);
+        declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
+
+        badgeQuad.Hide();
+        badgeLabel.Value = "";
+        rankLabel.Value = "1";
+        nameLabel.Value = user.Name;
+        scoreLabel.Value = "0:00.000";
+        avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
+        flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+        regionLabel.Value = user.LadderZoneName ^ ": " ^ user.LadderRank;
+        fameStarsLabel.Value = getStars(user.FameStars);
+        box.Show();
+    }
+
+    Void updateScoreTable(){
+        foreach(Key => Score in Scores){
+            if(Key >= boxes.count){
+                return;
+            }
+
+            updateBox(boxes[Key], Score);
+        }
+    }
+
+    main() {
+        declare SB_Last_Update = 0;
+
+        mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+        boxes = CMlFrame[];
+
+        foreach(Control in (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame).Controls){
+            boxes.add((Control as CMlFrame));
+        }
+
+        while(True){
+            yield;
+
+            if(GameTime - SB_Last_Update > SB_Update_Interval){
+                updateScoreTable();
+                return;
+            }
+        }
+    }
+    --></script>
+</manialink>
