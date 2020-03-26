@@ -166,7 +166,7 @@ class DedimaniaApi extends Module
         }
 
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->gbx->MapUid,
+            'UId' => $map->uid,
             'Name' => str_replace('&', '', $map->name),
             'Environment' => $map->gbx->Environment,
             'Author' => $map->author->Login,
@@ -330,7 +330,7 @@ class DedimaniaApi extends Module
 
         //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->gbx->MapUid,
+            'UId' => $map->uid,
             'Name' => $map->name,
             'Environment' => $map->gbx->Environment,
             'Author' => $map->author->Login,

@@ -109,7 +109,7 @@ class MapList extends Module implements ModuleInterface
     private static function getMapList(): Collection
     {
         return Map::whereEnabled(1)->get()->transform(function (Map $map) {
-            if (!$map->id || !$map->gbx->MapUid) {
+            if (!$map->id || !$map->uid) {
                 return null;
             }
 
@@ -118,7 +118,7 @@ class MapList extends Module implements ModuleInterface
                 'name' => $map->name,
                 'a' => $map->author->id,
                 'r' => sprintf('%.1f', $map->average_rating),
-                'uid' => $map->gbx->MapUid,
+                'uid' => $map->uid,
                 'c' => $map->cooldown,
             ];
         })->filter();
