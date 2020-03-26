@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:groups-info" id="groups-info" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct EvoSC_Group {
+        Text name;
+        Text icon;
+        Text color;
+    }
+
+    main(){
+        declare EvoSC_Group[Integer] EvoSC_Groups for This;
+        EvoSC_Groups.fromjson("""{$groups->toJson()|noescape}""");
+    }
+
+    --></script>
+</manialink>

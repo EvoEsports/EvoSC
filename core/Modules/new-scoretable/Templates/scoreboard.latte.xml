@@ -1,40 +1,61 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoreTable" layer="ScoresTable" id="ScoreTable" version="3">
     <stylesheet>
-        <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1" />
-        <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05" size="10 5.5" focusareacolor1="fff1" focusareacolor12="fff3" autonewline="1" />
-        <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}" opacity="{config('colors.ui.window.bg.opacity')|noescape}" />
+        <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1"/>
+        <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05"
+               size="10 5.5" focusareacolor1="fff1" focusareacolor12="fff3" autonewline="1"/>
+        <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}"
+               opacity="{config('colors.ui.window.bg.opacity')|noescape}"/>
     </stylesheet>
 
     <framemodel id="box" size="86 12">
-        <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff" z-index="10" /> <!-- Name -->
-        <label class="label" pos="64.25 -7.5" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center" text="" opacity="0.85" /> <!-- Group Icon -->
+        <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff"
+               z-index="10"/> <!-- Name -->
+        <label class="label" pos="64.25 -7.5" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center"
+               text="" opacity="0.85"/> <!-- Group Icon -->
         <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
-            <quad pos="-3 5" size="50 7" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" rot="-45" z-index="-2" opacity="0.65" />
-            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="666" />
+            <quad pos="-3 5" size="50 7" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" rot="-45"
+                  z-index="-2" opacity="0.65"/>
+            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7"
+                   textcolor="666"/>
         </frame> <!-- Badge -->
-        <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center" valign="center" text="" opacity="1" textcolor="fff" /> <!-- Rank -->
-        <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="fff" halign="right" /> <!-- Score -->
-        <quad pos="15 -6" valign="center" size="8 8" /> <!-- Avatar -->
-        <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" /> <!-- Flag -->
-        <label class="label" pos="66.25 -3.8" scale="0.9" textcolor="fff" valign="center" opacity="0.75" text="Region: Rank" /> <!-- Region -->
-        <label class="label" pos="66.25 -7.5" scale="0.9" textcolor="fff" valign="center" text="Player" opacity="0.75" /> <!-- Group -->
-        <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s" text="" opacity="0.85" z-index="2" /> <!-- Fame Stars -->
-        <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="right" /> <!-- Score BG -->
+        <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center"
+               valign="center" text="" opacity="1" textcolor="fff"/> <!-- Rank -->
+        <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="fff" halign="right"/> <!-- Score -->
+        <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
+        <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
+        <label class="label" pos="66.25 -3.8" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
+               text="Region: Rank"/> <!-- Region -->
+        <label class="label" pos="66.25 -7.5" scale="0.9" textcolor="fff" valign="center" text="Player"
+               opacity="0.75"/> <!-- Group -->
+        <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s"
+               text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
+        <label class="label" pos="36 -7" size="11 3" scale="1"
+               textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="right"/> <!-- Score BG -->
 
-        <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12" opacity="0" /> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="86 12" z-index="-10" opacity="0.6" ScriptEvents="1" /> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15" /> <!-- Rank BG -->
-        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1" /> <!-- Controls Trigger -->
+        <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"
+              opacity="0"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="86 12" z-index="-10" opacity="0.6"
+              ScriptEvents="1"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
+        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5"
+              ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -7.75" hidden="1" z-index="10">
-            <label class="button spec"       data-color="" data-icon="" text="Spec" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button profile"    data-color="" data-icon="" text="Profile" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button pm"         data-color="" data-icon="" text="PM" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button mute"       data-color="" data-icon="" text="Mute" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button ban"        data-color="" data-icon="" text="Ban" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button kick"       data-color="" data-icon="" text="Kick" ScriptEvents="1" halign="center" valign="center" />
-            <label class="button force_spec" data-color="" data-icon="" text="Force Spec" ScriptEvents="1" halign="center" valign="center" />
+            <label class="button spec" data-color="" data-icon="" text="Spec" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button profile" data-color="" data-icon="" text="Profile" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button pm" data-color="" data-icon="" text="PM" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button mute" data-color="" data-icon="" text="Mute" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button ban" data-color="" data-icon="" text="Ban" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button kick" data-color="" data-icon="" text="Kick" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button force_spec" data-color="" data-icon="" text="Force Spec" ScriptEvents="1"
+                   halign="center" valign="center"/>
         </frame>
     </framemodel>
 
@@ -42,11 +63,12 @@
 
     <frame id="main-frame" pos="-86 32">
         {if !empty($logoUrl)}
-        <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}" image="{$logoUrl|noescape}" scale="0.8" />
+        <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
+              image="{$logoUrl|noescape}" scale="0.8"/>
         {/if}
-        <label id="server-name" class="label" pos="1 15" size="60 6" scale="2" />
-        <label id="mode-name" class="label" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: " />
-        <label id="player-info" class="label" pos="1.1 4.8" size="60 6" scale="1" textprefix="$s " />
+        <label id="server-name" class="label" pos="1 15" size="60 6" scale="2"/>
+        <label id="mode-name" class="label" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
+        <label id="player-info" class="label" pos="1.1 4.8" size="60 6" scale="1" textprefix="$s "/>
         <frame id="boxes-frame">
             {for $i=0;$i<6;$i++}
             <frameinstance modelid="box" pos="-0.5 {$i * -13}"></frameinstance>
@@ -55,17 +77,32 @@
             <frameinstance modelid="box" pos="85.5 {$i * -13}"></frameinstance>
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad class="bg-window" pos="0.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15" />
+            <quad class="bg-window" pos="0.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad class="bg-window" pos="86.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15" />
+            <quad class="bg-window" pos="86.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
             {/for}
         </frame>
     </frame>
 
     <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
     #Const SB_Update_Interval 250
     #Const SB_Button_Padding 1
+
+    #Struct EvoSC_Group {
+        Text name;
+        Text icon;
+        Text color;
+    }
+
+    #Struct EvoSC_User {
+        Text login;
+        Text name;
+        Integer groupId;
+    }
 
     declare CMlFrame mainFrame;
     declare CMlFrame[] boxes;
@@ -118,8 +155,30 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
+    Integer getUserGroupId(Text login){
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        if(EvoSC_Players.existskey(login)){
+            return EvoSC_Players[login].groupId;
+        }
+
+        return -1;
+    }
+
+    EvoSC_Group getGroup(Text login){
+        declare EvoSC_Group[Integer] EvoSC_Groups for This;
+        declare groupId = getUserGroupId(login);
+
+        if(EvoSC_Groups.existskey(groupId)){
+            return EvoSC_Groups[groupId];
+        }
+
+        declare EvoSC_Group group;
+        return group;
+    }
+
     Void updateBox(CMlFrame box, CTmScore score, Integer rank){
         declare CUser user <=> score.User;
+        declare EvoSC_Group group = getGroup(score.User.Login);
         declare nameLabel <=> (box.Controls[0] as CMlLabel);
         declare groupIconLabel <=> (box.Controls[1] as CMlLabel);
         declare badgeQuad <=> ((box.Controls[2] as CMlFrame).Controls[0] as CMlQuad);
@@ -137,6 +196,8 @@
         badgeLabel.Value = "";
         rankLabel.Value = "" ^ rank;
         nameLabel.Value = user.Name;
+        groupLabel.Value = group.name;
+        groupIconLabel.Value = "$" ^ group.color ^ group.icon;
         scoreBgLabel.Value = formatScoreCorrect(score.BestLap.Time, False);
         scoreLabel.Value = formatScoreCorrect(score.BestLap.Time, True);
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
@@ -148,9 +209,22 @@
     }
 
     Void updateScoreTable(){
+        declare EvoSC_User[Text] EvoSC_Players for This;
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
         (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel).Value = CurrentServerModeName;
         (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+
+        declare Text[] missingLogins = Text[];
+        foreach(Score in Scores){
+            if(!EvoSC_Players.existskey(Score.User.Login)){
+                missingLogins.add(Score.User.Login);
+            }
+        }
+
+        if(missingLogins.count > 0){
+            TriggerPageAction("sb.load_missing_logins," ^ TL::Join(",", missingLogins));
+            sleep(500);
+        }
 
         declare rank = 1;
         declare filled = 0;
@@ -221,6 +295,9 @@
                     declare buttonLabel <=> (Event.Control as CMlLabel);
                     declare targetLogin = buttonLabel.Parent.Parent.DataAttributeGet("login");
 
+                    if(Event.Control.HasClass("pm")){
+                        TriggerPageAction("pm," ^ targetLogin);
+                    }
                     if(Event.Control.HasClass("spec")){
                         TriggerPageAction("spec," ^ targetLogin);
                     }

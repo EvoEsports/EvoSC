@@ -1,0 +1,24 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-players" name="ESC:update-players">
+    <script><!--
+    #Struct EvoSC_User {
+        Text login;
+        Text name;
+        Integer groupId;
+    }
+
+    main(){
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        declare EvoSC_User[Text] new;
+
+        new.fromjson("""{$players->toJson()|noescape}""");
+
+        foreach(newUser in new){
+            if(!EvoSC_Players.existskey(newUser.login)){
+                EvoSC_Players[newUser.login] = newUser;
+            }
+        }
+    }
+    --></script>
+</manialink>

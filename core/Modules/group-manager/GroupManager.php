@@ -22,6 +22,8 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        Hook::add('PlayerConnect', [self::class, 'sendGroupsInformation']);
+
         ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
 
         ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');
@@ -42,6 +44,16 @@ class GroupManager extends Module implements ModuleInterface
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
         }
+    }
+
+    public static function sendGroupsInformation(Player $player)
+    {
+        $groups = DB::table('groups')
+            ->select(['id', 'Name as name', 'chat_prefix as icon', 'color'])
+            ->get()
+            ->keyBy('id');
+
+        Template::show($player, 'group-manager.update', compact('groups'));
     }
 
     public function groupRightsUpdate(Player $player, $formData)
