@@ -114,7 +114,7 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         $filename = self::downloadMapAndGetFilename(intval($mxId));
-        $gbx = MapController::getGbxInformation($filename, false);
+        $gbx = json_decode(MapController::getGbxInformation($filename, true));
 
         dump($gbx);
 
