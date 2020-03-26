@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:ScoreTable" layer="ScoresTable" id="ScoreTable" version="3">
+<manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     <stylesheet>
         <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1"/>
         <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05"
