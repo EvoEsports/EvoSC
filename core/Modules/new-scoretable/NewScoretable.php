@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\Module;
+use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
@@ -19,7 +20,11 @@ class NewScoretable extends Module implements ModuleInterface
         // TODO: Implement start() method.
     }
 
-    public static function sendScoreTable(Player $player){
-        Template::show($player, 'new-scoretable.scoreboard');
+    public static function sendScoreTable(Player $player)
+    {
+        $logoUrl = config('scoreboard.logo-url');
+        $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
+        $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
+        Template::show($player, 'new-scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 }
