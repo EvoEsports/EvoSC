@@ -70,7 +70,7 @@ class QueueController implements ControllerInterface
             return false;
         }
 
-        if (DB::table(Map::TABLE)->where('uid', '=', $mapUid)->where('enabled', '=', 0)->exists()) {
+        if (DB::table(Map::TABLE)->where('uid', '=', $mapUid)->where('enabled', '=', 0)->exists() || MapController::getMapToDisable()->contains('uid', $mapUid)) {
             warningMessage('Can not queue disabled map.')->send($player);
 
             return false;

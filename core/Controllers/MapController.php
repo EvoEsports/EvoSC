@@ -392,4 +392,12 @@ class MapController implements ControllerInterface
 
         Server::restartMap();
     }
+
+    /**
+     * @return Collection
+     */
+    public static function getMapToDisable(): Collection
+    {
+        return self::$mapToDisable;
+    }
 }
