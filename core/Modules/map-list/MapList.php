@@ -18,6 +18,32 @@ use Illuminate\Support\Collection;
 
 class MapList extends Module implements ModuleInterface
 {
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        ManiaLinkEvent::add('maplist.show_queue', [self::class, 'showQueue']);
+        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
+        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
+
+        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
+        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('GroupChanged', [self::class, 'playerConnect']);
+
+        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
+            ->addAlias('/list');
+        ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
+            ->addAlias('/queue')
+            ->addAlias('/jb');
+    }
+
     public static function playerConnect(Player $player)
     {
         self::sendFavorites($player);
@@ -183,31 +209,5 @@ class MapList extends Module implements ModuleInterface
     public static function showMapQueue(Player $player)
     {
         Template::show($player, 'map-list.show-queue', null, false);
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        ManiaLinkEvent::add('maplist.show_queue', [self::class, 'showQueue']);
-        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
-
-        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
-        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('GroupChanged', [self::class, 'playerConnect']);
-
-        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
-            ->addAlias('/list');
-        ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
-            ->addAlias('/queue')
-            ->addAlias('/jb');
     }
 }
