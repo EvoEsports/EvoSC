@@ -212,7 +212,16 @@
 
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
         flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
-        regionLabel.Value = user.LadderZoneName ^ ": " ^ user.LadderRank;
+
+		declare Zone = "Other";
+		declare ZoneArray = TL::Split("|", score.User.LadderZoneName);
+		if (ZoneArray.existskey(2)) Zone = ZoneArray[2];
+		if (score.User.LadderRank > 0){
+		    regionLabel.Value = TL::Compose("%1: %2", Zone, TL::ToText(score.User.LadderRank));
+		}else{
+		    regionLabel.Value = TL::Compose("%1: %2", Zone, "Not ranked");
+		}
+
         fameStarsLabel.Value = getStars(user.FameStars);
 
 		if (UI.UISequence == CUIConfig::EUISequence::Podium && score.LadderScore != -1.) {
