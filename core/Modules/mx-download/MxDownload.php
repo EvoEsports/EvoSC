@@ -116,8 +116,6 @@ class MxDownload extends Module implements ModuleInterface
         $filename = self::downloadMapAndGetFilename(intval($mxId));
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
 
-        dump($gbx);
-
         if (!isset($gbx->MapUid)) {
             warningMessage('Could not load UID for map.')->send($player);
             return;
@@ -149,7 +147,7 @@ class MxDownload extends Module implements ModuleInterface
                 Server::addMap($filename);
                 Log::info("Added $filename to the selection.");
             } catch (Exception $e) {
-                warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool')->send($player);
+                warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool: ' . $e->getMessage())->send($player);
                 Log::write('Adding map to selection failed: ' . $e->getMessage());
                 return;
             }
