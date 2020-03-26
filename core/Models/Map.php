@@ -156,7 +156,11 @@ class Map extends Model
         $cacheId = 'gbx/' . $this->uid;
 
         if (Cache::has($cacheId)) {
-            return Cache::get($cacheId);
+            $cacheObject = Cache::get($cacheId);
+
+            if (isset($cacheObject->data) && $cacheObject->data != null) {
+                return $cacheObject->data;
+            }
         }
 
         $gbx = MapController::getGbxInformation($this->filename, false);
