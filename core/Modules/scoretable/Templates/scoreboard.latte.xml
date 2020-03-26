@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:ScoreTable" layer="ScoresTable" id="ScoreTable" version="3">
+    <stylesheet>
+        <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1"/>
+        <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05"
+               size="9.2 5.5" focusareacolor1="fff1" focusareacolor12="fff3" autonewline="1"/>
+        <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}"
+               opacity="{config('colors.ui.window.bg.opacity')|noescape}"/>
+    </stylesheet>
+
+    <framemodel id="box" size="86 12">
+        <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff"
+               z-index="10"/> <!-- Name -->
+        <label class="label" pos="64.25 -7.5" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center"
+               text="" opacity="0.85"/> <!-- Group Icon -->
+        <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
+            <quad pos="-3 5" size="50 7" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" rot="-45"
+                  z-index="-2" opacity="0.65"/>
+            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7"
+                   textcolor="666"/>
+        </frame> <!-- Badge -->
+        <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center"
+               valign="center" text="" opacity="1" textcolor="fff"/> <!-- Rank -->
+        <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="fff" halign="right"/> <!-- Score -->
+        <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
+        <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
+        <label class="label" pos="66.25 -3.8" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
+               text="Region: Rank"/> <!-- Region -->
+        <label class="label" pos="66.25 -7.5" size="19.5 3" scale="0.9" textcolor="fff" valign="center" text="Player"
+               opacity="0.75"/> <!-- Group -->
+        <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s"
+               text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
+        <label class="label" pos="36 -7" size="11 3" scale="1"
+               textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="right"/> <!-- Score BG -->
+        <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="{config('colors.ui.window.header.color')|noescape}" valign="center" halign="right" opacity="0.9"
+               text="+12.7 LP"/> <!-- LP Gain -->
+
+        <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"
+              opacity="0"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="86 12" z-index="-10" opacity="0.6"
+              ScriptEvents="1"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
+        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5"
+              ScriptEvents="1"/> <!-- Controls Trigger -->
+
+        <frame pos="8 -7.75" hidden="1" z-index="10">
+            <label class="button spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button pm" data-icon="" data-access="" text="PM" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button mute" data-icon="" data-access="" text="Mute" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button kick" data-icon="" data-access="player_kick" text="Kick" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button warn" data-icon="" data-access="player_warn" text="Warn" ScriptEvents="1" halign="center"
+                   valign="center"/>
+            <label class="button force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1"
+                   halign="center" valign="center"/>
+        </frame>
+    </framemodel>
+
+    <!-- end components -->
+
+    <frame id="main-frame" pos="-86 30">
+        {if !empty($logoUrl)}
+        <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
+              image="{$logoUrl|noescape}" scale="0.8"/>
+        {/if}
+        <label id="server-name" class="label" pos="1 15" size="60 6" scale="2"/>
+        <label id="mode-name" class="label" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
+        <label id="player-info" class="label" pos="1.1 4.8" size="60 6" scale="1" textprefix="$s "/>
+        <frame id="boxes-frame">
+            {for $i=0;$i<6;$i++}
+            <frameinstance modelid="box" pos="-0.5 {$i * -13}"></frameinstance>
+            {/for}
+            {for $i=0;$i<6;$i++}
+            <frameinstance modelid="box" pos="85.5 {$i * -13}"></frameinstance>
+            {/for}
+            {for $i=0;$i<6;$i++}
+            <quad class="bg-window" pos="0.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
+            {/for}
+            {for $i=0;$i<6;$i++}
+            <quad class="bg-window" pos="86.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
+            {/for}
+        </frame>
+
+        <label class="label prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="page" class="label" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="label next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="label me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -81" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Const SB_Update_Interval 250
+    #Const SB_Button_Padding 1
+    #Const SB_Per_Page 12
+    #Const C_Status_Disconnected	0
+    #Const C_Status_Spawned			1
+    #Const C_Status_NotSpawned		2
+    #Const C_Status_Spectating		3
+
+    #Struct EvoSC_Group {
+        Text name;
+        Text icon;
+        Text color;
+    }
+
+    #Struct EvoSC_User {
+        Text login;
+        Text name;
+        Integer groupId;
+    }
+
+    declare CMlFrame mainFrame;
+    declare CMlFrame[] boxes;
+    declare Integer page;
+    declare Boolean forceUpdate;
+
+    Integer ceil(Real value){
+        return ML::CeilingInteger(value);
+    }
+
+    Text getStars(Integer count){
+        declare Text stars = "";
+        for(i, 0, count - 1){
+            stars = stars ^ " ";
+        }
+        return stars;
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Integer getUserGroupId(Text login){
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        if(EvoSC_Players.existskey(login)){
+            return EvoSC_Players[login].groupId;
+        }
+
+        return -1;
+    }
+
+    EvoSC_Group getGroup(Text login){
+        declare EvoSC_Group[Integer] EvoSC_Groups for This;
+        declare groupId = getUserGroupId(login);
+
+        if(EvoSC_Groups.existskey(groupId)){
+            return EvoSC_Groups[groupId];
+        }
+
+        declare EvoSC_Group group;
+        return group;
+    }
+
+    Void updateBox(CMlFrame box, CTmScore score, Integer rank){
+        declare CUser user <=> score.User;
+        declare EvoSC_Group group = getGroup(score.User.Login);
+        declare nameLabel <=> (box.Controls[0] as CMlLabel);
+        declare groupIconLabel <=> (box.Controls[1] as CMlLabel);
+        declare badgeQuad <=> ((box.Controls[2] as CMlFrame).Controls[0] as CMlQuad);
+        declare badgeLabel <=> ((box.Controls[2] as CMlFrame).Controls[1] as CMlLabel);
+        declare rankLabel <=> (box.Controls[3] as CMlLabel);
+        declare scoreLabel <=> (box.Controls[4] as CMlLabel);
+        declare scoreBgLabel <=> (box.Controls[10] as CMlLabel);
+        declare avatarQuad <=> (box.Controls[5] as CMlQuad);
+        declare flagQuad <=> (box.Controls[6] as CMlQuad);
+        declare regionLabel <=> (box.Controls[7] as CMlLabel);
+        declare groupLabel <=> (box.Controls[8] as CMlLabel);
+        declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
+        declare lpGainLabel <=> (box.Controls[11] as CMlLabel);
+
+		declare LibST_Status for user = C_Status_Disconnected;
+		if(LibST_Status == C_Status_Disconnected){
+            badgeQuad.Show();
+            badgeLabel.Value = "";
+		}else if(LibST_Status == C_Status_Spectating){
+            badgeQuad.Show();
+            badgeLabel.Value = "${config('colors.ui.window.header.color')|noescape}";
+		}else{
+            badgeQuad.Hide();
+            badgeLabel.Value = "";
+		}
+
+        rankLabel.Value = "" ^ rank;
+        nameLabel.Value = user.Name;
+        groupLabel.Value = group.name;
+        groupIconLabel.Value = "$" ^ group.color ^ group.icon;
+
+        if(score.BestLap.Time > 0){
+            scoreBgLabel.Value = formatScoreCorrect(score.BestLap.Time, False);
+            scoreLabel.Value = formatScoreCorrect(score.BestLap.Time, True);
+        }else{
+            scoreBgLabel.Value = "No finish";
+            scoreLabel.Value = "";
+        }
+
+        avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
+        flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+
+		declare Zone = "Other";
+		declare ZoneArray = TL::Split("|", score.User.LadderZoneName);
+		if (ZoneArray.existskey(2)) Zone = ZoneArray[2];
+		if (score.User.LadderRank > 0){
+		    regionLabel.Value = TL::Compose("%1: %2", Zone, TL::ToText(score.User.LadderRank));
+		}else{
+		    regionLabel.Value = TL::Compose("%1: %2", Zone, "Not ranked");
+		}
+
+        fameStarsLabel.Value = getStars(user.FameStars);
+
+		if (UI.UISequence == CUIConfig::EUISequence::Podium && score.LadderScore != -1.) {
+			lpGainLabel.Show();
+			declare LadderPointsExplode = TL::Split(".", TL::ToText(score.LadderScore));
+			declare LadderPoints = "0.0";
+			if (LadderPointsExplode.existskey(0)) LadderPoints = LadderPointsExplode[0];
+			if (LadderPointsExplode.existskey(1)) LadderPoints ^= "."^TL::SubString(LadderPointsExplode[1], 0, 2);
+			if (score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
+			else lpGainLabel.Value = LadderPoints;
+		} else {
+		    lpGainLabel.Hide();
+		}
+
+        box.Show();
+        box.DataAttributeSet("login", user.Login);
+    }
+
+
+    Integer[CTmScore] GetSortedScores() {
+        declare persistent Boolean[Text] LibScoresTable2_Settings for This;
+        declare SortedScores = Integer[CTmScore];
+        declare Count = 0;
+
+        foreach (Score in Scores) {
+            declare LibST_Status for Score.User = C_Status_Disconnected;
+            declare Weight = Count;
+            if (
+                LibScoresTable2_Settings.existskey("SortSpec") &&
+                LibScoresTable2_Settings["SortSpec"] &&
+                LibST_Status == C_Status_Spectating
+            ) Weight += Scores.count;
+            if (
+                LibScoresTable2_Settings.existskey("SortDisco") &&
+                LibScoresTable2_Settings["SortDisco"] &&
+                LibST_Status == C_Status_Disconnected
+            ) Weight += 2 * Scores.count;
+            SortedScores[Score] = Weight;
+            Count += 1;
+        }
+
+        return SortedScores.sort();
+    }
+
+    Void updateScoreTable(){
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ ceil(Scores.count / SB_Per_Page * 1.0);
+
+        foreach (Player in Players) {
+            declare LibST_LastTick for Player.User = -1;
+            LibST_LastTick = Now;
+            declare LibST_Status for Player.User = C_Status_Disconnected;
+            if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
+                LibST_Status = C_Status_Spectating;
+            }
+            if (!Player.RequestsSpectate && Player.IsSpawned && LibST_Status != C_Status_Spawned) {
+                LibST_Status = C_Status_Spawned;
+            }
+        }
+
+        (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
+        (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel).Value = CurrentServerModeName;
+        (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        declare Text[] missingLogins = Text[];
+        foreach(Score in Scores){
+            declare matches = TL::RegexMatch("^\\*(fakeplayer\\d+)\\*$", Score.User.Login, "");
+            if(!EvoSC_Players.existskey(Score.User.Login) && matches.count == 1){
+                missingLogins.add(Score.User.Login);
+            }
+        }
+
+        if(missingLogins.count > 0){
+            TriggerPageAction("sb.load_missing_logins," ^ TL::Join(",", missingLogins));
+            while(True){
+                declare EvoSC_User[Text] EvoSC_Players for This;
+                if(EvoSC_Players.existskey(missingLogins[0])) break;
+                sleep(50);
+            }
+        }
+
+        declare rank = 1;
+        declare filled = 0;
+        declare skipped = 0;
+        declare toSkip = (page - 1) * SB_Per_Page;
+        foreach(Score => Weight in GetSortedScores()){
+            if(skipped < toSkip){
+                skipped += 1;
+                continue;
+            }
+
+            if(filled >= boxes.count / 2){
+                return;
+            }
+
+            declare SlotNeedUpdate = False;
+            declare LibST_LastTick for Score.User = -1;
+            declare LibST_Status for Score.User = C_Status_Disconnected;
+            if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
+                LibST_Status = C_Status_Disconnected;
+                SlotNeedUpdate = True;
+            }
+
+            declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
+            if (LibST_PrevStatus != LibST_Status) {
+                LibST_PrevStatus = LibST_Status;
+                SlotNeedUpdate = True;
+            }
+
+            declare LibST_PrevUpdate for Score = -1;
+            declare netread Integer Net_LibST_Update for Score;
+            if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
+                LibST_PrevUpdate = Net_LibST_Update;
+                updateBox(boxes[filled], Score, rank);
+            }
+            rank += 1;
+            filled += 1;
+        }
+
+        forceUpdate = False;
+
+        if(filled < 12){
+            for(i, filled, 11){
+                boxes[i].Hide();
+            }
+        }
+    }
+
+    Void setupButtons(CMlFrame box){
+        declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
+        declare widths = 0.0;
+        foreach(Control in buttonsFrame.Controls){
+            declare buttonLabel <=> (Control as CMlLabel);
+
+            if(buttonLabel.DataAttributeGet("icon") != ""){
+                buttonLabel.Value = buttonLabel.DataAttributeGet("icon") ^ "\n" ^ buttonLabel.Value;
+                buttonLabel.DataAttributeSet("icon", "");
+            }
+
+            if(buttonLabel.Visible){
+                declare Real width = buttonLabel.Size[0];
+                buttonLabel.RelativePosition_V3[0] = widths;
+                widths += width + SB_Button_Padding;
+            }
+        }
+    }
+
+    Void showControls(CMlFrame _box){
+        declare CMlFrame box = _box;
+        setupButtons(box);
+        AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='5 -2.4' scale='0.85' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='19 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='19 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='20 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='44 -2.5' scale='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='46 -2.5' scale='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -2.5' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -2.5' scale='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add(box.Controls[5], "<label opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        box.Controls[2].Hide();
+        box.Controls[11].Hide();
+        box.Controls[14].Hide();
+        box.Controls[16].Show();
+
+        declare Real xMin = box.AbsolutePosition_V3[0];
+        declare Real xMax = box.AbsolutePosition_V3[0] + box.Size[0];
+        declare Real yMin = box.AbsolutePosition_V3[1] - box.Size[1];
+        declare Real yMax = box.AbsolutePosition_V3[1];
+
+        while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin){
+            foreach(Event in PendingEvents){
+                if(Event.Control == Null) continue;
+                if(Event.Control.HasClass("button") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare buttonLabel <=> (Event.Control as CMlLabel);
+                    declare targetLogin = buttonLabel.Parent.Parent.DataAttributeGet("login");
+
+                    if(Event.Control.HasClass("spec")){
+                        if(!IsSpectatorClient) RequestSpectatorClient(True);
+                        SetSpectateTarget(targetLogin);
+                    }
+                    if(Event.Control.HasClass("pm")){
+                        TriggerPageAction("pm," ^ targetLogin);
+                    }
+                    if(Event.Control.HasClass("mute")){
+                        TriggerPageAction("mute," ^ targetLogin);
+                    }
+                    if(Event.Control.HasClass("kick")){
+                        TriggerPageAction("kick," ^ targetLogin);
+                    }
+                    if(Event.Control.HasClass("force_spec")){
+                        TriggerPageAction("forcespec," ^ targetLogin);
+                    }
+                    if(Event.Control.HasClass("ban")){
+                        TriggerPageAction("ban," ^ targetLogin);
+                    }
+                    if(Event.Control.HasClass("warn")){
+                        TriggerPageAction("warn," ^ targetLogin ^ ",");
+                    }
+                    if(Event.Control.HasClass("profile")){
+                        ShowProfile(targetLogin);
+                    }
+                }
+            }
+
+            yield;
+        }
+
+
+        AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='6.85 -5.5' scale='2' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='36 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='36 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='25 -2.5' scale='1.3' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='64.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='66.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -4' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -3.8' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add(box.Controls[5], "<label opacity='1.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        box.Controls[2].Show();
+        box.Controls[11].Show();
+        box.Controls[14].Show();
+        box.Controls[16].Hide();
+    }
+
+    main() {
+        declare SB_Last_Update = 0;
+        declare podium = False;
+
+        mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
+        boxes = CMlFrame[];
+        page = 1;
+        forceUpdate = True;
+
+        foreach(Control in (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame).Controls){
+            boxes.add((Control as CMlFrame));
+        }
+
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ ceil(Scores.count / SB_Per_Page * 1.0);
+
+        while(True){
+            yield;
+
+            if(GameTime - SB_Last_Update > SB_Update_Interval){
+                updateScoreTable();
+            }
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
+                podium = True;
+                AnimMgr.Add(mainFrame, "<frame scale='0.95' pos='-82 20.5' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+            if(UI.UISequence != CUIConfig::EUISequence::Podium && podium){
+                podium = False;
+                AnimMgr.Add(mainFrame, "<frame scale='1.0' pos='-86 30' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+            }
+
+            foreach(Event in PendingEvents){
+                if(Event.Control == Null) continue;
+                declare control = Event.Control;
+
+                if(control.HasClass("trigger") && Event.Type == CMlScriptEvent::Type::MouseOver){
+                    showControls((Event.Control.Parent as CMlFrame));
+                }
+
+                if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    page -= 1;
+                    if(page < 1){
+                        page = ceil(Scores.count / SB_Per_Page * 1.0);
+                    }
+                    forceUpdate = True;
+                    updateScoreTable();
+                }
+
+                if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    page += 1;
+                    if(page > ceil(Scores.count / SB_Per_Page * 1.0)){
+                        page = 1;
+                    }
+                    forceUpdate = True;
+                    updateScoreTable();
+                }
+
+                if(control.HasClass("me") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare i = 0;
+                    foreach(Score => Weight in GetSortedScores()){
+                        i += 1;
+                        if(Score.User.Login == LocalUser.Login){
+                            break;
+                        }
+                    }
+                    page = ML::FloorInteger(Scores.count / i * 1.0);
+                    forceUpdate = True;
+                    updateScoreTable();
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>

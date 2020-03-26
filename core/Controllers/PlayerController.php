@@ -381,7 +381,7 @@ class PlayerController implements ControllerInterface
         return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
-    public static function addFakePlayer(Player $player, string $count = '1')
+    public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
     {
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
 
