@@ -492,6 +492,7 @@
             yield;
 
             if(GameTime - SB_Last_Update > SB_Update_Interval){
+                forceUpdate = True;
                 updateScoreTable();
             }
 
