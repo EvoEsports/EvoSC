@@ -32,6 +32,8 @@
                text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
         <label class="label" pos="36 -7" size="11 3" scale="1"
                textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="right"/> <!-- Score BG -->
+        <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="{config('colors.ui.window.header.color')|noescape}" valign="center" halign="right" opacity="0.9"
+               text="+12.7 LP"/> <!-- LP Gain -->
 
         <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"
               opacity="0"/> <!-- Primary BG -->
@@ -191,6 +193,7 @@
         declare regionLabel <=> (box.Controls[7] as CMlLabel);
         declare groupLabel <=> (box.Controls[8] as CMlLabel);
         declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
+        declare lpGainLabel <=> (box.Controls[11] as CMlLabel);
 
         badgeQuad.Hide();
         badgeLabel.Value = "";
@@ -198,12 +201,32 @@
         nameLabel.Value = user.Name;
         groupLabel.Value = group.name;
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
-        scoreBgLabel.Value = formatScoreCorrect(score.BestLap.Time, False);
-        scoreLabel.Value = formatScoreCorrect(score.BestLap.Time, True);
+
+        if(score.BestLap.Time > 0){
+            scoreBgLabel.Value = formatScoreCorrect(score.BestLap.Time, False);
+            scoreLabel.Value = formatScoreCorrect(score.BestLap.Time, True);
+        }else{
+            scoreBgLabel.Value = "No finish";
+            scoreLabel.Value = "";
+        }
+
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
         flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
         regionLabel.Value = user.LadderZoneName ^ ": " ^ user.LadderRank;
         fameStarsLabel.Value = getStars(user.FameStars);
+
+		if (UI.UISequence == CUIConfig::EUISequence::Podium && score.LadderScore != -1.) {
+			lpGainLabel.Show();
+			declare LadderPointsExplode = TL::Split(".", TL::ToText(score.LadderScore));
+			declare LadderPoints = "0.0";
+			if (LadderPointsExplode.existskey(0)) LadderPoints = LadderPointsExplode[0];
+			if (LadderPointsExplode.existskey(1)) LadderPoints ^= "."^TL::SubString(LadderPointsExplode[1], 0, 2);
+			if (score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
+			else lpGainLabel.Value = LadderPoints;
+		} else {
+		    lpGainLabel.Hide();
+		}
+
         box.Show();
         box.DataAttributeSet("login", user.Login);
     }
@@ -246,7 +269,7 @@
     }
 
     Void setupButtons(CMlFrame box){
-        declare buttonsFrame <=> (box.Controls[15] as CMlFrame);
+        declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
         declare widths = 0.0;
         foreach(Control in buttonsFrame.Controls){
             declare buttonLabel <=> (Control as CMlLabel);
@@ -280,8 +303,9 @@
         AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -2.5' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -2.5' scale='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add(box.Controls[5], "<label opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        box.Controls[15].Show();
-        box.Controls[13].Hide();
+        box.Controls[11].Hide();
+        box.Controls[14].Hide();
+        box.Controls[16].Show();
 
         declare Real xMin = box.AbsolutePosition_V3[0];
         declare Real xMax = box.AbsolutePosition_V3[0] + box.Size[0];
@@ -332,8 +356,9 @@
         AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -4' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -3.8' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add(box.Controls[5], "<label opacity='1.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        box.Controls[15].Hide();
-        box.Controls[13].Show();
+        box.Controls[11].Show();
+        box.Controls[14].Show();
+        box.Controls[16].Hide();
     }
 
     main() {
