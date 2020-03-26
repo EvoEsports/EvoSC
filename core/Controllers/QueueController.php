@@ -113,7 +113,7 @@ class QueueController implements ControllerInterface
      */
     public static function queueMap(Player $player, Map $map)
     {
-        if (self::queueMapByUid($player, $map->uid)) {
+        if (self::queueMapByUid($player, $map->uid, $map->cooldown)) {
             infoMessage(secondary($player), ' queued map ', secondary($map->name))->sendAll();
         }
     }
