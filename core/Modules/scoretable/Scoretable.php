@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 
 use esc\Classes\DB;
+use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Server;
@@ -12,7 +13,7 @@ use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class NewScoretable extends Module implements ModuleInterface
+class Scoretable extends Module implements ModuleInterface
 {
     /**
      * @inheritDoc
@@ -20,6 +21,8 @@ class NewScoretable extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         ManiaLinkEvent::add('sb.load_missing_logins', [self::class, 'mleLoadMissingLogins']);
+
+        Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
     }
 
     public static function sendScoreTable(Player $player)
@@ -28,7 +31,7 @@ class NewScoretable extends Module implements ModuleInterface
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
 
-        Template::show($player, 'new-scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
+        Template::show($player, 'scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 
     public static function mleLoadMissingLogins(Player $player, ...$logins)
@@ -39,8 +42,8 @@ class NewScoretable extends Module implements ModuleInterface
             ->get()
             ->keyBy('login');
 
-        dump($players);
+        dump($logins);
 
-        Template::show($player, 'new-scoretable.update', compact('players'));
+        Template::show($player, 'scoretable.update', compact('players'));
     }
 }

@@ -25,7 +25,7 @@ class TestModule extends Module implements ModuleInterface
     {
         TemplateController::loadTemplates();
         GroupManager::sendGroupsInformation($player);
-        NewScoretable::sendScoreTable($player);
+        Scoretable::sendScoreTable($player);
     }
 
     public static function sendTestManialink(Player $player)

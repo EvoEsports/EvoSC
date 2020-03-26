@@ -19,6 +19,8 @@
                 EvoSC_Players[newUser.login] = newUser;
             }
         }
+
+        log(EvoSC_Players);
     }
     --></script>
 </manialink>
