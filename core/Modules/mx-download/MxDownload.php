@@ -116,6 +116,11 @@ class MxDownload extends Module implements ModuleInterface
         $filename = self::downloadMapAndGetFilename(intval($mxId));
         $gbx = MapController::getGbxInformation($filename, false);
 
+        if (!isset($gbx)) {
+            warningMessage('Could not load GBX information for map.')->send($player);
+            return;
+        }
+
         if (DB::table(Map::TABLE)->where('filename', '=', $filename)->where('uid', '!=', $gbx->MapUid)->exists()) {
             $oldMap = DB::table(Map::TABLE)->where('filename', '=', $filename)->where('uid', '!=', $gbx->MapUid)->first();
 
