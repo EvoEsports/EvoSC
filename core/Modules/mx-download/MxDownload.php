@@ -76,7 +76,7 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception("Download $mxId failed: " . $download->getReasonPhrase());
         }
 
-        Log::write("Request $mxId finished.", isVeryVerbose());
+        Log::write("Request $mxId finished.", true);
 
         if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
             throw new Exception('File is not a valid GBX.');
@@ -86,13 +86,13 @@ class MxDownload extends Module implements ModuleInterface
         $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
         $filename = preg_replace('/[^a-z0-9\-_# .]/i', '', $filename);
         $filename = preg_replace('/\s/i', '_', $filename);
-        $filename = "MX/$filename" . "_$mxId";
+        $filename = "MX/$mxId\_$filename";
 
-        Log::write('Saving map as ' . MapController::getMapsPath($filename), isVerbose());
+        Log::write('Saving map as ' . MapController::getMapsPath($filename), true);
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
 
         if (!File::exists(MapController::getMapsPath($filename))) {
-            throw new Exception('Map download failed, map does not exist.');
+            throw new Exception('Map download failed, map does not exist.', true);
         }
 
         return $filename;
