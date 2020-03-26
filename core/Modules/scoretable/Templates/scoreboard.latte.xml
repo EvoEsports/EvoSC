@@ -21,7 +21,7 @@
         </frame> <!-- Badge -->
         <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center"
                valign="center" text="" opacity="1" textcolor="fff"/> <!-- Rank -->
-        <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="fff" halign="right"/> <!-- Score -->
+        <label class="label" pos="25 -7" size="11 3" scale="1" textcolor="fff" halign="left"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
         <label class="label" pos="66.25 -3.8" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
@@ -30,8 +30,8 @@
                opacity="0.75"/> <!-- Group -->
         <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s"
                text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
-        <label class="label" pos="36 -7" size="11 3" scale="1"
-               textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="right"/> <!-- Score BG -->
+        <label class="label" pos="25 -7" size="11 3" scale="1"
+               textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="left"/> <!-- Score BG -->
         <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="{config('colors.ui.window.header.color')|noescape}" valign="center" halign="right" opacity="0.9"
                text="+12.7 LP"/> <!-- LP Gain -->
 
@@ -231,11 +231,11 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         if(score.BestLap.Time > 0){
-            scoreBgLabel.Value = formatScoreCorrect(score.BestLap.Time, False);
-            scoreLabel.Value = formatScoreCorrect(score.BestLap.Time, True);
+            scoreBgLabel.Value = "";
+            scoreLabel.Value = "$aaa" ^ formatScoreCorrect(score.BestLap.Time, True);
         }else{
-            scoreBgLabel.Value = "No finish";
-            scoreLabel.Value = "";
+            scoreBgLabel.Value = "";
+            scoreLabel.Value = "$aaaNo finish";
         }
 
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
@@ -460,8 +460,8 @@
 
 
         AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='6.85 -5.5' scale='2' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='36 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='36 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='25 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='25 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='25 -2.5' scale='1.3' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='64.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='66.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
@@ -469,7 +469,6 @@
         AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -3.8' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add(box.Controls[5], "<label opacity='1.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         box.Controls[2].Show();
-        box.Controls[11].Show();
         box.Controls[14].Show();
         box.Controls[16].Hide();
     }
