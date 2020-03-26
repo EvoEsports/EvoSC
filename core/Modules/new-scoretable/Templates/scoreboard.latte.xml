@@ -24,9 +24,9 @@
         <label class="label" pos="36 -7" size="11 3" scale="1" textcolor="fff" halign="right"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="label" pos="66.25 -3.8" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
+        <label class="label" pos="66.25 -3.8" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
                text="Region: Rank"/> <!-- Region -->
-        <label class="label" pos="66.25 -7.5" scale="0.9" textcolor="fff" valign="center" text="Player"
+        <label class="label" pos="66.25 -7.5" size="19.5 3" scale="0.9" textcolor="fff" valign="center" text="Player"
                opacity="0.75"/> <!-- Group -->
         <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s"
                text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
@@ -63,7 +63,7 @@
 
     <!-- end components -->
 
-    <frame id="main-frame" pos="-86 32">
+    <frame id="main-frame" pos="-86 30">
         {if !empty($logoUrl)}
         <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
@@ -328,11 +328,12 @@
                     declare buttonLabel <=> (Event.Control as CMlLabel);
                     declare targetLogin = buttonLabel.Parent.Parent.DataAttributeGet("login");
 
+                    if(Event.Control.HasClass("spec")){
+                        if(!IsSpectatorClient) RequestSpectatorClient(True);
+                        SetSpectateTarget(targetLogin);
+                    }
                     if(Event.Control.HasClass("pm")){
                         TriggerPageAction("pm," ^ targetLogin);
-                    }
-                    if(Event.Control.HasClass("spec")){
-                        TriggerPageAction("spec," ^ targetLogin);
                     }
                     if(Event.Control.HasClass("mute")){
                         TriggerPageAction("mute," ^ targetLogin);
