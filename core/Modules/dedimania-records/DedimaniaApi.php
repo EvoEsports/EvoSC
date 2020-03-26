@@ -159,9 +159,6 @@ class DedimaniaApi extends Module
         //string SessionId
         $params->addChild('param')->addChild('value', self::getSessionKey());
 
-
-        dd($map->gbx);
-
         if (!$map->gbx) {
             Log::write('Error: No gbx info available for map ' . $map);
 
