@@ -316,8 +316,7 @@
         declare EvoSC_User[Text] EvoSC_Players for This;
         declare Text[] missingLogins = Text[];
         foreach(Score in Scores){
-            declare matches = TL::RegexMatch("^\\*(fakeplayer\\d+)\\*$", Score.User.Login, "");
-            if(!EvoSC_Players.existskey(Score.User.Login) && matches.count == 1){
+            if(!EvoSC_Players.existskey(Score.User.Login)){
                 missingLogins.add(Score.User.Login);
             }
         }
@@ -326,8 +325,10 @@
             TriggerPageAction("sb.load_missing_logins," ^ TL::Join(",", missingLogins));
             while(True){
                 declare EvoSC_User[Text] EvoSC_Players for This;
-                if(EvoSC_Players.existskey(missingLogins[0])) break;
-                sleep(50);
+                if(EvoSC_Players.existskey(missingLogins[0])){
+                    break;
+                }
+                sleep(100);
             }
         }
 
