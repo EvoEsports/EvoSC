@@ -402,7 +402,7 @@
         declare CMlFrame box = _box;
         setupButtons(box);
         AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='5 -2.4' scale='0.85' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='19 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='8 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='19 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='20 -1.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='44 -2.5' scale='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
