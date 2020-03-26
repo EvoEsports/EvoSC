@@ -37,6 +37,7 @@ class Scoreboard extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        return;
         self::$logoUrl = config('scoreboard.logo-url');
         self::$playersOnline = collect();
         self::$mode = $mode;

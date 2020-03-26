@@ -25,6 +25,7 @@ class NewScoretable extends Module implements ModuleInterface
         $logoUrl = config('scoreboard.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
+
         Template::show($player, 'new-scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 }
