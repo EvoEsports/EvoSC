@@ -20,7 +20,7 @@ class Scoretable extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        ManiaLinkEvent::add('sb.load_missing_logins', [self::class, 'mleLoadMissingLogins']);
+        ManiaLinkEvent::add('sb.load_missing_logins', [self::class, 'mleLoadMissingLogin']);
 
         Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
     }
@@ -35,18 +35,13 @@ class Scoretable extends Module implements ModuleInterface
         Template::show($player, 'scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 
-    public static function mleLoadMissingLogins(Player $player, ...$logins)
+    public static function mleLoadMissingLogin(Player $player, string $login)
     {
-        $players = DB::table('players')
+        $player_ = DB::table('players')
             ->select(['NickName as name', 'Login as login', 'Group as groupId'])
-            ->whereIn('Login', $logins)
-            ->get()
-            ->map(function ($player) {
-                $player->name = ml_escape($player->name);
-                return $player;
-            })
-            ->keyBy('login');
+            ->where('Login', '=', $login)
+            ->first();
 
-        Template::show($player, 'scoretable.update', compact('players'));
+        Template::showAll('scoretable.update', ['player' => $player_]);
     }
 }

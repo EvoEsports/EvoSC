@@ -324,15 +324,10 @@
         (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
 
         declare EvoSC_User[Text] EvoSC_Players for This;
-        declare Text[] missingLogins = Text[];
         foreach(Score in Scores){
             if(!EvoSC_Players.existskey(Score.User.Login)){
-                missingLogins.add(Score.User.Login);
+                TriggerPageAction("sb.load_missing_logins," ^ Score.User.Login);
             }
-        }
-
-        if(missingLogins.count > 0){
-            TriggerPageAction("sb.load_missing_logins," ^ TL::Join(",", missingLogins));
         }
 
         declare rank = 1;
