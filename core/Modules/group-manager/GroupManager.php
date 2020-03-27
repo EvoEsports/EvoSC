@@ -22,8 +22,6 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('PlayerConnect', [self::class, 'sendGroupsInformation']);
-
         ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
 
         ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');

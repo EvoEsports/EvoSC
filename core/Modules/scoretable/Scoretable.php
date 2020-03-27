@@ -31,6 +31,7 @@ class Scoretable extends Module implements ModuleInterface
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
 
+        GroupManager::sendGroupsInformation($player);
         Template::show($player, 'scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 
@@ -40,7 +41,13 @@ class Scoretable extends Module implements ModuleInterface
             ->select(['NickName as name', 'Login as login', 'Group as groupId'])
             ->whereIn('Login', $logins)
             ->get()
+            ->map(function ($player) {
+                $player->name = ml_escape($player->name);
+                return $player;
+            })
             ->keyBy('login');
+
+        dump($players, $logins);
 
         Template::show($player, 'scoretable.update', compact('players'));
     }

@@ -333,13 +333,6 @@
 
         if(missingLogins.count > 0){
             TriggerPageAction("sb.load_missing_logins," ^ TL::Join(",", missingLogins));
-            while(True){
-                declare EvoSC_User[Text] EvoSC_Players for This;
-                if(EvoSC_Players.existskey(missingLogins[0])){
-                    break;
-                }
-                sleep(100);
-            }
         }
 
         declare rank = 1;
