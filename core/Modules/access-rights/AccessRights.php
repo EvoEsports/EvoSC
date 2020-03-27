@@ -8,7 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Group;
+use esc\Models\AccessRight;
 use esc\Models\Player;
 
 class AccessRights extends Module implements ModuleInterface
@@ -26,7 +26,11 @@ class AccessRights extends Module implements ModuleInterface
      */
     public static function sendAccessRights(Player $player)
     {
-        $accessRights = $player->group->accessRights()->pluck('name')->values();
+        if ($player->Group == 1) {
+            $accessRights = AccessRight::all()->pluck('name')->values();;
+        } else {
+            $accessRights = $player->group->accessRights()->pluck('name')->values();
+        }
 
         Template::show($player, 'access-rights.update', compact('accessRights'));
     }

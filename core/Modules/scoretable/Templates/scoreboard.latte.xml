@@ -36,8 +36,8 @@
                text="+12.7 LP"/> <!-- LP Gain -->
 
         <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"
-              opacity="0"/> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="86 12" z-index="-10" opacity="0.6"
+              opacity="0" hidden="0"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="86 12" z-index="-15" opacity="0.5"
               ScriptEvents="1"/> <!-- Primary BG -->
         <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5"
@@ -61,6 +61,8 @@
             <label class="button force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1"
                    halign="center" valign="center"/>
         </frame>
+
+        <quad pos="1 0" size="86 12" z-index="-12" opacity="0" bgcolor="{config('colors.ui.widget.header.color')|noescape}"/> <!-- Primary BG -->
     </framemodel>
 
     <!-- end components -->
@@ -194,6 +196,14 @@
 
         declare EvoSC_Group group;
         return group;
+    }
+
+    Void flashBox(CMlFrame box){
+        declare quad <=> (box.Controls[17] as CMlQuad);
+
+        AnimMgr.Add(quad, "<quad opacity='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        sleep(220);
+        AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
     Void updateBox(CMlFrame box, CTmScore score, Integer rank){
@@ -550,6 +560,7 @@
                     page = ML::FloorInteger(Scores.count / i * 1.0);
                     forceUpdate = True;
                     updateScoreTable();
+                    flashBox(boxes[i % SB_Per_Page - 1]);
                 }
             }
         }
