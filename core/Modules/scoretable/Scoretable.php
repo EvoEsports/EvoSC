@@ -47,8 +47,6 @@ class Scoretable extends Module implements ModuleInterface
             })
             ->keyBy('login');
 
-        dump($players, $logins);
-
         Template::show($player, 'scoretable.update', compact('players'));
     }
 }
