@@ -50,7 +50,7 @@
                    valign="center"/>
             <label class="button pm" data-icon="" data-access="" text="PM" ScriptEvents="1" halign="center"
                    valign="center"/>
-            <label class="button mute" data-icon="" data-access="" text="Mute" ScriptEvents="1" halign="center"
+            <label class="button mute" data-icon="" data-access="player_mute" text="Mute" ScriptEvents="1" halign="center"
                    valign="center"/>
             <label class="button ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" halign="center"
                    valign="center"/>
@@ -380,6 +380,7 @@
     }
 
     Void setupButtons(CMlFrame box){
+        declare Text[] EvoSC_Access_Rights for This;
         declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
         declare widths = 0.0;
         foreach(Control in buttonsFrame.Controls){
@@ -388,6 +389,13 @@
             if(buttonLabel.DataAttributeGet("icon") != ""){
                 buttonLabel.Value = buttonLabel.DataAttributeGet("icon") ^ "\n" ^ buttonLabel.Value;
                 buttonLabel.DataAttributeSet("icon", "");
+            }
+
+            declare access = buttonLabel.DataAttributeGet("access");
+            if(access != ""){
+                if(!EvoSC_Access_Rights.exists(access)){
+                    buttonLabel.Visible = False;
+                }
             }
 
             if(buttonLabel.Visible){
