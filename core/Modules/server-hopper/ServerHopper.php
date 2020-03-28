@@ -20,8 +20,12 @@ class ServerHopper extends Module implements ModuleInterface
      */
     private static $servers;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
+
         /**
          * TODO: Add pagination
          */
@@ -61,9 +65,9 @@ class ServerHopper extends Module implements ModuleInterface
         })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
-            Template::show($player, 'server-hopper.update', compact('serversJson'));
+            Template::show($player, 'server-hopper.update', compact('serversJson'), false, 2);
         } else {
-            Template::showAll('server-hopper.update', compact('serversJson'));
+            Template::showAll('server-hopper.update', compact('serversJson'), 2);
         }
     }
 
@@ -86,13 +90,5 @@ class ServerHopper extends Module implements ModuleInterface
         });
 
         self::sendUpdatedServerInformations();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

@@ -46,7 +46,7 @@ class LiveRankings extends Module implements ModuleInterface
                 ->pluck('nick', 'score');
         }
 
-        Template::showAll('live-rankings.update', compact('liveRankings'));
+        Template::showAll('live-rankings.update', compact('liveRankings'), 5);
     }
 
     /**

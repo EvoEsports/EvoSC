@@ -32,6 +32,6 @@ class AccessRights extends Module implements ModuleInterface
             $accessRights = $player->group->accessRights()->pluck('name')->values();
         }
 
-        Template::show($player, 'access-rights.update', compact('accessRights'));
+        Template::show($player, 'access-rights.update', compact('accessRights'), false, 1);
     }
 }

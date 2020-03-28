@@ -27,7 +27,13 @@ class MusicClient extends Module implements ModuleInterface
      */
     private static stdClass $song;
 
-    public function __construct()
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         $url = config('music.url');
 
@@ -69,7 +75,7 @@ class MusicClient extends Module implements ModuleInterface
         InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
     }
 
-    private function enableMusicDisabledNotice()
+    private static function enableMusicDisabledNotice()
     {
         Hook::add('PlayerConnect', function (Player $player) {
             warningMessage('Music server not reachable, custom music is disabled.')->send($player);
@@ -78,7 +84,7 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function searchMusic(Player $player, string $search = '')
     {
-        Template::show($player, 'music-client.search-command', compact('search'));
+        Template::show($player, 'music-client.search-command', compact('search'), false, 2);
     }
 
     public static function setNextSong()
@@ -87,7 +93,7 @@ class MusicClient extends Module implements ModuleInterface
         Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));
 
         if (self::$song) {
-            Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)]);
+            Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)], 60);
         }
     }
 
@@ -99,7 +105,7 @@ class MusicClient extends Module implements ModuleInterface
         Template::show($player, 'music-client.send-music', [
             'server' => $server,
             'music' => $chunks,
-        ]);
+        ], false, 2);
     }
 
     public static function showMusicList(Player $player)
@@ -128,18 +134,7 @@ class MusicClient extends Module implements ModuleInterface
         }
 
         if ($song != 'null') {
-            Template::show($player, 'music-client.start-song', compact('song'));
+            Template::show($player, 'music-client.start-song', compact('song'), 60);
         }
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

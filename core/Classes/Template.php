@@ -40,17 +40,51 @@ class Template
     /**
      * Show the template to everyone.
      *
-     * @param  string  $index
-     * @param  array|null  $values
+     * @param string $index
+     * @param array|null $values
+     * @param int $timeoutInSeconds
      */
-    public static function showAll(string $index, array $values = null)
+    public static function showAll(string $index, array $values = [], int $timeoutInSeconds = 0)
     {
-        if (!$values) {
-            $values = [];
+        $xml = TemplateController::getTemplate($index, $values);
+        Server::sendDisplayManialinkPage('', $xml, $timeoutInSeconds * 1000);
+    }
+
+    /**
+     * Render and send a template to a player.
+     *
+     * @param Player $player
+     * @param string $index
+     * @param null $values
+     * @param bool $multicall
+     * @param int $timeoutInSeconds
+     */
+    public static function show(Player $player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
+    {
+        $data = [];
+
+        if ($values instanceof Collection) {
+            foreach ($values as $key => $value) {
+                $data[$key] = $value;
+            }
+        } else {
+            $data = $values;
         }
 
-        $xml = TemplateController::getTemplate($index, $values);
-        Server::sendDisplayManialinkPage('', $xml);
+        $data['localPlayer'] = $player;
+        $xml = TemplateController::getTemplate($index, $data);
+
+        if ($xml != '') {
+            if ($multicall) {
+                if (!isset(self::$multiCalls)) {
+                    self::$multiCalls = collect();
+                }
+
+                self::$multiCalls->put($player->Login, $xml);
+            } else {
+                Server::sendDisplayManialinkPage($player->Login, $xml, $timeoutInSeconds * 1000);
+            }
+        }
     }
 
     /**
@@ -74,42 +108,6 @@ class Template
     {
         Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
-    }
-
-    /**
-     * Render and send a template to a player.
-     *
-     * @param  Player  $player
-     * @param  string  $index
-     * @param  null  $values
-     * @param  bool  $multicall
-     */
-    public static function show(Player $player, string $index, $values = null, bool $multicall = false)
-    {
-        $data = [];
-
-        if ($values instanceof Collection) {
-            foreach ($values as $key => $value) {
-                $data[$key] = $value;
-            }
-        } else {
-            $data = $values;
-        }
-
-        $data['localPlayer'] = $player;
-        $xml = TemplateController::getTemplate($index, $data);
-
-        if ($xml != '') {
-            if ($multicall) {
-                if (!isset(self::$multiCalls)) {
-                    self::$multiCalls = collect();
-                }
-
-                self::$multiCalls->put($player->Login, $xml);
-            } else {
-                Server::sendDisplayManialinkPage($player->Login, $xml);
-            }
-        }
     }
 
     /**

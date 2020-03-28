@@ -150,7 +150,7 @@ class MxKarma extends Module implements ModuleInterface
                 $rating = self::playerCanVote($player, $map) ? -1 : -2; // -1 = can vote, -2 = can't vote
             }
 
-            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true);
+            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true, 1);
         }
 
         Template::executeMulticall();
@@ -180,7 +180,7 @@ class MxKarma extends Module implements ModuleInterface
         self::updateVotesAverage();
 
         $average = self::$updatedVotesAverage;
-        Template::showAll('mx-karma.update-karma', compact('average'));
+        Template::showAll('mx-karma.update-karma', compact('average'), 2);
     }
 
     public static function playerCanVote(Player $player, Map $map): bool
@@ -432,7 +432,7 @@ class MxKarma extends Module implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 1);
 
         self::sendUpdatedKarma();
     }
@@ -524,7 +524,7 @@ class MxKarma extends Module implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
         Log::info($player . " rated " . $map . " @ 0|worst");
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 1);
 
         self::sendUpdatedKarma();
     }

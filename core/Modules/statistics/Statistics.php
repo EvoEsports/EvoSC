@@ -106,7 +106,7 @@ class Statistics extends Module implements ModuleInterface
                 return $last_played ? (new Carbon($last_played))->diffForHumans() : 'never';
             }, true, true, $popularMaps));
 
-        Template::showAll('statistics.widgets', compact('statCollection'));
+        Template::showAll('statistics.widgets', compact('statCollection'), 120);
 
         /**
          * Calculate scores
