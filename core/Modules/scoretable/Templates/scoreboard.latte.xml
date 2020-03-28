@@ -3,7 +3,7 @@
     <stylesheet>
         <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1"/>
         <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05"
-               size="9.2 5.5" focusareacolor1="fff1" focusareacolor12="fff3" autonewline="1"/>
+               size="9.2 5.5" focusareacolor1="fff1" focusareacolor2="fff3" autonewline="1"/>
         <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}"
                opacity="{config('colors.ui.window.bg.opacity')|noescape}"/>
     </stylesheet>
@@ -11,22 +11,21 @@
     <framemodel id="box" size="86 12">
         <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff"
                z-index="10"/> <!-- Name -->
-        <label class="label" pos="64.25 -7.5" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center"
+        <label class="label" pos="64.25 -3.8" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center"
                text="" opacity="0.85"/> <!-- Group Icon -->
         <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
-            <quad pos="-3 5" size="50 7" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" rot="-45"
-                  z-index="-2" opacity="0.65"/>
+            <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2"/>
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7"
-                   textcolor="666"/>
+                   textcolor="888"/>
         </frame> <!-- Badge -->
         <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center"
                valign="center" text="" opacity="1" textcolor="fff"/> <!-- Rank -->
         <label class="label" pos="25 -7" size="11 3" scale="1" textcolor="fff" halign="left"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
-        <quad pos="63 -4" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="label" pos="66.25 -3.8" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
+        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
+        <label class="label" pos="66.25 -7.5" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
                text="Region: Rank"/> <!-- Region -->
-        <label class="label" pos="66.25 -7.5" size="19.5 3" scale="0.9" textcolor="fff" valign="center" text="Player"
+        <label class="label" pos="66.25 -3.7" size="19.5 3" scale="0.9" textcolor="fff" valign="center" text="Player"
                opacity="0.75"/> <!-- Group -->
         <label class="label" pos="19 -9.75" scale="0.6" textcolor="fffa" halign="center" valign="center" textprefix="$s"
                text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
@@ -93,7 +92,7 @@
         <label class="label prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
         <label id="page" class="label" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
         <label class="label next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="label me" textprefix="$s" text="" valign="center" halign="center" pos="24.5 -81" textsize="2.1" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="label me" textprefix="$s" text="" valign="center" halign="center" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
     </frame>
 
     <script><!--
@@ -126,7 +125,9 @@
     declare Boolean forceUpdate;
 
     Integer ceil(Real value){
-        return ML::CeilingInteger(value);
+        declare Integer ceiled = ML::CeilingInteger(value);
+
+        return ceiled;
     }
 
     Text getStars(Integer count){
@@ -201,7 +202,7 @@
     Void flashBox(CMlFrame box){
         declare quad <=> (box.Controls[17] as CMlQuad);
 
-        AnimMgr.Add(quad, "<quad opacity='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add(quad, "<quad opacity='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         sleep(220);
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
@@ -229,7 +230,7 @@
             badgeLabel.Value = "";
 		}else if(LibST_Status == C_Status_Spectating){
             badgeQuad.Show();
-            badgeLabel.Value = "${config('colors.ui.window.header.color')|noescape}";
+            badgeLabel.Value = "$eee";
 		}else{
             badgeQuad.Hide();
             badgeLabel.Value = "";
@@ -242,7 +243,7 @@
 
         if(score.BestLap.Time > 0){
             scoreBgLabel.Value = "";
-            scoreLabel.Value = "$aaa" ^ formatScoreCorrect(score.BestLap.Time, True);
+            scoreLabel.Value = "$ddd" ^ formatScoreCorrect(score.BestLap.Time, True);
         }else{
             scoreBgLabel.Value = "";
             scoreLabel.Value = "$aaaNo finish";
@@ -304,8 +305,16 @@
         return SortedScores.sort();
     }
 
+    Integer getMaxPage(){
+        if(Scores.count % SB_Per_Page == 0){
+            return ML::NearestInteger(Scores.count / SB_Per_Page * 1.0);
+        }
+
+        return (ceil(Scores.count / SB_Per_Page * 1.0));
+    }
+
     Void updateScoreTable(){
-        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ ceil(Scores.count / SB_Per_Page * 1.0);
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
 
         foreach (Player in Players) {
             declare LibST_LastTick for Player.User = -1;
@@ -322,13 +331,6 @@
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
         (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel).Value = CurrentServerModeName;
         (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
-
-        declare EvoSC_User[Text] EvoSC_Players for This;
-        foreach(Score in Scores){
-            if(!EvoSC_Players.existskey(Score.User.Login)){
-                TriggerPageAction("sb.load_missing_logins," ^ Score.User.Login);
-            }
-        }
 
         declare rank = 1;
         declare filled = 0;
@@ -438,7 +440,7 @@
                         SetSpectateTarget(targetLogin);
                     }
                     if(Event.Control.HasClass("pm")){
-                        TriggerPageAction("pm," ^ targetLogin);
+                        TriggerPageAction("pm.dialog," ^ targetLogin);
                     }
                     if(Event.Control.HasClass("mute")){
                         TriggerPageAction("mute," ^ targetLogin);
@@ -469,10 +471,10 @@
         AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='25 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='25 -7' scale='1' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='25 -2.5' scale='1.3' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='64.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='66.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -4' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -3.8' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='64.25 -3.8' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='66.25 -3.7' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -7.7' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -7.5' scale='0.9' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add(box.Controls[5], "<label opacity='1.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         box.Controls[2].Show();
         box.Controls[14].Show();
@@ -480,6 +482,7 @@
     }
 
     main() {
+        declare Boolean ESC_Tab_Pressed for This;
         declare SB_Last_Update = 0;
         declare podium = False;
 
@@ -492,12 +495,12 @@
             boxes.add((Control as CMlFrame));
         }
 
-        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ ceil(Scores.count / SB_Per_Page * 1.0);
-
         while(True){
             yield;
 
-            if(GameTime - SB_Last_Update > SB_Update_Interval){
+            ESC_Tab_Pressed = PageIsVisible;
+
+            if(GameTime - SB_Last_Update > SB_Update_Interval && PageIsVisible){
                 forceUpdate = True;
                 updateScoreTable();
             }
@@ -522,7 +525,7 @@
                 if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
                     page -= 1;
                     if(page < 1){
-                        page = ceil(Scores.count / SB_Per_Page * 1.0);
+                        page = getMaxPage();
                     }
                     forceUpdate = True;
                     updateScoreTable();
@@ -530,7 +533,7 @@
 
                 if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
                     page += 1;
-                    if(page > ceil(Scores.count / SB_Per_Page * 1.0)){
+                    if(page > getMaxPage()){
                         page = 1;
                     }
                     forceUpdate = True;
@@ -540,15 +543,16 @@
                 if(control.HasClass("me") && Event.Type == CMlScriptEvent::Type::MouseClick){
                     declare i = 0;
                     foreach(Score => Weight in GetSortedScores()){
-                        i += 1;
                         if(Score.User.Login == LocalUser.Login){
                             break;
                         }
+                        i += 1;
                     }
-                    page = ML::FloorInteger(Scores.count / i * 1.0);
+                    page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
                     forceUpdate = True;
                     updateScoreTable();
-                    flashBox(boxes[i % SB_Per_Page - 1]);
+                    sleep(80);
+                    flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
                 }
             }
         }

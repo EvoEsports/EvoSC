@@ -10,9 +10,12 @@
 
     main(){
         declare EvoSC_User[Text] EvoSC_Players for This;
-        declare EvoSC_User new;
-        new.fromjson("""{json_encode($player)|noescape}""");
-        EvoSC_Players["{$player->login|noescape}"] = new;
+        declare EvoSC_User[Text] new;
+        new.fromjson("""{$players->toJson()|noescape}""");
+
+        foreach(login => updatedEntry in new){
+            EvoSC_Players[login] = updatedEntry;
+        }
     }
     --></script>
 </manialink>

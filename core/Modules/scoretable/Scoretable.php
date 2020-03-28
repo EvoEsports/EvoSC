@@ -20,8 +20,6 @@ class Scoretable extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        ManiaLinkEvent::add('sb.load_missing_logins', [self::class, 'mleLoadMissingLogin']);
-
         Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
     }
 
@@ -31,17 +29,25 @@ class Scoretable extends Module implements ModuleInterface
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
 
+        $joinedPlayerInfo = collect([$player])->map(function (Player $player) {
+            return [
+                'login' => $player->Login,
+                'name' => ml_escape($player->NickName),
+                'groupId' => $player->group->id
+            ];
+        })->keyBy('login');
+
+        $playerInfo = onlinePlayers()->map(function (Player $player) {
+            return [
+                'login' => $player->Login,
+                'name' => ml_escape($player->NickName),
+                'groupId' => $player->group->id
+            ];
+        })->keyBy('login');
+
         GroupManager::sendGroupsInformation($player);
+        Template::showAll('scoretable.update', ['players' => $joinedPlayerInfo]);
+        Template::show($player, 'scoretable.update', ['players' => $playerInfo]);
         Template::show($player, 'scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
-    }
-
-    public static function mleLoadMissingLogin(Player $player, string $login)
-    {
-        $player_ = DB::table('players')
-            ->select(['NickName as name', 'Login as login', 'Group as groupId'])
-            ->where('Login', '=', $login)
-            ->first();
-
-        Template::showAll('scoretable.update', ['player' => $player_]);
     }
 }
