@@ -134,7 +134,7 @@ class MusicClient extends Module implements ModuleInterface
         }
 
         if ($song != 'null') {
-            Template::show($player, 'music-client.start-song', compact('song'), 60);
+            Template::show($player, 'music-client.start-song', compact('song'), false, 60);
         }
     }
 }
