@@ -84,7 +84,7 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function searchMusic(Player $player, string $search = '')
     {
-        Template::show($player, 'music-client.search-command', compact('search'), false, 2);
+        Template::show($player, 'music-client.search-command', compact('search'), false, 20);
     }
 
     public static function setNextSong()
@@ -134,7 +134,7 @@ class MusicClient extends Module implements ModuleInterface
         }
 
         if ($song != 'null') {
-            Template::show($player, 'music-client.start-song', compact('song'), false, 60);
+            Template::show($player, 'music-client.start-song', compact('song'), false, 180);
         }
     }
 }

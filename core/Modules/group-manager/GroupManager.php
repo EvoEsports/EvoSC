@@ -51,7 +51,7 @@ class GroupManager extends Module implements ModuleInterface
             ->get()
             ->keyBy('id');
 
-        Template::show($player, 'group-manager.update', compact('groups'), false, 2);
+        Template::show($player, 'group-manager.update', compact('groups'), false, 20);
     }
 
     public function groupRightsUpdate(Player $player, $formData)

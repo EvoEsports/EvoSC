@@ -46,8 +46,8 @@ class Scoretable extends Module implements ModuleInterface
         })->keyBy('login');
 
         GroupManager::sendGroupsInformation($player);
-        Template::showAll('scoretable.update', ['players' => $joinedPlayerInfo], 2);
-        Template::show($player, 'scoretable.update', ['players' => $playerInfo], false, 2);
+        Template::showAll('scoretable.update', ['players' => $joinedPlayerInfo], 20);
+        Template::show($player, 'scoretable.update', ['players' => $playerInfo], false, 20);
         Template::show($player, 'scoretable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
     }
 }

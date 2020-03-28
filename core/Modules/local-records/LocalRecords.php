@@ -110,7 +110,7 @@ class LocalRecords extends Module implements ModuleInterface
 
             $localsJson = $records->sortBy('rank')->values()->toJson();
 
-            Template::show($player, 'local-records.update', compact('localsJson'), false, 5);
+            Template::show($player, 'local-records.update', compact('localsJson'), false, 20);
         }
     }
 

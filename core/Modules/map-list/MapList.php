@@ -59,7 +59,7 @@ class MapList extends Module implements ModuleInterface
     {
         $favorites = $player->favorites()->where('enabled', true)->pluck('uid')->toJson();
 
-        Template::show($player, 'map-list.update-favorites', compact('favorites'), false, 1);
+        Template::show($player, 'map-list.update-favorites', compact('favorites'), false, 20);
     }
 
     public static function sendRecordsJson(Player $player)
@@ -67,12 +67,12 @@ class MapList extends Module implements ModuleInterface
         $locals = DB::table(LocalRecords::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
         $dedis = DB::table(Dedimania::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
-        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'), false, 1);
+        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'), false, 20);
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
     {
-        Template::show($player, 'map-list.update-search-query', compact('query'), false, 1);
+        Template::show($player, 'map-list.update-search-query', compact('query'), false, 20);
     }
 
     /**
@@ -203,7 +203,7 @@ class MapList extends Module implements ModuleInterface
             ];
         })->filter();
 
-        Template::showAll('map-list.update-map-queue', compact('mapQueue'), 1);
+        Template::showAll('map-list.update-map-queue', compact('mapQueue'), 20);
     }
 
     public static function showMapQueue(Player $player)

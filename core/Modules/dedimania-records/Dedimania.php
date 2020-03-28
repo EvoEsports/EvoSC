@@ -180,7 +180,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
         $dedisJson = $records->sortBy('rank')->values()->toJson();
 
-        Template::show($player, 'dedimania-records.update', compact('dedisJson'), false, 5);
+        Template::show($player, 'dedimania-records.update', compact('dedisJson'), false, 20);
     }
 
     public static function showDedisTable(Player $player)

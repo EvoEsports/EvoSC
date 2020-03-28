@@ -31,7 +31,7 @@
                text="" opacity="0.85" z-index="2"/> <!-- Fame Stars -->
         <label class="label" pos="25 -7" size="11 3" scale="1"
                textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="left"/> <!-- Score BG -->
-        <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="{config('colors.ui.window.header.color')|noescape}" valign="center" halign="right" opacity="0.9"
+        <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9"
                text="+12.7 LP"/> <!-- LP Gain -->
 
         <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"

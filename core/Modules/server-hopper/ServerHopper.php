@@ -65,9 +65,9 @@ class ServerHopper extends Module implements ModuleInterface
         })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
-            Template::show($player, 'server-hopper.update', compact('serversJson'), false, 2);
+            Template::show($player, 'server-hopper.update', compact('serversJson'), false, 20);
         } else {
-            Template::showAll('server-hopper.update', compact('serversJson'), 2);
+            Template::showAll('server-hopper.update', compact('serversJson'), 20);
         }
     }
 
