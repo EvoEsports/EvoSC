@@ -34,7 +34,7 @@ class NextMap extends Module implements ModuleInterface
 
         if (Server::isFilenameInSelection($map->filename)) {
             infoMessage('Upcoming map ', secondary($map->name))->setIcon('')->sendAll();
-            Template::showAll('next-map.widget', compact('map', 'author'), 60);
+            Template::showAll('next-map.widget', compact('map', 'author'));
         }
     }
 

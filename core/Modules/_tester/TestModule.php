@@ -27,7 +27,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        self::sendTestManialink($player);
+        EvoDonate::sendWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
