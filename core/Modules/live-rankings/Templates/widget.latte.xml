@@ -107,6 +107,7 @@
         (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, False);
         (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, True);
         (box.Controls[3] as CMlLabel).Value = prefix ^ score.User.Name;
+        box.Show();
     }
 
     Void updateList(){
@@ -180,6 +181,7 @@
         declare lastUpdate = 0;
 
         max = {config('live-rankings.show',14)};
+        updateList();
 
         left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('live-rankings.ui.slot')};
