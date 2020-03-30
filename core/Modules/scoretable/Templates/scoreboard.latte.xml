@@ -504,6 +504,7 @@
             if(GameTime - SB_Last_Update > SB_Update_Interval && PageIsVisible){
                 forceUpdate = True;
                 updateScoreTable();
+                SB_Last_Update = GameTime;
             }
 
             if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){

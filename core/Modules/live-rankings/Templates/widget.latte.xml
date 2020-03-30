@@ -27,6 +27,31 @@
 
     {block script}
     <script><!--
+    Integer[CTmScore] GetSortedScores() {
+        declare persistent Boolean[Text] LibScoresTable2_Settings for This;
+        declare SortedScores = Integer[CTmScore];
+        declare Count = 0;
+
+        foreach (Score in Scores) {
+            declare LibST_Status for Score.User = C_Status_Disconnected;
+            declare Weight = Count;
+            if (
+                LibScoresTable2_Settings.existskey("SortSpec") &&
+                LibScoresTable2_Settings["SortSpec"] &&
+                LibST_Status == C_Status_Spectating
+            ) Weight += Scores.count;
+            if (
+                LibScoresTable2_Settings.existskey("SortDisco") &&
+                LibScoresTable2_Settings["SortDisco"] &&
+                LibST_Status == C_Status_Disconnected
+            ) Weight += 2 * Scores.count;
+            SortedScores[Score] = Weight;
+            Count += 1;
+        }
+
+        return SortedScores.sort();
+    }
+
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
         declare Text msString;
@@ -67,59 +92,75 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Void updateLabels(CMlFrame ranking, Integer position, Text name, Integer score){
-        declare index = position - 1;
+    Void updateSlot(CMlFrame box, Integer rank, CTmScore score){
+        declare prefix = "";
+		declare LibST_Status for score.User = C_Status_Disconnected;
+		if(LibST_Status == C_Status_Disconnected){
+            prefix = "$aaa $z";
+		}else if(LibST_Status == C_Status_Spectating){
+            prefix = "$eee $z";
+		}else{
+            prefix = "";
+		}
 
-        if(index >= ranking.Controls.count){
-            return;
-        }
-
-        declare frame <=> (ranking.Controls[position - 1] as CMlFrame);
-        (frame.Controls[0] as CMlLabel).SetText(position ^ ".");
-
-        if(CurrentServerModeName == "Rounds"){
-            (frame.Controls[1] as CMlLabel).SetText("" ^ score);
-            (frame.Controls[2] as CMlLabel).SetText("" ^ score);
-        }else{
-            (frame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(score, False));
-            (frame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(score, True));
-        }
-        (frame.Controls[3] as CMlLabel).SetText(name);
-        frame.Show();
+        (box.Controls[0] as CMlLabel).Value = rank ^ ".";
+        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, False);
+        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, True);
+        (box.Controls[3] as CMlLabel).Value = prefix ^ score.User.Name;
     }
 
     Void updateList(){
-        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
-        declare Integer max = {config('live-rankings.show',14)};
-        declare Integer i = 0;
+        foreach (Player in Players) {
+            declare LibST_LastTick for Player.User = -1;
+            LibST_LastTick = Now;
+            declare LibST_Status for Player.User = C_Status_Disconnected;
+            if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
+                LibST_Status = C_Status_Spectating;
+            }
+            if (!Player.RequestsSpectate && Player.IsSpawned && LibST_Status != C_Status_Spawned) {
+                LibST_Status = C_Status_Spawned;
+            }
+        }
 
-        scores = scores.sort();
-
-        foreach(name => score in scores){
-            if(i > max){
+        declare rank = 1;
+        declare filled = 0;
+        declare boxesFrame <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
+        foreach(Score => Weight in GetSortedScores()){
+            if(filled >= boxesFrame.Controls.count){
                 return;
             }
 
-            i = i + 1;
-
-            if(i > {config('live-rankings.show', 14)}){
-                return;
+            if(Score.BestLap.Time == -1){
+                continue;
             }
 
-            updateLabels(ranking, i, name, score);
-        }
-
-        if(scores.count < max){
-            for(i, scores.count, max - 1){
-                (ranking.Controls[i] as CMlFrame).Hide();
+            declare SlotNeedUpdate = False;
+            declare LibST_LastTick for Score.User = -1;
+            declare LibST_Status for Score.User = C_Status_Disconnected;
+            if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
+                LibST_Status = C_Status_Disconnected;
+                SlotNeedUpdate = True;
             }
-        }
-    }
 
-    Void reset(){
-        declare CMlFrame ranking <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
-        foreach(control in ranking.Controls){
-            control.Hide();
+            declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
+            if (LibST_PrevStatus != LibST_Status) {
+                LibST_PrevStatus = LibST_Status;
+                SlotNeedUpdate = True;
+            }
+
+            declare LibST_PrevUpdate for Score = -1;
+            declare netread Integer Net_LibST_Update for Score;
+            LibST_PrevUpdate = Net_LibST_Update;
+            updateSlot((boxesFrame.Controls[rank - 1] as CMlFrame), rank, Score);
+
+            rank += 1;
+            filled += 1;
+        }
+
+        if(filled < max){
+            for(i, filled, max - 1){
+                boxesFrame.Controls[i].Hide();
+            }
         }
     }
     --></script>
@@ -127,36 +168,27 @@
 
     <script><!--
     {block globals}
-    declare Integer[Text] scores;
+    #Const C_Status_Disconnected	0
+    #Const C_Status_Spawned			1
+    #Const C_Status_NotSpawned		2
+    #Const C_Status_Spectating		3
+
+    declare Integer max;
     {/block}
 
     {block bootScript}
-        declare Text[Text] LiveRankings__ for This;
-        declare Integer LiveRankingsUpdate for This;
-        declare Ident currentMapUid = Map.Id;
+        declare lastUpdate = 0;
+
+        max = {config('live-rankings.show',14)};
 
         left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('live-rankings.ui.slot')};
-
-        declare lastUpdate = 0;
-
-        reset();
     {/block}
 
     {block loop}
-        if(lastUpdate != LiveRankingsUpdate){
-            lastUpdate = LiveRankingsUpdate;
-            log(LiveRankings__);
-            scores = Integer[Text];
-            foreach(score => nick in LiveRankings__){
-                scores[nick] = TL::ToInteger(score);
-            }
+        if(GameTime - lastUpdate > 250){
+            lastUpdate = GameTime;
             updateList();
-        }
-
-        if(currentMapUid != Map.Id){
-            currentMapUid = Map.Id;
-            reset();
         }
     {/block}
 
