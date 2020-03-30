@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:asay" id="asay" version="3">
-    <label id="text" opacity="1.0" textprefix="$s" textcolor="{config('colors.warning')|noescape}f" textfont="{config('colors.ui.font')|noescape}" halign="center" valign="center" size="80 100" textsize="1.0" autonewline="1" text={$text} pos={config('asay.pos')} />
+    <label id="text" opacity="1.0" textprefix="$s" textcolor="fc2f" textfont="{config('colors.ui.font')|noescape}" halign="center" valign="center" size="80 120" textsize="2.5" autonewline="1" text="{$text|noescape}" pos="{config('asay.pos')|noescape}" />
 
     <script><!--
     main() {
@@ -17,12 +17,12 @@
             if(InputPlayer == Null) continue;
             if(InputPlayer.DisplaySpeed > 50 && !hidden){
                 hidden = True;
-                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(textLabel, "<label textcolor='fc20' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;
             }
             if(InputPlayer.DisplaySpeed < 50 && hidden){
                 hidden = False;
-                AnimMgr.Add(textLabel, "<label textcolor='{config('colors.warning')|noescape}f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                AnimMgr.Add(textLabel, "<label textcolor='fc2f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;
             }
         }
