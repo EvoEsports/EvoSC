@@ -235,7 +235,7 @@
             badgeLabel.Value = "";
 		}
 
-        rankLabel.Value = "" ^ rank;
+        rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
         nameLabel.Value = user.Name;
         groupLabel.Value = group.name;
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
