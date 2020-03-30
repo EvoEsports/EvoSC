@@ -36,8 +36,6 @@ class LocalRecords extends Module implements ModuleInterface
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
-
-        Template::showAll('local-records.manialink');
     }
 
     public static function beginMap(Map $map)
