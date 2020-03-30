@@ -264,7 +264,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.82.x';
+    return '0.83.x';
 }
 
 /**
