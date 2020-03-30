@@ -6,7 +6,7 @@
     "time-limit-in-seconds": 1800,
     "ui": {
       "position": "right",
-      "slot": 8,
+      "slot": 40,
       "slot_horizontal": 5
     }
   },
@@ -16,7 +16,7 @@
     "cost": 5000,
     "ui": {
       "position": "right",
-      "slot": 8,
+      "slot": 40,
       "slot_horizontal": 4
     }
   }

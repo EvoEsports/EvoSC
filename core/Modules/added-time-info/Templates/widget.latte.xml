@@ -6,9 +6,9 @@
     {block size}29 9{/block}
 
     {block content}
-    <frame pos="20.5 -1.25" z-index="2">
+    <frame pos="20.5 -1" z-index="2">
         <label class="open-controls" id="time" z-index="2" size="20 5" text="+0 min." textsize="1"
-               halign="center" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+               halign="center" valign="center" textcolor="fff" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
     </frame>
     <frame pos="0.5 -4" scale="0.6" id="buttons">
         {foreach $buttons as $i => $button}
@@ -70,9 +70,9 @@
                     }
 
                     if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
-                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
                     }else{
-                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
+                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
                     }
 
                     timeLabel.Show();
