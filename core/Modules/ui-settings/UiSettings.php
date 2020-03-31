@@ -43,10 +43,5 @@ class UiSettings extends Module implements ModuleInterface
     {
         $settings = $player->setting('ui');
         Template::show($player, 'ui-settings.update', compact('settings'), false, 20);
-
-        Timer::create(uniqid('fix-ui'), function () use ($player, $settings) {
-            $settings = $player->setting('ui');
-            Template::show($player, 'ui-settings.update', compact('settings'), false, 20);
-        }, '10s', false);
     }
 }

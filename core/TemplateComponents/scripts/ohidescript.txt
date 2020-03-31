@@ -1,0 +1,45 @@
+Void hidescript(){
+    if(HS_Target == Null){
+        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+    }
+
+    declare UISettings settings for This;
+    declare Boolean ESC_Tab_Pressed for This;
+    declare hideSpeed = settings.speed;
+
+    if(hideSpeed == -1 || InputPlayer == Null){
+        return;
+    }
+
+    declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+    if(mapFinished){
+        if(!HS_Hidden){
+            hs_hide(800);
+        }
+    }else{
+        if(ESC_Tab_Pressed == True){
+            hs_show(1);
+            wait(ESC_Tab_Pressed == False);
+            hs_hide(1);
+        }
+
+        if(InputPlayer == Null){
+            return;
+        }
+
+        declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+        declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+
+        if(overHidespeed && playerIsRacing && !HS_Hidden){
+            hs_hide(800);
+
+            {if !isset($doNotPause)}
+            //wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            {/if}
+        }
+        if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+            hs_show(600);
+        }
+    }
+}
