@@ -4,12 +4,6 @@ declare Vec2 HS_POS;
 declare CMlFrame HS_Target;
 declare Boolean HS_Hidden;
 
-declare Vec2 pos;
-declare Real width;
-declare Integer dirX;
-declare Integer dirY;
-declare Real multiplier;
-
 Void hs_hide(Integer duration){
     HS_Hidden = True;
     declare Real x;
@@ -26,7 +20,7 @@ Void hs_show(Integer duration){
     AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
-Void hs(){
+Void hidescript(){
     if(HS_Target == Null){
         HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
     }
@@ -71,58 +65,4 @@ Void hs(){
         }
     }
 }
-
-Void april(){
-    if(HS_Target == Null){
-        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
-        width = HS_Target.Size[0];
-
-        if(HS_Target.RelativePosition_V3[0] > 0){
-            dirX = -1;
-        }else{
-            dirX = 1;
-        }
-        if(HS_Target.RelativePosition_V3[1] > 0){
-            dirY = 1;
-        }else{
-            dirY = -1;
-        }
-        multiplier = ML::Rand(0.0001, 0.0003);
-    }
-
-    if(InputPlayer == Null){
-        return;
-    }
-    if(InputPlayer.DisplaySpeed < 5){
-        return;
-    }
-
-    declare addX = InputPlayer.Speed * InputPlayer.Speed * dirX * multiplier;
-    declare addY = InputPlayer.Speed * InputPlayer.Speed * dirY * multiplier;
-    HS_Target.RelativePosition_V3[0] += addX;
-    HS_Target.RelativePosition_V3[1] += addY;
-
-    if(dirX == 1 && HS_Target.RelativePosition_V3[0]+width > 155){
-        dirX = -1;
-    }
-    if(dirX == -1 && HS_Target.RelativePosition_V3[0] < -155){
-        dirX = 1;
-    }
-    if(dirY == 1 && HS_Target.RelativePosition_V3[1] > 85){
-        dirY = -1;
-    }
-    if(dirY == -1 && HS_Target.RelativePosition_V3[1] < -80){
-        dirY = 1;
-    }
-}
-
-Void hidescript(){
-    declare Boolean AprilMadness for This = True;
-    if(AprilMadness){
-        april();
-    }else{
-        hs();
-    }
-}
-
 --></script>
