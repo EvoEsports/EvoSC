@@ -25,7 +25,7 @@ Example:
 If any available, add screenshots/logs to help explain your problem.
 
 **EvoSC (please complete the following information):**
- - EvoSC-Version: [e.g. 0.87.3] (Displayed in console on start)
+ - EvoSC-Version: [e.g. 0.87.x] (get with `php esc version`)
 
 **When using git (please complete the following information):**
  - Current-Commit: [e.g. bb3eefb3622e864ad480641f281d4a2e4be50a69] (get with `git rev-parse HEAD`)
