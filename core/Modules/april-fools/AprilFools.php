@@ -23,5 +23,6 @@ class AprilFools extends Module implements ModuleInterface
     public static function show(Player $player)
     {
         Template::show($player, 'april-fools.april-fools');
+        infoMessage("Happy ", secondary("1st April"), ", enjoy the ride! If you can't take it anymore click the button :)")->send($player);
     }
 }
