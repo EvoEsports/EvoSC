@@ -1,11 +1,5 @@
 <?php
 
-foreach (['cache', 'logs', 'modules'] as $dir) {
- if (!is_dir($dir)) {
-    mkdir($dir);
- }
-}
-
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
