@@ -7,6 +7,7 @@ use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\MatchSettingsController;
@@ -14,13 +15,14 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\Player;
+use SimpleXMLElement;
 
-class MatchSettingsManager implements ModuleInterface
+class MatchSettingsManager extends Module implements ModuleInterface
 {
-    private static $path;
+    private static string $path;
     private static $objects;
 
-    private static $modes = [
+    private static array $modes = [
         'TimeAttack' => 'timeattack.xml',
         'Team' => 'team.xml',
         'Rounds' => 'rounds.xml',
@@ -76,7 +78,7 @@ class MatchSettingsManager implements ModuleInterface
         $map = Map::find($mapId);
 
         if ($map) {
-            MatchSettingsController::addMap("$matchSettingsName.txt", $map);
+            MatchSettingsController::addMap("$matchSettingsName.txt", $map->filename, $map->uid);
             Log::info($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
         }
     }
@@ -96,7 +98,7 @@ class MatchSettingsManager implements ModuleInterface
         $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
         $data = File::get($file);
         $nodes = collect();
-        $xml = new \SimpleXMLElement($data);
+        $xml = new SimpleXMLElement($data);
 
         foreach ($xml as $node) {
             if ($node->getName() != 'map') {
@@ -128,7 +130,7 @@ class MatchSettingsManager implements ModuleInterface
         $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
         $data = File::get($file);
         $enabledMapUids = collect();
-        $xml = new \SimpleXMLElement($data);
+        $xml = new SimpleXMLElement($data);
 
         foreach ($xml as $node) {
             if ($node->getName() == 'map') {
@@ -227,16 +229,14 @@ class MatchSettingsManager implements ModuleInterface
 
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
-        MatchSettingsController::loadMatchSettings($player, $matchsettingsFile.'.txt');
+        MatchSettingsController::loadMatchSettings(true, $player, $matchsettingsFile.'.txt');
     }
 
     public static function getMatchsettings()
     {
-        $files = File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (String $file) {
+        return File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (String $file) {
             return preg_replace('/\.txt$/', '', $file);
         });
-
-        return $files;
     }
 
     /**

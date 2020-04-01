@@ -5,6 +5,7 @@ namespace esc\Classes;
 
 use esc\Models\Map;
 use esc\Models\Player;
+use stdClass;
 
 /**
  * Class ChatMessage
@@ -15,7 +16,7 @@ use esc\Models\Player;
  */
 class ChatMessage
 {
-    private $parts;
+    private array $parts;
     private $color;
     private $icon;
 
@@ -37,7 +38,7 @@ class ChatMessage
      *
      * @param  string  $color
      *
-     * @return \esc\Classes\ChatMessage
+     * @return ChatMessage
      */
     public function setColor(string $color): ChatMessage
     {
@@ -51,7 +52,7 @@ class ChatMessage
      *
      * @param  string  $icon
      *
-     * @return \esc\Classes\ChatMessage
+     * @return ChatMessage
      */
     public function setIcon(string $icon): ChatMessage
     {
@@ -63,7 +64,7 @@ class ChatMessage
     /**
      * Set info-color and icon on chat-message.
      *
-     * @return \esc\Classes\ChatMessage
+     * @return ChatMessage
      */
     public function setIsInfoMessage(): ChatMessage
     {
@@ -76,7 +77,7 @@ class ChatMessage
     /**
      * Set warning-color and icon on chat-message.
      *
-     * @return \esc\Classes\ChatMessage
+     * @return ChatMessage
      */
     public function setIsWarning(): ChatMessage
     {
@@ -91,7 +92,7 @@ class ChatMessage
      *
      * @param  mixed  ...$parts
      *
-     * @return \esc\Classes\ChatMessage
+     * @return ChatMessage
      */
     public function setParts(...$parts): ChatMessage
     {
@@ -115,7 +116,7 @@ class ChatMessage
                 continue;
             }
 
-            if ($part instanceof \stdClass) {
+            if ($part instanceof stdClass) {
                 var_dump($part);
                 continue;
             }
@@ -167,7 +168,7 @@ class ChatMessage
     /**
      * Send the message to a specific player.
      *
-     * @param  \esc\Models\Player|null|string  $player
+     * @param Player|null|string  $player
      */
     public function send($player = null)
     {

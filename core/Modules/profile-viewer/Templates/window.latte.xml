@@ -15,6 +15,7 @@
         <quad pos="12 -7" z-index="10" halign="center" size="11 11" image="file://Avatars/{$values['Login']|noescape}/default" />
         <quad pos="12 -19.5" z-index="10" halign="center" size="5 4" image="file://ZoneFlags/Path/{$zonePath|noescape}" />
 
+        <!--suppress CheckTagEmptyBody -->
         <frame id="content" size="125 80" pos="24 -7" z-index="5">
             {for $i=0; $i<count($values); $i++}
             <frameinstance modelid="info" pos="{floor($i / 5) * 25} {$i * -6 + floor($i / 5) * 30}"></frameinstance>

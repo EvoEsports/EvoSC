@@ -161,7 +161,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("id"));
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("uid"));
         return;
     }
 }

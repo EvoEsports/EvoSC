@@ -25,12 +25,12 @@ class TemplateController implements ControllerInterface
     /**
      * @var Engine
      */
-    private static $latte;
+    private static Engine $latte;
 
     /**
      * @var Collection
      */
-    private static $templates;
+    private static Collection $templates;
 
     /**
      * Initialize TemplateController
@@ -78,7 +78,7 @@ class TemplateController implements ControllerInterface
     public static function getTemplate(string $index, $values): string
     {
         try {
-            if (isVeryVerbose()) {
+            if (isDebug()) {
                 Log::write('Rendering Template: ' . $index);
             }
 
@@ -102,9 +102,8 @@ class TemplateController implements ControllerInterface
     /**
      * Load templates from all modules.
      *
-     * @param null $args
      */
-    public static function loadTemplates($args = null)
+    public static function loadTemplates()
     {
         Log::info('Loading templates...');
 

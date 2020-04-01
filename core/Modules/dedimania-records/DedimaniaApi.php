@@ -7,19 +7,21 @@ use Carbon\Carbon;
 use esc\Classes\Cache;
 use esc\Classes\File;
 use esc\Classes\Log;
+use esc\Classes\Module;
 use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
-class DedimaniaApi
+class DedimaniaApi extends Module
 {
-    protected static $enabled = false;
-    protected static $maxRank = 30;
+    protected static bool $enabled = false;
+    protected static int $maxRank = 30;
 
     /**
      * dedimania.OpenSession
@@ -37,6 +39,7 @@ class DedimaniaApi
      *
      * Return struct {'SessionId': string, 'Error': string}
      * . If successful SessionId is the value to be used it other methods, if not it is empty and a message is in Error.
+     * @throws GuzzleException
      */
     protected static function openSession(): bool
     {
@@ -141,7 +144,7 @@ class DedimaniaApi
      * . Checks: checkpoints times of the associated record.
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
-     * @param \esc\Models\Map $map
+     * @param Map $map
      *
      * @return null|Collection
      */
@@ -163,7 +166,7 @@ class DedimaniaApi
         }
 
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->gbx->MapUid,
+            'UId' => $map->uid,
             'Name' => str_replace('&', '', $map->name),
             'Environment' => $map->gbx->Environment,
             'Author' => $map->author->Login,
@@ -244,6 +247,7 @@ class DedimaniaApi
      * @param Map $map
      *
      * @return null|SimpleXMLElement
+     * @throws GuzzleException
      */
     static function updateServerPlayers(Map $map)
     {
@@ -301,6 +305,7 @@ class DedimaniaApi
      * Send new records
      *
      * @param Map $map
+     * @throws GuzzleException
      */
     static function setChallengeTimes(Map $map)
     {
@@ -325,7 +330,7 @@ class DedimaniaApi
 
         //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->gbx->MapUid,
+            'UId' => $map->uid,
             'Name' => $map->name,
             'Environment' => $map->gbx->Environment,
             'Author' => $map->author->Login,
@@ -389,10 +394,10 @@ class DedimaniaApi
         try {
             //Check if there is top1 dedi
             if ($newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = file_get_contents($dedi->ghost_replay) ?? '';
+                $Top1GReplay = File::get($bestRecord->ghost_replay, false);
 
-                if ($Top1GReplay == '') {
-                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, isVerbose());
+                if ($Top1GReplay == null) {
+                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, true);
                 }
             }
 
@@ -430,12 +435,10 @@ class DedimaniaApi
                         //Request failed
 
                         Log::write('Failed to update dedis.', true);
-                    } else {
-//                        Cache::forget('vreplays/'.$bestRecord->player->Login.'_'.$map->uid);
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
     }
@@ -448,9 +451,10 @@ class DedimaniaApi
      * . OptionsEnabled: true if tool options can be stored for the player,
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
-     * @param \esc\Models\Player $player
+     * @param Player $player
      *
-     * @return null|\SimpleXMLElement
+     * @return null|SimpleXMLElement
+     * @throws GuzzleException
      */
     public static function playerConnect(Player $player)
     {
@@ -526,10 +530,6 @@ class DedimaniaApi
             if ($key == 'Top1GReplay') {
                 $member->addChild('value')->addChild('base64', base64_encode($value));
                 continue;
-            }
-
-            if (isVerbose()) {
-                // Log::write(sprintf('paramAddStruct %s: %s => %s', $struct->getName(), $key, $value), true);
             }
 
             switch (gettype($value)) {
@@ -610,7 +610,6 @@ class DedimaniaApi
      *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private static function post(SimpleXMLElement $xml): ?SimpleXMLElement
     {
@@ -622,7 +621,7 @@ class DedimaniaApi
                 ],
                 'decode_content' => 'gzip',
                 'body' => $xml->asXML(),
-                'connect_timeout' => 1.5,
+                'connect_timeout' => 5.0,
             ]);
         } catch (RequestException $e) {
             Log::write('DedimaniaAp::post failed: ' . $e->getMessage());
@@ -641,7 +640,7 @@ class DedimaniaApi
 
         try {
             return new SimpleXMLElement($data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

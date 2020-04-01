@@ -19,7 +19,7 @@ class HookController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $hooks;
+    private static Collection $hooks;
 
     /**
      * Initialize HookController

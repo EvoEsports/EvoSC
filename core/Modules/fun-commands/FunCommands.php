@@ -4,12 +4,13 @@ namespace esc\Modules;
 
 
 use esc\Classes\ChatCommand;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Controllers\ChatController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class FunCommands implements ModuleInterface
+class FunCommands extends Module implements ModuleInterface
 {
     public function __construct()
     {
@@ -40,7 +41,7 @@ class FunCommands implements ModuleInterface
                 return;
             }
 
-            if (preg_match_all('/\{(.+?)\}/', $message, $matches)) {
+            if (preg_match_all('/{(.+?)}/', $message, $matches)) {
                 for ($i = 0; $i < count($matches[0]); $i++) {
                     $message = str_replace($matches[0][$i], secondary($matches[1][$i]) . '$z$s$' . config('colors.info'), $message);
                 }

@@ -5,14 +5,14 @@ namespace esc\Models;
 
 class Bill
 {
-    public $player;
+    public Player $player;
     public $id;
     public $created_at;
     public $label;
     public $successFunction;
     public $failFunction;
     public $amount;
-    public $expired;
+    public bool $expired;
 
     public function __construct(Player $player, $id, $amount, $created_at, $label, array $successFunction = null, array $failFunction = null)
     {

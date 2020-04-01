@@ -3,6 +3,7 @@
 namespace esc\Controllers;
 
 
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
@@ -12,7 +13,6 @@ use esc\Models\AccessRight;
 use esc\Models\Map;
 use esc\Models\MapQueue;
 use esc\Models\Player;
-use esc\Modules\MxMapDetails;
 use Illuminate\Support\Collection;
 
 /**
@@ -24,13 +24,10 @@ use Illuminate\Support\Collection;
  */
 class QueueController implements ControllerInterface
 {
-    /**
-     * @var bool
-     */
-    private static $preCache = true;
+    private static bool $preCache = true;
 
     /**
-     * Initialize QueueController
+     * @inheritDoc
      */
     public static function init()
     {
@@ -41,62 +38,88 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     * Queue a map
+     * @inheritDoc
      *
-     * @param  Player  $player
-     * @param  Map  $map
-     * @param  bool  $replay
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
      */
-    public static function queueMap(Player $player, Map $map, bool $replay = false)
+    public static function start(string $mode, bool $isBoot)
     {
-        if ($map->cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
-            warningMessage('Can not queue recently played track. Please wait '.secondary(config('server.map-cooldown') - $map->cooldown).' maps.')->send($player);
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMatch', [self::class, 'endMatch']);
 
-            return;
+        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
+        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
+    }
+
+    /**
+     * Add a map to the queue by its uid.
+     *
+     * @param Player $player
+     * @param string $mapUid
+     * @param int $cooldown
+     * @return bool
+     */
+    public static function queueMapByUid(Player $player, string $mapUid, int $cooldown = 999): bool
+    {
+        if ($cooldown < config('server.map-cooldown') && !$player->hasAccess('map_queue_recent')) {
+            warningMessage('Can not queue recently played track. Please wait ' . secondary(config('server.map-cooldown') - $cooldown) . ' maps.')->send($player);
+
+            return false;
         }
 
-        if (MapQueue::whereMapUid($map->uid)->count() > 0) {
-            warningMessage('The map ', secondary($map), ' is already in queue.')->send($player);
+        if (DB::table(Map::TABLE)->where('uid', '=', $mapUid)->where('enabled', '=', 0)->exists() || MapController::getMapToDisable()->contains('uid', $mapUid)) {
+            warningMessage('Can not queue disabled map.')->send($player);
 
-            return;
+            return false;
         }
 
-        if (MapQueue::whereRequestingPlayer($player->Login)->count() > 0) {
+        if (DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->count()) {
+            warningMessage('The map is already in the queue.')->send($player);
+
+            return false;
+        }
+
+        if (DB::table(MapQueue::TABLE)->where('requesting_player', '=', $player->Login)->count()) {
             if (!$player->hasAccess('queue_multiple')) {
                 warningMessage('You are only allowed to queue one map at a time.')->send($player);
 
-                return;
+                return false;
             }
         }
 
-        if ($map->mx_id) {
-            MxMapDetails::loadMxDetails($map);
-            MxMapDetails::loadMxWordlRecord($map);
-        }
-
-        MapQueue::create([
+        $mapQueueItem = MapQueue::create([
             'requesting_player' => $player->Login,
-            'map_uid' => $map->uid,
+            'map_uid' => $mapUid,
         ]);
 
-        if ($replay) {
-            infoMessage($player, ' queued map ', secondary($map), ' for replay.')->sendAll();
-        } else {
-            infoMessage($player, ' queued map ', secondary($map), '.')->sendAll();
-        }
-
-        Log::write($player.'('.$player->Login.') queued map '.$map.' ['.$map->uid.']');
-
+        Log::write($player . '(' . $player->Login . ') queued map ' . $mapQueueItem->map->name . ' [' . $mapUid . ']');
         Hook::fire('MapQueueUpdated', self::getMapQueue());
 
         if (self::$preCache) {
-            self::preCacheNextMap();
+            self::chooseNextMap();
+        }
+
+        return true;
+    }
+
+    /**
+     * Put a map object in queue.
+     *
+     * @param Player $player
+     * @param Map $map
+     */
+    public static function queueMap(Player $player, Map $map)
+    {
+        if (self::queueMapByUid($player, $map->uid, $map->cooldown)) {
+            infoMessage(secondary($player), ' queued map ', secondary($map->name))->sendAll();
         }
     }
 
     /**
-     * @param  Map  $map
+     * @param Map $map
      */
     public static function beginMap(Map $map)
     {
@@ -111,9 +134,9 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     * Drop a map from queue.
+     * Drop a map from queue by its uid.
      *
-     * @param  Player  $player
+     * @param Player $player
      * @param                    $mapUid
      */
     public static function dropMap(Player $player, $mapUid)
@@ -129,29 +152,31 @@ class QueueController implements ControllerInterface
 
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             self::dropMapSilent($mapUid);
-            self::preCacheNextMap();
+            self::chooseNextMap();
         }
     }
 
     /**
+     * Drop a map without info-message.
+     *
      * @param $mapUid
      */
     public static function dropMapSilent($mapUid)
     {
-        if (MapQueue::whereMapUid($mapUid)->exists()) {
-            MapQueue::whereMapUid($mapUid)->delete();
-
-            if (Server::getNextMapInfo()->uId == $mapUid) {
-                Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
-            }
-
+        if (DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->exists()) {
+            DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->delete();
+            self::chooseNextMap();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $mapUid
+     */
     public static function manialinkQueueMap(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::getByUid($mapUid);
 
         if ($map) {
             QueueController::queueMap($player, $map);
@@ -169,9 +194,7 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     * Called on PlayerDisconnect
-     *
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function playerDisconnect(Player $player)
     {
@@ -188,7 +211,7 @@ class QueueController implements ControllerInterface
                 MapQueue::whereMapUid($queueItem->map_uid)->delete();
                 infoMessage('Dropped ', secondary($queueItem->map), ' from queue, because ', secondary($player),
                     ' left.')->sendAll();
-                Log::write('Dropped map '.$queueItem->map.' from queue, because '.$player.' left.');
+                Log::write('Dropped map ' . $queueItem->map . ' from queue, because ' . $player . ' left.');
             });
 
             Hook::fire('MapQueueUpdated', self::getMapQueue());
@@ -196,41 +219,39 @@ class QueueController implements ControllerInterface
     }
 
     /**
-     *
+     * Tell the QueueController to pick the next map.
      */
-    public static function preCacheNextMap()
+    public static function chooseNextMap()
     {
-        if (MapQueue::count() > 0) {
+        $map = null;
+
+        if (DB::table(MapQueue::TABLE)->count()) {
             $firstQueueItem = MapQueue::orderBy('created_at')->first();
 
             if (!$firstQueueItem) {
-                return;
+                $map = Map::whereEnabled(1)->inRandomOrder()->first();
+            } else {
+                $map = $firstQueueItem->map;
             }
 
-            $firstMapInQueue = $firstQueueItem->map;
-
-            if (Server::getNextMapInfo()->uId != $firstMapInQueue->uid) {
-                Log::write('QueueController',
-                    sprintf('Pre-caching map %s [%s]', $firstMapInQueue->name, $firstMapInQueue->uid));
-                Server::chooseNextMap($firstMapInQueue->filename);
-            }
         } else {
-            Server::chooseNextMap(Map::inRandomOrder()->first()->filename);
+            $map = Map::whereEnabled(1)->inRandomOrder()->first();
         }
-    }
 
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMatch', [self::class, 'endMatch']);
+        /** @var \Maniaplanet\DedicatedServer\Structures\Map $nextMap */
+        $nextMap = Server::getNextMapInfo();
 
-        ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
-        ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
+        if ($map && $nextMap) {
+            if ($nextMap->uId != $map->uid && Server::isFilenameInSelection($map->filename)) {
+                Log::write('QueueController', sprintf('Pre-caching map %s [%s]', $map->name, $map->uid));
+
+                try {
+                    Server::chooseNextMap($map->filename);
+                } catch (\Exception $e) {
+                    Log::error('Failed to pre-cache map ' . $map->name . ': ' . $e->getMessage(), true);
+                    Log::write($e->getMessage(), isVerbose());
+                }
+            }
+        }
     }
 }

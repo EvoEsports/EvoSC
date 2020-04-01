@@ -4,16 +4,18 @@
         <!--
         #Struct Record {
             Integer rank;
+            Integer[] cps;
             Integer score;
             Text name;
-            Boolean online;
+            Text login;
         }
 
         main(){
-            declare Record[] ESC_Locals_ for This;
-            declare Integer LastLocalRecordsUpdate for This = 0;
+            declare Record[] LocalRecords for This;
+            declare Integer LastLocalRecordsUpdate for This;
+            declare Text localsJson = """{$localsJson|noescape}""";
 
-            ESC_Locals_.fromjson("""{$records->toJson()|noescape}""");
+            LocalRecords.fromjson(localsJson);
             LastLocalRecordsUpdate = GameTime;
         }
         -->

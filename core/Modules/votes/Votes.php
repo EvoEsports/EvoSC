@@ -3,10 +3,12 @@
 namespace esc\Modules;
 
 
+use Error;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Controllers\CountdownController;
@@ -15,23 +17,17 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class Votes implements ModuleInterface
+class Votes extends Module implements ModuleInterface
 {
-    /**
-     * @var Collection
-     */
-    private static $vote;
-
-    /**
-     * @var Collection
-     */
-    private static $voters;
+    private static ?Collection $vote;
+    private static Collection $voters;
 
     private static $lastTimeVote;
     private static $lastSkipVote;
     private static $timeVotesThisRound = 0;
-    private static $skipVotesThisRound = 0;
+    private static int $skipVotesThisRound = 0;
     private static $onlinePlayersCount;
 
     public function __construct()
@@ -73,7 +69,7 @@ class Votes implements ModuleInterface
 
     public static function startVote(Player $player, string $question, $action, $successRatio = 0.5): bool
     {
-        if (self::$vote != null) {
+        if (isset(self::$vote)) {
             warningMessage('There is already a vote in progress.')->send($player);
 
             return false;
@@ -192,7 +188,7 @@ class Votes implements ModuleInterface
         }
     }
 
-    public static function startVoteQuestion(Player $player, string $cmd, ...$questionArray)
+    public static function startVoteQuestion(Player $player, ...$questionArray)
     {
         $question = implode(' ', $questionArray);
 
@@ -276,7 +272,7 @@ class Votes implements ModuleInterface
 
     public static function voteYes(Player $player)
     {
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = 'true';
         self::$voters->put($player->Login, $vote);
@@ -287,7 +283,7 @@ class Votes implements ModuleInterface
 
     public static function voteNo(Player $player)
     {
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = 'false';
         self::$voters->put($player->Login, $vote);
@@ -302,7 +298,7 @@ class Votes implements ModuleInterface
             return;
         }
 
-        $vote = new \stdClass();
+        $vote = new stdClass();
         $vote->player = $player->Login;
         $vote->decision = null;
         self::$voters->put($player->Login, $vote);
@@ -329,7 +325,7 @@ class Votes implements ModuleInterface
 
         try {
             $action(true);
-        } catch (\Error $e) {
+        } catch (Error $e) {
             Log::write($e->getMessage());
         }
 
@@ -347,7 +343,7 @@ class Votes implements ModuleInterface
 
         try {
             $action(false);
-        } catch (\Error $e) {
+        } catch (Error $e) {
             Log::write($e->getMessage());
         }
 
@@ -360,13 +356,13 @@ class Votes implements ModuleInterface
 
     public static function endMatch()
     {
-        if (self::$vote != null) {
+        if (isset(self::$vote)) {
             Timer::destroy('vote.check_state');
             $action = self::$vote['action'];
 
             try {
                 $action(false);
-            } catch (\Error $e) {
+            } catch (Error $e) {
                 Log::write($e->getMessage());
             }
 

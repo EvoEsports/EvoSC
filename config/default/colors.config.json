@@ -1,49 +1,49 @@
 {
-  "primary"  : "6ce",
+  "primary": "6ce",
   "secondary": "eee",
-  "chat"     : "FF0",
-  "info"     : "5ad",
-  "warning"  : "e33",
-  "local"    : "3d4",
-  "dedi"     : "4b2",
-  "ui"       : {
-    "font"  : "RajdhaniMono",
+  "chat": "FF0",
+  "info": "5ad",
+  "warning": "e33",
+  "local": "3d4",
+  "dedi": "4b2",
+  "ui": {
+    "font": "RajdhaniMono",
     "window": {
-      "bg"    : {
-        "color"  : "111",
-        "opacity": 0.8
+      "bg": {
+        "color": "222",
+        "opacity": 0.9
       },
       "header": {
-        "color": "38c",
-        "text" : "fff"
+        "color": "4b6",
+        "text": "fff"
       },
-      "btn"   : {
-        "primary": "38c",
-        "default": "999",
+      "btn": {
+        "primary": "fd0",
+        "default": "4b6",
         "warning": "e90",
-        "danger" : "e33"
+        "danger": "e33"
       },
-      "text"  : {
-        "primary"  : "fff",
-        "highlight": "38c",
-        "warning"  : "fc0",
-        "danger"   : "f00"
+      "text": {
+        "primary": "fff",
+        "highlight": "fd0",
+        "warning": "4b6",
+        "danger": "e33"
       }
     },
     "widget": {
-      "bg"    : {
-        "color"  : "111",
-        "opacity": 0.8
+      "bg": {
+        "color": "222",
+        "opacity": 0.95
       },
       "header": {
-        "color": "38c",
-        "text" : "fff"
+        "color": "4b6",
+        "text": "fff"
       },
-      "text"  : {
-        "primary"  : "fff",
-        "highlight": "38c",
-        "warning"  : "fc0",
-        "danger"   : "f00"
+      "text": {
+        "primary": "fff",
+        "highlight": "4b6",
+        "warning": "4b6",
+        "danger": "f22"
       }
     }
   }

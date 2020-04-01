@@ -11,15 +11,15 @@ class ScoreTracker
     /**
      * @var Player
      */
-    public $player;
+    public Player $player;
 
-    public $best_checkpoints;
-    public $last_checkpoints;
-    public $best_score;
-    public $last_score;
+    public string $best_checkpoints;
+    public string $last_checkpoints;
+    public int $best_score;
+    public int $last_score;
 
-    public $points = 0;
-    public $last_points_received = 0;
+    public int $points = 0;
+    public int $last_points_received = 0;
 
     public function __construct(Player $player, int $score, string $checkpoints)
     {

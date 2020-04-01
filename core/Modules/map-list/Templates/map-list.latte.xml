@@ -172,7 +172,7 @@
 
     {block scriptDeclarations}
     <script><!--
-declare Integer[] favorites;
+declare Text[] favorites;
 declare Text[Text][] maps;
 declare Text[Text][Integer] mapAuthors;
 declare Text[Text][] currentMapPool;
@@ -316,6 +316,14 @@ Text getStarString(Real rating){
     return starString;
 }
 
+Integer ceil(Real value){
+    if(ML::NearestInteger(value) == value){
+        return ML::NearestInteger(value);
+    }
+
+    return ML::CeilingInteger(value);
+}
+
 Void updateView(Text[Text][] mapPool, Integer page){
     declare mapsFrame = (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
     declare pageInfo = (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
@@ -355,7 +363,7 @@ Void updateView(Text[Text][] mapPool, Integer page){
             (mapFrame.Controls[2] as CMlLabel).Opacity = 1.0;
         }
 
-        if(favorites.exists(TL::ToInteger(map["id"]))){
+        if(favorites.exists(map["uid"])){
             (mapFrame.Controls[5] as CMlLabel).SetText("");
         }else{
             (mapFrame.Controls[5] as CMlLabel).SetText("");
@@ -367,13 +375,13 @@ Void updateView(Text[Text][] mapPool, Integer page){
         rowsFilled = rowsFilled + 1;
     }
 
-    if(rowsFilled < 19){
+    if(rowsFilled <= 19){
         for(i, rowsFilled, 19){
             (mapsFrame.Controls[i] as CMlFrame).Hide();
         }
     }
 
-    pageInfo.SetText((page + 1) ^ "/" ^ ML::CeilingInteger(mapPool.count / 20.0));
+    pageInfo.SetText((page + 1) ^ "/" ^ ceil(mapPool.count / 20.0));
 }
 
 Void search(){
@@ -404,7 +412,7 @@ Void search(){
         case "favorites":{
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
-                if(favorites.exists(TL::ToInteger(map["id"]))){
+                if(favorites.exists(map["uid"])){
                     mapsFound.add(map);
                 }
             }
@@ -596,7 +604,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
     }
 
     if(control.HasClass("info")){
-        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-id"));
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-uid"));
         return;
     }
 }
@@ -652,7 +660,7 @@ Void setCooldownToZero(Text uid){
         userCanDrop = {($localPlayer->hasAccess('queue_drop') ? 'True' : 'False')|noescape};
         cooldown = {config('server.map-cooldown')};
 
-        declare Integer[] ESC_Map_Favorites for This;
+        declare Text[] ESC_Map_Favorite_Uids for This;
         declare Integer ESC_Last_Map_Favorites_Update for This;
         declare Boolean MapQueueShow for This = False;
         declare lastFavoritesUpdate = 0;
@@ -705,8 +713,8 @@ Void setCooldownToZero(Text uid){
                 if(currentPage < 0){
                     currentPage = 0;
                 }
-                if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
-                    currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                if(currentPage >= ceil(currentMapPool.count / 20.0)){
+                    currentPage = ceil(currentMapPool.count / 20.0) - 1;
                 }
 
                 updateView(currentMapPool, currentPage);
@@ -726,7 +734,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
             currentPage = currentPage - 1;
             if(currentPage < 0){
-                currentPage = ML::CeilingInteger(currentMapPool.count / 20.0) - 1;
+                currentPage = ceil(currentMapPool.count / 20.0) - 1;
             }
             updateView(currentMapPool, currentPage);
             continue;
@@ -734,7 +742,7 @@ Void setCooldownToZero(Text uid){
 
         if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
             currentPage = currentPage + 1;
-            if(currentPage >= ML::CeilingInteger(currentMapPool.count / 20.0)){
+            if(currentPage >= ceil(currentMapPool.count / 20.0)){
                 currentPage = 0;
             }
             updateView(currentMapPool, currentPage);
@@ -830,7 +838,7 @@ Void setCooldownToZero(Text uid){
 
         if(lastFavoritesUpdate != ESC_Last_Map_Favorites_Update){
             lastFavoritesUpdate = ESC_Last_Map_Favorites_Update;
-            favorites = ESC_Map_Favorites;
+            favorites = ESC_Map_Favorite_Uids;
             updateView(currentMapPool, currentPage);
         }
 

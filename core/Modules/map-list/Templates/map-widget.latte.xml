@@ -23,6 +23,15 @@
         <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.header.color')}6" z-index="-2"/>
 
         <frame pos="1 -4">
+            <label class="map-control fav" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
+                   valign="center" ScriptEvents="1" focusareacolor1="0000"
+                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
+            <label id="fav-icon" pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label id="fav-label" textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Add"
+                   z-index="1" halign="center" valign="center"/>
+        </frame>
+
+        <frame pos="13 -4">
             <label class="map-control details" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
                    valign="center" ScriptEvents="1" focusareacolor1="0000"
                    focusareacolor2="{config('colors.ui.window.header.color')}9"/>
@@ -31,8 +40,8 @@
                    z-index="1" halign="center" valign="center"/>
         </frame>
 
-        <frame pos="19 -4">
-            <label class="map-control list" textsize="1.5" size="24 8" text="" z-index="0" halign="center"
+        <frame pos="25 -4">
+            <label class="map-control list" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
                    valign="center" ScriptEvents="1" focusareacolor1="0000"
                    focusareacolor2="{config('colors.ui.window.header.color')}9"/>
             <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
@@ -44,45 +53,8 @@
 
     {block script}
     {include 'scripts.drag'}
-
     <script><!--
-
-declare Text[Text][] maps;
-declare Text[Text][Integer] mapAuthors;
-declare Text currentMapUid;
-declare Text[Text] currentMap;
-
-Text[Text] getAuthor(Text id){
-    return mapAuthors[TL::ToInteger(id)];
-}
-
-Text[Text] findMapByUid(Text Uid){
-    foreach(map in maps){
-        if(!map.existskey("uid")){
-            log("[Maps] findMapByUid Error " ^ Uid);
-            return Text[Text];
-        }
-
-        if(map["uid"] == Uid){
-            return map;
-        }
-    }
-
-    return Text[Text];
-}
-
-Void updateWidget(Text[Text] map){
-    if(!map.existskey("a")){
-        log("[Maps] update Widget Error");
-        log(map);
-        return;
-    }
-
-    declare author = getAuthor(map["a"]);
-    (Page.MainFrame.GetFirstChild("map-name") as CMlLabel).SetText(map["name"]);
-    (Page.MainFrame.GetFirstChild("author-name") as CMlLabel).SetText(author["nick"]);
-}
---></script>
+    --></script>
     {/block}
 
     <script><!--
@@ -98,27 +70,30 @@ Void updateWidget(Text[Text] map){
         declare Text MapSearchQuery for LocalUser;
         declare Integer MapUpdateTime for LocalUser = 0;
         declare lastMapUpdate = 0;
+        declare Text[] ESC_Map_Favorite_Uids for This;
+        declare Text currentMapUid;
 
-        while(Maps.count == 0){
-            yield;
-            hidescript();
-        }
+        declare mapNameLabel <=> (Page.MainFrame.GetFirstChild("map-name") as CMlLabel);
+        declare authorNameLabel <=> (Page.MainFrame.GetFirstChild("author-name") as CMlLabel);
+        declare favIconLabel <=> (Page.MainFrame.GetFirstChild("fav-icon") as CMlLabel);
+        declare favLabelLabel <=> (Page.MainFrame.GetFirstChild("fav-label") as CMlLabel);
 
         left__ = {config('map-list.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('map-list.ui.slot')};
     {/block}
 
     {block loop}
-        if(MapUpdateTime != 0 && lastMapUpdate != MapUpdateTime){
-            lastMapUpdate = MapUpdateTime;
-            mapAuthors = MapAuthors;
-            maps = Maps;
-        }
-
-        if(currentMapUid != Map.MapInfo.MapUid && maps.count > 0){
+        if(currentMapUid != Map.MapInfo.MapUid){
             currentMapUid = Map.MapInfo.MapUid;
-            currentMap = findMapByUid(currentMapUid);
-            updateWidget(currentMap);
+            mapNameLabel.Value = Map.MapName;
+            authorNameLabel.Value = Map.AuthorNickName;
+            if(!ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
+                favIconLabel.Value = "";
+                favLabelLabel.Value = "Add";
+            }else{
+                favIconLabel.Value = "";
+                favLabelLabel.Value = "Remove";
+            }
         }
 
         declare x_min = widget.RelativePosition_V3[0];
@@ -139,11 +114,21 @@ Void updateWidget(Text[Text] map){
     {/block}
 
     {block pendingEvents}
-            if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
-                if(!currentMap.existskey("id")){
-                    return;
+            if(event.Control.HasClass("fav") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
+                    TriggerPageAction("map.fav.remove," ^ Map.Id);
+                    favIconLabel.Value = "";
+                    favLabelLabel.Value = "Add";
+                }else{
+                    TriggerPageAction("map.fav.add," ^ Map.Id);
+                    favIconLabel.Value = "";
+                    favLabelLabel.Value = "Remove";
                 }
-                TriggerPageAction("mx.details," ^ currentMap["id"]);
+                continue;
+            }
+
+            if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                TriggerPageAction("mx.details," ^ Map.Id);
                 continue;
             }
 

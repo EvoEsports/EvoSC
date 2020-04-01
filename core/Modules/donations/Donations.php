@@ -6,14 +6,18 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\PlanetsController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Donations implements ModuleInterface
+class Donations extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'show']);
 
@@ -48,13 +52,5 @@ class Donations implements ModuleInterface
     {
         $player->stats()->increment('Donations', $amount);
         infoMessage($player, ' donated ', secondary("$amount Planets"), ' to the server, thank you!')->sendAll();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

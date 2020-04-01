@@ -10,7 +10,6 @@ use esc\Interfaces\ControllerInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
  * Class ChatController
@@ -24,21 +23,19 @@ class ChatController implements ControllerInterface
     /**
      * @var Collection
      */
-    private static $mutedPlayers;
+    private static Collection $mutedPlayers;
 
     /** @var boolean */
-    private static $routingEnabled;
+    private static bool $routingEnabled;
 
     /** @var boolean */
-    private static $externalRouter;
+    private static bool $externalRouter;
 
     /**
      * Initialize ChatController.
      */
     public static function init()
     {
-        self::$mutedPlayers = collect();
-
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
 
@@ -51,15 +48,9 @@ class ChatController implements ControllerInterface
             $routingEnabled = false;
 
             while (!$routingEnabled) {
-                try {
-                    Server::chatEnableManualRouting(true, false);
-                    $routingEnabled = true;
-                    Log::info('Chat router started.');
-                } catch (FaultException $e) {
-                    $msg = $e->getMessage();
-                    Log::error("$msg There might already be a running instance of EvoSC.");
-                    sleep(1);
-                }
+                Server::chatEnableManualRouting(true, false);
+                $routingEnabled = true;
+                Log::info('Chat router started.');
             }
         } else {
             Server::chatEnableManualRouting(false, true);
@@ -93,11 +84,10 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: unmute player.
      *
-     * @param  Player  $player
-     * @param                    $cmd
+     * @param Player $player
      * @param                    $nick
      */
-    public static function cmdUnmute(Player $player, $cmd, $nick)
+    public static function cmdUnmute(Player $player, $nick)
     {
         $target = PlayerController::findPlayerByName($player, $nick);
 
@@ -109,11 +99,10 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: mute player.
      *
-     * @param  Player  $admin
-     * @param                    $cmd
+     * @param Player $admin
      * @param                    $nick
      */
-    public static function cmdMute(Player $admin, $cmd, $nick)
+    public static function cmdMute(Player $admin, $nick)
     {
         $target = PlayerController::findPlayerByName($admin, $nick);
 
@@ -133,12 +122,11 @@ class ChatController implements ControllerInterface
     /**
      * Chat-command: send pm to a player
      *
-     * @param  Player  $player
-     * @param  string  $cmd
-     * @param  string  $nick
-     * @param  mixed  ...$message
+     * @param Player $player
+     * @param string $nick
+     * @param mixed ...$message
      */
-    public static function pm(Player $player, $cmd, $nick, ...$message)
+    public static function pm(Player $player, $nick, ...$message)
     {
         $target = PlayerController::findPlayerByName($player, $nick);
 

@@ -3,6 +3,7 @@
 namespace esc\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 /**
@@ -15,14 +16,16 @@ use Illuminate\Support\Collection;
  */
 class Dedi extends Model
 {
-    protected $table = 'dedi-records';
+    const TABLE = 'dedi-records';
+
+    protected $table = self::TABLE;
 
     protected $fillable = ['Map', 'Player', 'Score', 'Rank', 'Checkpoints', 'ghost_replay', 'v_replay', 'New'];
 
     public $timestamps = false;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function player()
     {
@@ -30,7 +33,7 @@ class Dedi extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function map()
     {
@@ -56,11 +59,9 @@ class Dedi extends Model
 
     public function getCpsAttribute(): Collection
     {
-        $cps = collect(explode(',', $this->Checkpoints))->transform(function($cp){
+        return collect(explode(',', $this->Checkpoints))->transform(function($cp){
             return intval($cp);
         });
-
-        return $cps;
     }
 
     public function __toString()

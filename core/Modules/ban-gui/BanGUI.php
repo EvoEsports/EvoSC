@@ -6,14 +6,16 @@ namespace esc\Modules;
 use esc\Classes\ChatCommand;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\BansController;
 use esc\Interfaces\ModuleInterface as ModuleInterfaceAlias;
 use esc\Models\AccessRight;
 use esc\Models\Player;
+use Exception;
 
-class BanGUI implements ModuleInterfaceAlias
+class BanGUI extends Module implements ModuleInterfaceAlias
 {
     public function __construct()
     {
@@ -55,7 +57,7 @@ class BanGUI implements ModuleInterfaceAlias
         Template::show($player, 'ban-gui.add', compact('results', 'search'));
     }
 
-    public static function cmdBanPlayer(Player $player, $cmd, $name = null)
+    public static function cmdBanPlayer(Player $player, $name = null)
     {
         if ($name) {
             self::mleSearchPlayerAndShowResults($player, $name);
@@ -76,7 +78,7 @@ class BanGUI implements ModuleInterfaceAlias
 
         try {
             BansController::ban($toBan, $player, $reason);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             warningMessage($e->getMessage())->send($player);
             Log::write('Failed to ban & blacklist: ' . $login);
         }

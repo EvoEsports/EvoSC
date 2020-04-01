@@ -5,10 +5,11 @@ namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class ResetModule implements ModuleInterface
+class ResetModule extends Module implements ModuleInterface
 {
     public function __construct()
     {
@@ -21,7 +22,7 @@ class ResetModule implements ModuleInterface
         Hook::fire('PlayerConnect', $player);
     }
 
-    public static function resetAll(Player $player)
+    public static function resetAll()
     {
         onlinePlayers()->each(function (Player $player) {
             Hook::fire('PlayerConnect', $player);

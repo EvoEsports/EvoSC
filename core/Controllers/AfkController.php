@@ -9,6 +9,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Interfaces\ControllerInterface;
 use esc\Models\Player;
+use Illuminate\Support\Collection;
 
 /**
  * Class AfkController
@@ -20,9 +21,9 @@ use esc\Models\Player;
 class AfkController implements ControllerInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
-    private static $pingTracker;
+    private static Collection $pingTracker;
 
     /**
      * Initialize
@@ -35,7 +36,7 @@ class AfkController implements ControllerInterface
     /**
      * Add player to the tracker and send pinger
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      */
     public static function sendPinger(Player $player)
     {
@@ -55,7 +56,7 @@ class AfkController implements ControllerInterface
     /**
      * Handle received ping
      *
-     * @param  \esc\Models\Player  $player
+     * @param Player $player
      * @param  int  $secondsSinceLastInteraction
      */
     public static function pingReceived(Player $player, int $secondsSinceLastInteraction)
@@ -119,8 +120,8 @@ class AfkController implements ControllerInterface
     /**
      * Force a player to spectator-mode.
      *
-     * @param  \esc\Models\Player  $player
-     * @param  \esc\Models\Player  $admin
+     * @param Player $player
+     * @param Player $admin
      */
     public static function forceToSpectators(Player $player, Player $admin)
     {

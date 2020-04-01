@@ -29,6 +29,7 @@ After it dissapears you can reset and the song will start to play." autonewline=
         <label pos="80 0" size="34 4" textsize="0.9" text="Album" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
         <label pos="126 0" size="20 4" textsize="0.9" text="Length" halign="right" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
 
+        <!--suppress CheckTagEmptyBody -->
         <frame id="rows" pos="0 -5">
             {for $i=0; $i<15; $i++}
             <frameinstance modelid="row" pos="0 {$i * -4}"></frameinstance>

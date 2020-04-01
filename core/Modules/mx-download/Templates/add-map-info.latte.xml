@@ -1,6 +1,8 @@
 {contentType text}
 {extends 'components.window'}
 
+{php $window_height = -1;}
+
 {block id}
 add-mx-map
 {/block}
@@ -15,7 +17,7 @@ Add map?
 
 {block content}
 <frame pos="1 0">
-    <label pos="-1 0" size="100 20" text="{$details->GbxMapName}" textsize="3" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="-0.5 0" size="100 20" text="{$details->GbxMapName}" textsize="3" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
     <label pos="0 -6" size="116 20" text="by {$details->Username}" textsize="1" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
     <label pos="0 -10" size="116 20" text="Title-Pack: TM{$details->EnvironmentName}@{$details->TitlePack}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
     <label pos="0 -13" size="116 20" text="Style: {$details->StyleName} {$details->LengthName} ({$details->DifficultyName})" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
@@ -37,7 +39,7 @@ Add map?
 {block bootScript}
     declare commentsLabel <=> (Page.MainFrame.GetFirstChild("comments") as CMlLabel);
     declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
-    bg.Size = <bg.Size[0], commentsLabel.ComputeHeight(commentsLabel.Value) + 29.0>;
+    bg.Size = <bg.Size[0], commentsLabel.ComputeHeight(commentsLabel.Value) + 32.0>;
 {/block}
 
 {block loop}

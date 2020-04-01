@@ -1,0 +1,11 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="access-rights" name="ESC:access-rights">
+    <script><!--
+    main(){
+        declare Text[] EvoSC_Access_Rights for This;
+
+        EvoSC_Access_Rights.fromjson("""{$accessRights->toJson()|noescape}""");
+    }
+    --></script>
+</manialink>

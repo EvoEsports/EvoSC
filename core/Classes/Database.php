@@ -19,7 +19,7 @@ class Database
     /**
      * @var Capsule
      */
-    private static $capsule;
+    private static Capsule $capsule;
 
     /**
      * Start a keep-alive connection to the database and boot Eloquent.
@@ -59,7 +59,7 @@ class Database
     /**
      * Get the database-connection
      *
-     * @return \Illuminate\Database\Connection
+     * @return Connection
      */
     public static function getConnection(): Connection
     {

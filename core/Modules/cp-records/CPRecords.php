@@ -3,17 +3,19 @@
 namespace esc\Modules;
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class CPRecords implements ModuleInterface
+class CPRecords extends Module implements ModuleInterface
 {
     /**
      * @var Collection
      */
-    private static $tracker;
+    private static Collection $tracker;
 
     public static function playerConnect(Player $player)
     {
@@ -34,7 +36,7 @@ class CPRecords implements ModuleInterface
             return;
         }
 
-        $o = new \stdClass();
+        $o = new stdClass();
         $o->nick = $player->NickName;
         $o->time = $time;
 

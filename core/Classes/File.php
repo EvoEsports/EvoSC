@@ -18,7 +18,7 @@ class File
      * Get the contents of a file and optionally json decode them.
      *
      * @param string|null $fileName
-     * @param bool        $json_decode
+     * @param bool $json_decode
      *
      * @return null|string|Object
      */
@@ -42,15 +42,16 @@ class File
     /**
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
-     * @param string       $fileName
+     * @param string $fileName
      * @param string|mixed $content
      *
+     * @param bool $jsonEncode
      * @return bool
      */
     public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
-        $dir      = str_replace(basename($fileName), '', $fileName);
+        $dir = str_replace(basename($fileName), '', $fileName);
 
         if (!is_dir(realpath($dir))) {
             mkdir(realpath($dir));
@@ -98,10 +99,10 @@ class File
     /**
      * Gets all files in the directory, you can optionally filter them with a RegEx-pattern.
      *
-     * @param string      $path
+     * @param string $path
      * @param string|null $filterPattern
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
@@ -124,7 +125,7 @@ class File
      * @param string $baseDirectory
      * @param string $filterPattern
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {
@@ -234,6 +235,10 @@ class File
         $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
+        if (!is_dir(baseDir($targetFile))) {
+            mkdir(is_dir(baseDir($targetFile)));
+        }
+
         rename($sourceFile, $targetFile);
     }
 
@@ -241,6 +246,10 @@ class File
     {
         $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
         $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
+
+        if (!is_dir(baseDir($target))) {
+            mkdir(is_dir(baseDir($target)));
+        }
 
         copy($source, $target);
     }

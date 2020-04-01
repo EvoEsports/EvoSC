@@ -19,6 +19,16 @@ use esc\Models\Player;
 class BansController implements ControllerInterface
 {
     /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
+    }
+
+    /**
      * Called on boot
      *
      * @return mixed|void
@@ -61,18 +71,8 @@ class BansController implements ControllerInterface
         $toUnban->update(['banned' => 0]);
     }
 
-    public static function banPlayerEvent(Player $player, $targetLogin, $reason)
+    public static function banPlayerEvent(Player $player, $targetLogin, $reason = '')
     {
         self::ban(player($targetLogin), $player, $reason);
-    }
-
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        ManiaLinkEvent::add('ban', [self::class, 'banPlayerEvent'], 'player_ban');
     }
 }

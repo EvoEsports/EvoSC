@@ -7,19 +7,21 @@ namespace esc\Modules;
 use esc\Classes\Cache;
 use esc\Classes\ChatCommand;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\MxPackJob;
 use esc\Classes\RestClient;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 
-class MxPackLoader implements ModuleInterface
+class MxPackLoader extends Module implements ModuleInterface
 {
     /**
      * @var MxPackJob
      */
-    private static $activeJob;
+    private static MxPackJob $activeJob;
 
     public function __construct()
     {
@@ -34,7 +36,7 @@ class MxPackLoader implements ModuleInterface
         ManiaLinkEvent::add('mappack.aprove', [self::class, 'downloadMapPack'], 'map_add');
     }
 
-    public static function showAddMapPack(Player $player, string $cmd, string $packId, string $secret = null)
+    public static function showAddMapPack(Player $player, string $packId, string $secret = null)
     {
         $cacheIdInfo = 'map-packs/'.$packId.'_info';
         $cacheIdTracks = 'map-packs/'.$packId.'_trackslist';
@@ -67,13 +69,13 @@ class MxPackLoader implements ModuleInterface
                 $response = RestClient::get($url);
 
                 if ($response->getStatusCode() != 200) {
-                    throw new \Exception('Failed to get map-list.');
+                    throw new Exception('Failed to get map-list.');
                 }
 
                 $trackList = json_decode($response->getBody()->getContents());
 
                 Cache::put($cacheIdTracks, $trackList, now()->addDays(1));
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
 
                 return;

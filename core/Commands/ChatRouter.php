@@ -4,6 +4,7 @@
 namespace esc\Commands;
 
 
+use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\Log;
 use esc\Classes\Server;
@@ -26,6 +27,7 @@ class ChatRouter extends Command
     {
         Log::setOutput($output);
         ConfigController::init();
+        ChatCommand::removeAll();
         Database::init();
 
         try {

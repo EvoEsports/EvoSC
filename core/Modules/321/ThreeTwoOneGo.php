@@ -4,11 +4,12 @@
 namespace esc\Modules;
 
 
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class ThreeTwoOneGo implements ModuleInterface
+class ThreeTwoOneGo extends Module implements ModuleInterface
 {
 
     /**

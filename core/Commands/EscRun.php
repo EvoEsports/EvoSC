@@ -3,6 +3,7 @@
 namespace esc\Commands;
 
 use Error;
+use esc\Classes\ChatCommand;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\File;
@@ -31,6 +32,8 @@ use esc\Controllers\SetupController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
 use esc\Models\Player;
+use esc\Modules\InputSetup;
+use esc\Modules\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,6 +58,11 @@ class EscRun extends Command
 
         Log::setOutput($output);
         ConfigController::init();
+
+        ChatCommand::removeAll();
+        Timer::destroyAll();
+        QuickButtons::removeAll();
+        InputSetup::clearAll();
 
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));
@@ -116,7 +124,7 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        file_put_contents(baseDir(config('server.login').'_evosc.pid'), getmypid());
+        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -199,7 +207,7 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        infoMessage(secondary('EvoSC v'.getEscVersion()), ' started.')->sendAdmin();
+        infoMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAdmin();
 
         //cycle-loop
         while (true) {
@@ -217,7 +225,7 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: '.$failedConnectionRequests.'/50');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
@@ -230,12 +238,12 @@ class EscRun extends Command
                 sleep(5);
             } catch (Error $e) {
                 $errorClass = get_class($e);
-                $output->writeln("<error>$errorClass in ".$e->getFile()." on Line ".$e->getLine()."</error>");
-                $output->writeln("<fg=white;bg=red;options=bold>".$e->getMessage()."</>");
+                $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");
+                $output->writeln("<fg=white;bg=red;options=bold>" . $e->getMessage() . "</>");
                 $output->writeln("<error>===============================================================================</error>");
-                $output->writeln("<error>".$e->getTraceAsString()."</error>");
+                $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
 
-                Log::write('EvoSC encountered an error: '.$e->getMessage(), false);
+                Log::write('EvoSC encountered an error: ' . $e->getMessage(), false);
                 Log::write($e->getTraceAsString(), false);
             }
         }

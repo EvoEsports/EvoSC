@@ -14,6 +14,7 @@
 
         <frame size="20 13" pos="-10 -10">
             <frame pos="10 -2.25">
+                <!--suppress CheckTagEmptyBody -->
                 <frame id="boxes">
                     {for $i=0;$i<100;$i++}
                     <frameinstance modelid="box" pos="0 {$i * 4.25}" size="10 10" hidden="1"></frameinstance>

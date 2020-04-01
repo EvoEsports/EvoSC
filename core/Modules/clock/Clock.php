@@ -3,11 +3,12 @@
 namespace esc\Modules;
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Clock implements ModuleInterface
+class Clock extends Module implements ModuleInterface
 {
     public function __construct()
     {
@@ -20,7 +21,7 @@ class Clock implements ModuleInterface
         Template::show($player, 'clock.clock');
     }
 
-    public static function configUpdated(Config $config = null)
+    public static function configUpdated($config = null)
     {
         if ($config && isset($config->id) && $config->id == "clock" || $config->id == "colors") {
             onlinePlayers()->each(function (Player $player) use ($config) {

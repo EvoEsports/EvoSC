@@ -24,7 +24,7 @@ class CreateMapsTable extends Migration
             $table->text('mx_world_record')->nullable();
             $table->string('filename')->unique();
             $table->integer('plays')->default(0);
-            $table->integer('cooldown')->default(0);
+            $table->integer('cooldown')->default(999);
             $table->dateTime('last_played')->nullable();
             $table->boolean('enabled')->default(0);
         });

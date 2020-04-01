@@ -3,9 +3,9 @@
     <script>
         <!--
         main(){
-            declare Integer[] ESC_Map_Favorites for This;
+            declare Text[] ESC_Map_Favorite_Uids for This;
             declare Integer ESC_Last_Map_Favorites_Update for This;
-            ESC_Map_Favorites.fromjson("""{$favorites|noescape}""");
+            ESC_Map_Favorite_Uids.fromjson("""{$favorites|noescape}""");
             ESC_Last_Map_Favorites_Update = GameTime;
         }
         -->

@@ -13,6 +13,7 @@
     </framemodel>
 
     <frame id="widget" pos="{config('cp-records.pos')}" scale="{config('cp-records.scale')}">
+        <!--suppress CheckTagEmptyBody -->
         <frame id="records">
             {for $i=0; $i<100; $i++}
             <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>

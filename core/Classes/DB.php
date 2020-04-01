@@ -4,11 +4,13 @@
 namespace esc\Classes;
 
 
+use Illuminate\Database\Query\Builder;
+
 class DB
 {
     /**
      * @param  string  $tableName
-     * @return \Illuminate\Database\Query\Builder
+     * @return Builder
      */
     public static function table(string $tableName)
     {

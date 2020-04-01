@@ -18,20 +18,20 @@ class ManiaLinkEvent
     /**
      * @var Collection
      */
-    private static $maniaLinkEvents;
+    private static Collection $maniaLinkEvents;
 
     /**
      * @var Collection
      */
-    private static $extendedMLE;
+    private static Collection $extendedMLE;
 
-    public $id;
+    public string $id;
 
     /**
      * @var callable
      */
     public $callback;
-    public $access;
+    public ?string $access;
 
     /**
      * Initialize ManiaLinkEvent
@@ -123,7 +123,7 @@ class ManiaLinkEvent
             Log::write("$action", false);
         }
 
-        if (preg_match('/(\w+[\.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
+        if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 
             if (!$event) {
@@ -149,7 +149,7 @@ class ManiaLinkEvent
         $arguments[0] = $ply;
 
         if ($formValues) {
-            $formValuesObject = collect();
+            $formValuesObject = new \stdClass();
             foreach ($formValues as $value) {
                 $formValuesObject->{$value['Name']} = $value['Value'];
             }

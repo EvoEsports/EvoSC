@@ -4,14 +4,14 @@ namespace esc\Classes;
 
 class StatisticWidget
 {
-    public $stat;
-    public $title;
+    public string $stat;
+    public string $title;
     public $pos;
     public $scale;
     public $show;
-    public $prefix;
-    public $suffix;
-    public $nameLeft;
+    public string $prefix;
+    public string $suffix;
+    public bool $nameLeft;
 
     public function __construct(
         string $stat,

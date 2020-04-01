@@ -11,6 +11,7 @@ class CreateDediRecordsTable extends Migration
     /**
      * Run the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function up(Builder $schemaBuilder)
@@ -30,6 +31,7 @@ class CreateDediRecordsTable extends Migration
     /**
      * Reverse the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function down(Builder $schemaBuilder)

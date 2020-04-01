@@ -4,21 +4,28 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Classes\Timer;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
+use Exception;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Connection;
 
-class ServerHopper implements ModuleInterface
+class ServerHopper extends Module implements ModuleInterface
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $servers;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
+
         /**
          * TODO: Add pagination
          */
@@ -58,9 +65,9 @@ class ServerHopper implements ModuleInterface
         })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
-            Template::show($player, 'server-hopper.update', compact('serversJson'));
+            Template::show($player, 'server-hopper.update', compact('serversJson'), false, 20);
         } else {
-            Template::showAll('server-hopper.update', compact('serversJson'));
+            Template::showAll('server-hopper.update', compact('serversJson'), 20);
         }
     }
 
@@ -75,7 +82,7 @@ class ServerHopper implements ModuleInterface
                 $server->maxPlayers  = $connection->getMaxPlayers()['CurrentValue'];
                 $server->titlePack   = $connection->getVersion()->titleId;
                 $server->hasPassword = $connection->getServerPassword() != false;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $server->online = false;
             }
 
@@ -83,13 +90,5 @@ class ServerHopper implements ModuleInterface
         });
 
         self::sendUpdatedServerInformations();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

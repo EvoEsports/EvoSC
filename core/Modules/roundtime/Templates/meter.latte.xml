@@ -44,7 +44,7 @@
 
     Void resetMeter(){
         settings.showLabel = True;
-        settings.position = <80.0, -86.0>;
+        settings.position = <{config('roundtime.default-pos.x')|noescape}, {config('roundtime.default-pos.y')|noescape}>;
         settings.scale = 1.0;
     }
 

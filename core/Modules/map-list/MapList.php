@@ -3,8 +3,10 @@
 namespace esc\Modules;
 
 use esc\Classes\ChatCommand;
+use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\MapController;
 use esc\Controllers\QueueController;
@@ -14,8 +16,34 @@ use esc\Models\MapQueue;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class MapList implements ModuleInterface
+class MapList extends Module implements ModuleInterface
 {
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        ManiaLinkEvent::add('maplist.show_queue', [self::class, 'showQueue']);
+        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
+        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
+        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
+
+        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
+        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('GroupChanged', [self::class, 'playerConnect']);
+
+        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
+            ->addAlias('/list');
+        ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
+            ->addAlias('/queue')
+            ->addAlias('/jb');
+    }
+
     public static function playerConnect(Player $player)
     {
         self::sendFavorites($player);
@@ -29,45 +57,45 @@ class MapList implements ModuleInterface
 
     public static function sendFavorites(Player $player)
     {
-        $favorites = $player->favorites()->where('enabled', true)->pluck('id')->toJson();
+        $favorites = $player->favorites()->where('enabled', true)->pluck('uid')->toJson();
 
-        Template::show($player, 'map-list.update-favorites', compact('favorites'));
+        Template::show($player, 'map-list.update-favorites', compact('favorites'), false, 20);
     }
 
     public static function sendRecordsJson(Player $player)
     {
-        $locals = $player->locals()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
-        $dedis = $player->dedis()->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $locals = DB::table(LocalRecords::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
+        $dedis = DB::table(Dedimania::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
-        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'));
+        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'), false, 20);
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
     {
-        Template::show($player, 'map-list.update-search-query', compact('query'));
+        Template::show($player, 'map-list.update-search-query', compact('query'), false, 20);
     }
 
     /**
      * Player add favorite map
      *
-     * @param  Player  $player
-     * @param  string  $mapId
+     * @param Player $player
+     * @param string $mapUid
      */
-    public static function favAdd(Player $player, string $mapId)
+    public static function favAdd(Player $player, string $mapUid)
     {
-        $player->favorites()->attach($mapId);
+        $player->favorites()->attach(Map::getByUid($mapUid)->id);
         self::sendFavorites($player);
     }
 
     /**
      * Player remove favorite map
      *
-     * @param  Player  $player
-     * @param  string  $mapId
+     * @param Player $player
+     * @param string $mapUid
      */
-    public static function favRemove(Player $player, string $mapId)
+    public static function favRemove(Player $player, string $mapUid)
     {
-        $player->favorites()->detach($mapId);
+        $player->favorites()->detach(Map::getByUid($mapUid)->id);
         self::sendFavorites($player);
     }
 
@@ -95,19 +123,19 @@ class MapList implements ModuleInterface
             Template::show($player, 'map-list.update-map-list', [
                 'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
-            ]);
+            ], false, 2);
         } else {
             Template::showAll('map-list.update-map-list', [
                 'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
-            ]);
+            ], 2);
         }
     }
 
     private static function getMapList(): Collection
     {
         return Map::whereEnabled(1)->get()->transform(function (Map $map) {
-            if (!$map->id || !$map->gbx->MapUid) {
+            if (!$map->id || !$map->uid) {
                 return null;
             }
 
@@ -116,7 +144,7 @@ class MapList implements ModuleInterface
                 'name' => $map->name,
                 'a' => $map->author->id,
                 'r' => sprintf('%.1f', $map->average_rating),
-                'uid' => $map->gbx->MapUid,
+                'uid' => $map->uid,
                 'c' => $map->cooldown,
             ];
         })->filter();
@@ -135,7 +163,7 @@ class MapList implements ModuleInterface
 
     public static function disableMapEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::whereUid($mapUid)->get()->first();
 
         if (!$map) {
             return;
@@ -147,7 +175,7 @@ class MapList implements ModuleInterface
 
     public static function deleteMapPermEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->last();
+        $map = Map::whereUid($mapUid)->get()->first();
 
         if (!$map) {
             return;
@@ -160,7 +188,7 @@ class MapList implements ModuleInterface
     /**
      * Send updated map queue to everyone
      *
-     * @param  \Illuminate\Support\Collection  $queueItems
+     * @param Collection $queueItems
      */
     public static function mapQueueUpdated(Collection $queueItems)
     {
@@ -175,37 +203,11 @@ class MapList implements ModuleInterface
             ];
         })->filter();
 
-        Template::showAll('map-list.update-map-queue', compact('mapQueue'));
+        Template::showAll('map-list.update-map-queue', compact('mapQueue'), 20);
     }
 
     public static function showMapQueue(Player $player)
     {
         Template::show($player, 'map-list.show-queue', null, false);
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        ManiaLinkEvent::add('maplist.show_queue', [self::class, 'showQueue']);
-        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
-
-        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
-        Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('GroupChanged', [self::class, 'playerConnect']);
-
-        ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
-            ->addAlias('/list');
-        ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
-            ->addAlias('/queue')
-            ->addAlias('/jb');
     }
 }

@@ -4,6 +4,7 @@ namespace esc\Modules;
 
 use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Controllers\CountdownController;
 use esc\Controllers\MapController;
@@ -11,7 +12,7 @@ use esc\Controllers\PlanetsController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 
-class Pay2Play implements ModuleInterface
+class Pay2Play extends Module implements ModuleInterface
 {
     private static $priceAddTime;
     private static $priceSkip;
@@ -34,7 +35,8 @@ class Pay2Play implements ModuleInterface
     public static function showWidget(Player $player)
     {
         if (config('pay2play.addtime.enabled')) {
-            Template::show($player, 'pay2play.add-time');
+            $value = round(CountdownController::getOriginalTimeLimit() / 60);
+            Template::show($player, 'pay2play.add-time', compact('value'));
         }
 
         if (config('pay2play.skip.enabled')) {
@@ -58,7 +60,6 @@ class Pay2Play implements ModuleInterface
     {
         infoMessage($player, ' paid ', $amount, ' to add more time')->sendAll();
         CountdownController::addTime(CountdownController::getOriginalTimeLimit(), $player);
-        Template::showAll('pay2play.widget');
     }
 
     public static function skip(Player $player)

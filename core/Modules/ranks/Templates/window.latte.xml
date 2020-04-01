@@ -1,0 +1,76 @@
+{contentType text}
+{extends 'components.window'}
+
+{php $window_width = 140;}
+{php $window_height = 85;}
+
+{block id}
+ranks
+{/block}
+
+{block icon}
+🔥
+{/block}
+
+{block title}
+Server Ranking
+{/block}
+
+{block content}
+<frame pos="1 -1">
+    {foreach $ranks[0] as $i => $rank}
+    <label pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" textsize="1" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="left" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    {/foreach}
+</frame>
+{if isset($ranks[1])}
+<frame pos="46 76">
+    {foreach $ranks[1] as $i => $rank}
+    <label pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" textsize="1" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="left" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    {/foreach}
+</frame>
+{/if}
+{if isset($ranks[2])}
+<frame pos="91 153">
+    {foreach $ranks[2] as $i => $rank}
+    <label pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" textsize="1" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="left" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75" textcolor="{config('colors.ui.window.text.primary')}" valign="center" halign="right" textfont="{config('colors.ui.font')|noescape}"/>
+    {/foreach}
+</frame>
+{/if}
+<frame pos="2 -79.5" scale="0.9">
+{include 'components.pagination'}
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+    declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    pageInfo.Value = "{$pageInfo}";
+    declare page = {intval($page)};
+{/block}
+
+{block loop}
+{/block}
+
+{block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next-page")){
+        ManiaLinkEvent("ranks.list", "" ^ (page + 1));
+        continue;
+    }
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous-page")){
+        ManiaLinkEvent("ranks.list", "" ^ (page - 1));
+        continue;
+    }
+{/block}
+--></script>

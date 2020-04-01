@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MapQueue extends Model
 {
-    protected $table = 'map-queue';
+    const TABLE = 'map-queue';
+    protected $table = self::TABLE;
 
     protected $fillable = [
         'requesting_player',

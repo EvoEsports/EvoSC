@@ -3,22 +3,23 @@
 namespace esc\Modules;
 
 
+use esc\Classes\DB;
+use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Dedi;
-use esc\Models\LocalRecord;
 use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 
-class RecordsTable implements ModuleInterface
+class RecordsTable extends Module implements ModuleInterface
 {
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -35,22 +36,28 @@ class RecordsTable implements ModuleInterface
             compact('records', 'pages', 'onlineLogins', 'window_title', 'map'));
     }
 
-    public static function showGraph(Player $player, $mapId, $window_title, $recordId)
+    public static function showGraph(Player $player, $mapId, $window_title, $targetRecordRank)
     {
         if ($window_title == 'Local Records') {
-            $record = LocalRecord::whereId($recordId)->first();
+            $record = DB::table(LocalRecords::TABLE)->where('Map', '=', $mapId)->where('Rank', '=', $targetRecordRank)->first();
         } else {
-            $record = Dedi::whereId($recordId)->first();
+            $record = DB::table(Dedimania::TABLE)->where('Map', '=', $mapId)->where('Rank', '=', $targetRecordRank)->first();
         }
 
         if (!$record) {
+            Log::info('Target record not found.');
             return;
         }
 
-        $myRecord = Dedi::whereMap($record->Map)->wherePlayer($player->id)->first();
+        $myRecord = DB::table(Dedimania::TABLE)
+            ->where('Map', '=', $mapId)
+            ->where('Player', '=', $player->id)
+            ->first();
 
         if (!$myRecord) {
-            $myRecord = LocalRecord::whereMap($record->Map)->wherePlayer($player->id)->first();
+            $myRecord = DB::table(LocalRecords::TABLE)
+                ->where('Map', '=', $mapId)
+                ->where('Player', '=', $player->id)->first();
         }
 
         if (!$myRecord) {
@@ -60,8 +67,8 @@ class RecordsTable implements ModuleInterface
         }
 
         $diffs = collect();
-        $recordCps = $record->cps->toArray();
-        $myCps = $myRecord->cps->toArray();
+        $recordCps = explode(',', $record->Checkpoints);
+        $myCps = explode(',', $myRecord->Checkpoints);
 
         for ($i = 0; $i < count($recordCps); $i++) {
             $baseCp = $myCps[$i];
@@ -70,6 +77,8 @@ class RecordsTable implements ModuleInterface
             $diffs->push($compareToCp - $baseCp);
         }
 
-        Template::show($player, 'records-table.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps'));
+        $target = DB::table('players')->where('id', '=', $record->Player)->first();
+
+        Template::show($player, 'records-table.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps', 'target'));
     }
 }

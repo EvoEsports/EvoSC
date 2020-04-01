@@ -4,6 +4,7 @@
 namespace esc\Controllers;
 
 
+use DOMDocument;
 use esc\Classes\ChatCommand;
 use esc\Classes\File;
 use esc\Classes\Hook;
@@ -12,7 +13,6 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Timer;
 use esc\Interfaces\ControllerInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\QuickButtons;
 use Exception;
@@ -24,7 +24,7 @@ class MatchSettingsController implements ControllerInterface
     /**
      * @var string
      */
-    private static $currentMatchSettingsFile;
+    private static string $currentMatchSettingsFile;
 
     private static $lastMatchSettingsModification;
 
@@ -41,27 +41,39 @@ class MatchSettingsController implements ControllerInterface
         }
     }
 
-    public static function loadMatchSettings(Player $player, string $matchSettingsFile)
+    public static function loadMatchSettings(bool $rebootClasses = false, Player $player = null, string $matchSettingsFile = null)
     {
+        if ($player) {
+            infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
+            Log::info($player . ' loads matchsettings ' . $matchSettingsFile);
+        } else {
+            Log::info('Automatically loading matchsettings ' . $matchSettingsFile);
+        }
+
+        if (!$matchSettingsFile) {
+            $matchSettingsFile = self::getCurrentMatchSettingsFile();
+        }
+
         Server::loadMatchSettings('MatchSettings/' . $matchSettingsFile);
-        infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();
-        Log::info($player . ' loads matchsettings ' . $matchSettingsFile);
         self::$currentMatchSettingsFile = $matchSettingsFile;
         self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
-        $mode = Server::getScriptName()['NextValue'];
+        if ($rebootClasses) {
+            $mode = Server::getScriptName()['NextValue'];
 
-        HookController::init();
-        ChatCommand::removeAll();
-        Timer::destroyAll();
-        ManiaLinkEvent::removeAll();
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::removeAll();
+            HookController::init();
+            ChatCommand::removeAll();
+            Timer::destroyAll();
+            ManiaLinkEvent::removeAll();
+            if (config('quick-buttons.enabled')) {
+                QuickButtons::removeAll();
+            }
+
+            ControllerController::loadControllers($mode);
+            ModuleController::startModules($mode);
         }
 
-        ControllerController::loadControllers($mode);
-        MapController::loadMaps($matchSettingsFile);
-        ModuleController::startModules($mode);
+        MapController::loadMaps();
         Hook::fire('MapPoolUpdated');
         Hook::fire('MatchSettingsLoaded', $matchSettingsFile);
     }
@@ -118,21 +130,22 @@ class MatchSettingsController implements ControllerInterface
 
     /**
      * @param string $matchSettings
-     * @param Map $map
+     * @param string $filename
+     * @param string $uid
      */
-    public static function addMap(string $matchSettings, Map $map)
+    public static function addMap(string $matchSettings, string $filename, string $uid)
     {
         $file = self::getPath($matchSettings);
         $settings = new SimpleXMLElement(File::get($file));
 
         $node = $settings->addChild('map');
-        $node->addChild('file', $map->filename);
-        $node->addChild('ident', $map->uid);
+        $node->addChild('file', $filename);
+        $node->addChild('ident', $uid);
 
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::error("Failed to add map \"$map\" to \"$matchSettings\"");
+            Log::error("Failed to add map \"$filename\" to \"$matchSettings\"");
         }
     }
 
@@ -287,11 +300,12 @@ class MatchSettingsController implements ControllerInterface
     }
 
     /**
-     * @param Map $map
+     * @param string $filename
+     * @param string $uid
      */
-    public static function addMapToCurrentMatchSettings(Map $map)
+    public static function addMapToCurrentMatchSettings(string $filename, string $uid)
     {
-        self::addMap(self::$currentMatchSettingsFile, $map);
+        self::addMap(self::$currentMatchSettingsFile, $filename, $uid);
         self::updateMatchSettingsModificationTime();
     }
 
@@ -325,7 +339,7 @@ class MatchSettingsController implements ControllerInterface
         }
 
 
-        $domDocument = new \DOMDocument("1.0");
+        $domDocument = new DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;
         $domDocument->formatOutput = true;
         $domDocument->loadXML($settings->asXML());
@@ -353,7 +367,7 @@ class MatchSettingsController implements ControllerInterface
      */
     private static function saveMatchSettings(string $file, SimpleXMLElement $matchSettings)
     {
-        $domDocument = new \DOMDocument("1.0");
+        $domDocument = new DOMDocument("1.0");
         $domDocument->preserveWhiteSpace = false;
         $domDocument->formatOutput = true;
         $domDocument->loadXML($matchSettings->asXML());
@@ -380,8 +394,7 @@ class MatchSettingsController implements ControllerInterface
         if (self::$lastMatchSettingsModification != filemtime(self::getPath(self::getCurrentMatchSettingsFile()))) {
             self::updateMatchSettingsModificationTime();
             infoMessage('MatchSettings was updated by external source, reloading.')->sendAll();
-            MapController::loadMaps(self::getCurrentMatchSettingsFile());
-            Hook::fire('MapPoolUpdated');
+            self::loadMatchSettings();
         }
     }
 

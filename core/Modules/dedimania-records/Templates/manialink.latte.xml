@@ -94,7 +94,7 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Integer getMyRank(Record[Integer] records){
+    Integer getMyRank(Record[] records){
         foreach(record in records){
             if(record.login == LocalUser.Login){
                 return record.rank;
@@ -126,7 +126,7 @@
         recordsFrame.Show();
     }
 
-    Void updateWidget(Record[Integer] records){
+    Void updateWidget(Record[] records){
         declare myRank = getMyRank(records);
         declare filled = 0;
         declare skipped = 0;
@@ -194,7 +194,7 @@
     {/block}
 
     {block bootScript}
-        declare Record[Integer] DediRecords_ for LocalUser;
+        declare Record[] DediRecords for LocalUser;
         declare Integer LastDediRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
@@ -210,12 +210,12 @@
             if(LastDediRecordsUpdate != lastUpdate){
                 //update
                 lastUpdate = LastDediRecordsUpdate;
-                updateWidget(DediRecords_);
+                updateWidget(DediRecords);
             }
 
             if(playerCount != Players.count){
                 playerCount = Players.count;
-                updateWidget(DediRecords_);
+                updateWidget(DediRecords);
             }
     {/block}
 

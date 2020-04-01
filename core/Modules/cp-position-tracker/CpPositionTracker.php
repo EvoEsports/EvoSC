@@ -4,18 +4,19 @@ namespace esc\Modules;
 
 
 use esc\Classes\Hook;
+use esc\Classes\Module;
 use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
-use esc\Models\Map;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
-class CpPositionTracker implements ModuleInterface
+class CpPositionTracker extends Module implements ModuleInterface
 {
     /**
      * @var Collection
      */
-    private static $tracker;
+    private static Collection $tracker;
 
     public static function showManialink(Player $player)
     {
@@ -32,7 +33,7 @@ class CpPositionTracker implements ModuleInterface
         Template::showAll('cp-position-tracker.update', compact('data'));
     }
 
-    public static function beginMap(Map $map)
+    public static function beginMap()
     {
         self::$tracker = collect();
 
@@ -47,7 +48,7 @@ class CpPositionTracker implements ModuleInterface
 
     public static function playerCheckpoint(Player $player, int $score, int $cp, bool $isFinish)
     {
-        $o = new \stdClass();
+        $o = new stdClass();
         $o->name = $player->NickName;
         $o->score = $score;
         $o->cp = $cp + 1;

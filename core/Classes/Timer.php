@@ -14,18 +14,18 @@ use Illuminate\Support\Collection;
  */
 class Timer
 {
-    private static $interval = 100; //one callback-fetch each X milliseconds
+    private static int $interval = 100; //one callback-fetch each X milliseconds
     private static $uStart;
 
     /**
      * @var Collection
      */
-    private static $timers;
+    private static Collection $timers;
 
-    public $id;
+    public string $id;
     public $callback;
-    public $runtime;
-    public $repeat;
+    public int $runtime;
+    public bool $repeat;
     public $delay;
 
     /**

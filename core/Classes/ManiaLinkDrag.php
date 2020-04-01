@@ -13,7 +13,7 @@ namespace esc\Classes;
  */
 class ManiaLinkDrag
 {
-    public $targetId;
+    public string $targetId;
 
     /**
      * ManiaLinkDrag constructor.

@@ -7,6 +7,7 @@ use esc\Classes\DB;
 use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\CountdownController;
@@ -15,11 +16,13 @@ use esc\Interfaces\ModuleInterface;
 use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use Illuminate\Support\Collection;
 use stdClass;
 
-class MxKarma implements ModuleInterface
+class MxKarma extends Module implements ModuleInterface
 {
     const startSession = 1;
     const activateSession = 2;
@@ -30,32 +33,21 @@ class MxKarma implements ModuleInterface
     private static $mapKarma;
     private static $updatedVotesAverage;
 
-    /**
-     * @var stdClass
-     */
-    private static $session;
-
-    /**
-     * @var Client
-     */
-    private static $client;
-
-    /**
-     * @var Map
-     */
-    private static $currentMap;
+    private static stdClass $session;
+    private static Client $client;
+    private static string $currentMapUid;
 
     /**
      * @var array
      */
-    private static $ratings;
+    private static array $ratings;
 
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private static $updatedVotesPlayerIds;
 
-    private static $offline = false;
+    private static bool $offline = false;
 
     public function __construct()
     {
@@ -94,9 +86,8 @@ class MxKarma implements ModuleInterface
     }
 
     /**
-     * @param \esc\Models\Map|null $map
+     * @param Map|null $map
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function endMap(Map $map)
     {
@@ -137,12 +128,12 @@ class MxKarma implements ModuleInterface
 
         try {
             self::$mapKarma = self::call(self::getMapRating, $map);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
             self::$mapKarma = 50.0;
         }
 
-        self::$currentMap = $mapUid;
+        self::$currentMapUid = $mapUid;
         self::updateVotesAverage();
         self::sendUpdatedKarma();
 
@@ -159,7 +150,7 @@ class MxKarma implements ModuleInterface
                 $rating = self::playerCanVote($player, $map) ? -1 : -2; // -1 = can vote, -2 = can't vote
             }
 
-            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true);
+            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true, 20);
         }
 
         Template::executeMulticall();
@@ -181,15 +172,15 @@ class MxKarma implements ModuleInterface
 
         $mapUid = $map->uid;
 
-        if (self::$currentMap != $mapUid) {
+        if (self::$currentMapUid != $mapUid) {
             self::$mapKarma = self::call(self::getMapRating);
-            self::$currentMap = $mapUid;
+            self::$currentMapUid = $mapUid;
         }
 
         self::updateVotesAverage();
 
         $average = self::$updatedVotesAverage;
-        Template::showAll('mx-karma.update-karma', compact('average'));
+        Template::showAll('mx-karma.update-karma', compact('average'), 20);
     }
 
     public static function playerCanVote(Player $player, Map $map): bool
@@ -241,7 +232,6 @@ class MxKarma implements ModuleInterface
      * @param array|null $votes
      *
      * @return null|stdClass
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function call(int $method, Map $map = null, array $votes = null): ?stdClass
     {
@@ -374,7 +364,6 @@ class MxKarma implements ModuleInterface
 
     /**
      * Starts MX Karma session
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function startSession()
     {
@@ -432,7 +421,7 @@ class MxKarma implements ModuleInterface
 
             $karma->update(['Rating' => $rating]);
         } else {
-            $karma = Karma::create([
+            Karma::create([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'Rating' => $rating,
@@ -443,7 +432,7 @@ class MxKarma implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 20);
 
         self::sendUpdatedKarma();
     }
@@ -524,7 +513,7 @@ class MxKarma implements ModuleInterface
         if ($karma != null) {
             $karma->update(['Rating' => 0]);
         } else {
-            $karma = Karma::create([
+            Karma::create([
                 'Player' => $player->id,
                 'Map' => $map->id,
                 'Rating' => 0,
@@ -535,7 +524,7 @@ class MxKarma implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
         Log::info($player . " rated " . $map . " @ 0|worst");
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'));
+        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 20);
 
         self::sendUpdatedKarma();
     }

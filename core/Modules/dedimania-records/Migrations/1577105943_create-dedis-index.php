@@ -11,6 +11,7 @@ class CreateDedisIndex extends Migration
     /**
      * Run the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function up(Builder $schemaBuilder)
@@ -23,6 +24,7 @@ class CreateDedisIndex extends Migration
     /**
      * Reverse the migrations.
      *
+     * @param Builder $schemaBuilder
      * @return void
      */
     public function down(Builder $schemaBuilder)

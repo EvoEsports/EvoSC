@@ -4,11 +4,12 @@ namespace esc\Modules;
 
 
 use esc\Classes\ManiaLinkEvent;
+use esc\Classes\Module;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Player;
 
-class Warning implements ModuleInterface
+class Warning extends Module implements ModuleInterface
 {
     public function __construct()
     {

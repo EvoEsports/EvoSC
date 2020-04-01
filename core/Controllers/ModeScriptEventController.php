@@ -151,11 +151,7 @@ class ModeScriptEventController implements ControllerInterface
     static function tmWayPoint($arguments)
     {
         $wayPoint = json_decode($arguments[0]);
-
         $player = player($wayPoint->login);
-        $map = MapController::getCurrentMap();
-
-        $totalCps = $map->gbx->CheckpointsPerLaps;
 
         //checkpoint passed
         Hook::fire('PlayerCheckpoint',

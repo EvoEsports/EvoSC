@@ -4,7 +4,6 @@ namespace esc\Classes;
 
 
 use esc\Controllers\TemplateController;
-use esc\Controllers\TemplateControllerTwig;
 use esc\Models\Player;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
@@ -18,13 +17,13 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
  */
 class Template
 {
-    public $index;
-    public $template;
+    public string $index;
+    public string $template;
 
     /**
      * @var Collection
      */
-    private static $multiCalls;
+    private static Collection $multiCalls;
 
     /**
      * Template constructor.
@@ -41,50 +40,26 @@ class Template
     /**
      * Show the template to everyone.
      *
-     * @param  string  $index
-     * @param  array|null  $values
+     * @param string $index
+     * @param array|null $values
+     * @param int $timeoutInSeconds
      */
-    public static function showAll(string $index, array $values = null)
+    public static function showAll(string $index, array $values = [], int $timeoutInSeconds = 0)
     {
-        if (!$values) {
-            $values = [];
-        }
-
         $xml = TemplateController::getTemplate($index, $values);
-        Server::sendDisplayManialinkPage('', $xml);
-    }
-
-    /**
-     * Hide a manialink with the given id for everyone.
-     *
-     * @param  string  $id
-     */
-    public static function hideAll(string $id)
-    {
-        Server::sendDisplayManialinkPage('', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
-    }
-
-    /**
-     * Hide a manialink with the given id for a single player.
-     *
-     * @param  string  $id
-     */
-    public static function hide(Player $player, string $id)
-    {
-        Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
+        Server::sendDisplayManialinkPage('', $xml, $timeoutInSeconds * 1000);
     }
 
     /**
      * Render and send a template to a player.
      *
-     * @param  Player  $player
-     * @param  string  $index
-     * @param  null  $values
-     * @param  bool  $multicall
+     * @param Player $player
+     * @param string $index
+     * @param null $values
+     * @param bool $multicall
+     * @param int $timeoutInSeconds
      */
-    public static function show(Player $player, string $index, $values = null, bool $multicall = false)
+    public static function show(Player $player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
         $data = [];
 
@@ -101,15 +76,38 @@ class Template
 
         if ($xml != '') {
             if ($multicall) {
-                if (!self::$multiCalls) {
+                if (!isset(self::$multiCalls)) {
                     self::$multiCalls = collect();
                 }
 
                 self::$multiCalls->put($player->Login, $xml);
             } else {
-                Server::sendDisplayManialinkPage($player->Login, $xml);
+                Server::sendDisplayManialinkPage($player->Login, $xml, $timeoutInSeconds * 1000);
             }
         }
+    }
+
+    /**
+     * Hide a manialink with the given id for everyone.
+     *
+     * @param  string  $id
+     */
+    public static function hideAll(string $id)
+    {
+        Server::sendDisplayManialinkPage('', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
+    }
+
+    /**
+     * Hide a manialink with the given id for a single player.
+     *
+     * @param Player $player
+     * @param string $id
+     */
+    public static function hide(Player $player, string $id)
+    {
+        Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
     }
 
     /**
@@ -117,7 +115,7 @@ class Template
      */
     public static function executeMulticall()
     {
-        if (!self::$multiCalls) {
+        if (!isset(self::$multiCalls)) {
             return;
         }
 
@@ -125,20 +123,15 @@ class Template
             try {
                 Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
             } catch (Exception $e) {
-                $id = uniqid(str_slug($e->getMessage())).'.xml';
+                $id = uniqid(evo_str_slug($e->getMessage())).'.xml';
                 Log::warning('Failed to render template for '.$login.'. Saving to as '.$id);
                 Cache::put($id, $xml);
             }
         });
 
-        self::$multiCalls = null;
+        self::$multiCalls = collect();
 
-        try {
-            Server::executeMulticall();
-        } catch (Exception $e) {
-            Log::error('Multicall failed: '.$e->getMessage());
-            Log::warning($e->getTraceAsString());
-        }
+        Server::executeMulticall();
     }
 
     /**

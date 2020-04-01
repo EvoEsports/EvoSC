@@ -8,6 +8,7 @@ use esc\Controllers\MapController;
 use esc\Controllers\MatchSettingsController;
 use esc\Models\Map;
 use esc\Models\Player;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use ZipArchive;
@@ -16,16 +17,16 @@ class MxPackJob
 {
     private $id;
     private $files;
-    private $name;
-    private $path;
-    private $packsDir;
+    private string $name;
+    private string $path;
+    private string $packsDir;
     private $info;
-    private $i = 0;
+    private int $i = 0;
 
     /**
      * @var Player
      */
-    private $issuer;
+    private Player $issuer;
 
     public function __construct(Player $player, $packId)
     {
@@ -45,7 +46,7 @@ class MxPackJob
 
         try {
             $this->loadFiles();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
         } catch (GuzzleException $e) {
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
@@ -53,8 +54,7 @@ class MxPackJob
     }
 
     /**
-     * @param $info
-     * @throws \GuzzleHttp\Exception\GuzzleException|\Exception
+     * @throws Exception
      */
     private function loadFiles()
     {
@@ -80,7 +80,7 @@ class MxPackJob
 
     /**
      * @param  string  $path
-     * @throws \Exception
+     * @throws Exception
      */
     private function unpackFiles(string $path)
     {
@@ -98,7 +98,7 @@ class MxPackJob
             $zip->extractTo($dir);
             $zip->close();
         } else {
-            throw new \Exception('Failed to unzip archive.');
+            throw new Exception('Failed to unzip archive.');
         }
 
         $this->addFiles(File::getFiles($dir));
@@ -121,7 +121,7 @@ class MxPackJob
                     $authorId = Player::find($authorLogin)->id;
                 } else {
                     $authorId = Player::insertGetId([
-                        'NickName' => $gbx->AuthorNick,
+                        'NickName' => $authorLogin,
                         'Login' => $authorLogin
                     ]);
                 }
@@ -145,11 +145,11 @@ class MxPackJob
                 'enabled' => 1
             ]);
 
-            MatchSettingsController::addMapToCurrentMatchSettings($map);
+            MatchSettingsController::addMapToCurrentMatchSettings($filename, $map->uid);
 
             try {
                 Server::addMap($filename);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::write($e->getMessage());
             }
         });

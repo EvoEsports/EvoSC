@@ -131,21 +131,6 @@ class Player extends Model
     }
 
     /**
-     * Get players locals.
-     *
-     * ->locals() = query builder
-     * ->locals = fetches all locals of that player and returns collection
-     *
-     * ->locals()->get() = ->locals
-     *
-     * @return HasMany
-     */
-    public function locals()
-    {
-        return $this->hasMany(LocalRecord::class, 'Player', 'id');
-    }
-
-    /**
      * Get players dedis, like locals.
      *
      * @return HasMany
@@ -305,11 +290,11 @@ class Player extends Model
 
     public function getNameAttribute()
     {
-        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\]))/i', '', $this->NickName);
+        return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?]))/i', '', $this->NickName);
     }
 
     public function getNameBlankAttribute()
     {
-        return preg_replace('/(?<![$])\${1}((l|m)(?:\[.+?\])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
+        return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
     }
 }
