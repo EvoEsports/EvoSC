@@ -39,8 +39,9 @@ Get all available commands with `php esc list`
 
 | Action | Description |
 | --------- | -------------------------------------------- |
-| Run EvoSC | In terminal type `php esc run (-v/-vv/-vvv/-s/-f)`. -v/vv/vvv for verbosity. -f will skip map verification on start. -s will skip migrations on start.|
-| Import data from UASECO | In terminal type `php esc import:uaseco {host} {database} {user} {password}` optionally add `{table_prefix}` |
-| Import data from PyPlanet | In terminal type `php esc import:pyplanet {host} {database} {user} {password}` optionally add `{table_prefix}` |
+| Get EvoSC version | Run `php esc version` to get the installed version. |
+| Run EvoSC | Run `php esc run (-v/-vv/-vvv/-s/-f)`. -v/vv/vvv for verbosity. -f will skip map verification on start. -s will skip migrations on start.|
+| Import data from UASECO | Run `php esc import:uaseco {host} {database} {user} {password}` optionally add `{table_prefix}` |
+| Import data from PyPlanet | Run `php esc import:pyplanet {host} {database} {user} {password}` optionally add `{table_prefix}` |
 | Fix player scores and ranking | Run `php esc fix:scores` to re-calculate all scores and fix the player ranks. |
 | Creating a database migration | Run `php esc make:migration <MigrationClassName>`. The migration is saved to to /Migrations. Copy it to your module if necessary. |
