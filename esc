@@ -3,6 +3,7 @@
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
+use esc\Commands\GetVersion;
 use esc\Commands\EscRun;
 use esc\Commands\AddAdmin;
 use esc\Commands\FakeLocals;
@@ -51,6 +52,7 @@ $application->add(new ImportUaseco());
 $application->add(new ImportPyplanet());
 $application->add(new FixRanks());
 $application->add(new FixScores());
+$application->add(new GetVersion());
 $application->add(new EscRun());
 $application->add(new FakeLocals());
 $application->add(new ChatRouter());
