@@ -85,7 +85,9 @@ main() {
         yield;
 
         if(!visible){
-            wait(InputPlayer != Null);
+            if(InputPlayer == Null){
+                continue;
+            }
             wait(InputPlayer.DisplaySpeed > 50);
             visible = True;
             start(frame);
