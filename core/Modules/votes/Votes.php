@@ -167,7 +167,7 @@ class Votes extends Module implements ModuleInterface
         } else {
             $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
         }
-        $question = 'Add ' . round($secondsToAdd / 60, 1) . ' minutes?';
+        $question = 'Add $' . config('colors.chat') . round($secondsToAdd / 60, 1) . '$z$s$fff minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {

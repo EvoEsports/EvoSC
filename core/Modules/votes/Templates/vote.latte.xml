@@ -10,7 +10,7 @@
 
         <label textfont="{config('colors.ui.font')|noescape}" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{$duration}" valign="center" textsize="0.6" textcolor="fff8"/>
 
-        <label id="question" textfont="{config('colors.ui.font')|noescape}" pos="25 -8.5" z-index="1" size="49 5" textprefix="$s" autonewline="1" text="{$question}" halign="center" textsize="1.25"/>
+        <label id="question" textfont="{config('colors.ui.font')|noescape}" pos="25 -8.5" z-index="1" size="48 5" textprefix="$s" autonewline="1" text="{$question}" halign="center" textsize="1.25"/>
 
         <quad id="bg1" pos="0 0" size="50 13" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
         <quad id="bg2" pos="0 0" size="50 13" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.65" z-index="-2" />
@@ -53,12 +53,12 @@
 
             if(voteEnded){
                 if(widget.RelativeScale == originalScale){
-                    AnimMgr.Add(widget, """ <frame scale="0" /> """, 500, CAnimManager::EAnimManagerEasing::ElasticIn);
+                    AnimMgr.Add(widget, """ <frame pos='""" ^ widget.RelativePosition_V3[0] ^ """ 110' /> """, 500, CAnimManager::EAnimManagerEasing::ExpIn);
                 }
 
-                sleep(500);
-                if(widget.RelativeScale == 0) return;
-                continue;
+                sleep(550);
+                widget.Hide();
+                return;
             }
 
             foreach(event in PendingEvents){
