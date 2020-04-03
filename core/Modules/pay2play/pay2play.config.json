@@ -7,7 +7,7 @@
     "ui": {
       "position": "right",
       "slot": 40,
-      "slot_horizontal": 5
+      "slot_horizontal": 7
     }
   },
 
@@ -17,7 +17,7 @@
     "ui": {
       "position": "right",
       "slot": 40,
-      "slot_horizontal": 4
+      "slot_horizontal": 6
     }
   }
 }
