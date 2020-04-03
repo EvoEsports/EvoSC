@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="QuickButtons" name="ESC:QuickButtons">
-    <frame id="buttons" pos="{($buttons->count() * 6) / -2 - 2.5} -51" halign="center" valign="center" scale="1">
+    <frame id="buttons" pos="89 -50.5" halign="center" valign="center" scale="1.1">
         {foreach $buttons as $button}
-        <frame pos="{$iterator->counter * 6} 0" data-action="{$button->action}">
+        <frame pos="{$iterator->counter * -6} 0" data-action="{$button->action}">
             <label size="5.5 5.5" valign="center" halign="center" textsize="1.25" text="$s{$button->icon}" textcolor="fffe" z-index="1" focusareacolor1="0000" focusareacolor2="000c" ScriptEvents="1" />
             <label pos="0 -5" valign="center" halign="center" textsize="0.7" text="$s{$button->text}" textfont="{config('colors.ui.font')|noescape}" textcolor="eeee" z-index="1" hidden="1" />
             {if $button->access}

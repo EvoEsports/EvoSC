@@ -312,6 +312,14 @@
         return (ceil(Scores.count / SB_Per_Page * 1.0));
     }
 
+    Void setMode(CMlLabel modeLabel){
+        modeLabel.Value = CurrentServerModeName;
+
+        if(CurrentServerModeName == "Rounds"){
+            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: {$pointLimitRounds})";
+        }
+    }
+
     Void updateScoreTable(){
         (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
 
@@ -328,8 +336,8 @@
         }
 
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
-        (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel).Value = CurrentServerModeName;
         (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+        setMode((Page.MainFrame.GetFirstChild("mode-name") as CMlLabel));
 
         declare rank = 1;
         declare filled = 0;

@@ -17,8 +17,8 @@ UI-Settings
 {/block}
 
 {block content}
-<label pos="27 -1" size="27 3" textsize="0.6" text="Hide widgets while driving" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="29 -1" size="10 3" textsize="0.6" text="" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<label pos="27 -1" size="27 3" textsize="0.6" text="Hide widgets while driving" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+<label pos="29 -1" size="10 3" textsize="0.6" text="" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
 
 <label pos="27 -5" size="27 3" textsize="0.6" text="Hide at" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
 <entry id="speed" pos="29 -5" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
