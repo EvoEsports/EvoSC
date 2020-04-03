@@ -41,7 +41,7 @@
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5"
               ScriptEvents="1"/> <!-- Controls Trigger -->
 
-        <frame pos="8 -7.75" hidden="1" z-index="10">
+        <frame pos="8 -7.75" hidden="1" z-index="9999">
             <label class="button spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" halign="center"
                    valign="center"/>
             <label class="button profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" halign="center"
@@ -493,7 +493,7 @@
                         TriggerPageAction("forcespec," ^ targetLogin);
                     }
                     if(Event.Control.HasClass("ban")){
-                        TriggerPageAction("ban," ^ targetLogin);
+                        TriggerPageAction("banui.search," ^ targetLogin);
                     }
                     if(Event.Control.HasClass("warn")){
                         if(confirm("Warn player " ^ targetLogin ^ "?")){

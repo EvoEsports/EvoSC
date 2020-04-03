@@ -35,9 +35,9 @@ class BanGUI extends Module implements ModuleInterfaceAlias
         Template::show($player, 'ban-gui.list', compact('bans'));
     }
 
-    public static function showAddBanTab(Player $player)
+    public static function showAddBanTab(Player $player, $targetLogin = '')
     {
-        Template::show($player, 'ban-gui.add');
+        Template::show($player, 'ban-gui.add', compact('targetLogin'));
     }
 
     public static function mleSearchPlayerAndShowResults(Player $player, $search)
@@ -57,7 +57,7 @@ class BanGUI extends Module implements ModuleInterfaceAlias
         Template::show($player, 'ban-gui.add', compact('results', 'search'));
     }
 
-    public static function cmdBanPlayer(Player $player, $name = null)
+    public static function cmdBanPlayer(Player $player, $cmd, $name = null)
     {
         if ($name) {
             self::mleSearchPlayerAndShowResults($player, $name);

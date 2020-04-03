@@ -57,6 +57,9 @@
         declare nameEntry <=> (Page.MainFrame.GetFirstChild("name") as CMlEntry);
         declare selectedLabel <=> (Page.MainFrame.GetFirstChild("selected") as CMlLabel);
         declare selectedLogin = "";
+        declare Text[Text] results;
+
+        results.fromjson("""{$results|noescape}""");
 
         {if isset($results)}
         declare reasonTextEdit <=> (Page.MainFrame.GetFirstChild("reason") as CMlTextEdit);
@@ -69,6 +72,14 @@
         {else}
         nameEntry.StartEdition();
         {/if}
+
+        if(results.count == 1){
+            foreach(Login => Name in results){
+                selectedLogin = Login;
+                selectedLabel.Value = Name;
+            }
+            nameEntry.Value = "";
+        }
 
         while(True){
             yield;
