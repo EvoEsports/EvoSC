@@ -1,8 +1,8 @@
 {contentType text}
 {extends 'components.window'}
 
-{php $window_width = '100';}
-{php $window_height = '21';}
+{php $window_width = '60';}
+{php $window_height = '31';}
 
 {block id}
 pm-dialog
@@ -17,12 +17,13 @@ Personal Message
 {/block}
 
 {block content}
-<label pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<entry id="login" pos="11 -1" size="86 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<entry id="text" pos="11 -4" size="86 8" textsize="0.6" halign="left" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="font" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" />
+<entry class="input" id="login" pos="11 -1" size="46 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" />
+<label class="font" pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center"/>
+<entry class="input" id="text" pos="11 -4" size="46 18" textsize="0.9" halign="left"/>
 
-<label class="send" pos="17 -15" size="12 4" textsize="0.6" halign="center" text=" Send" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+<label class="btn-primary send" pos="18 -25" size="14 4" textsize="0.6" text=" Send" ScriptEvents="1"/>
+<label class="btn cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
 {/block}
 
 {include 'scripts.mle'}
@@ -47,6 +48,18 @@ if(event.Control.HasClass("send") && event.Type == CMlScriptEvent::Type::MouseCl
     ManiaLinkEvent("pm", login ^ "," ^ text);
     window.Hide();
     return;
+}
+if(event.Control.HasClass("cancel") && event.Type == CMlScriptEvent::Type::MouseClick){
+    declare text = (Page.MainFrame.GetFirstChild("text") as CMlEntry).Value;
+    if(TL::Length(text) > 0){
+        if(confirm("Cancel PM?")){
+            window.Hide();
+            return;
+        }
+    }else{
+        window.Hide();
+        return;
+    }
 }
 {/block}
 --></script>
