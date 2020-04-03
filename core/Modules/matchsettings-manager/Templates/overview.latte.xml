@@ -1,6 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
+    {include 'components.stylesheet'}
     <frame id="window" pos="-25 10">
         <quad pos="0 0" size="50 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
         <quad id="handle" data-id="help" pos="0 0" size="35 5" z-index="5"/>

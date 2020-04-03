@@ -1,6 +1,9 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+    <stylesheet>
+        <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}"/>
+    </stylesheet>
     {include 'components.stylesheet'}
 
     <framemodel id="box" size="86 12">
@@ -64,10 +67,10 @@
             {/for}
         </frame>
 
-        <label class="font prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
-        <label id="page" class="font" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
-        <label class="font next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
-        <label class="font me" textprefix="$s" text="" valign="center" halign="center" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
+        <label class="floating prev-page" text="" pos="4 -81" ScriptEvents="1" />
+        <label id="page" class="floating" text="1/1" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" />
+        <label class="floating next-page" text="" pos="18 -81" />
+        <label class="floating me" text="" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" />
     </frame>
 
     <script><!--

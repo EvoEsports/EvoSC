@@ -96,9 +96,9 @@
         declare prefix = "";
 		declare LibST_Status for score.User = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
-            prefix = "$aaa $z";
+            prefix = "  | ";
 		}else if(LibST_Status == C_Status_Spectating){
-            prefix = "$eee $z";
+            prefix = "  | ";
 		}else{
             prefix = "";
 		}
@@ -153,6 +153,7 @@
             declare netread Integer Net_LibST_Update for Score;
             LibST_PrevUpdate = Net_LibST_Update;
             updateSlot((boxesFrame.Controls[rank - 1] as CMlFrame), rank, Score);
+            boxesFrame.Controls[filled].Show();
 
             rank += 1;
             filled += 1;
