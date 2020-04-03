@@ -1,6 +1,6 @@
 {contentType text}
 <frame id="confirm-dialog" z-index="99999" hidden="1">
-    <quad size="320 180" style="Bgs1" substyle="BgDialogBlur" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
+    <quad class="bg-blur" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
 
     <label id="confirm-label" text="Please confirm" class="font" pos="0 4" scale="2.4" valign="center" halign="center" z-index="1" />
     <label text="Confirm" class="btn-primary confirm" pos="-10.5 -8" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />

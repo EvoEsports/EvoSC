@@ -1,69 +1,42 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
-    <stylesheet>
-        <style class="label" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="1"/>
-        <style class="button" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" textsize="0.05"
-               size="9.2 5.5" focusareacolor1="fff1" focusareacolor2="fff3" autonewline="1"/>
-        <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')|noescape}"
-               opacity="{config('colors.ui.window.bg.opacity')|noescape}"/>
-    </stylesheet>
-
     {include 'components.stylesheet'}
 
     <framemodel id="box" size="86 12">
-        <label class="label" pos="25 -2.5" size="25 3" scale="1.3" textprefix="$fff" textcolor="fff"
-               z-index="10"/> <!-- Name -->
-        <label class="label" pos="64.25 -3.8" scale="0.9" size="3 3" textcolor="fff" valign="center" halign="center"
-               text="" opacity="0.85"/> <!-- Group Icon -->
+        <label class="font" pos="25 -2.5" size="25 3" scale="1.3" z-index="10"/> <!-- Name -->
+        <label class="font" pos="64.25 -3.8" scale="0.9" size="3 3" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
         <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
             <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2"/>
-            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7"
-                   textcolor="888"/>
+            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
-        <label class="label" pos="6.85 -5.5" textprefix="" size="10 10" textsize="1.1" scale="2" halign="center"
-               valign="center" text="" opacity="1" textcolor="fff"/> <!-- Rank -->
-        <label class="label" pos="25 -7" size="11 3" scale="1" textcolor="fff" halign="left"/> <!-- Score -->
+        <label class="font" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
+        <label class="font" pos="25 -7" size="11 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="label" pos="66.25 -7.5" size="19.5 3" scale="0.9" textcolor="fff" valign="center" opacity="0.75"
-               text="Region: Rank"/> <!-- Region -->
-        <label class="label" pos="66.25 -3.7" size="19.5 3" scale="0.9" textcolor="fff" valign="center" text="Player"
-               opacity="0.75"/> <!-- Group -->
-        <label class="label" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
-        <label class="label" pos="25 -7" size="11 3" scale="1"
-               textcolor="{config('colors.ui.window.header.color')|noescape}4" halign="left"/> <!-- Score BG -->
-        <label class="label" pos="61.5 -3.8" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9"
-               text="+12.7 LP"/> <!-- LP Gain -->
+        <label class="font" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
+        <label class="font" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
+        <label class="font" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
+        <label class="font" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
+        <label class="font" pos="61.5 -3.8" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9"/> <!-- LP Gain -->
 
-        <quad style="Bgs1" substyle="BgDialogBlur" pos="1 0" size="86 12" z-index="-12"
-              opacity="0" hidden="0"/> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="86 12" z-index="-15" opacity="0.5"
-              ScriptEvents="1"/> <!-- Primary BG -->
+        <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
+        <quad class="bg-window" pos="1 0" size="86 12" z-index="-15" opacity="0.5" ScriptEvents="1"/> <!-- Primary BG -->
         <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
-        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5"
-              ScriptEvents="1"/> <!-- Controls Trigger -->
+        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -7.75" hidden="1" z-index="9999">
-            <label class="button spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button pm" data-icon="" data-access="" text="PM" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button mute" data-icon="" data-access="player_mute" text="Mute" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button kick" data-icon="" data-access="player_kick" text="Kick" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button warn" data-icon="" data-access="player_warn" text="Warn" ScriptEvents="1" halign="center"
-                   valign="center"/>
-            <label class="button force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1"
-                   halign="center" valign="center"/>
+            <label class="btn spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn pm" data-icon="" data-access="" text="PM" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn mute" data-icon="" data-access="player_mute" text="Mute" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn kick" data-icon="" data-access="player_kick" text="Kick" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn warn" data-icon="" data-access="player_warn" text="Warn" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
         </frame>
 
-        <quad pos="1 0" size="86 12" z-index="-12" opacity="0" bgcolor="{config('colors.ui.widget.header.color')|noescape}"/> <!-- Primary BG -->
+        <quad class="bg-window-header" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Flash BG -->
     </framemodel>
 
     <!-- end components -->
@@ -73,9 +46,9 @@
         <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
         {/if}
-        <label id="server-name" class="label" pos="1 15" size="60 6" scale="2"/>
-        <label id="mode-name" class="label" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
-        <label id="player-info" class="label" pos="1.1 4.8" size="60 6" scale="1" textprefix="$s "/>
+        <label id="server-name" class="font" pos="1 15" size="60 6" scale="2"/>
+        <label id="mode-name" class="font" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
+        <label id="player-info" class="font" pos="1.1 4.8" size="60 6" textprefix="$s "/>
         <frame id="boxes-frame">
             {for $i=0;$i<6;$i++}
             <frameinstance modelid="box" pos="-0.5 {$i * -13}"></frameinstance>
@@ -91,10 +64,10 @@
             {/for}
         </frame>
 
-        <label class="label prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label id="page" class="label" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="label next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="label me" textprefix="$s" text="" valign="center" halign="center" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="font prev-page" textprefix="$s" text="" valign="center" halign="center" pos="4 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
+        <label id="page" class="font" textprefix="$s" text="1/1" valign="center" halign="center" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
+        <label class="font next-page" textprefix="$s" text="" valign="center" halign="center" pos="18 -81" textsize="2.5" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
+        <label class="font me" textprefix="$s" text="" valign="center" halign="center" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000" />
     </frame>
 
     <script><!--
@@ -448,9 +421,9 @@
         while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin){
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
-                if(Event.Control.HasClass("button") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare buttonLabel <=> (Event.Control as CMlLabel);
-                    declare targetLogin = buttonLabel.Parent.Parent.DataAttributeGet("login");
+                if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare btnLabel <=> (Event.Control as CMlLabel);
+                    declare targetLogin = btnLabel.Parent.Parent.DataAttributeGet("login");
 
                     if(Event.Control.HasClass("spec")){
                         if(!IsSpectatorClient) RequestSpectatorClient(True);

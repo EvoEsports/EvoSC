@@ -1,23 +1,14 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-<stylesheet>
-    <style class="bg-header" bgcolor="{config('colors.ui.window.header.color')}"/>
-    <style class="bg-color" bgcolor="{config('colors.ui.window.bg.color')}"/>
-    <style class="font" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="input" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.bg.color')}9" focusareacolor2="{config('colors.ui.window.bg.color')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.default')}9" focusareacolor2="{config('colors.ui.window.btn.default')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-primary" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-warning" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.warning')}9" focusareacolor2="{config('colors.ui.window.btn.warning')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-danger" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-</stylesheet>
+{include 'components.stylesheet'}
 
 <frame id="window" pos="0 0" scale="1.0" hidden="{isset($startHidden) ? 1 : 0}">
-    <quad class="bg-header" size="{$window_width ?? 120} 6" opacity="0.9" z-index="-3"/>
-    <quad class="bg-header" pos="0 -6" size="{$window_width ?? 120} 0.4" valign="center" />
+    <quad class="bg-window-header" size="{$window_width ?? 120} 6" opacity="0.9" z-index="-3"/>
+    <quad class="bg-window-header" pos="0 -6" size="{$window_width ?? 120} 0.4" valign="center" />
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 6" z-index="5"/>
-    <quad class="bg-color" size="{$window_width ?? 120} 6" opacity="0.4" z-index="-1"/>
-    <quad id="bg" class="bg-color" pos="0 -6" size="{$window_width ?? 120} {$window_height ?? 77}" opacity="0.8" z-index="-1"/>
+    <quad class="bg-window" size="{$window_width ?? 120} 6" opacity="0.4" z-index="-1"/>
+    <quad id="bg" class="bg-window" pos="0 -6" size="{$window_width ?? 120} {$window_height ?? 77}" opacity="0.8" z-index="-1"/>
     <label class="icon font" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
     <label class="font" pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center"/>
     <label class="close font" pos="{($window_width ?? 120) - 3} -3" size="6 6" textsize="0.2" text="❌" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>

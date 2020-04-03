@@ -1,6 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
+    {include 'components.stylesheet'}
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL

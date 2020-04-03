@@ -1,11 +1,14 @@
 {contentType text}
 <stylesheet>
-    <style class="bg-header" bgcolor="{config('colors.ui.window.header.color')}"/>
-    <style class="bg-color" bgcolor="{config('colors.ui.window.bg.color')}"/>
+    <style class="bg-widget-header" bgcolor="{config('colors.ui.widget.header.color')}"/>
+    <style class="bg-widget" bgcolor="{config('colors.ui.widget.bg.color')}"/>
+    <style class="bg-window-header" bgcolor="{config('colors.ui.window.header.color')}"/>
+    <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')}"/>
+    <style class="bg-blur" style="Bgs1" substyle="BgDialogBlur"/>
     <style class="font" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
     <style class="input" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.bg.color')}9" focusareacolor2="{config('colors.ui.window.bg.color')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.default')}9" focusareacolor2="{config('colors.ui.window.btn.default')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-primary" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-warning" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.warning')}9" focusareacolor2="{config('colors.ui.window.btn.warning')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-danger" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
+    <style class="btn" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.default')}9" focusareacolor2="{config('colors.ui.window.btn.default')}" textcolor="{config('colors.ui.window.text.primary')}d" textsize="1"/>
+    <style class="btn-primary" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}" textcolor="{config('colors.ui.window.text.primary')}d" textsize="1"/>
+    <style class="btn-warning" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.warning')}9" focusareacolor2="{config('colors.ui.window.btn.warning')}" textcolor="{config('colors.ui.window.text.primary')}d" textsize="1"/>
+    <style class="btn-danger" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.danger')}9" focusareacolor2="{config('colors.ui.window.btn.danger')}" textcolor="{config('colors.ui.window.text.primary')}d" textsize="1"/>
 </stylesheet>
