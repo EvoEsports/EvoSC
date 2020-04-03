@@ -38,7 +38,7 @@
                         OpenLink("{config('discord.url')|noescape}", ::LinkType::ExternalBrowser);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
-                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="038" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="78d" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
                         AnimMgr.Add(bg, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
