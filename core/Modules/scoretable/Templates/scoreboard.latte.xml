@@ -11,14 +11,14 @@
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
         <label class="font" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
-        <label class="font" pos="25 -7" size="11 3"/> <!-- Score -->
+        <label class="font" pos="25 -7" size="25 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
         <label class="font" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
         <label class="font" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
         <label class="font" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
         <label class="font" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
-        <label class="font" pos="61.5 -3.8" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9"/> <!-- LP Gain -->
+        <label class="font" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
         <quad class="bg-window" pos="1 0" size="86 12" z-index="-15" opacity="0.5" ScriptEvents="1"/> <!-- Primary BG -->
@@ -222,12 +222,19 @@
         groupLabel.Value = group.name;
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
-        if(score.BestLap.Time > 0){
-            scoreBgLabel.Value = "";
-            scoreLabel.Value = "$ddd" ^ formatScoreCorrect(score.BestLap.Time, True);
+        scoreBgLabel.Value = "";
+        if(CurrentServerModeName == "Rounds"){
+            if(score.Points > 0){
+                scoreLabel.Value = "$ddd" ^ score.Points ^ " Points";
+            }else{
+                scoreLabel.Value = "$aaaNo Points";
+            }
         }else{
-            scoreBgLabel.Value = "";
-            scoreLabel.Value = "$aaaNo finish";
+            if(score.BestLap.Time > 0){
+                scoreLabel.Value = "$ddd" ^ formatScoreCorrect(score.BestLap.Time, True);
+            }else{
+                scoreLabel.Value = "$aaaNo finish";
+            }
         }
 
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
@@ -245,15 +252,14 @@
         fameStarsLabel.Value = getStars(user.FameStars);
 
 		if (UI.UISequence == CUIConfig::EUISequence::Podium && score.LadderScore != -1.) {
-			lpGainLabel.Show();
 			declare LadderPointsExplode = TL::Split(".", TL::ToText(score.LadderScore));
 			declare LadderPoints = "0.0";
 			if (LadderPointsExplode.existskey(0)) LadderPoints = LadderPointsExplode[0];
 			if (LadderPointsExplode.existskey(1)) LadderPoints ^= "."^TL::SubString(LadderPointsExplode[1], 0, 2);
 			if (score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
 			else lpGainLabel.Value = LadderPoints;
-		} else {
-		    lpGainLabel.Hide();
+
+			scoreLabel.Value = scoreLabel.Value ^ " " ^ lpGainLabel.Value;
 		}
 
         box.Show();
