@@ -21,7 +21,7 @@ class Warning extends Module implements ModuleInterface
         $target = Player::whereLogin($targetLogin)->first();
 
         if ($target) {
-            warningMessage("You have been warned by $player: ", secondary($message))->send($target);
+            warningMessage("You have been warned by $player ", secondary($message))->send($target);
         }
     }
 

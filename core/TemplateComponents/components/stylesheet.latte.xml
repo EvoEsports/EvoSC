@@ -1,3 +1,4 @@
+{contentType text}
 <stylesheet>
     <style class="bg-header" bgcolor="{config('colors.ui.window.header.color')}"/>
     <style class="bg-color" bgcolor="{config('colors.ui.window.bg.color')}"/>

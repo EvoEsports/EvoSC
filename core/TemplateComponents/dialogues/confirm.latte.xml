@@ -7,7 +7,6 @@
     <label text="Cancel" class="btn-danger cancel" pos="10.5 -8" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />
 </frame>
 
-
 <script><!--
     Boolean confirm(Text question){
         declare confirmDialogFrame <=> (Page.MainFrame.GetFirstChild("confirm-dialog") as CMlFrame);

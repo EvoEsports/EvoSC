@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     <stylesheet>
@@ -128,31 +129,9 @@
     --></script>
 
     {include 'dialogues.confirm'}
+    {include 'scripts.mle'}
 
     <script><!--
-    Boolean confirm(Text question){
-        declare dialog <=> (Page.MainFrame.GetFirstChild("confirm-dialog") as CMlFrame);
-        (Page.MainFrame.GetFirstChild("confirm-label") as CMlLabel).Value = question;
-        dialog.Show();
-
-        while(True){
-            yield;
-            foreach(Event in PendingEvents){
-                if(Event.Control == Null) continue;
-                if(Event.Control.HasClass("confirm") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    dialog.Hide();
-                    return True;
-                }
-                if(Event.Control.HasClass("cancel") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    dialog.Hide();
-                    return False;
-                }
-            }
-        }
-        dialog.Hide();
-        return False;
-    }
-
     Integer ceil(Real value){
         declare Integer ceiled = ML::CeilingInteger(value);
 
@@ -476,31 +455,39 @@
                     if(Event.Control.HasClass("spec")){
                         if(!IsSpectatorClient) RequestSpectatorClient(True);
                         SetSpectateTarget(targetLogin);
+                        continue;
                     }
                     if(Event.Control.HasClass("pm")){
                         TriggerPageAction("pm.dialog," ^ targetLogin);
+                        continue;
                     }
                     if(Event.Control.HasClass("mute")){
                         TriggerPageAction("mute," ^ targetLogin);
+                        continue;
                     }
                     if(Event.Control.HasClass("kick")){
-                        if(confirm("Kick " ^ targetLogin ^ " from the server?")){
+                        if(confirm("Kick " ^ targetLogin ^ "$z from the server?")){
                             TriggerPageAction("kick," ^ targetLogin);
                         }
+                        continue;
                     }
                     if(Event.Control.HasClass("force_spec")){
                         TriggerPageAction("forcespec," ^ targetLogin);
+                        continue;
                     }
                     if(Event.Control.HasClass("ban")){
                         TriggerPageAction("banui.search," ^ targetLogin);
+                        continue;
                     }
                     if(Event.Control.HasClass("warn")){
-                        if(confirm("Warn player " ^ targetLogin ^ "?")){
+                        if(confirm("Warn player " ^ targetLogin ^ "$z?")){
                             TriggerPageAction("warn," ^ targetLogin ^ ",");
                         }
+                        continue;
                     }
                     if(Event.Control.HasClass("profile")){
                         ShowProfile(targetLogin);
+                        continue;
                     }
                 }
             }
