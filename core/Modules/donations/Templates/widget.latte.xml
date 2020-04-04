@@ -6,12 +6,12 @@
     {block size}44 4{/block}
 
     {block content}
-    <quad size="44 4" z-index="0" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" id="bg-quad" ScriptEvents="1" />
+    <quad class="bg-dark" size="44 4" z-index="0" opacity="0.8" id="bg-quad" ScriptEvents="1" />
 
     <frame id="content-frame" pos="0 -6" z-index="1">
-        <label pos="25 4" halign="center" valign="center" textsize="0.5" textcolor="{config('colors.ui.widget.text.primary')}" text="Donate planets" textfont="{config('colors.ui.font')|noescape}"/>
-        <label id="amount-label" pos="25 0" halign="center" valign="center" textsize="0.5" textcolor="{config('colors.ui.widget.text.primary')}" text="12000 Planets" z-index="3" textfont="{config('colors.ui.font')|noescape}"/>
-        <quad id="bar-quad" pos="0 0" valign="center" z-index="2" size="0 4" bgcolor="{config('colors.ui.widget.header.color')|noescape}9" />
+        <label class="text-light" pos="25 4" halign="center" valign="center" textsize="0.5" text="Donate planets"/>
+        <label id="amount-label" class="text-light" pos="25 0" halign="center" valign="center" textsize="0.5" text="0 Planets" z-index="3"/>
+        <quad id="bar-quad" class="bg-accent" valign="center" z-index="2" size="0 4"/>
     </frame>
     {/block}
 

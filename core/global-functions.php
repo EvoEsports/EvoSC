@@ -256,7 +256,7 @@ function now(): Carbon
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$' . config('colors.secondary') . $str;
+    return '$z$s$' . config('theme.chat.highlight') . $str;
 }
 
 /**

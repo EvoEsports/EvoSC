@@ -7,54 +7,36 @@
     {block size}44 8{/block}
 
     {block content}
-    <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
-    <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
-
-    <label id="map-name" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Unknown Map" halign="right" textcolor="eeee" textsize="1.4"
-           textfont="{config('colors.ui.font')|noescape}"/>
-    <label id="author-name" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Unknown Author" halign="right" textcolor="dddd" valign="center"
-           textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
-
-    <label pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text="" textcolor="{config('colors.ui.widget.text.primary')}"
-           textfont="{config('colors.ui.font')|noescape}"/>
-
+    <quad id="bg" class="bg-dark" size="36 8" opacity="0.8" z-index="-1"/>
+    <quad id="header" class="bg-accent" pos="36 0" size="8 8" z-index="-1"/>
+    <label id="map-name" class="text-light" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Unknown Map" halign="right" textsize="1.4"/>
+    <label id="author-name" class="text-light" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Unknown Author" halign="right" valign="center" textsize="0.6"/>
+    <label class="text-light" pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text=""/>
     <frame id="controls" pos="5 -8.5" z-index="10">
-        <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.bg.color')|noescape}6" z-index="-1"/>
-        <quad pos="-5 0" size="36 8" bgcolor="{config('colors.ui.window.header.color')}6" z-index="-2"/>
+        <quad class="bg-dark" pos="-5 0" size="36 8" opacity="0.75" z-index="-1"/>
 
         <frame pos="1 -4">
-            <label class="map-control fav" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
-                   valign="center" ScriptEvents="1" focusareacolor1="0000"
-                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
-            <label id="fav-icon" pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
-            <label id="fav-label" textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Add"
-                   z-index="1" halign="center" valign="center"/>
+            <label class="map-control fav btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label id="fav-icon" class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label id="fav-label" class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Add" z-index="1" halign="center" valign="center"/>
         </frame>
 
         <frame pos="13 -4">
-            <label class="map-control details" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
-                   valign="center" ScriptEvents="1" focusareacolor1="0000"
-                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
-            <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Details"
-                   z-index="1" halign="center" valign="center"/>
+            <label class="map-control details btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Details" z-index="1" halign="center" valign="center"/>
         </frame>
 
         <frame pos="25 -4">
-            <label class="map-control list" textsize="1.5" size="12 8" text="" z-index="0" halign="center"
-                   valign="center" ScriptEvents="1" focusareacolor1="0000"
-                   focusareacolor2="{config('colors.ui.window.header.color')}9"/>
-            <label pos="0 1.5" textsize="1" size="10 10" text="" z-index="1" halign="center" valign="center"/>
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -2" textsize="1" scale="0.6" size="10 10" text="Maps" z-index="1"
-                   halign="center" valign="center"/>
+            <label class="map-control list btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Maps" z-index="1" halign="center" valign="center"/>
         </frame>
     </frame>
     {/block}
 
     {block script}
     {include 'scripts.drag'}
-    <script><!--
-    --></script>
     {/block}
 
     <script><!--

@@ -7,11 +7,11 @@
     {block size}8 10{/block}
 
     {block content}
-    <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" ScriptEvents="1" />
-
+    <quad id="bg" class="bg-dark" size="8 10" opacity="0.8" z-index="-1" ScriptEvents="1" />
     <frame z-index="2">
-        <quad pos="2 -2" size="4 4" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/paypal/paypal.png" imagefocus="" />
-        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="PayPal" textfont="{config('colors.ui.font')|noescape}" />
+        <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/paypal/paypal.png"/>
+
+        <label id="time" class="text-light" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Patreon"/>
     </frame>
     {/block}
 
@@ -34,13 +34,13 @@
 
     {block pendingEvents}
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseClick){
-                        OpenLink("{config('paypal.url')|noescape}", ::LinkType::ExternalBrowser);
+                        OpenLink("{config('paypal.url')}", ::LinkType::ExternalBrowser);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
                         AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="038" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
-                        AnimMgr.Add(bg, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(bg, """<quad opacity="0.8" bgcolor="{config('theme.hud.bg-dark')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
     {/block}
 --></script>

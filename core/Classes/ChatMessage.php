@@ -29,7 +29,7 @@ class ChatMessage
      */
     public function __construct(...$message)
     {
-        $this->color = config('colors.primary');
+        $this->color = config('theme.chat.info');
         $this->parts = $message;
     }
 
@@ -68,7 +68,7 @@ class ChatMessage
      */
     public function setIsInfoMessage(): ChatMessage
     {
-        $this->color = config('colors.info');
+        $this->color = config('theme.chat.info');
         $this->icon = '';
 
         return $this;
@@ -81,7 +81,7 @@ class ChatMessage
      */
     public function setIsWarning(): ChatMessage
     {
-        $this->color = config('colors.warning');
+        $this->color = config('theme.chat.warning');
         $this->icon = '';
 
         return $this;

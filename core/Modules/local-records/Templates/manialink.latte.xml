@@ -6,36 +6,18 @@
     {block size}44 {config('locals.rows') * 3 + 6.5}{/block}
 
     {block content}
-    <label id="header-color" textcolor="{config('colors.ui.window.header.color')|noescape}" />
-
     <framemodel id="record">
-        <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="{config('colors.ui.widget.text.primary')}4" textfont="{config('colors.ui.font')|noescape}"/>
-        <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <quad pos="-1 -0.2" size="45 3" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78."/>
+        <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" opacity="0.25"/>
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000"/>
+        <label class="text-light" z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name"/>
+        <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
     </framemodel>
 
-    <framemodel id="window-record">
-        <quad class="record" size="45 3" z-index="2" valign="center" ScriptEvents="1" />
-
-        <frame z-index="10" pos="0 0" hidden="1">
-            <label class="record-button profile" z-index="1" pos="21.5 0" size="43 3" text=" Profile" textsize="0.2" halign="center" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}9" focusareacolor2="{config('colors.ui.window.header.color')}c" />
-        </frame>
-
-        <frame z-index="0">
-            <label z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}"/>
-            <label z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee4" textfont="{config('colors.ui.font')|noescape}"/>
-            <label z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" textcolor="eee" textfont="{config('colors.ui.font')|noescape}"/>
-            <label z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name name name name name" textfont="{config('colors.ui.font')|noescape}"/>
-            <quad pos="-1 -0.2" size="44 3" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.3" z-index="-1" hidden="1" valign="center" />
-        </frame>
-    </framemodel>
-
-    <quad class="widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" ScriptEvents="1"/>
-    <quad z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.25}"/>
-    <quad size="45 5" bgcolor="{config('colors.ui.widget.header.color')}" opacity="0.8"/>
-    <label z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records" textcolor="{config('colors.ui.widget.header.text')}" textfont="{config('colors.ui.font')}"/>
+    <quad class="bg-dark widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" opacity="0.8" ScriptEvents="1"/>
+    <quad class="bg-darker" z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" opacity="0.4" />
+    <quad class="bg-accent" size="45 5" opacity="0.8"/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records"/>
 
     <frame id="records" pos="1 -7">
         {for $i=0; $i<config('locals.rows'); $i++}
@@ -199,8 +181,8 @@
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
 
-        primaryColor = TL::ToColor("{config('colors.ui.window.text.primary')|noescape}");
-        headerColor = TL::ToColor("{config('colors.ui.window.header.color')|noescape}");
+        primaryColor = TL::ToColor("{config('theme.hud.text-light')}");
+        headerColor = TL::ToColor("{config('theme.hud.accent')}");
 
         left__ = {config('locals.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('locals.ui.slot')};

@@ -29,14 +29,14 @@
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -7.75" hidden="1" z-index="9999">
-            <label class="btn spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn pm" data-icon="" data-access="" text="PM" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn mute" data-icon="" data-access="player_mute" text="Mute" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn kick" data-icon="" data-access="player_kick" text="Kick" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn warn" data-icon="" data-access="player_warn" text="Warn" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
-            <label class="btn force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default spec" data-icon="" data-access="" text="Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default profile" data-icon="" data-access="" text="Profile" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default pm" data-icon="" data-access="" text="PM" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default mute" data-icon="" data-access="player_mute" text="Mute" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default ban" data-icon="" data-access="player_ban" text="Ban" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default kick" data-icon="" data-access="player_kick" text="Kick" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default warn" data-icon="" data-access="player_warn" text="Warn" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
+            <label class="btn-default force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
         </frame>
 
         <quad class="bg-accent" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Flash BG -->
@@ -430,7 +430,7 @@
         while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin){
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
-                if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                if(Event.Control.HasClass("btn-default") && Event.Type == CMlScriptEvent::Type::MouseClick){
                     declare btnLabel <=> (Event.Control as CMlLabel);
                     declare targetLogin = btnLabel.Parent.Parent.DataAttributeGet("login");
 

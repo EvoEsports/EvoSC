@@ -7,10 +7,10 @@
     {block size}44 8{/block}
 
     {block content}
-    <label id="" textprefix="$s" scale="3.0" textsize="1" textcolor="fff" textfont="{config('colors.ui.font')|noescape}" halign="center" />
+    <label class="text-lighter" textprefix="$s" scale="3.0" halign="center" />
     <frame id="Frame_Global">
         <frame id="Frame_Intro" pos="43 0">
-            <label id="Label_Countdown" textprefix="$s" scale="3.0" textsize="1" textcolor="fff" textfont="{config('colors.ui.font')|noescape}" halign="right" />
+            <label id="Label_Countdown" class="text-light" textprefix="$s" scale="3.0" halign="right" />
         </frame>
     </frame>
     {/block}

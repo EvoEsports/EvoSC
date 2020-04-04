@@ -6,43 +6,48 @@
     {block size}44 10{/block}
 
     {block content}
-    <quad pos="0 0" z-index="-1" size="50 12" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}"  hidden="0"/>
-    <quad pos="0 0" z-index="0" size="50 6" bgcolor="{config('colors.ui.widget.header.color')|noescape}" hidden="1"/>
-    <label textfont="{config('colors.ui.font')|noescape}" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".3" valign="center"/>
+    <quad class="bg-dark" z-index="-1" size="50 12" opacity="0.8"/>
+    <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".3" valign="center"/>
 
     <frame z-index="2" pos="0 -6">
-    <label id="star-string" pos="43 3" z-index="1" size="25 4" text="$666" halign="right" valign="center" textcolor="{config('colors.ui.widget.text.primary')}" textsize="0.5" textfont="{config('colors.ui.font')|noescape}"/>
+        <label class="text-light" id="star-string" pos="43 3" z-index="1" size="25 4" halign="right" valign="center" textsize="0.5"/>
 
-    <frame id="buttons" scale="0.8" pos="-0.5 1">
-        <frame pos="6  -3.2" id="100" data-id="100">
-            <label              size="9 4" focusareacolor1="3c35" focusareacolor2="3c35" text="+++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="3c35" text="+++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
+        <frame id="buttons" scale="0.8" pos="-0.5 1">
+            <frame pos="6  -3.2" id="100" data-id="100">
+                <label class="text-success" size="9 4" textprefix="$s" text="+++" halign="center" valign="center" />
+                <quad class="bg-success" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-success" size="9 4" text="+++" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
+            <frame pos="15  -3.2" id="80" data-id="80">
+                <label class="text-success" size="9 4" textprefix="$s" text="++" halign="center" valign="center" />
+                <quad class="bg-success" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-success" size="9 4" text="++" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
+            <frame pos="24  -3.2" id="60" data-id="60">
+                <label class="text-success" size="9 4" textprefix="$s" text="+" halign="center" valign="center" />
+                <quad class="bg-success" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-success" size="9 4" text="+" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
+            <frame pos="33  -3.2" id="40" data-id="40">
+                <label class="text-danger" size="9 4" textprefix="$s" text="-" halign="center" valign="center" />
+                <quad class="bg-danger" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-danger" size="9 4" text="-" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
+            <frame pos="42  -3.2" id="20" data-id="20">
+                <label class="text-danger" size="9 4" textprefix="$s" text="--" halign="center" valign="center" />
+                <quad class="bg-danger" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-danger" size="9 4" text="--" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
+            <frame pos="51  -3.2" id="0" data-id="0">
+                <label class="text-danger" size="9 4" textprefix="$s" text="---" halign="center" valign="center" />
+                <quad class="bg-danger" size="9 4" halign="center" valign="center" opacity="0.5" />
+                <label class="vote btn-danger" size="9 4" text="---" focusareacolor1="0000" ScriptEvents="1" />
+            </frame>
         </frame>
-        <frame pos="15  -3.2" id="80" data-id="80">
-            <label              size="9 4" focusareacolor1="3c35" focusareacolor2="3c35" text="++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="3c35" text="++" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-        </frame>
-        <frame pos="24  -3.2" id="60" data-id="60">
-            <label              size="9 4" focusareacolor1="3c35" focusareacolor2="3c35" text="+" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="3c35" text="+" halign="center" valign="center" textcolor="9f9c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-        </frame>
-        <frame pos="33  -3.2" id="40" data-id="40">
-            <label              size="9 4" focusareacolor1="c335" focusareacolor2="c335" text="-" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="c335" text="-" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-        </frame>
-        <frame pos="42  -3.2" id="20" data-id="20">
-            <label              size="9 4" focusareacolor1="c335" focusareacolor2="c335" text="--" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="c335" text="--" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-        </frame>
-        <frame pos="51  -3.2" id="0" data-id="0">
-            <label              size="9 4" focusareacolor1="c335" focusareacolor2="c335" text="---" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-            <label class="vote" size="9 4" focusareacolor1="0000" focusareacolor2="c335" text="---" halign="center" valign="center" textcolor="c33c" textsize="1" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" />
-        </frame>
-    </frame>
 
-    <frame id="finish-notice" pos="0 2" scale="0.9">
-        <label pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote" halign="left" valign="center" textcolor="fff9" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
-    </frame>
+        <frame id="finish-notice" pos="0 2" scale="0.9">
+            <label class="text-light" pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote" halign="left" valign="center" textcolor="fff9"/>
+        </frame>
     </frame>
     {/block}
 
@@ -83,14 +88,17 @@ Void updateKarma(Real average){
 Void switchButton(CMlControl frameControl, Boolean enabled){
     declare frame = (frameControl as CMlFrame);
     declare label1 = (frame.Controls[0] as CMlLabel);
-    declare label2 = (frame.Controls[1] as CMlLabel);
+    declare label2 = (frame.Controls[1] as CMlQuad);
+    declare label3 = (frame.Controls[2] as CMlLabel);
 
     if(enabled){
         label1.Show();
-        label2.Hide();
+        label2.Show();
+        label3.Hide();
     }else{
         label1.Hide();
-        label2.Show();
+        label2.Hide();
+        label3.Show();
     }
 }
 

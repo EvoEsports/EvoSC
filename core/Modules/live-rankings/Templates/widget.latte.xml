@@ -7,15 +7,15 @@
     {block size}44 {config('live-rankings.show',14) * 3 + 6}{/block}
 
     {block content}
-    <quad id="header" pos="0 0" size="44 5" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
-    <quad id="bg" pos="0 -5" size="44 200" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
-    <label z-index="1" valign="center" pos="1.5 -2.5" size="44 5" textsize="0.3" text=" Live ranking" textfont="{config('colors.ui.font')|noescape}" />
+    <quad id="header" class="bg-accent" size="44 5" z-index="-1"/>
+    <quad id="bg" class="bg-dark" pos="0 -5" size="44 200" opacity="0.8" z-index="-1"/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" size="44 5" textsize="0.3" text=" Live ranking"/>
 
     <framemodel id="record">
-        <label z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="78." textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="fff4" textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" textcolor="eeef" textfont="{config('colors.ui.font')|noescape}" />
-        <label z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name name name name name" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="text-light" z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="0."/>
+        <label class="text-lighter" z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" opacity="0.25"/>
+        <label class="text-light" z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000"/>
+        <label class="text-light" z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name"/>
     </framemodel>
 
     <frame id="ranking" pos="1 -7">

@@ -3,6 +3,7 @@
   "chat": {
     "text": "fc2",
     "info": "29b",
+    "highlight": "eee",
     "success": "5b6",
     "warning": "e83",
     "danger": "b55"

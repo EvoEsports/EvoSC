@@ -7,12 +7,11 @@
     {block size}8 10{/block}
 
     {block content}
-    <quad id="bg" pos="0 0" size="8 10" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1" ScriptEvents="1" />
-
+    <quad id="bg" class="bg-dark" size="8 10" opacity="0.8" z-index="-1" ScriptEvents="1" />
     <frame z-index="2">
-        <label pos="4 -4" size="4 4" halign="center" valign="center" textsize="2" text="" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="text-light" pos="4 -4" size="4 4" halign="center" valign="center" textsize="2" text=""/>
 
-        <label id="time" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Website" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="time" class="text-light" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Website"/>
     </frame>
     {/block}
 
@@ -35,13 +34,13 @@
 
     {block pendingEvents}
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseClick){
-                        OpenLink("{config('website.url')|noescape}", ::LinkType::ExternalBrowser);
+                        OpenLink("{config('website.url')}", ::LinkType::ExternalBrowser);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
-                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="{config('colors.ui.widget.header.color')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="{config('theme.hud.accent')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
-                        AnimMgr.Add(bg, """<quad opacity="{(config('colors.ui.widget.bg.opacity') - 0.15)|noescape}" bgcolor="{config('colors.ui.widget.bg.color')|noescape}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(bg, """<quad opacity="0.8" bgcolor="{config('theme.hud.bg-dark')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
     {/block}
 --></script>

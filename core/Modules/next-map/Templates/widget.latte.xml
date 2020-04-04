@@ -7,13 +7,13 @@
 {block size}44 8{/block}
 
 {block content}
-<quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
-<quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+<quad id="bg" class="bg-dark" size="36 8" opacity="0.8" z-index="-1"/>
+<quad id="header" class="bg-accent" pos="36 0" size="8 8" z-index="-1"/>
 
-<label pos="40 -4" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="NEXT" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-light" pos="40 -4" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="NEXT"/>
 
-<label pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="{$map->name}" halign="right" textcolor="eeee" textsize="1.4" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="{$author->NickName}" halign="right" textcolor="dddd" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-lighter" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="{$map->name}" halign="right" textsize="1.4"/>
+<label class="text-light" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="{$author->NickName}" halign="right" valign="center" textsize="0.6"/>
 {/block}
 
 {block script}

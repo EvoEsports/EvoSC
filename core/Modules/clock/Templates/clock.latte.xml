@@ -7,12 +7,10 @@
     {block size}44 8{/block}
 
     {block content}
-    <quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
-    <quad id="header" pos="36 0" size="8 8" bgcolor="{config('colors.ui.widget.header.color')}e" z-index="-1"/>
+    <quad id="bg" class="bg-dark" size="36 8" opacity="0.8" z-index="-1"/>
+    <quad id="header" class="bg-accent" pos="36 0" size="8 8" z-index="-1"/>
 
-    <label id="time" pos="34 -4" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s"
-           textcolor="{config('colors.ui.widget.text.primary')|noescape}"
-           textfont="{config('colors.ui.font')|noescape}"/>
+    <label id="time" class="text-light" pos="34 -4" size="30 8" valign="center" halign="right" textsize="2" text="time" textprefix="$s"/>
 
     <frame pos="40 -4" scale="0.75">
         <quad id="circle" size="5 5" halign="center" valign="center"

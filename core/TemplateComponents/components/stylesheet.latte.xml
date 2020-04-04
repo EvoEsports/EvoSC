@@ -3,6 +3,9 @@
     <!-- Text -->
     <style class="text" textfont="{config('theme.font')}" textcolor="{config('theme.chat.text')}" textsize="1"/>
     <style class="text-accent" textfont="{config('theme.font')}" textcolor="{config('theme.hud.accent')}" textsize="1"/>
+    <style class="text-success" textfont="{config('theme.font')}" textcolor="{config('theme.form.success.bg')}" textsize="1"/>
+    <style class="text-warning" textfont="{config('theme.font')}" textcolor="{config('theme.form.warning.bg')}" textsize="1"/>
+    <style class="text-danger" textfont="{config('theme.font')}" textcolor="{config('theme.form.danger.bg')}" textsize="1"/>
     <style class="text-light" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
     <style class="text-lighter" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-lighter')}" textsize="1"/>
     <style class="text-dark" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-dark')}" textsize="1"/>
@@ -15,10 +18,15 @@
     <style class="bg-darker" bgcolor="{config('theme.hud.bg-darker')}"/>
     <style class="bg-light" bgcolor="{config('theme.hud.bg-light')}"/>
     <style class="bg-lighter" bgcolor="{config('theme.hud.bg-lighter')}"/>
+    <style class="bg-success" bgcolor="{config('theme.form.success.bg')}"/>
+    <style class="bg-warning" bgcolor="{config('theme.form.warning.bg')}"/>
+    <style class="bg-danger" bgcolor="{config('theme.form.danger.bg')}"/>
 
     <!-- Buttons -->
-    <style class="btn" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}5" focusareacolor2="{config('theme.form.default.bg')}c" textcolor="{config('theme.form.default.text')}" textsize="1"/>
-    <style class="btn-accent" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.accent')}5" focusareacolor2="{config('theme.hud.accent')}c" textcolor="{config('theme.form.primary.text')}" textsize="1"/>
+    <style class="btn-default" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}5" focusareacolor2="{config('theme.form.default.bg')}c" textcolor="{config('theme.form.default.text')}" textsize="1"/>
+    <style class="btn-light" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.text-light')}5" focusareacolor2="{config('theme.hud.text-light')}c" textcolor="{config('theme.hud.text-dark')}9" textsize="1"/>
+    <style class="btn-accent" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.accent')}5" focusareacolor2="{config('theme.hud.accent')}c" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
+    <style class="btn-muted" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}5" focusareacolor2="{config('theme.hud.accent')}c" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
     <style class="btn-success" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.success.bg')}5" focusareacolor2="{config('theme.form.success.bg')}c" textcolor="{config('theme.form.success.text')}" textsize="1"/>
     <style class="btn-warning" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.warning.bg')}5" focusareacolor2="{config('theme.form.warning.bg')}c" textcolor="{config('theme.form.warning.text')}" textsize="1"/>
     <style class="btn-danger" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.danger.bg')}5" focusareacolor2="{config('theme.form.danger.bg')}c" textcolor="{config('theme.form.danger.text')}" textsize="1"/>

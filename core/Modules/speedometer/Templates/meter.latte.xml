@@ -1,31 +1,33 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
+    {include 'components.stylesheet'}
     <frame id="speedometer" z-index="10000">
-        <label id="speed" pos="0 0" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
-        <label id="label" pos="0.5 -1.5" text="Km/H" halign="left" valign="center" textsize="1.8" textprefix="$s" textfont="{config('colors.ui.font')|noescape}"/>
-        <label class="action" pos="-12.5 2.5" size="22.5 6.5" focusareacolor1="0000" focusareacolor2="{config('colors.ui.widget.header.color')}c" ScriptEvents="1" />
-        <label z-index="5" id="wrench" pos="-9 0.5" text="" halign="right" valign="center" textsize="0.5" textprefix="$s" textfont="{config('colors.ui.font')|noescape}" hidden="1"/>
+        <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s"/>
+        <label id="label" class="text-light" pos="0.5 -1.5" text="Km/H" valign="center" textsize="1.8" textprefix="$s"/>
+        <label class="action btn-accent" pos="-12.5 2.5" size="22.5 6.5"  valign="top" halign="left" focusareacolor1="0000" ScriptEvents="1"/>
+        <label class="text-light" z-index="5" id="wrench" pos="-9 0.5" text="" valign="center" textsize="0.5" textprefix="$s" hidden="1"/>
     </frame>
 
     <frame id="settings" pos="-20 7" hidden="1">
-        <quad id="handle" data-id="speedo" z-index="5" size="35 5" />
-        <quad z-index="-1" size="41 5" bgcolor="{config('colors.ui.window.header.color')}c" />
-        <quad z-index="-1" size="41 18" pos="0 -5" bgcolor="{config('colors.ui.window.bg.color')}c" />
-        <label class="close" pos="37.5 -2.5" size="5 5" halign="center" valign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
-        <label pos="1 -2.5" size="30 5" halign="left" valign="center" textsize="0.3" text=" Speedometer Settings" textfont="{config('colors.ui.font')|noescape}" />
+        <quad id="handle" data-id="speedo" z-index="5" size="35 5"/>
+        <quad class="bg-accent" z-index="-1" size="41 5"/>
+        <quad class="bg-dark" z-index="-1" size="41 18" pos="0 -5"/>
+        <label class="close text-light" pos="37.5 -2.5" size="5 5" halign="center" valign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+        <label class="text-light" pos="1 -2.5" size="30 5" valign="center" textsize="0.3" text=" Speedometer Settings"/>
 
-        <label pos="2 -7.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Show label" textfont="{config('colors.ui.font')|noescape}" />
-        <label id="label-disabled" class="label-disabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}3" textfont="{config('colors.ui.font')|noescape}" textcolor="9999" />
-        <label id="label-enabled" class="label-enabled" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}3" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}f" />
+        <label pos="2 -7.5" size="30 5"  valign="center" textsize="0.3" text="Show label" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="label-disabled" class="label-disabled text-light" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1"/>
+        <label id="label-enabled" class="label-enabled text-accent" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1"/>
 
-        <label pos="2 -11.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Scale" textfont="{config('colors.ui.font')|noescape}" />
-        <entry id="entry-scale" class="entry" pos="14 -10.5" size="15 3" textsize="0.5" />
+        <label class="text-light" pos="2 -11.5" size="30 5" valign="center" textsize="0.3" text="Scale"/>
+        <entry id="entry-scale" class="entry form" pos="14 -10.5" size="15 3" textsize="0.5" />
 
-        <label pos="2 -15.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Position" textfont="{config('colors.ui.font')|noescape}" />
-        <label pos="14 -15.5" size="30 5" halign="left" valign="center" textsize="0.3" text="$iDrag the widget" textcolor="fffc" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="text-light" pos="2 -15.5" size="30 5"  valign="center" textsize="0.3" text="Position"/>
+        <label class="text-light" pos="14 -15.5" size="30 5"  valign="center" textsize="0.3" text="$iDrag the widget" opacity="0.75"/>
 
-        <label class="save" pos="20 -20" size="12 3" halign="center" valign="center" textsize="0.5" text="Save" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c" ScriptEvents="1" />
-        <label class="reset" pos="33 -20" size="12 3" halign="center" valign="center" textsize="0.5" text="Reset" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.btn.warning')}3" focusareacolor2="{config('colors.ui.window.btn.warning')}6" ScriptEvents="1" />
+        <label class="save btn-success" pos="20 -20" size="12 3" textsize="0.5" text="Save" ScriptEvents="1" />
+        <label class="reset btn-danger" pos="33 -20" size="12 3" textsize="0.5" text="Reset" ScriptEvents="1" />
     </frame>
 
     <script><!--
