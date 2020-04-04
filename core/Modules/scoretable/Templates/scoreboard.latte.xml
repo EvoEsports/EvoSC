@@ -1,31 +1,31 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+    {include 'components.stylesheet'}
     <stylesheet>
         <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}"/>
     </stylesheet>
-    {include 'components.stylesheet'}
 
     <framemodel id="box" size="86 12">
-        <label class="font" pos="25 -2.5" size="25 3" scale="1.3" z-index="10"/> <!-- Name -->
-        <label class="font" pos="64.25 -3.8" scale="0.9" size="3 3" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
+        <label class="text-light" pos="25 -2.5" size="25 3" scale="1.3" z-index="10"/> <!-- Name -->
+        <label class="text-light" pos="64.25 -3.8" scale="0.9" size="3 3" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
         <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
             <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2"/>
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
-        <label class="font" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
-        <label class="font" pos="25 -7" size="25 3"/> <!-- Score -->
+        <label class="text-light" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
+        <label class="text-light" pos="25 -7" size="25 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="font" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
-        <label class="font" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
-        <label class="font" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
-        <label class="font" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
-        <label class="font" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
+        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
+        <label class="text-light" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
+        <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
+        <label class="text-light" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
+        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="86 12" z-index="-15" opacity="0.5" ScriptEvents="1"/> <!-- Primary BG -->
-        <quad class="bg-window" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
+        <quad class="bg-dark" pos="1 0" size="86 12" z-index="-15" opacity="0.5" ScriptEvents="1"/> <!-- Primary BG -->
+        <quad class="bg-dark" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -7.75" hidden="1" z-index="9999">
@@ -39,7 +39,7 @@
             <label class="btn force_spec" data-icon="" data-access="player_force_spec" text="Force Spec" ScriptEvents="1" autonewline="1" size="9.2 5.5" textsize="0.05"/>
         </frame>
 
-        <quad class="bg-window-header" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Flash BG -->
+        <quad class="bg-accent" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Flash BG -->
     </framemodel>
 
     <!-- end components -->
@@ -49,9 +49,9 @@
         <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
         {/if}
-        <label id="server-name" class="font" pos="1 15" size="60 6" scale="2"/>
-        <label id="mode-name" class="font" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
-        <label id="player-info" class="font" pos="1.1 4.8" size="60 6" textprefix="$s "/>
+        <label id="server-name" class="text-light" pos="1 15" size="60 6" scale="2"/>
+        <label id="mode-name" class="text-light" pos="1 9" size="60 6" scale="1.2" textprefix="$sMode: "/>
+        <label id="player-info" class="text-light" pos="1.1 4.8" size="60 6" textprefix="$s "/>
         <frame id="boxes-frame">
             {for $i=0;$i<6;$i++}
             <frameinstance modelid="box" pos="-0.5 {$i * -13}"></frameinstance>
@@ -60,10 +60,10 @@
             <frameinstance modelid="box" pos="85.5 {$i * -13}"></frameinstance>
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad class="bg-window" pos="0.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
+            <quad class="bg-dark" pos="0.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad class="bg-window" pos="86.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
+            <quad class="bg-dark" pos="86.5 {$i * -13}" size="85 12" z-index="-10" opacity="0.15"/>
             {/for}
         </frame>
 

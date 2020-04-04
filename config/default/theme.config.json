@@ -1,0 +1,39 @@
+{
+  "font": "RajdhaniMono",
+  "chat": {
+    "text": "fc2",
+    "info": "29b",
+    "success": "5b6",
+    "warning": "e83",
+    "danger": "b55"
+  },
+  "hud": {
+    "accent": "41b562",
+    "text-light": "f0f0f0",
+    "text-lighter": "ffffff",
+    "text-dark": "303030",
+    "text-darker": "212121",
+    "bg-dark": "2e2e2e",
+    "bg-darker": "1f1f1f",
+    "bg-light": "dbdbdb",
+    "bg-lighter": "f0f0f0"
+  },
+  "form": {
+    "default": {
+      "text": "ffffff",
+      "bg": "666"
+    },
+    "success": {
+      "text": "ffffff",
+      "bg": "5b6"
+    },
+    "warning": {
+      "text": "ffffff",
+      "bg": "e83"
+    },
+    "danger": {
+      "text": "ffffff",
+      "bg": "b55"
+    }
+  }
+}

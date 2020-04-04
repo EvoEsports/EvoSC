@@ -1,14 +1,28 @@
 {contentType text}
 <stylesheet>
-    <style class="bg-widget-header" bgcolor="{config('colors.ui.widget.header.color')}"/>
-    <style class="bg-widget" bgcolor="{config('colors.ui.widget.bg.color')}"/>
-    <style class="bg-window-header" bgcolor="{config('colors.ui.window.header.color')}"/>
-    <style class="bg-window" bgcolor="{config('colors.ui.window.bg.color')}"/>
+    <!-- Text -->
+    <style class="text" textfont="{config('theme.font')}" textcolor="{config('theme.chat.text')}" textsize="1"/>
+    <style class="text-accent" textfont="{config('theme.font')}" textcolor="{config('theme.hud.accent')}" textsize="1"/>
+    <style class="text-light" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
+    <style class="text-lighter" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-lighter')}" textsize="1"/>
+    <style class="text-dark" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-dark')}" textsize="1"/>
+    <style class="text-darker" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-darker')}" textsize="1"/>
+
+    <!-- Backgrounds -->
     <style class="bg-blur" style="Bgs1" substyle="BgDialogBlur"/>
-    <style class="font" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="input" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.bg.color')}9" focusareacolor2="{config('colors.ui.window.bg.color')}" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.default')}5" focusareacolor2="{config('colors.ui.window.btn.default')}c" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-primary" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.primary')}5" focusareacolor2="{config('colors.ui.window.btn.primary')}c" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-warning" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.warning')}5" focusareacolor2="{config('colors.ui.window.btn.warning')}c" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
-    <style class="btn-danger" halign="center" valign="center" textfont="{config('colors.ui.font')}" focusareacolor1="{config('colors.ui.window.btn.danger')}5" focusareacolor2="{config('colors.ui.window.btn.danger')}c" textcolor="{config('colors.ui.window.text.primary')}" textsize="1"/>
+    <style class="bg-accent" bgcolor="{config('theme.hud.accent')}"/>
+    <style class="bg-dark" bgcolor="{config('theme.hud.bg-dark')}"/>
+    <style class="bg-darker" bgcolor="{config('theme.hud.bg-darker')}"/>
+    <style class="bg-light" bgcolor="{config('theme.hud.bg-light')}"/>
+    <style class="bg-lighter" bgcolor="{config('theme.hud.bg-lighter')}"/>
+
+    <!-- Buttons -->
+    <style class="btn" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}5" focusareacolor2="{config('theme.form.default.bg')}c" textcolor="{config('theme.form.default.text')}" textsize="1"/>
+    <style class="btn-accent" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.accent')}5" focusareacolor2="{config('theme.hud.accent')}c" textcolor="{config('theme.form.primary.text')}" textsize="1"/>
+    <style class="btn-success" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.success.bg')}5" focusareacolor2="{config('theme.form.success.bg')}c" textcolor="{config('theme.form.success.text')}" textsize="1"/>
+    <style class="btn-warning" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.warning.bg')}5" focusareacolor2="{config('theme.form.warning.bg')}c" textcolor="{config('theme.form.warning.text')}" textsize="1"/>
+    <style class="btn-danger" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.danger.bg')}5" focusareacolor2="{config('theme.form.danger.bg')}c" textcolor="{config('theme.form.danger.text')}" textsize="1"/>
+
+    <!-- Form-Elements -->
+    <style class="form" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}3" focusareacolor2="{config('theme.form.default.bg')}c" textcolor="{config('theme.form.default.text')}" textsize="1"/>
 </stylesheet>

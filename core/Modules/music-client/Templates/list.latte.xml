@@ -12,22 +12,22 @@
 
     {block content}
     <framemodel id="row">
-        <label valign="center" pos="0 0" size="39 3" textsize="0.7" text="Title" textfont="{config('colors.ui.font')|noescape}" />
-        <label valign="center" pos="40 0" size="39 3" textsize="0.7" text="Artist" textfont="{config('colors.ui.font')|noescape}" />
-        <label valign="center" pos="80 0" size="34 3" textsize="0.7" text="Album" textfont="{config('colors.ui.font')|noescape}" />
-        <label valign="center" pos="126 0" size="20 3" textsize="0.7" text="Length" halign="right" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="play" valign="center" pos="-2" size="130 4" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}0" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+        <label class="text-light" valign="center" pos="0 0" size="39 3" textsize="0.7" text="Title"  />
+        <label class="text-light" valign="center" pos="40 0" size="39 3" textsize="0.7" text="Artist"  />
+        <label class="text-light" valign="center" pos="80 0" size="34 3" textsize="0.7" text="Album"  />
+        <label class="text-light" valign="center" pos="126 0" size="20 3" textsize="0.7" text="Length" halign="right"  />
+        <label class="btn-accent play" pos="63" size="130 4" ScriptEvents="1" focusareacolor1="0000" />
     </framemodel>
 
-    <label valign="center" pos="0 -78" size="120 10" textsize="0.6" textprefix="$s" text=" Due to ManiaPlanets caching-system, changing music can sometimes be difficult. A song only starts playing when it was successfully loaded into cache and that only happens when you either reset your car or open the game menu.
+    <label class="text-light" valign="center" pos="0 -78" size="120 10" textsize="0.6" textprefix="$s" text=" Due to ManiaPlanets caching-system, changing music can sometimes be difficult. A song only starts playing when it was successfully loaded into cache and that only happens when you either reset your car or open the game menu.
 After switching songs a blue bar will appear in the top right corner or the screen (if the song is not in cache).
-After it dissapears you can reset and the song will start to play." autonewline="1" textcolor="eee" textfont="{config('colors.ui.font')|noescape}" />
+After it dissapears you can reset and the song will start to play." autonewline="1" />
 
     <frame pos="0 -1">
-        <label pos="0 0" size="39 4" textsize="0.9" text="Title" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="40 0" size="39 4" textsize="0.9" text="Arist" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="80 0" size="34 4" textsize="0.9" text="Album" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
-        <label pos="126 0" size="20 4" textsize="0.9" text="Length" halign="right" textfont="{config('colors.ui.font')|noescape}" textcolor="{config('colors.ui.window.header.color')}" />
+        <label class="text-accent" pos="0 0" size="39 4" textsize="0.9" text="Title"/>
+        <label class="text-accent" pos="40 0" size="39 4" textsize="0.9" text="Arist"/>
+        <label class="text-accent" pos="80 0" size="34 4" textsize="0.9" text="Album"/>
+        <label class="text-accent" pos="126 0" size="20 4" textsize="0.9" text="Length" halign="right"/>
 
         <!--suppress CheckTagEmptyBody -->
         <frame id="rows" pos="0 -5">
@@ -41,12 +41,9 @@ After it dissapears you can reset and the song will start to play." autonewline=
         </frame>
 
         <frame id="search-frame" pos="100 -66.5" scale="0.9">
-            <label textfont="{config('colors.ui.font')|noescape}" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
-            <entry textfont="{config('colors.ui.font')|noescape}" id="search-input" class="search-input" pos="26.5 0" size="25 3.5" textcolor="{config('colors.ui.window.text.primary')}"
-                   halign="right" valign="center" style="TextValueSmall" default="" textsize="1.2"/>
-            <label textfont="{config('colors.ui.font')|noescape}" id="clear-search" class="clear-search" pos="0 0" size="3.5 3.5" textcolor="{config('colors.ui.window.text.primary')}"
-                   halign="center" valign="center" textsize="0.25" text="" focusareacolor1="{config('colors.ui.window.btn.danger')}6"
-                   focusareacolor2="{config('colors.ui.window.btn.danger')}c" ScriptEvents="1" hidden="1"/>
+            <label pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
+            <entry id="search-input" class="form search-input" pos="26.5 0" size="25 3.5" halign="right" valign="center" textsize="1.2"/>
+            <label id="clear-search" class="btn-danger clear-search" size="3.5 3.5" textsize="0.25" text="" ScriptEvents="1" hidden="1"/>
         </frame>
     </frame>
     {/block}

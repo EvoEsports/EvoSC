@@ -17,18 +17,18 @@ UI-Settings
 {/block}
 
 {block content}
-<label pos="27 -1" size="27 3" textsize="0.6" text="Hide widgets while driving" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
-<label pos="29 -1" size="10 3" textsize="0.6" text="" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
+<label pos="27 -1" size="27 3" textsize="0.6" text="Hide widgets while driving" halign="right" valign="center"  hidden="1" />
+<label pos="29 -1" size="10 3" textsize="0.6" text="" halign="left" valign="center"  hidden="1" />
 
-<label pos="27 -5" size="27 3" textsize="0.6" text="Hide at" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<entry id="speed" pos="29 -5" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="35 -5" size="27 3" textsize="0.6" text="kph" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-light" pos="27 -5" size="27 3" textsize="0.6" text="Hide at" halign="right" valign="center"/>
+<entry class="form" id="speed" pos="29 -5" size="5 3" textsize="0.6" valign="center"/>
+<label class="text-light" pos="35 -5" size="27 3" textsize="0.6" text="kph" valign="center"/>
 
-<label pos="27 -9" size="27 3" textsize="0.6" text="UI scale" halign="right" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<entry id="scale" pos="29 -9" size="5 3" textsize="0.6" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="35 -9" size="27 3" textsize="0.6" text="%" halign="left" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-light" pos="27 -9" size="27 3" textsize="0.6" text="UI scale" halign="right" valign="center" />
+<entry class="form" id="scale" pos="29 -9" size="5 3" textsize="0.6" halign="left" valign="center" />
+<label class="text-light" pos="35 -9" size="27 3" textsize="0.6" text="%" valign="center" />
 
-<label class="save" pos="25 -15" size="12 4" textsize="0.6" halign="center" text=" Save" valign="center" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+<label class="btn-success save" pos="25 -15" size="12 4" textsize="0.6" text=" Save" ScriptEvents="1"/>
 {/block}
 
 <script><!--
