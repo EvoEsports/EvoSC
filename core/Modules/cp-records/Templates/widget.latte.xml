@@ -27,16 +27,15 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct Record{
-        Integer index;
-        Integer time;
+    #Struct EvoSC_CP_Tracker {
+        Integer cpId;
         Text name;
+        Integer time;
     }
 
     declare Real padding;
     declare Integer columns;
     declare CMlFrame records;
-    declare Record[Integer] cps;
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -85,60 +84,62 @@
         return position;
     }
 
-    Void updateWidget(Record record){
-        if(!records.Controls.existskey(record.index)) return;
+    Void updateWidget(EvoSC_CP_Tracker record, Boolean flash){
+        if(!records.Controls.existskey(record.cpId)) return;
 
-        declare frame = (records.Controls[record.index] as CMlFrame);
+        declare frame = (records.Controls[record.cpId] as CMlFrame);
         declare indexLabel = (frame.Controls[1] as CMlLabel);
         declare timeLabel = (frame.Controls[2] as CMlLabel);
         declare timeLabel2 = (frame.Controls[3] as CMlLabel);
         declare nameLabel = (frame.Controls[4] as CMlLabel);
-        declare flashQuad = (frame.Controls[8] as CMlQuad);
 
-        indexLabel.SetText(TL::ToText(record.index + 1));
+        indexLabel.SetText(TL::ToText(record.cpId + 1));
         timeLabel.SetText(formatScoreCorrect(record.time, False));
         timeLabel2.SetText(formatScoreCorrect(record.time, True));
         nameLabel.SetText(record.name);
 
-        flashQuad.Opacity = 1.0;
-        AnimMgr.Add(flashQuad, """ <quad opacity="0" /> """, 1200, CAnimManager::EAnimManagerEasing::QuartOut);
+        if(flash){
+            declare flashQuad = (frame.Controls[8] as CMlQuad);
+            flashQuad.Opacity = 1.0;
+            AnimMgr.Add(flashQuad, """ <quad opacity="0" /> """, 1200, CAnimManager::EAnimManagerEasing::QuartOut);
+        }
 
-        frame.RelativePosition_V3 = getRecordPosition(record.index);
+        frame.RelativePosition_V3 = getRecordPosition(record.cpId);
         frame.Show();
     }
 
-    Record newRecord(Integer id, Integer time, Text name){
-        declare Record record;
-        record.index = id;
-        record.time = time;
-        record.name = name;
-        return record;
+    Void updateWidgets(EvoSC_CP_Tracker[] records, Integer newCpId){
+        foreach(record in records){
+            updateWidget(record, record.cpId == newCpId);
+        }
     }
 
     Void reset(){
-        cps = Record[Integer];
         foreach(control in records.Controls){
             control.Hide();
         }
     }
 
     main() {
+        declare EvoSC_CP_Tracker[] EvoSC_CP_Records for This;
+        declare Integer EvoSC_CP_New for This;
+        declare Integer EvoSC_CP_Update for This;
+        declare lastUpdate = 0;
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare currentMapId = "";
-        declare Record tempRecord;
 
         columns = {config('cp-records.columns')};
         padding = 0.5;
         records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
         currentMapId = Map.MapInfo.MapUid;
 
-        {foreach $cps as $record}
-        tempRecord.fromjson("""{json_encode($record)|noescape}""");
-        updateWidget(tempRecord);
-        {/foreach}
-
         while(True){
             yield;
+
+            if(lastUpdate != EvoSC_CP_Update){
+                lastUpdate = EvoSC_CP_Update;
+                updateWidgets(EvoSC_CP_Records, EvoSC_CP_New);
+            }
 
             if(Map.MapInfo.MapUid != currentMapId){
                 currentMapId = Map.MapInfo.MapUid;
@@ -148,29 +149,6 @@
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 reset();
                 sleep(2000);
-            }
-
-            foreach(event in RaceEvents){
-                if(event.Type == CTmRaceClientEvent::EType::WayPoint){
-                    if(event.IsEndLap){
-                        continue;
-                    }
-
-                    declare index = event.CheckpointInLap;
-                    declare time = event.LapTime;
-
-                    if(cps.existskey(index)){
-                        if(time < cps[index].time){
-                            declare name = event.Player.User.Name;
-                            cps[index] = newRecord(index, time, name);
-                            updateWidget(cps[index]);
-                        }
-                    }else{
-                        declare name = event.Player.User.Name;
-                        cps[index] = newRecord(index, time, name);
-                        updateWidget(cps[index]);
-                    }
-                }
             }
         }
     }

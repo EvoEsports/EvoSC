@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-cp-records" id="update-cp-records" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_CP_Tracker {
+            Integer cpId;
+            Text name;
+            Integer time;
+        }
+
+        main(){
+            declare EvoSC_CP_Tracker[] EvoSC_CP_Records for This;
+            declare Integer EvoSC_CP_New for This;
+            declare Integer EvoSC_CP_Update for This;
+
+            EvoSC_CP_New = {$updatedCpId};
+            EvoSC_CP_Records.fromjson("""{$data|noescape}""");
+            EvoSC_CP_Update = GameTime;
+        }
+        -->
+    </script>
+</manialink>
