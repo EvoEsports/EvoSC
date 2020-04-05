@@ -17,13 +17,13 @@ Personal Message
 {/block}
 
 {block content}
-<label class="font" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" />
-<entry class="input" id="login" pos="11 -1" size="46 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" />
-<label class="font" pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center"/>
-<entry class="input" id="text" pos="11 -4" size="46 18" textsize="0.9" halign="left"/>
+<label class="text-light" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" />
+<entry class="form" id="login" pos="11 -1" size="46 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" />
+<label class="text-light" pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center"/>
+<entry class="form" id="text" pos="11 -4" size="46 18" textsize="0.9" halign="left"/>
 
-<label class="btn-primary send" pos="18 -25" size="14 4" textsize="0.6" text=" Send" ScriptEvents="1"/>
-<label class="btn cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
+<label class="btn-accent send" pos="18 -25" size="14 4" textsize="0.6" text=" Send" ScriptEvents="1"/>
+<label class="btn-default cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
 {/block}
 
 {include 'scripts.mle'}

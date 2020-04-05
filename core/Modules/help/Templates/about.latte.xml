@@ -27,7 +27,7 @@ About EvoSC
 <label pos="55 -21" textsize="0.5" text="$o$n{getEscVersion()} BETA" autonewline="1" valign="center" halign="center" />
 
 <label pos="55 -22" textsize="0.5" size="70 200" text="
-EvoSC is a server-controller designed for ManiaPlanet and build with PHP7.3. It is developed by Evo and the source is available at $l[https://github.com/EvoTM/EvoSC]GitHub$z. Primarily developed by Braker with great help from the community and especially phenom and reaby. If you encounter bugs you can report them on the issue page on $l[https://github.com/EvoTM/EvoSC]GitHub$z or in our $l[https://discord.gg/knSj6qy]Discord$z and write to the evosc channel.
+EvoSC is a server-controller designed for ManiaPlanet and build with PHP7.4. It is developed by Evo and the source is available at $l[https://github.com/EvoTM/EvoSC]GitHub$z. Primarily developed by Braker with great help from the community and especially phenom and reaby. If you encounter bugs you can report them on the issue page on $l[https://github.com/EvoTM/EvoSC]GitHub$z or in our $l[https://discord.gg/knSj6qy]Discord$z and write to the evosc channel.
 " autonewline="1" halign="center" />
 
 <quad pos="47 -45.25" size="3 3" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/help/GitHub-Mark-Light-32px.png" />

@@ -172,7 +172,6 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
-        ScoreController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {

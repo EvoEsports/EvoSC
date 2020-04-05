@@ -1,11 +1,13 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ban-ui" id="ban-ui" version="3">
+    {include 'components.stylesheet'}
     <frame id="window" pos="0 0" size="50 {isset($results) ? 44 + count($results)*4 : 24}" scale="1.0">
-        <quad size="50 {isset($results) ? 37.5 + count($results)*4 : 20}" pos="0 0" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
-        <quad size="50 9" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
+        <quad class="bg-dark" size="50 {isset($results) ? 37.5 + count($results)*4 : 20}" opacity="0.8" z-index="-1" />
+        <quad class="bg-accent" size="50 9"/>
         <quad id="handle" data-id="ban-ui" size="45 9" z-index="5" />
-        <label pos="2 -2.5" valign="center" textsize="1" text=" Bans" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="close" pos="47.5 -2.5" size="5 5" text="❌" textsize="1" z-index="2" halign="center" valign="center" textcolor="{config('theme.hud.text-light')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="text-light" pos="2 -2.5" valign="center" text=" Bans" z-index="1"/>
+        <label class="close text-light" pos="47.5 -2.5" size="5 5" text="" z-index="2" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
         <frame id="navbar" pos="0 -4.5" z-index="5" scale="0.95">
             <label textfont="{config('colors.ui.font')|noescape}" class="nav-btn" pos="10 -3" textsize="0.3" textcolor="{config('theme.hud.text-light')}"
@@ -68,7 +70,7 @@
         {/if}
 
         {if isset($search)}
-        nameEntry.Value = {$search};
+        nameEntry.Value = "{$search}";
         {else}
         nameEntry.StartEdition();
         {/if}

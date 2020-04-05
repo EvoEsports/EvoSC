@@ -7,7 +7,7 @@
         <quad id="bg" pos="0 -5" size="90 100" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity')}" z-index="-1"/>
         <label pos="5 -2.5" textsize="0.8" text="Edit {$name} (no saving)" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
         <label pos="2 -2.5" textsize="0.8" text="" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" action="msm.overview"/>
-        <label class="close" pos="87.5 -2.5" size="5 5" textsize="0.2" text="❌" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+        <label class="close" pos="87.5 -2.5" size="5 5" textsize="0.75" text="" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
         <entry id="filename" pos="2 -9" size="60 4" textsize="0.5" valign="center" textfont="{config('colors.ui.font')|noescape}" />
         <label class="save" pos="75 -9" size="25 4" text=" Save" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />

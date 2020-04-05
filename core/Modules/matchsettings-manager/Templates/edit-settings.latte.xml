@@ -15,31 +15,30 @@
     {/block}
 
     {block content}
-    <label pos="0 -9" size="8 4" textsize="0.5" text="Name:" valign="center" textfont="{config('colors.ui.font')|noescape}" />
-    <entry id="filename" pos="8 -9" size="108 4" textsize="0.5" valign="center" textfont="{config('colors.ui.font')|noescape}" />
+    <label class="text-light" pos="0 -9" size="8 4" textsize="0.5" text="Name:" valign="center"/>
+    <entry id="filename" class="form" pos="8 -9" size="108 4" textsize="0.5" valign="center"/>
 
-    <label class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+    <label class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="0006" />
 
     <frame pos="0 -15" id="rows">
     {php $row=0}
     {foreach $nodes as $key => $node}
     <frame id="r{$row}" pos="0 {$row * -4.5}" data-row="{$row}" data-nodes="{count($node)}">
         {if !is_string($node)}
-        <label class="collapsable" pos="58 0" size="117 4" textprefix="{$key}  " text="" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}"
-               ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+        <label class="collapsable btn-default" pos="58 0" size="117 4" textprefix="{$key}  " text="" textsize="0.5" ScriptEvents="1"/>
 
         <frame pos="-0.5 -1.5" size="117 {count($node)*5}" z-index="100">
             <quad pos="0 -0.5" size="120 {count($node)*5}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
             {php $i=0}
             {foreach $node as $subKey => $subNode}
-            <label pos="2 {$i * -5 - 3}" size="80 4" text="{$subKey}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
-            <entry class="entry" pos="116 {$i++ * -5 - 2.5}" size="50 4" default="{$subNode}" data-key="{$subKey}" data-prev="{$subNode}" data-parent="{$key}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+            <label class="text-light" pos="2 {$i * -5 - 3}" size="80 4" text="{$subKey}" halign="left" valign="center" textsize="0.75"/>
+            <entry class="entry form" pos="116 {$i++ * -5 - 2.5}" size="50 4" default="{$subNode}" data-key="{$subKey}" data-prev="{$subNode}" data-parent="{$key}" halign="right" valign="center" textsize="0.75"/>
             {/foreach}
         </frame>
         {else}
-        <quad pos="-0.5 2" size="117 4" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
-        <label pos="1 0" size="55 4" text="{$key}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
-        <entry class="entry" pos="116 0" size="50 4" default="{$node}" data-key="{$key}" data-prev="{$node}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+        <quad class="bg-dark" pos="-0.5 2" size="117 4" opacity="0.5" z-index="-1" />
+        <label class="text-light" pos="1 0" size="55 4" text="{$key}" halign="left" valign="center" textsize="0.75"/>
+        <entry class="entry form" pos="116 0" size="50 4" default="{$node}" data-key="{$key}" data-prev="{$node}" halign="right" valign="center" textsize="0.75"/>
         {/if}
     </frame>
     {php $row++}

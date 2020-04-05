@@ -1,24 +1,25 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:GroupsManagerEditor" id="GroupsManager" version="3">
-
+<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+    {include 'components.stylesheet'}
     <frame id="overview" pos="-40 10">
-        <quad size="80 20" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
-        <quad size="80 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.95" z-index="0" />
-        <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Edit: {$group->Name}" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="close" pos="77 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('theme.hud.text-light')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+        <quad class="bg-dark" size="80 20" pos="0 -6" opacity="0.8" z-index="-1" />
+        <quad class="bg-accent" size="80 6" z-index="0" />
+        <label class="text-light" pos="2 -3" valign="center" text="Groups Manager - Edit: {$group->Name}" z-index="1"/>
+        <label class="close text-light" pos="77 -3" size="6 6" text="" textsize="1.2" z-index="2" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
         <frame pos="-4 -11">
-            <label pos="18 0" size="20 5" halign="right" text="Prefix" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
-            <entry id="prefix" class="prefix" pos="20 0" size="8 5" valign="center" default="{$group->chat_prefix}" textsize="1" />
+            <label class="text-light" pos="18 0" size="20 5" halign="right" text="Prefix" valign="center"/>
+            <entry class="form prefix" id="prefix" pos="20 0" size="8 5" valign="center" default="{$group->chat_prefix}"/>
 
-            <label pos="18 -5" size="20 5" halign="right" text="Color" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
-            <entry id="color" class="color" pos="20 -5" size="8 5" valign="center" default="{$group->color}" textsize="1" />
+            <label class="text-light" pos="18 -5" size="20 5" halign="right" text="Color" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
+            <entry class="form color" id="color" pos="20 -5" size="8 5" valign="center" default="{$group->color}" textsize="1" />
 
-            <label pos="18 -10" size="20 5" halign="right" text="Preview" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
-            <label id="preview" pos="20 -10" size="40 5" text="Preview" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
+            <label class="text-light" pos="18 -10" size="20 5" halign="right" text="Preview" valign="center"/>
+            <label class="text-light" id="preview" pos="20 -10" size="40 5" text="Preview" valign="center"/>
 
-            <label pos="81 0" size="20 5" halign="right" text="$h[symbols]Symbols" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
-            <label class="save" pos="75 -10" halign="center" size="12 5" text="Save" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}9" focusareacolor2="{config('colors.ui.window.header.color')}c" />
+            <label class="text-light" pos="81 0" size="20 5" halign="right" text="$h[symbols]Symbols" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />
+            <label class="form save" pos="75 -10" halign="center" size="12 5" text="Save" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}9" focusareacolor2="{config('colors.ui.window.header.color')}c" />
         </frame>
     </frame>
 

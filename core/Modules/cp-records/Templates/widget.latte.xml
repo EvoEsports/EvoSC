@@ -1,15 +1,17 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:best-cps" id="best-cps" version="3">
+    {include 'components.stylesheet'}
     <framemodel id="record">
-        <quad pos="0 -0.25" size="42 4" valign="center" bgcolor="{config('colors.ui.widget.bg.color')}9" z-index="-2"/>
-        <label pos="3" size="5" valign="center" halign="center" textsize="0.8" text="" textfont="{config('colors.ui.font')|noescape}" z-index="5" />
-        <label pos="18" valign="center" halign="right" textsize="0.75" text="" opacity="0.5" textcolor="{config('colors.ui.widget.header.color')}" textfont="{config('colors.ui.font')|noescape}" z-index="4" />
-        <label pos="18" valign="center" halign="right" textsize="0.75" text="" textfont="{config('colors.ui.font')|noescape}" z-index="5" />
-        <label pos="30.5" size="21" valign="center" halign="center" textsize="0.8" text="" textfont="{config('colors.ui.font')|noescape}" z-index="5" />
-        <quad pos="0 -0.25" size="19 4" valign="center" bgcolor="{config('colors.ui.widget.bg.color')}4" z-index="-1"/>
-        <quad pos="0 -0.25" size="6 4" valign="center" bgcolor="{config('colors.ui.widget.bg.color')}4" z-index="-1"/>
-        <quad pos="6 -0.25" size="0.3 4" valign="center" bgcolor="{config('colors.ui.widget.header.color')}f" z-index="1"/>
-        <quad pos="0 -0.25" size="42 4" valign="center" bgcolor="{config('colors.ui.widget.header.color')}f" opacity="0" z-index="2"/>
+        <quad class="bg-dark" opacity="0.5" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
+        <label class="text-light" pos="3" size="5" valign="center" halign="center" textsize="0.8" z-index="5" />
+        <label class="text-light" pos="18" valign="center" halign="right" textsize="0.75" opacity="0.5" z-index="4" />
+        <label class="text-light" pos="18" valign="center" halign="right" textsize="0.75" z-index="5" />
+        <label class="text-light" pos="30.5" size="21" valign="center" halign="center" textsize="0.8" z-index="5" />
+        <quad class="bg-dark" opacity="0.25" pos="0 -0.25" size="19 4" valign="center" z-index="-1"/>
+        <quad class="bg-dark" opacity="0.25" pos="0 -0.25" size="6 4" valign="center" z-index="-1"/>
+        <quad class="bg-accent" pos="6 -0.25" size="0.3 4" valign="center" z-index="1"/>
+        <quad class="bg-accent" pos="0 -0.25" size="42 4" valign="center" opacity="0" z-index="2"/>
     </framemodel>
 
     <frame id="widget" pos="{config('cp-records.pos')}" scale="{config('cp-records.scale')}">

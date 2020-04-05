@@ -26,19 +26,17 @@ Help
 <frame id="commands">
     {for $i=0; $i<20; $i++}
     <frame pos="0 {$i * -3.5 - 8}">
-        <label size="20 3" textsize="0.5" text="cmd" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="left"/>
-        <label pos="20 0" size="97 3" textsize="0.5" text="description" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="left"/>
+        <label class="text-light" size="20 3" textsize="0.5" text="cmd" textprefix="$s" valign="center"/>
+        <label class="text-light" pos="20 0" size="97 3" textsize="0.5" text="description" textprefix="$s" valign="center"/>
     </frame>
     {/for}
 </frame>
 
-<frame id="pagination" pos="1 -79 " scale="0.8">
-    <label id="page-info" class="enable-page-input" pos="6 0" size="8 3.5" valign="center" halign="center" text="1/1" textsize="0.8"/>
-    <label class="previous-page" pos="0 0" size="3.5 3.5" valign="center" halign="center" text="⏴" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
-    <label class="next-page" pos="12 0" size="3.5 3.5" valign="center" halign="center" text="⏵" textsize="1" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"/>
+<frame pos="1 -79">
+{include 'components.pagination'}
 </frame>
 
-<label id="restricted" pos="115 -78.75" textsize="0.2" text="${config('colors.ui.window.header.color')|noescape}$z = Restricted access" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="right" hidden="1"/>
+<label id="restricted" class="text-light" pos="115 -78.75" textsize="0.2" text=" = Restricted access" textprefix="$s" valign="center" halign="right" hidden="1"/>
 {/block}
 
 {block scriptDeclarations}

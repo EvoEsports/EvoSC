@@ -7,15 +7,15 @@
 
 {block content}
     {if !isset($warmUpEnded)}
-<quad id="bg" pos="0 0" size="36 8" bgcolor="{config('colors.ui.widget.bg.color')}" opacity="{config('colors.ui.widget.bg.opacity') - 0.15}" z-index="-1"/>
+<quad class="bg-dark" id="bg" pos="0 0" size="36 8" opacity="0.8" z-index="-1"/>
 <quad id="header" pos="36 0" size="8 8" bgcolor="f90e" z-index="-1"/>
 
-<label pos="40 -3" valign="center" halign="center" textsize="0.4" size="6 6" scale="1.6" text="" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="40 -6" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="WARMUP" textcolor="{config('colors.ui.widget.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-light" pos="40 -3" valign="center" halign="center" textsize="0.4" size="6 6" scale="1.6" text=""/>
+<label class="text-light" pos="40 -6" valign="center" halign="center" textsize="0.4" size="6 6" scale="0.8" text="WARMUP"/>
 
-<label pos="34 -3" valign="center" halign="right" textsize="0.4" size="6 6" scale="1.6" text="1 / 2" textcolor="f90" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="34 -6" valign="center" halign="right" textsize="0.4" size="6 6" scale="0.8" text="ROUNDS" textcolor="f90" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="10 -4" valign="center" halign="center" textsize="0.4" size="20 4" scale="0.8" text=" Skip WarmUp" textcolor="fff" focusareacolor1="f903" focusareacolor2="f90c" textfont="{config('colors.ui.font')|noescape}" action="warmup.skip"/>
+<label class="text-light" pos="34 -3" valign="center" halign="right" textsize="0.4" size="6 6" scale="1.6" text="1 / 2" textcolor="f90"/>
+<label class="text-light" pos="34 -6" valign="center" halign="right" textsize="0.4" size="6 6" scale="0.8" text="ROUNDS" textcolor="f90"/>
+<label class="btn-default" pos="10 -4" textsize="0.4" size="20 4" scale="0.8" text=" Skip WarmUp" focusareacolor1="f903" focusareacolor2="f90c" action="warmup.skip"/>
     {/if}
 {/block}
 

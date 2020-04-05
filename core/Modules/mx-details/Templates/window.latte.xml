@@ -1,80 +1,84 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MXDetails" id="MXDetails" version="3"
-           xmlns:n="file://C:/Users/arasz/Projects/esc/manialink_v3.xsd">
+<manialink name="ESC:MXDetails" id="MXDetails" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
+    {include 'components.stylesheet'}
     <frame id="overview" pos="-60 19" z-index="450">
-        <quad id="handle" data-id="mxdetails" size="104 6" z-index="5" />
-        <quad size="110 38" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-1" ScriptEvents="1" />
-        <quad size="110 38" pos="0 -6" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
-        <quad size="110 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.95" z-index="0" />
-        <label textfont="{config('colors.ui.font')|noescape}" pos="2 -3" valign="center" textsize="1" text="Map Details" z-index="1" />
-        <label textfont="{config('colors.ui.font')|noescape}" class="close" pos="107 -3" size="3 3" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.header.text')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <quad id="handle" data-id="mxdetails" size="104 6" z-index="5"/>
+        <quad class="bg-dark" size="110 38" pos="0 -6" opacity="0.8" z-index="-1" ScriptEvents="1"/>
+        <quad class="bg-blur" size="110 38" pos="0 -6" z-index="-1"/>
+        <quad class="bg-accent" size="110 6"/>
+        <label class="text-light" pos="2 -3" valign="center" textsize="1" text="Map Details" z-index="1" />
+        <label class="text-light close" pos="107 -3" size="3 3" text="" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.header.text')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
 
         <frame pos="16 -10" scale="0.95">
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-ID" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 0" size="20 5" textsize="1" text="$l[https://tm.mania-exchange.com/tracks/{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
-            <label n:if="!$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 0" size="20 5" textsize="1" textcolor="{config('colors.warning')}" text="Map not on MX" valign="center" />
+            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-ID" halign="right" valign="center" />
+            {if $map->mx_id}
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="$l[https://tm.mania-exchange.com/tracks/{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
+            {else}
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" textcolor="{config('colors.warning')}" text="Map not on MX" valign="center" />
+            {/if}
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Name" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 -5" size="20 5" textsize="1" text="{$map->name}" valign="center" />
+            <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Name" halign="right" valign="center" />
+            <label class="text-light" pos="+1 -5" size="20 5" textsize="1" text="{$map->name}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Name" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 -10" size="20 5" textsize="1" text="{$map->author->NickName}" valign="center" />
+            <label class="text-light" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Name" halign="right" valign="center" />
+            <label class="text-light" pos="+1 -10" size="20 5" textsize="1" text="{$map->author->NickName}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Login" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 -15" size="20 5" textsize="1" text="{$map->author->Login}" valign="center" />
+            <label class="text-light" pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Login" halign="right" valign="center" />
+            <label class="text-light" pos="+1 -15" size="20 5" textsize="1" text="{$map->author->Login}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Uploaded" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -20" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" />
+            <label class="text-light" pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Uploaded" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -20" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Updated" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -25" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UpdatedAt)}" valign="center" />
+            <label class="text-light" pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Updated" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -25" size="20 5" textsize="1" text="{preg_replace('/T.+/', '', $map->mx_details->UpdatedAt)}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Released" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Unreleased ? '' : ''}" valign="center" />
+            <label class="text-light" pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Released" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Unreleased ? '' : ''}" valign="center" />
         </frame>
 
         <frame pos="54 -10" scale="0.95">
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="TitlePack" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 0" size="20 5" textsize="1" text="{$map->title_id}" valign="center" />
+            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="TitlePack" halign="right" valign="center" />
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="{$map->title_id}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Style" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_details->StyleName}" valign="center" />
+            <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Style" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_details->StyleName}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Difficulty" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -10" size="20 5" textsize="1" text="{$map->mx_details->DifficultyName}" valign="center" />
+            <label class="text-light" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="Difficulty" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -10" size="20 5" textsize="1" text="{$map->mx_details->DifficultyName}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Length" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -15" size="20 5" textsize="1" text="~{$map->mx_details->LengthName}" valign="center" />
+            <label class="text-light" pos="-1 -15" size="20 5" textprefix="$o$n" textsize="0.6" text="Length" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -15" size="20 5" textsize="1" text="~{$map->mx_details->LengthName}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Mood" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -20" size="20 5" textsize="1" text="{$map->mx_details->Mood}" valign="center" />
+            <label class="text-light" pos="-1 -20" size="20 5" textprefix="$o$n" textsize="0.6" text="Mood" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -20" size="20 5" textsize="1" text="{$map->mx_details->Mood}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Checkpoints" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 -25" size="20 5" textsize="1" text="{$map->gbx->CheckpointsPerLaps}" valign="center" />
+            <label class="text-light" pos="-1 -25" size="20 5" textprefix="$o$n" textsize="0.6" text="Checkpoints" halign="right" valign="center" />
+            <label class="text-light" pos="+1 -25" size="20 5" textsize="1" text="{$map->gbx->CheckpointsPerLaps}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Multi-Lap" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Laps > 1 ? '' : ''}" valign="center" />
+            <label class="text-light" pos="-1 -30" size="20 5" textprefix="$o$n" textsize="0.6" text="Multi-Lap" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -30" size="20 5" textsize="1" text="{$map->mx_details->Laps > 1 ? '' : ''}" valign="center" />
         </frame>
 
         <frame pos="95 -10" scale="0.95">
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Time" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 0" size="20 5" textsize="1" text="{formatScore($map->gbx->AuthorTime)}" valign="center" />
+            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Time" halign="right" valign="center" />
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="{formatScore($map->gbx->AuthorTime)}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-World-Record" halign="right" valign="center" />
-            <label n:if="$map->mx_id" textfont="{config('colors.ui.font')|noescape}" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_world_record ? formatScore($map->mx_world_record->ReplayTime) : '0'}" valign="center" />
+            <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-World-Record" halign="right" valign="center" />
+            <label class="text-light" n:if="$map->mx_id" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_world_record ? formatScore($map->mx_world_record->ReplayTime) : '0'}" valign="center" />
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="1. Dedi" halign="right" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="+1 -10" size="20 5" textsize="1" text="{$map->dedis->first() ? formatScore($map->dedis->first()->Score) : '-'}" valign="center" />
+            <label class="text-light" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="1. Dedi" halign="right" valign="center" />
+            <label class="text-light" pos="+1 -10" size="20 5" textsize="1" text="{$map->dedis->first() ? formatScore($map->dedis->first()->Score) : '-'}" valign="center" />
 
 
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="MX-Karma" halign="center" valign="center" scale="0.75" />
+            <label class="text-light" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="MX-Karma" halign="center" valign="center" scale="0.75" />
             {if $map->mx_id && $map->mx_details->RatingVoteCount > 0}
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="{sprintf('%.1f', $map->mx_details->RatingVoteAverage)}% - {$map->mx_details->RatingVoteCount} Votes" halign="center" valign="center" />
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -25" size="30 5" textsize="3" text="{$rating}" valign="center" halign="center" textcolor="{config('colors.ui.window.header.color')}" z-index="1" />
+            <label class="text-light" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="{sprintf('%.1f', $map->mx_details->RatingVoteAverage)}% - {$map->mx_details->RatingVoteCount} Votes" halign="center" valign="center" />
+            <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="{$rating}" valign="center" halign="center" textcolor="{config('colors.ui.window.header.color')}" z-index="1" />
             {else}
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="This map was not rated yet" halign="center" valign="center" textcolor="fff3" />
+            <label class="text-light" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="This map was not rated yet" halign="center" valign="center" textcolor="fff3" />
             {/if}
-            <label textfont="{config('colors.ui.font')|noescape}" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+            <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
         </frame>
     </frame>
 

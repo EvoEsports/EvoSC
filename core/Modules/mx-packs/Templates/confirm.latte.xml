@@ -14,15 +14,14 @@ Add {$info->Name} map-pack
 {/block}
 
 {block content}
-<label pos="0 0" size="58 20" text="{$info->Name}" textsize="3" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="0 -6" size="58 20" text="{$info->Description}" textsize="0.5" autonewline="1" textcolor="{config('theme.hud.text-light')}" textfont=""/>
+<label class="text-light" pos="0 0" size="58 20" text="{$info->Name}" textsize="3"/>
+<label class="text-light" pos="0 -6" size="58 20" text="{$info->Description}" textsize="0.5" autonewline="1"/>
 
-<label pos="10 -70.5" size="20 5" text=" Install" textsize="0.75" valign="center" halign="center" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c"
-ScriptEvents="1" class="confirm"/>
+<label class="btn-success confirm" pos="10 -70.5" size="20 5" text=" Install" textsize="0.75" ScriptEvents="1"/>
 
-<label pos="60 0" size="116 3" text="Map" textsize="0.75" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="80 0" size="116 3" text="Author" textsize="0.75" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-<label pos="100 0" size="116 3" text="TitlePack" textsize="0.75" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+<label class="text-light" pos="60 0" size="116 3" text="Map" textsize="0.75"/>
+<label class="text-light" pos="80 0" size="116 3" text="Author" textsize="0.75"/>
+<label class="text-light" pos="100 0" size="116 3" text="TitlePack" textsize="0.75"/>
 <quad pos="60 -3.5" size="56 0.2" bgcolor="fff9" />
 
 <frame pos="102 -71">
@@ -33,9 +32,9 @@ ScriptEvents="1" class="confirm"/>
     {foreach collect($trackList)->chunk(18) as $x => $chunk}
     <frame hidden="{$x}" pos="0 {$x * 3.5 * 18}">
         {foreach $chunk as  $i => $map}
-        <label pos="60 {$i * -3.5 - 5}" size="19 3" text="{$map->GbxMapName}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <label pos="80 {$i * -3.5 - 5}" size="19 3" text="{$map->Username}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-        <label pos="100 {$i * -3.5 - 5}" size="19 3" text="{$map->TitlePack}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+        <label class="text-light" pos="60 {$i * -3.5 - 5}" size="19 3" text="{$map->GbxMapName}" textsize="0.5"/>
+        <label class="text-light" pos="80 {$i * -3.5 - 5}" size="19 3" text="{$map->Username}" textsize="0.5"/>
+        <label class="text-light" pos="100 {$i * -3.5 - 5}" size="19 3" text="{$map->TitlePack}" textsize="0.5"/>
         {/foreach}
     </frame>
     {/foreach}

@@ -18,7 +18,7 @@
 
     {block content}
     <frame pos="0 -7">
-        <quad size="176 50" style="Bgs1" substyle="BgDialogBlur" z-index="-1" />
+        <quad class="bg-blur" size="176 50" z-index="-1"/>
         {php $hMin = $diffs->min() - 100;}
         {php $hMax = $diffs->max() + 100;}
         {php $wMax = ($record->Score > $myRecord->Score ? $record->Score : $myRecord->Score) + 1000;}
@@ -55,29 +55,29 @@
             {/foreach}
         </graph>
 
-        <label halign="right" pos="174 -2" valign="center" size="20 5" textsize="0.4" text="+{$hMax}ms" textfont="{config('colors.ui.font')|noescape}" textcolor="666" />
-        <label halign="right" pos="174 -47.75" valign="center" size="20 5" textsize="0.4" text="{$hMin}ms" textfont="{config('colors.ui.font')|noescape}" textcolor="666" />
+        <label class="text-light" halign="right" pos="174 -2" valign="center" size="20 5" textsize="0.4" text="+{$hMax}ms" textcolor="666" />
+        <label class="text-light" halign="right" pos="174 -47.75" valign="center" size="20 5" textsize="0.4" text="{$hMin}ms" textcolor="666" />
 
         <frame pos="1 -54">
             <quad pos="0.5 -0.25" size="2 2" bgcolor="999" valign="center" />
-            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{ml_escape($localPlayer->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
-            <label pos="4 -4" valign="center" textsize="2" text="{formatScore($myRecord->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="999" />
+            <label class="text-light" pos="4 0" valign="center" size="20 5" text="{ml_escape($localPlayer->NickName)}" textcolor="999" />
+            <label class="text-light" pos="4 -4" valign="center" textsize="2" text="{formatScore($myRecord->Score, true)}" textcolor="999" />
         </frame>
 
         <frame pos="1 -64">
             <quad pos="0.5 -0.25" size="2 2" bgcolor="fff" valign="center" />
-            <label pos="4 0" valign="center" size="20 5" textsize="1" text="{ml_escape($target->NickName)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
-            <label pos="4 -4" valign="center" textsize="2" text="{formatScore($record->Score, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+            <label class="text-light" pos="4 0" valign="center" size="20 5" text="{ml_escape($target->NickName)}" textcolor="fff" />
+            <label class="text-light" pos="4 -4" valign="center" textsize="2" text="{formatScore($record->Score, true)}" textcolor="fff" />
         </frame>
 
         <frame pos="30 -54">
             {for $i=0; $i<count($recordCps); $i++}
             <frame pos="{floor($i/6)*40} {$i%6*-3.5}">
-                <label valign="center" textsize="1" text="{$i + 1}." textfont="{config('colors.ui.font')|noescape}" />
-                <label pos="14 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($myCps[$i], true)}" textfont="{config('colors.ui.font')|noescape}"  textcolor="999" />
-                <label pos="24 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($recordCps[$i], true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="fff" />
+                <label class="text-light" valign="center" text="{$i + 1}." />
+                <label class="text-light" pos="14 0" halign="right" size="10 4" valign="center" text="{formatScore($myCps[$i], true)}"  textcolor="999" />
+                <label class="text-light" pos="24 0" halign="right" size="10 4" valign="center" text="{formatScore($recordCps[$i], true)}" textcolor="fff" />
                 {php $diff = $diffs->get($i);}
-                <label pos="34 0" halign="right" size="10 4" valign="center" textsize="1" text="{formatScore($diff, true)}" textfont="{config('colors.ui.font')|noescape}" textcolor="{$diff == 0 ? '36e' : ($diff < 0 ? '3e3' : 'e33')}" />
+                <label class="text-light" pos="34 0" halign="right" size="10 4" valign="center" text="{formatScore($diff, true)}" textcolor="{$diff == 0 ? '36e' : ($diff < 0 ? '3e3' : 'e33')}" />
             </frame>
             {/for}
         </frame>

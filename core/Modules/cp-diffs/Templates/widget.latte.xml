@@ -1,16 +1,18 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
+    {include 'components.stylesheet'}
     <framemodel id="box" valign="center" halign="center">
-        <quad pos="-7.5" halign="center" valign="center" size="5 4" bgcolor="000" opacity="0.5" z-index="-1" />
-        <label pos="-7.5 0.25" text="0" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" valign="center" textsize="0.4" textfont="{config('colors.ui.font')|noescape}" />
-        <quad pos="2.5" halign="center" valign="center" size="15 4" bgcolor="f00" opacity="0.5" z-index="-1" />
-        <label pos="2.55 0.25" text="" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" valign="center" textsize="0.6" textfont="{config('colors.ui.font')|noescape}" />
-        <label pos="0 0" text="" halign="center" valign="center" textsize="1" opacity="0.5" textfont="{config('colors.ui.font')|noescape}" hidden="1" />
-        <label pos="0 0" text="+" halign="center" valign="center" textprefix="" textsize="0.5" opacity="1" textfont="{config('colors.ui.font')|noescape}" z-index="1" hidden="1" />
+        <quad class="bg-dark" pos="-7.5" halign="center" valign="center" size="5 4" opacity="0.5" z-index="-1" />
+        <label class="text-light" pos="-7.5 0.25" halign="center" valign="center" textsize="0.4"/>
+        <quad class="bg-danger" pos="2.5" halign="center" valign="center" size="15 4" opacity="0.85" z-index="-1" />
+        <label class="text-light" pos="2.55 0.25" halign="center" valign="center" textsize="0.6"/>
+        <label class="text-light" text="" halign="center" valign="center" opacity="0.5" hidden="1" />
+        <label class="text-light" text="+" halign="center" valign="center" textsize="0.5" z-index="1" hidden="1" />
     </framemodel>
 
     <frame id="cpdiffs" pos="0 -65" scale="0.85">
-        <label id="target-label" pos="0 -10" opacity="0.99" text="$s{$target->name}$z$s | {$target->score|score}" textcolor="{config('colors.ui.widget.text.primary')|noescape}" halign="center" textsize="1" textfont="{config('colors.ui.font')|noescape}" />
+        <label id="target-label" class="text-light" pos="0 -10" text="$s{$target->name}$z$s | {$target->score|score}" opacity="1" halign="center" textsize="1"/>
 
         <frame size="20 13" pos="-10 -10">
             <frame pos="10 -2.25">
@@ -35,6 +37,8 @@
             Text name;
         }
 
+        declare Vec3 colorGreen;
+        declare Vec3 colorRed;
         declare Target target;
 
         CTmMlPlayer GetOwner() {
@@ -82,8 +86,8 @@
             (boxFrame.Controls[3] as CMlLabel).Value = formatDiff(diff);
 
             if(diff > 0){
-                (boxFrame.Controls[2] as CMlQuad).BgColor = <1.0, 0.0, 0.0>;
-                (boxFrame.Controls[4] as CMlLabel).TextColor = <1.0, 0.0, 0.0>;
+                (boxFrame.Controls[2] as CMlQuad).BgColor = colorRed;
+                (boxFrame.Controls[4] as CMlLabel).TextColor = colorRed;
                 (boxFrame.Controls[5] as CMlLabel).Value = "+";
             }else{
                 if(diff == 0){
@@ -91,8 +95,8 @@
                     (boxFrame.Controls[4] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
                     (boxFrame.Controls[5] as CMlLabel).Value = "";
                 }else{
-                    (boxFrame.Controls[2] as CMlQuad).BgColor = <0.1, 0.75, 0.2>;
-                    (boxFrame.Controls[4] as CMlLabel).TextColor = <0.1, 0.75, 0.2>;
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = colorGreen;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = colorGreen;
                     (boxFrame.Controls[5] as CMlLabel).Value = "-";
                 }
             }
@@ -134,6 +138,9 @@
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
             declare Ident currentMapUid = Map.Id;
+
+            colorGreen = TL::ToColor("{config('theme.form.success.bg')}");
+            colorRed = TL::ToColor("{config('theme.form.danger.bg')}");
 
             while(True){
                 yield;
