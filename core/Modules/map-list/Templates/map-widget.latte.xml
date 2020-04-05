@@ -68,7 +68,7 @@
         if(currentMapUid != Map.MapInfo.MapUid){
             currentMapUid = Map.MapInfo.MapUid;
             mapNameLabel.Value = Map.MapName;
-            authorNameLabel.Value = Map.AuthorNickName;
+            authorNameLabel.Value = TL::RegexReplace("\\$[lh](\\[.+?\\])?", Map.AuthorNickName, "i", "");
             if(!ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
                 favIconLabel.Value = "";
                 favLabelLabel.Value = "Add";
