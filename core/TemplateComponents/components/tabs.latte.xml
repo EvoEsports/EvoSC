@@ -9,7 +9,7 @@
     {if trim($action) == ''}
     <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" text="{$tab}" size="17 4" ScriptEvents="1"/>
     {else}
-    <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" textcolor="{config('colors.ui.window.text.primary')}" text="{$tab}" size="17 4" action="{$action}"/>
+    <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" textcolor="{config('theme.hud.text-light')}" text="{$tab}" size="17 4" action="{$action}"/>
     {/if}
     {/foreach}
 </frame>

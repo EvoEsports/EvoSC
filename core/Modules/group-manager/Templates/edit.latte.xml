@@ -5,7 +5,7 @@
         <quad size="80 20" pos="0 -6" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.85" z-index="-1" />
         <quad size="80 6" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.95" z-index="0" />
         <label pos="2 -3" valign="center" textsize="1" text="Groups Manager - Edit: {$group->Name}" z-index="1" textfont="{config('colors.ui.font')|noescape}" />
-        <label class="close" pos="77 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.text.primary')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+        <label class="close" pos="77 -3" size="6 6" text="❌" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('theme.hud.text-light')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
 
         <frame pos="-4 -11">
             <label pos="18 0" size="20 5" halign="right" text="Prefix" textsize="1" textfont="{config('colors.ui.font')|noescape}" valign="center" />

@@ -17,16 +17,16 @@ Add map?
 
 {block content}
 <frame pos="1 0">
-    <label pos="-0.5 0" size="100 20" text="{$details->GbxMapName}" textsize="3" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label pos="0 -6" size="116 20" text="by {$details->Username}" textsize="1" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label pos="0 -10" size="116 20" text="Title-Pack: TM{$details->EnvironmentName}@{$details->TitlePack}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label pos="0 -13" size="116 20" text="Style: {$details->StyleName} {$details->LengthName} ({$details->DifficultyName})" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label pos="0 -16" size="116 20" text="Mood: {$details->Mood}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label pos="0 -19" size="116 20" text="Single-Lap: {$details->RouteName=='Single' ? 'Yes' : 'No'}" textsize="0.5" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label id="comments" pos="0 -24" size="115 20" text="{\esc\Modules\MxDownload::parseBB($details->Comments)}" textsize="0.5" autonewline="1" textcolor="{config('colors.ui.window.text.primary')}" textfont=""/>
+    <label pos="-0.5 0" size="100 20" text="{$details->GbxMapName}" textsize="3" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="0 -6" size="116 20" text="by {$details->Username}" textsize="1" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="0 -10" size="116 20" text="Title-Pack: TM{$details->EnvironmentName}@{$details->TitlePack}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="0 -13" size="116 20" text="Style: {$details->StyleName} {$details->LengthName} ({$details->DifficultyName})" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="0 -16" size="116 20" text="Mood: {$details->Mood}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label pos="0 -19" size="116 20" text="Single-Lap: {$details->RouteName=='Single' ? 'Yes' : 'No'}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label id="comments" pos="0 -24" size="115 20" text="{\esc\Modules\MxDownload::parseBB($details->Comments)}" textsize="0.5" autonewline="1" textcolor="{config('theme.hud.text-light')}" textfont=""/>
 </frame>
 
-<label pos="105 -3" size="20 5" text=" Add" textsize="0.75" valign="center" halign="center" textcolor="{config('colors.ui.window.text.primary')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c" ScriptEvents="1" class="confirm"/>
+<label pos="105 -3" size="20 5" text=" Add" textsize="0.75" valign="center" halign="center" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}c" ScriptEvents="1" class="confirm"/>
 {/block}
 
 <script><!--

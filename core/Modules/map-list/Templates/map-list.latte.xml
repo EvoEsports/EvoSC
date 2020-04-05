@@ -50,7 +50,7 @@
 
             <frame id="sorting-controls" pos="-1 5.25">
                 <quad valign="center" pos="-1" size="200 6" textcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity') - 0.1}" z-index="-1"/>
-                <label pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" textcolor="{config('colors.ui.window.text.primary')}"
+                <label pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" textcolor="{config('theme.hud.text-light')}"
                        textfont="{config('colors.ui.font')|noescape}" valign="center"/>
 
                 <label class="filter-btn btn-accent" data-sort=" " pos="20" size="13 4" textsize="0.7" text="Show All" scale="0.8" ScriptEvents="1"/>
@@ -227,11 +227,11 @@ Text getStarString(Real rating){
     declare Real left = stars - full;
 
     for(i, 0, full - 1){
-        starString = starString ^ "${config('colors.ui.window.text.primary')|noescape}";
+        starString = starString ^ "";
     }
 
     if(left >= 0.5){
-        starString = starString ^ "${config('colors.ui.window.text.primary')|noescape}";
+        starString = starString ^ "";
         full = full + 1;
     }
 

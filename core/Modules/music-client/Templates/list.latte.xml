@@ -41,7 +41,7 @@ After it dissapears you can reset and the song will start to play." autonewline=
         </frame>
 
         <frame id="search-frame" pos="100 -66.5" scale="0.9">
-            <label pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('colors.ui.window.text.primary')}"/>
+            <label pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍" textcolor="{config('theme.hud.text-light')}"/>
             <entry id="search-input" class="form search-input" pos="26.5 0" size="25 3.5" halign="right" valign="center" textsize="1.2"/>
             <label id="clear-search" class="btn-danger clear-search" size="3.5 3.5" textsize="0.25" text="" ScriptEvents="1" hidden="1"/>
         </frame>

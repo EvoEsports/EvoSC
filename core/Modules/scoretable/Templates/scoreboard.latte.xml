@@ -3,7 +3,7 @@
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     {include 'components.stylesheet'}
     <stylesheet>
-        <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('colors.ui.window.text.primary')}"/>
+        <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('theme.hud.text-light')}"/>
     </stylesheet>
 
     <framemodel id="box" size="86 12">
