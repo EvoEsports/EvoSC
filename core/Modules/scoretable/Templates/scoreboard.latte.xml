@@ -69,7 +69,7 @@
 
         <label class="floating prev-page" text="" pos="4 -81" ScriptEvents="1" />
         <label id="page" class="floating" text="1/1" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" />
-        <label class="floating next-page" text="" pos="18 -81" />
+        <label class="floating next-page" text="" pos="18 -81" ScriptEvents="1" />
         <label class="floating me" text="" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" />
     </frame>
 
@@ -533,6 +533,7 @@
 
                 if(control.HasClass("trigger") && Event.Type == CMlScriptEvent::Type::MouseOver){
                     showControls((Event.Control.Parent as CMlFrame));
+                    continue;
                 }
 
                 if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
@@ -542,6 +543,7 @@
                     }
                     forceUpdate = True;
                     updateScoreTable();
+                    continue;
                 }
 
                 if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
@@ -551,6 +553,7 @@
                     }
                     forceUpdate = True;
                     updateScoreTable();
+                    continue;
                 }
 
                 if(control.HasClass("me") && Event.Type == CMlScriptEvent::Type::MouseClick){
@@ -566,6 +569,7 @@
                     updateScoreTable();
                     sleep(80);
                     flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
+                    continue;
                 }
             }
         }
