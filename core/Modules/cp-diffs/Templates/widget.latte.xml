@@ -41,12 +41,6 @@
         declare Vec3 colorRed;
         declare Target target;
 
-        CTmMlPlayer GetOwner() {
-          if (GUIPlayer != Null) return GUIPlayer;
-          if (InputPlayer != Null) return InputPlayer;
-          return Null;
-        }
-
         Text formatDiff(Integer diff){
             declare Text sign;
             declare Integer ms = diff;
@@ -134,7 +128,7 @@
 
         main(){
             target.fromjson("""{json_encode($target)|noescape}""");
-            declare CTmMlPlayer player <=> GetOwner();
+            declare player <=> GUIPlayer;
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
             declare Ident currentMapUid = Map.Id;
@@ -159,12 +153,13 @@
                     continue;
                 }
 
-                if(targetLabel.Visible && player.Distance > 10.0){
+                if(targetLabel.Visible && player.Speed * 3.6 > 10.0){
                     AnimMgr.Add(targetLabel, "<label opacity='0.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
                     sleep(300);
                     targetLabel.Visible = False;
                 }
 
+                {if $is_maniaplanet}
                 foreach(event in RaceEvents){
                     if(event.Player.User.Login == player.Login){
                         switch(event.Type){
@@ -173,6 +168,19 @@
                         }
                     }
                 }
+                {else}
+                foreach (Event in PendingEvents) {
+                    if(Event.Type == CSmModeEvent::EType::OnPlayerTriggersWaypoint){
+                        log(Event);
+                        //fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+                        continue;
+                    }
+                    if(Event.Type == CSmModeEvent::EType::OnPlayerRequestRespawn){
+                        respawn();
+                        continue;
+                    }
+                }
+                {/if}
             }
         }
         -->

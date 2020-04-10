@@ -70,7 +70,7 @@ class PlayerController implements ControllerInterface
                 infoMessage($player, ' cleared the server password.')->sendAll();
             } else {
                 infoMessage($player, ' set a server password.')->sendAll();
-                infoMessage($player, ' set the server password to "'.$pw.'".')->sendAdmin();
+                infoMessage($player, ' set the server password to "' . $pw . '".')->sendAdmin();
             }
         }
 
@@ -80,7 +80,7 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerConnect
      *
-     * @param  Player  $player
+     * @param Player $player
      *
      * @throws \Exception
      */
@@ -120,7 +120,7 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerDisconnect
      *
-     * @param  Player  $player
+     * @param Player $player
      *
      * @throws \Exception
      */
@@ -128,7 +128,7 @@ class PlayerController implements ControllerInterface
     {
         $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::write($player." [".$player->Login."] left the server after $playtime playtime.");
+        Log::write($player . " [" . $player->Login . "] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {
@@ -169,8 +169,8 @@ class PlayerController implements ControllerInterface
     /**
      * Gets a player by nickname or login.
      *
-     * @param  Player  $callee
-     * @param  string  $nick
+     * @param Player $callee
+     * @param string $nick
      *
      * @return Player|null
      */
@@ -201,7 +201,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($players->count() > 1) {
-            warningMessage('Found more than one person ('.$players->pluck('NickName')->implode(', ').'), please be more specific or use login.')->send($callee);
+            warningMessage('Found more than one person (' . $players->pluck('NickName')->implode(', ') . '), please be more specific or use login.')->send($callee);
 
             return null;
         }
@@ -239,9 +239,9 @@ class PlayerController implements ControllerInterface
     /**
      * ManiaLinkEvent: kick player
      *
-     * @param  Player  $player
-     * @param  string  $login
-     * @param  string  $reason
+     * @param Player $player
+     * @param string $login
+     * @param string $reason
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
@@ -265,7 +265,7 @@ class PlayerController implements ControllerInterface
 
         if (strlen($reason) > 0) {
             warningMessage($player, ' kicked ', secondary($toBeKicked),
-                secondary(' Reason: '.$reason))->setIcon('')->sendAll();
+                secondary(' Reason: ' . $reason))->setIcon('')->sendAll();
         } else {
             warningMessage($player, ' kicked ', secondary($toBeKicked))->setIcon('')->sendAll();
         }
@@ -274,9 +274,9 @@ class PlayerController implements ControllerInterface
     /**
      * Called on players finish
      *
-     * @param  Player  $player
-     * @param  int  $score
-     * @param  string  $checkpoints
+     * @param Player $player
+     * @param int $score
+     * @param string $checkpoints
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -289,7 +289,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player."\$z finished with time ($score) ".formatScore($score));
+            Log::info($player . "\$z finished with time ($score) " . formatScore($score));
 
             $player->Score = $score;
             $player->save();
@@ -325,7 +325,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  string  $login
+     * @param string $login
      *
      * @return bool
      */
@@ -335,7 +335,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  string  $login
+     * @param string $login
      *
      * @return Player
      */
@@ -345,7 +345,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      *
      * @return Collection
      */
@@ -414,8 +414,8 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
@@ -435,5 +435,13 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
+        ChatCommand::add('/setname', [self::class, 'setName'], 'Overwrite your nick name.');
+    }
+
+    public static function setName(Player $player, $cmd, ...$name)
+    {
+        $nameI = implode(' ', $name);
+        $player->NickName = $nameI;
+        PlayerController::putPlayer($player);
     }
 }

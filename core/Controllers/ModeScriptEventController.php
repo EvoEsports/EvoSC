@@ -162,7 +162,7 @@ class ModeScriptEventController implements ControllerInterface
         );
 
         //player finished
-        if ($wayPoint->isendlap) {
+        if ($wayPoint->isendrace) {
             Hook::fire('PlayerFinish',
                 $player,
                 $wayPoint->laptime,

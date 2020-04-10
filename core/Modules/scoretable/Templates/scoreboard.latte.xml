@@ -44,7 +44,11 @@
 
     <!-- end components -->
 
-    <frame id="main-frame" pos="-86 30">
+    {if !$is_maniaplanet}
+    <quad pos="-160 90" class="bg-blur" size="320 180" z-index="9998" />
+    {/if}
+
+    <frame id="main-frame" pos="-86 30" z-index="9999">
         {if !empty($logoUrl)}
         <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
@@ -233,8 +237,8 @@
                 scoreLabel.Value = "$aaaNo Points";
             }
         }else{
-            if({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.count > 0 && score.BestLapTimes[0]{/if} > 0){
-                scoreLabel.Value = "$ddd" ^ formatScoreCorrect({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes[0]{/if}, True);
+            if({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.count > 0 && score.BestLapTimes.slice(score.BestLapTimes.count - 1, 1){/if} > 0){
+                scoreLabel.Value = "$ddd" ^ formatScoreCorrect({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.slice(score.BestLapTimes.count - 1, 1){/if}, True);
             }else{
                 scoreLabel.Value = "$aaaNo finish";
             }

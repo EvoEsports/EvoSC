@@ -102,7 +102,9 @@
             return 0;
         }
 
-        return Score.BestLapTimes[0];
+        declare bestTimes = Score.BestLapTimes;
+        bestTimes = bestTimes.sortreverse();
+        return bestTimes[0];
     }
     {/if}
 
@@ -145,7 +147,10 @@
                 return;
             }
 
-            if({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.count > 0 && Score.BestLapTimes[0]{/if} == -1){
+            declare bestTimes = Score.BestLapTimes;
+            bestTimes = bestTimes.sortreverse();
+
+            if({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.count > 0 && bestTimes[0]{/if} == -1){
                 continue;
             }
 

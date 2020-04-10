@@ -7,22 +7,8 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-#Struct WidgetRow {
-    Real height;
-    Boolean visible;
-    Real[Integer] widths;
-    Integer slot;
-}
-
-#Struct WidgetGrid {
-    WidgetRow[Integer] left;
-    WidgetRow[Integer] right;
-}
-
 main() {
-    declare WidgetGrid grid_ for This;
-    declare WidgetGrid empty;
-    grid_ = empty;
+    log(CurrentServerJoinLink);
 }
     --></script>
 </manialink>
