@@ -7,10 +7,11 @@ main() {
 
     TriggerPageAction("ping,0");
 
+    {if $is_maniaplanet}
     while(True){
         yield;
 
-        foreach(event in RaceEvents){
+        foreach(event in PendingEvents){
             if(event.Player.User.Login == LocalUser.Login){
                 lastInteraction = GameTime;
                 break;
@@ -25,6 +26,7 @@ main() {
             TriggerPageAction("ping," ^ diff);
         }
     }
+    {/if}
 }
     --></script>
 </manialink>

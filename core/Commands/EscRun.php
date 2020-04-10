@@ -27,7 +27,6 @@ use esc\Controllers\ModuleController;
 use esc\Controllers\PlanetsController;
 use esc\Controllers\PlayerController;
 use esc\Controllers\QueueController;
-use esc\Controllers\ScoreController;
 use esc\Controllers\SetupController;
 use esc\Controllers\TemplateController;
 use esc\Models\Map;
@@ -55,6 +54,7 @@ class EscRun extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         global $serverName;
+        global $__ManiaPlanet;
 
         Log::setOutput($output);
         ConfigController::init();
@@ -106,6 +106,8 @@ class EscRun extends Command
             if (!Server::isAutoSaveReplaysEnabled()) {
                 Server::autoSaveReplays(true);
             }
+
+            $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
             //Disable all default ManiaPlanet votes
             /*

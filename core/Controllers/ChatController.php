@@ -175,7 +175,7 @@ class ChatController implements ControllerInterface
 
             $prefix = $player->group->chat_prefix;
             $color = $player->group->color ?? config('theme.chat.text');
-            $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, $nick, $color, config('theme.chat.text'), $text);
+            $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, secondary($nick), $color, config('theme.chat.text'), $text);
 
             if ($prefix) {
                 $chatText = '$'.$color.$prefix.' '.$chatText;

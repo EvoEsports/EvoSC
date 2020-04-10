@@ -2,24 +2,33 @@
 
 namespace esc\Modules;
 
+use esc\Classes\Hook;
 use esc\Classes\Module;
 use esc\Classes\Server;
+use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
+use esc\Models\Player;
 
 class AlterUi extends Module implements ModuleInterface
 {
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        global $__ManiaPlanet;
+
         if ($mode == 'TimeAttack.Script.txt') {
             $properties = self::getTASettings();
         } else {
             $properties = self::getRoundsSettings();
+        }
+
+        if (!$__ManiaPlanet) {
+            Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         }
 
         Server::triggerModeScriptEvent('Trackmania.UI.SetProperties', [$properties]);
@@ -137,5 +146,10 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Scores table displayed in the middle of the screen -->
  		<scorestable alt_visible="false" visible="false" />
  	</ui_properties>';
+    }
+
+    public static function playerConnect(Player $player)
+    {
+        Template::show($player, 'alter-ui.hud');
     }
 }

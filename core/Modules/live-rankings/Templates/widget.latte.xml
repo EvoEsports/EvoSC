@@ -27,14 +27,14 @@
 
     {block script}
     <script><!--
-    Integer[CTmScore] GetSortedScores() {
+    Integer[CSmScore] GetSortedScores() {
         declare persistent Boolean[Text] LibScoresTable2_Settings for This;
-        declare SortedScores = Integer[CTmScore];
-        declare Count = 0;
+        declare SortedScores = Integer[CSmScore];
+        declare c = 0;
 
         foreach (Score in Scores) {
             declare LibST_Status for Score.User = C_Status_Disconnected;
-            declare Weight = Count;
+            declare Weight = c;
             if (
                 LibScoresTable2_Settings.existskey("SortSpec") &&
                 LibScoresTable2_Settings["SortSpec"] &&
@@ -46,7 +46,7 @@
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
             SortedScores[Score] = Weight;
-            Count += 1;
+            c += 1;
         }
 
         return SortedScores.sort();
@@ -92,7 +92,21 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Void updateSlot(CMlFrame box, Integer rank, CTmScore score){
+    {if $is_maniaplanet}
+    Integer getTimeFromScore(CTmScore Score){
+        return Score.BestLap.Time;
+    }
+    {else}
+    Integer getTimeFromScore(CSmScore Score){
+        if(Score.BestLapTimes.count == 0){
+            return 0;
+        }
+
+        return Score.BestLapTimes[0];
+    }
+    {/if}
+
+    Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} score){
         declare prefix = "";
 		declare LibST_Status for score.User = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
@@ -104,8 +118,8 @@
 		}
 
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
-        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, False);
-        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(score.BestLap.Time, True);
+        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(score), False);
+        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(score), True);
         (box.Controls[3] as CMlLabel).Value = prefix ^ score.User.Name;
         box.Show();
     }
@@ -118,7 +132,7 @@
             if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
                 LibST_Status = C_Status_Spectating;
             }
-            if (!Player.RequestsSpectate && Player.IsSpawned && LibST_Status != C_Status_Spawned) {
+            if (!Player.RequestsSpectate && LibST_Status != C_Status_Spawned) {
                 LibST_Status = C_Status_Spawned;
             }
         }
@@ -131,7 +145,7 @@
                 return;
             }
 
-            if(Score.BestLap.Time == -1){
+            if({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.count > 0 && Score.BestLapTimes[0]{/if} == -1){
                 continue;
             }
 

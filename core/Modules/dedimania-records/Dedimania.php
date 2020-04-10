@@ -29,6 +29,11 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        global $__ManiaPlanet;
+        if (!$__ManiaPlanet) {
+            return;
+        }
+
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
         Hook::add('PlayerConnect', [self::class, 'showManialink']);

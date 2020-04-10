@@ -114,9 +114,9 @@
         return ceiled;
     }
 
-    Text getStars(Integer count){
+    Text getStars(Integer c){
         declare Text stars = "";
-        for(i, 0, count - 1){
+        for(i, 0, c - 1){
             stars = stars ^ " ";
         }
         return stars;
@@ -191,7 +191,7 @@
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
-    Void updateBox(CMlFrame box, CTmScore score, Integer rank){
+    Void updateBox(CMlFrame box, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} score, Integer rank){
         declare CUser user <=> score.User;
         declare EvoSC_Group group = getGroup(score.User.Login);
         declare nameLabel <=> (box.Controls[0] as CMlLabel);
@@ -233,8 +233,8 @@
                 scoreLabel.Value = "$aaaNo Points";
             }
         }else{
-            if(score.BestLap.Time > 0){
-                scoreLabel.Value = "$ddd" ^ formatScoreCorrect(score.BestLap.Time, True);
+            if({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.count > 0 && score.BestLapTimes[0]{/if} > 0){
+                scoreLabel.Value = "$ddd" ^ formatScoreCorrect({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes[0]{/if}, True);
             }else{
                 scoreLabel.Value = "$aaaNo finish";
             }
@@ -269,15 +269,14 @@
         box.DataAttributeSet("login", user.Login);
     }
 
-
-    Integer[CTmScore] GetSortedScores() {
+    Integer[CSmScore] GetSortedScores() {
         declare persistent Boolean[Text] LibScoresTable2_Settings for This;
-        declare SortedScores = Integer[CTmScore];
-        declare Count = 0;
+        declare SortedScores = Integer[CSmScore];
+        declare c = 0;
 
         foreach (Score in Scores) {
             declare LibST_Status for Score.User = C_Status_Disconnected;
-            declare Weight = Count;
+            declare Weight = c;
             if (
                 LibScoresTable2_Settings.existskey("SortSpec") &&
                 LibScoresTable2_Settings["SortSpec"] &&
@@ -289,7 +288,7 @@
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
             SortedScores[Score] = Weight;
-            Count += 1;
+            c += 1;
         }
 
         return SortedScores.sort();
@@ -321,7 +320,7 @@
             if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
                 LibST_Status = C_Status_Spectating;
             }
-            if (!Player.RequestsSpectate && Player.IsSpawned && LibST_Status != C_Status_Spawned) {
+            if (!Player.RequestsSpectate && LibST_Status != C_Status_Spawned) {
                 LibST_Status = C_Status_Spawned;
             }
         }

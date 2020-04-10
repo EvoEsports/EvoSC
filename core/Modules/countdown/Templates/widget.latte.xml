@@ -32,13 +32,6 @@ Text TimeToText(Integer _Time) {
   return Time;
 }
 
-CTmMlPlayer GetOwner() {
-  if (GUIPlayer != Null) return GUIPlayer;
-  if (InputPlayer != Null) return InputPlayer;
-  return Null;
-}
-
-
 Void HideDuringIntro(CMlFrame _Frame) {
   if (_Frame == Null) return;
 
@@ -81,7 +74,7 @@ Void HideDuringIntro(CMlFrame _Frame) {
     {block loop}
 //HideDuringIntro(Frame_Intro);
 
-declare Owner <=> GetOwner();
+declare Owner <=> GUIPlayer;
 if (!PageIsVisible || Owner == Null) continue;
 
 if (PrevSettingsUpdate != Net_LibUI_SettingsUpdate) {

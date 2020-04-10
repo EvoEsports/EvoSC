@@ -7,6 +7,7 @@ namespace esc\Modules;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Template;
+use esc\Controllers\AfkController;
 use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;

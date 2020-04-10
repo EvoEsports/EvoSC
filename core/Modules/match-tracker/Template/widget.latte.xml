@@ -94,13 +94,17 @@
                 hide();
             }
         }else{
+            {if $is_maniaplanet}
             declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
-            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > hideSpeed;
+            {else}
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > 10;
+            {/if}
 
-            if(overHidespeed && playerIsRacing && !HS_Hidden){
+            if(overHidespeed {if $is_maniaplanet}&& playerIsRacing {/if}&& !HS_Hidden){
                 hide();
             }
-            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+            if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
                 show();
             }
         }

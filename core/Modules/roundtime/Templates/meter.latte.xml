@@ -50,12 +50,6 @@
         settings.scale = 1.0;
     }
 
-    CTmMlPlayer GetOwner() {
-      if (GUIPlayer != Null) return GUIPlayer;
-      if (InputPlayer != Null) return InputPlayer;
-      return Null;
-    }
-
     Void HideDuringIntro(CMlFrame _Frame) {
       if (_Frame == Null) return;
 
@@ -99,13 +93,27 @@
             yield;
 
             HideDuringIntro(roundtime);
-            declare Owner <=> GetOwner();
+            declare Owner <=> GUIPlayer;
             if (!PageIsVisible || Owner == Null) continue;
 
             roundtime.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
             if(roundtime.Visible){
+                {if $is_maniaplanet}
                 speedLabel.Value = TL::TimeToText(Owner.CurLap.Time, True);
+                {else}
+				if (Owner.StartTime > GameTime) {
+					speedLabel.Value = TL::TimeToText(0, True);
+				} else if (Owner.StartTime >= 0) {
+					if (UI.UISequence == CUIConfig::EUISequence::Finish && Owner.RaceWaypointTimes.count > 0) {
+						speedLabel.Value = TL::TimeToText(Owner.RaceWaypointTimes[Owner.RaceWaypointTimes.count - 1], True);
+					} else {
+						speedLabel.Value = TL::TimeToText(GameTime - Owner.StartTime, True);
+					}
+				} else {
+					speedLabel.Value = "--:--.--";
+				}
+				{/if}
             }else{
                 sleep(500);
                 continue;

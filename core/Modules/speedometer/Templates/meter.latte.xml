@@ -50,12 +50,6 @@
         settings.scale = 1.0;
     }
 
-    CTmMlPlayer GetOwner() {
-      if (GUIPlayer != Null) return GUIPlayer;
-      if (InputPlayer != Null) return InputPlayer;
-      return Null;
-    }
-
     Void HideDuringIntro(CMlFrame _Frame) {
       if (_Frame == Null) return;
 
@@ -100,13 +94,13 @@
             yield;
 
             HideDuringIntro(speedometer);
-            declare Owner <=> GetOwner();
+            declare Owner <=> GUIPlayer;
             if (!PageIsVisible || Owner == Null) continue;
 
             speedometer.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
             if(speedometer.Visible){
-                speedLabel.Value = TL::ToText(Owner.DisplaySpeed);
+                speedLabel.Value = ML::NearestInteger(Owner.Speed * 3.6) ^ "";
             }else{
                 sleep(500);
                 continue;

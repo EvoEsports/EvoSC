@@ -46,6 +46,8 @@ class Template
      */
     public static function showAll(string $index, array $values = [], int $timeoutInSeconds = 0)
     {
+        global $__ManiaPlanet;
+        $values['is_maniaplanet'] = $__ManiaPlanet;
         $xml = TemplateController::getTemplate($index, $values);
         Server::sendDisplayManialinkPage('', $xml, $timeoutInSeconds * 1000);
     }
@@ -61,6 +63,7 @@ class Template
      */
     public static function show(Player $player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
+        global $__ManiaPlanet;
         $data = [];
 
         if ($values instanceof Collection) {
@@ -72,6 +75,7 @@ class Template
         }
 
         $data['localPlayer'] = $player;
+        $data['is_maniaplanet'] = $__ManiaPlanet;
         $xml = TemplateController::getTemplate($index, $data);
 
         if ($xml != '') {

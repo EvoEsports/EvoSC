@@ -17,12 +17,12 @@
             yield;
 
             if(InputPlayer == Null) continue;
-            if(InputPlayer.DisplaySpeed > 50 && !hidden){
+            if(InputPlayer.Speed * 3.6 > 50 && !hidden){
                 hidden = True;
                 AnimMgr.Add(textLabel, "<label textcolor='fc20' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;
             }
-            if(InputPlayer.DisplaySpeed < 50 && hidden){
+            if(InputPlayer.Speed * 3.6 < 50 && hidden){
                 hidden = False;
                 AnimMgr.Add(textLabel, "<label textcolor='fc2f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
                 continue;

@@ -458,7 +458,7 @@ Void search(){
 
         case "worst_karma":{
             declare Text[Text][Text] selected = Text[Text][Text];
-            declare Text[Text][] reverse = Text[Text][];
+            declare Text[Text][] reversed = Text[Text][];
             declare Real[Text] sorter = Real[Text];
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
@@ -472,12 +472,12 @@ Void search(){
 
             foreach(mapId => sortedKarma in sorter){
                 if(selected.existskey(mapId)){
-                    reverse.add(selected[mapId]);
+                    reversed.add(selected[mapId]);
                 }
             }
 
-            for(i, 0, reverse.count - 1){
-                mapsFound.add(reverse[reverse.count - i - 1]);
+            for(i, 0, reversed.count - 1){
+                mapsFound.add(reversed[reversed.count - i - 1]);
             }
         }
 

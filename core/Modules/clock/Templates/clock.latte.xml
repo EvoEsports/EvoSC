@@ -48,7 +48,11 @@
         }
 
         declare UISettings settings for This;
+        {if $is_maniaplanet}
         declare hideSpeed = settings.speed;
+        {else}
+        declare hideSpeed = 10;
+        {/if}
 
         if(hideSpeed == -1 || InputPlayer == Null){
             return;
@@ -61,16 +65,20 @@
                 hide();
             }
         }else{
+            {if $is_maniaplanet}
             declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
-            declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > hideSpeed;
+            {else}
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > 10;
+            {/if}
 
-            if(overHidespeed && playerIsRacing && !HS_Hidden){
+            if(overHidespeed {if $is_maniaplanet}&& playerIsRacing {/if}&& !HS_Hidden){
                 hide();
                 {if !isset($doNotPause)}
-                wait(InputPlayer.DisplaySpeed < hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+                wait(InputPlayer.Speed * 3.6 < hideSpeed {if $is_maniaplanet}|| InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running{/if});
                 {/if}
             }
-            if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+            if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
                 show();
             }
         }

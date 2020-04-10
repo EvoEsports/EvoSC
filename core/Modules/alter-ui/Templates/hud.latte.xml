@@ -1,0 +1,13 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:hud-settings" id="hud-settings" version="3">
+
+    <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+main() {
+    UI.OverlayHideChrono = True;
+}
+    --></script>
+</manialink>

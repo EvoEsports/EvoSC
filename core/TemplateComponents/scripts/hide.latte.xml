@@ -27,7 +27,7 @@ Void hidescript(){
 
     declare UISettings settings for This;
     declare Boolean ESC_Tab_Pressed for This;
-    declare hideSpeed = settings.speed;
+    declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
 
     if(hideSpeed == -1 || InputPlayer == Null){
         return;
@@ -50,17 +50,19 @@ Void hidescript(){
             return;
         }
 
+        {if $is_maniaplanet}
         declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
-        declare Boolean overHidespeed = InputPlayer.DisplaySpeed > hideSpeed;
+        {/if}
+        declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > hideSpeed;
 
-        if(overHidespeed && playerIsRacing && !HS_Hidden){
+        if(overHidespeed && !HS_Hidden {if $is_maniaplanet}&& playerIsRacing{/if}){
             hs_hide(800);
 
             {if !isset($doNotPause)}
-            //wait(InputPlayer.DisplaySpeed <= hideSpeed || InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running);
+            wait(InputPlayer.Speed * 3.6 <= hideSpeed {if $is_maniaplanet}|| InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running{/if});
             {/if}
         }
-        if((!overHidespeed || !playerIsRacing) && HS_Hidden){
+        if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
             hs_show(600);
         }
     }
