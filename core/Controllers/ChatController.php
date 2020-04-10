@@ -20,11 +20,6 @@ use Illuminate\Support\Collection;
  */
 class ChatController implements ControllerInterface
 {
-    /**
-     * @var Collection
-     */
-    private static Collection $mutedPlayers;
-
     /** @var boolean */
     private static bool $routingEnabled;
 
@@ -175,7 +170,6 @@ class ChatController implements ControllerInterface
             $nick = $player->NickName;
 
             if ($player->isSpectator()) {
-                //$nick = '$eee📷 '.$nick;
                 $nick = '$eee '.$nick;
             }
 

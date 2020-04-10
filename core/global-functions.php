@@ -207,22 +207,20 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {
-            Player::create([
+            $player = Player::create([
                 'Login' => $data->login,
                 'NickName' => $data->nickName,
             ]);
         } else {
-            Player::create([
+            $player = Player::create([
                 'Login' => $login,
                 'NickName' => $login,
             ]);
         }
-
-        $player = Player::find($login);
     }
 
     if ($addToOnlineIfOffline) {
-        PlayerController::addPlayer($player);
+        PlayerController::putPlayer($player);
     }
 
     return $player;

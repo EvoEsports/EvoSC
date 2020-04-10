@@ -9,6 +9,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Template;
+use esc\Controllers\PlayerController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
 use esc\Models\Group;
@@ -192,6 +193,7 @@ class GroupManager extends Module implements ModuleInterface
         if ($newMember) {
             Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
             Hook::fire('GroupChanged', $newMember);
+            PlayerController::putPlayer(Player::whereLogin($playerLogin)->first());
 
             if ($newMember->group->id == 3) {
                 infoMessage($player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group))->sendAll();

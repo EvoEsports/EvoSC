@@ -203,7 +203,7 @@ class MapList extends Module implements ModuleInterface
             ];
         })->filter();
 
-        Template::showAll('map-list.update-map-queue', compact('mapQueue'), 20);
+        Template::showAll('map-list.update-map-queue', compact('mapQueue'));
     }
 
     public static function showMapQueue(Player $player)

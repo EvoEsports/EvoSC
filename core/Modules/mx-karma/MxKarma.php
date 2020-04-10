@@ -180,7 +180,7 @@ class MxKarma extends Module implements ModuleInterface
         self::updateVotesAverage();
 
         $average = self::$updatedVotesAverage;
-        Template::showAll('mx-karma.update-karma', compact('average'), 20);
+        Template::showAll('mx-karma.update-karma', compact('average'));
     }
 
     public static function playerCanVote(Player $player, Map $map): bool

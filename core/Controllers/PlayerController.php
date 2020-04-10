@@ -349,7 +349,7 @@ class PlayerController implements ControllerInterface
      *
      * @return Collection
      */
-    public static function addPlayer(Player $player)
+    public static function putPlayer(Player $player)
     {
         return self::$players->put($player->Login, $player);
     }

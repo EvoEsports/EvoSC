@@ -97,7 +97,7 @@ class CPRecords extends Module implements ModuleInterface
     public static function sendUpdatedCpRecords(int $updatedCpId = -1)
     {
         $data = self::$tracker->values()->toJson();
-        Template::showAll('cp-records.update', compact('data', 'updatedCpId'), 5);
+        Template::showAll('cp-records.update', compact('data', 'updatedCpId'));
     }
 
     /**

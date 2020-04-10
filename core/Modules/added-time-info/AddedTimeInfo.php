@@ -58,7 +58,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
             Template::show($player, 'added-time-info.update', compact('addedTime'), false, 20);
             Template::show($player, 'added-time-info.widget', compact('buttons'));
         }else{
-            Template::showAll('added-time-info.update', compact('addedTime'), 20);
+            Template::showAll('added-time-info.update', compact('addedTime'));
             Template::showAll('added-time-info.widget', compact('buttons'));
         }
     }

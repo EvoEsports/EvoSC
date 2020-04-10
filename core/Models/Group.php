@@ -15,6 +15,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Group extends Model
 {
+    const MASTERADMIN = 1;
+    const ADMIN = 2;
+    const PLAYER = 3;
+
     protected $table = 'groups';
 
     protected $fillable = ['Name', 'chat_prefix', 'color'];

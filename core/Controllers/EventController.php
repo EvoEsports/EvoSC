@@ -104,10 +104,7 @@ class EventController implements ControllerInterface
 
             $player->spectator_status = $playerInfo['SpectatorStatus'];
             $player->player_id = $playerInfo['PlayerId'];
-
-            if (PlayerController::hasPlayer($player->Login)) {
-                PlayerController::addPlayer($player);
-            }
+            PlayerController::putPlayer($player);
         }
     }
 
@@ -148,8 +145,13 @@ class EventController implements ControllerInterface
             }
 
             try {
-                ChatController::playerChat(player($login), $text);
                 Hook::fire('PlayerChat', player($login), $text);
+            } catch (Exception $e) {
+                Log::write("Error: " . $e->getMessage());
+            }
+
+            try {
+                ChatController::playerChat(player($login), $text);
             } catch (Exception $e) {
                 Log::write("Error: " . $e->getMessage());
             }
