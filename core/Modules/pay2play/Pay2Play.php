@@ -46,6 +46,12 @@ class Pay2Play extends Module implements ModuleInterface
 
     public static function addTime(Player $player)
     {
+        $addTimeVoteSuccess = Votes::getAddTimeSuccess();
+        if (!is_null($addTimeVoteSuccess) && !$addTimeVoteSuccess) {
+            warningMessage('Can not force time when vote resulted in no.')->send($player);
+            return;
+        }
+
         if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimit() >= config('pay2play.addtime.time-limit-in-seconds')) {
             warningMessage('Maximum playtime for this round reached.')->send($player);
 
@@ -53,7 +59,7 @@ class Pay2Play extends Module implements ModuleInterface
         }
 
         PlanetsController::createBill($player, self::$priceAddTime,
-            'Pay '.self::$priceAddTime.' planets to add more time?', [self::class, 'addTimePaySuccess']);
+            'Pay ' . self::$priceAddTime . ' planets to add more time?', [self::class, 'addTimePaySuccess']);
     }
 
     public static function addTimePaySuccess(Player $player, int $amount)
@@ -64,7 +70,7 @@ class Pay2Play extends Module implements ModuleInterface
 
     public static function skip(Player $player)
     {
-        PlanetsController::createBill($player, self::$priceSkip, 'Pay '.self::$priceSkip.' planets to skip map?',
+        PlanetsController::createBill($player, self::$priceSkip, 'Pay ' . self::$priceSkip . ' planets to skip map?',
             [self::class, 'skipPaySuccess']);
     }
 

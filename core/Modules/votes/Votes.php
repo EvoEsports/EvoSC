@@ -29,18 +29,13 @@ class Votes extends Module implements ModuleInterface
     private static $timeVotesThisRound = 0;
     private static int $skipVotesThisRound = 0;
     private static $onlinePlayersCount;
+    private static $addTimeSuccess = null;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
-        self::$voters = collect();
-        self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
-        self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimit();
-        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
-
-        AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
-        AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
-
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
@@ -67,6 +62,18 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
+    public function __construct()
+    {
+        self::$voters = collect();
+        self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
+        self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
+        $originalTimeLimit = CountdownController::getOriginalTimeLimit();
+        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+
+        AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
+        AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
+    }
+
     public static function startVote(Player $player, string $question, $action, $successRatio = 0.5): bool
     {
         if (isset(self::$vote)) {
@@ -84,7 +91,7 @@ class Votes extends Module implements ModuleInterface
 
                 return false;
             }
-            
+
             $duration = $secondsLeft - 3;
         }
 
@@ -171,9 +178,11 @@ class Votes extends Module implements ModuleInterface
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
+                self::$addTimeSuccess = true;
                 infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
                 CountdownController::addTime($secondsToAdd);
             } else {
+                self::$addTimeSuccess = false;
                 infoMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
             }
         }, config('votes.time.success-ratio'));
@@ -200,6 +209,11 @@ class Votes extends Module implements ModuleInterface
 
     public static function askSkip(Player $player)
     {
+        if (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess) {
+            infoMessage('Can not skip the map after time was added.')->send($player);
+            return;
+        }
+
         $secondsPassed = time() - self::$lastSkipVote;
 
         if (!$player->hasAccess('vote_always')) {
@@ -379,6 +393,7 @@ class Votes extends Module implements ModuleInterface
     {
         self::$timeVotesThisRound = 0;
         self::$skipVotesThisRound = 0;
+        self::$addTimeSuccess = null;
     }
 
     private static function getSecondsSinceLastTimeVote()
@@ -392,10 +407,10 @@ class Votes extends Module implements ModuleInterface
     }
 
     /**
-     * @inheritDoc
+     * @return null
      */
-    public static function start(string $mode, bool $isBoot = false)
+    public static function getAddTimeSuccess()
     {
-        // TODO: Implement start() method.
+        return self::$addTimeSuccess;
     }
 }
