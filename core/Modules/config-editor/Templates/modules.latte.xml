@@ -48,7 +48,26 @@ Config-Editor
                         <frame pos="0 {$iterator->counter * -4.5 + 1}">
                             <label class="{array_key_exists('blank', $config) ? 'text-accent' : 'text-light'}" size="30 4" pos="2 0" text="{$config['key']}" textprefix="$999{str_repeat('—', $config['level'])}$z " textsize="0.75" valign="center"/>
                             {if !array_key_exists('blank', $config)}
-                            <entry class="form" size="45 4" pos="31 0" default="{$config['value']}" textsize="0.75" valign="center"/>
+                            {if $config['type'] == 'bool'}
+                            <frame pos="31 1.5" size="8 3">
+                                <frame pos="{$config['value'] == 1 ? 5 : 0} 0">
+                                    <entry class="form" pos="1000 0" default="{$config['value']}"/>
+                                    <label class="text-dark" pos="1.5 -1.5" valign="center" halign="center" text="{$config['value'] == 1 ? '' : ''}" size="3 3" z-index="2" opacity="0.75" scale="0.5" />
+                                    <quad class="switch" bgcolor="0000" pos="-5" size="13 3" opacity="0.75" z-index="3" ScriptEvents="1" />
+                                    <quad class="bg-accent" pos="-5" size="5 3" opacity="0.75" />
+                                    <quad class="bg-light" size="3 3" />
+                                    <quad class="bg-light" pos="3" size="5 3" opacity="0.25" />
+                                </frame>
+                            </frame>
+                            {elseif $config['type'] == 'int'}
+                            <frame pos="31 0">
+                                <entry class="form" size="37 4" default="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                                <label class="btn-muted number add" size="4 4" pos="39" text="+" ScriptEvents="1" />
+                                <label class="btn-muted number sub" size="4 4" pos="43" text="-" ScriptEvents="1" />
+                            </frame>
+                            {else}
+                            <entry class="form" size="45 4" pos="31 0" default="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                            {/if}
                             {/if}
                         </frame>
                         {/foreach}
@@ -119,8 +138,37 @@ Config-Editor
         }
         Page.MainFrame.GetFirstChild(event.Control.DataAttributeGet("config")).Visible = True;
         AnimMgr.Add(panFrame, "<frame pos='-80 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+        continue;
     }
     if(event.Control.HasClass("back") && event.Type == CMlScriptEvent::Type::MouseClick){
         AnimMgr.Add(panFrame, "<frame pos='0 0' />", 400, CAnimManager::EAnimManagerEasing::ExpOut);
+        continue;
+    }
+    if(event.Control.HasClass("number") && event.Type == CMlScriptEvent::Type::MouseClick){
+        declare frame = (event.Control.Parent as CMlFrame);
+        declare entry = (frame.Controls[0] as CMlEntry);
+        if(event.Control.HasClass("add")){
+            entry.Value = "" ^ (TL::ToInteger(entry.Value) + 1);
+        }else if(event.Control.HasClass("sub")){
+            entry.Value = "" ^ (TL::ToInteger(entry.Value) - 1);
+        }
+        continue;
+    }
+    if(event.Control.HasClass("switch") && event.Type == CMlScriptEvent::Type::MouseClick){
+        declare frame = (event.Control.Parent as CMlFrame);
+        declare entry = (frame.Controls[0] as CMlEntry);
+        declare label = (frame.Controls[1] as CMlLabel);
+
+        if(entry.Value == "1"){
+            label.Value = "";
+            entry.Value = "0";
+            AnimMgr.Add(frame, "<frame pos='0 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+        }else{
+            label.Value = "";
+            entry.Value = "1";
+            AnimMgr.Add(frame, "<frame pos='5 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+        }
+
+        continue;
     }
 {/block}
