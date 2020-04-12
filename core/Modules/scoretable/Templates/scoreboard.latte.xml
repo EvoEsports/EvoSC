@@ -195,9 +195,9 @@
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
-    Void updateBox(CMlFrame box, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} score, Integer rank){
-        declare CUser user <=> score.User;
-        declare EvoSC_Group group = getGroup(score.User.Login);
+    Void updateBox(CMlFrame box, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score, Integer rank){
+        declare CUser user <=> Score.User;
+        declare EvoSC_Group group = getGroup(Score.User.Login);
         declare nameLabel <=> (box.Controls[0] as CMlLabel);
         declare groupIconLabel <=> (box.Controls[1] as CMlLabel);
         declare badgeQuad <=> ((box.Controls[2] as CMlFrame).Controls[0] as CMlQuad);
@@ -231,14 +231,14 @@
 
         scoreBgLabel.Value = "";
         if(CurrentServerModeName == "Rounds"){
-            if(score.Points > 0){
-                scoreLabel.Value = "$ddd" ^ score.Points ^ " Points";
+            if(Score.Points > 0){
+                scoreLabel.Value = "$ddd" ^ Score.Points ^ " Points";
             }else{
                 scoreLabel.Value = "$aaaNo Points";
             }
         }else{
-            if({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.count > 0 && score.BestLapTimes.slice(score.BestLapTimes.count - 1, 1){/if} > 0){
-                scoreLabel.Value = "$ddd" ^ formatScoreCorrect({if $is_maniaplanet}Score.BestLap.Time{else}score.BestLapTimes.slice(score.BestLapTimes.count - 1, 1){/if}, True);
+            if({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.count > 0 && Score.BestLapTimes.slice(Score.BestLapTimes.count - 1, 1){/if} > 0){
+                scoreLabel.Value = "$ddd" ^ formatScoreCorrect({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.slice(Score.BestLapTimes.count - 1, 1){/if}, True);
             }else{
                 scoreLabel.Value = "$aaaNo finish";
             }
@@ -248,22 +248,22 @@
         flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
 
 		declare Zone = "Other";
-		declare ZoneArray = TL::Split("|", score.User.LadderZoneName);
+		declare ZoneArray = TL::Split("|", Score.User.LadderZoneName);
 		if (ZoneArray.existskey(2)) Zone = ZoneArray[2];
-		if (score.User.LadderRank > 0){
-		    regionLabel.Value = TL::Compose("%1: %2", Zone, TL::ToText(score.User.LadderRank));
+		if (Score.User.LadderRank > 0){
+		    regionLabel.Value = TL::Compose("%1: %2", Zone, TL::ToText(Score.User.LadderRank));
 		}else{
 		    regionLabel.Value = TL::Compose("%1: %2", Zone, "Not ranked");
 		}
 
         fameStarsLabel.Value = getStars(user.FameStars);
 
-		if (UI.UISequence == CUIConfig::EUISequence::Podium && score.LadderScore != -1.) {
-			declare LadderPointsExplode = TL::Split(".", TL::ToText(score.LadderScore));
+		if (UI.UISequence == CUIConfig::EUISequence::Podium && Score.LadderScore != -1.) {
+			declare LadderPointsExplode = TL::Split(".", TL::ToText(Score.LadderScore));
 			declare LadderPoints = "0.0";
 			if (LadderPointsExplode.existskey(0)) LadderPoints = LadderPointsExplode[0];
 			if (LadderPointsExplode.existskey(1)) LadderPoints ^= "."^TL::SubString(LadderPointsExplode[1], 0, 2);
-			if (score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
+			if (Score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
 			else lpGainLabel.Value = LadderPoints;
 
 			scoreLabel.Value = scoreLabel.Value ^ " " ^ lpGainLabel.Value;
@@ -273,9 +273,9 @@
         box.DataAttributeSet("login", user.Login);
     }
 
-    Integer[CSmScore] GetSortedScores() {
+    Integer[{if $is_maniaplanet}CTmScore{else}CSmScore{/if}] GetSortedScores() {
         declare persistent Boolean[Text] LibScoresTable2_Settings for This;
-        declare SortedScores = Integer[CSmScore];
+        declare SortedScores = Integer[{if $is_maniaplanet}CTmScore{else}CSmScore{/if}];
         declare c = 0;
 
         foreach (Score in Scores) {
@@ -291,7 +291,7 @@
                 LibScoresTable2_Settings["SortDisco"] &&
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
-            SortedScores[Score] = Weight;
+            SortedScores[{if $is_maniaplanet}Score{else}CSmScore{/if}] = Weight;
             c += 1;
         }
 

@@ -11,7 +11,7 @@ main() {
     while(True){
         yield;
 
-        foreach(event in PendingEvents){
+        foreach(event in RaceEvents){
             if(event.Player.User.Login == LocalUser.Login){
                 lastInteraction = GameTime;
                 break;

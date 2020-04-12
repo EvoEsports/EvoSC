@@ -27,9 +27,9 @@
 
     {block script}
     <script><!--
-    Integer[CSmScore] GetSortedScores() {
+    Integer[{if $is_maniaplanet}CTmScore{else}CSmScore{/if}] GetSortedScores() {
         declare persistent Boolean[Text] LibScoresTable2_Settings for This;
-        declare SortedScores = Integer[CSmScore];
+        declare SortedScores = Integer[{if $is_maniaplanet}CTmScore{else}CSmScore{/if}];
         declare c = 0;
 
         foreach (Score in Scores) {
@@ -45,7 +45,7 @@
                 LibScoresTable2_Settings["SortDisco"] &&
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
-            SortedScores[Score] = Weight;
+            SortedScores[{if $is_maniaplanet}Score{else}CSmScore{/if}] = Weight;
             c += 1;
         }
 
@@ -108,9 +108,9 @@
     }
     {/if}
 
-    Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} score){
+    Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score){
         declare prefix = "";
-		declare LibST_Status for score.User = C_Status_Disconnected;
+		declare LibST_Status for Score.User = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
             prefix = "  | ";
 		}else if(LibST_Status == C_Status_Spectating){
@@ -120,9 +120,9 @@
 		}
 
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
-        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(score), False);
-        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(score), True);
-        (box.Controls[3] as CMlLabel).Value = prefix ^ score.User.Name;
+        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), False);
+        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), True);
+        (box.Controls[3] as CMlLabel).Value = prefix ^ Score.User.Name;
         box.Show();
     }
 
@@ -147,12 +147,17 @@
                 return;
             }
 
-            declare bestTimes = Score.BestLapTimes;
-            bestTimes = bestTimes.sortreverse();
-
-            if({if $is_maniaplanet}Score.BestLap.Time{else}Score.BestLapTimes.count > 0 && bestTimes[0]{/if} == -1){
+            {if $is_maniaplanet}
+            if(Score.BestLap.Time == -1){
                 continue;
             }
+            {else}
+            declare bestTimes = Score.BestLapTimes;
+            bestTimes = bestTimes.sortreverse();
+            if(Score.BestLapTimes.count > 0 && bestTimes[0] == -1){
+                continue;
+            }
+            {/if}
 
             declare SlotNeedUpdate = False;
             declare LibST_LastTick for Score.User = -1;
