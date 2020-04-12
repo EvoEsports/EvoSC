@@ -1,0 +1,42 @@
+{contentType text}
+{extends 'components.tabbed-window'}
+
+{block id}
+config-editor-window
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Config-Editor
+{/block}
+
+
+{block navbar}
+{include 'components.tabs', tabs => [
+    'General'=>'',
+    'Modules'=>'config_editor.modules'
+]
+}
+{/block}
+
+{block content}
+<label class="text-light" pos="55 -16" text="$i$oEvoSC"/>
+{/block}
+
+{block scriptDeclarations}
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+{/block}
+
+{block loop}
+{/block}
+
+{block pendingEvents}
+{/block}

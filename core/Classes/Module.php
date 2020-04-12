@@ -8,6 +8,7 @@ use stdClass;
 
 class Module
 {
+    protected string $name;
     protected string $namespace;
     protected string $directory;
     protected string $configId;
@@ -58,6 +59,22 @@ class Module
     public function setConfigId(string $configId): void
     {
         $this->configId = $configId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
     }
 
 

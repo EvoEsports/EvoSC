@@ -1,0 +1,126 @@
+{contentType text}
+{extends 'components.tabbed-window'}
+{php $window_width = 80;}
+{php $window_height = 70;}
+
+{block id}
+config-editor-window
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Config-Editor
+{/block}
+
+
+{block navbar}
+{include 'components.tabs', tabs => [
+    'General'=>'config_editor.general',
+    'Modules'=>''
+]
+}
+{/block}
+
+{block content}
+<frame pos="-2 -5" size="80 59">
+    <frame id="pan-frame">
+        <frame size="80 59">
+            <quad id="scroll-bar" rot="90" size="100 10" style="Bgs1" substyle="BgTitle3_3" pos="79" scale="0.2" opacity="0.85" />
+            <frame id="scroll-frame" size="80 59">
+                {foreach $modules as $module}
+                <label class="btn-muted open-settings" size="80 4" pos="40 {$iterator->counter * -4 + 2}" text="{$module->getName()}" data-config="{$module->getConfigId()}" textsize="0.75" ScriptEvents="1"/>
+                {/foreach}
+            </frame>
+        </frame>
+        <frame id="settings-frame" size="80 59" pos="80 0">
+            {foreach $modules as $module}
+            <frame id="{$module->getConfigId()}" class="settings-frame-content" hidden="1">
+                <quad class="bg-dark" size="80 6.5" z-index="-1"/>
+                <label class="text-light back" size="50 4" pos="2 -3" textprefix="  " text="{$module->getName()}" valign="center" textsize="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
+
+                <frame class="settings-scroll">
+                    <quad rot="90" size="100 10" style="Bgs1" substyle="BgTitle3_3" pos="79 -8" scale="0.2" opacity="0.85" />
+                    <frame pos="0 -6.5" size="80 59">
+                        {foreach $module->configs as $config}
+                        <frame pos="0 {$iterator->counter * -4.5 + 1}">
+                            <label class="{array_key_exists('blank', $config) ? 'text-accent' : 'text-light'}" size="30 4" pos="2 0" text="{$config['key']}" textprefix="$999{str_repeat('—', $config['level'])}$z " textsize="0.75" valign="center"/>
+                            {if !array_key_exists('blank', $config)}
+                            <entry class="form" size="45 4" pos="31 0" default="{$config['value']}" textsize="0.75" valign="center"/>
+                            {/if}
+                        </frame>
+                        {/foreach}
+                    </frame>
+                </frame>
+            </frame>
+            {/foreach}
+        </frame>
+    </frame>
+</frame>
+{/block}
+
+{block scriptDeclarations}
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+    declare CMlFrame[] settingsControls;
+    declare scrollBar <=> (Page.MainFrame.GetFirstChild("scroll-bar") as CMlQuad);
+    declare scrollFrame <=> (Page.MainFrame.GetFirstChild("scroll-frame") as CMlFrame);
+    declare panFrame <=> (Page.MainFrame.GetFirstChild("pan-frame") as CMlFrame);
+    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
+    declare scrollMax = {sprintf('%.01f', $modules->count() * 4)} - 59.0;
+
+    Page.GetClassChildren("settings-scroll", settingsFrame, True);
+    foreach(control in Page.GetClassChildren_Result){
+        declare frame <=> (control as CMlFrame);
+        declare sb <=> (frame.Controls[0] as CMlFrame);
+        declare scrollFrame_ <=> (frame.Controls[1] as CMlFrame);
+        declare scrollHeight = scrollFrame_.Controls.count * 4.0 - 6.5;
+        frame.Size[1] = scrollHeight;
+        if(scrollHeight >= 52.5){
+            sb.Show();
+            scrollFrame_.ScrollActive = True;
+            scrollFrame_.ScrollMin = <0.0, 0.0>;
+            scrollFrame_.ScrollMax = <0.0, scrollHeight>;
+        }else{
+            sb.Hide();
+        }
+        settingsControls.add(frame);
+    }
+
+    scrollFrame.ScrollActive = True;
+    scrollFrame.ScrollMin = <0.0, 0.0>;
+    scrollFrame.ScrollMax = <0.0, scrollMax>;
+{/block}
+
+{block loop}
+    scrollBar.RelativePosition_V3[1] = scrollFrame.ScrollOffset[1] / scrollMax * -37.0 - 1.0;
+
+    foreach(frame in settingsControls){
+        if(frame.Visible && frame.Size[1] >= 52.5){
+            declare sb = (frame.Controls[0] as CMlFrame);
+            declare scrollFrame_ = (frame.Controls[1] as CMlFrame);
+            declare offset = scrollFrame_.ScrollOffset[1] / frame.Size[1];
+            sb.RelativePosition_V3[1] = offset * -29.0 - 8.0;
+        }
+    }
+{/block}
+
+{block pendingEvents}
+    if(event.Control.HasClass("open-settings") && event.Type == CMlScriptEvent::Type::MouseClick){
+        foreach(Control in settingsFrame.Controls){
+            declare frame <=> (Control as CMlFrame);
+            frame.Visible = False;
+        }
+        Page.MainFrame.GetFirstChild(event.Control.DataAttributeGet("config")).Visible = True;
+        AnimMgr.Add(panFrame, "<frame pos='-80 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+    }
+    if(event.Control.HasClass("back") && event.Type == CMlScriptEvent::Type::MouseClick){
+        AnimMgr.Add(panFrame, "<frame pos='0 0' />", 400, CAnimManager::EAnimManagerEasing::ExpOut);
+    }
+{/block}

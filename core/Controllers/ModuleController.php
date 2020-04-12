@@ -107,6 +107,7 @@ class ModuleController implements ControllerInterface
                 $instance->setConfigId($configId);
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);
+                $instance->setName(preg_replace('#^.+[\\\]#', '', $moduleClass));
                 Log::info("Module: $moduleClass [Started]", isVerbose());
 
                 $totalStarted++;
