@@ -27,7 +27,7 @@ class Database
      */
     public static function init()
     {
-        Log::info("Connecting to database...");
+        Log::write("Connecting to database...");
 
         $capsule = new Capsule();
 

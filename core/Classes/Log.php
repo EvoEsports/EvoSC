@@ -68,9 +68,9 @@ class Log
             $callingClass = $caller['function'];
         }
 
-        if(count($caller['args']) > 0){
+        if (count($caller['args']) > 0) {
             $callingClass .= '(...)';
-        }else {
+        } else {
             $callingClass .= '';
         }
 
@@ -132,6 +132,16 @@ class Log
 
         list($childClass, $caller) = debug_backtrace(false, 2);
         self::write('<fg=red>' . $message . '</>', $echo, $caller);
+    }
+
+    /**
+     * @param string $message
+     * @param bool $echo
+     */
+    public static function cyan(string $message, bool $echo = true)
+    {
+        list($childClass, $caller) = debug_backtrace(false, 2);
+        self::write("<fg=cyan;options=bold>$message</>", $echo, $caller);
     }
 
     /**

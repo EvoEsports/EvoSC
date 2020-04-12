@@ -54,6 +54,7 @@ class ModuleController implements ControllerInterface
 
         $coreModules = File::getFilesRecursively(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
         $allModules = $coreModules->merge(File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/'));
+        $totalStarted = 0;
 
         $moduleClasses = $allModules
             ->reject(function ($file) {
@@ -64,7 +65,7 @@ class ModuleController implements ControllerInterface
                 return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname($file)];
             })
             ->unique()
-            ->map(function ($moduleDir, $moduleClass) use ($mode) {
+            ->map(function ($moduleDir, $moduleClass) use ($mode, &$totalStarted) {
                 $files = scandir($moduleDir);
                 $configId = null;
                 $config = null;
@@ -76,12 +77,13 @@ class ModuleController implements ControllerInterface
                 }
 
                 if ($configId == null) {
-                    Log::error('Missing config for module: ' . $moduleClass, true);
+                    Log::warning('No config for module: ' . $moduleClass, true);
                     return null;
                 } else {
                     $config = ConfigController::getConfig($configId, true);
                     $enabled = isset($config->enabled) ? $config->enabled : true;
                     if (!is_null($enabled) && $enabled == false) {
+                        Log::warning("Module: $moduleClass [Disabled]", isVerbose());
                         return null;
                     }
                 }
@@ -91,28 +93,30 @@ class ModuleController implements ControllerInterface
                 try {
                     $instance = new $moduleClass();
                 } catch (\Error $e) {
-                    Log::error($e->getMessage() . ', module not started.');
+                    Log::error('Module: ' . $moduleClass . ' [ERROR] ' . $e->getMessage() . ' (not started).', true);
                     return null;
                 }
 
                 if (!($instance instanceof Module)) {
-                    Log::error("$moduleClass is not a module, but should be.", true);
+                    Log::error("$moduleClass is not a module, but should be (not started).", true);
                     return null;
                 }
 
                 /** @var $moduleClass Module */
                 $instance::start($mode);
-                $instance->setConfig($config);
+                $instance->setConfigId($configId);
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);
-                Log::info("Module $moduleClass started.", isVeryVerbose());
+                Log::info("Module: $moduleClass [Started]", isVerbose());
+
+                $totalStarted++;
 
                 return $instance;
             })
             ->filter();
 
         //Boot modules
-        Log::write('Finished starting modules.');
+        Log::cyan("Starting modules finished. $totalStarted modules started.");
 
         self::$loadedModules = $moduleClasses;
     }

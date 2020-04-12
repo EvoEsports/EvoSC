@@ -10,7 +10,7 @@ class Module
 {
     protected string $namespace;
     protected string $directory;
-    protected stdClass $config;
+    protected string $configId;
 
     /**
      * @return string
@@ -47,17 +47,17 @@ class Module
     /**
      * @return stdClass
      */
-    public function getConfig(): stdClass
+    public function getConfigId(): string
     {
-        return $this->config;
+        return $this->configId;
     }
 
     /**
      * @param stdClass $config
      */
-    public function setConfig(stdClass $config): void
+    public function setConfigId(string $configId): void
     {
-        $this->config = $config;
+        $this->configId = $configId;
     }
 
 
