@@ -37,6 +37,7 @@ class CPRecords extends Module implements ModuleInterface
         }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('EndMap', [self::class, 'beginMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
     }
 

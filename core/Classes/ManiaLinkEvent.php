@@ -127,7 +127,7 @@ class ManiaLinkEvent
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 
             if (!$event) {
-                Log::warning("Calling non-existent ManiaLinkEvent $action.");
+                Log::warning("Calling undefined ManiaLinkEvent $action.");
 
                 return;
             }

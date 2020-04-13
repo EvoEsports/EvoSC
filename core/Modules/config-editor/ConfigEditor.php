@@ -102,8 +102,11 @@ class ConfigEditor extends Module implements ModuleInterface
         return $configs;
     }
 
-    public static function mleSaveConfig(Player $player, string $data)
+    public static function mleSaveConfig(Player $player, \stdClass $formValues)
     {
-        dump(json_decode($data));
+        foreach ((array)json_decode($formValues->data) as $key => $updatedValue) {
+            $configId = "$formValues->id.$key";
+            ConfigController::saveConfig($configId, $updatedValue);
+        }
     }
 }

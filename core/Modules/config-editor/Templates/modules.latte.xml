@@ -27,6 +27,8 @@ Config-Editor
 {block content}
 <frame pos="-2 -5" size="80 59">
     <frame id="pan-frame">
+        <entry id="id-entry" name="id" pos="1000"/>
+        <entry id="data-entry" name="data" pos="1000"/>
         <frame size="80 59">
             <quad id="scroll-bar" rot="90" size="100 10" style="Bgs1" substyle="BgTitle3_3" pos="79" scale="0.2" opacity="0.85" />
             <frame id="scroll-frame" size="80 59">
@@ -120,7 +122,6 @@ Void resetEntriesInActiveFrame(){
 }
 
 Void save(){
-    declare Text[Text] payload;
     declare Text[Text] values;
     Page.GetClassChildren("form", activeFrame, True);
     foreach(Control in Page.GetClassChildren_Result){
@@ -129,9 +130,9 @@ Void save(){
             values[entry.DataAttributeGet("key")] = entry.Value;
         }
     }
-    payload["data"] = values.tojson();
-    payload["config"] = activeFrame.DataAttributeGet("config");
-    ManiaLinkEvent("config_editor_save", payload.tojson());
+    (Page.MainFrame.GetFirstChild("data-entry") as CMlEntry).Value = values.tojson();
+    (Page.MainFrame.GetFirstChild("id-entry") as CMlEntry).Value = activeFrame.DataAttributeGet("config");
+    TriggerPageAction("config_editor_save");
 }
 --></script>
 {/block}

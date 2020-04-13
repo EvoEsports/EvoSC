@@ -100,10 +100,7 @@ class ConfigController implements ControllerInterface
         self::$config->put($id, $value);
     }
 
-    /**
-     *
-     */
-    private static function loadConfigurationFiles()
+    public static function loadConfigurationFiles()
     {
         $defaultConfigFiles = File::getFilesRecursively(configDir('default'), self::$configFilePattern);
         $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern));
