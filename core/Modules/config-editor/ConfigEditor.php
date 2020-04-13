@@ -26,8 +26,9 @@ class ConfigEditor extends Module implements ModuleInterface
 
         ChatCommand::add('//config', [self::class, 'cmdShowEditConfig'], 'Open the Config-Editor', 'config_edit');
 
-        ManiaLinkEvent::add('config_editor.general', [self::class, 'mleShowEditGeneralConfig'], 'config_edit');
-        ManiaLinkEvent::add('config_editor.modules', [self::class, 'mleShowEditModulesConfig'], 'config_edit');
+        ManiaLinkEvent::add('config_editor_general', [self::class, 'mleShowEditGeneralConfig'], 'config_edit');
+        ManiaLinkEvent::add('config_editor_modules', [self::class, 'mleShowEditModulesConfig'], 'config_edit');
+        ManiaLinkEvent::add('config_editor_save', [self::class, 'mleSaveConfig'], 'config_edit');
     }
 
     /**
@@ -71,6 +72,7 @@ class ConfigEditor extends Module implements ModuleInterface
             if (is_array($entry) || is_object($entry)) {
                 $configs->push([
                     'key' => $key,
+                    'full_key' => strlen($prevKey) ? $prevKey . '.' . $key : $key,
                     'blank' => true,
                     'level' => $level
                 ]);
@@ -89,6 +91,7 @@ class ConfigEditor extends Module implements ModuleInterface
 
                 $configs->push([
                     'key' => $key,
+                    'full_key' => strlen($prevKey) ? $prevKey . '.' . $key : $key,
                     'value' => $entry,
                     'type' => $type,
                     'level' => $level
@@ -97,5 +100,10 @@ class ConfigEditor extends Module implements ModuleInterface
         }
 
         return $configs;
+    }
+
+    public static function mleSaveConfig(Player $player, string $data)
+    {
+        dump(json_decode($data));
     }
 }

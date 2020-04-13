@@ -37,9 +37,9 @@ Config-Editor
         </frame>
         <frame id="settings-frame" size="80 59" pos="80 0">
             {foreach $modules as $module}
-            <frame id="{$module->getConfigId()}" class="settings-frame-content" hidden="1">
+            <frame id="{$module->getConfigId()}" data-config="{$module->getConfigId()}" class="settings-frame-content" hidden="1">
                 <quad class="bg-dark" size="80 6.5" z-index="-1"/>
-                <label class="text-light back" size="50 4" pos="2 -3" textprefix="  " text="{$module->getName()}" valign="center" textsize="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
+                <label class="text-light back" size="45 4" pos="2 -3.25" textprefix="  " text="{$module->getName()}" valign="center" textsize="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
 
                 <frame class="settings-scroll">
                     <quad rot="90" size="100 10" style="Bgs1" substyle="BgTitle3_3" pos="79 -8" scale="0.2" opacity="0.85" />
@@ -51,7 +51,7 @@ Config-Editor
                             {if $config['type'] == 'bool'}
                             <frame pos="31 1.5" size="8 3">
                                 <frame pos="{$config['value'] == 1 ? 5 : 0} 0">
-                                    <entry class="form" pos="1000 0" default="{$config['value']}"/>
+                                    <entry class="form" pos="1000 0" default="{$config['value']}" data-key="{$config['full_key']}" data-original="{$config['value']}"/>
                                     <label class="text-dark" pos="1.5 -1.5" valign="center" halign="center" text="{$config['value'] == 1 ? '' : ''}" size="3 3" z-index="2" opacity="0.75" scale="0.5" />
                                     <quad class="switch" bgcolor="0000" pos="-5" size="13 3" opacity="0.75" z-index="3" ScriptEvents="1" />
                                     <quad class="bg-accent" pos="-5" size="5 3" opacity="0.75" />
@@ -61,18 +61,29 @@ Config-Editor
                             </frame>
                             {elseif $config['type'] == 'int'}
                             <frame pos="31 0">
-                                <entry class="form" size="37 4" default="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                                <entry class="form" size="37 4" default="{$config['value']}" data-key="{$config['full_key']}" data-original="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
                                 <label class="btn-muted number add" size="4 4" pos="39" text="+" ScriptEvents="1" />
                                 <label class="btn-muted number sub" size="4 4" pos="43" text="-" ScriptEvents="1" />
                             </frame>
+                            {elseif $config['type'] == 'float'}
+                            <frame pos="31 0">
+                                <entry class="form" size="37 4" default="{$config['value']}" data-key="{$config['full_key']}" data-original="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                                <label class="btn-muted float add" size="4 4" pos="39" text="+" ScriptEvents="1" />
+                                <label class="btn-muted float sub" size="4 4" pos="43" text="-" ScriptEvents="1" />
+                            </frame>
                             {else}
-                            <entry class="form" size="45 4" pos="31 0" default="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                            <frame pos="31 0">
+                                <entry class="form" size="45 4" default="{$config['value']}" data-key="{$config['full_key']}" data-original="{$config['value']}" textprefix="  " textsize="0.75" valign="center"/>
+                            </frame>
                             {/if}
                             {/if}
                         </frame>
                         {/foreach}
                     </frame>
                 </frame>
+
+                <label id="save-button" class="btn-accent save" size="12 4" pos="59 -3.25" text=" Save" ScriptEvents="1" textsize="0.25" hidden="1"/>
+                <label class="btn-warning load" size="12 4" pos="72 -3.25" text=" Load" ScriptEvents="1" textsize="0.25" />
             </frame>
             {/foreach}
         </frame>
@@ -81,13 +92,53 @@ Config-Editor
 {/block}
 
 {block scriptDeclarations}
+<script><!--
+declare CMlFrame activeFrame;
+--></script>
 {/block}
 
 {block functions}
+<script><!--
+Boolean hasUnsavedChanges(){
+    Page.GetClassChildren("form", activeFrame, True);
+    foreach(Control in Page.GetClassChildren_Result){
+        declare entry = (Control as CMlEntry);
+        if(entry.Value != entry.DataAttributeGet("original")){
+            return True;
+        }
+    }
+
+    return False;
+}
+
+Void resetEntriesInActiveFrame(){
+    Page.GetClassChildren("form", activeFrame, True);
+    foreach(Control in Page.GetClassChildren_Result){
+        declare entry = (Control as CMlEntry);
+        entry.Value = entry.DataAttributeGet("original");
+    }
+}
+
+Void save(){
+    declare Text[Text] payload;
+    declare Text[Text] values;
+    Page.GetClassChildren("form", activeFrame, True);
+    foreach(Control in Page.GetClassChildren_Result){
+        declare entry = (Control as CMlEntry);
+        if(entry.Value != entry.DataAttributeGet("original")){
+            values[entry.DataAttributeGet("key")] = entry.Value;
+        }
+    }
+    payload["data"] = values.tojson();
+    payload["config"] = activeFrame.DataAttributeGet("config");
+    ManiaLinkEvent("config_editor_save", payload.tojson());
+}
+--></script>
 {/block}
 
 {block bootScript}
     declare CMlFrame[] settingsControls;
+    declare saveButton <=> (Page.MainFrame.GetFirstChild("save-button") as CMlLabel);
     declare scrollBar <=> (Page.MainFrame.GetFirstChild("scroll-bar") as CMlQuad);
     declare scrollFrame <=> (Page.MainFrame.GetFirstChild("scroll-frame") as CMlFrame);
     declare panFrame <=> (Page.MainFrame.GetFirstChild("pan-frame") as CMlFrame);
@@ -120,27 +171,44 @@ Config-Editor
 {block loop}
     scrollBar.RelativePosition_V3[1] = scrollFrame.ScrollOffset[1] / scrollMax * -37.0 - 1.0;
 
-    foreach(frame in settingsControls){
-        if(frame.Visible && frame.Size[1] >= 52.5){
-            declare sb = (frame.Controls[0] as CMlFrame);
-            declare scrollFrame_ = (frame.Controls[1] as CMlFrame);
-            declare offset = scrollFrame_.ScrollOffset[1] / frame.Size[1];
-            sb.RelativePosition_V3[1] = offset * -29.0 - 8.0;
-        }
+    if(activeFrame != Null && activeFrame.Size[1] >= 52.5){
+        declare mFrame = (activeFrame.Controls[2] as CMlFrame);
+        declare sb = (mFrame.Controls[0] as CMlFrame);
+        declare scrollFrame_ = (mFrame.Controls[1] as CMlFrame);
+        declare offset = scrollFrame_.ScrollOffset[1] / activeFrame.Size[1];
+        sb.RelativePosition_V3[1] = offset * -29.0 - 8.0;
     }
 {/block}
 
 {block pendingEvents}
+    if(event.Control.HasClass("form") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+        declare saveButton = (activeFrame.Controls[3] as CMlLabel);
+        saveButton.Visible = hasUnsavedChanges();
+        continue;
+    }
     if(event.Control.HasClass("open-settings") && event.Type == CMlScriptEvent::Type::MouseClick){
         foreach(Control in settingsFrame.Controls){
             declare frame <=> (Control as CMlFrame);
             frame.Visible = False;
         }
-        Page.MainFrame.GetFirstChild(event.Control.DataAttributeGet("config")).Visible = True;
+        activeFrame <=> (Page.MainFrame.GetFirstChild(event.Control.DataAttributeGet("config")) as CMlFrame);
+        activeFrame.Visible = True;
         AnimMgr.Add(panFrame, "<frame pos='-80 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
         continue;
     }
+    if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
+        save();
+        continue;
+    }
     if(event.Control.HasClass("back") && event.Type == CMlScriptEvent::Type::MouseClick){
+        if(hasUnsavedChanges()){
+            if(!confirm("Continue without saving?")){
+                continue;
+            }
+
+            resetEntriesInActiveFrame();
+        }
+
         AnimMgr.Add(panFrame, "<frame pos='0 0' />", 400, CAnimManager::EAnimManagerEasing::ExpOut);
         continue;
     }
@@ -148,9 +216,19 @@ Config-Editor
         declare frame = (event.Control.Parent as CMlFrame);
         declare entry = (frame.Controls[0] as CMlEntry);
         if(event.Control.HasClass("add")){
-            entry.Value = "" ^ (TL::ToInteger(entry.Value) + 1);
+            entry.SetText("" ^ (TL::ToInteger(entry.Value) + 1), True);
         }else if(event.Control.HasClass("sub")){
-            entry.Value = "" ^ (TL::ToInteger(entry.Value) - 1);
+            entry.SetText("" ^ (TL::ToInteger(entry.Value) - 1), True);
+        }
+        continue;
+    }
+    if(event.Control.HasClass("float") && event.Type == CMlScriptEvent::Type::MouseClick){
+        declare frame = (event.Control.Parent as CMlFrame);
+        declare entry = (frame.Controls[0] as CMlEntry);
+        if(event.Control.HasClass("add")){
+            entry.SetText("" ^ (TL::ToReal(entry.Value) + 1.0), True);
+        }else if(event.Control.HasClass("sub")){
+            entry.SetText("" ^ (TL::ToReal(entry.Value) - 1.0), True);
         }
         continue;
     }
@@ -161,14 +239,13 @@ Config-Editor
 
         if(entry.Value == "1"){
             label.Value = "";
-            entry.Value = "0";
+            entry.SetText("0", True);
             AnimMgr.Add(frame, "<frame pos='0 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
         }else{
             label.Value = "";
-            entry.Value = "1";
+            entry.SetText("1", True);
             AnimMgr.Add(frame, "<frame pos='5 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
         }
-
         continue;
     }
 {/block}
