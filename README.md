@@ -11,7 +11,7 @@
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
 
-A server controller for Trackmania² for ManiaPlanet 4.1
+A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack

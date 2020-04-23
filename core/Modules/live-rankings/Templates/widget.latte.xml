@@ -45,7 +45,7 @@
                 LibScoresTable2_Settings["SortDisco"] &&
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
-            SortedScores[{if $is_maniaplanet}Score{else}CSmScore{/if}] = Weight;
+            SortedScores[Score] = Weight;
             c += 1;
         }
 

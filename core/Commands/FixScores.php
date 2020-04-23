@@ -2,6 +2,7 @@
 
 namespace esc\Commands;
 
+use esc\Classes\DB;
 use esc\Classes\Log;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
@@ -50,14 +51,23 @@ class FixScores extends Command
         $playerIds = $evoSC->table('stats')->where('Locals', '>', 0)->pluck('Player')->toArray();
         $players = $evoSC->table('players')->whereIn('id', $playerIds)->get();
         $bar = new ProgressBar($output, $players->count());
-        $limit = 200;
+        $limit = config('locals.limit');
         $players->each(function ($player) use ($evoSC, $bar, $limit) {
-            $score = $evoSC->table('local-records')->where('Player', $player->id)->where('Rank', '<',
-                $limit)->selectRaw($limit . ' - Rank as rank_diff')->get()->sum('rank_diff');
+            $data = DB::table('local-records')
+                ->join('players', 'local-records.Player', '=', 'players.id')
+                ->join('maps', 'local-records.Map', '=', 'maps.id')
+                ->selectRaw('Player as id, Login, SUM(Rank) as rank_sum, COUNT(Rank) as locals')
+                ->where('maps.enabled', '=', 1)
+                ->where('Login', $player->Login)
+                ->groupBy('Login')
+                ->get();
 
-            $evoSC->table('stats')->where('Player', $player->id)->update([
-                'Score' => $score,
-            ]);
+
+            foreach ($data as $stat) {
+                $evoSC->table('stats')->where('Player', $player->id)->update([
+                    'Score' => $limit * $stat->locals - intval($stat->rank_sum),
+                ]);
+            }
 
             $bar->advance();
         });
