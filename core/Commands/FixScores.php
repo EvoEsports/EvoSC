@@ -2,6 +2,8 @@
 
 namespace esc\Commands;
 
+use esc\Classes\ChatCommand;
+use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Log;
 use esc\Controllers\ConfigController;
@@ -22,6 +24,8 @@ class FixScores extends Command
     {
         Log::setOutput($output);
         ConfigController::init();
+        ChatCommand::removeAll();
+        Database::init();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
