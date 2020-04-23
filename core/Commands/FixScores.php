@@ -4,6 +4,7 @@ namespace esc\Commands;
 
 use esc\Classes\DB;
 use esc\Classes\Log;
+use esc\Controllers\ConfigController;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -20,6 +21,7 @@ class FixScores extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         Log::setOutput($output);
+        ConfigController::init();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
