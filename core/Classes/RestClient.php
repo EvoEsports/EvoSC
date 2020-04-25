@@ -44,7 +44,7 @@ class RestClient
      */
     public static function getClient(): Client
     {
-        return self::getClient();
+        return self::$client;
     }
 
     /**

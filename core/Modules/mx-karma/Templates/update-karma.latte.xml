@@ -2,8 +2,8 @@
 <manialink name="ESC:MxKarma:update-map-karma" id="update-map-karma" version="3">
     <script><!--
 main(){
-    declare Real MxKarmaAverage for LocalUser;
-    MxKarmaAverage = {sprintf('%.2f', $average)|noescape};
+    declare Real EvoSC_MxKarma_VotesAverage for This;
+    EvoSC_MxKarma_VotesAverage = {sprintf('%.2f', $average)|noescape};
 }
     --></script>
 </manialink>

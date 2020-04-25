@@ -8,6 +8,7 @@ use esc\Classes\Hook;
 use esc\Classes\Log;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
+use esc\Classes\RestClient;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Controllers\CountdownController;
@@ -34,7 +35,6 @@ class MxKarma extends Module implements ModuleInterface
     private static $updatedVotesAverage;
 
     private static stdClass $session;
-    private static Client $client;
     private static string $currentMapUid;
 
     /**
@@ -58,9 +58,6 @@ class MxKarma extends Module implements ModuleInterface
         self::$apiKey = config('mx-karma.key');
         self::$updatedVotesPlayerIds = collect([]);
         self::$ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
-        self::$client = new Client([
-            'base_uri' => 'https://karma.mania-exchange.com/api2/',
-        ]);
 
         try {
             MxKarma::startSession();
@@ -83,6 +80,25 @@ class MxKarma extends Module implements ModuleInterface
         ChatCommand::add('-----', [MxKarma::class, 'voteWorst'], 'Rate the map trash', null, true);
 
         ManiaLinkEvent::add('mxk.vote', [MxKarma::class, 'vote']);
+        ManiaLinkEvent::add('mx_karma.get_my_rating', [self::class, 'mleGetMyRating']);
+    }
+
+    public static function mleGetMyRating(Player $player, string $mapUid)
+    {
+        $map = DB::table('maps')->select('id')->where('uid', '=', $mapUid)->first();
+        $rating = DB::table('mx-karma')->select('Rating')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->first();
+
+        if ($rating) {
+            $payload = $rating->Rating;
+        } else {
+            if (self::playerCanVote($player, $map)) {
+                $payload = -1;
+            } else {
+                $payload = -2;
+            }
+        }
+
+        Template::show($player, 'mx-karma.update-my-rating', ['rating' => $payload]);
     }
 
     /**
@@ -136,24 +152,6 @@ class MxKarma extends Module implements ModuleInterface
         self::$currentMapUid = $mapUid;
         self::updateVotesAverage();
         self::sendUpdatedKarma();
-
-        $onlinePlayers = onlinePlayers();
-        $playerIds = $onlinePlayers->pluck('id');
-        $ratings = DB::table('mx-karma')->where('Map', '=', $map->id)->whereIn('Player', $playerIds)
-            ->select(['Rating', 'Player'])
-            ->pluck('Rating', 'Player');
-
-        foreach ($onlinePlayers as $player) {
-            if ($ratings->has($player->id)) {
-                $rating = $ratings->get($player->id);
-            } else {
-                $rating = self::playerCanVote($player, $map) ? -1 : -2; // -1 = can vote, -2 = can't vote
-            }
-
-            Template::show($player, 'mx-karma.update-my-vote', compact('rating'), true, 20);
-        }
-
-        Template::executeMulticall();
     }
 
     public static function showWidget(Player $player)
@@ -165,11 +163,6 @@ class MxKarma extends Module implements ModuleInterface
     public static function sendUpdatedKarma()
     {
         $map = MapController::getCurrentMap();
-
-        if (!$map) {
-            return;
-        }
-
         $mapUid = $map->uid;
 
         if (self::$currentMapUid != $mapUid) {
@@ -183,21 +176,11 @@ class MxKarma extends Module implements ModuleInterface
         Template::showAll('mx-karma.update-karma', compact('average'));
     }
 
-    public static function playerCanVote(Player $player, Map $map): bool
+    public static function playerCanVote(Player $player, $map): bool
     {
-        if ($player->Score > 0) {
+        if (DB::table('pbs')->where('player_id', '=', $player->id)->where('map_id', '=', $map->id)->exists()) {
             return true;
-        }
-
-        if (DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
-            return true;
-        }
-
-        if (DB::table('mx-karma')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
-            return true;
-        }
-
-        if (DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
+        } else if (DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
             return true;
         }
 
@@ -305,8 +288,8 @@ class MxKarma extends Module implements ModuleInterface
         }
 
         //Do the request to mx servers
-        $response = self::$client
-            ->request($requestMethod, $function, [
+        $response = RestClient::getClient()
+            ->request($requestMethod, "https://karma.mania-exchange.com/api2/$function", [
                 'query' => $query ?? null,
                 'json' => $json ?? null,
                 'timeout' => 5
@@ -432,7 +415,6 @@ class MxKarma extends Module implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary(strtolower(self::$ratings[$rating])))->sendAll();
         Log::info($player . " rated " . $map . " @ $rating|" . self::$ratings[$rating]);
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 20);
 
         self::sendUpdatedKarma();
     }
@@ -524,7 +506,6 @@ class MxKarma extends Module implements ModuleInterface
 
         infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
         Log::info($player . " rated " . $map . " @ 0|worst");
-        Template::show($player, 'mx-karma.update-my-vote', compact('rating'), false, 20);
 
         self::sendUpdatedKarma();
     }

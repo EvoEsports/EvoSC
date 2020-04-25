@@ -10,7 +10,10 @@
     <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".3" valign="center"/>
 
     <frame z-index="2" pos="0 -6">
-        <label class="text-light" id="star-string" pos="43 3" z-index="1" size="25 4" halign="right" valign="center" textsize="0.5"/>
+        <label class="text-lighter" pos="31 4" text="" z-index="1" size="25 4" textsize="0.5" opacity="0.3"/>
+        <frame id="star-frame" size="11 4" pos="31 4" z-index="2">
+            <label class="text-light" textcolor="fd0" text="" textsize="0.5"/>
+        </frame>
 
         <frame id="buttons" scale="0.8" pos="-0.5 1">
             <frame pos="6  -3.2" id="100" data-id="100">
@@ -48,41 +51,40 @@
         <frame id="finish-notice" pos="0 2" scale="0.9">
             <label class="text-light" pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote" halign="left" valign="center" textcolor="fff9"/>
         </frame>
+
+        <frame id="loading-frame" pos="3.5 0" scale="0.85">
+            <frame id="spinner-frame" pos="15 -1.75" halign="center" valign="center" scale="0.9">
+                <label class="text-warning" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
+            </frame>
+            <label class="text-warning" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
+        </frame>
     </frame>
     {/block}
 
     {block script}
     <script><!--
-    Text getStarString(Real rating){
-    if(rating == -1.0){
-        return "$666";
-    }
+Void startLoading(){
+    (Page.MainFrame.GetFirstChild("finish-notice") as CMlFrame).Hide();
+    declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
+    AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1000, CAnimManager::EAnimManagerEasing::Linear);
+    (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Show();
+}
 
-    declare Text starString = "";
-    declare Real stars = rating / 20.0;
-    declare Integer full = ML::FloorInteger(stars);
-    declare Real left = stars - full;
+Void stopLoading(){
+    declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
+    AnimMgr.Flush(spinner);
+    (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Hide();
+}
 
-    for(i, 0, full - 1){
-        starString = starString ^ "$fff";
-    }
-
-    if(left >= 0.5){
-        starString = starString ^ "$fff";
-        full = full + 1;
-    }
-
-    for(i, full + 1, 5){
-        starString = starString ^ "$666";
-    }
-
-    return starString;
+Void getMyRating(){
+    startLoading();
+    TriggerPageAction("mx_karma.get_my_rating," ^ Map.Id);
 }
 
 Void updateKarma(Real average){
-    declare starStringLabel <=> (Page.MainFrame.GetFirstChild("star-string") as CMlLabel);
-    declare starString = getStarString(average);
-    starStringLabel.SetText(starString);
+    declare starFrame <=> (Page.MainFrame.GetFirstChild("star-frame") as CMlFrame);
+    declare width = average * 0.11;
+    AnimMgr.Add(starFrame, "<frame size='"^width^" 3' />", 750, CAnimManager::EAnimManagerEasing::ExpOut);
 }
 
 Void switchButton(CMlControl frameControl, Boolean enabled){
@@ -121,7 +123,6 @@ Void updateMyRating(Integer myRating){
             switchButton(Page.MainFrame.GetFirstChild("" ^ myRating), True);
         }
     }
-
 }
     --></script>
     {/block}
@@ -131,44 +132,57 @@ Void updateMyRating(Integer myRating){
     {/block}
 
     {block bootScript}
-        declare Integer MxKarmaRating for LocalUser = -2;
-        declare Integer lastRating = -1;
-        declare Real MxKarmaAverage for LocalUser = 0.0;
+        declare Real EvoSC_MxKarma_VotesAverage for This;
+        declare Integer EvoSC_MxKarma_MyRating for This;
+        declare Integer EvoSC_MxKarma_MyRating_Update for This;
+        declare Integer lastMyRatingUpdate = 0;
         declare Real lastKarma = 0.0;
+        declare currentMapId = Map.Id;
 
-        MxKarmaAverage = {($rating ?: -1)|noescape} * 1.0;
-        updateMyRating(MxKarmaRating);
+        EvoSC_MxKarma_VotesAverage = {($rating ?: -1)|noescape} * 1.0;
+        updateMyRating(-2);
+        getMyRating();
 
         left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('mx-karma.ui.slot')};
     {/block}
 
     {block loop}
-        if(MxKarmaAverage != lastKarma){
-            lastKarma = MxKarmaAverage;
+        if(EvoSC_MxKarma_VotesAverage != lastKarma){
+            lastKarma = EvoSC_MxKarma_VotesAverage;
             updateKarma(lastKarma);
-            log("New map karma: " ^ lastKarma);
         }
 
-        if(MxKarmaRating != lastRating){
-            lastRating = MxKarmaRating;
-            updateMyRating(lastRating);
+        if(currentMapId != Map.Id){
+            currentMapId = Map.Id;
+            EvoSC_MxKarma_MyRating = -2;
+            updateMyRating(EvoSC_MxKarma_MyRating);
+            getMyRating();
         }
 
-        foreach(event in RaceEvents){
-            if(event.Player.User.Login == InputPlayer.User.Login && event.IsEndLap){
-                if(MxKarmaRating == -2){
-                    MxKarmaRating = -1;
-                }
-            }
+        if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){
+            lastMyRatingUpdate = EvoSC_MxKarma_MyRating_Update;
+            stopLoading();
+            updateMyRating(EvoSC_MxKarma_MyRating);
+        }
+
+        if(InputPlayer == Null) continue;
+        if(InputPlayer.Score == Null) continue;
+        if(InputPlayer.Score.BestRace == Null) continue;
+
+        if(InputPlayer.Score.BestRace.Time != -1 && EvoSC_MxKarma_MyRating == -2){
+            EvoSC_MxKarma_MyRating = -1;
+            updateMyRating(EvoSC_MxKarma_MyRating);
         }
     {/block}
 
     {block pendingEvents}
-            if(event.Control.HasClass("vote") && event.Type == CMlScriptEvent::Type::MouseClick){
-                declare rating = event.Control.Parent.DataAttributeGet("id");
-                TriggerPageAction("mxk.vote," ^ rating);
-            }
+        if(event.Control.HasClass("vote") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare rating = event.Control.Parent.DataAttributeGet("id");
+            TriggerPageAction("mxk.vote," ^ rating);
+            EvoSC_MxKarma_MyRating = TL::ToInteger(rating);
+            updateMyRating(EvoSC_MxKarma_MyRating);
+        }
     {/block}
 --></script>
 </manialink>
