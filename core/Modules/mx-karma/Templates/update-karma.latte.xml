@@ -3,7 +3,9 @@
     <script><!--
 main(){
     declare Real EvoSC_MxKarma_VotesAverage for This;
+    declare Integer EvoSC_MxKarma_VotesTotal for This;
     EvoSC_MxKarma_VotesAverage = {sprintf('%.2f', $average)|noescape};
+    EvoSC_MxKarma_VotesTotal = {$total};
 }
     --></script>
 </manialink>

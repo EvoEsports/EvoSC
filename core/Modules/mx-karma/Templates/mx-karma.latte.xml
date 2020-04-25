@@ -10,8 +10,9 @@
     <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".3" valign="center"/>
 
     <frame z-index="2" pos="0 -6">
-        <label class="text-lighter" pos="31 4" text="" z-index="1" size="25 4" textsize="0.5" opacity="0.3"/>
-        <frame id="star-frame" size="11 4" pos="31 4" z-index="2">
+        <label class="text-lighter" id="stars-bg" pos="31 4" text="" z-index="1" size="25 4" textsize="0.5" opacity="0.3" hidden="1"/>
+        <label class="text-lighter" id="no-votes" pos="41.5 4" text="No Votes" z-index="1" size="25 4" halign="right" textsize="0.5" opacity="0.3"/>
+        <frame id="star-frame" size="0 4" pos="31 4" z-index="2">
             <label class="text-light" textcolor="fd0" text="" textsize="0.5"/>
         </frame>
 
@@ -81,10 +82,17 @@ Void getMyRating(){
     TriggerPageAction("mx_karma.get_my_rating," ^ Map.Id);
 }
 
-Void updateKarma(Real average){
+Void updateKarma(Real average, Integer total){
     declare starFrame <=> (Page.MainFrame.GetFirstChild("star-frame") as CMlFrame);
-    declare width = average * 0.11;
-    AnimMgr.Add(starFrame, "<frame size='"^width^" 3' />", 750, CAnimManager::EAnimManagerEasing::ExpOut);
+    if(total == 0){
+        (Page.MainFrame.GetFirstChild("stars-bg") as CMlLabel).Hide();
+        (Page.MainFrame.GetFirstChild("no-votes") as CMlLabel).Show();
+    }else{
+        (Page.MainFrame.GetFirstChild("stars-bg") as CMlLabel).Show();
+        (Page.MainFrame.GetFirstChild("no-votes") as CMlLabel).Hide();
+        declare width = average * 0.11;
+        AnimMgr.Add(starFrame, "<frame size='"^width^" 3' />", 750, CAnimManager::EAnimManagerEasing::ExpOut);
+    }
 }
 
 Void switchButton(CMlControl frameControl, Boolean enabled){
@@ -133,13 +141,15 @@ Void updateMyRating(Integer myRating){
 
     {block bootScript}
         declare Real EvoSC_MxKarma_VotesAverage for This;
+        declare Integer EvoSC_MxKarma_VotesTotal for This = 0;
         declare Integer EvoSC_MxKarma_MyRating for This;
         declare Integer EvoSC_MxKarma_MyRating_Update for This;
         declare Integer lastMyRatingUpdate = 0;
         declare Real lastKarma = 0.0;
         declare currentMapId = Map.Id;
 
-        EvoSC_MxKarma_VotesAverage = {($rating ?: -1)|noescape} * 1.0;
+        EvoSC_MxKarma_VotesAverage = {sprintf('%.02f', $rating)};
+        updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
         updateMyRating(-2);
         getMyRating();
 
@@ -149,8 +159,8 @@ Void updateMyRating(Integer myRating){
 
     {block loop}
         if(EvoSC_MxKarma_VotesAverage != lastKarma){
+            updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
             lastKarma = EvoSC_MxKarma_VotesAverage;
-            updateKarma(lastKarma);
         }
 
         if(currentMapId != Map.Id){

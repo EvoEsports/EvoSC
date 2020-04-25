@@ -33,6 +33,7 @@ class MxKarma extends Module implements ModuleInterface
     private static $apiKey;
     private static $mapKarma;
     private static $updatedVotesAverage;
+    private static $updatedVotesTotal;
 
     private static stdClass $session;
     private static string $currentMapUid;
@@ -146,7 +147,7 @@ class MxKarma extends Module implements ModuleInterface
             self::$mapKarma = self::call(self::getMapRating, $map);
         } catch (Exception $e) {
             Log::error('Failed to get MxKarma ratings for ' . $map, isVerbose());
-            self::$mapKarma = 50.0;
+            self::$mapKarma = -1.0;
         }
 
         self::$currentMapUid = $mapUid;
@@ -157,7 +158,8 @@ class MxKarma extends Module implements ModuleInterface
     public static function showWidget(Player $player)
     {
         $rating = self::$updatedVotesAverage;
-        Template::show($player, 'mx-karma.mx-karma', compact('rating'));
+        $total = self::$updatedVotesTotal;
+        Template::show($player, 'mx-karma.mx-karma', compact('rating', 'total'));
     }
 
     public static function sendUpdatedKarma()
@@ -173,7 +175,8 @@ class MxKarma extends Module implements ModuleInterface
         self::updateVotesAverage();
 
         $average = self::$updatedVotesAverage;
-        Template::showAll('mx-karma.update-karma', compact('average'));
+        $total = self::$updatedVotesTotal;
+        Template::showAll('mx-karma.update-karma', compact('average', 'total'));
     }
 
     public static function playerCanVote(Player $player, $map): bool
@@ -202,8 +205,10 @@ class MxKarma extends Module implements ModuleInterface
 
         foreach ($newRatings as $rating) {
             $items->push($rating->Rating);
+            dump($rating->Rating);
         }
 
+        self::$updatedVotesTotal = self::$mapKarma->votecount + $newRatings->count();
         self::$updatedVotesAverage = $items->average();
     }
 
