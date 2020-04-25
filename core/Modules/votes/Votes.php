@@ -152,19 +152,29 @@ class Votes extends Module implements ModuleInterface
 
     public static function askMoreTime(Player $player, string $time = '0')
     {
-        if (self::$timeVotesThisRound >= config('votes.time.limit-votes') && !$player->hasAccess('vote_always')) {
-            warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
+        if (!$player->hasAccess('vote_always')) {
+            if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
+                warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
 
-            return;
-        }
+                return;
+            }
 
-        $diffInSeconds = self::getSecondsSinceLastTimeVote();
-        if ($diffInSeconds < config('votes.time.cooldown-in-seconds') && !$player->hasAccess('vote_always')) {
-            $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
-            warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
-                ' before voting again.')->send($player);
+            $diffInSeconds = self::getSecondsSinceLastTimeVote();
+            if ($diffInSeconds < config('votes.time.cooldown-in-seconds')) {
+                $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
+                warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
+                    ' before voting again.')->send($player);
 
-            return;
+                return;
+            }
+
+            if (CountdownController::getSecondsLeft() < config('votes.time.disable-in-last', 15)) {
+                warningMessage('It is too late to start a vote.')->send($player);
+                return;
+            } else if (CountdownController::getSecondsPassed() < config('votes.time.disable-in-first', 120)) {
+                warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 120) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
+                return;
+            }
         }
 
         $time = floatval($time);
@@ -243,6 +253,14 @@ class Votes extends Module implements ModuleInterface
                 warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
 
+                return;
+            }
+
+            if (CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
+                warningMessage('It is too late to start a vote.')->send($player);
+                return;
+            } else if (CountdownController::getSecondsPassed() < config('votes.skip.disable-in-first', 0)) {
+                warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 0) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
                 return;
             }
         }
