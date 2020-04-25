@@ -11,10 +11,10 @@
             <frame pos="0 -5" size="50 {($statisticWidget->config->show ?? 6) * 5}">
                 {foreach $statisticWidget->records as $player => $stat}
                 {if $statisticWidget->nameLeft}
-                <label class="text-light" pos="1 {$iterator->counter * -4}" size="26 4" halign="left" valign="center" text="{$player}"/>
+                <label class="text-light" pos="1 {$iterator->counter * -4}" size="26 4" halign="left" valign="center" text="{ml_escape($player)}"/>
                 <label class="text-light" pos="49 {$iterator->counter * -4}" size="22 4" halign="right" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}"/>
                 {else}
-                <label class="text-light" pos="49 {$iterator->counter * -4}" size="26 4" halign="right" valign="center" text="{$player}"/>
+                <label class="text-light" pos="49 {$iterator->counter * -4}" size="26 4" halign="right" valign="center" text="{ml_escape($player)}"/>
                 <label class="text-light" pos="1 {$iterator->counter * -4}" size="22 4" halign="left" valign="center" textprefix="{$statisticWidget->prefix}" text="{$stat}{$statisticWidget->suffix}"/>
                 {/if}
                 {/foreach}
