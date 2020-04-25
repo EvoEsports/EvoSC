@@ -25,7 +25,10 @@
         <label class="text-light" pos="88 0" valign="center" size="30 3" halign="center" text="local" textsize="0.6" z-index="1"/>
         <label class="text-light" pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textsize="0.6" z-index="1"/>
         <label class="fav text-light" pos="115.5 0" valign="center" size="3 3" text="" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
-        <label class="text-light" pos="106 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="100.5 1" size="30 3" text="" textsize="0.6" z-index="1" opacity="0.3"/>
+        <frame pos="100.5 1" size="0 3" z-index="2">
+            <label class="text-lighter" size="30 3" text="" textcolor="fd0" textsize="0.6"/>
+        </frame>
 
         <frame id="buttons" pos="120 0" z-index="5">
             <label textfont="{config('colors.ui.font')|noescape}" class="btn juke btn-muted" size="11 3" text=" Juke" textsize="0.3" ScriptEvents="1"/>
@@ -295,7 +298,8 @@ Void updateView(Text[Text][] mapPool, Integer page){
             (mapFrame.Controls[5] as CMlLabel).SetText("");
         }
 
-        (mapFrame.Controls[6] as CMlLabel).SetText(getStarString(TL::ToReal(map["r"])));
+        declare width = TL::ToReal(map["r"]) * 0.113;
+        AnimMgr.Add(mapFrame.Controls[7], "<frame size='"^width^" 3' />", 150, CAnimManager::EAnimManagerEasing::Linear);
         mapFrame.Show();
 
         rowsFilled = rowsFilled + 1;
