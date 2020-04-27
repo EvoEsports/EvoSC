@@ -23,6 +23,7 @@ class AlterUi extends Module implements ModuleInterface
 
         if ($mode == 'TimeAttack.Script.txt') {
             $properties = self::getTASettings();
+            dump($properties);
         } else {
             $properties = self::getRoundsSettings();
         }
@@ -47,7 +48,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Information about live envent displayed in the top right of the screen -->
  		<live_info visible="false" pos="-159. 84. 5." />
  		<!-- Information about the spectated player displayed in the bottom of the screen -->
- 		<spectator_info visible="true" pos="0. -68. 5." />
+ 		<spectator_info visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="0. -78. 5." />
  		<!-- Only visible in solo modes, it hides the medal/ghost selection UI -->
  		<opponents_info visible="false" />
  		<!--
@@ -104,7 +105,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Information about live envent displayed in the top right of the screen -->
  		<live_info visible="false" pos="-159. 84. 5." />
  		<!-- Information about the spectated player displayed in the bottom of the screen -->
- 		<spectator_info visible="true" pos="0. -68. 5." />
+ 		<spectator_info visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="0. -68. 5." />
  		<!-- Only visible in solo modes, it hides the medal/ghost selection UI -->
  		<opponents_info visible="true" />
  		<!--
