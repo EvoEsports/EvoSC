@@ -126,7 +126,7 @@ class MxDownload extends Module implements ModuleInterface
 
             DB::table('dedi-records')->where('Map', '=', $oldMap->id)->delete();
             DB::table('local-records')->where('Map', '=', $oldMap->id)->delete();
-            $oldMap->delete();
+            DB::table(Map::TABLE)->where('id', '=', $oldMap->id)->delete();
         }
 
         DB::table(Map::TABLE)->updateOrInsert([
