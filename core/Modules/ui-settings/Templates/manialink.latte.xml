@@ -39,7 +39,7 @@ UI-Settings
 Void save(){
     declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
     declare scaleLabel <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
-    declare UISettings newSettings;
+    declare UISettings_V2 newSettings;
     newSettings.hide = True;
     newSettings.speed = TL::ToInteger(speedLabel.Value);
     newSettings.scale = TL::ToReal(scaleLabel.Value) / 100.0;

@@ -84,8 +84,8 @@
             HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
         }
 
-        declare UISettings settings for This;
-        declare hideSpeed = settings.speed;
+        declare UISettings_V2 settings2 for This;
+        declare hideSpeed = settings2.speed;
 
         if(hideSpeed == -1 || InputPlayer == Null){
             return;

@@ -25,9 +25,9 @@ Void hidescript(){
         HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
     }
 
-    declare UISettings settings for This;
+    declare UISettings_V2 settings2 for This;
     declare Boolean ESC_Tab_Pressed for This;
-    declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
+    declare hideSpeed = {if $is_maniaplanet}settings2.speed{else}10{/if};
 
     if(hideSpeed == -1 || InputPlayer == Null){
         return;

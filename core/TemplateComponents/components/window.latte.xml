@@ -23,11 +23,12 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
-#Struct UISettings {
+#Struct UISettings_V2 {
     Boolean hide;
     Integer speed;
     Real scale;
     Boolean sb_blur;
+    Boolean viewer_count;
 }
 
 {include globals}
@@ -45,14 +46,15 @@ declare Real lastScale__;
 main() {
     declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
     declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
-    declare UISettings settings for This;
+    declare UISettings_V2 settings2 for This;
 
-    if(settings.scale == 0.0){
-        settings.scale = 1.0;
+    if(settings2.scale == 0.0){
+        settings2.scale = 1.0;
+        settings2.viewer_count = True;
     }
 
-    window.Scale = settings.scale;
-    lastScale__ = settings.scale;
+    window.Scale = settings2.scale;
+    lastScale__ = settings2.scale;
 
     {include bootScript}
 
@@ -75,8 +77,8 @@ main() {
 
             maniaLinkDrag();
 
-            if(lastScale__ != settings.scale){
-                lastScale__ = settings.scale;
+            if(lastScale__ != settings2.scale){
+                lastScale__ = settings2.scale;
                 AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 400, CAnimManager::EAnimManagerEasing::ExpInOut);
                 sleep(400);
             }

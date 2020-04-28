@@ -23,7 +23,6 @@ class AlterUi extends Module implements ModuleInterface
 
         if ($mode == 'TimeAttack.Script.txt') {
             $properties = self::getTASettings();
-            dump($properties);
         } else {
             $properties = self::getRoundsSettings();
         }
@@ -48,7 +47,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Information about live envent displayed in the top right of the screen -->
  		<live_info visible="false" pos="-159. 84. 5." />
  		<!-- Information about the spectated player displayed in the bottom of the screen -->
- 		<spectator_info visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="0. -78. 5." />
+ 		<spectator_info visible="true" pos="0. -68. 5." />
  		<!-- Only visible in solo modes, it hides the medal/ghost selection UI -->
  		<opponents_info visible="false" />
  		<!--
@@ -86,7 +85,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Player\'s ranking at the latest checkpoint -->
  		<checkpoint_ranking visible="true" pos="0. 84. 5." />
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
- 		<viewers_count visible="true" pos="157. -40. 5." />
+ 		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -55. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
  		<scorestable alt_visible="false" visible="false" />
  	</ui_properties>';
@@ -105,7 +104,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Information about live envent displayed in the top right of the screen -->
  		<live_info visible="false" pos="-159. 84. 5." />
  		<!-- Information about the spectated player displayed in the bottom of the screen -->
- 		<spectator_info visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="0. -68. 5." />
+ 		<spectator_info visible="true" pos="0. -68. 5." />
  		<!-- Only visible in solo modes, it hides the medal/ghost selection UI -->
  		<opponents_info visible="true" />
  		<!--
@@ -143,7 +142,7 @@ class AlterUi extends Module implements ModuleInterface
  		<!-- Player\'s ranking at the latest checkpoint -->
  		<checkpoint_ranking visible="true" pos="0. 84. 5." />
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
- 		<viewers_count visible="true" pos="157. -40. 5." />
+ 		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -55. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
  		<scorestable alt_visible="false" visible="false" />
  	</ui_properties>';
