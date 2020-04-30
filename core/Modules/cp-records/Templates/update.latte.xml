@@ -12,7 +12,9 @@
             declare EvoSC_CP_Tracker[] EvoSC_CP_Records for This;
             declare Integer EvoSC_CP_New for This;
             declare Integer EvoSC_CP_Update for This;
+            declare Ident EvoSC_CP_MapId for This;
 
+            EvoSC_CP_MapId = Map.Id;
             EvoSC_CP_New = {$updatedCpId};
             EvoSC_CP_Records.fromjson("""{$data|noescape}""");
             EvoSC_CP_Update = GameTime;

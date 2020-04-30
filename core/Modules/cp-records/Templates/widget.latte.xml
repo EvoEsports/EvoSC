@@ -122,6 +122,7 @@
 
     main() {
         declare EvoSC_CP_Tracker[] EvoSC_CP_Records for This;
+        declare Ident EvoSC_CP_MapId for This;
         declare Integer EvoSC_CP_New for This;
         declare Integer EvoSC_CP_Update for This;
         declare lastUpdate = 0;
@@ -136,7 +137,7 @@
         while(True){
             yield;
 
-            if(lastUpdate != EvoSC_CP_Update){
+            if(lastUpdate != EvoSC_CP_Update && Map.Id == EvoSC_CP_MapId){
                 lastUpdate = EvoSC_CP_Update;
                 updateWidgets(EvoSC_CP_Records, EvoSC_CP_New);
             }

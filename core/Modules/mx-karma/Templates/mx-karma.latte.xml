@@ -84,15 +84,17 @@ Void getMyRating(){
 
 Void updateKarma(Real average, Integer total){
     declare starFrame <=> (Page.MainFrame.GetFirstChild("star-frame") as CMlFrame);
+    declare width = 0.0;
     if(total == 0){
         (Page.MainFrame.GetFirstChild("stars-bg") as CMlLabel).Hide();
         (Page.MainFrame.GetFirstChild("no-votes") as CMlLabel).Show();
     }else{
         (Page.MainFrame.GetFirstChild("stars-bg") as CMlLabel).Show();
         (Page.MainFrame.GetFirstChild("no-votes") as CMlLabel).Hide();
-        declare width = average * 0.11;
-        AnimMgr.Add(starFrame, "<frame size='"^width^" 3' />", 750, CAnimManager::EAnimManagerEasing::ExpOut);
+        width = average * 0.11;
     }
+
+    AnimMgr.Add(starFrame, "<frame size='"^width^" 3' />", 750, CAnimManager::EAnimManagerEasing::ExpOut);
 }
 
 Void switchButton(CMlControl frameControl, Boolean enabled){

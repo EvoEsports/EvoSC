@@ -38,7 +38,7 @@ Void prepare(CMlFrame widget){
 }
 
 Void show(CMlFrame widget){
-    AnimMgr.Add(widget, widget.DataAttributeGet("target"), 800, CAnimManager::EAnimManagerEasing::BackOut);
+    AnimMgr.Add(widget, widget.DataAttributeGet("target"), 800, CAnimManager::EAnimManagerEasing::ExpOut);
 }
 
 main(){
