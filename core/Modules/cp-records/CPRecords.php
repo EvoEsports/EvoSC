@@ -107,5 +107,6 @@ class CPRecords extends Module implements ModuleInterface
     public static function beginMatch()
     {
         self::$tracker = collect();
+        Template::showAll('cp-records.widget');
     }
 }
