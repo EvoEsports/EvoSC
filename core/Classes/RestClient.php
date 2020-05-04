@@ -5,9 +5,9 @@ namespace esc\Classes;
 
 use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
-use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Handler\CurlMultiHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class RestClient
@@ -25,7 +25,9 @@ class RestClient
     /**
      * @var Client
      */
-    public static Client $client;
+    private static Client $client;
+
+    private static CurlMultiHandler $curl;
 
     /**
      * Initialize the client
@@ -34,8 +36,10 @@ class RestClient
      */
     public static function init(string $serverName)
     {
-        self::$client = new Client();
+        self::$curl = new CurlMultiHandler();
+        $handler = HandlerStack::create(self::$curl);
 
+        self::$client = new Client(['handler' => $handler]);
         self::$serverName = stripAll($serverName);
     }
 
@@ -49,6 +53,11 @@ class RestClient
         return self::$client;
     }
 
+    public static function curlTick()
+    {
+        self::$curl->tick();
+    }
+
     /**
      * Create a get-request.
      *
@@ -59,9 +68,7 @@ class RestClient
      */
     public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        if (isDebug()) {
-            Log::write('GET: ' . $url, isDebug());
-        }
+        Log::write('GET: ' . $url, isVerbose());
 
         return self::$client->request('GET', $url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -73,9 +80,7 @@ class RestClient
      */
     public static function getAsync(string $url, array $options = null)
     {
-        if (isVerbose()) {
-            Log::write('ASYNC GET: ' . $url, isDebug());
-        }
+        Log::write('ASYNC GET: ' . $url, isVerbose());
 
         return self::$client->getAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -90,10 +95,7 @@ class RestClient
      */
     public static function post(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        if (isDebug()) {
-            Log::write('POST: ' . $url . ' with options: ' . json_encode($options),
-                isDebug());
-        }
+        Log::write('POST: ' . $url, isVerbose());
 
         return self::$client->request('POST', $url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -105,33 +107,10 @@ class RestClient
      */
     public static function postAsync(string $url, array $options = null)
     {
-        if (isVerbose()) {
-            Log::write('ASYNC POST: ' . $url . ' with options: ' . json_encode($options),
-                isDebug());
-        }
+        Log::write('ASYNC POST: ' . $url, isVerbose());
 
         return self::$client->postAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
-
-    /**
-     * Create a put-request.
-     *
-     * @param string $url
-     * @param array|null $options
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public static function put(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
-    {
-        if (isDebug()) {
-            Log::write('PUT: ' . $url . ' with options: ' . json_encode($options),
-                isDebug());
-        }
-
-        return self::$client->request('PUT', $url, self::addUserAgentAndDefaultTimeout($options));
-    }
-
-    //Add user-agent to current options.
 
     /**
      * @param array|null $options

@@ -215,7 +215,7 @@ class EscRun extends Command
         while (true) {
             try {
                 Timer::startCycle();
-
+                RestClient::curlTick();
                 EventController::handleCallbacks(Server::executeCallbacks());
 
                 $pause = Timer::getNextCyclePause();
