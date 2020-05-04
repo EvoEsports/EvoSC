@@ -5,7 +5,6 @@ namespace esc\Models;
 
 use Carbon\Carbon;
 use esc\Controllers\UserSettingsController;
-use esc\Modules\MxKarma;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -147,7 +146,7 @@ class Player extends Model
      */
     public function ratings()
     {
-        return $this->hasMany(MxKarma::class, 'Player', 'id');
+        return $this->hasMany(Karma::class, 'Player', 'id');
     }
 
     /**

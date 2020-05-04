@@ -5,7 +5,9 @@ namespace esc\Classes;
 
 use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class RestClient
@@ -65,6 +67,20 @@ class RestClient
     }
 
     /**
+     * @param string $url
+     * @param array|null $options
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function getAsync(string $url, array $options = null)
+    {
+        if (isVerbose()) {
+            Log::write('ASYNC GET: ' . $url, isDebug());
+        }
+
+        return self::$client->getAsync($url, self::addUserAgentAndDefaultTimeout($options));
+    }
+
+    /**
      * Create a post-request.
      *
      * @param string $url
@@ -80,6 +96,21 @@ class RestClient
         }
 
         return self::$client->request('POST', $url, self::addUserAgentAndDefaultTimeout($options));
+    }
+
+    /**
+     * @param string $url
+     * @param array|null $options
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function postAsync(string $url, array $options = null)
+    {
+        if (isVerbose()) {
+            Log::write('ASYNC POST: ' . $url . ' with options: ' . json_encode($options),
+                isDebug());
+        }
+
+        return self::$client->postAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     /**

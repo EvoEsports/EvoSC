@@ -49,7 +49,7 @@
             </frame>
         </frame>
 
-        <frame id="finish-notice" pos="0 2" scale="0.9">
+        <frame id="finish-notice" pos="0 2" scale="0.9" hidden="1">
             <label class="text-light" pos="5  -3.2" z-index="1" size="40 4" text="You need to finish before you can vote" halign="left" valign="center" textcolor="fff9"/>
         </frame>
 
@@ -146,21 +146,22 @@ Void updateMyRating(Integer myRating){
         declare Integer EvoSC_MxKarma_VotesTotal for This = 0;
         declare Integer EvoSC_MxKarma_MyRating for This;
         declare Integer EvoSC_MxKarma_MyRating_Update for This;
+        declare Text EvoSC_MxKarma_MyRating_MapUid for This;
+        declare Text EvoSC_MxKarma_MapUid for This;
         declare Integer lastMyRatingUpdate = 0;
         declare Real lastKarma = 0.0;
         declare currentMapId = Map.Id;
 
-        EvoSC_MxKarma_VotesAverage = {sprintf('%.02f', $rating)};
         updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
         updateMyRating(-2);
-        getMyRating();
+        //getMyRating();
 
         left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('mx-karma.ui.slot')};
     {/block}
 
     {block loop}
-        if(EvoSC_MxKarma_VotesAverage != lastKarma){
+        if(EvoSC_MxKarma_VotesAverage != lastKarma && EvoSC_MxKarma_MapUid == "" ^ Map.Id){
             updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
             lastKarma = EvoSC_MxKarma_VotesAverage;
         }
@@ -169,7 +170,7 @@ Void updateMyRating(Integer myRating){
             currentMapId = Map.Id;
             EvoSC_MxKarma_MyRating = -2;
             updateMyRating(EvoSC_MxKarma_MyRating);
-            getMyRating();
+            //getMyRating();
         }
 
         if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){
@@ -192,8 +193,6 @@ Void updateMyRating(Integer myRating){
         if(event.Control.HasClass("vote") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare rating = event.Control.Parent.DataAttributeGet("id");
             TriggerPageAction("mxk.vote," ^ rating);
-            EvoSC_MxKarma_MyRating = TL::ToInteger(rating);
-            updateMyRating(EvoSC_MxKarma_MyRating);
         }
     {/block}
 --></script>

@@ -185,7 +185,7 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        ModuleController::startModules(Server::getScriptName()['CurrentValue']);
+        ModuleController::startModules(Server::getScriptName()['CurrentValue'], true);
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);

@@ -47,7 +47,7 @@ class ModuleController implements ControllerInterface
         return self::$loadedModules;
     }
 
-    public static function startModules(string $mode)
+    public static function startModules(string $mode, bool $isBoot)
     {
         //Boot modules
         Log::info('Starting modules...');
@@ -65,7 +65,7 @@ class ModuleController implements ControllerInterface
                 return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname($file)];
             })
             ->unique()
-            ->map(function ($moduleDir, $moduleClass) use ($mode, &$totalStarted) {
+            ->map(function ($moduleDir, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
                 $files = scandir($moduleDir);
                 $configId = null;
                 $config = null;
@@ -103,7 +103,7 @@ class ModuleController implements ControllerInterface
                 }
 
                 /** @var $moduleClass Module */
-                $instance::start($mode);
+                $instance::start($mode, $isBoot);
                 $instance->setConfigId($configId);
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);

@@ -4,8 +4,10 @@
 main(){
     declare Integer EvoSC_MxKarma_MyRating for This;
     declare Integer EvoSC_MxKarma_MyRating_Update for This;
+    declare Text EvoSC_MxKarma_MyRating_MapUid for This;
     EvoSC_MxKarma_MyRating = {$rating};
     EvoSC_MxKarma_MyRating_Update = GameTime;
+    EvoSC_MxKarma_MyRating_MapUid = {$uid};
 }
     --></script>
 </manialink>
