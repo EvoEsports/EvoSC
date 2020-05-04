@@ -42,8 +42,8 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
         //Check if session is still valid each 5 seconds
-        Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
-        Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
+        Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m', true);
+        Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m', true);
 
         ManiaLinkEvent::add('dedis.show', [self::class, 'showDedisTable']);
     }
@@ -85,13 +85,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function reportConnectedPlayers()
     {
         $map = MapController::getCurrentMap();
-        $data = self::updateServerPlayers($map);
-
-        if ($data && !isset($data->params->param->value->boolean)) {
-            Log::write('Failed to report connected players. Trying again in 5 minutes.');
-        }
-
-        Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m');
+        self::updateServerPlayers($map);
     }
 
     public static function checkSessionStillValid()
@@ -106,8 +100,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
                 return;
             }
         }
-
-        Timer::create('dedimania.check_session', [self::class, 'checkSessionStillValid'], '5m');
     }
 
     /**
@@ -122,7 +114,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function showManialink(Player $player)
     {
         if (self::$offlineMode) {
-            warningMessage('Unfortunately Dedimania is offline, new records will not be visible before it comes online again.')->send($player);
+            warningMessage('Unfortunately Dedimania is offline, new records will not be saved before it comes online again.')->send($player);
         }
 
         self::showRecords($player);
@@ -209,36 +201,10 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        $records = self::getChallengeRecords($map);
-
-        if ($records && $records->count() > 0) {
-            //Wipe all dedis for current map
-            DB::table('dedi-records')
-                ->where('Map', '=', $map->id)
-                ->where('New', '=', 0)
-                ->delete();
-
-            $insert = $records->transform(function ($record) use ($map) {
-                $player = DB::table('players')->updateOrInsert(['Login' => $record->login], [
-                    'NickName' => $record->nickname,
-                    'MaxRank' => $record->max_rank,
-                ]);
-
-                return [
-                    'Map' => $map->id,
-                    'Player' => $player->id ?? player($record->login)->id,
-                    'Score' => $record->score,
-                    'Rank' => $record->rank,
-                    'Checkpoints' => $record->checkpoints,
-                ];
-            })->filter();
-
-            DB::table('dedi-records')->insert($insert->toArray());
-        }
-
+        self::getChallengeRecords($map);
         self::sendUpdatedDedis();
 
-        Log::write("Loaded records for map $map #" . $map->id);
+        Log::write("Loaded records for map $map [" . $map->id , ']');
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)

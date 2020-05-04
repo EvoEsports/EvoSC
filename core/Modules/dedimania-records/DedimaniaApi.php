@@ -5,6 +5,7 @@ namespace esc\Modules;
 
 use Carbon\Carbon;
 use esc\Classes\Cache;
+use esc\Classes\DB;
 use esc\Classes\File;
 use esc\Classes\Log;
 use esc\Classes\Module;
@@ -16,7 +17,9 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
+use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
+use function foo\func;
 
 class DedimaniaApi extends Module
 {
@@ -145,10 +148,8 @@ class DedimaniaApi extends Module
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
      * @param Map $map
-     *
-     * @return null|Collection
      */
-    static function getChallengeRecords(Map $map): ?Collection
+    static function getChallengeRecords(Map $map)
     {
         Log::write(sprintf('getChallengeRecords(%s)', $map));
 
@@ -199,46 +200,65 @@ class DedimaniaApi extends Module
 
         self::paramAddArray($params->addChild('param'), $players->toArray());
 
-        try {
-            $responseData = self::post($xml);
-        } catch (GuzzleException $e) {
-            return null;
-        }
+        self::postAsync($xml, function (SimpleXMLElement $responseData) use ($map) {
+            if ($responseData == null) {
+                return null;
+            }
 
-        if ($responseData == null) {
-            return null;
-        }
+            if (isset($responseData->fault)) {
+                //Error
+                $errorMsg = $responseData->fault->value->struct->member[1]->value->string;
+                Log::error($errorMsg);
 
-        if (isset($responseData->fault)) {
-            //Error
-            $errorMsg = $responseData->fault->value->struct->member[1]->value->string;
-            Log::error($errorMsg);
+                return null;
+            }
 
-            return null;
-        }
+            $maxRank = intval($responseData->params->param->value->struct->children()[1]->value->int);
+            if ($maxRank != self::$maxRank) {
+                self::$maxRank = $maxRank;
+                Log::info("Max-Rank changed to $maxRank.");
+            }
 
-        $maxRank = intval($responseData->params->param->value->struct->children()[1]->value->int);
-        if ($maxRank != self::$maxRank) {
-            self::$maxRank = $maxRank;
-            Log::info("Max-Rank changed to $maxRank.");
-        }
+            $recordsXmlArray = $responseData->params->param->value->struct->children()[3]->value->array->data->value;
+            $records = collect();
 
-        $recordsXmlArray = $responseData->params->param->value->struct->children()[3]->value->array->data->value;
-        $records = collect();
+            foreach ($recordsXmlArray as $xmlRecord) {
+                $record = collect();
+                $record->login = sprintf('%s', $xmlRecord->struct->member[0]->value->string);
+                $record->nickname = sprintf('%s', $xmlRecord->struct->member[1]->value->string);
+                $record->score = intval($xmlRecord->struct->member[2]->value->int);
+                $record->rank = intval($xmlRecord->struct->member[3]->value->int);
+                $record->max_rank = intval($xmlRecord->struct->member[4]->value->int);
+                $record->checkpoints = sprintf('%s', $xmlRecord->struct->member[5]->value->string);
 
-        foreach ($recordsXmlArray as $xmlRecord) {
-            $record = collect();
-            $record->login = sprintf('%s', $xmlRecord->struct->member[0]->value->string);
-            $record->nickname = sprintf('%s', $xmlRecord->struct->member[1]->value->string);
-            $record->score = intval($xmlRecord->struct->member[2]->value->int);
-            $record->rank = intval($xmlRecord->struct->member[3]->value->int);
-            $record->max_rank = intval($xmlRecord->struct->member[4]->value->int);
-            $record->checkpoints = sprintf('%s', $xmlRecord->struct->member[5]->value->string);
+                $records->push($record);
+            }
 
-            $records->push($record);
-        }
+            if ($records->count() > 0) {
+                //Wipe all dedis for current map
+                DB::table('dedi-records')
+                    ->where('Map', '=', $map->id)
+                    ->where('New', '=', 0)
+                    ->delete();
 
-        return $records;
+                $insert = $records->transform(function ($record) use ($map) {
+                    $player = DB::table('players')->updateOrInsert(['Login' => $record->login], [
+                        'NickName' => $record->nickname,
+                        'MaxRank' => $record->max_rank,
+                    ]);
+
+                    return [
+                        'Map' => $map->id,
+                        'Player' => $player->id ?? player($record->login)->id,
+                        'Score' => $record->score,
+                        'Rank' => $record->rank,
+                        'Checkpoints' => $record->checkpoints,
+                    ];
+                })->filter();
+
+                DB::table('dedi-records')->insert($insert->toArray());
+            }
+        });
     }
 
     /**
@@ -246,13 +266,12 @@ class DedimaniaApi extends Module
      *
      * @param Map $map
      *
-     * @return null|SimpleXMLElement
      * @throws GuzzleException
      */
     static function updateServerPlayers(Map $map)
     {
         if (Dedimania::isOfflineMode()) {
-            return null;
+            return;
         }
 
         Log::write(sprintf('updateServerPlayers(%s)', $map));
@@ -291,14 +310,11 @@ class DedimaniaApi extends Module
         });
 
         self::paramAddArray($params->addChild('param'), $players->toArray());
-
-        $responseData = self::post($xml);
-
-        if ($responseData) {
-            return $responseData;
-        }
-
-        return null;
+        self::postAsync($xml, function ($data) {
+            if ($data && !isset($data->params->param->value->boolean)) {
+                Log::write('Failed to report connected players. Trying again in 5 minutes.');
+            }
+        });
     }
 
     /**
@@ -417,27 +433,14 @@ class DedimaniaApi extends Module
             }
 
             //Send the request
-            $data = self::post($xml);
-            $time = time();
-
-            Log::write("Response ($time):");
-            // Log::write($data->asXML());
-//            $data->saveXML(cacheDir('dedimania_'.$time));
-
-            if ($data) {
-                //Got response
-
-                if (isset($data->params->param->value->boolean)) {
-                    //Success parameter is set
-                    Log::info('Dedis saved.');
-
-                    if (!$data->params->param->value->boolean) {
-                        //Request failed
-
-                        Log::write('Failed to update dedis.', true);
-                    }
+            self::postAsync($xml, function (SimpleXMLElement $data) {
+                if ($data && isset($data->params->param->value->boolean)) {
+                    Log::info('New Dedis saved.');
+                } else {
+                    Log::warning('Failed to update dedis.');
                 }
-            }
+            });
+
         } catch (Exception $e) {
             Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
@@ -452,9 +455,6 @@ class DedimaniaApi extends Module
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
      * @param Player $player
-     *
-     * @return null|SimpleXMLElement
-     * @throws GuzzleException
      */
     public static function playerConnect(Player $player)
     {
@@ -485,26 +485,20 @@ class DedimaniaApi extends Module
         //boolean IsSpec
         $params->addChild('param')->addChild('boolean', $player->isSpectator() ? 1 : 0);
 
-        $responseData = self::post($xml);
+        self::postAsync($xml, function (SimpleXMLElement $responseData) use ($player) {
+            if (isset($responseData->params->param->value->struct->member) && $responseData->params->param->value->struct->member[0]->value->string == $player->Login) {
+                $playerData = $responseData->params->param->value->struct;
 
-        if (isset($responseData->params->param->value->struct->member) && $responseData->params->param->value->struct->member[0]->value->string == $player->Login) {
-            $playerData = $responseData->params->param->value->struct;
+                $player->update([
+                    'MaxRank' => (int)$playerData->member[1]->value->string,
+                    'Banned' => ($playerData->member[2]->value->int != "0"),
+                ]);
 
-            $player->update([
-                'MaxRank' => (int)$playerData->member[1]->value->string,
-                'Banned' => ($playerData->member[2]->value->int != "0"),
-            ]);
-
-            if ($player->Banned) {
-                warningMessage($player, ' is banned from dedimania.')->sendAll();
+                if ($player->Banned) {
+                    warningMessage($player, ' is banned from dedimania.')->sendAll();
+                }
             }
-        }
-
-        if ($responseData) {
-            return $responseData;
-        }
-
-        return null;
+        });
     }
 
 
@@ -643,6 +637,30 @@ class DedimaniaApi extends Module
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    private static function postAsync(SimpleXMLElement $xml, $success = null, $fail = null)
+    {
+        $promise = RestClient::postAsync('http://dedimania.net:8082/Dedimania', [
+            'headers' => [
+                'Content-Type' => 'text/xml; charset=UTF8',
+                'Accept-Encoding' => 'gzip',
+            ],
+            'decode_content' => 'gzip',
+            'body' => $xml->asXML(),
+            'connect_timeout' => 10.0,
+        ]);
+
+        $promise->then(function (ResponseInterface $response) use ($success) {
+            if (!is_null($success)) {
+                $success(new SimpleXMLElement($response->getBody()));
+            }
+        }, function (RequestException $e) use ($fail) {
+            Log::warning('Request failed: ' . $e->getMessage());
+            if (!is_null($fail)) {
+                $fail();
+            }
+        });
     }
 
     protected static function getSessionKey(): ?string
