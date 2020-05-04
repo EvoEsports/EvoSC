@@ -55,7 +55,7 @@
 
         <frame id="loading-frame" pos="3.5 0" scale="0.85">
             <frame id="spinner-frame" pos="15 -1.75" halign="center" valign="center" scale="0.9">
-                <label class="text-warning" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
+                <label class="text-warning" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
             </frame>
             <label class="text-warning" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
         </frame>
@@ -75,11 +75,6 @@ Void stopLoading(){
     declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
     AnimMgr.Flush(spinner);
     (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Hide();
-}
-
-Void getMyRating(){
-    startLoading();
-    TriggerPageAction("mx_karma.get_my_rating," ^ Map.Id);
 }
 
 Void updateKarma(Real average, Integer total){
@@ -152,9 +147,8 @@ Void updateMyRating(Integer myRating){
         declare Real lastKarma = 0.0;
         declare currentMapId = Map.Id;
 
-        updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
+        updateKarma({sprintf('%.02f',$average)}, {$total});
         updateMyRating(-2);
-        //getMyRating();
 
         left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('mx-karma.ui.slot')};
@@ -170,7 +164,6 @@ Void updateMyRating(Integer myRating){
             currentMapId = Map.Id;
             EvoSC_MxKarma_MyRating = -2;
             updateMyRating(EvoSC_MxKarma_MyRating);
-            //getMyRating();
         }
 
         if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){

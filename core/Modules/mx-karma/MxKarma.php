@@ -18,19 +18,18 @@ use esc\Models\Karma;
 use esc\Models\Map;
 use esc\Models\Player;
 use esc\Modules\Classes\MxKarmaMapRating;
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
-use stdClass;
 
 class MxKarma extends Module implements ModuleInterface
 {
     const ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
     private static string $sessionKey;
+    private static float $voteAverage;
+    private static int $votesTotal;
+    private static Collection $newVotes;
 
     /**
      * @inheritDoc
@@ -62,29 +61,31 @@ class MxKarma extends Module implements ModuleInterface
     public static function playerConnect(Player $player)
     {
         $map = MapController::getCurrentMap();
-        $promise = self::getMapRatingAsync($map->uid, [$player->Login]);
 
-        $promise->then(function (ResponseInterface $response) use ($player, $map) {
-            if ($response->getStatusCode() == 200) {
-                $mxResponse = json_decode($response->getBody());
-                $ratings = new MxKarmaMapRating($mxResponse->data);
+        self::getMapRatingAsync($map->uid, [$player->Login])
+            ->then(function (ResponseInterface $response) use ($player, $map) {
+                if ($response->getStatusCode() == 200) {
+                    $mxResponse = json_decode($response->getBody());
+                    $ratings = new MxKarmaMapRating($mxResponse->data);
 
-                $vote = $ratings->getVotes()->first();
-                if (!$vote) {
-                    $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                    $vote = $ratings->getVotes()->first();
+                    if (!$vote) {
+                        $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                    }
+
+                    Template::show($player, 'mx-karma.update-my-rating', [
+                        'rating' => $vote,
+                        'uid' => $map->uid
+                    ]);
+                } else {
+                    Log::cyan('oops: ' . $response->getReasonPhrase());
                 }
+            }, function (RequestException $e) use ($player) {
+                warningMessage('Failed to load MxKarma vote.')->send($player);
+                Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
+            });
 
-                Template::show($player, 'mx-karma.update-my-rating', [
-                    'rating' => $vote,
-                    'uid' => $map->uid
-                ]);
-            }
-        }, function (RequestException $e) use ($player) {
-            warningMessage('Failed to load MxKarma vote.')->send($player);
-            Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
-        });
-
-        Template::show($player, 'mx-karma.mx-karma');
+        Template::show($player, 'mx-karma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
     }
 
     /**
@@ -93,68 +94,78 @@ class MxKarma extends Module implements ModuleInterface
     public static function beginMap(Map $map)
     {
         $players = onlinePlayers();
-        $promise = self::getMapRatingAsync($map->uid, $players->pluck('Login')->toArray());
 
-        $promise->then(function (ResponseInterface $response) use ($players, $map) {
-            if ($response->getStatusCode() == 200) {
-                $mxResponse = json_decode($response->getBody());
+        self::$newVotes = DB::table('mx-karma')
+            ->where('Map', '=', $map->id)
+            ->where('new', '=', 1)
+            ->get()
+            ->keyBy('Player');
 
-                //Check if method was executed properly
-                if (!$mxResponse->success) {
-                    Log::warning("getMapRating failed: " . $response->getBody());
-                }
+        self::getMapRatingAsync($map->uid, $players->pluck('Login')->toArray())
+            ->then(function (ResponseInterface $response) use ($players, $map) {
+                if ($response->getStatusCode() == 200) {
+                    $mxResponse = json_decode($response->getBody());
 
-                $ratings = new MxKarmaMapRating($mxResponse->data);
-                $players = $players->keyBy('Login');
-                $massInsert = collect();
-
-                foreach ($ratings->getVotes() as $login => $vote) {
-                    $player = $players->get($login);
-
-                    if (DB::table('mx-karma')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
-                        DB::table('mx-karma')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->update([
-                            'Rating' => $vote
-                        ]);
-                    } else {
-                        $massInsert->push([
-                            'Map' => $map->id,
-                            'Player' => $player->id,
-                            'Rating' => $vote
-                        ]);
+                    //Check if method was executed properly
+                    if (!$mxResponse->success) {
+                        Log::warning("getMapRating failed: " . $response->getBody());
                     }
 
-                    Template::show($player, 'mx-karma.update-my-rating', [
-                        'rating' => $vote,
+                    $ratings = new MxKarmaMapRating($mxResponse->data);
+                    $players = $players->keyBy('Login');
+                    $massInsert = collect();
+
+                    self::$voteAverage = $ratings->getVoteAvg();
+                    self::$votesTotal = $ratings->getTotalVotes();
+
+                    foreach ($ratings->getVotes() as $login => $vote) {
+                        $player = $players->get($login);
+
+                        if (DB::table('mx-karma')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
+                            DB::table('mx-karma')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->update([
+                                'Rating' => $vote
+                            ]);
+                        } else {
+                            $massInsert->push([
+                                'Map' => $map->id,
+                                'Player' => $player->id,
+                                'Rating' => $vote
+                            ]);
+                        }
+
+                        Template::show($player, 'mx-karma.update-my-rating', [
+                            'rating' => $vote,
+                            'uid' => $map->uid
+                        ], true);
+                    }
+
+                    DB::table('mx-karma')->insert($massInsert->toArray());
+
+                    Template::showAll('mx-karma.update-karma', [
+                        'average' => $ratings->getVoteAvg(),
+                        'total' => $ratings->getTotalVotes(),
                         'uid' => $map->uid
-                    ], true);
+                    ]);
+
+                    $ratingLogins = $ratings->getVotes()->keys()->flip();
+                    $playerDiff = $players->diffKeys($ratingLogins);
+
+                    foreach ($playerDiff as $player) {
+                        Template::show($player, 'mx-karma.update-my-rating', [
+                            'rating' => self::playerCanVote($player, $map) ? -1 : -2,
+                            'uid' => $map->uid
+                        ], true);
+                    }
+
+                    Template::executeMulticall();
+
+                    Log::info('Map ratings loaded successfully.');
+                } else {
+                    Log::warning('Connection to MxKarma failed: ' . $response->getReasonPhrase());
                 }
-
-                DB::table('mx-karma')->insert($massInsert->toArray());
-
-                Template::showAll('mx-karma.update-karma', [
-                    'average' => $ratings->getVoteAvg(),
-                    'total' => $ratings->getTotalVotes(),
-                    'uid' => $map->uid
-                ]);
-
-                $ratingLogins = $ratings->getVotes()->keys()->flip();
-
-                foreach ($players->diffKeys($ratingLogins) as $player) {
-                    Template::show($player, 'mx-karma.update-my-rating', [
-                        'rating' => self::playerCanVote($player, $map) ? -1 : -2,
-                        'uid' => $map->uid
-                    ], true);
-                }
-
-                Template::executeMulticall();
-
-                Log::info('Map ratings loaded successfully.');
-            } else {
-                Log::warning('Connection to MxKarma failed: ' . $response->getReasonPhrase());
-            }
-        }, function (RequestException $e) {
-            Log::warning('Failed to load map ratings: ' . $e->getMessage());
-        });
+            }, function (RequestException $e) {
+                Log::warning('Failed to load map ratings: ' . $e->getMessage());
+            });
     }
 
     /**
@@ -200,7 +211,10 @@ class MxKarma extends Module implements ModuleInterface
             Log::warning('Failed to save map ratings: ' . $e->getMessage());
         });
 
-        DB::table('mx-karma')->where('new', '=', 1)->update(['new' => 0]);
+        DB::table('mx-karma')
+            ->where('Map', '=', $map->id)
+            ->where('new', '=', 1)
+            ->update(['new' => 0]);
     }
 
     /**
@@ -231,7 +245,7 @@ class MxKarma extends Module implements ModuleInterface
      */
     private static function startAndActivateSession()
     {
-        $response = RestClient::get('https://karma.mania-exchange.com/api2/startSession', [
+        $promise = RestClient::getAsync('https://karma.mania-exchange.com/api2/startSession', [
             'query' => [
                 'serverLogin' => config('server.login'),
                 'applicationIdentifier' => 'EvoSC v' . getEscVersion(),
@@ -239,87 +253,48 @@ class MxKarma extends Module implements ModuleInterface
             ]
         ]);
 
-        if ($response->getStatusCode() == 200) {
-            $mxResponse = json_decode($response->getBody());
+        $promise->then(function (ResponseInterface $response) {
+            if ($response->getStatusCode() == 200) {
+                $mxResponse = json_decode($response->getBody());
 
-            if (!$mxResponse->success) {
-                Log::warning("startSession failed: " . $response->getBody());
-            }
-
-            Log::info("MX Karma session created. Activating...");
-
-            $activationResponse = RestClient::get('https://karma.mania-exchange.com/api2/activateSession', [
-                'query' => [
-                    'sessionKey' => $mxResponse->data->sessionKey,
-                    'activationHash' => hash("sha512", config('mx-karma.key') . $mxResponse->data->sessionSeed),
-                ]
-            ]);
-
-            if ($activationResponse->getStatusCode() == 200) {
-                $activationResponse = json_decode($activationResponse->getBody());
-
-                if (!$activationResponse->data->activated || !isset($activationResponse->data->activated)) {
-                    Log::warning('Could not activate MxKarma session.');
-
-                    return;
+                if (!$mxResponse->success) {
+                    Log::warning("startSession failed: " . $response->getBody());
                 }
 
-                Log::info("MX Karma session activated.");
+                Log::info("MX Karma session created. Activating...");
 
-                self::$sessionKey = $mxResponse->data->sessionKey;
+                $activationPromise = RestClient::getAsync('https://karma.mania-exchange.com/api2/activateSession', [
+                    'query' => [
+                        'sessionKey' => $mxResponse->data->sessionKey,
+                        'activationHash' => hash("sha512", config('mx-karma.key') . $mxResponse->data->sessionSeed),
+                    ]
+                ]);
+
+                $activationPromise->then(function (ResponseInterface $activationResponse) use ($mxResponse) {
+                    if ($activationResponse->getStatusCode() == 200) {
+                        $activationResponse = json_decode($activationResponse->getBody());
+
+                        if (!$activationResponse->data->activated || !isset($activationResponse->data->activated)) {
+                            Log::warning('Could not activate MxKarma session.');
+
+                            return;
+                        }
+
+                        Log::info("MX Karma session activated.");
+
+                        self::$sessionKey = $mxResponse->data->sessionKey;
+                    } else {
+                        Log::warning('Failed to activate MXKarma session: ' . $activationResponse->getReasonPhrase());
+                    }
+                }, function (RequestException $e) {
+                    Log::warning('Failed to activate MXKarma session: ' . $e->getMessage());
+                });
             } else {
-                Log::warning('Connection to MxKarma failed (2): ' . $response->getReasonPhrase());
+                Log::warning('Failed to start MXKarma session: ' . $response->getReasonPhrase());
             }
-        } else {
-            Log::warning('Connection to MxKarma failed (1): ' . $response->getReasonPhrase());
-        }
-    }
-
-    /**
-     * @param Player $player
-     * @param $map
-     * @return bool
-     */
-    private static function playerCanVote(Player $player, $map): bool
-    {
-        if ($player->Score > 0) {
-            return true;
-        }
-
-        if (DB::table('pbs')->where('player_id', '=', $player->id)->where('map_id', '=', $map->id)->exists()) {
-            return true;
-        } else if (DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns current game mode string
-     *
-     * @return string
-     */
-    private static function getGameMode(): string
-    {
-        switch (Server::getGameMode()) {
-            case 0:
-                return Server::getScriptName()['CurrentValue'];
-            case 1:
-                return "Rounds";
-            case 2:
-                return "TimeAttack";
-            case 3:
-                return "Team";
-            case 4:
-                return "Laps";
-            case 5:
-                return "Cup";
-            case 6:
-                return "Stunts";
-            default:
-                return "n/a";
-        }
+        }, function (RequestException $e) {
+            Log::warning('Failed to start MXKarma session: ' . $e->getMessage());
+        });
     }
 
     /**
@@ -373,6 +348,68 @@ class MxKarma extends Module implements ModuleInterface
             'rating' => $rating,
             'uid' => $map->uid
         ]);
+
+        self::$newVotes->put($player->Login, $rating);
+
+        $votes = array_fill(0, self::$votesTotal, self::$voteAverage);
+        foreach (self::$newVotes as $vote) {
+            array_push($votes, $vote);
+        }
+        $newTotalVotes = count($votes);
+        $newVotesAverage = array_sum($votes) / $newTotalVotes;
+
+        Template::showAll('mx-karma.update-karma', [
+            'average' => $newVotesAverage,
+            'total' => $newTotalVotes,
+            'uid' => $map->uid
+        ]);
+    }
+
+    /**
+     * @param Player $player
+     * @param $map
+     * @return bool
+     */
+    private static function playerCanVote(Player $player, $map): bool
+    {
+        if ($player->Score > 0) {
+            return true;
+        }
+
+        if (DB::table('pbs')->where('player_id', '=', $player->id)->where('map_id', '=', $map->id)->exists()) {
+            return true;
+        } else if (DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns current game mode string
+     *
+     * @return string
+     */
+    private static function getGameMode(): string
+    {
+        switch (Server::getGameMode()) {
+            case 0:
+                return Server::getScriptName()['CurrentValue'];
+            case 1:
+                return "Rounds";
+            case 2:
+                return "TimeAttack";
+            case 3:
+                return "Team";
+            case 4:
+                return "Laps";
+            case 5:
+                return "Cup";
+            case 6:
+                return "Stunts";
+            default:
+                return "n/a";
+        }
     }
 
     /**

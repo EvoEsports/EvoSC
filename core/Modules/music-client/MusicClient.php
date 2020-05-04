@@ -12,7 +12,9 @@ use esc\Classes\Template;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
+use Psr\Http\Message\ResponseInterface;
 use stdClass;
 
 class MusicClient extends Module implements ModuleInterface
@@ -30,8 +32,8 @@ class MusicClient extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -43,36 +45,33 @@ class MusicClient extends Module implements ModuleInterface
             return;
         }
 
-        try {
-            $timeout = 10;
-            Log::write('Loading music library ('.$timeout.'s timeout).');
+        $promise = RestClient::getAsync($url, [
+            'connect_timeout' => 30
+        ]);
 
-            $response = RestClient::get($url, [
-                'connect_timeout' => $timeout
-            ]);
-        } catch (GuzzleException $e) {
-            Log::error('Failed to fetch music list from '.$url);
+        $promise->then(function (ResponseInterface $response) {
+            if ($response->getStatusCode() != 200) {
+                Log::warning('Failed to fetch music list.');
+                self::enableMusicDisabledNotice();
+
+                return;
+            }
+
+            $musicJson = $response->getBody()->getContents();
+            self::$music = collect(json_decode($musicJson));
+
+            Log::info('Library loaded successfully.');
+
+            Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+            Hook::add('BeginMap', [self::class, 'setNextSong']);
+
+            ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
+
+            InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
+        }, function(RequestException $e){
+            Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
-
-            return;
-        }
-
-        if ($response->getStatusCode() != 200) {
-            Log::write('Failed to fetch music list from '.$url);
-            self::enableMusicDisabledNotice();
-
-            return;
-        }
-
-        $musicJson = $response->getBody()->getContents();
-        self::$music = collect(json_decode($musicJson));
-
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('BeginMap', [self::class, 'setNextSong']);
-
-        ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
-
-        InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
+        });
     }
 
     private static function enableMusicDisabledNotice()
@@ -90,7 +89,7 @@ class MusicClient extends Module implements ModuleInterface
     public static function setNextSong()
     {
         self::$song = self::$music->random(1)->first();
-        Server::setForcedMusic(true, config('music.url').'?song='.urlencode(self::$song->file));
+        Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
 
         if (self::$song) {
             Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)], 60);
@@ -116,7 +115,7 @@ class MusicClient extends Module implements ModuleInterface
     /**
      * Hook: PlayerConnect
      *
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function playerConnect(Player $player)
     {
