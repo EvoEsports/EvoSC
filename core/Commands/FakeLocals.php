@@ -5,6 +5,7 @@ namespace esc\Commands;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Log;
+use esc\Classes\Utility;
 use esc\Controllers\ConfigController;
 use esc\Models\Map;
 use esc\Modules\LocalRecords;
@@ -51,7 +52,7 @@ class FakeLocals extends Command
 
             $bar->advance();
 
-            LocalRecords::fixRanks($map);
+            Utility::fixRanks('local-records', $map->id, config('locals.limit', 200));
         }
 
         $bar->finish();

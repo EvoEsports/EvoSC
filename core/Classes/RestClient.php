@@ -127,10 +127,6 @@ class RestClient
             $options['headers'] = [];
         }
 
-        if (!array_key_exists('connect_timeout', $options)) {
-            $options['connect_timeout'] = config('server.rest-timeout', 10);
-        }
-
         $options[RequestOptions::VERIFY] = CaBundle::getSystemCaRootBundlePath();
         $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.2', getEscVersion());
 

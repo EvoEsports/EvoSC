@@ -7,7 +7,7 @@ use esc\Classes\Hook;
 use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Module;
 use esc\Classes\Template;
-use esc\Classes\Utlity;
+use esc\Classes\Utility;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\AccessRight;
@@ -40,7 +40,7 @@ class LocalRecords extends Module implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        self::fixRanks($map);
+        Utility::fixRanks('local-records', $map->id, config('locals.limit', 200));
         self::sendLocalsChunk();
     }
 
@@ -70,7 +70,7 @@ class LocalRecords extends Module implements ModuleInterface
                 $baseRank = $count;
             }
 
-            $range = Utlity::getRankRange($baseRank, $top, $fill, $count);
+            $range = Utility::getRankRange($baseRank, $top, $fill, $count);
 
             $bottomRecords = DB::table(self::TABLE)
                 ->where('Map', '=', $map->id)
@@ -126,13 +126,7 @@ class LocalRecords extends Module implements ModuleInterface
         }
 
         $map = MapController::getCurrentMap();
-        $nextBetterRecord = DB::table(self::TABLE)
-            ->where('Map', '=', $map->id)
-            ->where('Score', '<=', $score)
-            ->orderByDesc('Score')
-            ->first();
-
-        $newRank = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
+        $newRank = Utility::getNextBetterRank(self::TABLE, $map->id, $score);
 
         if ($newRank > config('locals.limit', 200)) {
             return;
@@ -275,12 +269,5 @@ class LocalRecords extends Module implements ModuleInterface
             ->get();
 
         RecordsTable::show($player, $map, $records, 'Local Records');
-    }
-
-    public static function fixRanks(Map $map)
-    {
-        DB::raw('SET @rank=0');
-        DB::raw('UPDATE `local-records` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $map->id . ' ORDER BY `Score`');
-        DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', '>', config('locals.limit', 200))->delete();
     }
 }

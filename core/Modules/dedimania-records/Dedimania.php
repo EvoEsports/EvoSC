@@ -11,7 +11,7 @@ use esc\Classes\ManiaLinkEvent;
 use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Timer;
-use esc\Classes\Utlity;
+use esc\Classes\Utility;
 use esc\Controllers\MapController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Map;
@@ -139,7 +139,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             $baseRank = $count;
         }
 
-        $range = Utlity::getRankRange($baseRank, $top, $fill, $count);
+        $range = Utility::getRankRange($baseRank, $top, $fill, $count);
 
         $bottom = DB::table('dedi-records')
             ->where('Map', '=', $map->id)
@@ -215,13 +215,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
 
         $map = MapController::getCurrentMap();
-        $nextBetterRecord = DB::table('dedi-records')
-            ->where('Map', '=', $map->id)
-            ->where('Score', '<=', $score)
-            ->orderByDesc('Score')
-            ->first();
-
-        $newRank = $nextBetterRecord ? $nextBetterRecord->Rank + 1 : 1;
+        $newRank = Utility::getNextBetterRank(self::TABLE, $map->id, $score);
 
         $playerHasDedi = DB::table('dedi-records')
             ->where('Map', '=', $map->id)

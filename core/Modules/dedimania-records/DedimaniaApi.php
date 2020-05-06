@@ -614,8 +614,7 @@ class DedimaniaApi extends Module
                     'Accept-Encoding' => 'gzip',
                 ],
                 'decode_content' => 'gzip',
-                'body' => $xml->asXML(),
-                'connect_timeout' => 5.0,
+                'body' => $xml->asXML()
             ]);
         } catch (RequestException $e) {
             Log::write('DedimaniaAp::post failed: ' . $e->getMessage());
@@ -647,8 +646,7 @@ class DedimaniaApi extends Module
                 'Accept-Encoding' => 'gzip',
             ],
             'decode_content' => 'gzip',
-            'body' => $xml->asXML(),
-            'connect_timeout' => 10.0,
+            'body' => $xml->asXML()
         ]);
 
         $promise->then(function (ResponseInterface $response) use ($success) {

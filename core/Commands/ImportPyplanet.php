@@ -7,6 +7,7 @@ namespace esc\Commands;
 use esc\Classes\Database;
 use esc\Classes\DB;
 use esc\Classes\Log;
+use esc\Classes\Utility;
 use esc\Controllers\ConfigController;
 use esc\Models\Map;
 use esc\Models\Player;
@@ -204,7 +205,7 @@ class ImportPyplanet extends Command
         $bar->start();
 
         foreach ($mapIds as $id => $mappedId) {
-            LocalRecords::fixRanks(Map::find($mappedId));
+            Utility::fixRanks('local-records', Map::find($mappedId)->id, config('locals.limit', 200));
             $bar->advance();
         }
 
