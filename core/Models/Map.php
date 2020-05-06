@@ -103,20 +103,6 @@ class Map extends Model
     }
 
     /**
-     * @return mixed
-     */
-    public function getAverageRatingAttribute()
-    {
-        $mxDetails = $this->mx_details;
-
-        if ($mxDetails && $mxDetails->RatingVoteCount > 0) {
-            return $mxDetails->RatingVoteAverage;
-        }
-
-        return $this->ratings()->pluck('Rating')->average();
-    }
-
-    /**
      * @return mixed|stdClass|null
      */
     public function getMxDetailsAttribute()

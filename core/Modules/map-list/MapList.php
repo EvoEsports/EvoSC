@@ -2,6 +2,7 @@
 
 namespace esc\Modules;
 
+use esc\Classes\Cache;
 use esc\Classes\ChatCommand;
 use esc\Classes\DB;
 use esc\Classes\Hook;
@@ -21,8 +22,8 @@ class MapList extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -32,7 +33,7 @@ class MapList extends Module implements ModuleInterface
         ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
         ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
 
-        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMaplist']);
+        Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMapList']);
         Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'playerConnect']);
@@ -47,7 +48,7 @@ class MapList extends Module implements ModuleInterface
     public static function playerConnect(Player $player)
     {
         self::sendFavorites($player);
-        self::sendUpdatedMaplist($player);
+        self::sendUpdatedMapList($player);
         self::mapQueueUpdated(MapQueue::all());
         self::sendRecordsJson($player);
         Template::show($player, 'map-list.map-queue');
@@ -100,24 +101,12 @@ class MapList extends Module implements ModuleInterface
     }
 
     /**
-     * Returns enabled maps count
-     *
-     * @return mixed
+     * @param Player|null $player
      */
-    public static function getMapsCount()
-    {
-        return Map::whereEnabled(true)->count();
-    }
-
-    public static function sendUpdatedMaplist(Player $player = null)
+    public static function sendUpdatedMapList(Player $player = null)
     {
         $maps = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
-
-        if (isVerbose()) {
-            var_dump("All maps count: ".Map::count());
-            var_dump("Enabled maps count: ".Map::whereEnabled(1)->count());
-        }
 
         if ($player) {
             Template::show($player, 'map-list.update-map-list', [
@@ -132,57 +121,79 @@ class MapList extends Module implements ModuleInterface
         }
     }
 
-    private static function getMapList(): Collection
+    public static function getMapList(): Collection
     {
-        return Map::whereEnabled(1)->get()->transform(function (Map $map) {
-            if (!$map->id || !$map->uid) {
-                return null;
-            }
+        return DB::table('maps')
+            ->select('NickName as nick', 'maps.id', 'name', 'players.id as author', 'uid', 'cooldown', 'mx_id')
+            ->leftJoin('players', 'players.id', '=', 'maps.author')
+            ->where('enabled', '=', 1)
+            ->get()
+            ->transform(function ($data) {
+                $voteAverage = 0;
 
-            return [
-                'id' => (string) $map->id,
-                'name' => $map->name,
-                'a' => $map->author->id,
-                'r' => sprintf('%.1f', $map->average_rating),
-                'uid' => $map->uid,
-                'c' => $map->cooldown,
-            ];
-        })->filter();
+                if (Cache::has('mx-details/' . $data->mx_id)) {
+                    $mxDetails = Cache::get('mx-details/' . $data->mx_id);
+
+                    if ($mxDetails->RatingVoteCount > 0) {
+                        $voteAverage = $mxDetails->RatingVoteAverage;
+                    }
+                }
+
+                return [
+                    'id' => (string)$data->id,
+                    'name' => $data->name,
+                    'a' => $data->author,
+                    'r' => sprintf('%.1f', $voteAverage),
+                    'uid' => $data->uid,
+                    'c' => $data->cooldown,
+                ];
+            });
     }
 
+    /**
+     * @param $authorIds
+     * @return Collection
+     */
     private static function getMapAuthors($authorIds): Collection
     {
-        return Player::whereIn('id', $authorIds)->get()->transform(function (Player $player) {
-            return [
-                'nick' => $player->NickName,
-                'login' => $player->Login,
-                'id' => $player->id,
-            ];
-        });
+        return DB::table('players')
+            ->whereIn('id', $authorIds)
+            ->get()
+            ->transform(function (Player $player) {
+                return [
+                    'nick' => $player->NickName,
+                    'login' => $player->Login,
+                    'id' => $player->id,
+                ];
+            });
     }
 
+    /**
+     * @param Player $player
+     * @param $mapUid
+     */
     public static function disableMapEvent(Player $player, $mapUid)
     {
         $map = Map::whereUid($mapUid)->get()->first();
 
-        if (!$map) {
-            return;
+        if ($map) {
+            QueueController::dropMap($player, $map->uid);
+            MapController::disableMap($player, $map);
         }
-
-        QueueController::dropMap($player, $map->uid);
-        MapController::disableMap($player, $map);
     }
 
+    /**
+     * @param Player $player
+     * @param $mapUid
+     */
     public static function deleteMapPermEvent(Player $player, $mapUid)
     {
-        $map = Map::whereUid($mapUid)->get()->first();
+        $map = Map::whereUid($mapUid)->first();
 
-        if (!$map) {
-            return;
+        if ($map) {
+            QueueController::dropMap($player, $map->uid);
+            MapController::deleteMap($player, $map);
         }
-
-        QueueController::dropMap($player, $map->uid);
-        MapController::deleteMap($player, $map);
     }
 
     /**
@@ -206,6 +217,9 @@ class MapList extends Module implements ModuleInterface
         Template::showAll('map-list.update-map-queue', compact('mapQueue'));
     }
 
+    /**
+     * @param Player $player
+     */
     public static function showMapQueue(Player $player)
     {
         Template::show($player, 'map-list.show-queue', null, false);

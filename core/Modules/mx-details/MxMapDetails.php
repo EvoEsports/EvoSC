@@ -46,7 +46,16 @@ class MxMapDetails extends Module implements ModuleInterface
             self::loadMxWordlRecord($map);
         }
 
-        $rating = self::getRatingString($map->average_rating);
+        $voteAverage = 0;
+        if (Cache::has('mx-details/' . $map->mx_id)) {
+            $mxDetails = Cache::get('mx-details/' . $map->mx_id);
+
+            if ($mxDetails && $mxDetails->RatingVoteCount > 0) {
+                $voteAverage = $mxDetails->RatingVoteAverage;
+            }
+        }
+
+        $rating = self::getRatingString($voteAverage);
         Template::show($player, 'mx-details.window', compact('map', 'rating'));
     }
 
