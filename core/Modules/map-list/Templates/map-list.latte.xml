@@ -72,8 +72,8 @@
                     <label class="filter-btn btn-accent" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
                     <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
-                    <label class="filter-btn btn-accent" data-sort="best_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
-                    <label class="filter-btn btn-accent" data-sort="worst_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <label class="filter-btn btn-accent" data-sort="worst_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <label class="filter-btn btn-accent" data-sort="best_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
                     <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
                     <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
@@ -444,7 +444,7 @@ Void search(){
             }
         }
 
-        case "best_karma":{
+        case "worst_karma":{
             declare Text[Text][Text] selected = Text[Text][Text];
             declare Real[Text] sorter = Real[Text];
             for(i, 0, maps.count - 1){
@@ -464,7 +464,7 @@ Void search(){
             }
         }
 
-        case "worst_karma":{
+        case "best_karma":{
             declare Text[Text][Text] selected = Text[Text][Text];
             declare Text[Text][] reversed = Text[Text][];
             declare Real[Text] sorter = Real[Text];
@@ -491,7 +491,6 @@ Void search(){
 
         case "author_time_asc":{
             declare Text[Text][Text] selected = Text[Text][Text];
-            declare Text[Text][] reversed = Text[Text][];
             declare Real[Text] sorter = Real[Text];
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
