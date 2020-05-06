@@ -74,6 +74,10 @@
                     <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
                     <label class="filter-btn btn-accent" data-sort="best_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                     <label class="filter-btn btn-accent" data-sort="worst_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                    <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                    <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <label class="filter-btn btn-accent" data-sort="author_time_desc" pos="106.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                 </frame>
             </frame>
 
@@ -469,6 +473,52 @@ Void search(){
                 if(map["r"] != "0.0"){
                     selected[map["id"]] = map;
                     sorter[map["id"]] = TL::ToReal(map["r"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    reversed.add(selected[mapId]);
+                }
+            }
+
+            for(i, 0, reversed.count - 1){
+                mapsFound.add(reversed[reversed.count - i - 1]);
+            }
+        }
+
+        case "author_time_asc":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Text[Text][] reversed = Text[Text][];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["author_time"] != "-1"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["author_time"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "author_time_desc":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Text[Text][] reversed = Text[Text][];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["author_time"] != "-1"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["author_time"]);
                 }
             }
 

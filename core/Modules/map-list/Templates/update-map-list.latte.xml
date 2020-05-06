@@ -21,6 +21,8 @@
 
             Maps = MapsTemp;
             MapUpdateTime = GameTime;
+
+            log(Maps[0]);
         }
         -->
     </script>

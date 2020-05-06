@@ -121,11 +121,10 @@ class MapList extends Module implements ModuleInterface
         }
     }
 
-    public static function getMapList(): Collection
+    private static function getMapList(): Collection
     {
         return DB::table('maps')
-            ->select('NickName as nick', 'maps.id', 'name', 'players.id as author', 'uid', 'cooldown', 'mx_id')
-            ->leftJoin('players', 'players.id', '=', 'maps.author')
+            ->select('maps.id', 'name', 'author', 'uid', 'cooldown', 'mx_id')
             ->where('enabled', '=', 1)
             ->get()
             ->transform(function ($data) {
@@ -139,6 +138,12 @@ class MapList extends Module implements ModuleInterface
                     }
                 }
 
+                $authorTime = -1;
+                if (Cache::has('gbx/' . $data->uid)) {
+                    $gbx = Cache::get('gbx/' . $data->uid);
+                    $authorTime = $gbx->AuthorTime;
+                }
+
                 return [
                     'id' => (string)$data->id,
                     'name' => $data->name,
@@ -146,6 +151,7 @@ class MapList extends Module implements ModuleInterface
                     'r' => sprintf('%.1f', $voteAverage),
                     'uid' => $data->uid,
                     'c' => $data->cooldown,
+                    'author_time' => $authorTime
                 ];
             });
     }
@@ -157,12 +163,13 @@ class MapList extends Module implements ModuleInterface
     private static function getMapAuthors($authorIds): Collection
     {
         return DB::table('players')
+            ->select('NickName as nick', 'Login as login', 'id')
             ->whereIn('id', $authorIds)
             ->get()
-            ->transform(function (Player $player) {
+            ->transform(function ($player) {
                 return [
-                    'nick' => $player->NickName,
-                    'login' => $player->Login,
+                    'nick' => $player->nick,
+                    'login' => $player->login,
                     'id' => $player->id,
                 ];
             });
