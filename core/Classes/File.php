@@ -33,7 +33,7 @@ class File
 
             return file_get_contents($fileName);
         } else {
-            Log::error("Could not load file $fileName");
+            Log::error("Could not load file '$fileName'");
         }
 
         return null;

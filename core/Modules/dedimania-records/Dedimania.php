@@ -356,12 +356,11 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             unlink($oldGhostReplay);
         }
 
-        $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($dedi->map->Name), $dedi->Score);
+        $map = Map::whereId($dedi->Map)->first();
+        $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($map->uid), $dedi->Score);
 
         try {
-            $saved = Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile);
-
-            if ($saved) {
+            if (Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile)) {
                 $dedi->update(['ghost_replay' => $ghostFile]);
             }
         } catch (Exception $e) {

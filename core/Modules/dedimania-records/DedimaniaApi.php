@@ -410,10 +410,14 @@ class DedimaniaApi extends Module
         try {
             //Check if there is top1 dedi
             if ($newTimes->where('Rank', 1)->isNotEmpty()) {
-                $Top1GReplay = File::get($bestRecord->ghost_replay, false);
+                if (isset($bestRecord->ghost_replay) && $bestRecord->ghost_replay != null) {
+                    $Top1GReplay = File::get(ghost($bestRecord->ghost_replay), false);
 
-                if ($Top1GReplay == null) {
-                    Log::write('Failed to get ghost replay for player ' . $bestRecord->player, true);
+                    if ($Top1GReplay == null) {
+                        Log::write('Failed to get ghost replay for player ' . $bestRecord->player, true);
+                    }
+                } else {
+                    Log::error('Ghost not set for top1 dedi.');
                 }
             }
 
