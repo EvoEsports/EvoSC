@@ -33,7 +33,7 @@
     {/block}
 
     {block loop}
-        if(Map.MapInfo.MapUid != uid){
+        if(Map.MapInfo.MapUid != uid || UI.UISequence != CUIConfig::EUISequence::Podium){
             widget.Hide();
 
             if(left__){

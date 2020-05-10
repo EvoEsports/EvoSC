@@ -8,7 +8,7 @@
 #Include "TextLib" as TL
 
 main() {
-    log(CurrentServerJoinLink);
+    log(Period);
 }
     --></script>
 </manialink>

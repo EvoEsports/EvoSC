@@ -33,7 +33,7 @@ class NextMap extends Module implements ModuleInterface
         $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
 
         if (Server::isFilenameInSelection($map->filename)) {
-            infoMessage('Upcoming map ', secondary($map->name))->setIcon('')->sendAll();
+            infoMessage('Upcoming map ', secondary($map->name), ' by ', secondary($map->author->NickName))->setIcon('')->sendAll();
             Template::showAll('next-map.widget', compact('map', 'author'));
         }
     }

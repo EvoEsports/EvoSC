@@ -258,6 +258,9 @@ class DedimaniaApi extends Module
 
                 DB::table('dedi-records')->insert($insert->toArray());
             }
+
+            Log::write("Loaded records for map $map [" . $map->uid . ']');
+            Dedimania::sendUpdatedDedis();
         });
     }
 
@@ -438,11 +441,7 @@ class DedimaniaApi extends Module
 
             //Send the request
             self::postAsync($xml, function (SimpleXMLElement $data) {
-                if ($data && isset($data->params->param->value->boolean)) {
-                    Log::info('New Dedis saved.');
-                } else {
-                    Log::warning('Failed to update dedis.');
-                }
+                Log::info('New Dedis saved.');
             });
 
         } catch (Exception $e) {
