@@ -147,7 +147,7 @@ class LocalRecords extends Module implements ModuleInterface
 
             $chatMessage = chatMessage()
                 ->setIcon('')
-                ->setColor(config('colors.local'));
+                ->setColor(config('locals.text-color'));
 
             if ($oldRecord->Score < $score) {
                 return;
@@ -155,7 +155,7 @@ class LocalRecords extends Module implements ModuleInterface
 
             if ($oldRecord->Score == $score) {
                 $chatMessage->setParts($player, ' equaled his/her ',
-                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)));
+                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)));
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
                 } else {
@@ -178,7 +178,7 @@ class LocalRecords extends Module implements ModuleInterface
                     ]);
 
                 $chatMessage->setParts($player, ' secured his/her ',
-                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)),
+                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)),
                     ' (' . $oldRank . '. -' . formatScore($diff) . ')');
 
                 if ($newRank <= config('locals.echo-top', 100)) {
@@ -203,7 +203,7 @@ class LocalRecords extends Module implements ModuleInterface
                     ]);
 
                 $chatMessage->setParts($player, ' gained the ',
-                    secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)),
+                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)),
                     ' (' . $oldRank . '. -' . formatScore($diff) . ')');
 
                 if ($newRank <= config('locals.echo-top', 100)) {
@@ -231,9 +231,9 @@ class LocalRecords extends Module implements ModuleInterface
                 ]);
 
             $chatMessage = chatMessage($player, ' gained the ',
-                secondary($newRank . '.$') . config('colors.local') . ' local record ' . secondary(formatScore($score)))
+                secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)))
                 ->setIcon('')
-                ->setColor(config('colors.local'));
+                ->setColor(config('locals.text-color'));
 
             if ($newRank <= config('locals.echo-top', 100)) {
                 $chatMessage->sendAll();

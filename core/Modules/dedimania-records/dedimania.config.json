@@ -2,6 +2,7 @@
   "module": "dedimania",
   "login": "",
   "key": "",
+  "text-color": "4b2",
   "ui": {
     "position": "left",
     "slot": 11
