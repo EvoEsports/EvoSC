@@ -27,17 +27,23 @@ class NextMap extends Module implements ModuleInterface
         Hook::add('BeginMatch', [self::class, 'hideNextMap']);
     }
 
+    /**
+     *
+     */
     public static function showNextMap()
     {
         $map = MapController::getNextMap();
         $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
 
         if (Server::isFilenameInSelection($map->filename)) {
-            infoMessage('Upcoming map ', secondary($map->name), ' by ', secondary($map->author->NickName))->setIcon('')->sendAll();
+            infoMessage('Upcoming map ', secondary($map->name), ' by ', secondary($author->NickName))->setIcon('')->sendAll();
             Template::showAll('next-map.widget', compact('map', 'author'));
         }
     }
 
+    /**
+     *
+     */
     public static function hideNextMap()
     {
         Template::hideAll('next-map.widget');

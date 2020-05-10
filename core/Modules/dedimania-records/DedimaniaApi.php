@@ -443,7 +443,6 @@ class DedimaniaApi extends Module
             self::postAsync($xml, function (SimpleXMLElement $data) {
                 Log::info('New Dedis saved.');
             });
-
         } catch (Exception $e) {
             Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
