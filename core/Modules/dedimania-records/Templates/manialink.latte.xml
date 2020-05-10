@@ -19,6 +19,13 @@
     <quad class="bg-accent" size="45 5" opacity="0.8"/>
     <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Dedimania Records"/>
 
+    <frame id="loading-frame" pos="4 -{config('dedimania.rows') * 1.5 + 6.5}" z-index="5" scale="0.85" hidden="1">
+        <frame id="spinner-frame" pos="15 -1.75" halign="center" valign="center" scale="0.9">
+            <label class="text-warning" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
+        </frame>
+        <label class="text-warning" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
+    </frame>
+
     <frame id="records" pos="1 -7">
         {for $i=0; $i<config('dedimania.rows'); $i++}
         <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
@@ -28,6 +35,21 @@
 
     {block script}
     <script><!--
+    Void startLoad(){
+        declare records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        foreach(Control in records.Controls){
+            Control.Hide();
+        }
+        declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
+        AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1900, CAnimManager::EAnimManagerEasing::Linear);
+        (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Show();
+    }
+
+    Void stopLoad(){
+        AnimMgr.Flush((Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame));
+        (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Hide();
+    }
+
     Text[] getOnlinePlayers(){
         declare Text[] onlinePlayers = Text[];
         foreach(player in Players){
@@ -109,6 +131,7 @@
     }
 
     Void updateWidget(Record[] records){
+        stopLoad();
         declare myRank = getMyRank(records);
         declare filled = 0;
         declare skipped = 0;
@@ -180,12 +203,16 @@
         declare Integer LastDediRecordsUpdate for LocalUser = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
+        declare Ident mapUid;
 
         primaryColor = TL::ToColor("{config('theme.hud.text-light')|noescape}");
         headerColor = TL::ToColor("{config('theme.hud.accent')|noescape}");
 
         left__ = {config('dedimania.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('dedimania.ui.slot')};
+
+        mapUid = Map.Id;
+        startLoad();
     {/block}
 
     {block loop}
@@ -193,6 +220,11 @@
                 //update
                 lastUpdate = LastDediRecordsUpdate;
                 updateWidget(DediRecords);
+            }
+
+            if(mapUid != Map.Id){
+                mapUid = Map.Id;
+                startLoad();
             }
 
             if(playerCount != Players.count){

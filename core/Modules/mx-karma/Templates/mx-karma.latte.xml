@@ -67,7 +67,7 @@
 Void startLoading(){
     (Page.MainFrame.GetFirstChild("finish-notice") as CMlFrame).Hide();
     declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
-    AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1000, CAnimManager::EAnimManagerEasing::Linear);
+    AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1900, CAnimManager::EAnimManagerEasing::Linear);
     (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Show();
 }
 
