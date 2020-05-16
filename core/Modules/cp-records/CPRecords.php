@@ -45,8 +45,9 @@ class CPRecords extends Module implements ModuleInterface
      * @param Player $player
      * @param int $time
      * @param int $cpId
+     * @param bool $isFinish
      */
-    public static function playerCheckpoint(Player $player, int $time, int $cpId)
+    public static function playerCheckpoint(Player $player, int $time, int $cpId, bool $isFinish)
     {
         if ($time < 500) {
             return;
@@ -58,7 +59,7 @@ class CPRecords extends Module implements ModuleInterface
             }
         }
 
-        self::$tracker->put($cpId, new CpRecordsTracker($cpId, $player->NickName, $time));
+        self::$tracker->put($cpId, new CpRecordsTracker($cpId, $player->NickName, $time, $isFinish));
         self::sendUpdatedCpRecords($cpId);
     }
 
@@ -81,9 +82,12 @@ class CPRecords extends Module implements ModuleInterface
         }
 
         $times = explode(',', $checkpoints);
+        $last = array_pop($times);
+        $i = 0;
         foreach ($times as $i => $time) {
-            self::$tracker->put($i, new CpRecordsTracker($i, $player->NickName, $time));
+            self::$tracker->put($i, new CpRecordsTracker($i, $player->NickName, $time, false));
         }
+        self::$tracker->put($i + 1, new CpRecordsTracker($i + 1, $player->NickName, $last, true));
         self::sendUpdatedCpRecords();
     }
 

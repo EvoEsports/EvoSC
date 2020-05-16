@@ -27,10 +27,11 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct EvoSC_CP_Tracker {
+    #Struct EvoSC_CP_Tracker_V2 {
         Integer cpId;
         Text name;
         Integer time;
+        Boolean isFinish;
     }
 
     declare Real padding;
@@ -84,7 +85,7 @@
         return position;
     }
 
-    Void updateWidget(EvoSC_CP_Tracker record, Boolean flash){
+    Void updateWidget(EvoSC_CP_Tracker_V2 record, Boolean flash){
         if(!records.Controls.existskey(record.cpId)) return;
 
         declare frame = (records.Controls[record.cpId] as CMlFrame);
@@ -93,7 +94,13 @@
         declare timeLabel2 = (frame.Controls[3] as CMlLabel);
         declare nameLabel = (frame.Controls[4] as CMlLabel);
 
-        indexLabel.SetText(TL::ToText(record.cpId + 1));
+        if(record.isFinish){
+            indexLabel.SetText("🏁");
+            indexLabel.TextSizeReal = 0.5;
+        }else{
+            indexLabel.SetText(TL::ToText(record.cpId + 1));
+            indexLabel.TextSizeReal = 0.8;
+        }
         timeLabel.SetText(formatScoreCorrect(record.time, False));
         timeLabel2.SetText(formatScoreCorrect(record.time, True));
         nameLabel.SetText(record.name);
@@ -108,7 +115,7 @@
         frame.Show();
     }
 
-    Void updateWidgets(EvoSC_CP_Tracker[] records, Integer newCpId){
+    Void updateWidgets(EvoSC_CP_Tracker_V2[] records, Integer newCpId){
         foreach(record in records){
             updateWidget(record, record.cpId == newCpId);
         }
@@ -121,7 +128,7 @@
     }
 
     main() {
-        declare EvoSC_CP_Tracker[] EvoSC_CP_Records for This;
+        declare EvoSC_CP_Tracker_V2[] EvoSC_CP_Records_V2 for This;
         declare Ident EvoSC_CP_MapId for This;
         declare Integer EvoSC_CP_New for This;
         declare Integer EvoSC_CP_Update for This;
@@ -139,7 +146,7 @@
 
             if(lastUpdate != EvoSC_CP_Update && Map.Id == EvoSC_CP_MapId){
                 lastUpdate = EvoSC_CP_Update;
-                updateWidgets(EvoSC_CP_Records, EvoSC_CP_New);
+                updateWidgets(EvoSC_CP_Records_V2, EvoSC_CP_New);
             }
 
             if(Map.MapInfo.MapUid != currentMapId){
