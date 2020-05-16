@@ -37,7 +37,7 @@ class ConfigEditor extends Module implements ModuleInterface
      */
     public static function cmdShowEditConfig(Player $player, $cmd = null)
     {
-        self::mleShowEditGeneralConfig($player);
+        self::mleShowEditModulesConfig($player);
     }
 
     /**

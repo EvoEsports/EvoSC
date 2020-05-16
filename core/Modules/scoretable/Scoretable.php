@@ -25,7 +25,7 @@ class Scoretable extends Module implements ModuleInterface
 
     public static function sendScoreTable(Player $player)
     {
-        $logoUrl = config('scoreboard.logo-url');
+        $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
 

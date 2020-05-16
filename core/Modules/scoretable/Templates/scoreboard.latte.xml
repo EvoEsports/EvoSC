@@ -50,7 +50,7 @@
 
     <frame id="main-frame" pos="-86 30" z-index="9999">
         {if !empty($logoUrl)}
-        <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoreboard.logo-dimensions')}"
+        <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
         {/if}
         <label id="server-name" class="text-light" pos="1 15" size="60 6" scale="2"/>

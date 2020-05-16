@@ -48,6 +48,10 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function playerCheckpoint(Player $player, int $time, int $cpId)
     {
+        if ($time < 500) {
+            return;
+        }
+
         if (self::$tracker->has($cpId)) {
             if (self::$tracker->get($cpId)->time <= $time) {
                 return;
