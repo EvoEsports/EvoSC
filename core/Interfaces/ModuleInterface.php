@@ -1,7 +1,7 @@
 <?php
 
 
-namespace esc\Interfaces;
+namespace EvoSC\Interfaces;
 
 
 interface ModuleInterface

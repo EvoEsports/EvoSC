@@ -1,44 +1,43 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 use Error;
-use esc\Classes\ChatCommand;
-use esc\Classes\Database;
-use esc\Classes\DB;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\RestClient;
-use esc\Classes\Server;
-use esc\Classes\Timer;
-use esc\Controllers\AfkController;
-use esc\Controllers\BansController;
-use esc\Controllers\ChatController;
-use esc\Controllers\ConfigController;
-use esc\Controllers\ControllerController;
-use esc\Controllers\CountdownController;
-use esc\Controllers\EventController;
-use esc\Controllers\HookController;
-use esc\Controllers\MapController;
-use esc\Controllers\MatchSettingsController;
-use esc\Controllers\ModuleController;
-use esc\Controllers\PlanetsController;
-use esc\Controllers\PlayerController;
-use esc\Controllers\QueueController;
-use esc\Controllers\SetupController;
-use esc\Controllers\TemplateController;
-use esc\Models\Map;
-use esc\Models\Player;
-use esc\Modules\InputSetup;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Controllers\AfkController;
+use EvoSC\Controllers\BansController;
+use EvoSC\Controllers\ChatController;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Controllers\ControllerController;
+use EvoSC\Controllers\CountdownController;
+use EvoSC\Controllers\EventController;
+use EvoSC\Controllers\HookController;
+use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\MatchSettingsController;
+use EvoSC\Controllers\ModuleController;
+use EvoSC\Controllers\PlanetsController;
+use EvoSC\Controllers\PlayerController;
+use EvoSC\Controllers\QueueController;
+use EvoSC\Controllers\SetupController;
+use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Debug\Exception\ClassNotFoundException;
 
 class EscRun extends Command
 {
@@ -68,6 +67,13 @@ class EscRun extends Command
         if ($input->getOption('setup') !== false || !File::exists(cacheDir('.setupfinished'))) {
             SetupController::startSetup($input, $output, $this->getHelper('question'));
             return;
+        }
+
+        if ($input->getOption('skip_migrate') !== false) {
+            $output->writeln('Skipping migrations.');
+        } else {
+            $migrate = $this->getApplication()->find('migrate');
+            $migrate->execute($input, $output);
         }
 
         if (config('server.use-external-router', false)) {
@@ -132,13 +138,6 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('skip_migrate') !== false) {
-            $output->writeln('Skipping migrations.');
-        } else {
-            $migrate = $this->getApplication()->find('migrate');
-            $migrate->execute($input, $output);
-        }
-
         global $_onlinePlayers;
         global $_restart;
         global $serverName;

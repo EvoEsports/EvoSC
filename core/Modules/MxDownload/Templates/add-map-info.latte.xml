@@ -1,0 +1,56 @@
+{contentType text}
+{extends 'components.window'}
+
+{php $window_height = -1;}
+
+{block id}
+add-mx-map
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Add map?
+{/block}
+
+{block content}
+<frame pos="1 0">
+    <label class="text-light" pos="-0.5 0" size="100 20" text="{$details->GbxMapName}" textsize="3" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" pos="0 -6" size="116 20" text="by {$details->Username}" textsize="1" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" pos="0 -10" size="116 20" text="Title-Pack: TM{$details->EnvironmentName}@{$details->TitlePack}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" pos="0 -13" size="116 20" text="Style: {$details->StyleName} {$details->LengthName} ({$details->DifficultyName})" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" pos="0 -16" size="116 20" text="Mood: {$details->Mood}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" pos="0 -19" size="116 20" text="Single-Lap: {$details->RouteName=='Single' ? 'Yes' : 'No'}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
+    <label class="text-light" id="comments" pos="0 -24" size="115 20" text="{\EvoSC\Modules\MxDownload::parseBB($details->Comments)}" textsize="0.5" autonewline="1" textcolor="{config('theme.hud.text-light')}" textfont=""/>
+</frame>
+
+<label class="btn-default confirm" pos="105 -3" size="20 5" text=" Add" textsize="0.75" ScriptEvents="1"/>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+    declare commentsLabel <=> (Page.MainFrame.GetFirstChild("comments") as CMlLabel);
+    declare bg <=> (Page.MainFrame.GetFirstChild("bg") as CMlQuad);
+    bg.Size = <bg.Size[0], commentsLabel.ComputeHeight(commentsLabel.Value) + 32.0>;
+{/block}
+
+{block loop}
+{/block}
+
+{block pendingEvents}
+    if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::MouseClick){
+        window.Hide();
+        TriggerPageAction("mx.add,{$details->TrackID}");
+
+        return;
+    }
+{/block}
+--></script>

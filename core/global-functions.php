@@ -1,13 +1,13 @@
 <?php
 
 use Carbon\Carbon;
-use esc\Classes\ChatMessage;
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Classes\Server;
-use esc\Controllers\ConfigController;
-use esc\Controllers\PlayerController;
-use esc\Models\Player;
+use EvoSC\Classes\ChatMessage;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Controllers\PlayerController;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -107,7 +107,7 @@ function config(string $id, $default = null)
  */
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename));
 }
 
 /**
@@ -117,7 +117,7 @@ function cacheDir(string $filename = ''): string
  */
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename));
 }
 
 /**
@@ -127,7 +127,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename));
 }
 
 /**
@@ -137,8 +137,8 @@ function modulesDir(string $filename = ''): string
  */
 function ghost(string $filename = ''): string
 {
-    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
+    return realpath(Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
+            '/Replays/Ghosts/' . $filename . '.Replay.Gbx'));
 }
 
 /**
@@ -148,7 +148,7 @@ function ghost(string $filename = ''): string
  */
 function coreDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename));
 }
 
 /**
@@ -158,7 +158,7 @@ function coreDir(string $filename = ''): string
  */
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename));
 }
 
 /**
@@ -168,7 +168,7 @@ function configDir(string $filename = ''): string
  */
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
+    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename));
 }
 
 /**
@@ -197,7 +197,7 @@ function ml_escape(string $string)
 function player(string $login, bool $addToOnlineIfOffline = false): Player
 {
     if (PlayerController::hasPlayer($login)) {
-        return esc\Controllers\PlayerController::getPlayer($login);
+        return EvoSC\Controllers\PlayerController::getPlayer($login);
     }
 
     $player = Player::find($login);

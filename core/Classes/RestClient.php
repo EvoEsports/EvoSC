@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Composer\CaBundle\CaBundle;
@@ -16,7 +16,7 @@ use GuzzleHttp\RequestOptions;
  *
  * @see     http://docs.guzzlephp.org/en/stable/request-options.html
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class RestClient
 {

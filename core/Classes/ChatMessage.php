@@ -1,10 +1,10 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Map;
-use esc\Models\Player;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
 use stdClass;
 
 /**
@@ -12,7 +12,7 @@ use stdClass;
  *
  * Create and send chat/info/warning messages.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ChatMessage
 {

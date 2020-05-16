@@ -1,17 +1,17 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Player;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
 
 /**
  * Class ModeScriptEventController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class ModeScriptEventController implements ControllerInterface
 {

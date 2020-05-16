@@ -1,13 +1,13 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\DB;
-use esc\Classes\ManiaLinkEvent;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Player;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
 
 class UserSettingsController implements ControllerInterface
 {

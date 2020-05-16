@@ -1,9 +1,9 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Player;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
  *
  * Handle actions send from ManiaScripts (clients).
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ManiaLinkEvent
 {

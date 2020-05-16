@@ -1,0 +1,120 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
+    {include 'components.stylesheet'}
+    <frame id="window" pos="-25 10">
+        <quad class="bg-accent" size="50 5" z-index="-1"/>
+        <quad id="handle" data-id="help" size="35 5" z-index="5"/>
+        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($matchsettings) * 5 + 8}" opacity="0.8" z-index="-1"/>
+        <label class="text-light" pos="2 -2.5" textsize="0.8" text=" Matchsettings Manager" textprefix="$s" valign="center"/>
+        <label class="close" pos="47.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+        <label pos="25 -9"
+               class="btn-accent"
+               text=" Create new"
+               size="46 4"
+               textsize="0.5"
+               textprefix="$s"
+               action="msm.create"
+        />
+
+        <frame pos="2 -14" n:if="count($matchsettings) > 0">
+            {foreach $matchsettings as $i => $name}
+            <label pos="15.5 {$i * -5}"
+                   text="{$name}  "
+                   size="31 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   ScriptEvents="1"
+                   class="edit btn-default"
+                   data-name="{$name}"
+            />
+
+            <label pos="33.5 {$i * -5}"
+                   text=""
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="load btn-default"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+            />
+
+            <label pos="38.5 {$i * -5}"
+                   text=""
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="btn-default"
+                   action="msm.duplicate,{$name}"
+            />
+
+            <label pos="43.5 {$i * -5}"
+                   text=""
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="delete btn-danger"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+            />
+            {/foreach}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+    --></script>
+
+    {include 'dialogues.confirm'}
+
+    <script><!--
+    {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+        while(True){
+            yield;
+
+            if(window.Visible){
+                foreach(event in PendingEvents){
+                    if(event.Control == Null) continue;
+
+                    if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        window.Hide();
+                        return;
+                    }
+
+                    if(event.Control.HasClass("edit") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+                        TriggerPageAction("msm.edit," ^ name);
+                        window.Hide();
+                        return;
+                    }
+
+                    if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+
+                        if(confirm("Delete " ^ name ^ "?")){
+                            TriggerPageAction("msm.delete," ^ name);
+                        }
+                    }
+
+                    if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+
+                        if(confirm("Do you really want to load " ^ name ^ " now?")){
+                            TriggerPageAction("msm.load," ^ name);
+                        }
+                    }
+                }
+
+                maniaLinkDrag();
+            }
+        }
+    }
+
+    --></script>
+</manialink>

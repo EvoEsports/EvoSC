@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Command\Command;
@@ -26,7 +26,7 @@ class MakeMigration extends Command
 
             $template = str_replace('{className}', $name, '<?php
 
-namespace esc\Migrations;
+namespace EvoSC\Migrations;
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

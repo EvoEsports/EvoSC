@@ -1,11 +1,11 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\File;
-use esc\Commands\Migrate;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Commands\Migrate;
+use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;

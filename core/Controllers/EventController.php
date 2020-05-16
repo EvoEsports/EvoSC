@@ -1,23 +1,23 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Map;
-use esc\Models\Player;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
 use Exception;
 
 /**
  * Class EventController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class EventController implements ControllerInterface
 {

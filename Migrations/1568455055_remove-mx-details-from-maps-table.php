@@ -1,10 +1,10 @@
 <?php
 
-namespace esc\Migrations;
+namespace EvoSC\Migrations;
 
-use esc\Classes\Cache;
-use esc\Classes\File;
-use esc\Models\Map;
+use EvoSC\Classes\Cache;
+use EvoSC\Classes\File;
+use EvoSC\Models\Map;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;

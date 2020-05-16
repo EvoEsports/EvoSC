@@ -1,10 +1,12 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Carbon\Carbon;
-use esc\Controllers\UserSettingsController;
+use EvoSC\Controllers\UserSettingsController;
+use EvoSC\Modules\Dedimania\Models\Dedi;
+use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,7 +17,7 @@ use Illuminate\Support\Collection;
 /**
  * Class Player
  *
- * @package esc\Models
+ * @package EvoSC\Models
  * @property int $id
  * @property string $Login
  * @property string $NickName

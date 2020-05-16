@@ -1,10 +1,10 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Controllers\TemplateController;
-use esc\Models\Player;
+use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
@@ -13,7 +13,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
  *
  * Render manialink-templates and send them to all or single players.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Template
 {

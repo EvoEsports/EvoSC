@@ -1,13 +1,13 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
 use Carbon\Carbon;
-use esc\Classes\ChatCommand;
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Illuminate\Support\Collection;
 use Latte\Engine;
@@ -18,7 +18,7 @@ use Latte\Loaders\StringLoader;
  *
  * Handles loading and rendering templates.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class TemplateController implements ControllerInterface
 {
@@ -84,16 +84,8 @@ class TemplateController implements ControllerInterface
 
             return self::$latte->renderToString($index, $values);
         } catch (Exception $e) {
-            //Build parameter string
-            $parameters = [];
-            foreach ($values as $key => $value) {
-                array_push($parameters,
-                    "<options=bold>$key:</> <fg=yellow>" . json_encode($value, JSON_PRETTY_PRINT) . "</>");
-            }
-            $vals = implode(', ', $parameters);
-
-            Log::write('Failed to render template: ' . $index . " [$vals]");
-            var_dump($e->getTraceAsString());
+            Log::warning('Failed to render template: ' . $index . ' (' . $e->getMessage() . ')');
+            Log::write($e->getTraceAsString(), isVeryVerbose());
         }
 
         return '';
@@ -113,9 +105,10 @@ class TemplateController implements ControllerInterface
 
         //Get all template files in core directory
         $coreTemplates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/');
-        $extModuleTemplates = File::getFilesRecursively(coreDir('../modules'), '/\.latte\.xml$/');
+        $extModuleTemplates = File::getFilesRecursively(modulesDir(), '/\.latte\.xml$/');
 
-        self::$templates = $coreTemplates->merge($extModuleTemplates)->map(function (&$template) {
+        self::$templates = $coreTemplates->merge($extModuleTemplates)->map(function ($template) {
+            dump($template);
             $templateObject = collect();
 
             //Get path relative to core directory
@@ -129,7 +122,7 @@ class TemplateController implements ControllerInterface
             }
 
             //Load template contents
-            $templateObject->template = file_get_contents($template);
+            //$templateObject->template = file_get_contents($template);
 
             //Assign as new value
             return $templateObject;
@@ -150,6 +143,7 @@ class TemplateController implements ControllerInterface
         $pathParts = explode(DIRECTORY_SEPARATOR, $relativePath);
 
         //Remove first entry
+        $location = array_shift($pathParts);
         $location = array_shift($pathParts);
 
         if ($location == 'Modules') {

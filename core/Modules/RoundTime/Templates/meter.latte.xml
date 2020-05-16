@@ -1,0 +1,212 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:roundtime" id="roundtime" version="3">
+    {include 'components.stylesheet'}
+    <frame id="roundtime" z-index="10000">
+        <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s"/>
+        <label id="label" class="text-light" pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="$s"/>
+        <label class="action btn-accent" halign="left" valign="top" pos="-27 2.5" size="46 6.5" ScriptEvents="1" focusareacolor1="0000" />
+        <label class="text-light" z-index="5" id="wrench" pos="-24 0.5" text="" halign="right" valign="center" textsize="0.5" textprefix="$s" hidden="1"/>
+    </frame>
+
+    <frame id="settings" pos="-20 7" hidden="1">
+        <quad id="handle" data-id="roundtime" z-index="5" size="35 5" />
+        <quad class="bg-accent" z-index="-1" size="41 5" />
+        <quad class="bg-dark" z-index="-1" size="41 18" pos="0 -5" />
+        <label class="close text-light" pos="38.5 -2.5" size="5 5" halign="center" valign="center" textsize="0.5" text="" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+        <label class="text-light" pos="1 -2.5" size="30 5" valign="center" textsize="0.3" text=" RoundTime Settings"/>
+
+        <label class="text-light" pos="2 -7.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Show label"/>
+        <label id="label-disabled" class="label-disabled btn-success" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1"/>
+        <label id="label-enabled" class="label-enabled btn-default" pos="15 -7.5" size="3 3" halign="center" valign="center" textsize="0.3" text="" ScriptEvents="1"/>
+
+        <label class="text-light" pos="2 -11.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Scale"/>
+        <entry id="entry-scale" class="entry form" pos="14 -10.5" size="15 3" textsize="0.5" />
+
+        <label class="text-light" pos="2 -15.5" size="30 5" halign="left" valign="center" textsize="0.3" text="Position"/>
+        <label class="text-light" pos="14 -15.5" size="30 5" halign="left" valign="center" textsize="0.3" text="$iDrag the widget"/>
+
+        <label class="save btn-success" pos="20 -20" size="12 3" halign="center" valign="center" textsize="0.5" text="Save" ScriptEvents="1"/>
+        <label class="reset btn-danger" pos="33 -20" size="12 3" halign="center" valign="center" textsize="0.5" text="Reset" ScriptEvents="1"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct RoundTimeSettings {
+        Boolean showLabel;
+        Vec2 position;
+        Real scale;
+    }
+
+    declare RoundTimeSettings settings;
+
+    {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
+
+    Void resetMeter(){
+        settings.showLabel = True;
+        settings.position = <{config('roundtime.default-pos.x')|noescape}, {config('roundtime.default-pos.y')|noescape}>;
+        settings.scale = 1.0;
+    }
+
+    Void HideDuringIntro(CMlFrame _Frame) {
+      if (_Frame == Null) return;
+
+      declare IsIntro = (
+        UI.UISequence == CUIConfig::EUISequence::Intro ||
+        UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
+        UI.UISequence == CUIConfig::EUISequence::Outro
+      );
+
+      if (_Frame.Visible && IsIntro) {
+        _Frame.Visible = False;
+      } else if (!_Frame.Visible && !IsIntro) {
+        _Frame.Visible = True;
+      }
+    }
+
+    main(){
+        {if $settings}
+        settings.fromjson("""{$settings|noescape}""");
+        {else}
+        resetMeter();
+        {/if}
+
+        declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);
+        declare labelDisabled <=> (Page.MainFrame.GetFirstChild("label-disabled") as CMlLabel);
+        declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
+        declare labelLabel <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
+        declare wrench <=> (Page.MainFrame.GetFirstChild("wrench") as CMlLabel);
+        declare scaleEntry <=> (Page.MainFrame.GetFirstChild("entry-scale") as CMlEntry);
+        declare roundtime <=> (Page.MainFrame.GetFirstChild("roundtime") as CMlFrame);
+        declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings") as CMlFrame);
+        declare Boolean hidden = False;
+        declare Boolean settingsVisible = False;
+        declare PrevIsSpectator = !IsSpectator;
+
+        roundtime.RelativeScale = settings.scale;
+        labelLabel.Visible = settings.showLabel;
+        roundtime.RelativePosition_V3 = settings.position;
+
+        while(True){
+            yield;
+
+            HideDuringIntro(roundtime);
+            declare Owner <=> GUIPlayer;
+            if (!PageIsVisible || Owner == Null) continue;
+
+            roundtime.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
+
+            if(roundtime.Visible){
+                {if $is_maniaplanet}
+                speedLabel.Value = TL::TimeToText(Owner.CurLap.Time, True);
+                {else}
+				if (Owner.StartTime > GameTime) {
+					speedLabel.Value = TL::TimeToText(0, True);
+				} else if (Owner.StartTime >= 0) {
+					if (UI.UISequence == CUIConfig::EUISequence::Finish && Owner.RaceWaypointTimes.count > 0) {
+						speedLabel.Value = TL::TimeToText(Owner.RaceWaypointTimes[Owner.RaceWaypointTimes.count - 1], True);
+					} else {
+						speedLabel.Value = TL::TimeToText(GameTime - Owner.StartTime, True);
+					}
+				} else {
+					speedLabel.Value = "--:--.--";
+				}
+				{/if}
+            }else{
+                sleep(500);
+                continue;
+            }
+
+            if(!hidden){
+                foreach(event in PendingEvents){
+                    if(event.Control == Null){
+                        continue;
+                    }
+
+                    if(event.Control.HasClass("label-disabled") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        labelEnabled.Show();
+                        labelDisabled.Hide();
+                        settings.showLabel = True;
+                        labelLabel.Show();
+                    }
+                    if(event.Control.HasClass("label-enabled") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        labelEnabled.Hide();
+                        labelDisabled.Show();
+                        settings.showLabel = False;
+                        labelLabel.Hide();
+                    }
+                    if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        settingsFrame.Hide();
+                        settingsVisible = False;
+                    }
+                    if(event.Control.HasClass("reset") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        resetMeter();
+                        roundtime.RelativeScale = settings.scale;
+                        labelLabel.Visible = settings.showLabel;
+                        roundtime.RelativePosition_V3 = settings.position;
+                        TriggerPageAction("roundtime.reset");
+                    }
+                    if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        TriggerPageAction("roundtime.save," ^ settings.tojson());
+                    }
+                    if(event.Control.HasClass("action") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        if(settingsVisible){
+                            declare startPos = roundtime.RelativePosition_V3;
+                            declare startX = MouseX;
+                            declare startY = MouseY;
+
+                            while(MouseLeftButton){
+                                yield;
+
+                                declare newPosX = startPos[0] + (MouseX - startX);
+                                declare newPosY = startPos[1] + (MouseY - startY);
+
+                                roundtime.RelativePosition_V3 = <newPosX, newPosY>;
+                                settings.position = roundtime.RelativePosition_V3;
+                            }
+
+                            continue;
+                        }
+
+                        if(settings.showLabel){
+                            labelEnabled.Show();
+                            labelDisabled.Hide();
+                        }else{
+                            labelEnabled.Hide();
+                            labelDisabled.Show();
+                        }
+                        scaleEntry.SetText(settings.scale ^ "", False);
+                        settingsFrame.Show();
+                        settingsVisible = True;
+                    }
+                    if(event.Control.HasClass("action") && event.Type == CMlScriptEvent::Type::MouseOver){
+                        wrench.Show();
+                    }
+                    if(event.Control.HasClass("action") && event.Type == CMlScriptEvent::Type::MouseOut){
+                        wrench.Hide();
+                    }
+                    if(event.Control.HasClass("entry") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+                        settings.scale = TL::ToReal(scaleEntry.Value);
+
+                        if(settings.scale < 0){
+                            settings.scale = -settings.scale;
+                        }
+                        if(settings.scale < 0.4){
+                            settings.scale = 0.4;
+                        }
+
+                        scaleEntry.SetText(settings.scale ^ "", False);
+                        roundtime.RelativeScale = settings.scale;
+                    }
+                }
+
+                if(settingsVisible){
+                    maniaLinkDrag();
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>

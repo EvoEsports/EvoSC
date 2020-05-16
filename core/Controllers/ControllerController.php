@@ -1,9 +1,9 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Interfaces\ControllerInterface;
 
 class ControllerController
 {

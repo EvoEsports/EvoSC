@@ -1,0 +1,127 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+    {include 'components.stylesheet'}
+
+    <frame id="overview" pos="-65 {$groups->count() * 3 + 5}" scale="1.1">
+        <quad class="bg-dark" size="120 {$groups->count() * 6 + 10}" pos="0 -6" opacity="0.8" z-index="-1" />
+        <quad class="bg-accent" size="120 6"/>
+        <quad id="handle" data-id="groupmgr" size="115 6" z-index="5"/>
+        <label class="text-light" pos="2 -3" valign="center" text=" Groups Manager" z-index="1"/>
+        <label class="close text-light" pos="117 -3" size="6 6" text="" textsize="1.2" z-index="2" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+        <frame pos="2 -1.5" z-index="2">
+            {foreach $groups as $group}
+            <frame pos="0 {$iterator->counter * -6 - 2}">
+                <label class="text-light" pos="5 0.25" size="24 4" valign="center" text="{$group->Name}" textprefix="{(strlen($group->color) > 1) ? '$'.$group->color : ''}" scale="0.9"/>
+                <label class="text-light" pos="5 -2" size="24 4" valign="center" text="{$group->player()->count() ?: 'No'} Members" scale="0.5"/>
+                <label class="text-light" pos="2 -0.5" size="5 5" valign="center" halign="center" text="{$group->chat_prefix}" scale="1.1"/>
+
+                {if !$group->Protected}
+                <frame pos="93 -0.5" data-id="{$group->id}">
+                    {if $group->player()->count() > 0}
+                    <label pos="-59 0" class="members" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    {/if}
+                    <label class="btn-default edit" pos="-42 0" size="16 4" halign="center" valign="center" text=" Edit Group" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="btn-default add" pos="-27.5 0" size="12 4" halign="center" valign="center" text=" Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="btn-default add_login" pos="-14 0" size="13 4" halign="center" valign="center" text=" By Login" textsize="0.4" ScriptEvents="1" />
+                    <label class="btn-default edit_access" pos="2 0" size="17 4" halign="center" valign="center" text=" Edit Access" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="btn-default delete_group" pos="17.5 -0" size="12 4" halign="center" valign="center" text=" Delete" textsize="0.4" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="b00a" data-id="{$group->id}" />
+                </frame>
+                {else}
+                <frame pos="106 -0.5" data-id="{$group->id}">
+                    {if $group->id != 3 && $group->player()->count() > 0}
+                    <label class="btn-default members" pos="-59 0" size="16 4" halign="center" valign="center" text=" Members" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    {/if}
+                    <label class="btn-default edit" pos="-42 0" size="16 4" halign="center" valign="center" text=" Edit Group" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="btn-default add" pos="-27.5 0" size="12 4" halign="center" valign="center" text=" Player" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                    <label class="btn-default add_login" pos="-14 0" size="13 4" halign="center" valign="center" text=" By Login" textsize="0.4" ScriptEvents="1" />
+                    <label class="btn-default edit_access" pos="2 0" size="17 4" halign="center" valign="center" text=" Edit Access" textsize="0.4" ScriptEvents="1" data-id="{$group->id}" />
+                </frame>
+                {/if}
+
+                <quad pos="-2 2.5" size="120 6" bgcolor="{$group->color}" opacity="0.1" z-index="-1" />
+            </frame>
+            {/foreach}
+        </frame>
+
+        <frame pos="0 {$groups->count() * -6 - 6.5}" z-index="5">
+            <label class="create_group btn-default" pos="13 -5" valign="center" halign="center" size="22 5" textsize="0.8" text=" Create Group" focusareacolor1="{config('colors.ui.window.header.color')}6" focusareacolor2="{config('colors.ui.window.header.color')}c" ScriptEvents="1" textfont="{config('colors.ui.font')|noescape}"/>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+    --></script>
+
+    {include 'dialogues.confirm'}
+    {include 'dialogues.input'}
+
+    <script><!--
+
+    {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    overview.Hide();
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("create_group")){
+                    declare Text input = input("Choose a name for the group");
+
+                    if(input != ""){
+                        TriggerPageAction("group.create," ^ input);
+                    }
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("delete_group")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+
+                    if(confirm("Do you really want to delete this group?")){
+                        TriggerPageAction("group.delete," ^ groupId);
+                    }
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("members")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.members," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit_access")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.edit_access," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("edit")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.edit_group," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("add")){
+                    declare Text groupId = event.Control.DataAttributeGet("id");
+                    TriggerPageAction("group.member_add_form," ^ groupId);
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("add_login")){
+                    declare Text groupId = event.Control.Parent.DataAttributeGet("id");
+                    declare Text login = input("Enter login");
+                    if(login != ""){
+                        TriggerPageAction("group.member_add," ^ groupId ^ "," ^ login);
+                    }
+                }
+            }
+
+            maniaLinkDrag();
+        }
+    }
+
+    --></script>
+</manialink>

@@ -1,25 +1,25 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Classes\ChatCommand;
-use esc\Classes\DB;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MPS_Map;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Map;
-use esc\Models\MapFavorite;
-use esc\Models\MapQueue;
-use esc\Models\Player;
-use esc\Modules\Dedimania;
-use esc\Modules\LocalRecords;
-use esc\Modules\MxMapDetails;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\MPS_Map;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Map;
+use EvoSC\Models\MapQueue;
+use EvoSC\Models\Player;
+use EvoSC\Modules\Dedimania\Dedimania;
+use EvoSC\Modules\LocalRecords\LocalRecords;
+use EvoSC\Modules\MapList\Models\MapFavorite;
+use EvoSC\Modules\MxDetails\MxDetails;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
@@ -28,7 +28,7 @@ use stdClass;
 /**
  * Class MapController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class MapController implements ControllerInterface
 {
@@ -115,7 +115,7 @@ class MapController implements ControllerInterface
             'plays' => $map->plays + 1,
         ]);
 
-        MxMapDetails::loadMxDetails($map);
+        MxDetails::loadMxDetails($map);
     }
 
     /**
@@ -157,7 +157,11 @@ class MapController implements ControllerInterface
     public static function getCurrentMap(): Map
     {
         if (!isset(self::$currentMap)) {
-            Log::error('Current map is not set. Exiting...', true);
+            Log::warning('Current map is not set.', true);
+
+            list($childClass, $caller) = debug_backtrace(false, 2);
+            Log::write($caller);
+
             exit(4); //Runtime error
         }
 

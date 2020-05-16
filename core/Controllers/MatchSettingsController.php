@@ -1,20 +1,19 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
 use DOMDocument;
-use esc\Classes\ChatCommand;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Classes\Timer;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Player;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
 use Exception;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;

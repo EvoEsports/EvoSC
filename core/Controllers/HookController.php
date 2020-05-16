@@ -1,18 +1,18 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
 /**
  * Class HookController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class HookController implements ControllerInterface
 {

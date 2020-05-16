@@ -1,10 +1,10 @@
 <?php
 
 
-namespace esc\Tests;
+namespace EvoSC\Tests;
 
 
-use esc\Classes\Utility;
+use EvoSC\Classes\Utility;
 use PHPUnit\Framework\TestCase;
 
 class UtlityTest extends TestCase

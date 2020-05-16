@@ -1,13 +1,13 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Group
- * @package esc\Models
+ * @package EvoSC\Models
  * @property int $id;
  * @property string $Name;
  * @property string $chat_prefix;

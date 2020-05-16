@@ -1,17 +1,16 @@
 <?php
 
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 
-use esc\Classes\Database;
-use esc\Classes\DB;
-use esc\Classes\Log;
-use esc\Classes\Utility;
-use esc\Controllers\ConfigController;
-use esc\Models\Map;
-use esc\Models\Player;
-use esc\Modules\LocalRecords;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Utility;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;

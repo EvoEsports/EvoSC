@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

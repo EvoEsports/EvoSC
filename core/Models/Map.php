@@ -1,11 +1,10 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
-use esc\Classes\Cache;
-use esc\Classes\Log;
-use esc\Controllers\MapController;
+use EvoSC\Classes\Cache;
+use EvoSC\Controllers\MapController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -14,7 +13,7 @@ use stdClass;
 /**
  * Class Map
  *
- * @package esc\Models
+ * @package EvoSC\Models
  *
  * @property string $id
  * @property string $uid

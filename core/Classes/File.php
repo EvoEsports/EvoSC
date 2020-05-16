@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Illuminate\Support\Collection;
@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
  *
  * Create/delete/update/append files, read/create directories.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class File
 {
@@ -146,7 +146,7 @@ class File
                     //File is not directory
                     if (preg_match($filterPattern, $file)) {
                         //Add template
-                        $files->push($path);
+                        $files->push(realpath($path));
                     }
                 }
             });

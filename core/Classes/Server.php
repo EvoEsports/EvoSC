@@ -1,9 +1,9 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Player;
+use EvoSC\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\Map;
@@ -18,7 +18,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  *
  * XML-RPC helper class. See {@see https://doc.maniaplanet.com/dedicated-server/references/xml-rpc-methods} for a full list of all methods and their arguments.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  *
  * @method static bool authenticate(string $string, string $string)
  * @method static bool changeAuthPassword(string $string, string $string)

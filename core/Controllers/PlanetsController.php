@@ -1,15 +1,15 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
 use Carbon\Carbon;
-use esc\Classes\Log;
-use esc\Classes\Server;
-use esc\Classes\Timer;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Bill;
-use esc\Models\Player;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Bill;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
  *
  * Create planets payments.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class PlanetsController implements ControllerInterface
 {

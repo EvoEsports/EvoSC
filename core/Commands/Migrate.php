@@ -1,8 +1,8 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
-use esc\Classes\File;
+use EvoSC\Classes\File;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -92,7 +92,7 @@ class Migrate extends Command
             $content = file_get_contents($migration->path);
 
             if (preg_match('/class (.+) extends/', $content, $matches)) {
-                $class = 'esc\\Migrations\\' . $matches[1];
+                $class = 'EvoSC\\Migrations\\' . $matches[1];
                 require_once $migration->path;
                 $instance = new $class;
                 $instance->up($schemaBuilder);

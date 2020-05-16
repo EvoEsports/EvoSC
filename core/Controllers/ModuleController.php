@@ -1,20 +1,22 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Classes\Module;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Module;
+use EvoSC\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 
 /**
  * Class ModuleController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class ModuleController implements ControllerInterface
 {
+    const PATTERN = '/core\/Modules\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
+
     /**
      * @var Collection
      */
@@ -57,13 +59,19 @@ class ModuleController implements ControllerInterface
         $totalStarted = 0;
 
         $moduleClasses = $allModules
-            ->reject(function ($file) {
-                return preg_match('/\/[Mm]odules\/[a-z\-]+\/.+\/[A-Z].+/', $file);
+            ->filter(function ($file) {
+                return preg_match(self::PATTERN, $file);
             })
             ->mapWithKeys(function ($file) {
-                $file = realpath($file);
-                return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname($file)];
+                if(preg_match(self::PATTERN, $file, $matches)){
+                    $dir = $matches[1];
+                    $classname = $matches[2];
+                    return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                }
+
+                return null;
             })
+            ->filter()
             ->unique()
             ->map(function ($moduleDir, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
                 $files = scandir($moduleDir);
@@ -93,7 +101,7 @@ class ModuleController implements ControllerInterface
                 try {
                     $instance = new $moduleClass();
                 } catch (\Error $e) {
-                    Log::error('Module: ' . $moduleClass . ' [ERROR] ' . $e->getMessage() . ' (not started).', true);
+                    Log::error('[MODULE ERROR] ' . $e->getMessage() . ' (not started).', true);
                     return null;
                 }
 

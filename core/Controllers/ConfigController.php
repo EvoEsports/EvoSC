@@ -1,12 +1,12 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 use stdClass;
 

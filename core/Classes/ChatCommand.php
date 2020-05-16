@@ -1,11 +1,11 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Closure;
-use esc\Models\AccessRight;
-use esc\Models\Player;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
  *
  * Create chat-commands and aliases
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ChatCommand
 {

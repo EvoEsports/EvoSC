@@ -1,22 +1,21 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\Log;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Player;
-use Illuminate\Support\Collection;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
 
 /**
  * Class ChatController
  *
  * Handle chat-messages and commands.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class ChatController implements ControllerInterface
 {

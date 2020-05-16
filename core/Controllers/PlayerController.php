@@ -1,25 +1,25 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\DB;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Player;
-use esc\Models\Stats;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
+use EvoSC\Models\Stats;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
 /**
  * Class PlayerController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class PlayerController implements ControllerInterface
 {

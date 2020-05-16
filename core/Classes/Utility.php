@@ -1,7 +1,7 @@
 <?php
 
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 class Utility

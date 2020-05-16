@@ -1,15 +1,15 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 /**
  * Class ManiaLinkDrag
  *
  * Helper script for dragging ManiaLinks (could need optimization).
- * Add {(new esc\Classes\ManiaLinkDrag())|noescape} to your ManiaScript, make sure you have a quad in your header area with the id "handle", if not set your quad-id in the constructor.
+ * Add {(new EvoSC\Classes\ManiaLinkDrag())|noescape} to your ManiaScript, make sure you have a quad in your header area with the id "handle", if not set your quad-id in the constructor.
  * Call maniaLinkDrag(); in a loop.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ManiaLinkDrag
 {

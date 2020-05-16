@@ -1,15 +1,15 @@
 <?php
 
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\Database;
-use esc\Classes\Log;
-use esc\Classes\Server;
-use esc\Controllers\ConfigController;
-use esc\Models\Player;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Models\Player;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

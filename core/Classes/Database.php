@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -12,7 +12,7 @@ use Illuminate\Database\Connection;
  * Handles all database functionality with relationships and query-builder.
  * {@see https://laravel.com/docs/5.8/queries}
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Database
 {

@@ -1,23 +1,21 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Player;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
 
 class AccessRightsController implements ControllerInterface
 {
-
     /**
      * Method called on controller boot.
      */
     public static function init()
     {
-        // TODO: Implement init() method.
     }
 
     /**

@@ -1,18 +1,18 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\DB;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Map;
-use esc\Models\MapQueue;
-use esc\Models\Player;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Map;
+use EvoSC\Models\MapQueue;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -20,7 +20,7 @@ use Illuminate\Support\Collection;
  *
  * The QueueController handles adding/removing maps to/from the queue.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class QueueController implements ControllerInterface
 {
