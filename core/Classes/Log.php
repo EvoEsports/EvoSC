@@ -2,7 +2,6 @@
 
 namespace esc\Classes;
 
-use esc\Modules\Loggerino;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -77,8 +76,6 @@ class Log
         if (isDebug()) {
             $callingClass .= "\nData: " . json_encode($caller['args']);
         }
-
-        Loggerino::append(preg_replace('/<(?:error|info|fg=\w+|\/)>/', '', "$callingClass $string"));
 
         $date = date("Y-m-d", time());
         $time = date("H:i:s", time());

@@ -64,7 +64,7 @@ class DedimaniaApi extends Module
             'Login' => config('dedimania.login'),
             'Code' => config('dedimania.key'),
             'Path' => Server::getDetailedPlayerInfo(config('dedimania.login'))->path,
-            'Packmask' => 'Stadium', //TODO: implement canyon, valley, etc.
+            'Packmask' => config('server.title', 'Stadium'),
             'ServerVersion' => Server::getVersion()->version,
             'ServerBuild' => Server::getVersion()->build,
             'Tool' => 'EvoSC',
