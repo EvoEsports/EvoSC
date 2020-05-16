@@ -41,7 +41,7 @@ class CpDiffs extends Module implements ModuleInterface
         ChatCommand::add('/target', [self::class, 'cmdSetTarget'],
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
 
-        ChatCommand::add('/pb', [self::class, 'showPb']);
+        ChatCommand::add('/pb', [self::class, 'printPersonalBestToChat']);
     }
 
     public static function requestCpDiffs(Player $player)
@@ -69,7 +69,7 @@ class CpDiffs extends Module implements ModuleInterface
         self::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 
-    public static function showPb(Player $player)
+    public static function printPersonalBestToChat(Player $player)
     {
         $pb = DB::table('pbs')
             ->where('map_id', '=', MapController::getCurrentMap()->id)
@@ -80,6 +80,7 @@ class CpDiffs extends Module implements ModuleInterface
             $cps = collect(explode(',', $pb->checkpoints))->map(function ($cp, $key) {
                 return '$666' . ($key + 1) . '|$fff' . formatScore($cp, true);
             })->implode(', ');
+
             infoMessage('Your PB is ', secondary(formatScore($pb->score, true)), ', checkpoints: ', secondary($cps))->send($player);
         } else {
             infoMessage('You don\'t have a PB on this map yet.')->send($player);
@@ -95,6 +96,7 @@ class CpDiffs extends Module implements ModuleInterface
             $target->score = $pb->score;
             $target->cps = explode(',', $pb->checkpoints);
             $target->name = ml_escape($player->NickName);
+            $target->map_uid = $map->uid;
 
             self::$targets->put($player->id, $target);
             Template::show($player, 'cp-diffs.widget', compact('target'));
@@ -123,6 +125,7 @@ class CpDiffs extends Module implements ModuleInterface
                 $target->score = $targetRecord->Score;
                 $target->cps = explode(',', $targetRecord->Checkpoints);
                 $target->name = ml_escape($targetPlayer->NickName);
+                $target->map_uid = $map->uid;
 
                 self::$targets->put($player->id, $target);
                 Template::show($player, 'cp-diffs.widget', compact('target'));

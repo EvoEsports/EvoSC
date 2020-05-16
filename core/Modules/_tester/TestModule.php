@@ -10,6 +10,7 @@ use esc\Classes\Server;
 use esc\Classes\Template;
 use esc\Classes\Utility;
 use esc\Controllers\AfkController;
+use esc\Controllers\MapController;
 use esc\Controllers\TemplateController;
 use esc\Interfaces\ModuleInterface;
 use esc\Models\Player;

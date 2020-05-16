@@ -164,6 +164,11 @@ class MapController implements ControllerInterface
         return self::$currentMap;
     }
 
+    public static function current(): Map
+    {
+        return self::getCurrentMap();
+    }
+
     /**
      * Remove a map
      *

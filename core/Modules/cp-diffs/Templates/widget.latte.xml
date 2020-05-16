@@ -31,15 +31,17 @@
         #Include "MathLib" as ML
         #Include "TextLib" as TL
 
-        #Struct Target {
+        #Struct Target_V2 {
             Integer score;
             Integer[] cps;
             Text name;
+            Text map_uid;
         }
 
         declare Vec3 colorGreen;
         declare Vec3 colorRed;
-        declare Target target;
+        declare Vec3 colorBlue;
+        declare Target_V2 target;
 
         Text formatDiff(Integer diff){
             declare Text sign;
@@ -70,6 +72,11 @@
         Void fillBox(Integer cpId, Integer score, Boolean finish){
             declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
             declare boxFrame = (boxesFrame.Controls[cpId] as CMlFrame);
+
+            if(!target.cps.existskey(cpId)){
+                return;
+            }
+
             declare diff = score - target.cps[cpId];
 
             if(finish){
@@ -85,8 +92,8 @@
                 (boxFrame.Controls[5] as CMlLabel).Value = "+";
             }else{
                 if(diff == 0){
-                    (boxFrame.Controls[2] as CMlQuad).BgColor = <0.0, 0.25, 0.8>;
-                    (boxFrame.Controls[4] as CMlLabel).TextColor = <0.0, 0.25, 0.8>;
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = colorBlue;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = colorBlue;
                     (boxFrame.Controls[5] as CMlLabel).Value = "";
                 }else{
                     (boxFrame.Controls[2] as CMlQuad).BgColor = colorGreen;
@@ -131,21 +138,19 @@
             declare player <=> GUIPlayer;
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
-            declare Ident currentMapUid = Map.Id;
 
             colorGreen = TL::ToColor("{config('theme.form.success.bg')}");
             colorRed = TL::ToColor("{config('theme.form.danger.bg')}");
+            colorBlue = TL::ToColor("3086bf");
 
             while(True){
                 yield;
 
                 cpDiffs.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
 
-                if(currentMapUid != Map.Id){
-                    currentMapUid = Map.Id;
-                    TriggerPageAction("request_cp_diffs");
-                    wait(currentMapUid != Map.Id);
-                    continue;
+                if(target.map_uid != "" ^ Map.Id){
+                    cpDiffs.Hide();
+                    return;
                 }
 
                 if(player == Null || !cpDiffs.Visible){
