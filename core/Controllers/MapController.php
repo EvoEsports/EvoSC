@@ -55,6 +55,7 @@ class MapController implements ControllerInterface
 
         self::$mapsPath = Server::getMapsDirectory();
         self::$mapToDisable = collect();
+        self::$currentMap = Map::getByUid(Server::getCurrentMapInfo()->uId);
 
         if (!$_skipMapCheck) {
             self::loadMaps();
@@ -154,15 +155,12 @@ class MapController implements ControllerInterface
      *
      * @return Map
      */
-    public static function getCurrentMap(): Map
+    public static function getCurrentMap(): ?Map
     {
         if (!isset(self::$currentMap)) {
-            Log::warning('Current map is not set.', true);
-
             list($childClass, $caller) = debug_backtrace(false, 2);
-            Log::write($caller);
-
-            exit(4); //Runtime error
+            Log::warning('Current map is not set, called from: ' . implode('', [basename($caller['class']), $caller['type'], $caller['function']]), true);
+            return null;
         }
 
         return self::$currentMap;

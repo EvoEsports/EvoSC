@@ -28,8 +28,8 @@ class MxKarma extends Module implements ModuleInterface
     const ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
     private static string $sessionKey;
-    private static float $voteAverage;
-    private static int $votesTotal;
+    private static float $voteAverage = 0;
+    private static int $votesTotal = 0;
     private static Collection $newVotes;
 
     /**

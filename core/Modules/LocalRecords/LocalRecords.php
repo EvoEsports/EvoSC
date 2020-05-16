@@ -52,7 +52,9 @@ class LocalRecords extends Module implements ModuleInterface
             $players = [$playerIn];
         }
 
-        $map = MapController::getCurrentMap();
+        if(!$map = MapController::getCurrentMap()){
+            return;
+        }
         $count = DB::table(self::TABLE)->where('Map', '=', $map->id)->count();
 
         $top = config('locals.show-top', 3);

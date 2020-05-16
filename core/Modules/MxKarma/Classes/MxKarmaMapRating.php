@@ -1,7 +1,7 @@
 <?php
 
 
-namespace EvoSC\Modules\Classes;
+namespace EvoSC\Modules\MxKarma\Classes;
 
 
 use Illuminate\Support\Collection;
