@@ -2,7 +2,8 @@
   "enabled": false,
   "ui": {
     "position": "left",
-    "slot": 99
+    "slot": 99,
+    "servers-per-page": 2
   },
   "servers": [
     {

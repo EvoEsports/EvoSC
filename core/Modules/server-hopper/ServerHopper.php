@@ -37,7 +37,7 @@ class ServerHopper extends Module implements ModuleInterface
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
-            Timer::create('refresh_server_list', [self::class, 'updateServerInformation'], '30s', true);
+            Timer::create('refresh_server_list', [self::class, 'updateServerInformation'], '1m', true);
         }
     }
 
@@ -75,7 +75,7 @@ class ServerHopper extends Module implements ModuleInterface
     {
         self::$servers->transform(function ($server) {
             try {
-                $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 100, $server->rpc->login, $server->rpc->pw);
+                $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
                 $server->online      = true;
                 $server->name        = $connection->getServerName();
                 $server->players     = count($connection->getPlayerList());

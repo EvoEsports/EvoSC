@@ -10,11 +10,17 @@
     <quad id="bg" class="bg-dark" size="50 100" pos="0 -5" opacity="0.8" z-index="-1" />
     <label class="text-light" pos="2 -2.5" valign="center" textsize="0.5" text=" Servers" z-index="1" textprefix="" textfont="{config('colors.ui.font')|noescape}" />
 
-    <frame id="data" pos="-1 -7" scale="0.9">
-        {for $i=0; $i<7; $i++}
+    <frame id="pagination" pos="30 -2.5" scale="0.95">
+        <label class="text-light previous" pos="3.75 0" size="3 3" valign="center" halign="center" text="" z-index="5" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <label id="page-label" class="text-light" pos="7.5 0.05" size="4 1" valign="center" halign="center" text="1/2" z-index="5" textsize="0.75" />
+        <label class="text-light next" pos="11.5 0" size="3 3" valign="center" halign="center" text="" z-index="5" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+    </frame>
+
+    <frame id="data" pos="-1.25 -7.25" scale="0.9">
+        {for $i=0; $i<config('server-hopper.ui.servers-per-page'); $i++}
         <frame pos="0 {$i * -3.5}">
             <label class="text-light" pos="5.5 0" size="8 4" halign="right" valign="center" textsize="0.8" textprefix="$s" />
-            <label class="text-light" pos="5.5 -0.35" size="6 4" halign="left" valign="center" scale="0.65" textprefix="/" opacity="0.75" />
+            <label class="text-light" pos="5.6 -0.35" size="6 4" halign="left" valign="center" scale="0.65" textprefix="/" opacity="0.75" />
             <label class="text-light" pos="10.5 0" size="38 4" valign="center" textsize="0.8"/>
         </frame>
         {/for}
@@ -43,10 +49,21 @@
         declare dataFrame <=> (Page.MainFrame.GetFirstChild("data") as CMlFrame);
         declare Text[Text][] servers;
         declare filled = 0;
+        declare skipped = 0;
+        declare perPage = {config('server-hopper.ui.servers-per-page')}.0;
         declare Text pw = "";
         servers.fromjson(data);
 
+        totalPages = ML::NearestInteger(servers.count / perPage);
+        (Page.MainFrame.GetFirstChild("page-label") as CMlLabel).Value = (page + 1) ^ "/" ^ totalPages;
+        (Page.MainFrame.GetFirstChild("pagination") as CMlFrame).Visible = totalPages > 1;
+
         foreach(server in servers){
+            if(skipped <= page * ML::NearestInteger(servers.count / perPage)){
+                skipped += 1;
+                continue;
+            }
+
             if(filled >= servers.count || filled >= dataFrame.Controls.count){
                 break;
             }
@@ -70,11 +87,10 @@
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
 
-        declare newY = filled * 3.0 * 0.9 + 8.0;
+        declare newY = filled * 3.5 + 5.5;
         if(widget.Size[1] != newY){
             widget.Size = <widget.Size[0], newY>;
             setup__();
-            LastUiUpdate = GameTime;
         }
     }
     --></script>
@@ -82,12 +98,16 @@
 
     <script><!--
     {block globals}
+    declare Integer page;
+    declare Integer totalPages;
     {/block}
 
     {block bootScript}
         declare Integer LastServersWidgetUpdate for This;
         declare Text ServersWidgetInfo for This;
         declare Integer lastUpdate = 0;
+
+        page = 0;
 
         left__ = {config('server-hopper.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('server-hopper.ui.slot')};
@@ -101,6 +121,16 @@
     {/block}
 
     {block pendingEvents}
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous")){
+                page -= 1;
+                if(page < 0) page = totalPages - 1;
+                updateWidget(ServersWidgetInfo);
+            }
+            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next")){
+                page += 1;
+                if(page >= totalPages) page = 0;
+                updateWidget(ServersWidgetInfo);
+            }
     {/block}
 --></script>
 </manialink>
