@@ -16,6 +16,7 @@ use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\RecordsTable\RecordsTable;
 use Exception;
 
 class Dedimania extends DedimaniaApi implements ModuleInterface

@@ -1,6 +1,6 @@
 <?php
 
-namespace EvoSC\Models;
+namespace EvoSC\Modules\MxKarma\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
