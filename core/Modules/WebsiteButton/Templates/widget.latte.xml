@@ -1,17 +1,17 @@
 {contentType text}
-{extends 'components.widget-base'}
-{php $slotHorizontal = config('discord.ui.slot_horizontal')}
+{extends 'Components.widget-base'}
+{php $slotHorizontal = config('website.ui.slot_horizontal')}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
-    {block id}discord-button{/block}
+    {block id}website-button{/block}
     {block size}8 10{/block}
 
     {block content}
     <quad id="bg" class="bg-dark" size="8 10" opacity="0.8" z-index="-1" ScriptEvents="1" />
     <frame z-index="2">
-        <quad pos="4 -4" size="4 4" halign="center" valign="center" image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/discord/discord.png"/>
+        <label class="text-light" pos="4 -4" size="4 4" halign="center" valign="center" textsize="2" text=""/>
 
-        <label id="time" class="text-light" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Discord"/>
+        <label id="time" class="text-light" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="Website"/>
     </frame>
     {/block}
 
@@ -25,8 +25,8 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('discord.ui.position') == 'left' ? 'True' : 'False'};
-        slot__ = {config('discord.ui.slot')};
+        left__ = {config('website.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('website.ui.slot')};
     {/block}
 
     {block loop}
@@ -34,10 +34,10 @@
 
     {block pendingEvents}
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseClick){
-                        OpenLink("{config('discord.url')}", ::LinkType::ExternalBrowser);
+                        OpenLink("{config('website.url')}", ::LinkType::ExternalBrowser);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOver){
-                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="78d" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
+                        AnimMgr.Add(bg, """<quad opacity="0.95" bgcolor="{config('theme.hud.accent')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);
                     }
                     if(event.Control == bg && event.Type == CMlScriptEvent::Type::MouseOut){
                         AnimMgr.Add(bg, """<quad opacity="0.8" bgcolor="{config('theme.hud.bg-dark')}" />""", 100, CAnimManager::EAnimManagerEasing::Linear);

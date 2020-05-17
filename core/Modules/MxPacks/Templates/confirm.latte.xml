@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 
 {block id}
 add-mx-map-pack
@@ -25,7 +25,7 @@ Add {$info->Name} map-pack
 <quad pos="60 -3.5" size="56 0.2" bgcolor="fff9" />
 
 <frame pos="102 -71">
-{include 'components.pagination'}
+{include 'Components.pagination'}
 </frame>
 
 <frame id="frames">

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="window" pos="-25 10">
         <quad class="bg-accent" size="50 5" z-index="-1"/>
         <quad id="handle" data-id="help" size="35 5" z-index="5"/>
@@ -67,7 +67,7 @@
     #Include "TextLib" as TL
     --></script>
 
-    {include 'dialogues.confirm'}
+    {include 'Dialogues.confirm'}
 
     <script><!--
     {(new EvoSC\Classes\ManiaLinkDrag())|noescape}

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-{include 'components.stylesheet'}
+{include 'Components.stylesheet'}
 
 <frame id="window" pos="0 0" scale="1.0" hidden="{isset($startHidden) ? 1 : 0}">
     <quad class="bg-accent" size="{$window_width ?? 120} 6" opacity="0.9" z-index="-3"/>
@@ -36,9 +36,9 @@ declare Boolean alertUnsavedChanges;
 declare Real lastScale__;
 --></script>
 
-{include 'scripts.drag'}
-{include 'dialogues.confirm'}
-{include 'scripts.mle'}
+{include 'Scripts.drag'}
+{include 'Dialogues.confirm'}
+{include 'Scripts.mle'}
 
 <script><!--
 {include functions}

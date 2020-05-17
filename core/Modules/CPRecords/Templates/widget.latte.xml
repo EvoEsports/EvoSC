@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:best-cps" id="best-cps" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <framemodel id="record">
         <quad class="bg-dark" opacity="0.5" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
         <label class="text-light" pos="3" size="5" valign="center" halign="center" textsize="0.8" z-index="5" />

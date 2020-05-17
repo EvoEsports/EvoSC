@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:roundtime" id="roundtime" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="roundtime" z-index="10000">
         <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s"/>
         <label id="label" class="text-light" pos="0.5 -1.5" text="RoundTime" halign="left" valign="center" textsize="1.8" textprefix="$s"/>

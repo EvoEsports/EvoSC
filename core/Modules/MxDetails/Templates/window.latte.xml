@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MXDetails" id="MXDetails" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="overview" pos="-60 19" z-index="450">
         <quad id="handle" data-id="mxdetails" size="104 6" z-index="5"/>
         <quad class="bg-dark" size="110 38" pos="0 -6" opacity="0.8" z-index="-1" ScriptEvents="1"/>

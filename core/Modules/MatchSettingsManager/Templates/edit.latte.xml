@@ -39,9 +39,9 @@
         </frame>
     </frame>
 
-    {include 'scripts.includes'}
-    {include 'scripts.drag'}
-    {include 'scripts.resize'}
+    {include 'Scripts.includes'}
+    {include 'Scripts.drag'}
+    {include 'Scripts.resize'}
 
     <script><!--
 

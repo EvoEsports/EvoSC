@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ban-ui" id="ban-ui" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="window" pos="0 0" size="50 {isset($results) ? 44 + count($results)*4 : 24}" scale="1.0">
         <quad class="bg-dark" size="50 {isset($results) ? 37.5 + count($results)*4 : 20}" opacity="0.8" z-index="-1" />
         <quad class="bg-accent" size="50 9"/>

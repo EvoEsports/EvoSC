@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 {php $window_height = 89;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{block id}edit-settings{/block}" version="3">
@@ -7,7 +7,7 @@
     {block title}Edit {$name}{/block}
 
     {block navbar}
-        {include 'components.tabs', tabs =>
+        {include 'Components.tabs', tabs =>
             [
                 'Settings'=>'msm.edit,'.$name,
                 'Maps'=>''

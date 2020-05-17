@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 
 {block id}
 config-editor-window
@@ -15,7 +15,7 @@ Config-Editor
 
 
 {block navbar}
-{include 'components.tabs', tabs => [
+{include 'Components.tabs', tabs => [
     'General'=>'',
     'Modules'=>'config_editor.modules'
 ]

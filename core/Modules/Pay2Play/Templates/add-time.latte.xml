@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.widget-base'}
+{extends 'Components.widget-base'}
 {php $slotHorizontal = config('pay2play.addtime.ui.slot_horizontal')}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">

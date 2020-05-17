@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 {php $window_width = 156;}
 {php $window_height = 110;}
 {php $doNotStop = true;}
@@ -10,7 +10,7 @@
     {block icon}{/block}
 
     {block navbar}
-    {include 'components.tabs', tabs => [
+    {include 'Components.tabs', tabs => [
     ' Maps'=>'',
     ' Jukebox'=>' ',
     ]

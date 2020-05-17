@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 {php $window_width = 130;}
 {php $window_height = 89;}
 {php $doNotExit = true;}
@@ -37,7 +37,7 @@ After it dissapears you can reset and the song will start to play." autonewline=
         </frame>
 
         <frame pos="2 -66.5" scale="0.9">
-            {include 'components.pagination'}
+            {include 'Components.pagination'}
         </frame>
 
         <frame id="search-frame" pos="100 -66.5" scale="0.9">

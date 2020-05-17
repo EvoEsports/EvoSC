@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 
 {block id}
 help-window
@@ -15,7 +15,7 @@ Help
 
 
 {block navbar}
-    {include 'components.tabs', tabs => [
+    {include 'Components.tabs', tabs => [
         'Commands'=>'',
         'About'=>'help.show_about'
     ]
@@ -33,7 +33,7 @@ Help
 </frame>
 
 <frame pos="1 -79">
-{include 'components.pagination'}
+{include 'Components.pagination'}
 </frame>
 
 <label id="restricted" class="text-light" pos="115 -78.75" textsize="0.2" text=" = Restricted access" textprefix="$s" valign="center" halign="right" hidden="1"/>

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="overview" pos="-40 10">
         <quad class="bg-dark" size="80 20" pos="0 -6" opacity="0.8" z-index="-1" />
         <quad class="bg-accent" size="80 6" z-index="0" />

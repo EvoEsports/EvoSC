@@ -1,12 +1,12 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="{block id}edit-settings{/block}" version="3">
     {block icon}{/block}
     {block title}Edit {$name}{/block}
 
     {block navbar}
-    {include 'components.tabs', tabs =>
+    {include 'Components.tabs', tabs =>
         [
             'Settings'=>'',
             'Maps'=>'msm.edit_maps,'.$name

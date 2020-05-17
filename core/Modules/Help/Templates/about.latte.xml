@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 
 {block id}
 help-window
@@ -15,7 +15,7 @@ About EvoSC
 
 
 {block navbar}
-    {include 'components.tabs', tabs => [
+    {include 'Components.tabs', tabs => [
         'Commands'=>'help.show_cmds',
         'About'=>''
     ]

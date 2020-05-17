@@ -107,7 +107,7 @@ function config(string $id, $default = null)
  */
 function cacheDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
 }
 
 /**
@@ -117,7 +117,7 @@ function cacheDir(string $filename = ''): string
  */
 function logDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
 }
 
 /**
@@ -127,7 +127,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename);
 }
 
 /**
@@ -137,8 +137,8 @@ function modulesDir(string $filename = ''): string
  */
 function ghost(string $filename = ''): string
 {
-    return realpath(Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/' . $filename . '.Replay.Gbx'));
+    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
+            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 /**
@@ -148,7 +148,7 @@ function ghost(string $filename = ''): string
  */
 function coreDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 /**
@@ -158,7 +158,7 @@ function coreDir(string $filename = ''): string
  */
 function configDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
 }
 
 /**
@@ -168,7 +168,7 @@ function configDir(string $filename = ''): string
  */
 function baseDir(string $filename = ''): string
 {
-    return realpath(__DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename));
+    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
 }
 
 /**

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
 
     <frame id="overview" pos="-65 {$groups->count() * 3 + 5}" scale="1.1">
         <quad class="bg-dark" size="120 {$groups->count() * 6 + 10}" pos="0 -6" opacity="0.8" z-index="-1" />
@@ -55,8 +55,8 @@
     #Include "TextLib" as TL
     --></script>
 
-    {include 'dialogues.confirm'}
-    {include 'dialogues.input'}
+    {include 'Dialogues.confirm'}
+    {include 'Dialogues.input'}
 
     <script><!--
 

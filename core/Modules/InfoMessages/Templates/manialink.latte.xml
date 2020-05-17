@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 {php $window_height = 12.5 + count($messages) * 4;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">

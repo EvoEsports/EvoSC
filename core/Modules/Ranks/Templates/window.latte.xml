@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 
 {php $window_width = 140;}
 {php $window_height = 85;}
@@ -43,7 +43,7 @@ Server Ranking
 </frame>
 {/if}
 <frame pos="2 -79.5" scale="0.9">
-{include 'components.pagination'}
+{include 'Components.pagination'}
 </frame>
 {/block}
 

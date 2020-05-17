@@ -21,7 +21,7 @@ class Clock extends Module implements ModuleInterface
 
     public static function displayClock(Player $player)
     {
-        Template::show($player, 'clock.clock');
+        Template::show($player, 'Clock.clock');
     }
 
     public static function configUpdated($config = null)
@@ -29,7 +29,7 @@ class Clock extends Module implements ModuleInterface
         if ($config && isset($config->id) && $config->id == "clock" || $config->id == "colors") {
             onlinePlayers()->each(function (Player $player) use ($config) {
                 $clock = $config->data;
-                Template::show($player, 'clock.clock', compact('clock'));
+                Template::show($player, 'Clock.clock', compact('clock'));
             });
         }
     }

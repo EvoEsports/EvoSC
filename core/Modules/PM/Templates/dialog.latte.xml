@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 
 {php $window_width = '60';}
 {php $window_height = '31';}
@@ -26,7 +26,7 @@ Personal Message
 <label class="btn-default cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
 {/block}
 
-{include 'scripts.mle'}
+{include 'Scripts.mle'}
 
 <script><!--
 {block globals}

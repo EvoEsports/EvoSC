@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.window'}
+{extends 'Components.window'}
 
 {php $window_width = '50';}
 {php $window_height = '21';}

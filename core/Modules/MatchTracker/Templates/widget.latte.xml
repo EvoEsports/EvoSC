@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.widget-base'}
+{extends 'Components.widget-base'}
 {php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">

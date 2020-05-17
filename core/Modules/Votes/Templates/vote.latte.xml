@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <frame id="widget" size="50 30" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
         <quad pos="2 -6" z-index="1" size="46 0.5" bgcolor="3333"/>
         <quad pos="2 -6" z-index="2" size="3 0.5" bgcolor="1f8c"/>

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
-    {include 'components.stylesheet'}
+    {include 'Components.stylesheet'}
     <framemodel id="box" valign="center" halign="center">
         <quad class="bg-dark" pos="-7.5" halign="center" valign="center" size="5 4" opacity="0.5" z-index="-1" />
         <label class="text-light" pos="-7.5 0.25" halign="center" valign="center" textsize="0.4"/>

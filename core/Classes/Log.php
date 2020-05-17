@@ -55,7 +55,6 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
-
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(false, 2);
         }

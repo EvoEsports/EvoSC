@@ -13,14 +13,15 @@ class LiveRankings extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
         switch ($mode) {
             default:
             case 'TimeAttack.Script.txt':
+                Hook::add('PlayerConnect', [self::class, 'playerConnect']);
                 break;
         }
     }

@@ -40,7 +40,7 @@ class AfkController implements ControllerInterface
      */
     public static function sendPinger(Player $player)
     {
-        Template::show($player, 'pinger');
+        Template::show($player, 'Scripts.pinger');
     }
 
     /**

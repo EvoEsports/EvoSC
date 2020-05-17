@@ -24,6 +24,6 @@ class CountDown extends Module implements ModuleInterface
 
     public static function showCountdown(Player $player)
     {
-        Template::show($player, 'countdown.widget');
+        Template::show($player, 'CountDown.widget');
     }
 }

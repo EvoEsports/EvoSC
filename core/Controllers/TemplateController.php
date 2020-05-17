@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Log;
+use EvoSC\Exceptions\TemplateNameInvalidException;
 use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Illuminate\Support\Collection;
@@ -40,6 +41,16 @@ class TemplateController implements ControllerInterface
         self::loadTemplates();
     }
 
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
+    }
+
     //Add template filters
     private static function addCustomFilters()
     {
@@ -53,6 +64,8 @@ class TemplateController implements ControllerInterface
         })->addFilter('cfg', function ($str) {
             return config($str);
         })->addFilter('escape_quotes', function ($str) {
+            return ml_escape($str);
+        })->addFilter('ml_escape', function ($str) {
             return ml_escape($str);
         });
     }
@@ -113,15 +126,11 @@ class TemplateController implements ControllerInterface
             //Get path relative to core directory
             $relativePath = str_replace(coreDir('/'), '', $template);
 
-            //Generate template id from filename & path
+            //Get template id from filename & path
             $templateObject->id = self::getTemplateId($relativePath);
 
-            if (preg_match('/core\.{4}modules\.(.+)\.templates(\..+)/', $templateObject->id, $matches)) {
-                $templateObject->id = $matches[1] . $matches[2];
-            }
-
             //Load template contents
-            //$templateObject->template = file_get_contents($template);
+            $templateObject->template = File::get($template);
 
             //Assign as new value
             return $templateObject;
@@ -133,42 +142,19 @@ class TemplateController implements ControllerInterface
         self::$latte->setLoader($stringLoader);
     }
 
-    //Convert filename to template id
-    private static function getTemplateId($relativePath)
-    {
-        $id = '';
-
-        //Split directory structure
-        $pathParts = explode(DIRECTORY_SEPARATOR, $relativePath);
-
-        //Remove first entry
-        $location = array_shift($pathParts);
-        $location = array_shift($pathParts);
-
-        if ($location == 'Modules') {
-            array_splice($pathParts, 1, 1);
-        }
-
-        //Remove last entry
-        $filename = array_pop($pathParts);
-
-        if (count($pathParts) > 0) {
-            //Template is in sub-directory
-            $id .= implode('.', $pathParts) . '.';
-        }
-
-        $id .= str_replace('.latte.xml', '', str_replace('.script.txt', '', $filename));
-
-        return strtolower($id);
-    }
-
     /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
+     * @param $relativePath
+     * @return string
+     * @throws TemplateNameInvalidException
      */
-    public static function start(string $mode, bool $isBoot)
+    private static function getTemplateId($relativePath): string
     {
-        ChatCommand::add('//reload-templates', [TemplateController::class, 'loadTemplates'], 'Reload templates', 'ma');
+        if (preg_match('/([A-Z][a-zA-Z0-9]+)\/Templates\/(.+?)\.latte\.xml$/', $relativePath, $matches)) {
+            return sprintf('%s.%s', $matches[1], $matches[2]);
+        } else if (preg_match('/TemplateComponents\/(\w+)\/(.+?)\.latte\.xml$/', $relativePath, $matches)) {
+            return sprintf('%s.%s', $matches[1], $matches[2]);
+        } else {
+            throw new TemplateNameInvalidException("The template ID for '$relativePath' could not be detected. Please check that your naming is correct.");
+        }
     }
 }

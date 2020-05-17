@@ -1,5 +1,5 @@
 {contentType text}
-{extends 'components.tabbed-window'}
+{extends 'Components.tabbed-window'}
 {php $window_width = 180;}
 {php $window_height = 90;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -9,7 +9,7 @@
     {block icon}🏆{/block}
 
     {block navbar}
-    {include 'components.tabs', tabs => [
+    {include 'Components.tabs', tabs => [
     ' Records'=>($window_title=='Local Records' ? 'locals.show' : 'dedis.show'),
     ' Graph'=>'',
     ]
