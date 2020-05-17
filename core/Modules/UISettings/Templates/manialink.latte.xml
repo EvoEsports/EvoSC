@@ -59,16 +59,16 @@ Void save(){
 {/block}
 
 {block bootScript}
-if(settings.speed == 0){
-    settings.hide = True;
-    settings.speed = 10;
-    settings.scale = 1.0;
+if(settings2.speed == 0){
+    settings2.hide = True;
+    settings2.speed = 10;
+    settings2.scale = 1.0;
 }
 
 declare speedEntry <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
 declare scaleEntry <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
-speedEntry.SetText("" ^ settings.speed, False);
-scaleEntry.SetText("" ^ TL::ToInteger("" ^ (settings.scale * 100)), False);
+speedEntry.SetText("" ^ settings2.speed, False);
+scaleEntry.SetText("" ^ TL::ToInteger("" ^ (settings2.scale * 100)), False);
 {/block}
 
 {block pendingEvents}
