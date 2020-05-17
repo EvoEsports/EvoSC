@@ -5,6 +5,7 @@ namespace EvoSC\Models;
 
 use EvoSC\Classes\Cache;
 use EvoSC\Controllers\MapController;
+use EvoSC\Modules\Dedimania\Models\Dedi;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;

@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
  */
 class ModuleController implements ControllerInterface
 {
-    const PATTERN = '/core\/Modules\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
+    const PATTERN = '/(?:core\/Modules|modules)\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
 
     /**
      * @var Collection
