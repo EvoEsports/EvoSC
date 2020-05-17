@@ -13,8 +13,6 @@ use EvoSC\Interfaces\ModuleInterface;
 
 class NextMap extends Module implements ModuleInterface
 {
-    private static $isRounds;
-
     /**
      * Called when the module is loaded
      *
@@ -37,7 +35,7 @@ class NextMap extends Module implements ModuleInterface
 
         if (Server::isFilenameInSelection($map->filename)) {
             infoMessage('Upcoming map ', secondary($map->name), ' by ', secondary($author->NickName))->setIcon('')->sendAll();
-            Template::showAll('next-map.widget', compact('map', 'author'));
+            Template::showAll('NextMap.widget', compact('map', 'author'));
         }
     }
 
@@ -46,6 +44,6 @@ class NextMap extends Module implements ModuleInterface
      */
     public static function hideNextMap()
     {
-        Template::hideAll('next-map.widget');
+        Template::hideAll('NextMap.widget');
     }
 }

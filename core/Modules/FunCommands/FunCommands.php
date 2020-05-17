@@ -12,7 +12,10 @@ use EvoSC\Models\Player;
 
 class FunCommands extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('/afk', function (Player $player) {
             ChatController::playerChat($player, '$oAway from keyboard.');
@@ -49,13 +52,5 @@ class FunCommands extends Module implements ModuleInterface
 
             infoMessage($player, ' ', $message)->sendAll();
         }, 'Mimic info output, put text into curly braces to make it secondary-color.');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

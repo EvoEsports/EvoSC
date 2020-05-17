@@ -18,16 +18,20 @@ use stdClass;
 
 class MxDetails extends Module implements ModuleInterface
 {
-    public function __construct()
-    {
-        ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
 
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
         if (!File::dirExists(cacheDir('mx-details'))) {
             File::makeDir(cacheDir('mx-details'));
         }
         if (!File::dirExists(cacheDir('mx-wr'))) {
             File::makeDir(cacheDir('mx-wr'));
         }
+
+        ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
     }
 
     public static function showDetails(Player $player, string $mapUid)
@@ -56,7 +60,7 @@ class MxDetails extends Module implements ModuleInterface
         }
 
         $rating = self::getRatingString($voteAverage);
-        Template::show($player, 'mx-details.window', compact('map', 'rating'));
+        Template::show($player, 'MxDetails.window', compact('map', 'rating'));
     }
 
     private static function getRatingString($average): string
@@ -142,13 +146,5 @@ class MxDetails extends Module implements ModuleInterface
         Cache::put('mx-wr/' . $map->mx_id, $data);
 
         return $data;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

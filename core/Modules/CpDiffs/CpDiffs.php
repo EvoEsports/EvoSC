@@ -99,7 +99,7 @@ class CpDiffs extends Module implements ModuleInterface
             $target->map_uid = $map->uid;
 
             self::$targets->put($player->id, $target);
-            Template::show($player, 'cp-diffs.widget', compact('target'));
+            Template::show($player, 'CpDiffswidget', compact('target'));
         } else {
             $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
                 $player->id)->first();
@@ -128,7 +128,7 @@ class CpDiffs extends Module implements ModuleInterface
                 $target->map_uid = $map->uid;
 
                 self::$targets->put($player->id, $target);
-                Template::show($player, 'cp-diffs.widget', compact('target'));
+                Template::show($player, 'CpDiffswidget', compact('target'));
             }
         }
     }
@@ -168,7 +168,7 @@ class CpDiffs extends Module implements ModuleInterface
             $target->name = ml_escape($targetPlayer->NickName);
 
             self::$targets->put($player->id, $target);
-            Template::show($player, 'cp-diffs.widget', compact('target'));
+            Template::show($player, 'CpDiffswidget', compact('target'));
         } else {
             warningMessage('Invalid target specified. See ', secondary('/help'),
                 ' for more information.')->send($player);

@@ -11,7 +11,10 @@ use EvoSC\Models\Player;
 
 class PayPal extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         if (config('paypal.url')) {
             Hook::add('PlayerConnect', [self::class, 'show']);
@@ -20,14 +23,6 @@ class PayPal extends Module implements ModuleInterface
 
     public static function show(Player $player)
     {
-        Template::show($player, 'paypal.widget');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
+        Template::show($player, 'PayPal.widget');
     }
 }

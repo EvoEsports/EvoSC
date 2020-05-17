@@ -47,7 +47,7 @@ class InputSetup extends Module implements ModuleInterface
             return true;
         })->values();
 
-        Template::show($player, 'input-setup.settings', compact('binds'));
+        Template::show($player, 'InputSetup.settings', compact('binds'));
     }
 
     /**
@@ -144,7 +144,7 @@ class InputSetup extends Module implements ModuleInterface
             ];
         })->filter()->values();
 
-        Template::show($player, 'input-setup.script', compact('binds'));
+        Template::show($player, 'InputSetup.script', compact('binds'));
     }
 
     /**

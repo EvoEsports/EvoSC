@@ -11,6 +11,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
@@ -82,7 +83,7 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function searchMusic(Player $player, string $search = '')
     {
-        Template::show($player, 'music-client.search-command', compact('search'), false, 20);
+        Template::show($player, 'MusicClient.search-command', compact('search'), false, 20);
     }
 
     public static function setNextSong()
@@ -91,7 +92,7 @@ class MusicClient extends Module implements ModuleInterface
         Server::setForcedMusic(true, config('music.url') . '?song=' . urlencode(self::$song->file));
 
         if (self::$song) {
-            Template::showAll('music-client.start-song', ['song' => json_encode(self::$song)], 60);
+            Template::showAll('MusicClient.start-song', ['song' => json_encode(self::$song)], 60);
         }
     }
 
@@ -100,7 +101,7 @@ class MusicClient extends Module implements ModuleInterface
         $server = config('music.url');
         $chunks = self::$music->chunk(200);
 
-        Template::show($player, 'music-client.send-music', [
+        Template::show($player, 'MusicClient.send-music', [
             'server' => $server,
             'music' => $chunks,
         ], false, 2);
@@ -108,7 +109,7 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function showMusicList(Player $player)
     {
-        Template::show($player, 'music-client.list');
+        Template::show($player, 'MusicClient.list');
     }
 
     /**
@@ -120,7 +121,7 @@ class MusicClient extends Module implements ModuleInterface
     {
         self::sendMusicLib($player);
         self::showMusicList($player);
-        Template::show($player, 'music-client.music-client');
+        Template::show($player, 'MusicClient.music-client');
 
         $url = Server::getForcedMusic()->url;
 
@@ -132,7 +133,7 @@ class MusicClient extends Module implements ModuleInterface
         }
 
         if ($song != 'null') {
-            Template::show($player, 'music-client.start-song', compact('song'), false, 180);
+            Template::show($player, 'MusicClient.start-song', compact('song'), false, 180);
         }
     }
 }

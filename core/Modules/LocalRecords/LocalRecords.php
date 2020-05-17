@@ -13,12 +13,11 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\RecordsTable\RecordsTable;
 
 class LocalRecords extends Module implements ModuleInterface
 {
     const TABLE = 'local-records';
-
-    private static int $echoTop;
 
     /**
      * Called when the module is loaded
@@ -110,13 +109,13 @@ class LocalRecords extends Module implements ModuleInterface
 
             $localsJson = $records->sortBy('rank')->values()->toJson();
 
-            Template::show($player, 'local-records.update', compact('localsJson'), false, 20);
+            Template::show($player, 'LocalRecords.update', compact('localsJson'), false, 20);
         }
     }
 
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'local-records.manialink');
+        Template::show($player, 'LocalRecords.manialink');
         self::sendLocalsChunk($player);
     }
 

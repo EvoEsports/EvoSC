@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\CountdownController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\Votes\Votes;
 
 class AddedTimeInfo extends Module implements ModuleInterface
 {
@@ -41,7 +42,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
     public static function addedTimeChanged($addedSeconds)
     {
         $addedTime = round($addedSeconds / 60, 1);
-        Template::showAll('added-time-info.update', compact('addedTime'));
+        Template::showAll('AddedTimeInfo.update', compact('addedTime'));
     }
 
     public static function resetAddedTimeInfo()
@@ -55,11 +56,11 @@ class AddedTimeInfo extends Module implements ModuleInterface
         $buttons = config('added-time-info.buttons');
 
         if($player){
-            Template::show($player, 'added-time-info.update', compact('addedTime'), false, 20);
-            Template::show($player, 'added-time-info.widget', compact('buttons'));
+            Template::show($player, 'AddedTimeInfo.update', compact('addedTime'), false, 20);
+            Template::show($player, 'AddedTimeInfo.widget', compact('buttons'));
         }else{
-            Template::showAll('added-time-info.update', compact('addedTime'));
-            Template::showAll('added-time-info.widget', compact('buttons'));
+            Template::showAll('AddedTimeInfo.update', compact('addedTime'));
+            Template::showAll('AddedTimeInfo.widget', compact('buttons'));
         }
     }
 

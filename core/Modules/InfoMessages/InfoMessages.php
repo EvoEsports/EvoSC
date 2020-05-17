@@ -74,7 +74,7 @@ class InfoMessages extends Module implements ModuleInterface
     public static function showSettings(Player $player)
     {
         $messages = InfoMessage::all();
-        Template::show($player, 'info-messages.manialink', compact('messages'));
+        Template::show($player, 'InfoMessages.manialink', compact('messages'));
     }
 
     public static function showCreate(Player $player, $id = null)
@@ -88,6 +88,6 @@ class InfoMessages extends Module implements ModuleInterface
             $interval = $infoMessage->delay;
         }
 
-        Template::show($player, 'info-messages.edit', compact('id', 'message', 'interval'));
+        Template::show($player, 'InfoMessages.edit', compact('id', 'message', 'interval'));
     }
 }

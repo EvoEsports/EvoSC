@@ -36,12 +36,12 @@ class UISettings extends Module implements ModuleInterface
     public static function mleShowSettingsWindow(Player $player)
     {
         $settings = $player->setting('ui');
-        Template::show($player, 'ui-settings.manialink', compact('settings'));
+        Template::show($player, 'UISettings.manialink', compact('settings'));
     }
 
     public static function sendUiSettings(Player $player)
     {
         $settings = $player->setting('ui');
-        Template::show($player, 'ui-settings.update', compact('settings'), false, 20);
+        Template::show($player, 'UISettings.update', compact('settings'), false, 20);
     }
 }

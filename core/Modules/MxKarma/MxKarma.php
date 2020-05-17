@@ -17,7 +17,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Karma;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
-use EvoSC\Modules\Classes\MxKarmaMapRating;
+use EvoSC\Modules\MxKarma\Classes\MxKarmaMapRating;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Promise;
 use Illuminate\Support\Collection;
@@ -74,7 +74,7 @@ class MxKarma extends Module implements ModuleInterface
                         $vote = self::playerCanVote($player, $map) ? -1 : -2;
                     }
 
-                    Template::show($player, 'mx-karma.update-my-rating', [
+                    Template::show($player, 'MxKarma.update-my-rating', [
                         'rating' => $vote,
                         'uid' => $map->uid
                     ]);
@@ -86,7 +86,7 @@ class MxKarma extends Module implements ModuleInterface
                 Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
             });
 
-        Template::show($player, 'mx-karma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
+        Template::show($player, 'MxKarma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
     }
 
     /**
@@ -134,7 +134,7 @@ class MxKarma extends Module implements ModuleInterface
                             ]);
                         }
 
-                        Template::show($player, 'mx-karma.update-my-rating', [
+                        Template::show($player, 'MxKarma.update-my-rating', [
                             'rating' => $vote,
                             'uid' => $map->uid
                         ], true);
@@ -142,7 +142,7 @@ class MxKarma extends Module implements ModuleInterface
 
                     DB::table('mx-karma')->insert($massInsert->toArray());
 
-                    Template::showAll('mx-karma.update-karma', [
+                    Template::showAll('MxKarma.update-karma', [
                         'average' => $ratings->getVoteAvg(),
                         'total' => $ratings->getTotalVotes(),
                         'uid' => $map->uid
@@ -152,7 +152,7 @@ class MxKarma extends Module implements ModuleInterface
                     $playerDiff = $players->diffKeys($ratingLogins);
 
                     foreach ($playerDiff as $player) {
-                        Template::show($player, 'mx-karma.update-my-rating', [
+                        Template::show($player, 'MxKarma.update-my-rating', [
                             'rating' => self::playerCanVote($player, $map) ? -1 : -2,
                             'uid' => $map->uid
                         ], true);
@@ -349,7 +349,7 @@ class MxKarma extends Module implements ModuleInterface
             infoMessage($player, ' rated this map ', secondary(strtolower(self::ratings[$rating])))->sendAll();
         }
 
-        Template::show($player, 'mx-karma.update-my-rating', [
+        Template::show($player, 'MxKarma.update-my-rating', [
             'rating' => $rating,
             'uid' => $map->uid
         ]);
@@ -363,7 +363,7 @@ class MxKarma extends Module implements ModuleInterface
         $newTotalVotes = count($votes);
         $newVotesAverage = array_sum($votes) / $newTotalVotes;
 
-        Template::showAll('mx-karma.update-karma', [
+        Template::showAll('MxKarma.update-karma', [
             'average' => $newVotesAverage,
             'total' => $newTotalVotes,
             'uid' => $map->uid

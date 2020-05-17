@@ -52,13 +52,13 @@ class MatchTracker extends Module implements ModuleInterface
             $points = [10, 8, 6, 4, 2, 1];
         }
 
-        Template::show($player, 'match-tracker.widget', compact('points'));
+        Template::show($player, 'MatchTracker.widget', compact('points'));
     }
 
     public static function resetTracker()
     {
         $trackers = '[]';
-        Template::showAll('match-tracker.update', compact('trackers'));
+        Template::showAll('MatchTracker.update', compact('trackers'));
     }
 
     public static function playerCheckpoint(Player $player, int $score, int $cp, bool $isFinish)
@@ -103,6 +103,6 @@ class MatchTracker extends Module implements ModuleInterface
             return $data->sortBy('score');
         })->toJson();
 
-        Template::showAll('match-tracker.update', compact('trackers'));
+        Template::showAll('MatchTracker.update', compact('trackers'));
     }
 }

@@ -12,8 +12,17 @@ use EvoSC\Modules\QuickButtons\QuickButtons;
 
 class Help extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
+        ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
+        ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
+
         ManiaLinkEvent::add('help', [Help::class, 'showCommandsHelp']);
         ManiaLinkEvent::add('help.show_cmds', [Help::class, 'showCommandsHelp']);
         ManiaLinkEvent::add('help.show_about', [Help::class, 'showAbout']);
@@ -40,27 +49,11 @@ class Help extends Module implements ModuleInterface
             ];
         })->sortBy('access')->values()->toJson();
 
-        Template::show($player, 'help.cmds', compact('commands'));
+        Template::show($player, 'Help.cmds', compact('commands'));
     }
 
     public static function showAbout(Player $player)
     {
-        Template::show($player, 'help.about');
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        ChatCommand::add('/help', [Help::class, 'showCommandsHelp'], 'Show this help');
-        ChatCommand::add('/about', [Help::class, 'showAbout'], 'Show information about the server-controller.');
-
-        switch ($mode){
-            case 'TimeAttack.Script.txt':
-        }
+        Template::show($player, 'Help.about');
     }
 }

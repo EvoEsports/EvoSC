@@ -32,7 +32,7 @@ class RecordsTable extends Module implements ModuleInterface
         $records = $records->chunk(100);
         $onlineLogins = onlinePlayers()->pluck('Login');
 
-        Template::show($player, 'records-table.table',
+        Template::show($player, 'RecordsTable.table',
             compact('records', 'pages', 'onlineLogins', 'window_title', 'map'));
     }
 
@@ -79,6 +79,6 @@ class RecordsTable extends Module implements ModuleInterface
 
         $target = DB::table('players')->where('id', '=', $record->Player)->first();
 
-        Template::show($player, 'records-table.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps', 'target'));
+        Template::show($player, 'RecordsTable.graph', compact('record', 'myRecord', 'window_title', 'diffs', 'recordCps', 'myCps', 'target'));
     }
 }

@@ -23,7 +23,10 @@ class MxPacks extends Module implements ModuleInterface
      */
     private static MxPackJob $activeJob;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         if (!is_dir(cacheDir('map-packs'))) {
             mkdir(cacheDir('map-packs'));
@@ -99,13 +102,5 @@ class MxPacks extends Module implements ModuleInterface
 
         self::$activeJob = new MxPackJob($player, $mapPackId);
         self::$activeJob = null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

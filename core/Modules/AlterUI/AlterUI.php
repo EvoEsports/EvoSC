@@ -150,6 +150,6 @@ class AlterUI extends Module implements ModuleInterface
 
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'alter-ui.hud');
+        Template::show($player, 'AlterUI.hud');
     }
 }

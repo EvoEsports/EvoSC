@@ -118,7 +118,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
 
         self::showRecords($player);
-        Template::show($player, 'dedimania-records.manialink');
+        Template::show($player, 'Dedimania.manialink');
     }
 
     public static function showRecords(Player $player)
@@ -177,7 +177,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
         $dedisJson = $records->sortBy('rank')->values()->toJson();
 
-        Template::show($player, 'dedimania-records.update', compact('dedisJson'), false, 20);
+        Template::show($player, 'Dedimania.update', compact('dedisJson'), false, 20);
     }
 
     public static function showDedisTable(Player $player)

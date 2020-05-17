@@ -18,10 +18,24 @@ class CpPositionTracker extends Module implements ModuleInterface
      */
     private static Collection $tracker;
 
+    /**
+     * Called when the module is loaded
+     *
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        Hook::add('PlayerConnect', [self::class, 'showManialink']);
+        Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+        Hook::add('PlayerStartCountdown', [self::class, 'trackerResetPlayer']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+    }
+
     public static function showManialink(Player $player)
     {
         self::sendTrackerData();
-        Template::show($player, 'cp-position-tracker.manialink');
+        Template::show($player, 'CpPositionTracker.manialink');
     }
 
     public static function sendTrackerData()
@@ -30,7 +44,7 @@ class CpPositionTracker extends Module implements ModuleInterface
             return $group->sortBy('score');
         });
 
-        Template::showAll('cp-position-tracker.update', compact('data'));
+        Template::showAll('CpPositionTracker.update', compact('data'));
     }
 
     public static function beginMap()
@@ -56,19 +70,5 @@ class CpPositionTracker extends Module implements ModuleInterface
 
         self::$tracker->put($player->id, $o);
         self::sendTrackerData();
-    }
-
-    /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        Hook::add('PlayerConnect', [self::class, 'showManialink']);
-        Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-        Hook::add('PlayerStartCountdown', [self::class, 'trackerResetPlayer']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
     }
 }

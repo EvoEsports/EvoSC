@@ -11,13 +11,17 @@ use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\PlanetsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\Votes\Votes;
 
 class Pay2Play extends Module implements ModuleInterface
 {
     private static $priceAddTime;
     private static $priceSkip;
 
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
         self::$priceSkip = config('pay2play.skip.cost') ?? 5000;
@@ -36,11 +40,11 @@ class Pay2Play extends Module implements ModuleInterface
     {
         if (config('pay2play.addtime.enabled')) {
             $value = round(CountdownController::getOriginalTimeLimit() / 60);
-            Template::show($player, 'pay2play.add-time', compact('value'));
+            Template::show($player, 'Pay2Play.add-time', compact('value'));
         }
 
         if (config('pay2play.skip.enabled')) {
-            Template::show($player, 'pay2play.skip-map');
+            Template::show($player, 'Pay2Play.skip-map');
         }
     }
 
@@ -78,13 +82,5 @@ class Pay2Play extends Module implements ModuleInterface
     {
         infoMessage($player, ' paid ', $amount, ' to skip map.')->sendAll();
         MapController::skip($player);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

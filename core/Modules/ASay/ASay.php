@@ -24,6 +24,6 @@ class ASay extends Module implements ModuleInterface
     {
         $text = implode(' ', $message);
 
-        Template::showAll('asay.window', compact('text'));
+        Template::showAll('ASay.window', compact('text'));
     }
 }

@@ -53,7 +53,7 @@ class QuickButtons extends Module implements ModuleInterface
             return $player->hasAccess($button->access);
         });
 
-        Template::show($player, 'quick-buttons.overlay', compact('buttons'));
+        Template::show($player, 'QuickButtons.overlay', compact('buttons'));
     }
 
     public static function removeAll()

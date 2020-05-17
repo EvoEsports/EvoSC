@@ -11,21 +11,16 @@ use EvoSC\Models\Player;
 
 class GearInfo extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('/gear', [self::class, 'show'], 'Enable gear up/down indicator');
     }
 
     public static function show(Player $player)
     {
-        Template::show($player, 'gear-info.meter');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
+        Template::show($player, 'GearInfo.meter');
     }
 }

@@ -17,7 +17,11 @@ use Exception;
 
 class BanGUI extends Module implements ModuleInterfaceAlias
 {
-    public function __construct()
+
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         AccessRight::createIfMissing('player_ban', 'Ban/unban players.');
 
@@ -32,12 +36,12 @@ class BanGUI extends Module implements ModuleInterfaceAlias
     public static function showBansTab(Player $player)
     {
         $bans = Server::getBlackList(0, 999);
-        Template::show($player, 'ban-gui.list', compact('bans'));
+        Template::show($player, 'BanGUI.list', compact('bans'));
     }
 
     public static function showAddBanTab(Player $player, $targetLogin = '')
     {
-        Template::show($player, 'ban-gui.add', compact('targetLogin'));
+        Template::show($player, 'BanGUI.add', compact('targetLogin'));
     }
 
     public static function mleSearchPlayerAndShowResults(Player $player, $search)
@@ -54,7 +58,7 @@ class BanGUI extends Module implements ModuleInterfaceAlias
             return false;
         });
 
-        Template::show($player, 'ban-gui.add', compact('results', 'search'));
+        Template::show($player, 'BanGUI.add', compact('results', 'search'));
     }
 
     public static function cmdBanPlayer(Player $player, $cmd, $name = null)
@@ -82,13 +86,5 @@ class BanGUI extends Module implements ModuleInterfaceAlias
             warningMessage($e->getMessage())->send($player);
             Log::write('Failed to ban & blacklist: ' . $login);
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

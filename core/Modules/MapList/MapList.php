@@ -53,16 +53,16 @@ class MapList extends Module implements ModuleInterface
         self::sendUpdatedMapList($player);
         self::mapQueueUpdated(MapQueue::all());
         self::sendRecordsJson($player);
-        Template::show($player, 'map-list.map-queue');
-        Template::show($player, 'map-list.map-widget');
-        Template::show($player, 'map-list.map-list');
+        Template::show($player, 'MapList.map-queue');
+        Template::show($player, 'MapList.map-widget');
+        Template::show($player, 'MapList.map-list');
     }
 
     public static function sendFavorites(Player $player)
     {
         $favorites = $player->favorites()->where('enabled', true)->pluck('uid')->toJson();
 
-        Template::show($player, 'map-list.update-favorites', compact('favorites'), false, 20);
+        Template::show($player, 'MapList.update-favorites', compact('favorites'), false, 20);
     }
 
     public static function sendRecordsJson(Player $player)
@@ -70,12 +70,12 @@ class MapList extends Module implements ModuleInterface
         $locals = DB::table(LocalRecords::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
         $dedis = DB::table(Dedimania::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
 
-        Template::show($player, 'map-list.update-records', compact('locals', 'dedis'), false, 20);
+        Template::show($player, 'MapList.update-records', compact('locals', 'dedis'), false, 20);
     }
 
     public static function searchMap(Player $player, $cmd, $query = "")
     {
-        Template::show($player, 'map-list.update-search-query', compact('query'), false, 20);
+        Template::show($player, 'MapList.update-search-query', compact('query'), false, 20);
     }
 
     /**
@@ -111,12 +111,12 @@ class MapList extends Module implements ModuleInterface
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');
 
         if ($player) {
-            Template::show($player, 'map-list.update-map-list', [
+            Template::show($player, 'MapList.update-map-list', [
                 'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ], false, 2);
         } else {
-            Template::showAll('map-list.update-map-list', [
+            Template::showAll('MapList.update-map-list', [
                 'maps' => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ], 2);
@@ -223,7 +223,7 @@ class MapList extends Module implements ModuleInterface
             ];
         })->filter();
 
-        Template::showAll('map-list.update-map-queue', compact('mapQueue'));
+        Template::showAll('MapList.update-map-queue', compact('mapQueue'));
     }
 
     /**
@@ -231,6 +231,6 @@ class MapList extends Module implements ModuleInterface
      */
     public static function showMapQueue(Player $player)
     {
-        Template::show($player, 'map-list.show-queue', null, false);
+        Template::show($player, 'MapList.show-queue', null, false);
     }
 }

@@ -50,7 +50,7 @@ class MxDownload extends Module implements ModuleInterface
             try {
                 $details = self::loadMxDetails($mxId);
 
-                Template::show($player, 'mx-download.add-map-info', compact('details'));
+                Template::show($player, 'MxDownload.add-map-info', compact('details'));
             } catch (Exception $e) {
                 Log::write($e->getMessage());
             } catch (GuzzleException $e) {

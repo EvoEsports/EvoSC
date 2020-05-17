@@ -16,13 +16,13 @@ class WebsiteButton extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if(config('website.url')){
+        if (config('website.url')) {
             Hook::add('PlayerConnect', [self::class, 'show']);
         }
     }
 
     public static function show(Player $player)
     {
-        Template::show($player, 'website-button.widget');
+        Template::show($player, 'WebsiteButton.widget');
     }
 }

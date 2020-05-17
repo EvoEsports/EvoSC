@@ -35,7 +35,7 @@ class TestModule extends Module implements ModuleInterface
 
     public static function sendTestManialink(Player $player)
     {
-        Template::show($player, '_tester.test');
+        Template::show($player, 'TestModule.test');
     }
 
     public static function sendaction_for_Controller(Player $player, Collection $formData = null)

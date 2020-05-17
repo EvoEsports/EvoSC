@@ -28,7 +28,7 @@ class PM extends Module implements ModuleInterface
 
     public static function mlePmDialog(Player $player, string $recipientLogin)
     {
-        Template::show($player, 'pm.dialog', compact('recipientLogin'));
+        Template::show($player, 'PM.dialog', compact('recipientLogin'));
     }
 
     public static function mlePm(Player $player, string $recipientLogin, string ...$text)

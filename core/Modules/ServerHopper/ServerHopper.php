@@ -39,7 +39,7 @@ class ServerHopper extends Module implements ModuleInterface
     public static function showWidget(Player $player)
     {
         self::sendUpdatedServerInformations($player);
-        Template::show($player, 'server-hopper.widget');
+        Template::show($player, 'ServerHopper.widget');
     }
 
     public static function sendUpdatedServerInformations(Player $player = null)
@@ -60,9 +60,9 @@ class ServerHopper extends Module implements ModuleInterface
         })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
-            Template::show($player, 'server-hopper.update', compact('serversJson'), false, 20);
+            Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 20);
         } else {
-            Template::showAll('server-hopper.update', compact('serversJson'));
+            Template::showAll('ServerHopper.update', compact('serversJson'));
         }
     }
 

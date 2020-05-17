@@ -10,7 +10,10 @@ use EvoSC\Models\Player;
 
 class Clock extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'displayClock']);
         Hook::add('ConfigUpdated', [self::class, 'configUpdated']);
@@ -29,13 +32,5 @@ class Clock extends Module implements ModuleInterface
                 Template::show($player, 'clock.clock', compact('clock'));
             });
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

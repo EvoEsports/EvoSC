@@ -11,9 +11,14 @@ use EvoSC\Models\Player;
 
 class Warning extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         AccessRight::createIfMissing('warn_player', 'Warn a player.');
+
+        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn_player');
     }
 
     public static function warnPlayer(Player $player, string $targetLogin, string $message)
@@ -23,13 +28,5 @@ class Warning extends Module implements ModuleInterface
         if ($target) {
             warningMessage("You have been warned by $player ", secondary($message))->send($target);
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn_player');
     }
 }

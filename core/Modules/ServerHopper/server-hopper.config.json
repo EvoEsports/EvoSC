@@ -3,7 +3,7 @@
   "ui": {
     "position": "left",
     "slot": 99,
-    "servers-per-page": 2
+    "servers-per-page": 6
   },
   "servers": [
     {

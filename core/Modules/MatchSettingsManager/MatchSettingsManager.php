@@ -64,14 +64,14 @@ class MatchSettingsManager extends Module implements ModuleInterface
     {
         $matchsettings = self::getMatchsettings()->values();
 
-        Template::show($player, 'matchsettings-manager.overview', compact('matchsettings'));
+        Template::show($player, 'MatchSettingsManager.overview', compact('matchsettings'));
     }
 
     public static function showCreateMatchsettings(Player $player)
     {
         $modes = collect(self::$modes)->keys();
 
-        Template::show($player, 'matchsettings-manager.create', compact('modes'));
+        Template::show($player, 'MatchSettingsManager.create', compact('modes'));
     }
 
     public static function addMap(Player $player, string $matchSettingsName, string $mapId)
@@ -122,7 +122,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
             }
         }
 
-        @Template::show($player, 'matchsettings-manager.edit-settings', compact('name', 'nodes'));
+        @Template::show($player, 'MatchSettingsManager.edit-settings', compact('name', 'nodes'));
     }
 
     public static function showEditMatchsettingsMaps(Player $player, string $name)
@@ -155,14 +155,14 @@ class MatchSettingsManager extends Module implements ModuleInterface
             ->chunk(250);
 
         for ($i = 0; $i < $mapChunks->count(); $i++) {
-            Template::show($player, 'matchsettings-manager.send-maps',
+            Template::show($player, 'MatchSettingsManager.send-maps',
                 ['maps' => $mapChunks->get($i)->values(), 'chunks' => $mapChunks->count(), 'i' => $i]);
         }
 
         $totalMaps = Map::count();
         $totalPages = ceil($totalMaps / $perPage);
 
-        Template::show($player, 'matchsettings-manager.edit-maps', compact('name', 'totalPages', 'totalMaps'));
+        Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'totalPages', 'totalMaps'));
     }
 
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)

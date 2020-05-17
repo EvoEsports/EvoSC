@@ -45,7 +45,7 @@ class ConfigEditor extends Module implements ModuleInterface
      */
     public static function mleShowEditGeneralConfig(Player $player)
     {
-        Template::show($player, 'config-editor.general');
+        Template::show($player, 'ConfigEditor.general');
     }
 
     /**
@@ -63,7 +63,7 @@ class ConfigEditor extends Module implements ModuleInterface
             return $module;
         })->filter();
 
-        Template::show($player, 'config-editor.modules', compact('modules'));
+        Template::show($player, 'ConfigEditor.modules', compact('modules'));
     }
 
     private static function mapConfigRecursively($entries, Collection $configs, int $level, $prevKey = '')

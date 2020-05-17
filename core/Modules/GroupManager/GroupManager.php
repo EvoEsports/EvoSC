@@ -52,7 +52,7 @@ class GroupManager extends Module implements ModuleInterface
             ->get()
             ->keyBy('id');
 
-        Template::show($player, 'group-manager.update', compact('groups'), false, 20);
+        Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
     }
 
     public function groupRightsUpdate(Player $player, $formData)
@@ -77,7 +77,7 @@ class GroupManager extends Module implements ModuleInterface
 
         $groups = Group::all();
 
-        Template::show($player, 'group-manager.overview', compact('groups'));
+        Template::show($player, 'GroupManager.overview', compact('groups'));
     }
 
     public static function groupCreate(Player $player, $input)
@@ -136,14 +136,14 @@ class GroupManager extends Module implements ModuleInterface
         $group = Group::find($groupId);
         $accessRights = AccessRight::all();
 
-        Template::show($player, 'group-manager.edit_access', compact('group', 'accessRights'));
+        Template::show($player, 'GroupManager.edit_access', compact('group', 'accessRights'));
     }
 
     public static function groupEdit(Player $player, string $groupId)
     {
         $group = Group::find($groupId);
 
-        Template::show($player, 'group-manager.edit', compact('group'));
+        Template::show($player, 'GroupManager.edit', compact('group'));
     }
 
     public static function groupMembers(Player $player, string $groupId)
@@ -152,7 +152,7 @@ class GroupManager extends Module implements ModuleInterface
 
         if ($group) {
             $playerCount = $group->player()->count();
-            Template::show($player, 'group-manager.members', compact('group', 'playerCount'));
+            Template::show($player, 'GroupManager.members', compact('group', 'playerCount'));
         }
     }
 
@@ -172,7 +172,7 @@ class GroupManager extends Module implements ModuleInterface
         $players = onlinePlayers();
         $playerCount = $players->count();
 
-        Template::show($player, 'group-manager.add', compact('players', 'groupId', 'playerCount'));
+        Template::show($player, 'GroupManager.add', compact('players', 'groupId', 'playerCount'));
     }
 
     public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)

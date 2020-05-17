@@ -11,7 +11,10 @@ use EvoSC\Models\Player;
 
 class Reset extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('/reset', [self::class, 'reset'], 'Reset the UI in case it broke.');
         ChatCommand::add('//resetall', [self::class, 'resetAll'], 'Reset the UI in case it broke.', 'ma');
@@ -27,13 +30,5 @@ class Reset extends Module implements ModuleInterface
         onlinePlayers()->each(function (Player $player) {
             Hook::fire('PlayerConnect', $player);
         });
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

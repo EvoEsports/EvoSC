@@ -32,12 +32,12 @@ class WarmUpWidget extends Module implements ModuleInterface
 
     public static function showWarmUpWidget()
     {
-        Template::showAll('warmup-widget.widget');
+        Template::showAll('WarmUpWidget.widget');
     }
 
     public static function hideWarmUpWidget()
     {
-        Template::showAll('warmup-widget.widget', ['warmUpEnded' => true]);
+        Template::showAll('WarmUpWidget.widget', ['warmUpEnded' => true]);
     }
 
     public static function skipWarmUp(Player $player)

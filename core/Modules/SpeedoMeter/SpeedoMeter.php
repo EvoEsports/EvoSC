@@ -12,7 +12,10 @@ use EvoSC\Models\Player;
 
 class SpeedoMeter extends Module implements ModuleInterface
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'show']);
 
@@ -24,7 +27,7 @@ class SpeedoMeter extends Module implements ModuleInterface
     {
         $settings = $player->setting('speedo');
 
-        Template::show($player, 'speedometer.meter', compact('settings'));
+        Template::show($player, 'SpeedoMeter.meter', compact('settings'));
     }
 
     public static function saveSettings(Player $player, ...$settingsJson)
@@ -35,13 +38,5 @@ class SpeedoMeter extends Module implements ModuleInterface
     public static function resetSettings(Player $player)
     {
         $player->settings()->where('name', 'speedo')->delete();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        // TODO: Implement start() method.
     }
 }

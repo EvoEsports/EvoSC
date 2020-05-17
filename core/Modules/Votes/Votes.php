@@ -111,9 +111,9 @@ class Votes extends Module implements ModuleInterface
         Timer::create('vote.check_state', [self::class, 'checkVoteState'], '1s', true);
 
         $voteStateJson = '{"yes":0,"no":0}';
-        Template::showAll('votes.update-vote', compact('voteStateJson'));
+        Template::showAll('Votes.update-vote', compact('voteStateJson'));
 
-        Template::showAll('votes.vote', compact('question', 'duration'));
+        Template::showAll('Votes.vote', compact('question', 'duration'));
 
         return true;
     }
@@ -144,7 +144,7 @@ class Votes extends Module implements ModuleInterface
             self::$vote = null;
             self::$voters = collect();
             $voteStateJson = '{"yes":-1,"no":-1}';
-            Template::showAll('votes.update-vote', compact('voteStateJson'));
+            Template::showAll('Votes.update-vote', compact('voteStateJson'));
 
             return 1;
         }
@@ -301,7 +301,7 @@ class Votes extends Module implements ModuleInterface
     {
         $voteStateJson = self::getVoteState()->toJson();
 
-        Template::showAll('votes.update-vote', compact('voteStateJson'));
+        Template::showAll('Votes.update-vote', compact('voteStateJson'));
     }
 
     public static function voteYes(Player $player)
@@ -367,7 +367,7 @@ class Votes extends Module implements ModuleInterface
         self::$voters = collect();
         infoMessage($player, ' passes vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
-        Template::showAll('votes.update-vote', compact('voteStateJson'));
+        Template::showAll('Votes.update-vote', compact('voteStateJson'));
     }
 
     public static function declineVote(Player $player)
@@ -385,7 +385,7 @@ class Votes extends Module implements ModuleInterface
         self::$voters = collect();
         infoMessage($player, ' cancels vote.')->sendAll();
         $voteStateJson = '{"yes":-1,"no":-1}';
-        Template::showAll('votes.update-vote', compact('voteStateJson'));
+        Template::showAll('Votes.update-vote', compact('voteStateJson'));
     }
 
     public static function endMatch()
@@ -401,7 +401,7 @@ class Votes extends Module implements ModuleInterface
             }
 
             $voteStateJson = '{"yes":-1,"no":-1}';
-            Template::showAll('votes.update-vote', compact('voteStateJson'));
+            Template::showAll('Votes.update-vote', compact('voteStateJson'));
             infoMessage('Vote cancelled.')->setIcon('')->sendAll();
         }
 

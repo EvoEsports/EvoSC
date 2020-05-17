@@ -96,7 +96,7 @@ class CPRecords extends Module implements ModuleInterface
     public static function playerConnect(Player $player)
     {
         self::sendUpdatedCpRecords();
-        Template::show($player, 'cp-records.widget');
+        Template::show($player, 'CPRecords.widget');
     }
 
     /**
@@ -105,7 +105,7 @@ class CPRecords extends Module implements ModuleInterface
     public static function sendUpdatedCpRecords(int $updatedCpId = -1)
     {
         $data = self::$tracker->values()->toJson();
-        Template::showAll('cp-records.update', compact('data', 'updatedCpId'));
+        Template::showAll('CPRecords.update', compact('data', 'updatedCpId'));
     }
 
     /**
@@ -114,6 +114,6 @@ class CPRecords extends Module implements ModuleInterface
     public static function beginMatch()
     {
         self::$tracker = collect();
-        Template::showAll('cp-records.widget');
+        Template::showAll('CPRecords.widget');
     }
 }

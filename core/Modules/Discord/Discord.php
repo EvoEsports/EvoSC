@@ -11,23 +11,22 @@ use EvoSC\Models\Player;
 
 class Discord extends Module implements ModuleInterface
 {
-    public function __construct()
-    {
-        if(config('discord.url')){
-            Hook::add('PlayerConnect', [self::class, 'show']);
-        }
-    }
-
-    public static function show(Player $player)
-    {
-        Template::show($player, 'discord.widget');
-    }
 
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        // TODO: Implement start() method.
+        if(config('discord.url')){
+            Hook::add('PlayerConnect', [self::class, 'show']);
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function show(Player $player)
+    {
+        Template::show($player, 'Discord.widget');
     }
 }

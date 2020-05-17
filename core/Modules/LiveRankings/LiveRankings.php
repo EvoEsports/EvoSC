@@ -21,7 +21,6 @@ class LiveRankings extends Module implements ModuleInterface
         switch ($mode) {
             default:
             case 'TimeAttack.Script.txt':
-                Hook::add('PlayerConnect', [self::class, 'playerConnect']);
                 break;
         }
     }
@@ -31,6 +30,6 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'live-rankings.widget');
+        Template::show($player, 'LiveRankings.widget');
     }
 }

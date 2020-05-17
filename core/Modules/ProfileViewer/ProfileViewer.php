@@ -12,6 +12,18 @@ use EvoSC\Models\Player;
 
 class ProfileViewer extends Module implements ModuleInterface
 {
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
+        ManiaLinkEvent::add('profile', [self::class, 'showProfile']);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $targetLogin
+     */
     public static function showProfile(Player $player, string $targetLogin)
     {
         $target = player($targetLogin);
@@ -37,17 +49,9 @@ class ProfileViewer extends Module implements ModuleInterface
 
             $zonePath = $target->getOriginal('path');
 
-            Template::show($player, 'profile-viewer.window', compact('values', 'zonePath'));
+            Template::show($player, 'ProfileViewer.window', compact('values', 'zonePath'));
         } else {
             warningMessage('Player with login ', secondary($targetLogin), ' not found.')->send($player);
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
-    {
-        ManiaLinkEvent::add('profile', [self::class, 'showProfile']);
     }
 }

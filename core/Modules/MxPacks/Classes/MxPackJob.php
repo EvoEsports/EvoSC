@@ -1,7 +1,7 @@
 <?php
 
 
-namespace EvoSC\Classes;
+namespace EvoSC\Modules\MxPacks\Classes;
 
 
 use EvoSC\Controllers\MapController;
