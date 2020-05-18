@@ -7,14 +7,11 @@ namespace esc\Modules;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
-use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\Reset\Reset;
-use EvoSC\Modules\ServerHopper\ServerHopper;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface

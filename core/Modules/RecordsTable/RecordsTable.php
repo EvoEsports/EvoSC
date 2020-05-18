@@ -11,6 +11,8 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\Dedimania\Dedimania;
+use EvoSC\Modules\LocalRecords\LocalRecords;
 use Illuminate\Support\Collection;
 
 class RecordsTable extends Module implements ModuleInterface

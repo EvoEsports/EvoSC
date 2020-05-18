@@ -91,10 +91,8 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
 
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
-        }
+        QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+        QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
     }
 
     /**
