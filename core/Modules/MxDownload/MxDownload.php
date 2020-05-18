@@ -53,8 +53,6 @@ class MxDownload extends Module implements ModuleInterface
                 Template::show($player, 'MxDownload.add-map-info', compact('details'));
             } catch (Exception $e) {
                 Log::write($e->getMessage());
-            } catch (GuzzleException $e) {
-                Log::write($e->getMessage());
             }
         }
     }
@@ -103,7 +101,6 @@ class MxDownload extends Module implements ModuleInterface
      *
      * @param Player $player
      * @param $mxId
-     * @throws GuzzleException
      * @throws Throwable
      */
     public static function addMap(Player $player, int $mxId)

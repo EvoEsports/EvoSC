@@ -14,6 +14,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
+use stdClass;
 
 class ConfigEditor extends Module implements ModuleInterface
 {
@@ -102,7 +103,7 @@ class ConfigEditor extends Module implements ModuleInterface
         return $configs;
     }
 
-    public static function mleSaveConfig(Player $player, \stdClass $formValues)
+    public static function mleSaveConfig(Player $player, stdClass $formValues)
     {
         foreach ((array)json_decode($formValues->data) as $key => $updatedValue) {
             $configId = "$formValues->id.$key";

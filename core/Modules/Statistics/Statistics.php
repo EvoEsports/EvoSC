@@ -14,6 +14,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\Statistics\Classes\StatisticWidget;
 use EvoSC\Modules\Statistics\Models\Stats;
+use Exception;
 use Illuminate\Support\Collection;
 
 class Statistics extends Module implements ModuleInterface
@@ -188,7 +189,7 @@ class Statistics extends Module implements ModuleInterface
 
         try {
             $player->stats()->increment('Wins');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::write('Failed to increment win count of ' . $player);
         }
 

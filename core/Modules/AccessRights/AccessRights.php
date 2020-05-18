@@ -27,7 +27,7 @@ class AccessRights extends Module implements ModuleInterface
     public static function sendAccessRights(Player $player)
     {
         if ($player->Group == 1) {
-            $accessRights = AccessRight::all()->pluck('name')->values();;
+            $accessRights = AccessRight::all()->pluck('name')->values();
         } else {
             $accessRights = $player->group->accessRights()->pluck('name')->values();
         }

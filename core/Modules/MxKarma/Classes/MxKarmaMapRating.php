@@ -5,6 +5,7 @@ namespace EvoSC\Modules\MxKarma\Classes;
 
 
 use Illuminate\Support\Collection;
+use stdClass;
 
 class MxKarmaMapRating
 {
@@ -12,7 +13,7 @@ class MxKarmaMapRating
     private float $vote_avg;
     private Collection $votes;
 
-    public function __construct(\stdClass $mxKarmaResult)
+    public function __construct(stdClass $mxKarmaResult)
     {
         $this->total_votes = $mxKarmaResult->votecount;
         $this->vote_avg = $mxKarmaResult->voteaverage;

@@ -82,10 +82,6 @@ class MxPacks extends Module implements ModuleInterface
                 warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
 
                 return;
-            } catch (GuzzleException $e) {
-                warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
-
-                return;
             }
         }
 

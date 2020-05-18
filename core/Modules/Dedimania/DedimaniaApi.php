@@ -40,7 +40,6 @@ class DedimaniaApi extends Module
      *
      * Return struct {'SessionId': string, 'Error': string}
      * . If successful SessionId is the value to be used it other methods, if not it is empty and a message is in Error.
-     * @throws GuzzleException
      */
     protected static function openSession(): bool
     {
@@ -146,6 +145,8 @@ class DedimaniaApi extends Module
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
      * @param Map $map
+     * @return null
+     * @return null
      */
     static function getChallengeRecords(Map $map)
     {
@@ -267,7 +268,6 @@ class DedimaniaApi extends Module
      *
      * @param Map $map
      *
-     * @throws GuzzleException
      */
     static function updateServerPlayers(Map $map)
     {
@@ -322,7 +322,6 @@ class DedimaniaApi extends Module
      * Send new records
      *
      * @param Map $map
-     * @throws GuzzleException
      */
     static function setChallengeTimes(Map $map)
     {
@@ -455,6 +454,8 @@ class DedimaniaApi extends Module
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
      * @param Player $player
+     * @return null
+     * @return null
      */
     public static function playerConnect(Player $player)
     {

@@ -103,9 +103,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
     }
 
-    /**
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();

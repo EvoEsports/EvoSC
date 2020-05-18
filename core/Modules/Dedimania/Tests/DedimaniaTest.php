@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
 
-require '../../../global-functions.php';
+namespace EvoSC\Modules\Dedimania\Tests;
 
+use EvoSC\Modules\Dedimania\Dedimania;
 use PHPUnit\Framework\TestCase;
 
 final class DedimaniaTest extends TestCase

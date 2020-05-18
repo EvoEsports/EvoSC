@@ -20,6 +20,7 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\MxKarma\Classes\MxKarmaMapRating;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 
@@ -222,7 +223,7 @@ class MxKarma extends Module implements ModuleInterface
      * @param $mapUid
      * @param array $playerLogins
      * @param int $timeout
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return PromiseInterface
      */
     private static function getMapRatingAsync($mapUid, $playerLogins = [], $timeout = 25)
     {

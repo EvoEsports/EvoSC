@@ -48,8 +48,6 @@ class MxPackJob
             $this->loadFiles();
         } catch (Exception $e) {
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
-        } catch (GuzzleException $e) {
-            warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
         }
     }
 
