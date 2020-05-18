@@ -36,6 +36,8 @@ class CountdownController implements ControllerInterface
 
     public static function init()
     {
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
         AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
     }
 
@@ -72,7 +74,7 @@ class CountdownController implements ControllerInterface
         self::$addedSeconds = 0;
         Cache::put('added-time', 0);
         Cache::put('match-start', self::$matchStart);
-        self::setTimeLimit(self::getOriginalTimeLimit());
+        self::setTimeLimit(self::getOriginalTimeLimitInSeconds());
     }
 
     public static function endMap()
@@ -105,7 +107,7 @@ class CountdownController implements ControllerInterface
         Cache::put('added-time', $addedTime);
 
         self::$addedSeconds = $addedTime;
-        self::setTimeLimit(self::getOriginalTimeLimit() + $addedTime);
+        self::setTimeLimit(self::getOriginalTimeLimitInSeconds() + $addedTime);
 
         if ($player != null) {
             if ($seconds > 0) {
@@ -162,7 +164,7 @@ class CountdownController implements ControllerInterface
             return null;
         }
 
-        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimit() + self::$addedSeconds;
+        $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimitInSeconds() + self::$addedSeconds;
 
         $timeLeft = $calculatedProgressTime - time();
 
@@ -229,7 +231,7 @@ class CountdownController implements ControllerInterface
     /**
      * @return integer
      */
-    public static function getOriginalTimeLimit()
+    public static function getOriginalTimeLimitInSeconds()
     {
         return self::$originalTimeLimit;
     }

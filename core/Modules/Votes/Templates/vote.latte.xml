@@ -46,22 +46,10 @@
         declare targetScale = """ <frame pos='""" ^ targetPos ^ """' scale="{config('votes.scale')|noescape}" /> """;
         AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
         declare originalScale = {config('votes.scale')};
-
         declare startTime = GameTime;
-        declare voteEnded = False;
 
         while(True){
             yield;
-
-            if(voteEnded){
-                if(widget.RelativeScale == originalScale){
-                    AnimMgr.Add(widget, """ <frame pos='""" ^ widget.RelativePosition_V3[0] ^ """ 110' /> """, 500, CAnimManager::EAnimManagerEasing::ExpIn);
-                }
-
-                sleep(550);
-                widget.Hide();
-                return;
-            }
 
             foreach(event in PendingEvents){
                 if(event.Control == Null) continue;
@@ -78,13 +66,16 @@
             declare timeLeft = duration - (GameTime - startTime) / 1000;
             timeLeftLabel.SetText(TL::ToText(timeLeft));
 
+            if(timeLeft < 0){
+                break;
+            }
+
             if(VoteState.count > 0){
                 declare Integer yes = VoteState["yes"];
                 declare Integer no = VoteState["no"];
 
                 if((yes == -1 && no == -1) || timeLeft <= 0){
-                    voteEnded = True;
-                    continue;
+                    break;
                 }
 
                 declare Real total = (yes * 1.0) + (no * 1.0);
@@ -105,6 +96,13 @@
                 VoteState = Integer[Text];
             }
         }
+
+        if(widget.RelativeScale == originalScale){
+            AnimMgr.Add(widget, """ <frame pos='""" ^ widget.RelativePosition_V3[0] ^ """ 110' /> """, 500, CAnimManager::EAnimManagerEasing::ExpIn);
+        }
+
+        sleep(550);
+        widget.Hide();
     }
     --></script>
     </frame>

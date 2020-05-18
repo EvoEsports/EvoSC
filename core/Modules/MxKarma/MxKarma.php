@@ -199,7 +199,7 @@ class MxKarma extends Module implements ModuleInterface
                 'mapname' => $map->name,
                 'mapauthor' => $map->author->Login,
                 'isimport' => 'false',
-                'maptime' => CountdownController::getOriginalTimeLimit(),
+                'maptime' => CountdownController::getOriginalTimeLimitInSeconds(),
                 'votes' => $ratings->toArray(),
             ]
         ]);

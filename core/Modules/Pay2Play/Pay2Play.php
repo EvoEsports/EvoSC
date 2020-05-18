@@ -39,7 +39,7 @@ class Pay2Play extends Module implements ModuleInterface
     public static function showWidget(Player $player)
     {
         if (config('pay2play.addtime.enabled')) {
-            $value = round(CountdownController::getOriginalTimeLimit() / 60);
+            $value = round(CountdownController::getOriginalTimeLimitInSeconds() / 60);
             Template::show($player, 'Pay2Play.add-time', compact('value'));
         }
 
@@ -56,7 +56,7 @@ class Pay2Play extends Module implements ModuleInterface
             return;
         }
 
-        if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimit() >= config('pay2play.addtime.time-limit-in-seconds')) {
+        if (CountdownController::getAddedSeconds() + CountdownController::getOriginalTimeLimitInSeconds() >= config('pay2play.addtime.time-limit-in-seconds')) {
             warningMessage('Maximum playtime for this round reached.')->send($player);
 
             return;
@@ -69,7 +69,7 @@ class Pay2Play extends Module implements ModuleInterface
     public static function addTimePaySuccess(Player $player, int $amount)
     {
         infoMessage($player, ' paid ', $amount, ' to add more time')->sendAll();
-        CountdownController::addTime(CountdownController::getOriginalTimeLimit(), $player);
+        CountdownController::addTime(CountdownController::getOriginalTimeLimitInSeconds(), $player);
     }
 
     public static function skip(Player $player)

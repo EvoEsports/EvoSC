@@ -42,7 +42,7 @@ class Votes extends Module implements ModuleInterface
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
-        ChatCommand::add('/time', [self::class, 'askMoreTime'], 'Start a vote to add 10 minutes.')
+        ChatCommand::add('/time', [self::class, 'cmdAskMoreTime'], 'Start a vote to add 10 minutes.')
             ->addAlias('/replay')
             ->addAlias('/restart')
             ->addAlias('/res');
@@ -69,7 +69,7 @@ class Votes extends Module implements ModuleInterface
         self::$voters = collect();
         self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
         self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimit();
+        $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
         self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
 
         AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
@@ -152,8 +152,12 @@ class Votes extends Module implements ModuleInterface
         return 0;
     }
 
-    public static function askMoreTime(Player $player, string $time = '0')
+    public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
+        if($time == '0'){
+            $time = round(CountdownController::getOriginalTimeLimitInSeconds() / 60);
+        }
+
         if (!$player->hasAccess('vote_always')) {
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
                 warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
@@ -184,7 +188,7 @@ class Votes extends Module implements ModuleInterface
         if ($time > 0) {
             $secondsToAdd = floatval($time) * 60;
         } else {
-            $secondsToAdd = CountdownController::getOriginalTimeLimit() * config('votes.time-multiplier');
+            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
         }
         $question = 'Add $' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$z$s$fff minutes?';
 

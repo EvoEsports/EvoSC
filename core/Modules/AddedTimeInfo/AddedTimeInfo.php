@@ -66,7 +66,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
 
     public static function voteTime(Player $player, string $time)
     {
-        Votes::askMoreTime($player, $time);
+        Votes::cmdAskMoreTime($player, $time);
     }
 
     public static function addTime(Player $player, $time)
