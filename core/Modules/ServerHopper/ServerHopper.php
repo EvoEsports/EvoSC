@@ -28,7 +28,7 @@ class ServerHopper extends Module implements ModuleInterface
         self::$servers = collect(config('server-hopper.servers'));
 
         if (count(self::$servers)) {
-//            self::updateServerInformation();
+            self::updateServerInformation();
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
@@ -44,7 +44,7 @@ class ServerHopper extends Module implements ModuleInterface
 
     public static function sendUpdatedServerInformations(Player $player = null)
     {
-        $serversJson = self::$servers->map(function ($server) {
+        $data = self::$servers->map(function ($server) {
             if (isset($server->online) && $server->online) {
                 return [
                     'login'   => $server->login,
@@ -57,7 +57,8 @@ class ServerHopper extends Module implements ModuleInterface
             }
 
             return null;
-        })->filter()->sortByDesc('players')->values()->toJson();
+        })->filter()->sortByDesc('players')->values();
+        $serversJson = collect([...$data, ...$data])->toJson();
 
         if ($player != null) {
             Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 20);

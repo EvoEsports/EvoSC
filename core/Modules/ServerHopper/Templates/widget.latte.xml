@@ -44,22 +44,32 @@
         return "$p[#join=" ^ login ^ "@" ^ title ^ "]" ^ name ^ pw ^ youAreHere;
     }
 
+    Integer getTotalPages(Integer itemCount, Integer itemsPerPage){
+        declare pageCount = -1;
+        pageCount = ML::CeilingInteger(itemCount / itemsPerPage * 1.0);
+        if(itemCount % itemsPerPage == 0){
+            pageCount -= 1;
+        }
+        return pageCount;
+    }
+
     Void updateWidget(Text data){
         declare Integer LastUiUpdate for This = 0;
         declare dataFrame <=> (Page.MainFrame.GetFirstChild("data") as CMlFrame);
         declare Text[Text][] servers;
         declare filled = 0;
         declare skipped = 0;
-        declare perPage = {config('server-hopper.ui.servers-per-page')}.0;
+        declare perPage = {config('server-hopper.ui.servers-per-page')};
         declare Text pw = "";
         servers.fromjson(data);
 
-        totalPages = ML::NearestInteger(servers.count / perPage);
+        log(servers.count ^ " -> " ^ perPage);
+        totalPages = getTotalPages(servers.count, perPage);
         (Page.MainFrame.GetFirstChild("page-label") as CMlLabel).Value = (page + 1) ^ "/" ^ totalPages;
         (Page.MainFrame.GetFirstChild("pagination") as CMlFrame).Visible = totalPages > 1;
 
         foreach(server in servers){
-            if(skipped <= page * ML::NearestInteger(servers.count / perPage)){
+            if(skipped < page * perPage){
                 skipped += 1;
                 continue;
             }
@@ -87,7 +97,7 @@
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
 
-        declare newY = filled * 3.5 + 5.5;
+        declare newY = perPage * 3.5 + 5.5;
         if(widget.Size[1] != newY){
             widget.Size = <widget.Size[0], newY>;
             setup__();
@@ -114,23 +124,23 @@
     {/block}
 
     {block loop}
-            if(lastUpdate != LastServersWidgetUpdate){
-                lastUpdate = LastServersWidgetUpdate;
-                updateWidget(ServersWidgetInfo);
-            }
+        if(lastUpdate != LastServersWidgetUpdate){
+            lastUpdate = LastServersWidgetUpdate;
+            updateWidget(ServersWidgetInfo);
+        }
     {/block}
 
     {block pendingEvents}
-            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous")){
-                page -= 1;
-                if(page < 0) page = totalPages - 1;
-                updateWidget(ServersWidgetInfo);
-            }
-            if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next")){
-                page += 1;
-                if(page >= totalPages) page = 0;
-                updateWidget(ServersWidgetInfo);
-            }
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous")){
+            page -= 1;
+            if(page < 0) page = totalPages - 1;
+            updateWidget(ServersWidgetInfo);
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next")){
+            page += 1;
+            if(page >= totalPages) page = 0;
+            updateWidget(ServersWidgetInfo);
+        }
     {/block}
 --></script>
 </manialink>

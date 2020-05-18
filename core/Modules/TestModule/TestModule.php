@@ -13,6 +13,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\ServerHopper\ServerHopper;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
