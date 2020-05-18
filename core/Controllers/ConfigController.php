@@ -102,11 +102,13 @@ class ConfigController implements ControllerInterface
 
     public static function loadConfigurationFiles()
     {
-        $defaultConfigFiles = File::getFilesRecursively(configDir('default'), self::$configFilePattern);
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern));
-        $defaultConfigFiles = $defaultConfigFiles->merge(File::getFilesRecursively(modulesDir(), self::$configFilePattern));
+        $defaultConfigFiles = [
+            ...File::getFilesRecursively(configDir('default'), self::$configFilePattern),
+            ...File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern),
+            ...File::getFilesRecursively(modulesDir(), self::$configFilePattern)
+        ];
 
-        $defaultConfigFiles->each(function ($configFile) {
+        foreach ($defaultConfigFiles as $configFile) {
             $name = basename($configFile);
 
             if (!File::exists(configDir($name))) {
@@ -117,7 +119,7 @@ class ConfigController implements ControllerInterface
                 $targetJson = self::copyAttributesRecursively($sourceJson, $targetJson);
                 File::put(configDir($name), json_encode($targetJson, JSON_PRETTY_PRINT));
             }
-        });
+        }
 
         $configFiles = File::getFiles(coreDir('../config'), self::$configFilePattern)
             ->mapWithKeys(function ($configFile) {

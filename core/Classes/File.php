@@ -141,7 +141,7 @@ class File
 
                 if (is_dir($path) && !in_array($file, ['.', '..'])) {
                     //Check directory contents
-                    $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
+                    $files = collect([...$files, ...self::getFilesRecursively($path, $filterPattern)]);
                 } else {
                     //File is not directory
                     if (preg_match($filterPattern, $file)) {

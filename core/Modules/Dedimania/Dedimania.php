@@ -152,7 +152,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             ->where('Rank', '<=', $top)
             ->get();
 
-        $records = $top->merge($bottom);
+        $records = collect([...$top, ...$bottom]);
 
         $players = DB::table('players')
             ->whereIn('id', $records->pluck('Player'))

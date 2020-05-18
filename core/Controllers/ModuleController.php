@@ -55,7 +55,7 @@ class ModuleController implements ControllerInterface
         Log::info('Starting modules...');
 
         $coreModules = File::getFilesRecursively(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
-        $allModules = $coreModules->merge(File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/'));
+        $allModules = collect([...$coreModules, ...File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/')]);
         $totalStarted = 0;
 
         $moduleClasses = $allModules

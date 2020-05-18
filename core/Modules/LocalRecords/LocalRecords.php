@@ -83,7 +83,7 @@ class LocalRecords extends Module implements ModuleInterface
                 ->where('Rank', '<=', $top)
                 ->get();
 
-            $records = $topRecords->merge($bottomRecords);
+            $records = collect([...$topRecords, ...$bottomRecords]);
 
             $players = DB::table('players')
                 ->whereIn('id', $records->pluck('Player'))

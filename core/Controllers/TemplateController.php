@@ -120,7 +120,7 @@ class TemplateController implements ControllerInterface
         $coreTemplates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/');
         $extModuleTemplates = File::getFilesRecursively(modulesDir(), '/\.latte\.xml$/');
 
-        self::$templates = $coreTemplates->merge($extModuleTemplates)->map(function ($template) {
+        self::$templates = collect([...$coreTemplates, ...$extModuleTemplates])->map(function ($template) {
             $templateObject = collect();
 
             //Get path relative to core directory
