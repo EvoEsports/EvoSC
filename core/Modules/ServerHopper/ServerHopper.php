@@ -44,21 +44,20 @@ class ServerHopper extends Module implements ModuleInterface
 
     public static function sendUpdatedServerInformations(Player $player = null)
     {
-        $data = self::$servers->map(function ($server) {
+        $serversJson = self::$servers->map(function ($server) {
             if (isset($server->online) && $server->online) {
                 return [
-                    'login'   => $server->login,
-                    'name'    => $server->name,
+                    'login' => $server->login,
+                    'name' => $server->name,
                     'players' => $server->players,
-                    'max'     => $server->maxPlayers,
-                    'title'   => $server->titlePack,
-                    'pw'      => $server->hasPassword,
+                    'max' => $server->maxPlayers,
+                    'title' => $server->titlePack,
+                    'pw' => $server->hasPassword,
                 ];
             }
 
             return null;
-        })->filter()->sortByDesc('players')->values();
-        $serversJson = collect([...$data, ...$data])->toJson();
+        })->filter()->sortByDesc('players')->values()->toJson();
 
         if ($player != null) {
             Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 20);
@@ -71,12 +70,12 @@ class ServerHopper extends Module implements ModuleInterface
     {
         self::$servers->transform(function ($server) {
             try {
-                $connection          = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
-                $server->online      = true;
-                $server->name        = $connection->getServerName();
-                $server->players     = count($connection->getPlayerList());
-                $server->maxPlayers  = $connection->getMaxPlayers()['CurrentValue'];
-                $server->titlePack   = $connection->getVersion()->titleId;
+                $connection = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
+                $server->online = true;
+                $server->name = $connection->getServerName();
+                $server->players = count($connection->getPlayerList());
+                $server->maxPlayers = $connection->getMaxPlayers()['CurrentValue'];
+                $server->titlePack = $connection->getVersion()->titleId;
                 $server->hasPassword = $connection->getServerPassword() != false;
             } catch (Exception $e) {
                 $server->online = false;
