@@ -17,7 +17,7 @@ class ControllerController
         $classes = get_declared_classes();
 
         foreach ($classes as $class) {
-            if (preg_match('/^esc.Controllers./', $class)) {
+            if (preg_match('/^EvoSC.Controllers./', $class)) {
                 if (new $class instanceof ControllerInterface) {
                     $class::start($mode, $isBoot);
                 }

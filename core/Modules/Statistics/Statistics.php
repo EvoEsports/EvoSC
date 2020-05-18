@@ -209,7 +209,7 @@ class Statistics extends Module implements ModuleInterface
 
         self::showRank($player);
 
-        $player->stats()->increment('Visits');
+        DB::table('stats')->where('Player', '=', $player->id)->increment('Visits');
     }
 
     /**

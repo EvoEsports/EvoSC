@@ -12,7 +12,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
-use EvoSC\Models\Stats;
+use Exception;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
@@ -44,6 +44,30 @@ class PlayerController implements ControllerInterface
         AccessRight::createIfMissing('player_force_spec', 'Force a player into spectator mode.');
         AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
         AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
+    }
+
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
+        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
+        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
+
+        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
+            'Set the server password, leave empty to clear it.', 'ma');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
+        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
     }
 
     public static function cacheConnectedPlayers()
@@ -82,10 +106,12 @@ class PlayerController implements ControllerInterface
      *
      * @param Player $player
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public static function playerConnect(Player $player)
     {
+        dump($player->NickName);
+
         $diffString = $player->last_visit->diffForHumans();
         $stats = $player->stats;
 
@@ -98,7 +124,8 @@ class PlayerController implements ControllerInterface
                 ' joined for the first time.')
                 ->setIcon('');
 
-            Stats::updateOrCreate(['Player' => $player->id], [
+            DB::table('stats')->insertOrIgnore([
+                'Player' => $player->id,
                 'Visits' => 1,
             ]);
         }
@@ -411,37 +438,5 @@ class PlayerController implements ControllerInterface
         } else {
             ChatController::mute($player, $target);
         }
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
-        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
-        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
-        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
-
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
-            'Set the server password, leave empty to clear it.', 'ma');
-        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
-        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
-        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
-        ChatCommand::add('/setname', [self::class, 'setName'], 'Overwrite your nick name.');
-    }
-
-    public static function setName(Player $player, $cmd, ...$name)
-    {
-        $nameI = implode(' ', $name);
-        $player->NickName = $nameI;
-        PlayerController::putPlayer($player);
     }
 }
