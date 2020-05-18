@@ -9,6 +9,8 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\Dedimania\Dedimania;
+use EvoSC\Modules\LocalRecords\LocalRecords;
 
 class ProfileViewer extends Module implements ModuleInterface
 {
