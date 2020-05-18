@@ -110,8 +110,6 @@ class PlayerController implements ControllerInterface
      */
     public static function playerConnect(Player $player)
     {
-        dump($player->NickName);
-
         $diffString = $player->last_visit->diffForHumans();
         $stats = $player->stats;
 

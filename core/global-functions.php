@@ -371,3 +371,17 @@ function evo_str_slug($title)
 {
     return Str::slug($title, '-', 'en');
 }
+
+/**
+ *
+ */
+function restart_evosc()
+{
+    warningMessage(secondary('EvoSC ' . getEscVersion()), ' is restarting.')->sendAdmin();
+    Server::chatEnableManualRouting(false);
+    Log::warning('Old process is terminating.');
+    pcntl_exec(PHP_BINARY, $_SERVER['argv']);
+    warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
+    Log::error('[CRITICAL] Failed to create new process, dying...');
+    exit(56);
+}

@@ -39,15 +39,10 @@ class ChatController implements ControllerInterface
 
         if ((self::$routingEnabled = config('server.enable-chat-routing', true)) && !self::$externalRouter) {
             Log::info('Enabling manual chat routing.', isVerbose());
-            $routingEnabled = false;
-
-            while (!$routingEnabled) {
-                Server::chatEnableManualRouting(true, false);
-                $routingEnabled = true;
-                Log::info('Chat router started.');
-            }
+            Server::chatEnableManualRouting();
+            Log::info('Chat router started.');
         } else {
-            Server::chatEnableManualRouting(false, true);
+            Server::chatEnableManualRouting(false);
         }
     }
 
