@@ -25,6 +25,8 @@ class MusicClient extends Module implements ModuleInterface
      */
     private static $music;
 
+    private static string $musicLibraryHash;
+
     /**
      * @var stdClass
      */
@@ -58,6 +60,7 @@ class MusicClient extends Module implements ModuleInterface
 
             $musicJson = $response->getBody()->getContents();
             self::$music = collect(json_decode($musicJson));
+            self::$musicLibraryHash = md5($musicJson);
             self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', Server::getForcedMusic()->url)))->first();
 
             Log::info('Library loaded successfully.');
@@ -84,7 +87,19 @@ class MusicClient extends Module implements ModuleInterface
 
         $promise->then(function (ResponseInterface $response) {
             if ($response->getStatusCode() == 200) {
-                self::$music = collect(json_decode($response->getBody()->getContents()));
+                $newMusicJson = $response->getBody()->getContents();
+
+                if(md5($newMusicJson) != self::$musicLibraryHash){
+                    self::$music = collect(json_decode($newMusicJson));
+
+                    $server = config('music.url');
+                    $chunks = self::$music->chunk(200);
+
+                    Template::showAll('MusicClient.send-music', [
+                        'server' => $server,
+                        'music' => $chunks,
+                    ], 10);
+                }
             }
         }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
@@ -121,7 +136,7 @@ class MusicClient extends Module implements ModuleInterface
         Template::show($player, 'MusicClient.send-music', [
             'server' => $server,
             'music' => $chunks,
-        ], false, 2);
+        ], false, 10);
     }
 
     /**
