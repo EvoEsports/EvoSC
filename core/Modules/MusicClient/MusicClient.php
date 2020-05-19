@@ -59,6 +59,7 @@ class MusicClient extends Module implements ModuleInterface
 
             $musicJson = $response->getBody()->getContents();
             self::$music = collect(json_decode($musicJson));
+            self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', Server::getForcedMusic()->url)))->first();
 
             Log::info('Library loaded successfully.');
 
@@ -68,7 +69,7 @@ class MusicClient extends Module implements ModuleInterface
             ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
             InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
-        }, function(RequestException $e){
+        }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
         });
