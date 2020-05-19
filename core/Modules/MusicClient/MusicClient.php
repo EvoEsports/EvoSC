@@ -38,16 +38,14 @@ class MusicClient extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        $url = config('music.url');
-
-        if (!$url) {
+        if (!config('music.url')) {
             self::enableMusicDisabledNotice();
 
             return;
         }
 
-        $promise = RestClient::getAsync($url, [
-            'connect_timeout' => 30
+        $promise = RestClient::getAsync(config('music.url'), [
+            'connect_timeout' => 120
         ]);
 
         $promise->then(function (ResponseInterface $response) {
@@ -67,12 +65,29 @@ class MusicClient extends Module implements ModuleInterface
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
             Hook::add('BeginMap', [self::class, 'setNextSong']);
 
+            Timer::create('music_client_update_library', [self::class, 'updateLibrary'], '10m', true);
+
             ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
             InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
         }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
+        });
+    }
+
+    public static function updateLibrary()
+    {
+        $promise = RestClient::getAsync(config('music.url'), [
+            'connect_timeout' => 120
+        ]);
+
+        $promise->then(function (ResponseInterface $response) {
+            if ($response->getStatusCode() == 200) {
+                self::$music = collect(json_decode($response->getBody()->getContents()));
+            }
+        }, function (RequestException $e) {
+            Log::error('Failed to fetch music list: ' . $e->getMessage());
         });
     }
 
