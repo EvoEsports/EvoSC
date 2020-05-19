@@ -9,6 +9,7 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Classes\Timer;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -108,11 +109,6 @@ class MusicClient extends Module implements ModuleInterface
         ], false, 2);
     }
 
-    public static function showMusicList(Player $player)
-    {
-        Template::show($player, 'MusicClient.list');
-    }
-
     /**
      * Hook: PlayerConnect
      *
@@ -120,20 +116,18 @@ class MusicClient extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        self::sendMusicLib($player);
-        self::showMusicList($player);
-        Template::show($player, 'MusicClient.music-client');
-
-        $url = Server::getForcedMusic()->url;
-
-        if ($url) {
-            $file = urldecode(preg_replace('/.+\?song=/', '', Server::getForcedMusic()->url));
-            $song = json_encode(self::$music->where('file', $file)->first());
+        if (isset(self::$music)) {
+            self::sendMusicLib($player);
+            Template::show($player, 'MusicClient.list');
+            Template::show($player, 'MusicClient.music-client');
         } else {
-            $song = json_encode(self::$song);
+            Timer::create(uniqid('sendMusicLib'), function () use ($player) {
+                self::playerConnect($player);
+            }, '10s');
         }
 
-        if ($song != 'null') {
+        if (isset(self::$song)) {
+            $song = json_encode(self::$song);
             Template::show($player, 'MusicClient.start-song', compact('song'), false, 180);
         }
     }
