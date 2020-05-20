@@ -23,6 +23,9 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        AccessRight::createIfMissing('group_edit', 'Add/delete/update groups.');
+        AccessRight::createIfMissing('group_change', 'Change player group.');
+
         ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
 
         ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');
@@ -36,9 +39,6 @@ class GroupManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
         ManiaLinkEvent::add('group.rights_update', [self::class, 'groupRightsUpdate'], 'group');
-
-        AccessRight::createIfMissing('group_edit', 'Add/delete/update groups.');
-        AccessRight::createIfMissing('group_change', 'Change player group.');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
