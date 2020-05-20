@@ -26,8 +26,6 @@ class MusicClient extends Module implements ModuleInterface
      */
     private static $music;
 
-    private static string $musicLibraryHash;
-
     /**
      * @var stdClass
      */
@@ -59,9 +57,7 @@ class MusicClient extends Module implements ModuleInterface
                 return;
             }
 
-            $musicJson = $response->getBody()->getContents();
-            self::$music = collect(json_decode($musicJson));
-            self::$musicLibraryHash = md5($musicJson);
+            self::$music = collect(json_decode($response->getBody()->getContents()));
             self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', Server::getForcedMusic()->url)))->first();
 
             Log::info('Music-library loaded successfully.');
@@ -69,46 +65,12 @@ class MusicClient extends Module implements ModuleInterface
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
             Hook::add('BeginMap', [self::class, 'setNextSong']);
 
-            Timer::create('music_client_update_library', [self::class, 'updateLibrary'], '10m', true);
-
             ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
 
             InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
         }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
-        });
-
-        $promise->otherwise(function (PromiseInterface $promise) {
-            Log::warning('Could not load music-library.');
-            dump($promise->getState());
-        });
-    }
-
-    public static function updateLibrary()
-    {
-        $promise = RestClient::getAsync(config('music.url'), [
-            'connect_timeout' => 120
-        ]);
-
-        $promise->then(function (ResponseInterface $response) {
-            if ($response->getStatusCode() == 200) {
-                $newMusicJson = $response->getBody()->getContents();
-
-                if (md5($newMusicJson) != self::$musicLibraryHash) {
-                    self::$music = collect(json_decode($newMusicJson));
-
-                    $server = config('music.url');
-                    $chunks = self::$music->chunk(200);
-
-                    Template::showAll('MusicClient.send-music', [
-                        'server' => $server,
-                        'music' => $chunks,
-                    ], 10);
-                }
-            }
-        }, function (RequestException $e) {
-            Log::error('Failed to fetch music list: ' . $e->getMessage());
         });
     }
 
