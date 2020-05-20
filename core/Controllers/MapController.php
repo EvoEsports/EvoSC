@@ -53,13 +53,13 @@ class MapController implements ControllerInterface
             File::makeDir(cacheDir('gbx'));
         }
 
-        self::$mapsPath = Server::getMapsDirectory();
-        self::$mapToDisable = collect();
-        self::$currentMap = Map::getByUid(Server::getCurrentMapInfo()->uId);
-
         if (!$_skipMapCheck) {
             self::loadMaps();
         }
+
+        self::$mapsPath = Server::getMapsDirectory();
+        self::$mapToDisable = collect();
+        self::$currentMap = Map::getByUid(Server::getCurrentMapInfo()->uId);
 
         AccessRight::createIfMissing('map_skip', 'Skip map instantly.');
         AccessRight::createIfMissing('map_add', 'Add map permanently.');
