@@ -313,8 +313,6 @@ class Server
     {
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
-
-        ChatCommand::add('//restart', [self::class, 'restartController'], 'Restart EvoSC.', 'ma');
     }
 
     /**
@@ -352,14 +350,5 @@ class Server
         }
 
         return null;
-    }
-
-    public static function restartController(Player $player)
-    {
-        global $_restart;
-
-        warningMessage($player, ' restarted EvoSC.')->sendAdmin();
-
-        $_restart = true;
     }
 }

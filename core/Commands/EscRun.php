@@ -139,7 +139,6 @@ class EscRun extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         global $_onlinePlayers;
-        global $_restart;
         global $serverName;
         $_restart = false;
 
@@ -223,10 +222,6 @@ class EscRun extends Command
 
                 $pause = Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
-
-                if ($_restart) {
-                    return;
-                }
 
                 usleep($pause);
             } catch (Exception $e) {
