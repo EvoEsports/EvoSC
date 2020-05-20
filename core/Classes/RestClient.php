@@ -82,7 +82,7 @@ class RestClient
      */
     public static function getAsync(string $url, array $options = null)
     {
-        Log::write('ASYNC GET: ' . $url, isVerbose());
+        Log::cyan('ASYNC GET: ' . $url, isVerbose());
 
         return self::$client->getAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -109,7 +109,7 @@ class RestClient
      */
     public static function postAsync(string $url, array $options = null)
     {
-        Log::write('ASYNC POST: ' . $url, isVerbose());
+        Log::cyan('ASYNC POST: ' . $url, isVerbose());
 
         return self::$client->postAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
