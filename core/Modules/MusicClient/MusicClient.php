@@ -48,7 +48,6 @@ class MusicClient extends Module implements ModuleInterface
         }
 
         $promise = RestClient::getAsync(config('music.url'), [
-            'verify' => config('music.verify-ssl-certificate', true),
             'connect_timeout' => 120
         ]);
 
@@ -78,6 +77,11 @@ class MusicClient extends Module implements ModuleInterface
         }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
+        });
+
+        $promise->otherwise(function (PromiseInterface $promise) {
+            Log::warning('Could not load music-library.');
+            dump($promise->getState());
         });
     }
 

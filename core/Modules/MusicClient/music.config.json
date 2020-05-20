@@ -1,6 +1,5 @@
 {
   "url"    : "",
-  "verify-ssl-certificate": true,
   "ui": {
     "position": "right",
     "slot": 5
