@@ -36,6 +36,8 @@ class RestClient
      */
     public static function init(string $serverName)
     {
+        Log::info('Initializing RestClient -> ' . $serverName, isVerbose());
+
         self::$curl = new CurlMultiHandler();
         $handler = HandlerStack::create(self::$curl);
 

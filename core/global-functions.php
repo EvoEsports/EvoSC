@@ -262,7 +262,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.84.x';
+    return '0.86.x';
 }
 
 /**
@@ -377,7 +377,7 @@ function evo_str_slug($title)
  */
 function restart_evosc()
 {
-    warningMessage(secondary('EvoSC ' . getEscVersion()), ' is restarting.')->sendAll();
+    warningMessage(secondary('EvoSC v' . getEscVersion()), ' is restarting.')->sendAll();
     Server::chatEnableManualRouting(false);
     Log::warning('Old process is terminating.');
     pcntl_exec(PHP_BINARY, $_SERVER['argv']);
