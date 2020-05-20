@@ -176,6 +176,10 @@ class EscRun extends Command
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
+        ChatCommand::add('//restart-evosc', function(){
+            restart_evosc();
+        }, 'Restart EvoSC', 'ma');
+
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
         });
@@ -208,7 +212,7 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        infoMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAdmin();
+        infoMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAll();
 
         //cycle-loop
         while (true) {

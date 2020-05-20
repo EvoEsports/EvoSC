@@ -14,6 +14,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;
@@ -63,7 +64,7 @@ class MusicClient extends Module implements ModuleInterface
             self::$musicLibraryHash = md5($musicJson);
             self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', Server::getForcedMusic()->url)))->first();
 
-            Log::info('Library loaded successfully.');
+            Log::info('Music-library loaded successfully.');
 
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
             Hook::add('BeginMap', [self::class, 'setNextSong']);
@@ -77,6 +78,11 @@ class MusicClient extends Module implements ModuleInterface
             Log::error('Failed to fetch music list: ' . $e->getMessage());
             self::enableMusicDisabledNotice();
         });
+
+        $promise->otherwise(function (PromiseInterface $promise) {
+            Log::warning('Could not load music-library.');
+            dump($promise->getState());
+        });
     }
 
     public static function updateLibrary()
@@ -89,7 +95,7 @@ class MusicClient extends Module implements ModuleInterface
             if ($response->getStatusCode() == 200) {
                 $newMusicJson = $response->getBody()->getContents();
 
-                if(md5($newMusicJson) != self::$musicLibraryHash){
+                if (md5($newMusicJson) != self::$musicLibraryHash) {
                     self::$music = collect(json_decode($newMusicJson));
 
                     $server = config('music.url');
