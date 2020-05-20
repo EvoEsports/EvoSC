@@ -58,7 +58,10 @@ class MusicClient extends Module implements ModuleInterface
             }
 
             self::$music = collect(json_decode($response->getBody()->getContents()));
-            self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', Server::getForcedMusic()->url)))->first();
+            $forcedUrl = Server::getForcedMusic()->url;
+            if(!empty($forcedUrl)){
+                self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', $forcedUrl)))->first();
+            }
 
             Log::info('Music-library loaded successfully.');
 
