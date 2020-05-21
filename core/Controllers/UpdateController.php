@@ -18,33 +18,48 @@ use ZipArchive;
 class UpdateController implements ControllerInterface
 {
     private static bool $updateAvailable = false;
+    private static string $latestVersion = '';
 
+    /**
+     *
+     */
     public static function init()
     {
     }
 
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     */
     public static function start(string $mode, bool $isBoot)
     {
-        dump("started");
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
         ChatCommand::add('//update-evosc', [self::class, 'cmdUpdateEvoSC'], 'Updates EvoSC and restarts it.', 'ma');
 
+        self::$latestVersion = getEscVersion();
         self::checkForUpdates();
     }
 
+    /**
+     * @param Player $player
+     */
     public static function playerConnect(Player $player)
     {
         if (self::$updateAvailable && $player->hasAccess('ma')) {
-            infoMessage('There is an update available for ', secondary('EvoSC'), '. Type ', secondary('//update-evosc'), ' to update.')->send($player);
+            infoMessage('New ', secondary('EvoSC v' . self::$latestVersion), ' available, type ', secondary('//update-evosc'), ' to update.')->send($player);
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
     public static function cmdUpdateEvoSC(Player $player, $cmd)
     {
-        infoMessage('Updating ', secondary('EvoSC'))->send($player);
+        infoMessage('Updating ', secondary('EvoSC'), ' to the latest version.')->send($player);
 
-        $promise = RestClient::getAsync('https://evotm.com/api/evosc/latest?branch=develop');
+        $promise = RestClient::getAsync('https://evotm.com/api/evosc/latest?branch=' . config('evosc.release'));
 
         $promise->then(function (ResponseInterface $response) use ($player) {
             if ($response->getStatusCode() == 200) {
@@ -66,17 +81,22 @@ class UpdateController implements ControllerInterface
         });
     }
 
+    /**
+     *
+     */
     public static function checkForUpdates()
     {
         if (!self::$updateAvailable) {
-            $promise = RestClient::getAsync('https://evotm.com/api/evosc/version?branch=develop');
+            $promise = RestClient::getAsync('https://evotm.com/api/evosc/version?branch=' . config('evosc.release'));
 
             $promise->then(function (ResponseInterface $response) {
                 if ($response->getStatusCode() == 200) {
                     $latestVersion = $response->getBody()->getContents();
 
                     if ($latestVersion != '-1' && $latestVersion > getEscVersion()) {
+                        self::$latestVersion = $latestVersion;
                         Log::cyan('EvoSC update available.');
+                        infoMessage('New ', secondary('EvoSC v' . $latestVersion), ' available, type ', secondary('//update-evosc'), ' to update.')->send(accessPlayers('ma'));
                         self::$updateAvailable = true;
                     }
                 }

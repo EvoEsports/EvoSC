@@ -200,6 +200,15 @@ function onlinePlayers(): Collection
     return Player::whereIn('Login', $logins)->get();
 }
 
+function accessPlayers(string $accessRight): Collection
+{
+    $logins = array_column(Server::getPlayerList(), 'login');
+
+    return Player::whereIn('Login', $logins)->get()->filter(function (Player $player) use ($accessRight) {
+        return $player->hasAccess($accessRight);
+    });
+}
+
 function ml_escape(string $string)
 {
     $out = str_replace('{', '\u007B', str_replace('}', '\u007D', $string));
@@ -280,7 +289,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.87.5';
+    return '0.87.4';
 }
 
 /**

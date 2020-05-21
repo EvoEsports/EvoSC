@@ -5,6 +5,7 @@ namespace EvoSC\Classes;
 
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use Illuminate\Support\Collection;
 use stdClass;
 
 /**
@@ -82,7 +83,7 @@ class ChatMessage
     public function setIsWarning(): ChatMessage
     {
         $this->color = config('theme.chat.warning');
-        $this->icon = '';
+        $this->icon = '';
 
         return $this;
     }
@@ -190,7 +191,7 @@ class ChatMessage
     /**
      * Send the message to a specific player.
      *
-     * @param Player|null|string  $player
+     * @param mixed $player
      */
     public function send($player = null)
     {
@@ -201,11 +202,12 @@ class ChatMessage
         if ($player instanceof Player) {
             Server::chatSendServerMessage($this->getMessage(), $player->Login);
             Log::info("(@$player)".$this->getMessage(), isVerbose());
-        } else {
-            if (is_string($player)) {
-                Server::chatSendServerMessage($this->getMessage(), $player);
-                Log::info("(@$player)".$this->getMessage(), isVerbose());
-            }
+        } else if (is_string($player)) {
+            Server::chatSendServerMessage($this->getMessage(), $player);
+            Log::info("(@$player)".$this->getMessage(), isVerbose());
+        } else if ($player instanceof Collection) {
+            Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
+            Log::info($this->getMessage(), isVerbose());
         }
     }
 }
