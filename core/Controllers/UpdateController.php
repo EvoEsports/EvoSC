@@ -54,10 +54,10 @@ class UpdateController implements ControllerInterface
                     $zip->extractTo('.');
                     $zip->close();
 
-                    infoMessage('EvoSC successfully updated.')->send($player);
+                    successMessage(secondary('EvoSC'), ' successfully updated.')->send($player);
                     restart_evosc();
                 } else {
-                    warningMessage('Failed to update EvoSC.')->send($player);
+                    dangerMessage('Failed to update ', secondary('EvoSC'))->send($player);
                 }
             }
         });

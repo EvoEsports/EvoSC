@@ -88,6 +88,28 @@ class ChatMessage
     }
 
     /**
+     * @return $this
+     */
+    public function setIsDanger(): ChatMessage
+    {
+        $this->color = config('theme.chat.danger');
+        $this->icon = '';
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setIsSuccess(): ChatMessage
+    {
+        $this->color = config('theme.chat.success');
+        $this->icon = '';
+
+        return $this;
+    }
+
+    /**
      * Overwrite the chat-message content.
      *
      * @param  mixed  ...$parts

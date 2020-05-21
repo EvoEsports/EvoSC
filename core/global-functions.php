@@ -42,6 +42,24 @@ function warningMessage(...$message)
 }
 
 /**
+ * @param mixed ...$message
+ * @return ChatMessage
+ */
+function successMessage(...$message)
+{
+    return (new ChatMessage(...$message))->setIsSuccess();
+}
+
+/**
+ * @param mixed ...$message
+ * @return ChatMessage
+ */
+function dangerMessage(...$message)
+{
+    return (new ChatMessage(...$message))->setIsDanger();
+}
+
+/**
  * @param int $score
  *
  * @param bool $cutZero
