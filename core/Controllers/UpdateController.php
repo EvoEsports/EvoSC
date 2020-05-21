@@ -32,9 +32,6 @@ class UpdateController implements ControllerInterface
                 if ($response->getStatusCode() == 200) {
                     $latestVersion = $response->getBody()->getContents();
 
-                    Log::cyan($latestVersion);
-                    dump($latestVersion > getEscVersion(), $latestVersion < getEscVersion());
-
                     if ($latestVersion != '-1' && $latestVersion > getEscVersion()) {
                         Log::cyan('EvoSC update available.');
                         self::$updateAvailable = true;
