@@ -5,6 +5,7 @@ namespace EvoSC\Controllers;
 
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\RestClient;
@@ -24,9 +25,10 @@ class UpdateController implements ControllerInterface
 
     public static function start(string $mode, bool $isBoot)
     {
+        dump("started");
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
-        ChatCommand::add('//update-evosc', [self::class, 'updateEvoSC'], 'Updates EvoSC and restarts it.', 'ma');
+        ChatCommand::add('//update-evosc', [self::class, 'cmdUpdateEvoSC'], 'Updates EvoSC and restarts it.', 'ma');
 
         self::checkForUpdates();
     }
@@ -38,7 +40,7 @@ class UpdateController implements ControllerInterface
         }
     }
 
-    public static function updateEvoSC(Player $player, $cmd)
+    public static function cmdUpdateEvoSC(Player $player, $cmd)
     {
         infoMessage('Updating ', secondary('EvoSC'))->send($player);
 
@@ -55,6 +57,7 @@ class UpdateController implements ControllerInterface
                     $zip->close();
 
                     successMessage(secondary('EvoSC'), ' successfully updated.')->send($player);
+                    unlink(coreDir('../update.zip'));
                     restart_evosc();
                 } else {
                     dangerMessage('Failed to update ', secondary('EvoSC'))->send($player);
@@ -80,6 +83,6 @@ class UpdateController implements ControllerInterface
             });
         }
 
-        Timer::create('evosc_update_checker', [self::class, 'checkForUpdates'], '1m');
+        Timer::create('evosc_update_checker', [self::class, 'checkForUpdates'], '1h');
     }
 }
