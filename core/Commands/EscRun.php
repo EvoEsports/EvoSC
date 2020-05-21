@@ -29,6 +29,7 @@ use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
+use EvoSC\Controllers\UpdateController;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -140,7 +141,6 @@ class EscRun extends Command
     {
         global $_onlinePlayers;
         global $serverName;
-        $_restart = false;
 
         $version = getEscVersion();
         $motd = "      ______           _____ ______
@@ -174,6 +174,7 @@ class EscRun extends Command
         PlanetsController::init();
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
+        UpdateController::init();
 
         ChatCommand::add('//restart-evosc', function(){
             restart_evosc();
