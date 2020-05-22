@@ -63,7 +63,7 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
+        ChatCommand::add('//setpw', [self::class, 'cmdSetServerPassword'],
             'Set the server password, leave empty to clear it.', 'ma');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
@@ -85,7 +85,7 @@ class PlayerController implements ControllerInterface
      * @param Player $player
      * @param mixed ...$pw
      */
-    public static function setServerPassword(Player $player, ...$pw)
+    public static function cmdSetServerPassword(Player $player, $cmd, ...$pw)
     {
         $pw = trim(implode(' ', $pw));
 
