@@ -75,7 +75,6 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function cmdSearchMusic(Player $player, $cmd, string $search = '')
     {
-        dump($cmd, $search);
         Template::show($player, 'MusicClient.search-command', compact('search'), false, 20);
     }
 

@@ -1,6 +1,5 @@
 <?php
 
-//require 'vendor/composer/autoload_psr4.php';
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
@@ -13,7 +12,6 @@ use EvoSC\Commands\FixScores;
 use EvoSC\Commands\ImportUaseco;
 use EvoSC\Commands\ImportPyplanet;
 use EvoSC\Commands\MakeMigration;
-use EvoSC\Commands\ChatRouter;
 use EvoSC\Commands\Migrate;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -56,7 +54,6 @@ $application->add(new FixScores());
 $application->add(new GetVersion());
 $application->add(new EscRun());
 $application->add(new FakeLocals());
-$application->add(new ChatRouter());
 $application->add(new AddAdmin());
 $application->setDefaultCommand("list");
 

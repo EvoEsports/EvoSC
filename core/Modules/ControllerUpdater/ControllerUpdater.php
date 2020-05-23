@@ -1,37 +1,26 @@
 <?php
 
 
-namespace EvoSC\Controllers;
+namespace EvoSC\Modules\ControllerUpdater;
 
 
 use EvoSC\Classes\ChatCommand;
-use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
+use EvoSC\Classes\Module;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Timer;
-use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Psr\Http\Message\ResponseInterface;
 use ZipArchive;
 
-class UpdateController implements ControllerInterface
+class ControllerUpdater extends Module implements ModuleInterface
 {
     private static bool $updateAvailable = false;
     private static string $latestVersion = '';
 
-    /**
-     *
-     */
-    public static function init()
-    {
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     */
-    public static function start(string $mode, bool $isBoot)
+    public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
