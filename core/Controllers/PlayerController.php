@@ -94,7 +94,7 @@ class PlayerController implements ControllerInterface
                 infoMessage($player, ' cleared the server password.')->sendAll();
             } else {
                 infoMessage($player, ' set a server password.')->sendAll();
-                infoMessage($player, ' set the server password to "' . $pw . '".')->sendAdmin();
+                infoMessage($player, ' set the server password to ', secondary($pw))->sendAdmin();
             }
         }
 

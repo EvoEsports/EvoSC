@@ -22,9 +22,6 @@ class ChatController implements ControllerInterface
     /** @var boolean */
     private static bool $routingEnabled;
 
-    /** @var boolean */
-    private static bool $externalRouter;
-
     /**
      * Initialize ChatController.
      */
@@ -33,11 +30,7 @@ class ChatController implements ControllerInterface
         AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
         AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
 
-        if(self::$externalRouter = config('server.use-external-router', false)){
-            return;
-        }
-
-        if ((self::$routingEnabled = config('server.enable-chat-routing', true)) && !self::$externalRouter) {
+        if ((self::$routingEnabled = (bool)config('server.enable-chat-routing', true))) {
             Log::info('Enabling manual chat routing.', isVerbose());
             Server::chatEnableManualRouting();
             Log::info('Chat router started.');
@@ -160,23 +153,21 @@ class ChatController implements ControllerInterface
     {
         Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
 
-        if (!self::$externalRouter && self::$routingEnabled) {
-            $nick = $player->NickName;
+        $nick = $player->NickName;
 
-            if ($player->isSpectator()) {
-                $nick = '$eee '.$nick;
-            }
-
-            $prefix = $player->group->chat_prefix;
-            $color = $player->group->color ?? config('theme.chat.text');
-            $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, secondary($nick), $color, config('theme.chat.text'), $text);
-
-            if ($prefix) {
-                $chatText = '$'.$color.$prefix.' '.$chatText;
-            }
-
-            Server::ChatSendServerMessage($chatText);
+        if ($player->isSpectator()) {
+            $nick = '$eee '.$nick;
         }
+
+        $prefix = $player->group->chat_prefix;
+        $color = $player->group->color ?? config('theme.chat.text');
+        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s', $color, secondary($nick), $color, config('theme.chat.text'), $text);
+
+        if ($prefix) {
+            $chatText = '$'.$color.$prefix.' '.$chatText;
+        }
+
+        Server::ChatSendServerMessage($chatText);
     }
 
     /**
