@@ -7,8 +7,10 @@ namespace EvoSC\Modules\ControllerUpdater;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
@@ -18,15 +20,16 @@ use ZipArchive;
 class ControllerUpdater extends Module implements ModuleInterface
 {
     private static bool $updateAvailable = false;
-    private static string $latestVersion = '';
+    private static string $latestVersion;
 
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$latestVersion = getEscVersion();
+
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
-        ChatCommand::add('//update-evosc', [self::class, 'cmdUpdateEvoSC'], 'Updates EvoSC and restarts it.', 'ma');
+        ManiaLinkEvent::add('evosc.update', [self::class, 'mleUpdate'], 'ma');
 
-        self::$latestVersion = getEscVersion();
         self::checkForUpdates();
     }
 
@@ -35,18 +38,16 @@ class ControllerUpdater extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        if (self::$updateAvailable && $player->hasAccess('ma')) {
-            infoMessage('New ', secondary('EvoSC v' . self::$latestVersion), ' available, type ', secondary('//update-evosc'), ' to update.')->send($player);
+        if (self::$updateAvailable) {
+            if ($player->hasAccess('ma')) {
+                Template::show($player, 'ControllerUpdater.widget', ['latest_version' => self::$latestVersion]);
+            }
         }
     }
 
-    /**
-     * @param Player $player
-     * @param $cmd
-     */
-    public static function cmdUpdateEvoSC(Player $player, $cmd)
+    public static function mleUpdate(Player $player)
     {
-        infoMessage('Updating ', secondary('EvoSC'), ' to the latest version.')->send($player);
+        Template::show($player, 'ControllerUpdater.update', ['message' => 'Downloading EvoSC v' . self::$latestVersion]);
 
         $promise = RestClient::getAsync('https://evotm.com/api/evosc/latest?branch=' . config('evosc.release'));
 
@@ -54,13 +55,16 @@ class ControllerUpdater extends Module implements ModuleInterface
             if ($response->getStatusCode() == 200) {
                 file_put_contents(coreDir('../update.zip'), $response->getBody());
 
+                Template::show($player, 'ControllerUpdater.update', ['message' => 'Extracting update...']);
+
                 $zip = new ZipArchive;
                 $res = $zip->open(coreDir('../update.zip'));
                 if ($res === TRUE) {
                     $zip->extractTo('.');
                     $zip->close();
 
-                    successMessage(secondary('EvoSC'), ' successfully updated.')->send($player);
+                    Template::show($player, 'ControllerUpdater.update', ['message' => 'Update installed, restarting...']);
+                    usleep(100000);
                     unlink(coreDir('../update.zip'));
                     restart_evosc();
                 } else {
@@ -82,11 +86,14 @@ class ControllerUpdater extends Module implements ModuleInterface
                 if ($response->getStatusCode() == 200) {
                     $latestVersion = $response->getBody()->getContents();
 
-                    if ($latestVersion != '-1' && $latestVersion > getEscVersion()) {
+                    if ($latestVersion != '-1' && version_compare($latestVersion, getEscVersion(), 'gt')) {
                         self::$latestVersion = $latestVersion;
-                        Log::cyan('EvoSC update available.');
-                        infoMessage('New ', secondary('EvoSC v' . $latestVersion), ' available, type ', secondary('//update-evosc'), ' to update.')->send(accessPlayers('ma'));
                         self::$updateAvailable = true;
+                        Log::cyan('EvoSC update available.');
+
+                        foreach (accessPlayers('ma') as $player) {
+                            Template::show($player, 'ControllerUpdater.widget', ['latest_version' => self::$latestVersion]);
+                        }
                     }
                 }
             });
