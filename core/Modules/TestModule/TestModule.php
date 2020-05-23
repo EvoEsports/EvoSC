@@ -11,6 +11,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\MusicClient\MusicClient;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -18,7 +19,7 @@ class TestModule extends Module implements ModuleInterface
     /**
      * @inheritDoc
      */
-    public static function start(string $mode, bool $isBoot = false)
+    public static function start(string $mode, $isBoot = false)
     {
         InputSetup::add('test_stuff', 'Trigger TestModule::testStuff', [self::class, 'testStuff'], 'X', 'ma');
 
@@ -28,7 +29,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        restart_evosc();
+        MusicClient::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

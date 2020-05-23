@@ -131,7 +131,9 @@ After it dissapears you can reset and the song will start to play." autonewline=
     declare MusicLibrary musicLib for This;
     declare Song ESC_MC_PLAY for This;
     declare resetSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
-    declare Text SearchSong for This = "";
+    declare Text EvoSC_MusicSearch for This = "";
+    declare Integer EvoSC_LastMusicSearch for This;
+    declare lastMusicSearch = GameTime;
 
     wait(musicLib.songs.count > 0);
 
@@ -142,19 +144,21 @@ After it dissapears you can reset and the song will start to play." autonewline=
     {/block}
 
     {block loop}
-    if(TL::Length(SearchSong) > 0){
-        declare search = TL::Trim(SearchSong);
+    if(EvoSC_LastMusicSearch > 0 && lastMusicSearch != EvoSC_LastMusicSearch){
+        lastMusicSearch = EvoSC_LastMusicSearch;
+
+        declare search = TL::Trim(EvoSC_MusicSearch);
         if(search == ""){
             currentSelection = musicLib.songs;
             fillList();
             (Page.MainFrame.GetFirstChild("search-input") as CMlEntry).Value = "";
             resetSearch.Hide();
         }else{
-            search(TL::Trim(SearchSong));
-            (Page.MainFrame.GetFirstChild("search-input") as CMlEntry).Value = TL::Trim(SearchSong);
+            search(search);
+            (Page.MainFrame.GetFirstChild("search-input") as CMlEntry).Value = search;
             resetSearch.Show();
         }
-        SearchSong = "";
+
         window.Show();
     }
     {/block}

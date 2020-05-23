@@ -1,9 +1,13 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:music-search" id="music-search" version="3">
     <script><!--
 main() {
-    declare Text SearchSong for This = "";
-    SearchSong = {$search . ' '};
+    declare Text EvoSC_MusicSearch for This = "";
+    declare Integer EvoSC_LastMusicSearch for This;
+
+    EvoSC_MusicSearch = "{$search}";
+    EvoSC_LastMusicSearch = GameTime;
 }
     --></script>
 </manialink>

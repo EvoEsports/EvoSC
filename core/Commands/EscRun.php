@@ -212,7 +212,7 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAll();
+        successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
 
         //cycle-loop
         while (true) {

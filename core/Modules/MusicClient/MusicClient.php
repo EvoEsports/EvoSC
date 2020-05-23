@@ -40,8 +40,6 @@ class MusicClient extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (!config('music.url')) {
-            self::enableMusicDisabledNotice();
-
             return;
         }
 
@@ -52,14 +50,13 @@ class MusicClient extends Module implements ModuleInterface
         $promise->then(function (ResponseInterface $response) {
             if ($response->getStatusCode() != 200) {
                 Log::warning('Failed to fetch music list.');
-                self::enableMusicDisabledNotice();
 
                 return;
             }
 
             self::$music = collect(json_decode($response->getBody()->getContents()));
             $forcedUrl = Server::getForcedMusic()->url;
-            if(!empty($forcedUrl)){
+            if (!empty($forcedUrl)) {
                 self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', $forcedUrl)))->first();
             }
 
@@ -68,24 +65,17 @@ class MusicClient extends Module implements ModuleInterface
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
             Hook::add('BeginMap', [self::class, 'setNextSong']);
 
-            ChatCommand::add('/music', [self::class, 'searchMusic'], 'Open and search the music list.');
+            ChatCommand::add('/music', [self::class, 'cmdSearchMusic'], 'Open and search the music list.');
 
             InputSetup::add('reload_music_client', 'Reload music.', [self::class, 'reload'], 'F2', 'ms');
         }, function (RequestException $e) {
             Log::error('Failed to fetch music list: ' . $e->getMessage());
-            self::enableMusicDisabledNotice();
         });
     }
 
-    private static function enableMusicDisabledNotice()
+    public static function cmdSearchMusic(Player $player, $cmd, string $search = '')
     {
-        Hook::add('PlayerConnect', function (Player $player) {
-            warningMessage('Music server not reachable, custom music is disabled.')->send($player);
-        });
-    }
-
-    public static function searchMusic(Player $player, string $search = '')
-    {
+        dump($cmd, $search);
         Template::show($player, 'MusicClient.search-command', compact('search'), false, 20);
     }
 
@@ -101,13 +91,21 @@ class MusicClient extends Module implements ModuleInterface
 
     public static function sendMusicLib(Player $player)
     {
-        $server = config('music.url');
-        $chunks = self::$music->chunk(200);
+        Template::show($player, 'MusicClient.list');
 
-        Template::show($player, 'MusicClient.send-music', [
-            'server' => $server,
-            'music' => $chunks,
-        ], false, 10);
+        if (isset(self::$music)) {
+            $server = config('music.url');
+            $chunks = self::$music->chunk(200);
+
+            Template::show($player, 'MusicClient.send-music', [
+                'server' => $server,
+                'music' => $chunks,
+            ], false, 60);
+        } else {
+            Timer::create(uniqid('sendMusicLib'), function () use ($player) {
+                self::sendMusicLib($player);
+            }, '10s');
+        }
     }
 
     /**
@@ -117,15 +115,8 @@ class MusicClient extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        if (isset(self::$music)) {
-            self::sendMusicLib($player);
-            Template::show($player, 'MusicClient.list');
-            Template::show($player, 'MusicClient.music-client');
-        } else {
-            Timer::create(uniqid('sendMusicLib'), function () use ($player) {
-                self::playerConnect($player);
-            }, '10s');
-        }
+        Template::show($player, 'MusicClient.music-client');
+        self::sendMusicLib($player);
 
         if (isset(self::$song)) {
             $song = json_encode(self::$song);
