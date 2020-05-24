@@ -155,8 +155,7 @@ function modulesDir(string $filename = ''): string
  */
 function ghost(string $filename = ''): string
 {
-    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
+    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 /**

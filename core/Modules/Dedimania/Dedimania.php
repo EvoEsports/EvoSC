@@ -16,6 +16,7 @@ use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\Dedimania\Models\Dedi;
 use EvoSC\Modules\RecordsTable\RecordsTable;
 use Exception;
 
@@ -293,7 +294,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
-                self::saveGhostReplay($map->dedis()->where('Player', '=', $player->id)->first());
+                self::saveGhostReplay($player->id, $player->Login, $map->id);
             }
 
             self::sendUpdatedDedis();
@@ -318,7 +319,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
             if ($newRank == 1) {
                 //Ghost replay is needed for 1. dedi
-                self::saveGhostReplay($map->dedis()->where('Player', '=', $player->id)->first());
+                self::saveGhostReplay($player->id, $player->Login, $map->id);
             }
 
             if ($newRank <= config('dedimania.echo-top', 100)) {
@@ -343,20 +344,21 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
     }
 
-    private static function saveGhostReplay($dedi)
+    private static function saveGhostReplay(int $playerId, string $playerLogin, int $mapId)
     {
-        $oldGhostReplay = $dedi->ghost_replay;
+        $dedi = Dedi::wherePlayer($playerId)->whereMap($mapId)->first();
 
-        if ($oldGhostReplay && File::exists($oldGhostReplay)) {
-            unlink($oldGhostReplay);
+        if ($dedi->ghost_replay && File::exists($dedi->ghost_replay)) {
+            File::delete($dedi->ghost_replay);
         }
 
-        $map = Map::whereId($dedi->Map)->first();
-        $ghostFile = sprintf('%s_%s_%d', stripAll($dedi->player->Login), stripAll($map->uid), $dedi->Score);
+        $ghostFile = evo_str_slug(sprintf('%s_%s', $dedi->player->Login, $dedi->map->uid));
 
         try {
             if (Server::saveBestGhostsReplay($dedi->player->Login, 'Ghosts/' . $ghostFile)) {
                 $dedi->update(['ghost_replay' => $ghostFile]);
+            } else {
+                Log::error('Failed to save ghost for ' . $dedi->player->Login . " [" . $dedi->map->uid . "]");
             }
         } catch (Exception $e) {
             Log::error('Could not save ghost: ' . $e->getMessage());

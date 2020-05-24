@@ -146,7 +146,6 @@ class DedimaniaApi extends Module
      *
      * @param Map $map
      * @return null
-     * @return null
      */
     static function getChallengeRecords(Map $map)
     {
@@ -240,15 +239,26 @@ class DedimaniaApi extends Module
                     ->where('New', '=', 0)
                     ->delete();
 
-                $insert = $records->transform(function ($record) use ($map) {
-                    $player = DB::table('players')->updateOrInsert(['Login' => $record->login], [
+                $newRecordsPlayerIds = DB::table('dedi-records')
+                    ->where('Map', '=', $map->id)
+                    ->where('New', '=', 1)
+                    ->pluck('Player');
+
+                $insert = $records->map(function ($record) use ($map, $newRecordsPlayerIds) {
+                    DB::table('players')->updateOrInsert(['Login' => $record->login], [
                         'NickName' => $record->nickname,
                         'MaxRank' => $record->max_rank,
                     ]);
 
+                    $player = player($record->login);
+
+                    if ($newRecordsPlayerIds->contains('', $player->id)) {
+                        return null;
+                    }
+
                     return [
                         'Map' => $map->id,
-                        'Player' => $player->id ?? player($record->login)->id,
+                        'Player' => $player->id,
                         'Score' => $record->score,
                         'Rank' => $record->rank,
                         'Checkpoints' => $record->checkpoints,
@@ -261,6 +271,8 @@ class DedimaniaApi extends Module
             Log::write("Loaded records for map $map [" . $map->uid . ']');
             Dedimania::sendUpdatedDedis();
         });
+
+        return null;
     }
 
     /**
@@ -326,7 +338,6 @@ class DedimaniaApi extends Module
     static function setChallengeTimes(Map $map)
     {
         $newTimes = $map->dedis()->where('New', 1)->get();
-        $map->dedis()->where('New', 1)->update(['New' => 0]);
 
         if ($newTimes->count() == 0) {
             //No new records
@@ -357,8 +368,8 @@ class DedimaniaApi extends Module
         //string GameMode
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
-        Log::write('New Times:');
-        Log::write($newTimes->toJson());
+        Log::write('New Times:', isVerbose());
+        Log::write($newTimes->toJson(), isVerbose());
 
         //Times: array of struct {'Login': string, 'Best': int, 'Checks': string (list of int, comma separated)}:
         $times = $params->addChild('param')->addChild('array')->addChild('data')->addChild('value');
@@ -409,15 +420,11 @@ class DedimaniaApi extends Module
 
         try {
             //Check if there is top1 dedi
-            if ($newTimes->where('Rank', 1)->isNotEmpty()) {
-                if (isset($bestRecord->ghost_replay) && $bestRecord->ghost_replay != null) {
-                    $Top1GReplay = File::get(ghost($bestRecord->ghost_replay), false);
+            if ($bestRecord->Rank == 1) {
+                $Top1GReplay = File::get(ghost(DB::table('dedi-records')->where('Player', '=', $bestRecord->player->id)->where('Map', '=', $map->id)->first()->ghost_replay));
 
-                    if ($Top1GReplay == null) {
-                        Log::write('Failed to get ghost replay for player ' . $bestRecord->player, true);
-                    }
-                } else {
-                    Log::error('Ghost not set for top1 dedi.');
+                if ($Top1GReplay == null) {
+                    Log::error('Failed to get ghost replay for player ' . $bestRecord->player);
                 }
             }
 
@@ -443,6 +450,8 @@ class DedimaniaApi extends Module
         } catch (Exception $e) {
             Log::error('Error saving dedis: ' . $e->getMessage(), true);
         }
+
+        $map->dedis()->where('New', 1)->update(['New' => 0]);
     }
 
     /**
@@ -454,7 +463,6 @@ class DedimaniaApi extends Module
      * . ToolOption: optional value stored for the player by the used tool (can usually be config/layout values, and storable only if player has OptionsEnabled).
      *
      * @param Player $player
-     * @return null
      * @return null
      */
     public static function playerConnect(Player $player)
@@ -500,6 +508,8 @@ class DedimaniaApi extends Module
                 }
             }
         });
+
+        return null;
     }
 
 
