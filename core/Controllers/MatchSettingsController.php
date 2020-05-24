@@ -14,6 +14,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Classes\Timer;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
@@ -69,7 +70,7 @@ class MatchSettingsController implements ControllerInterface
             }
 
             ControllerController::loadControllers($mode);
-            ModuleController::startModules($mode);
+            ModuleController::startModules($mode, false);
         }
 
         MapController::loadMaps();

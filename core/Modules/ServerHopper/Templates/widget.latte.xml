@@ -63,7 +63,6 @@
         declare Text pw = "";
         servers.fromjson(data);
 
-        log(servers.count ^ " -> " ^ perPage);
         totalPages = getTotalPages(servers.count, perPage);
         (Page.MainFrame.GetFirstChild("page-label") as CMlLabel).Value = (page + 1) ^ "/" ^ totalPages;
         (Page.MainFrame.GetFirstChild("pagination") as CMlFrame).Visible = totalPages > 1;
@@ -97,11 +96,7 @@
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
 
-        declare newY = perPage * 3.5 + 5.5;
-        if(widget.Size[1] != newY){
-            widget.Size = <widget.Size[0], newY>;
-            setup__();
-        }
+        widgetSetHeight__(perPage * 3.5 + 5.5);
     }
     --></script>
     {/block}

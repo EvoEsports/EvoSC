@@ -63,10 +63,8 @@ declare Integer slot__;
         declare height = widget.Size[1] * widget.RelativeScale;
 
         if(left__){
-            widget.RelativePosition_V3[0] = -160.0;
             column = grid_.left;
         }else{
-            widget.RelativePosition_V3[0] = 160.0 - width;
             column = grid_.right;
         }
 
@@ -106,19 +104,32 @@ declare Integer slot__;
             newX = 160.0 - widths + gutter;
         }
         {else}
-        declare newX = widget.RelativePosition_V3[0];
+        declare newX = 160.0 - width;
+        if(left__){
+            newX = -160.0;
+        }
         {/if}
 
         declare newY = 90.0 - heights - (gutter * count) - 2.5;
         HS_POS = <newX, newY>;
-        if(widget.RelativePosition_V3[1] != newY){
+        if(widget.RelativePosition_V3[1] != newY || widget.RelativePosition_V3[0] != newX){
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpOut);
         }
-        sleep(50);
-        if(widget.RelativePosition_V3[0] != newX){
-            widget.RelativePosition_V3[0] = newX;
+    }
+
+    Void widgetSetHeight__(Real newHeight){
+        declare Integer LastUiUpdate for This = 0;
+        declare WidgetGrid grid_ for This;
+        if(left__){
+            if(!grid_.left.existskey(slot__)) return;
+            grid_.left[slot__].height = newHeight;
+        }else{
+            if(!grid_.right.existskey(slot__)) return;
+            grid_.right[slot__].height = newHeight;
         }
+        widget.Size[1] = newHeight;
+        LastUiUpdate = GameTime;
     }
 
     Void setup__(){
@@ -187,9 +198,12 @@ declare Integer slot__;
 
         {include bootScript}
 
+        widget.Hide();
         setup__();
         LastUiUpdate = GameTime;
         rearrange__();
+        sleep(50);
+        widget.Show();
 
         while(True){
             yield;

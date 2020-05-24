@@ -1,0 +1,149 @@
+{contentType text}
+{extends 'Components.widget-base'}
+{php $dontHide = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}race-ranking{/block}
+    {block size}44 5{/block}
+
+    {block content}
+    <framemodel id="row">
+        <label class="text-light" pos="1.5 0" size="4 3" valign="center" textsize="0.5" text="00." textprefix="$s" />
+        <label class="text-light" pos="6 0" size="19 3" valign="center" textsize="0.6" text="" textprefix="$s" />
+        <label class="text-light" pos="36.5 0" size="10 3" valign="center" halign="right" textsize="0.5" text="000:00.000" />
+        <label class="text-light" pos="36.5 0" size="10 3" valign="center" halign="right" textsize="0.5" text="000:00.000" z-index="-1" opacity="0.5" textprefix="$s" />
+        <label class="text-accent" pos="42 0" size="40 3" valign="center" halign="right" textsize="0.5" text="+00" textprefix="$s" />
+    </framemodel>
+
+    <quad class="bg-light" size="42 0.3" pos="1 -4.15" opacity="0.75" z-index="-9" />
+    <label class="text-light" pos="2 -1.5" size="40 3" opacity="0.9" valign="center" textsize="0.75" text="$s🏁  Race Ranking" />
+
+    <frame id="rows" pos="0 -6.5">
+        {for $i=0; $i<10; $i++}
+        <frameinstance modelid="row" pos="0 {$i * -4}" hidden="1" />
+        {/for}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Text getAddedPoints(){
+        declare Integer p = 1;
+        if(filled < points.count){
+            p = points[filled];
+        }
+        return "+" ^ p;
+    }
+
+    Void setWidgetSize(){
+        widgetSetHeight__(5.0 + (filled * 4));
+    }
+
+    Void fill(Integer score, Text name){
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+
+        if(rows.Controls.count <= filled){
+            return;
+        }
+
+        declare row <=> (rows.Controls[filled] as CMlFrame);
+        (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
+        (row.Controls[1] as CMlLabel).Value = name;
+        (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(score, True);
+        (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(score, False);
+        (row.Controls[4] as CMlLabel).Value = getAddedPoints();
+        row.Show();
+
+        filled += 1;
+        setWidgetSize();
+    }
+
+    Void reset(){
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+        foreach(row in rows.Controls){
+            row.Hide();
+        }
+        filled = 0;
+        setWidgetSize();
+    }
+        --></script>
+    {/block}
+
+    <script><!--
+        {block globals}
+        declare Integer[] points;
+        declare Integer filled;
+        {/block}
+
+        {block bootScript}
+        filled = 0;
+
+        points.fromjson("{$points}");
+
+        left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('race-ranking.ui.slot')};
+
+        sleep(10);
+        setWidgetSize();
+        {/block}
+
+        {block loop}
+        foreach(Event in RaceEvents){
+            if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
+                if(Event.IsEndLap){
+                    fill(Event.LapTime, Event.Player.User.Name);
+                    continue;
+                }
+            }
+            if(Event.Type == CTmRaceClientEvent::EType::Respawn){
+                if(Event.Player.User.Login == LocalUser.Login){
+                    reset();
+                }
+            }
+        }
+        {/block}
+
+        {block pendingEvents}
+        {/block}
+        --></script>
+</manialink>
