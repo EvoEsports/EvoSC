@@ -21,7 +21,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
@@ -49,8 +48,9 @@ class MxDownload extends Module implements ModuleInterface
 
             try {
                 $details = self::loadMxDetails($mxId);
+                $comment = self::parseBB($details->Comments);
 
-                Template::show($player, 'MxDownload.add-map-info', compact('details'));
+                Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
             } catch (Exception $e) {
                 Log::write($e->getMessage());
             }

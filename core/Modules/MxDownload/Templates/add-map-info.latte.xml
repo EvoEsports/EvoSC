@@ -23,7 +23,7 @@ Add map?
     <label class="text-light" pos="0 -13" size="116 20" text="Style: {$details->StyleName} {$details->LengthName} ({$details->DifficultyName})" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
     <label class="text-light" pos="0 -16" size="116 20" text="Mood: {$details->Mood}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
     <label class="text-light" pos="0 -19" size="116 20" text="Single-Lap: {$details->RouteName=='Single' ? 'Yes' : 'No'}" textsize="0.5" textcolor="{config('theme.hud.text-light')}" textfont="{config('colors.ui.font')|noescape}"/>
-    <label class="text-light" id="comments" pos="0 -24" size="115 20" text="{\EvoSC\Modules\MxDownload::parseBB($details->Comments)}" textsize="0.5" autonewline="1" textcolor="{config('theme.hud.text-light')}" textfont=""/>
+    <label class="text-light" id="comments" pos="0 -24" size="115 20" text="{$comment}" textsize="0.5" autonewline="1" textcolor="{config('theme.hud.text-light')}" textfont=""/>
 </frame>
 
 <label class="btn-default confirm" pos="105 -3" size="20 5" text=" Add" textsize="0.75" ScriptEvents="1"/>
