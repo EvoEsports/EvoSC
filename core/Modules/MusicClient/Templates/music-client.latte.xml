@@ -151,7 +151,7 @@ Void playRandomSong(){
         declare Song ESC_MC_PLAY for This;
         declare Song lastStartedSong;
         declare Text EvoSC_MusicSearch for This = "";
-        declare Integer EvoSC_LastMusicSearch for This;
+        declare Integer EvoSC_LastMusicSearch for This = 0;
 
         startLoading();
 

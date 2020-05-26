@@ -132,7 +132,7 @@ After it dissapears you can reset and the song will start to play." autonewline=
     declare Song ESC_MC_PLAY for This;
     declare resetSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
     declare Text EvoSC_MusicSearch for This = "";
-    declare Integer EvoSC_LastMusicSearch for This;
+    declare Integer EvoSC_LastMusicSearch for This = 0;
     declare lastMusicSearch = GameTime;
 
     wait(musicLib.songs.count > 0);
@@ -160,6 +160,7 @@ After it dissapears you can reset and the song will start to play." autonewline=
         }
 
         window.Show();
+        EvoSC_LastMusicSearch = 0;
     }
     {/block}
 
