@@ -92,13 +92,7 @@ class CpDiffs extends Module implements ModuleInterface
         $pb = DB::table('pbs')->where('map_id', '=', $map->id)->where('player_id', '=', $player->id)->first();
 
         if ($pb != null) {
-            $target = new stdClass();
-            $target->score = $pb->score;
-            $target->cps = explode(',', $pb->checkpoints);
-            $target->name = ml_escape($player->NickName);
-            $target->map_uid = $map->uid;
-
-            self::$targets->put($player->id, $target);
+            self::$targets->put($player->id, $target = self::createTarget($pb->score, $pb->checkpoints, $player->id, $map->uid));
             Template::show($player, 'CpDiffs.widget', compact('target'));
         } else {
             $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
@@ -114,20 +108,8 @@ class CpDiffs extends Module implements ModuleInterface
                 return;
             }
 
-            if ($targetRecord->Player == $player->id) {
-                $targetPlayer = $player;
-            } else {
-                $targetPlayer = DB::table('players')->where('id', '=', $targetRecord->Player)->first();
-            }
-
             if ($targetRecord) {
-                $target = new stdClass();
-                $target->score = $targetRecord->Score;
-                $target->cps = explode(',', $targetRecord->Checkpoints);
-                $target->name = ml_escape($targetPlayer->NickName);
-                $target->map_uid = $map->uid;
-
-                self::$targets->put($player->id, $target);
+                self::$targets->put($player->id, $target = self::createTarget($targetRecord->Score, $targetRecord->Checkpoints, $targetRecord->Player, $map->uid));
                 Template::show($player, 'CpDiffs.widget', compact('target'));
             }
         }
@@ -159,19 +141,30 @@ class CpDiffs extends Module implements ModuleInterface
                 return;
         }
 
-        if (isset($record)) {
-            $targetPlayer = Player::whereId($record->Player)->first();
-
-            $target = new stdClass();
-            $target->score = $record->Score;
-            $target->cps = explode(',', $record->Checkpoints);
-            $target->name = ml_escape($targetPlayer->NickName);
-
-            self::$targets->put($player->id, $target);
+        if (isset($record) && !is_null($record)) {
+            self::$targets->put($player->id, $target = self::createTarget($record->Score, $record->Checkpoints, $record->Player, $map->uid));
             Template::show($player, 'CpDiffs.widget', compact('target'));
         } else {
             warningMessage('Invalid target specified. See ', secondary('/help'),
                 ' for more information.')->send($player);
         }
+    }
+
+    /**
+     * @param $record
+     * @param $mapUid
+     * @return mixed
+     */
+    private static function createTarget($score, $checkpoints, $playerId, $mapUid)
+    {
+        $targetPlayer = Player::whereId($playerId)->first();
+
+        $target = new stdClass();
+        $target->score = $score;
+        $target->cps = explode(',', $checkpoints);
+        $target->name = ml_escape($targetPlayer->NickName);
+        $target->map_uid = $mapUid;
+
+        return $target;
     }
 }
