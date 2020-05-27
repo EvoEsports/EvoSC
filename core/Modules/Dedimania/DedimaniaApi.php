@@ -149,7 +149,8 @@ class DedimaniaApi extends Module
      */
     static function getChallengeRecords(Map $map)
     {
-        Log::write(sprintf('getChallengeRecords(%s)', $map));
+        $mpMap = Server::getCurrentMapInfo();
+        Log::write(sprintf('getChallengeRecords(%s)', $mpMap->uId));
 
         $xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><methodCall></methodCall>');
         $xml->addChild('methodName', 'dedimania.GetChallengeRecords');
@@ -158,23 +159,16 @@ class DedimaniaApi extends Module
         //string SessionId
         $params->addChild('param')->addChild('value', self::getSessionKey());
 
-        if (!$map->gbx) {
-            Log::write('Error: No gbx info available for map ' . $map);
-
-            return null;
-        }
-
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->uid,
-            'Name' => str_replace('&', '', $map->name),
-            'Environment' => $map->gbx->Environment,
-            'Author' => $map->author->Login,
-            'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
-            'NbLaps' => $map->gbx->NbLaps,
+            'UId' => $mpMap->uId,
+            'Name' => str_replace('&', '', $mpMap->name),
+            'Environment' => $mpMap->environnement,
+            'Author' => $mpMap->author,
+            'NbCheckpoints' => $mpMap->nbCheckpoints,
+            'NbLaps' => $mpMap->nbLaps,
         ]);
 
         //string GameMode
-
         $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
 
         //struct SrvInfo
@@ -337,6 +331,7 @@ class DedimaniaApi extends Module
      */
     static function setChallengeTimes(Map $map)
     {
+        $mpMap = Server::getCurrentMapInfo();
         $newTimes = $map->dedis()->where('New', 1)->get();
 
         if ($newTimes->count() == 0) {
@@ -357,12 +352,12 @@ class DedimaniaApi extends Module
 
         //MapInfo: struct {'uid': string, 'Name': string, 'Environment': string, 'Author': string, 'NbCheckpoints': int, 'NbLaps': int} from GetCurrentChallengeInfo
         self::paramAddStruct($params->addChild('param'), [
-            'UId' => $map->uid,
-            'Name' => $map->name,
-            'Environment' => $map->gbx->Environment,
-            'Author' => $map->author->Login,
-            'NbCheckpoints' => $map->gbx->CheckpointsPerLaps,
-            'NbLaps' => $map->gbx->NbLaps,
+            'UId' => $mpMap->uId,
+            'Name' => $mpMap->name,
+            'Environment' => $mpMap->environnement,
+            'Author' => $mpMap->author,
+            'NbCheckpoints' => $mpMap->nbCheckpoints,
+            'NbLaps' => $mpMap->nbLaps,
         ]);
 
         //string GameMode

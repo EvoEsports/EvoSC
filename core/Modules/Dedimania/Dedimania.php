@@ -200,7 +200,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        self::getChallengeRecords($map);
+        self::getChallengeRecords();
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)
