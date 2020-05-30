@@ -4,6 +4,8 @@
 namespace EvoSC\Classes;
 
 
+use EvoSC\Exceptions\UnauthorizedException;
+use EvoSC\Models\Player;
 use stdClass;
 
 class Module
@@ -77,5 +79,16 @@ class Module
         $this->name = $name;
     }
 
-
+    /**
+     * @param Player $player
+     * @param string $accessRight
+     * @throws UnauthorizedException
+     */
+    final static function authorize(Player $player, string $accessRight)
+    {
+        if (!$player->hasAccess($accessRight)) {
+            list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            throw new UnauthorizedException("$player is not authorized to call " . $caller['class'] . $caller['type'] . $caller['function']);
+        }
+    }
 }
