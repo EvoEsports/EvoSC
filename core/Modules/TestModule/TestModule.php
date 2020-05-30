@@ -10,8 +10,8 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\DarkSouls\DarkSouls;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\MapList\MapList;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface

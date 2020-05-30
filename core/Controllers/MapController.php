@@ -231,6 +231,24 @@ class MapController implements ControllerInterface
         self::$mapToDisable->push($map);
     }
 
+    /**
+     * @param Player $player
+     * @param Map $map
+     */
+    public static function enableMap(Player $player, Map $map)
+    {
+        infoMessage($player, ' enabled map ', secondary($map))->sendAll();
+        $map->update(['enabled' => 1]);
+
+        if (!Server::isFilenameInSelection($map->filename)) {
+            try {
+                Server::addMap($map->filename);
+            } catch (Exception $e) {
+                Log::error($e);
+            }
+        }
+    }
+
     public static function processMapsToDisable()
     {
         foreach (self::$mapToDisable as $map) {

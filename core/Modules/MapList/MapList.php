@@ -11,12 +11,14 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\QueueController;
+use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\MapQueue;
 use EvoSC\Models\Player;
 use EvoSC\Modules\Dedimania\Dedimania;
 use EvoSC\Modules\LocalRecords\LocalRecords;
+use Exception;
 use Illuminate\Support\Collection;
 
 class MapList extends Module implements ModuleInterface
@@ -42,6 +44,7 @@ class MapList extends Module implements ModuleInterface
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
             ->addAlias('/list');
+        ChatCommand::add('/disabled', [self::class, 'mleShowDisableMaps'], 'Open disabled map-list.');
         ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
             ->addAlias('/queue')
             ->addAlias('/jb');
@@ -76,6 +79,41 @@ class MapList extends Module implements ModuleInterface
     public static function searchMap(Player $player, $cmd, $query = "")
     {
         Template::show($player, 'MapList.update-search-query', compact('query'), false, 20);
+    }
+
+    /**
+     * @param Player $player
+     * @param null $cmd
+     * @param int $page
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function mleShowDisableMaps(Player $player, $cmd = null, int $page = 1)
+    {
+        $perPage = 22;
+        $maps = Map::whereEnabled(0)->skip(($page - 1) * $perPage)->take($perPage)->get();
+        $pages = ceil(Map::whereEnabled(0)->count() / $perPage);
+
+        Template::show($player, 'MapList.disabled-maps', ['maps' => $maps, 'pages' => $pages, 'page' => $page]);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $mapUid
+     * @throws UnauthorizedException
+     */
+    public static function mleEnableMap(Player $player, string $mapUid, int $page)
+    {
+        self::authorize($player, 'map_add');
+
+        try {
+            $map = Map::whereUid($mapUid)->firstOrFail();
+        } catch (Exception $e) {
+            dangerMessage('Failed to enable map ', secondary($mapUid))->send($player);
+            return;
+        }
+
+        MapController::enableMap($player, $map);
+        self::mleShowDisableMaps($player, null, $page);
     }
 
     /**

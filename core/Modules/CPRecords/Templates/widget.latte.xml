@@ -95,7 +95,7 @@
         declare nameLabel = (frame.Controls[4] as CMlLabel);
 
         if(record.isFinish){
-            indexLabel.SetText("🏁");
+            indexLabel.SetText("");
             indexLabel.TextSizeReal = 0.5;
         }else{
             indexLabel.SetText(TL::ToText(record.cpId + 1));

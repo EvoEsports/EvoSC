@@ -63,8 +63,6 @@ class TemplateController implements ControllerInterface
             return formatScore($str);
         })->addFilter('cfg', function ($str) {
             return config($str);
-        })->addFilter('escape_quotes', function ($str) {
-            return ml_escape($str);
         })->addFilter('ml_escape', function ($str) {
             return ml_escape($str);
         });

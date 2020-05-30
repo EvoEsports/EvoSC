@@ -12,6 +12,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 use Maniaplanet\DedicatedServer\Structures\Version;
+use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
  * Class Server
@@ -46,7 +47,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool chatSendToLogin(string $string, string $string)
  * @method static bool chatSendToId(string $string, int $int)
  * @method static array getChatLines()
- * @method static bool chatEnableManualRouting(bool $routeMessages = true, bool $autoForwardMessages = false)
+ * @method static bool chatEnableManualRouting(bool $routeMessages = true, bool $excludeServer = false) @throws FaultException
  * @method static bool chatForwardToLogin(string $string, string $string, string $string)
  * @method static bool sendNotice(string $string, string $string, int $int)
  * @method static bool sendNoticeToId(int $int, string $string, int $int, int $int)

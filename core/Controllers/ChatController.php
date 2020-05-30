@@ -9,6 +9,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
+use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
  * Class ChatController
@@ -32,8 +33,13 @@ class ChatController implements ControllerInterface
 
         if ((self::$routingEnabled = (bool)config('server.enable-chat-routing', true))) {
             Log::info('Enabling manual chat routing.', isVerbose());
-            Server::chatEnableManualRouting();
-            Log::info('Chat router started.');
+
+            try {
+                Server::chatEnableManualRouting();
+                Log::info('Chat router started.');
+            } catch (FaultException $e) {
+                Log::warning($e->getMessage(), isVerbose());
+            }
         } else {
             Server::chatEnableManualRouting(false);
         }
@@ -42,8 +48,8 @@ class ChatController implements ControllerInterface
     /**
      * Mute a player
      *
-     * @param  Player  $admin
-     * @param  Player  $target
+     * @param Player $admin
+     * @param Player $target
      */
     public static function mute(Player $admin, Player $target)
     {
@@ -54,8 +60,8 @@ class ChatController implements ControllerInterface
     /**
      * Unmute a player
      *
-     * @param  Player  $player
-     * @param  Player  $target
+     * @param Player $player
+     * @param Player $target
      */
     public static function unmute(Player $player, Player $target)
     {
@@ -136,35 +142,35 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        $from = sprintf(secondary('[from:').$player.secondary('] '));
-        $to = sprintf(secondary('[to:').$target.secondary('] '));
+        $from = sprintf(secondary('[from:') . $player . secondary('] '));
+        $to = sprintf(secondary('[to:') . $target . secondary('] '));
 
-        chatMessage($from.$message)->setIcon('')->send($target);
-        chatMessage($to.$message)->setIcon('')->send($player);
+        chatMessage($from . $message)->setIcon('')->send($target);
+        chatMessage($to . $message)->setIcon('')->send($player);
     }
 
     /**
      * Process chat-message and detect commands.
      *
-     * @param  Player  $player
-     * @param  string  $text
+     * @param Player $player
+     * @param string $text
      */
     public static function playerChat(Player $player, $text)
     {
-        Log::write('<fg=yellow>['.$player.'] '.$text.'</>', true);
+        Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
 
         $nick = $player->NickName;
 
         if ($player->isSpectator()) {
-            $nick = '$eee '.$nick;
+            $nick = '$eee ' . $nick;
         }
 
         $prefix = $player->group->chat_prefix;
         $color = $player->group->color ?? config('theme.chat.text');
-        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s$', $color, secondary($nick), $color, config('theme.chat.text'), $text).config('theme.chat.text');
+        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s$', $color, secondary($nick), $color, config('theme.chat.text'), $text) . config('theme.chat.text');
 
         if ($prefix) {
-            $chatText = '$'.$color.$prefix.' '.$chatText;
+            $chatText = '$' . $color . $prefix . ' ' . $chatText;
         }
 
         Server::ChatSendServerMessage($chatText);
@@ -179,8 +185,8 @@ class ChatController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)

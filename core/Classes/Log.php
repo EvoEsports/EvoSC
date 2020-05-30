@@ -56,7 +56,7 @@ class Log
     public static function write(string $string, $echo = true, $caller = null)
     {
         if (!$caller) {
-            list($childClass, $caller) = debug_backtrace(false, 2);
+            list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         }
 
         if (isset($caller['class']) && isset($caller['type'])) {
@@ -64,12 +64,6 @@ class Log
             $callingClass = $callerClassName . $caller['type'] . $caller['function'];
         } else {
             $callingClass = $caller['function'];
-        }
-
-        if (count($caller['args']) > 0) {
-            $callingClass .= '(...)';
-        } else {
-            $callingClass .= '';
         }
 
         if (isDebug()) {
@@ -80,7 +74,7 @@ class Log
         $time = date("H:i:s", time());
         $logFile = logDir($date . '.txt');
 
-        $line = sprintf("[%s] %s: %s", $time, $callingClass, $string);
+        $line = sprintf("[%s] %s(): %s", $time, $callingClass, $string);
 
         $line = stripAll($line);
 
@@ -99,7 +93,7 @@ class Log
      */
     public static function info($message, bool $echo = true)
     {
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<info>' . $message . '</>', $echo, $caller);
     }
 
@@ -111,7 +105,7 @@ class Log
      */
     public static function error($message, bool $echo = true)
     {
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<error>' . $message . '</>', $echo, $caller);
     }
 
@@ -123,7 +117,7 @@ class Log
      */
     public static function warning($message, bool $echo = true)
     {
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<fg=red>' . $message . '</>', $echo, $caller);
     }
 
@@ -133,7 +127,7 @@ class Log
      */
     public static function cyan(string $message, bool $echo = true)
     {
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write("<fg=cyan;options=bold>$message</>", $echo, $caller);
     }
 
