@@ -86,19 +86,6 @@ class File
     }
 
     /**
-     * Creates a directory
-     *
-     * @param string $name
-     */
-    public static function createDirectory(string $name)
-    {
-        if (!is_dir($name)) {
-            Log::info("Creating directory: $name");
-            mkdir($name, true);
-        }
-    }
-
-    /**
      * Gets all files in the directory, you can optionally filter them with a RegEx-pattern.
      *
      * @param string $path
