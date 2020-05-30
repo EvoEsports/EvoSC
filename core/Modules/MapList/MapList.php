@@ -103,7 +103,7 @@ class MapList extends Module implements ModuleInterface
      */
     public static function mleEnableMap(Player $player, string $mapUid, int $page)
     {
-        self::authorize($player, 'map_add');
+        authorize($player, 'map_add');
 
         try {
             $map = Map::whereUid($mapUid)->firstOrFail();

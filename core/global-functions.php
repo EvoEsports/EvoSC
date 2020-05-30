@@ -7,6 +7,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
 use EvoSC\Controllers\ConfigController;
 use EvoSC\Controllers\PlayerController;
+use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -296,7 +297,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.87.28';
+    return '0.88.1';
 }
 
 /**
@@ -407,7 +408,7 @@ function evo_str_slug($title)
 }
 
 /**
- *
+ * Restart EvoSC and keep its PID
  */
 function restart_evosc()
 {
@@ -418,4 +419,17 @@ function restart_evosc()
     warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
     Log::error('[CRITICAL] Failed to create new process, dying...');
     exit(56);
+}
+
+/**
+ * @param Player $player
+ * @param string $accessRight
+ * @throws UnauthorizedException
+ */
+function authorize(Player $player, string $accessRight)
+{
+    if (!$player->hasAccess($accessRight)) {
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        throw new UnauthorizedException("$player is not authorized to call " . $caller['class'] . $caller['type'] . $caller['function']);
+    }
 }

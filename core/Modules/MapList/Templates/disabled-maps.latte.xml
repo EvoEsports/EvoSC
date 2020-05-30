@@ -7,7 +7,7 @@
 <manialink version="3">
     {block id}disabled-map-list{/block}
     {block title}{$window_title ?? 'Maps'}{/block}
-    {block icon}{/block}
+    {block icon}{/block}
 
     {block navbar}
     {include 'Components.tabs', tabs => [
