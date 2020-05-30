@@ -130,6 +130,15 @@ function cacheDir(string $filename = ''): string
 
 /**
  * @param string $filename
+ * @return string
+ */
+function mapsDir(string $filename = ''): string
+{
+    return Server::getMapsDirectory() . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+}
+
+/**
+ * @param string $filename
  *
  * @return string
  */

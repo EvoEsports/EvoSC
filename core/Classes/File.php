@@ -53,8 +53,8 @@ class File
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
         $dir = str_replace(basename($fileName), '', $fileName);
 
-        if (!is_dir(realpath($dir))) {
-            mkdir(realpath($dir));
+        if (!self::dirExists($dir)) {
+            self::makeDir($dir);
         }
 
         if ($jsonEncode) {
@@ -225,9 +225,12 @@ class File
 
     public static function makeDir(string $dir)
     {
-        $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+        $dir = realpath(str_replace('/', DIRECTORY_SEPARATOR, $dir));
 
-        mkdir($dir);
+        if (!is_dir($dir)) {
+            mkdir($dir);
+            Log::info("Directory '$dir' created.");
+        }
     }
 
     public static function rename(string $sourceFile, string $targetFile)
