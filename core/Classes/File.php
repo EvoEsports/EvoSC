@@ -95,6 +95,8 @@ class File
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         if (!is_dir($path)) {
             return collect();
         }
@@ -118,6 +120,7 @@ class File
      */
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {
+        $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
 
         if (!is_dir($baseDirectory)) {
@@ -145,6 +148,7 @@ class File
 
     public static function getFiles(string $baseDirectory, string $filterPattern = null)
     {
+        $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
 
         File::getDirectoryContents($baseDirectory)
