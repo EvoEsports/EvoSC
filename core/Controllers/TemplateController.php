@@ -65,6 +65,8 @@ class TemplateController implements ControllerInterface
             return config($str);
         })->addFilter('ml_escape', function ($str) {
             return ml_escape($str);
+        })->addFilter('classpath', function ($str) {
+            return str_replace('\\', '\\\\', $str);
         });
     }
 

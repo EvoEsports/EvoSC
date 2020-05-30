@@ -6,7 +6,6 @@ use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
-use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
@@ -31,12 +30,6 @@ class MapList extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        ManiaLinkEvent::add('maplist.show_queue', [self::class, 'showQueue']);
-        ManiaLinkEvent::add('maplist.disable', [self::class, 'disableMapEvent'], 'map_disable');
-        ManiaLinkEvent::add('maplist.delete', [self::class, 'deleteMapPermEvent'], 'map_delete');
-        ManiaLinkEvent::add('map.fav.add', [self::class, 'favAdd']);
-        ManiaLinkEvent::add('map.fav.remove', [self::class, 'favRemove']);
-
         Hook::add('MapPoolUpdated', [self::class, 'sendUpdatedMapList']);
         Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -103,7 +96,7 @@ class MapList extends Module implements ModuleInterface
      */
     public static function mleEnableMap(Player $player, string $mapUid, int $page)
     {
-        authorize($player, 'map_add');
+        $player->authorize('map_add');
 
         try {
             $map = Map::whereUid($mapUid)->firstOrFail();
@@ -218,9 +211,11 @@ class MapList extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param $mapUid
+     * @throws UnauthorizedException
      */
-    public static function disableMapEvent(Player $player, $mapUid)
+    public static function mleDisableMap(Player $player, $mapUid)
     {
+        $player->authorize('map_disable');
         $map = Map::whereUid($mapUid)->get()->first();
 
         if ($map) {
@@ -233,8 +228,9 @@ class MapList extends Module implements ModuleInterface
      * @param Player $player
      * @param $mapUid
      */
-    public static function deleteMapPermEvent(Player $player, $mapUid)
+    public static function mleDeleteMap(Player $player, $mapUid)
     {
+        $player->authorize('map_delete');
         $map = Map::whereUid($mapUid)->first();
 
         if ($map) {

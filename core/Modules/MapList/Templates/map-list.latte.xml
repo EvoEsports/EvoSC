@@ -746,9 +746,9 @@ Void setCooldownToZero(Text uid){
             declare isFav = label.Value != "";
 
             if(isFav){
-                ManiaLinkEvent("map.fav.remove", event.Control.Parent.DataAttributeGet("map-id"));
+                ManiaLinkEvent("{$MODULE|classpath}::favRemove", event.Control.Parent.DataAttributeGet("map-uid"));
             }else{
-                ManiaLinkEvent("map.fav.add", event.Control.Parent.DataAttributeGet("map-id"));
+                ManiaLinkEvent("{$MODULE|classpath}::favAdd", event.Control.Parent.DataAttributeGet("map-uid"));
             }
         }
 
@@ -762,7 +762,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("disable") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
             if(confirm("Disable map?")){
-                TriggerPageAction("maplist.disable," ^ uid);
+                TriggerPageAction("{$MODULE|classpath}::mleDisableMap," ^ uid);
             }
             continue;
         }
@@ -770,7 +770,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
             if(confirm("Delete map and all associated data?")){
-                TriggerPageAction("maplist.delete," ^ uid);
+                TriggerPageAction("{$MODULE|classpath}::mleDeleteMap," ^ uid);
             }
             continue;
         }

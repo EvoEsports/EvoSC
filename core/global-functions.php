@@ -420,16 +420,3 @@ function restart_evosc()
     Log::error('[CRITICAL] Failed to create new process, dying...');
     exit(56);
 }
-
-/**
- * @param Player $player
- * @param string $accessRight
- * @throws UnauthorizedException
- */
-function authorize(Player $player, string $accessRight)
-{
-    if (!$player->hasAccess($accessRight)) {
-        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        throw new UnauthorizedException("$player is not authorized to call " . $caller['class'] . $caller['type'] . $caller['function']);
-    }
-}
