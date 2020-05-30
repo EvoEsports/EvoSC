@@ -10,6 +10,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
+use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\Statistics\Classes\StatisticWidget;
@@ -107,7 +108,9 @@ class Statistics extends Module implements ModuleInterface
                 return $last_played ? (new Carbon($last_played))->diffForHumans() : 'never';
             }, true, true, $popularMaps));
 
-        Template::showAll('Statistics.widgets', compact('statCollection'));
+        $currentMapUid = MapController::getCurrentMap()->uid;
+
+        Template::showAll('Statistics.widgets', compact('statCollection', 'currentMapUid'));
 
         /**
          * Calculate scores
