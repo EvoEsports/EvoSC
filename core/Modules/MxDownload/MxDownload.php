@@ -30,6 +30,10 @@ class MxDownload extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (!File::dirExists(Server::getMapsDirectory() . '/MX')) {
+            File::makeDir(Server::getMapsDirectory() . '/MX');
+        }
+
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
 
         ManiaLinkEvent::add('mx.add', [self::class, 'addMap'], 'map_add');
