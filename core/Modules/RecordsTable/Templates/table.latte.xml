@@ -26,7 +26,7 @@
             <label class="text-light" z-index="1" valign="center" halign="right" pos="3 0" size="3.5 2" textprefix="$s" textsize="0.3" text="{$record->Rank}." />
             <label class="text-lighter" z-index="0" valign="center" halign="right" pos="14 0" size="10 2" textsize="0.6" text="{formatScore($record->Score)}" textcolor="eee4" />
             <label class="text-light" z-index="1" valign="center" halign="right" pos="14 0" size="10 2" textsize="0.6" text="{formatScore($record->Score, true)}" textcolor="eee" />
-            <label class="text-light" z-index="1" valign="center" pos="15 0" size="16 2" textsize="0.4" textprefix="$s" text="{ml_escape($record->NickName)}" />
+            <label class="text-light" z-index="1" valign="center" pos="15 0" size="16 2" textsize="0.4" textprefix="$s" text="{$record->NickName|ml_escape}" />
             <label class="btn-muted" z-index="1" pos="33.5 0" size="3.5 2.5" textsize="0.1" textprefix="" text="" action="records.graph,{$map->id},{$window_title ?? 'Records'},{$record->Rank}"/>
             <label class="btn-muted" z-index="1" pos="37 0" size="3.5 2.5" textsize="0.1" textprefix="" text="" action="profile,{$record->Login}"/>
             {if $onlineLogins->contains($record->Login)}

@@ -169,7 +169,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
                 'rank' => $dedi->Rank,
                 'cps' => $checkpoints,
                 'score' => $dedi->Score,
-                'name' => ml_escape($player->NickName),
+                'name' => $player->NickName,
                 'login' => $player->Login,
             ];
         });

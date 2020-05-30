@@ -102,7 +102,7 @@ class LocalRecords extends Module implements ModuleInterface
                     'rank' => $local->Rank,
                     'cps' => $checkpoints,
                     'score' => $local->Score,
-                    'name' => ml_escape($player->NickName),
+                    'name' => $player->NickName,
                     'login' => $player->Login,
                 ];
             });

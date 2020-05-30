@@ -219,8 +219,7 @@ function accessPlayers(string $accessRight): Collection
 
 function ml_escape(string $string)
 {
-    $out = str_replace('{', '\u007B', str_replace('}', '\u007D', $string));
-    return str_replace('"', '\u0022', $out);
+    return str_replace('"', '”', $string);
 }
 
 /**
