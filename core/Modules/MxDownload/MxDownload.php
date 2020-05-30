@@ -36,6 +36,8 @@ class MxDownload extends Module implements ModuleInterface
             File::makeDir(mapsDir(self::DOWNLOAD_DIR));
         }
 
+        File::put(mapsDir('TestCreate2/Sub/Sub2/test.txt'), 'asdf');
+
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
 
         ManiaLinkEvent::add('mx.add', [self::class, 'addMap'], 'map_add');

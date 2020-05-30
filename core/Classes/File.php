@@ -3,6 +3,7 @@
 namespace EvoSC\Classes;
 
 
+use EvoSC\Exceptions\FilePathNotAbsoluteException;
 use Illuminate\Support\Collection;
 
 /**
@@ -53,6 +54,7 @@ class File
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
         $dir = str_replace(basename($fileName), '', $fileName);
 
+
         if (!self::dirExists($dir)) {
             self::makeDir($dir);
         }
@@ -77,7 +79,7 @@ class File
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
 
         if (!file_exists($fileName)) {
-            file_put_contents($fileName, $line);
+            self::put($fileName, $line);
         }
 
         file_put_contents($fileName, "\n" . $line, FILE_APPEND);
@@ -223,14 +225,41 @@ class File
         return is_dir($filename);
     }
 
+    /**
+     * @param string $dir
+     * @throws FilePathNotAbsoluteException
+     */
     public static function makeDir(string $dir)
     {
-        $dir = realpath(str_replace('/', DIRECTORY_SEPARATOR, $dir));
+        $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
+
+        if (substr($dir, 0, 1) != DIRECTORY_SEPARATOR) {
+            throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
+        }
 
         if (!is_dir($dir)) {
-            mkdir($dir);
+            self::createDirUntilExists($dir);
             Log::info("Directory '$dir' created.");
         }
+    }
+
+    private static function createDirUntilExists(string $startDir)
+    {
+        $levels = collect(explode(DIRECTORY_SEPARATOR, $startDir));
+
+        if ($levels->last() == "") {
+            $levels->pop();
+        }
+
+        $toCreate = $levels->implode(DIRECTORY_SEPARATOR);
+        $levels->pop();
+        $parentDir = $levels->implode(DIRECTORY_SEPARATOR);
+
+        if(!is_dir($parentDir)){
+            self::createDirUntilExists($parentDir);
+        }
+
+        mkdir($toCreate);
     }
 
     public static function rename(string $sourceFile, string $targetFile)
