@@ -155,8 +155,12 @@ class Votes extends Module implements ModuleInterface
     public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
         if($time == '0'){
-            $time = round(CountdownController::getOriginalTimeLimitInSeconds() / 60);
+            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds();
+        }else{
+            $secondsToAdd = floatval($time) * 60;
         }
+
+        $secondsToAdd *= config('votes.time-multiplier');
 
         if (!$player->hasAccess('vote_always')) {
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
@@ -183,13 +187,6 @@ class Votes extends Module implements ModuleInterface
             }
         }
 
-        $time = floatval($time);
-
-        if ($time > 0) {
-            $secondsToAdd = floatval($time) * 60;
-        } else {
-            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-        }
         $question = 'Add $' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$z$s$fff minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
