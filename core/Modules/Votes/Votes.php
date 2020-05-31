@@ -155,12 +155,10 @@ class Votes extends Module implements ModuleInterface
     public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
         if($time == '0'){
-            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds();
+            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
         }else{
             $secondsToAdd = floatval($time) * 60;
         }
-
-        $secondsToAdd *= config('votes.time-multiplier');
 
         if (!$player->hasAccess('vote_always')) {
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
