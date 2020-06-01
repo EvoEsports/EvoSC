@@ -2,31 +2,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
     <script><!--
+    Boolean check(){
+        declare currentDistance = InputPlayer.Distance;
+        sleep(3000);
+
+        return (InputPlayer.Distance - currentDistance) < 10;
+    }
+
     Boolean isAfk(){
         declare startTime = GameTime;
 
-        while(True){
+        while(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
             yield;
+
+            log(InputPlayer.RaceState);
 
             foreach(Event in RaceEvents){
                 if(Event.Type == CTmRaceClientEvent::EType::Respawn){
                     if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
                         if(Event.IsEndLap){
-                            break;
+                            return check();
                         }
                     }
                 }
             }
 
-            if(GameTime - startTime >= Map.MapInfo.TMObjective_AuthorTime){
-                break;
+            if(GameTime - startTime >= (Map.MapInfo.TMObjective_AuthorTime + 5000)){
+                return check();
             }
         }
 
-        declare currentDistance = InputPlayer.Distance;
-        sleep(5000);
-
-        return (InputPlayer.Distance - currentDistance) < 10;
+        return False;
     }
 
     main(){
