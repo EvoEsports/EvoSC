@@ -94,6 +94,7 @@
         (row.Controls[4] as CMlLabel).Value = getAddedPoints();
         row.Show();
 
+        needsReset = True;
         filled += 1;
         setWidgetSize();
     }
@@ -113,11 +114,15 @@
         {block globals}
         declare Integer[] points;
         declare Integer filled;
+        declare Boolean needsReset;
+        declare Boolean queueReset;
         {/block}
 
         {block bootScript}
         filled = 0;
 
+        needsReset = False;
+        queueReset = False;
         points.fromjson("{$points}");
 
         left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
@@ -128,16 +133,20 @@
         {/block}
 
         {block loop}
+        if(UI.UISequence == CUIConfig::EUISequence::EndRound && needsReset && !queueReset){
+            queueReset = True;
+        }
+        if(UI.UISequence == CUIConfig::EUISequence::Playing && queueReset){
+            queueReset = False;
+            needsReset = False;
+            reset();
+        }
+
         foreach(Event in RaceEvents){
             if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
                 if(Event.IsEndLap){
                     fill(Event.LapTime, Event.Player.User.Name);
                     continue;
-                }
-            }
-            if(Event.Type == CTmRaceClientEvent::EType::Respawn){
-                if(Event.Player.User.Login == LocalUser.Login){
-                    reset();
                 }
             }
         }
