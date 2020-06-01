@@ -12,10 +12,9 @@
     Boolean isAfk(){
         declare startTime = GameTime;
 
+        wait(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running);
         while(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
             yield;
-
-            log(InputPlayer.RaceState);
 
             foreach(Event in RaceEvents){
                 if(Event.Type == CTmRaceClientEvent::EType::Respawn){
@@ -27,7 +26,7 @@
                 }
             }
 
-            if(GameTime - startTime >= (Map.MapInfo.TMObjective_AuthorTime + 5000)){
+            if(GameTime - startTime >= (Map.MapInfo.TMObjective_AuthorTime + 2000)){
                 return check();
             }
         }
