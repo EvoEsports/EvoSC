@@ -1,0 +1,53 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
+    <script><!--
+    Boolean isAfk(){
+        declare startTime = GameTime;
+
+        while(True){
+            yield;
+
+            foreach(Event in RaceEvents){
+                if(Event.Type == CTmRaceClientEvent::EType::Respawn){
+                    if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
+                        if(Event.IsEndLap){
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(GameTime - startTime >= Map.MapInfo.TMObjective_AuthorTime){
+                break;
+            }
+        }
+
+        declare currentDistance = InputPlayer.Distance;
+        sleep(5000);
+
+        return (InputPlayer.Distance - currentDistance) < 10;
+    }
+
+    main(){
+        while(True){
+            yield;
+            if(InputPlayer == Null) continue;
+
+            foreach(Event in RaceEvents){
+                if(Event.Type == CTmRaceClientEvent::EType::Respawn){
+                    if(Event.Player.User.Login == LocalUser.Login){
+                        if(isAfk()){
+                            TriggerPageAction("{$MODULE|classpath}::mlePutMeToSpec,null");
+                        }
+                    }
+                }
+            }
+
+            if(CurrentServerModeName != "Rounds"){
+                return;
+            }
+        }
+    }
+    --></script>
+</manialink>
