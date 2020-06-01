@@ -26,6 +26,8 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     private static bool $offlineMode = false;
 
+    private static bool $isTimeAttack;
+
     /**
      * @inheritDoc
      */
@@ -35,6 +37,8 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         if (!$__ManiaPlanet) {
             return;
         }
+
+        self::$isTimeAttack = $mode == 'TimeAttack.Script.txt';
 
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
@@ -87,7 +91,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function reportConnectedPlayers()
     {
         $map = MapController::getCurrentMap();
-        self::updateServerPlayers($map);
+        self::updateServerPlayers($map, self::$isTimeAttack);
     }
 
     public static function checkSessionStillValid()
@@ -107,7 +111,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();
-        self::setChallengeTimes($map);
+        self::setChallengeTimes($map, self::$isTimeAttack);
     }
 
     public static function showManialink(Player $player)
@@ -200,7 +204,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        self::getChallengeRecords($map);
+        self::getChallengeRecords($map, self::$isTimeAttack);
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)

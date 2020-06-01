@@ -145,9 +145,10 @@ class DedimaniaApi extends Module
      * . Vote: 0 to 100 value (or -1 if player did not vote for the map).
      *
      * @param Map $map
+     * @param bool $isTimeAttack
      * @return null
      */
-    static function getChallengeRecords(Map $map)
+    static function getChallengeRecords(Map $map, bool $isTimeAttack)
     {
         $mpMap = Server::getCurrentMapInfo();
         Log::write(sprintf('getChallengeRecords(%s)', $mpMap->uId));
@@ -169,7 +170,7 @@ class DedimaniaApi extends Module
         ]);
 
         //string GameMode
-        $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
+        $params->addChild('param')->addChild('value', $isTimeAttack ? 'TA' : 'Rounds');
 
         //struct SrvInfo
         self::paramAddStruct($params->addChild('param'), [
@@ -273,9 +274,9 @@ class DedimaniaApi extends Module
      * Update connected players
      *
      * @param Map $map
-     *
+     * @param bool $isTimeAttack
      */
-    static function updateServerPlayers(Map $map)
+    static function updateServerPlayers(Map $map, bool $isTimeAttack)
     {
         if (Dedimania::isOfflineMode()) {
             return;
@@ -304,7 +305,7 @@ class DedimaniaApi extends Module
         //struct votesInfo
         self::paramAddStruct($params->addChild('param'), [
             'UId' => $map->uid,
-            'GameMode' => Server::getGameMode() == 4 ? 'Rounds' : 'TA',
+            'GameMode' => $isTimeAttack ? 'TA' : 'Rounds',
         ]);
 
         //array Players (array of struct: {'Login': string, 'IsSpec': boolean, 'Vote': int (-1 = unchanged)})
@@ -328,8 +329,9 @@ class DedimaniaApi extends Module
      * Send new records
      *
      * @param Map $map
+     * @param bool $isTimeAttack
      */
-    static function setChallengeTimes(Map $map)
+    static function setChallengeTimes(Map $map, bool $isTimeAttack)
     {
         $mpMap = Server::getCurrentMapInfo();
         $newTimes = $map->dedis()->where('New', 1)->get();
@@ -361,7 +363,7 @@ class DedimaniaApi extends Module
         ]);
 
         //string GameMode
-        $params->addChild('param')->addChild('value', Server::getGameMode() == 4 ? 'Rounds' : 'TA');
+        $params->addChild('param')->addChild('value', $isTimeAttack ? 'TA' : 'Rounds');
 
         Log::write('New Times:', isVerbose());
         Log::write($newTimes->toJson(), isVerbose());
