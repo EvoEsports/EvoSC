@@ -3,10 +3,18 @@
 <manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
     <script><!--
     Boolean check(){
-        declare currentDistance = InputPlayer.Distance;
-        sleep(3000);
+        declare startDistance = InputPlayer.Distance;
+        declare startTime = GameTime;
 
-        return (InputPlayer.Distance - currentDistance) < 10;
+        while(GameTime - startTime < 10000){
+            yield;
+
+            if(InputPlayer.Distance - startDistance > 5){
+                return False;
+            }
+        }
+
+        return True;
     }
 
     Boolean isAfk(){
@@ -17,11 +25,13 @@
             yield;
 
             foreach(Event in RaceEvents){
-                if(Event.Type == CTmRaceClientEvent::EType::Respawn){
-                    if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
-                        if(Event.IsEndLap){
-                            return check();
+                if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
+                    if(Event.IsEndLap){
+                        if(Event.Player.User.Login == LocalUser.Login){
+                            return False;
                         }
+
+                        return check();
                     }
                 }
             }
