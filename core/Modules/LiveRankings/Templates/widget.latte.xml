@@ -119,9 +119,15 @@
             prefix = "";
 		}
 
+        if(CurrentServerModeName == "Rounds"){
+            (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(Score.Points, 3) ^ " PTS";
+            (box.Controls[2] as CMlLabel).Value = Score.Points ^ " PTS";
+        }else{
+            (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), False);
+            (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), True);
+        }
+
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
-        (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), False);
-        (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), True);
         (box.Controls[3] as CMlLabel).Value = prefix ^ Score.User.Name;
         box.Show();
     }
