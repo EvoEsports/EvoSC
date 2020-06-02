@@ -21,7 +21,9 @@ class AntiRoundsAfk extends Module implements ModuleInterface
 
     public static function show(Player $player)
     {
-        Template::show($player, 'AntiRoundsAfk.script');
+        $timeout = 15000;
+
+        Template::show($player, 'AntiRoundsAfk.script', compact('timeout'));
     }
 
     public static function mlePutMeToSpec(Player $player)

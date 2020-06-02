@@ -2,66 +2,51 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
     <script><!--
-    Boolean check(){
-        declare startDistance = InputPlayer.Distance;
-        declare startTime = GameTime;
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
 
-        while(GameTime - startTime < 10000){
-            yield;
-
-            if(InputPlayer.Distance - startDistance > 5){
-                return False;
-            }
-        }
-
-        return True;
-    }
+    #Const METERS_TO_DRIVE	5
+    #Const FINISH_TIMEOUT	{$timeout}
 
     Boolean isAfk(){
-        declare startTime = GameTime;
-
-        wait(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running);
-        while(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
-            yield;
-
-            foreach(Event in RaceEvents){
-                if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
-                    if(Event.IsEndLap){
-                        if(Event.Player.User.Login == LocalUser.Login){
-                            return False;
-                        }
-
-                        return check();
-                    }
-                }
+        declare startMeters = ML::NearestInteger(InputPlayer.Distance);
+        declare endTime = GameTime + FINISH_TIMEOUT;
+        while(GameTime < endTime){
+            if(InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running){
+                return False;
             }
-
-            if(GameTime - startTime >= (Map.MapInfo.TMObjective_AuthorTime + 2000)){
-                return check();
-            }
+            sleep(10);
+        }
+        if(ML::NearestInteger(InputPlayer.Distance) - startMeters < METERS_TO_DRIVE){
+            TriggerPageAction("{$MODULE|classpath}::mlePutMeToSpec,null");
+            sleep(2000);
+            return True;
         }
 
         return False;
     }
 
     main(){
+        declare startTime = 0;
+        declare timePassed = 0;
+
         while(True){
-            yield;
+            if(CurrentServerModeName != "Rounds") return;
             if(InputPlayer == Null) continue;
 
-            foreach(Event in RaceEvents){
-                if(Event.Type == CTmRaceClientEvent::EType::Respawn){
-                    if(Event.Player.User.Login == LocalUser.Login){
-                        if(isAfk()){
-                            TriggerPageAction("{$MODULE|classpath}::mlePutMeToSpec,null");
-                        }
-                    }
+            startTime = GameTime;
+
+            while(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
+                timePassed = GameTime - startTime;
+
+                if(timePassed > Map.MapInfo.TMObjective_AuthorTime){
+                    if(isAfk()) break;
                 }
+
+                sleep(50);
             }
 
-            if(CurrentServerModeName != "Rounds"){
-                return;
-            }
+            sleep(100);
         }
     }
     --></script>
