@@ -123,6 +123,7 @@ class QueueController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
+        dump("begin map");
         self::$preCache = true;
 
         self::dropMapSilent($map->uid);
@@ -130,6 +131,7 @@ class QueueController implements ControllerInterface
 
     public static function endMatch()
     {
+        dump("end match");
         self::$preCache = false;
     }
 
@@ -165,7 +167,6 @@ class QueueController implements ControllerInterface
     {
         if (DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->exists()) {
             DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->delete();
-            self::chooseNextMap();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }

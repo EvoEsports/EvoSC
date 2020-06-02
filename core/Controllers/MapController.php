@@ -81,7 +81,7 @@ class MapController implements ControllerInterface
     {
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'processMapsToDisable']);
-        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
+        Hook::add('Maniaplanet.Podium_Start', [self::class, 'endMatch']);
 
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
@@ -123,7 +123,6 @@ class MapController implements ControllerInterface
     public static function endMatch()
     {
         $request = MapQueue::getFirst();
-
         $mapUid = Server::getNextMapInfo()->uId;
 
         if ($request) {
@@ -135,7 +134,6 @@ class MapController implements ControllerInterface
                 }
             }
 
-            QueueController::dropMapSilent($request->map->uid);
             $chosen = Server::chooseNextMap($request->map->filename);
 
             if (!$chosen) {

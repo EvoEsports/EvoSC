@@ -31,6 +31,7 @@
         declare timePassed = 0;
 
         while(True){
+            yield;
             if(CurrentServerModeName != "Rounds") return;
             if(InputPlayer == Null) continue;
 
