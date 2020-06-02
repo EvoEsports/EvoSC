@@ -26,7 +26,6 @@ class ScoreTable extends Module implements ModuleInterface
     {
         $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-        $pointLimitRounds = Server::getRoundPointsLimit()["CurrentValue"];
 
         $joinedPlayerInfo = collect([$player])->map(function (Player $player) {
             return [
@@ -47,6 +46,6 @@ class ScoreTable extends Module implements ModuleInterface
         GroupManager::sendGroupsInformation($player);
         Template::showAll('ScoreTable.update', ['players' => $joinedPlayerInfo], 20);
         Template::show($player, 'ScoreTable.update', ['players' => $playerInfo], false, 20);
-        Template::show($player, 'ScoreTable.scoreboard', compact('logoUrl', 'maxPlayers', 'pointLimitRounds'));
+        Template::show($player, 'ScoreTable.scoreboard', compact('logoUrl', 'maxPlayers'));
     }
 }

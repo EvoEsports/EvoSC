@@ -123,7 +123,6 @@ class QueueController implements ControllerInterface
      */
     public static function beginMap(Map $map)
     {
-        dump("begin map");
         self::$preCache = true;
 
         self::dropMapSilent($map->uid);
@@ -131,7 +130,6 @@ class QueueController implements ControllerInterface
 
     public static function endMatch()
     {
-        dump("end match");
         self::$preCache = false;
     }
 

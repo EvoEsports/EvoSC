@@ -128,7 +128,7 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- Previous and best times displayed at the bottom right of the screen -->
  		<personal_best_and_rank visible="false" pos="157. -24. 5." />
  		<!-- Current position in the map ranking displayed at the bottom right of the screen -->
- 		<position visible="true" pos="150.5 -38. 5." />
+ 		<position visible="false" pos="106.2 -74 150." />
  		<!-- Checkpoint time information displayed in the middle of the screen when crossing a checkpoint -->
  		<checkpoint_time visible="true" pos="0. 3. -10." />
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->

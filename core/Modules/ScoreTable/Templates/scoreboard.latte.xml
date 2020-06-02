@@ -266,7 +266,7 @@
 			if (Score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
 			else lpGainLabel.Value = LadderPoints;
 
-			scoreLabel.Value = scoreLabel.Value ^ " " ^ lpGainLabel.Value;
+			scoreLabel.Value = scoreLabel.Value ^ " ${config('theme.hud.accent')}" ^ lpGainLabel.Value;
 		}
 
         box.Show();
@@ -306,14 +306,6 @@
         return (ceil(Scores.count / SB_Per_Page * 1.0));
     }
 
-    Void setMode(CMlLabel modeLabel){
-        modeLabel.Value = CurrentServerModeName;
-
-        if(CurrentServerModeName == "Rounds"){
-            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: {$pointLimitRounds})";
-        }
-    }
-
     Void updateScoreTable(){
         (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
 
@@ -331,7 +323,14 @@
 
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
         (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
-        setMode((Page.MainFrame.GetFirstChild("mode-name") as CMlLabel));
+
+        declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);
+        declare Integer EvoSC_PointsLimit for This = 0;
+        modeLabel.Value = CurrentServerModeName;
+
+        if(CurrentServerModeName == "Rounds"){
+            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
+        }
 
         declare rank = 1;
         declare filled = 0;
@@ -497,14 +496,18 @@
     }
 
     main() {
+        declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
         declare Boolean ESC_Tab_Pressed for This;
         declare SB_Last_Update = 0;
         declare podium = False;
+        declare lastPointsLimitUpdate = 0;
 
         mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
         boxes = CMlFrame[];
         page = 1;
         forceUpdate = True;
+
+        declare Integer EvoSC_PointsLimit for This = 0;
 
         foreach(Control in (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame).Controls){
             boxes.add((Control as CMlFrame));
@@ -514,6 +517,11 @@
             yield;
 
             ESC_Tab_Pressed = PageIsVisible;
+
+            if(lastPointsLimitUpdate < EvoSC_LastPointsLimitUpdate){
+                lastPointsLimitUpdate = EvoSC_LastPointsLimitUpdate;
+                updateScoreTable();
+            }
 
             if(GameTime - SB_Last_Update > SB_Update_Interval && PageIsVisible){
                 forceUpdate = True;

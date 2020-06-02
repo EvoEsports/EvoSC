@@ -309,6 +309,31 @@ class MatchSettingsController implements ControllerInterface
         self::updateMatchSettingsModificationTime();
     }
 
+    /**
+     * @param string $key
+     * @return int
+     */
+    public static function getValueFromCurrentMatchSettings(string $key)
+    {
+        $file = self::getCurrentMatchSettingsFile();
+        $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
+        $xml = new SimpleXMLElement($matchSettings);
+
+        if (isset($xml->mode_script_settings)) {
+            $node = $xml->mode_script_settings;
+        } else {
+            $node = $xml->script_settings;
+        }
+
+        foreach ($node->children() as $child) {
+            if ($child->attributes()['name'] == $key) {
+                return intval($child->attributes()['value']);
+            }
+        }
+
+        return -1;
+    }
+
     public static function updateSetting(string $matchSettingsFile, string $setting, $value)
     {
         $file = self::getPath($matchSettingsFile);

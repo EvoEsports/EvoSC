@@ -13,6 +13,10 @@
     "disable-in-first": 120,
     "disable-in-last": 15
   },
+  "points": {
+    "enabled": true,
+    "max-points": 200
+  },
   "skip": {
     "enabled": true,
     "limit-votes": 2,

@@ -13,6 +13,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
 use EvoSC\Controllers\CountdownController;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
@@ -32,6 +33,7 @@ class Votes extends Module implements ModuleInterface
     private static int $skipVotesThisRound = 0;
     private static $onlinePlayersCount;
     private static $addTimeSuccess = null;
+    private static $isRounds = false;
 
     /**
      * @inheritDoc
@@ -42,10 +44,11 @@ class Votes extends Module implements ModuleInterface
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
-        ChatCommand::add('/time', [self::class, 'cmdAskMoreTime'], 'Start a vote to add 10 minutes.')
+        ChatCommand::add('/res', [self::class, 'cmdAskMoreTime'], 'Start a vote to add time/points.')
             ->addAlias('/replay')
             ->addAlias('/restart')
-            ->addAlias('/res');
+            ->addAlias('/points')
+            ->addAlias('/time');
 
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
@@ -55,6 +58,8 @@ class Votes extends Module implements ModuleInterface
 
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
+
+        self::$isRounds = $mode != 'TimeAttack.Script.txt';
 
         if (config('quick-buttons.enabled')) {
             ManiaLinkEvent::add('vote.approve', [self::class, 'approveVote'], 'vote_decide');
@@ -152,11 +157,21 @@ class Votes extends Module implements ModuleInterface
         return 0;
     }
 
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param string $time
+     */
     public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
-        if($time == '0'){
+        if (self::$isRounds) {
+            self::cmdAskMorePoints($player, $cmd, $time);
+            return;
+        }
+
+        if ($time == '0') {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-        }else{
+        } else {
             $secondsToAdd = floatval($time) * 60;
         }
 
@@ -190,11 +205,11 @@ class Votes extends Module implements ModuleInterface
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
                 self::$addTimeSuccess = true;
-                infoMessage('Vote ', secondary($question), ' was successful.')->sendAll();
+                successMessage('Vote ', secondary($question), ' was successful.')->sendAll();
                 CountdownController::addTime($secondsToAdd);
             } else {
                 self::$addTimeSuccess = false;
-                infoMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
+                dangerMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
             }
         }, config('votes.time.success-ratio'));
 
@@ -208,7 +223,46 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
-    public static function startVoteQuestion(Player $player, ...$questionArray)
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param string $points
+     */
+    public static function cmdAskMorePoints(Player $player, $cmd, $points = '0')
+    {
+        if (config('votes.points.enabled') === false) {
+            warningMessage('Point-limit votes are disabled.')->send($player);
+            return;
+        }
+
+        $points = intval($points) ?: PointsController::getOriginalPointsLimit();
+
+        if (!$player->hasAccess('vote_always')) {
+            if (PointsController::getCurrentPoints() >= config('votes.points.max-points')) {
+                dangerMessage('Point limit reached.')->send($player);
+                return;
+            }
+        }
+
+        $question = 'Add ' . $points . ' points to limit?';
+
+        $voteStarted = self::startVote($player, $question, function ($success) use ($points, $question) {
+            if ($success) {
+                successMessage('Vote ', secondary($question), ' successful, ', secondary('point-limit is now ' . (PointsController::getCurrentPoints() + $points)), '.')->sendAll();
+                PointsController::increasePointsLimit($points);
+            } else {
+                dangerMessage('Vote ', secondary($question), ' did not pass.')->sendAll();
+            }
+        }, config('votes.time.success-ratio'));
+
+        if ($voteStarted) {
+            infoMessage($player, ' started a vote to ', secondary($question),
+                '. Use ', secondary('F5/F6'), ' and ', secondary('/y'), ' or ', secondary('/n'),
+                ' to vote.')->setIcon('')->sendAll();
+        }
+    }
+
+    public static function startVoteQuestion(Player $player, $cmd, ...$questionArray)
     {
         $question = implode(' ', $questionArray);
 
@@ -268,10 +322,10 @@ class Votes extends Module implements ModuleInterface
 
         $voteStarted = self::startVote($player, 'Skip map?', function (bool $success) {
             if ($success) {
-                infoMessage('Vote to skip map was successful.')->sendAll();
+                successMessage('Vote to skip map was successful.')->sendAll();
                 MapController::skip();
             } else {
-                infoMessage('Vote to skip map was not successful.')->sendAll();
+                dangerMessage('Vote to skip map was not successful.')->sendAll();
             }
         }, config('votes.skip.success-ratio'));
 
