@@ -5,6 +5,7 @@ namespace EvoSC\Modules\LiveRankings;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
@@ -31,6 +32,8 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        Template::show($player, 'LiveRankings.widget');
+        $originalPointsLimit = PointsController::getOriginalPointsLimit();
+
+        Template::show($player, 'LiveRankings.widget', compact('originalPointsLimit'));
     }
 }
