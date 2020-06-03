@@ -136,8 +136,6 @@
         declare sorted = times.sort();
         filled = 0;
 
-        EvoSC_RoundsPointsDistribution = Integer[Text];
-
         foreach(User => score in sorted){
             if(filled >= rows.Controls.count) break;
 
