@@ -134,21 +134,20 @@
         declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         declare sorted = times.sort();
-        filled = 0;
 
-        foreach(User => score in sorted){
+        foreach(login => score in sorted){
             if(filled >= rows.Controls.count) break;
 
             declare addedPoints = getAddedPoints();
             declare row <=> (rows.Controls[filled] as CMlFrame);
             (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
-            (row.Controls[1] as CMlLabel).Value = User.Name;
+            (row.Controls[1] as CMlLabel).Value = names[login];
             (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(score, True);
             (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(score, False);
             (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
             row.Show();
 
-            EvoSC_RoundsPointsDistribution[User.Login] = addedPoints;
+            EvoSC_RoundsPointsDistribution[login] = addedPoints;
 
             filled += 1;
         }
@@ -168,7 +167,9 @@
         }
         queueReset = False;
         needsReset = False;
-        times = Integer[CUser];
+        filled = 0;
+        times = Integer[Text];
+        names = Text[Text];
         EvoSC_RoundsPointsDistribution = Integer[Text];
     }
         --></script>
@@ -183,7 +184,8 @@
         declare Integer filled;
         declare Boolean needsReset;
         declare Boolean queueReset;
-        declare Integer[CUser] times;
+        declare Integer[Text] times;
+        declare Text[Text] names;
         declare CMlQuad header;
         declare CMlQuad header2;
         {/block}
@@ -191,7 +193,6 @@
         {block bootScript}
         header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);
         header2 <=> (Page.MainFrame.GetFirstChild("header2") as CMlQuad);
-        filled = 0;
 
         points.fromjson("{$points}");
         reset();
@@ -211,7 +212,8 @@
         foreach(Event in RaceEvents){
             if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
                 if(Event.IsEndLap){
-                    times[Event.Player.User] = Event.LapTime;
+                    times[Event.Player.User.Login] = Event.LapTime;
+                    names[Event.Player.User.Login] = Event.Player.User.Name;
                     updateList();
                 }
             }

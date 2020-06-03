@@ -57,7 +57,6 @@ main(){
     log(uid == (Map.Id ^ ""));
 
     while(uid == (Map.Id ^ "")){
-        log("wait " ^ GameTime);
         sleep(500);
     }
     mainFrame.Hide();
