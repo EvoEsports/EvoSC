@@ -14,7 +14,7 @@
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
         <label class="text-light" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
-        <label class="text-light" pos="25 -7" size="25 3"/> <!-- Score -->
+        <label class="text-light" pos="25 -7" size="35 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
         <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
         <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
@@ -195,7 +195,7 @@
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
-    Void updateBox(CMlFrame box, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score, Integer rank){
+    Void updateBox(CMlFrame box, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score, Integer rank, Integer addedPoints){
         declare CUser user <=> Score.User;
         declare EvoSC_Group group = getGroup(Score.User.Login);
         declare nameLabel <=> (box.Controls[0] as CMlLabel);
@@ -267,6 +267,10 @@
 			else lpGainLabel.Value = LadderPoints;
 
 			scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}" ^ lpGainLabel.Value;
+		}else{
+		    if(addedPoints > 0){
+                scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}+" ^ addedPoints;
+		    }
 		}
 
         box.Show();
@@ -307,6 +311,7 @@
     }
 
     Void updateScoreTable(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
 
         foreach (Player in Players) {
@@ -360,11 +365,16 @@
                 SlotNeedUpdate = True;
             }
 
+            declare addedPoints = 0;
+            if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
+                addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
+            }
+
             declare LibST_PrevUpdate for Score = -1;
             declare netread Integer Net_LibST_Update for Score;
             if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
                 LibST_PrevUpdate = Net_LibST_Update;
-                updateBox(boxes[filled], Score, rank);
+                updateBox(boxes[filled], Score, rank, addedPoints);
             }
             rank += 1;
             filled += 1;
