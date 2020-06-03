@@ -17,6 +17,7 @@
         <label class="text-lighter" z-index="1" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000" opacity="0.25"/>
         <label class="text-light" z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000"/>
         <label class="text-light" z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name"/>
+        <label class="text-accent" z-index="2" valign="center" pos="41 0" size="23 2" halign="right" textsize="0.4" text="+00"/>
     </framemodel>
 
     <frame id="ranking" pos="1 -7">
@@ -109,7 +110,7 @@
     }
     {/if}
 
-    Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score){
+    Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score, Integer addedPoints){
         declare prefix = "";
 		declare LibST_Status for Score.User = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
@@ -123,9 +124,16 @@
         if(CurrentServerModeName == "Rounds"){
             (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(Score.Points, 3) ^ " PTS";
             (box.Controls[2] as CMlLabel).Value = Score.Points ^ " PTS";
+            if(addedPoints > 0){
+                (box.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
+                (box.Controls[4] as CMlLabel).Show();
+            }else{
+                (box.Controls[4] as CMlLabel).Hide();
+            }
         }else{
             (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), False);
             (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(getTimeFromScore(Score), True);
+            (box.Controls[4] as CMlLabel).Hide();
         }
 
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
@@ -134,6 +142,8 @@
     }
 
     Void updateList(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+
         foreach (Player in Players) {
             declare LibST_LastTick for Player.User = -1;
             LibST_LastTick = Now;
@@ -188,10 +198,15 @@
                 SlotNeedUpdate = True;
             }
 
+            declare addedPoints = 0;
+            if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
+                addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
+            }
+
             declare LibST_PrevUpdate for Score = -1;
             declare netread Integer Net_LibST_Update for Score;
             LibST_PrevUpdate = Net_LibST_Update;
-            updateSlot((boxesFrame.Controls[rank - 1] as CMlFrame), rank, Score);
+            updateSlot((boxesFrame.Controls[rank - 1] as CMlFrame), rank, Score, addedPoints);
             boxesFrame.Controls[filled].Show();
 
             rank += 1;

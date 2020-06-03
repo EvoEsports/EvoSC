@@ -122,29 +122,35 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Text getAddedPoints(){
+    Integer getAddedPoints(){
         declare Integer p = 1;
         if(filled < points.count){
             p = points[filled];
         }
-        return "+" ^ p;
+        return p;
     }
 
     Void updateList(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         declare sorted = times.sort();
         filled = 0;
 
-        foreach(name => score in sorted){
+        EvoSC_RoundsPointsDistribution = Integer[Text];
+
+        foreach(User => score in sorted){
             if(filled >= rows.Controls.count) break;
 
+            declare addedPoints = getAddedPoints();
             declare row <=> (rows.Controls[filled] as CMlFrame);
             (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
-            (row.Controls[1] as CMlLabel).Value = name;
+            (row.Controls[1] as CMlLabel).Value = User.Name;
             (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(score, True);
             (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(score, False);
-            (row.Controls[4] as CMlLabel).Value = getAddedPoints();
+            (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
             row.Show();
+
+            EvoSC_RoundsPointsDistribution[User.Login] = addedPoints;
 
             filled += 1;
         }
@@ -157,10 +163,15 @@
     }
 
     Void reset(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         foreach(row in rows.Controls){
             row.Hide();
         }
+        queueReset = False;
+        needsReset = False;
+        times = Integer[CUser];
+        EvoSC_RoundsPointsDistribution = Integer[Text];
     }
         --></script>
     {/block}
@@ -174,7 +185,7 @@
         declare Integer filled;
         declare Boolean needsReset;
         declare Boolean queueReset;
-        declare Integer[Text] times;
+        declare Integer[CUser] times;
         declare CMlQuad header;
         declare CMlQuad header2;
         {/block}
@@ -184,10 +195,8 @@
         header2 <=> (Page.MainFrame.GetFirstChild("header2") as CMlQuad);
         filled = 0;
 
-        needsReset = False;
-        queueReset = False;
         points.fromjson("{$points}");
-        times = Integer[Text];
+        reset();
 
         left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('race-ranking.ui.slot')};
@@ -198,16 +207,13 @@
             queueReset = True;
         }
         if(UI.UISequence == CUIConfig::EUISequence::Playing && queueReset){
-            queueReset = False;
-            needsReset = False;
-            times = Integer[Text];
             reset();
         }
 
         foreach(Event in RaceEvents){
             if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
                 if(Event.IsEndLap){
-                    times[Event.Player.User.Name] = Event.LapTime;
+                    times[Event.Player.User] = Event.LapTime;
                     updateList();
                 }
             }

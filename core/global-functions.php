@@ -433,6 +433,10 @@ function getShortColorCode($longColorCode)
         $longColorCode = substr($longColorCode, 1);
     }
 
+    if (strlen($longColorCode) == 3) {
+        return ($hasHash ? '#' : '') . $longColorCode;
+    }
+
     $parts = str_split($longColorCode);
     return ($hasHash ? '#' : '') . $parts[0] . $parts[2] . $parts[4];
 }

@@ -130,4 +130,21 @@ class PointsController implements ControllerInterface
     {
         Template::showAll('Helpers.update-points-limit', compact('points'));
     }
+
+    /**
+     * @return array
+     */
+    public static function getPointsRepartition(): array
+    {
+        $points = Server::getModeScriptSettings()['S_PointsRepartition'];
+
+        if ($points) {
+            $parts = explode(',', $points);
+            return array_map(function ($point) {
+                return intval($point);
+            }, $parts);
+        }
+
+        return [10, 6, 4, 3, 2, 1];
+    }
 }

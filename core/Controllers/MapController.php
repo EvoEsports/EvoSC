@@ -97,7 +97,7 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
 
         if ($mode != 'TimeAttack.Script.txt') {
-            QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
+//            QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }
 
