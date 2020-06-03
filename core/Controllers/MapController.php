@@ -67,6 +67,7 @@ class MapController implements ControllerInterface
         AccessRight::createIfMissing('map_disable', 'Disable map.');
         AccessRight::createIfMissing('map_replay', 'Force a replay.');
         AccessRight::createIfMissing('map_reset', 'Reset round.');
+        AccessRight::createIfMissing('force_end_round', 'Force the end of a round (Rounds/Laps).');
         AccessRight::createIfMissing('matchsettings_load', 'Load matchsettings.');
         AccessRight::createIfMissing('matchsettings_edit', 'Edit matchsettings.');
         AccessRight::createIfMissing('time', 'Change the countdown time.');
@@ -90,9 +91,23 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
+        ManiaLinkEvent::add('force_end_round', [self::class, 'mleForceEndOfRound'], 'force_end_round');
 
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+
+        if ($mode != 'TimeAttack.Script.txt') {
+            QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function mleForceEndOfRound(Player $player)
+    {
+        Server::forceEndRound();
+        infoMessage(secondary($player), ' forced the round to end.')->sendAll();
     }
 
     /**

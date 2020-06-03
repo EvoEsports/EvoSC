@@ -420,3 +420,19 @@ function restart_evosc()
     Log::error('[CRITICAL] Failed to create new process, dying...');
     exit(56);
 }
+
+/**
+ * @param $longColorCode
+ * @return string
+ */
+function getShortColorCode($longColorCode)
+{
+    $hasHash = false;
+    if (substr($longColorCode, 0, 1) == '#') {
+        $hasHash = true;
+        $longColorCode = substr($longColorCode, 1);
+    }
+
+    $parts = str_split($longColorCode);
+    return ($hasHash ? '#' : '') . $parts[0] . $parts[2] . $parts[4];
+}

@@ -266,7 +266,7 @@
 			if (Score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
 			else lpGainLabel.Value = LadderPoints;
 
-			scoreLabel.Value = scoreLabel.Value ^ " ${config('theme.hud.accent')}" ^ lpGainLabel.Value;
+			scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}" ^ lpGainLabel.Value;
 		}
 
         box.Show();
