@@ -11,8 +11,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
-use EvoSC\Modules\LiveRankings\LiveRankings;
-use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\RaceRanking\RaceRanking;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -30,7 +29,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        LiveRankings::playerConnect($player);
+        RaceRanking::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

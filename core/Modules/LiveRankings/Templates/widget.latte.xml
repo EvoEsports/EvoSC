@@ -150,7 +150,7 @@
         declare Integer EvoSC_PointsLimit for This = -1;
         declare pointsLimitText = "" ^ EvoSC_PointsLimit;
         if(EvoSC_PointsLimit > originalPointsLimit){
-            pointsLimitText = originalPointsLimit ^ "+" ^ (EvoSC_PointsLimit - originalPointsLimit);
+            pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
         }
         (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel).Value = pointsLimitText;
 
