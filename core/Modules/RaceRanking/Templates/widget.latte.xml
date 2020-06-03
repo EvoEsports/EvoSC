@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}race-ranking{/block}
-    {block size}44 5{/block}
+    {block size}44 46{/block}
 
     {block content}
     <framemodel id="row">
@@ -191,8 +191,6 @@
 
         left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('race-ranking.ui.slot')};
-
-        widgetSetHeight__(46.0);
         {/block}
 
         {block loop}
