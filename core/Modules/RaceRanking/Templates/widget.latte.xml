@@ -16,9 +16,8 @@
     </framemodel>
 
     <quad id="header" class="bg-accent" size="44 5" z-index="-1"/>
-    <quad id="header2" class="bg-light" pos="0 0" size="44 5" opacity="0.8" z-index="-2"/>
     <quad id="bg" class="bg-dark" pos="0 -5" size="44 200" opacity="0.8" z-index="-1"/>
-    <label class="text-light" z-index="1" valign="center" pos="2 -2.5" size="44 5" textsize="0.3" text=" Race Ranking"/>
+    <label id="title" class="text-light" z-index="1" valign="center" pos="2 -2.5" size="44 5" textsize="0.3" text=" Race Ranking"/>
 
     <frame id="rows" pos="0 -7.25">
         {for $i=0; $i<10; $i++}
@@ -32,14 +31,14 @@
     Void hide(){
         HS_Hidden = True;
         AnimMgr.Add(header, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(header2, "<quad opacity='0.2' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(title, "<label opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
         AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
     Void show(){
         HS_Hidden = False;
         AnimMgr.Add(header, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(header2, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(title, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
         AnimMgr.Add(bg, "<quad opacity='0.8' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
@@ -135,6 +134,9 @@
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         declare sorted = times.sort();
 
+        filled = 0;
+        EvoSC_RoundsPointsDistribution = Integer[Text];
+
         foreach(login => score in sorted){
             if(filled >= rows.Controls.count) break;
 
@@ -187,7 +189,7 @@
         declare Integer[Text] times;
         declare Text[Text] names;
         declare CMlQuad header;
-        declare CMlQuad header2;
+        declare CMlLabel title;
         {/block}
 
         {block bootScript}
