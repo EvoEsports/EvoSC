@@ -194,7 +194,7 @@
 
         {block bootScript}
         header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);
-        header2 <=> (Page.MainFrame.GetFirstChild("header2") as CMlQuad);
+        title <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
 
         points.fromjson("{$points}");
         reset();
