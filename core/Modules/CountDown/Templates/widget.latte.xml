@@ -38,8 +38,8 @@ Void HideDuringIntro(CMlFrame _Frame) {
   declare IsIntro = (
     UI.UISequence == CUIConfig::EUISequence::Intro ||
     UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
-    UI.UISequence == CUIConfig::EUISequence::Outro
-    // || UI.UISequence == CUIConfig::EUISequence::Podium
+    UI.UISequence == CUIConfig::EUISequence::Outro ||
+    UI.UISequence == CUIConfig::EUISequence::Podium
   );
 
   if (_Frame.Visible && IsIntro) {
@@ -73,7 +73,7 @@ Void HideDuringIntro(CMlFrame _Frame) {
     {/block}
 
     {block loop}
-//HideDuringIntro(Frame_Intro);
+HideDuringIntro(Frame_Intro);
 
 declare Owner <=> GUIPlayer;
 if (!PageIsVisible || Owner == Null) continue;
