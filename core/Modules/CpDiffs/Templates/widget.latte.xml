@@ -150,6 +150,7 @@
 
                 if(target.map_uid != "" ^ Map.Id){
                     cpDiffs.Hide();
+                    TriggerPageAction("request_cp_diffs");
                     return;
                 }
 

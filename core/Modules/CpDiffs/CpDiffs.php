@@ -52,6 +52,10 @@ class CpDiffs extends Module implements ModuleInterface
     public static function beginMap()
     {
         self::$targets = collect();
+
+        foreach (onlinePlayers() as $player) {
+            self::printPersonalBestToChat($player);
+        }
     }
 
     public static function playerFinish(Player $player, int $score)
@@ -83,7 +87,7 @@ class CpDiffs extends Module implements ModuleInterface
 
             infoMessage('Your PB is ', secondary(formatScore($pb->score, true)), ', checkpoints: ', secondary($cps))->send($player);
         } else {
-            infoMessage('You don\'t have a PB on this map yet.')->send($player);
+            infoMessage('You don\'t have a PB on this map/server yet.')->send($player);
         }
     }
 
