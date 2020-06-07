@@ -39,6 +39,7 @@ Void HideDuringIntro(CMlFrame _Frame) {
     UI.UISequence == CUIConfig::EUISequence::Intro ||
     UI.UISequence == CUIConfig::EUISequence::RollingBackgroundIntro ||
     UI.UISequence == CUIConfig::EUISequence::Outro
+    // || UI.UISequence == CUIConfig::EUISequence::Podium
   );
 
   if (_Frame.Visible && IsIntro) {

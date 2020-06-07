@@ -189,7 +189,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
  * @method static object getModeScriptVariables()
  * @method static bool setModeScriptVariables(object $struct)
  * @method static bool triggerModeScriptEvent(string $string, array $arrayWithString)
- * @method static bool triggerModeScriptEventArray(string $string, array $array)
+ * @method static bool triggerModeScriptEventArray(string $event, array $array = [])
  * @method static object getScriptCloudVariables(string $string, string $string)
  * @method static bool setScriptCloudVariables(string $string, string $string, object $struct)
  * @method static bool restartMap()
