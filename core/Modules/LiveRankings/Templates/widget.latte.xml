@@ -156,13 +156,19 @@
             }
         }
 
-        declare Integer originalPointsLimit = {$originalPointsLimit ?? 30};
-        declare Integer EvoSC_PointsLimit for This = -1;
-        declare pointsLimitText = "" ^ EvoSC_PointsLimit;
-        if(EvoSC_PointsLimit > originalPointsLimit){
-            pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+        declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
+        if(CurrentServerModeName == "Rounds"){
+            declare Integer originalPointsLimit = {$originalPointsLimit ?? 30};
+            declare Integer EvoSC_PointsLimit for This = -1;
+            declare pointsLimitText = "" ^ EvoSC_PointsLimit;
+            if(EvoSC_PointsLimit > originalPointsLimit){
+                pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+            }
+            pointsLimitLabel.Value = pointsLimitText;
+            pointsLimitLabel.Show();
+        }else{
+            pointsLimitLabel.Hide();
         }
-        (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel).Value = pointsLimitText;
 
         declare rank = 1;
         declare filled = 0;
