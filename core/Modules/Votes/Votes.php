@@ -296,8 +296,12 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
-            if (time() - CountdownController::getRoundStartTime() > 180) {
+            if (CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
                 warningMessage('It is too late to skip the map.')->send($player);
+
+                return;
+            } else if (CountdownController::getSecondsPassed() < config('votes.skip.disable-in-first', 0)) {
+                warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 0) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
 
                 return;
             }
@@ -308,14 +312,6 @@ class Votes extends Module implements ModuleInterface
                 warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
 
-                return;
-            }
-
-            if (CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
-                warningMessage('It is too late to start a vote.')->send($player);
-                return;
-            } else if (CountdownController::getSecondsPassed() < config('votes.skip.disable-in-first', 0)) {
-                warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 0) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
                 return;
             }
         }
