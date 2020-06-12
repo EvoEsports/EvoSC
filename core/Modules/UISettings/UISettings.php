@@ -30,6 +30,7 @@ class UISettings extends Module implements ModuleInterface
     public static function mleSaveSettings(Player $player, ...$data)
     {
         $player->setSetting('ui', implode(',', $data));
+        successMessage('UI settings saved.')->send($player);
         self::sendUiSettings($player);
     }
 

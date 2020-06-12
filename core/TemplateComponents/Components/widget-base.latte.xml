@@ -18,9 +18,10 @@
     WidgetRow[Integer] right;
 }
 
-#Struct UISettings_V2 {
+#Struct UISettings {
     Boolean hide;
     Integer speed;
+    Integer showDelay;
     Real scale;
     Boolean sb_blur;
     Boolean viewer_count;
@@ -46,8 +47,8 @@ declare Integer slot__;
     Void rearrange__(){
         declare WidgetGrid grid_ for This;
         declare WidgetRow[Integer] column;
-        declare UISettings_V2 settings2 for This;
-        declare Real scale = settings2.scale;
+        declare UISettings settings for This;
+        declare Real scale = settings.scale;
 
         if(scale < 0.75){
             scale = 1.0;

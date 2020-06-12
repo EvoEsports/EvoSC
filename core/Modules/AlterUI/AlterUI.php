@@ -142,7 +142,7 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- Player\'s ranking at the latest checkpoint -->
  		<checkpoint_ranking visible="true" pos="0. 84. 5." />
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
- 		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -55. 5." />
+ 		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -75. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
  		<scorestable alt_visible="false" visible="false" />
  	</ui_properties>';

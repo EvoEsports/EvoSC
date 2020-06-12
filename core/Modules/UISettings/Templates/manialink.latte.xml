@@ -2,7 +2,7 @@
 {extends 'Components.window'}
 
 {php $window_width = '50';}
-{php $window_height = '21';}
+{php $window_height = '28';}
 
 {block id}
 ui-settings
@@ -17,18 +17,33 @@ UI-Settings
 {/block}
 
 {block content}
-<label pos="27 -1" size="27 3" textsize="0.6" text="Hide widgets while driving" halign="right" valign="center"  hidden="1" />
-<label pos="29 -1" size="10 3" textsize="0.6" text="" halign="left" valign="center"  hidden="1" />
+<frame pos="-0.5 -1" scale="1.075">
+    <label  class="text-light" pos="27 -0.5" size="27 3" textsize="0.6" text="Hide HUD while driving" halign="right" valign="center" />
+    <frame pos="29 0.5" size="8 3">
+        <frame pos="5 0" id="switch">
+            <entry class="form" pos="1000 0"/>
+            <label class="text-dark" pos="1.5 -1.5" valign="center" halign="center" text="" size="3 3" z-index="2" opacity="0.75" scale="0.5" />
+            <label class="switch" focusareacolor1="fff0" focusareacolor2="fff3" pos="-5" size="13 3" opacity="0.75" z-index="3" ScriptEvents="1" />
+            <quad class="bg-accent" pos="-5" size="5 3" opacity="0.75" />
+            <quad class="bg-light" size="3 3" />
+            <quad class="bg-light" pos="3" size="5 3" opacity="0.25" />
+        </frame>
+    </frame>
 
-<label class="text-light" pos="27 -5" size="27 3" textsize="0.6" text="Hide at" halign="right" valign="center"/>
-<entry class="form" id="speed" pos="29 -5" size="5 3" textsize="0.6" valign="center"/>
-<label class="text-light" pos="35 -5" size="27 3" textsize="0.6" text="kph" valign="center"/>
+    <label class="text-light" pos="27 -5" size="27 3" textsize="0.6" text="Hide at" halign="right" valign="center"/>
+    <entry class="form" id="speed" pos="37 -5" size="8 3" textsize="0.6" valign="center" halign="right"/>
+    <label class="text-light" pos="38 -5" size="27 3" textsize="0.6" text="kph" valign="center"/>
 
-<label class="text-light" pos="27 -9" size="27 3" textsize="0.6" text="UI scale" halign="right" valign="center" />
-<entry class="form" id="scale" pos="29 -9" size="5 3" textsize="0.6" halign="left" valign="center" />
-<label class="text-light" pos="35 -9" size="27 3" textsize="0.6" text="%" valign="center" />
+    <label class="text-light" pos="27 -9" size="27 3" textsize="0.6" text="Show delay" halign="right" valign="center"/>
+    <entry class="form" id="delay" pos="37 -9" size="8 3" textsize="0.6" valign="center" halign="right"/>
+    <label class="text-light" pos="38 -9" size="27 3" textsize="0.6" text="ms" valign="center"/>
 
-<label class="btn-success save" pos="25 -15" size="12 4" textsize="0.6" text=" Save" ScriptEvents="1"/>
+    <label class="text-light" pos="27 -13" size="27 3" textsize="0.6" text="HUD scale" halign="right" valign="center" />
+    <entry class="form" id="scale" pos="37 -13" size="8 3" textsize="0.6" halign="right" valign="center" />
+    <label class="text-light" pos="38 -13" size="27 3" textsize="0.6" text="%" valign="center" />
+
+    <label class="btn-success save" pos="24 -19.5" size="12 4" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
+</frame>
 {/block}
 
 <script><!--
@@ -37,10 +52,13 @@ UI-Settings
 
 {block functions}
 Void save(){
+    declare UISettings settings for This;
     declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
     declare scaleLabel <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
-    declare UISettings_V2 newSettings;
-    newSettings.hide = True;
+    declare delayLabel <=> (Page.MainFrame.GetFirstChild("delay") as CMlEntry);
+    declare UISettings newSettings;
+    newSettings.hide = settings.hide;
+    newSettings.showDelay = TL::ToInteger(delayLabel.Value);
     newSettings.speed = TL::ToInteger(speedLabel.Value);
     newSettings.scale = TL::ToReal(scaleLabel.Value) / 100.0;
     if(newSettings.scale > 1.2){
@@ -52,6 +70,18 @@ Void save(){
         scaleLabel.SetText("" ^ TL::ToInteger("" ^ (newSettings.scale * 100)), False);
     }
     TriggerPageAction("ui.save," ^ newSettings.tojson());
+    settings = newSettings;
+    (Page.MainFrame.GetFirstChild("window") as CMlFrame).Hide();
+}
+
+Void setSwitch(CMlFrame parent, Boolean isSet){
+    if(isSet){
+        (parent.Controls[1] as CMlLabel).Value = "";
+        AnimMgr.Add(parent, "<frame pos='5 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+    }else{
+        (parent.Controls[1] as CMlLabel).Value = "";
+        AnimMgr.Add(parent, "<frame pos='0 0' />", 300, CAnimManager::EAnimManagerEasing::ExpOut);
+    }
 }
 {/block}
 
@@ -59,21 +89,31 @@ Void save(){
 {/block}
 
 {block bootScript}
-if(settings2.speed == 0){
-    settings2.hide = True;
-    settings2.speed = 10;
-    settings2.scale = 1.0;
+if(settings.speed == 0){
+    settings.hide = True;
+    settings.showDelay = 0;
+    settings.speed = 10;
+    settings.scale = 1.0;
 }
 
+declare switchParent <=> (Page.MainFrame.GetFirstChild("switch")  as CMlFrame);
 declare speedEntry <=> (Page.MainFrame.GetFirstChild("speed") as CMlEntry);
 declare scaleEntry <=> (Page.MainFrame.GetFirstChild("scale") as CMlEntry);
-speedEntry.SetText("" ^ settings2.speed, False);
-scaleEntry.SetText("" ^ TL::ToInteger("" ^ (settings2.scale * 100)), False);
+declare delayEntry <=> (Page.MainFrame.GetFirstChild("delay") as CMlEntry);
+speedEntry.SetText("" ^ settings.speed, False);
+scaleEntry.SetText("" ^ TL::ToInteger("" ^ (settings.scale * 100)), False);
+delayEntry.Value = settings.showDelay ^ "";
+
+setSwitch(switchParent, settings.hide);
 {/block}
 
 {block pendingEvents}
 if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
     save();
+}
+if(event.Control.HasClass("switch") && event.Type == CMlScriptEvent::Type::MouseClick){
+    settings.hide = !settings.hide;
+    setSwitch(switchParent, settings.hide);
 }
 {/block}
 --></script>

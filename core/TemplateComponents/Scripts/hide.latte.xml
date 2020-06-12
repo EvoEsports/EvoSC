@@ -25,11 +25,11 @@ Void hidescript(){
         HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
     }
 
-    declare UISettings_V2 settings2 for This;
+    declare UISettings settings for This;
     declare Boolean ESC_Tab_Pressed for This;
-    declare hideSpeed = {if $is_maniaplanet}settings2.speed{else}10{/if};
+    declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
 
-    if(hideSpeed == -1 || InputPlayer == Null){
+    if(!settings.hide || InputPlayer == Null){
         return;
     }
 
@@ -53,7 +53,7 @@ Void hidescript(){
         {if $is_maniaplanet}
         declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
         {/if}
-        declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > hideSpeed;
+        declare Boolean overHidespeed = ML::Abs(InputPlayer.Speed * 3.6) > hideSpeed;
 
         if(overHidespeed && !HS_Hidden {if $is_maniaplanet}&& playerIsRacing{/if}){
             hs_hide(800);
@@ -63,6 +63,7 @@ Void hidescript(){
             {/if}
         }
         if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
+            sleep(settings.showDelay);
             hs_show(600);
         }
     }

@@ -47,9 +47,9 @@
             HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
         }
 
-        declare UISettings_V2 settings2 for This;
+        declare UISettings settings for This;
         {if $is_maniaplanet}
-        declare hideSpeed = settings2.speed;
+        declare hideSpeed = settings.speed;
         {else}
         declare hideSpeed = 10;
         {/if}
