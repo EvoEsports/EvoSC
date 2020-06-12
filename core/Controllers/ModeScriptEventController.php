@@ -47,6 +47,7 @@ class ModeScriptEventController implements ControllerInterface
      */
     private static function call($callback, $arguments)
     {
+        echo "------> $callback\n";
         switch ($callback) {
             case 'Trackmania.Scores':
                 self::tmScores($arguments);
@@ -162,7 +163,7 @@ class ModeScriptEventController implements ControllerInterface
         );
 
         //player finished
-        if ($wayPoint->isendrace) {
+        if ($wayPoint->isendlap) {
             Hook::fire('PlayerFinish',
                 $player,
                 $wayPoint->laptime,
