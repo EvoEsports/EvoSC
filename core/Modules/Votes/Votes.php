@@ -262,6 +262,11 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param mixed ...$questionArray
+     */
     public static function startVoteQuestion(Player $player, $cmd, ...$questionArray)
     {
         $question = implode(' ', $questionArray);
@@ -272,9 +277,12 @@ class Votes extends Module implements ModuleInterface
         });
     }
 
+    /**
+     * @param Player $player
+     */
     public static function askSkip(Player $player)
     {
-        if (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess) {
+        if (!self::$isRounds && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
             infoMessage('Can not skip the map after time was added.')->send($player);
             return;
         }
@@ -296,11 +304,13 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
-            if (CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
+            if(!self::$isRounds && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)){
                 warningMessage('It is too late to skip the map.')->send($player);
 
                 return;
-            } else if (CountdownController::getSecondsPassed() < config('votes.skip.disable-in-first', 0)) {
+            }
+
+            if (CountdownController::getSecondsPassed() < config('votes.skip.disable-in-first', 0)) {
                 warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 0) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
 
                 return;
@@ -335,6 +345,9 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @return Collection
+     */
     private static function getVoteState(): Collection
     {
         $yesVotes = self::$voters->whereStrict('decision', 'true')->count();
@@ -346,6 +359,9 @@ class Votes extends Module implements ModuleInterface
         ]);
     }
 
+    /**
+     *
+     */
     private static function updateVoteState()
     {
         $voteStateJson = self::getVoteState()->toJson();
@@ -353,6 +369,9 @@ class Votes extends Module implements ModuleInterface
         Template::showAll('Votes.update-vote', compact('voteStateJson'));
     }
 
+    /**
+     * @param Player $player
+     */
     public static function voteYes(Player $player)
     {
         $vote = new stdClass();
@@ -364,6 +383,9 @@ class Votes extends Module implements ModuleInterface
         self::checkVoteState();
     }
 
+    /**
+     * @param Player $player
+     */
     public static function voteNo(Player $player)
     {
         $vote = new stdClass();
@@ -375,6 +397,9 @@ class Votes extends Module implements ModuleInterface
         self::checkVoteState();
     }
 
+    /**
+     * @param Player $player
+     */
     public static function playerConnect(Player $player)
     {
         if (!self::$vote) {
@@ -388,6 +413,9 @@ class Votes extends Module implements ModuleInterface
         self::$onlinePlayersCount++;
     }
 
+    /**
+     * @param Player $player
+     */
     public static function playerDisconnect(Player $player)
     {
         if (!self::$vote) {
@@ -401,6 +429,9 @@ class Votes extends Module implements ModuleInterface
         self::checkVoteState();
     }
 
+    /**
+     * @param Player $player
+     */
     public static function approveVote(Player $player)
     {
         Timer::destroy('vote.check_state');
@@ -419,6 +450,9 @@ class Votes extends Module implements ModuleInterface
         Template::showAll('Votes.update-vote', compact('voteStateJson'));
     }
 
+    /**
+     * @param Player $player
+     */
     public static function declineVote(Player $player)
     {
         Timer::destroy('vote.check_state');
