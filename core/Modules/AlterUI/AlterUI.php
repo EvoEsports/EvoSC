@@ -77,7 +77,7 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->
  		<chat_avatar visible="false" />
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
- 		<warmup visible="false" pos="153. 13. 0." />
+ 		<warmup visible="false" pos="200. -73. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
  		<endmap_ladder_recap visible="false" />
  		<!-- Laps count displayed on the right of the screen on multilaps map -->
@@ -134,11 +134,11 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- The avatar of the last player speaking in the chat displayed above the chat -->
  		<chat_avatar visible="false" />
  		<!-- Warm-up progression displayed on the right of the screen during warm-up -->
- 		<warmup visible="false" pos="153. 13. 0." />
+ 		<warmup visible="false" pos="200. -73. 0." />
  		<!-- Ladder progression box displayed on the top of the screen at the end of the map -->
  		<endmap_ladder_recap visible="false" />
  		<!-- Laps count displayed on the right of the screen on multilaps map -->
- 		<multilap_info visible="true" pos="140. 84. 5." />
+ 		<multilap_info visible="false" pos="140. 84. 5." />
  		<!-- Player\'s ranking at the latest checkpoint -->
  		<checkpoint_ranking visible="true" pos="0. 84. 5." />
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->

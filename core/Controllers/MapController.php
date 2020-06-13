@@ -107,6 +107,7 @@ class MapController implements ControllerInterface
     public static function mleForceEndOfRound(Player $player)
     {
         Server::triggerModeScriptEventArray('Trackmania.ForceEndRound');
+        Server::triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound');
         warningMessage(secondary($player), ' forced the round to end.')->sendAll();
     }
 
