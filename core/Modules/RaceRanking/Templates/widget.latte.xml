@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}race-ranking{/block}
-    {block size}44 46{/block}
+    {block size}44 {config('race-ranking.ui.show', 10)*3+7}{/block}
 
     {block content}
     <framemodel id="row">
@@ -20,8 +20,8 @@
     <label id="title" class="text-light" z-index="1" valign="center" pos="2 -2.5" size="44 5" textsize="0.3" text=" Race Ranking"/>
 
     <frame id="rows" pos="0 -7.25">
-        {for $i=0; $i<10; $i++}
-        <frameinstance modelid="row" pos="0 {$i * -4}" hidden="1" />
+        {for $i=0; $i<config('race-ranking.ui.show', 10); $i++}
+        <frameinstance modelid="row" pos="0 {$i * -3}" />
         {/for}
     </frame>
     {/block}
