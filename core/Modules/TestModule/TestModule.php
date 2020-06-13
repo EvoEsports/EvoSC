@@ -12,6 +12,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\MapList\MapList;
 use EvoSC\Modules\RaceRanking\RaceRanking;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\UISettings\UISettings;
@@ -33,7 +34,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        WarmUpWidget::warmUpStart();
+        MapList::playerConnect($player);
+        MapList::searchMap($player, ' ', ' ');
     }
 
     public static function sendTestManialink(Player $player)

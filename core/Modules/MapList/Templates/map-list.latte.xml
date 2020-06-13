@@ -53,31 +53,38 @@
 
             <frame id="sorting-controls" pos="-1 5.25">
                 <quad valign="center" pos="-1" size="200 6" textcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity') - 0.1}" z-index="-1"/>
-                <label pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" textcolor="{config('theme.hud.text-light')}"
-                       textfont="{config('colors.ui.font')|noescape}" valign="center"/>
+                <label class="text-light" pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" valign="center"/>
 
-                <label class="filter-btn btn-accent" data-sort=" " pos="20" size="13 4" textsize="0.7" text="Show All" scale="0.8" ScriptEvents="1"/>
-                <label class="filter-btn btn-accent" data-sort="favorites" pos="31" size="13 4" textsize="0.7" text="Favorites" scale="0.8" ScriptEvents="1"/>
+                <label class="filter-btn btn-accent" data-sort=" " pos="19.5" size="13 4" textsize="0.7" text="Show All" scale="0.8" ScriptEvents="1"/>
+                <label class="filter-btn btn-accent" data-sort="favorites" pos="30.75" size="13 4" textsize="0.7" text="Favorites" scale="0.8" ScriptEvents="1"/>
 
                 <frame pos="10.75">
                     <label class="filter-btn btn-accent" data-sort="nofinish" pos="32" size="15 4" textsize="0.7"
                            text="No Finish" scale="0.8" ScriptEvents="1"/>
 
-                    <label class="btn-accent" pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
-                    <label class="filter-btn btn-accent" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
-                    <label class="filter-btn btn-accent" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <label class="filter-btn btn-accent" data-sort="nolocal" pos="44.75" size="15 4" textsize="0.7"
+                           text="No Local" scale="0.8" ScriptEvents="1"/>
 
-                    <label class="btn-accent" pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
-                    <label class="filter-btn btn-accent" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
-                    <label class="filter-btn btn-accent" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <label class="filter-btn btn-accent" data-sort="nodedi" pos="57.5" size="15 4" textsize="0.7"
+                           text="No Dedi" scale="0.8" ScriptEvents="1"/>
 
-                    <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
-                    <label class="filter-btn btn-accent" data-sort="worst_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
-                    <label class="filter-btn btn-accent" data-sort="best_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    <frame pos="25.6 0">
+                        <label class="btn-accent" pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
-                    <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
-                    <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
-                    <label class="filter-btn btn-accent" data-sort="author_time_desc" pos="106.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="btn-accent" pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                        <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="worst_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="best_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                        <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="author_time_desc" pos="106.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    </frame>
                 </frame>
             </frame>
 
@@ -338,6 +345,24 @@ Void search(){
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
                 if(!hasRecord(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "nolocal":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasLocal(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "nodedi":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasDedi(map["id"])){
                     mapsFound.add(map);
                 }
             }
