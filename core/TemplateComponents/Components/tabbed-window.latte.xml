@@ -52,9 +52,11 @@ main() {
     declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
     declare UISettings settings for This;
 
-    if(settings.scale == 0.0){
+    if(settings.speed == 0){
+        settings.hide = True;
+        settings.showDelay = 0;
+        settings.speed = 10;
         settings.scale = 1.0;
-        settings.viewer_count = True;
     }
 
     window.Scale = settings.scale;

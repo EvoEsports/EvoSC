@@ -50,6 +50,13 @@ declare Integer slot__;
         declare UISettings settings for This;
         declare Real scale = settings.scale;
 
+        if(settings.speed == 0){
+            settings.hide = True;
+            settings.showDelay = 0;
+            settings.speed = 10;
+            settings.scale = 1.0;
+        }
+
         if(scale < 0.75){
             scale = 1.0;
         }
