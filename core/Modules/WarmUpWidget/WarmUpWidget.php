@@ -29,7 +29,6 @@ class WarmUpWidget extends Module implements ModuleInterface
     {
         AccessRight::createIfMissing('warm_up_skip', 'Lets you skip the warm-up phase.');
 
-        Hook::add('WarmUpStart', [self::class, 'warmUpStart']);
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
         Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpStartRound']);
 
@@ -38,22 +37,36 @@ class WarmUpWidget extends Module implements ModuleInterface
         ManiaLinkEvent::add('warmup.skip', [self::class, 'skipWarmUp'], 'warm_up_skip');
     }
 
-    public static function warmUpStart()
-    {
-        Template::showAll('WarmUpWidget.widget', [
-            'warmupNb' => self::$warmUpNb,
-            'round' => (self::$round = 0)
-        ]);
-
-        infoMessage('Warm-up started.')->setColor('f90')->setIcon(' ')->sendAll();
-    }
-
     public static function warmUpStartRound()
     {
         Template::showAll('WarmUpWidget.widget', [
             'warmupNb' => self::$warmUpNb,
             'round' => ++self::$round
         ]);
+
+
+        if (self::$warmUpNb == 1) {
+            $message = [
+                'Warm-up ',
+                secondary(self::$round . '/' . self::$warmUpNb),
+                ' started.'
+            ];
+        } else {
+            if (self::$warmUpNb == self::$round) {
+                $message = [
+                    secondary('Last warm-up'),
+                    ' started.'
+                ];
+            } else {
+                $message = [
+                    'Warm-up ',
+                    secondary(self::$round . '/' . self::$warmUpNb),
+                    ' started.'
+                ];
+            }
+        }
+
+        infoMessage(...$message)->setColor('f90')->setIcon(' ')->sendAll();
     }
 
     public static function warmUpEnd()
