@@ -84,6 +84,7 @@ class WarmUpWidget extends Module implements ModuleInterface
     public static function warmUpEnd()
     {
         self::$warmUpInProgress = false;
+        self::$round = 0;
 
         infoMessage('Warm-up ended, ', secondary('starting play-loop.'))->setColor('f90')->setIcon(' ')->sendAll();
         Template::showAll('WarmUpWidget.widget', ['warmUpEnded' => true, 'warmupNb' => 0, 'round' => 0]);
