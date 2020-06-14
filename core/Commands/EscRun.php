@@ -34,6 +34,7 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
+use Spatie\Async\Pool;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -55,6 +56,12 @@ class EscRun extends Command
     {
         global $serverName;
         global $__ManiaPlanet;
+        global $asyncPool;
+
+        $asyncPool = Pool::create()
+            ->concurrency(20)
+            ->timeout(10)
+            ->autoload(coreDir('../vendor/autoload.php'));
 
         Log::setOutput($output);
         ConfigController::init();
@@ -174,7 +181,7 @@ class EscRun extends Command
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
-        ChatCommand::add('//restart-evosc', function(){
+        ChatCommand::add('//restart-evosc', function () {
             restart_evosc();
         }, 'Restart EvoSC', 'ma');
 

@@ -3,6 +3,7 @@
 namespace EvoSC\Modules\Statistics;
 
 use Carbon\Carbon;
+use Closure;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
@@ -17,6 +18,10 @@ use EvoSC\Modules\Statistics\Classes\StatisticWidget;
 use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
+use Opis\Closure\SerializableClosure;
+use Spatie\Async\Pool;
+use Throwable;
 
 class Statistics extends Module implements ModuleInterface
 {
@@ -250,6 +255,17 @@ class Statistics extends Module implements ModuleInterface
     {
         $onlinePlayerIds = onlinePlayers()->pluck('id');
         Stats::whereIn('Player', $onlinePlayerIds)->increment('Playtime', 5);
+    }
+
+    public static function encodeTask($task): string
+    {
+        if ($task instanceof Closure) {
+            $task = new SerializableClosure($task);
+        }
+
+        $task = base64_encode(serialize($task));
+
+        return $task;
     }
 
     /**

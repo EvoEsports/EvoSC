@@ -440,3 +440,12 @@ function getShortColorCode($longColorCode)
     $parts = str_split($longColorCode);
     return ($hasHash ? '#' : '') . $parts[0] . $parts[2] . $parts[4];
 }
+
+/**
+ * @return \Spatie\Async\Pool
+ */
+function async_pool(): \Spatie\Async\Pool
+{
+    global $asyncPool;
+    return $asyncPool;
+}
