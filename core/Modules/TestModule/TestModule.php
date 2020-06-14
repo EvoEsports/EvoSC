@@ -11,6 +11,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\EvoDonate\EvoDonate;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MapList\MapList;
 use EvoSC\Modules\RaceRanking\RaceRanking;
@@ -34,8 +35,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MapList::playerConnect($player);
-        MapList::searchMap($player, ' ', ' ');
+        EvoDonate::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

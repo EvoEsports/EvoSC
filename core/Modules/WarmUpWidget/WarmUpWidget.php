@@ -16,8 +16,8 @@ use EvoSC\Models\Player;
 class WarmUpWidget extends Module implements ModuleInterface
 {
     private static int $round = 0;
-
     private static int $warmUpNb = 0;
+    private static bool $warmUpInProgress = false;
 
     /**
      * Called when the module is loaded
@@ -29,6 +29,7 @@ class WarmUpWidget extends Module implements ModuleInterface
     {
         AccessRight::createIfMissing('warm_up_skip', 'Lets you skip the warm-up phase.');
 
+        Hook::add('PlayerConnect', [self::class, 'sendWarmUpWidget']);
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
         Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpStartRound']);
 
@@ -37,13 +38,24 @@ class WarmUpWidget extends Module implements ModuleInterface
         ManiaLinkEvent::add('warmup.skip', [self::class, 'skipWarmUp'], 'warm_up_skip');
     }
 
+    public static function sendWarmUpWidget(Player $player)
+    {
+        if(self::$warmUpInProgress){
+            Template::show($player, 'WarmUpWidget.widget', [
+                'warmupNb' => self::$warmUpNb,
+                'round' => ++self::$round
+            ]);
+        }
+    }
+
     public static function warmUpStartRound()
     {
+        self::$warmUpInProgress = true;
+
         Template::showAll('WarmUpWidget.widget', [
             'warmupNb' => self::$warmUpNb,
             'round' => ++self::$round
         ]);
-
 
         if (self::$warmUpNb == 1) {
             $message = [
@@ -71,6 +83,8 @@ class WarmUpWidget extends Module implements ModuleInterface
 
     public static function warmUpEnd()
     {
+        self::$warmUpInProgress = false;
+
         infoMessage('Warm-up ended, ', secondary('starting play-loop.'))->setColor('f90')->setIcon(' ')->sendAll();
         Template::showAll('WarmUpWidget.widget', ['warmUpEnded' => true, 'warmupNb' => 0, 'round' => 0]);
     }
