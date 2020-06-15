@@ -14,10 +14,10 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\CountdownController;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\Karma;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxKarma\Classes\MxKarmaMapRating;
+use EvoSC\Modules\MxKarma\Models\Karma;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
@@ -378,10 +378,6 @@ class MxKarma extends Module implements ModuleInterface
      */
     private static function playerCanVote(Player $player, $map): bool
     {
-        if ($player->Score > 0) {
-            return true;
-        }
-
         if (DB::table('pbs')->where('player_id', '=', $player->id)->where('map_id', '=', $map->id)->exists()) {
             return true;
         } else if (DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=', $player->id)->exists()) {

@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\MxKarma\Models;
 
+use EvoSC\Models\Player;
 use Illuminate\Database\Eloquent\Model;
 
 class Karma extends Model
