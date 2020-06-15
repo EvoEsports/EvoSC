@@ -24,6 +24,8 @@ class ControllerUpdater extends Module implements ModuleInterface
 
     public static function start(string $mode, bool $isBoot = false)
     {
+        return;
+
         self::$latestVersion = getEscVersion();
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
