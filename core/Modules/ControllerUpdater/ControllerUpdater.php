@@ -49,29 +49,33 @@ class ControllerUpdater extends Module implements ModuleInterface
     {
         Template::show($player, 'ControllerUpdater.update', ['message' => 'Downloading EvoSC v' . self::$latestVersion]);
 
-        $promise = RestClient::getAsync('https://evotm.com/api/evosc/latest?branch=' . config('evosc.release'));
+        try {
+            $promise = RestClient::getAsync('https://evotm.com/api/evosc/latest?branch=' . config('evosc.release'));
 
-        $promise->then(function (ResponseInterface $response) use ($player) {
-            if ($response->getStatusCode() == 200) {
-                file_put_contents(coreDir('../update.zip'), $response->getBody());
+            $promise->then(function (ResponseInterface $response) use ($player) {
+                if ($response->getStatusCode() == 200) {
+                    file_put_contents(coreDir('../update.zip'), $response->getBody());
 
-                Template::show($player, 'ControllerUpdater.update', ['message' => 'Extracting update...']);
+                    Template::show($player, 'ControllerUpdater.update', ['message' => 'Extracting update...']);
 
-                $zip = new ZipArchive;
-                $res = $zip->open(coreDir('../update.zip'));
-                if ($res === TRUE) {
-                    $zip->extractTo('.');
-                    $zip->close();
+                    $zip = new ZipArchive;
+                    $res = $zip->open(coreDir('../update.zip'));
+                    if ($res === TRUE) {
+                        $zip->extractTo('.');
+                        $zip->close();
 
-                    Template::show($player, 'ControllerUpdater.update', ['message' => 'Update installed, restarting...']);
-                    usleep(100000);
-                    unlink(coreDir('../update.zip'));
-                    restart_evosc();
-                } else {
-                    dangerMessage('Failed to update ', secondary('EvoSC'))->send($player);
+                        Template::show($player, 'ControllerUpdater.update', ['message' => 'Update installed, restarting...']);
+                        usleep(100000);
+                        unlink(coreDir('../update.zip'));
+                        restart_evosc();
+                    } else {
+                        dangerMessage('Failed to update ', secondary('EvoSC'))->send($player);
+                    }
                 }
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            Log::error($e->getMessage() . "\n" . $e->getTraceAsString());
+        }
     }
 
     /**
@@ -80,23 +84,27 @@ class ControllerUpdater extends Module implements ModuleInterface
     public static function checkForUpdates()
     {
         if (!self::$updateAvailable) {
-            $promise = RestClient::getAsync('https://evotm.com/api/evosc/version?branch=' . config('evosc.release'));
+            try {
+                $promise = RestClient::getAsync('https://evotm.com/api/evosc/version?branch=' . config('evosc.release'));
 
-            $promise->then(function (ResponseInterface $response) {
-                if ($response->getStatusCode() == 200) {
-                    $latestVersion = $response->getBody()->getContents();
+                $promise->then(function (ResponseInterface $response) {
+                    if ($response->getStatusCode() == 200) {
+                        $latestVersion = $response->getBody()->getContents();
 
-                    if ($latestVersion != '-1' && version_compare($latestVersion, getEscVersion(), 'gt')) {
-                        self::$latestVersion = $latestVersion;
-                        self::$updateAvailable = true;
-                        Log::cyan('EvoSC update available.');
+                        if ($latestVersion != '-1' && version_compare($latestVersion, getEscVersion(), 'gt')) {
+                            self::$latestVersion = $latestVersion;
+                            self::$updateAvailable = true;
+                            Log::cyan('EvoSC update available.');
 
-                        foreach (accessPlayers('ma') as $player) {
-                            Template::show($player, 'ControllerUpdater.widget', ['latest_version' => self::$latestVersion]);
+                            foreach (accessPlayers('ma') as $player) {
+                                Template::show($player, 'ControllerUpdater.widget', ['latest_version' => self::$latestVersion]);
+                            }
                         }
                     }
-                }
-            });
+                });
+            } catch (\Exception $e) {
+                Log::error($e->getMessage() . "\n" . $e->getTraceAsString());
+            }
         }
 
         Timer::create('evosc_update_checker', [self::class, 'checkForUpdates'], '1h');
