@@ -38,6 +38,10 @@ class PointsController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
+        if ($mode == 'TimeAttack.Script.txt') {
+            return;
+        }
+
         self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
         if (self::$originalPointsLimit == -1) {
             self::$originalPointsLimit = Server::getRoundPointsLimit()['CurrentValue'];
