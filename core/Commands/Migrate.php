@@ -28,7 +28,7 @@ class Migrate extends Command
         $_isVeryVerbose = $output->isVeryVerbose();
         $_isDebug = $output->isDebug();
 
-        $output->writeln('Executing migrations...');
+        $output->writeln('<fg=green>Executing migrations...</>');
 
         $config = json_decode(file_get_contents('config/database.config.json'));
 
@@ -76,13 +76,15 @@ class Migrate extends Command
         $migrations = $this->getMigrations();
         $migrationsTable = $connection->table('migrations');
         $executedMigrations = $migrationsTable->get(['file']);
+        $anyMigrationRan = false;
 
         $migrations->each(function ($migration) use (
             $executedMigrations,
             $batch,
             $schemaBuilder,
             $migrationsTable,
-            $output
+            $output,
+            $anyMigrationRan
         ) {
             if ($executedMigrations->where('file', $migration->file)->isNotEmpty()) {
                 //Skip already executed migrations
@@ -93,14 +95,20 @@ class Migrate extends Command
 
             if (preg_match('/class (.+) extends/', $content, $matches)) {
                 $class = 'EvoSC\\Migrations\\' . $matches[1];
+                $output->writeln('<fg=yellow>Migrating: ' . $migration->file . '</>');
                 require_once $migration->path;
                 $instance = new $class;
                 $instance->up($schemaBuilder);
 
                 $migrationsTable->insert(['file' => $migration->file, 'batch' => $batch]);
-                $output->writeln('<fg=yellow>Migrated: ' . $migration->file . '</>');
+                $output->writeln('<fg=green>Migrated: ' . $migration->file . '</>');
+                $anyMigrationRan = true;
             }
         });
+
+        if(!$anyMigrationRan){
+            $output->writeln('<fg=green>Nothing to migrate.</>');
+        }
 
         if (!file_exists(cacheDir('.setupfinished'))) {
             File::put(cacheDir('.setupfinished'), 1);
