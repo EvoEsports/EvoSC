@@ -4,7 +4,6 @@
 namespace EvoSC\Modules\ControllerUpdater;
 
 
-use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;

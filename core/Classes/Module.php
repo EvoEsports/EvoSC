@@ -4,8 +4,6 @@
 namespace EvoSC\Classes;
 
 
-use EvoSC\Exceptions\UnauthorizedException;
-use EvoSC\Models\Player;
 use stdClass;
 
 class Module

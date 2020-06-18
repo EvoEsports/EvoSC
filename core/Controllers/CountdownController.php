@@ -12,7 +12,6 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use SimpleXMLElement;

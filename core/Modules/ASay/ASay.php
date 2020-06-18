@@ -5,7 +5,6 @@ namespace EvoSC\Modules\ASay;
 
 
 use EvoSC\Classes\ChatCommand;
-use EvoSC\Classes\DB;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;

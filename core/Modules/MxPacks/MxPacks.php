@@ -14,7 +14,6 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 
 class MxPacks extends Module implements ModuleInterface
 {

@@ -3,16 +3,13 @@
 namespace EvoSC\Classes;
 
 
-use EvoSC\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
-use Maniaplanet\DedicatedServer\Structures\Map;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 use Maniaplanet\DedicatedServer\Structures\Version;
-use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
  * Class Server

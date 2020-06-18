@@ -6,7 +6,6 @@ namespace EvoSC\Modules\Warning;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 
 class Warning extends Module implements ModuleInterface

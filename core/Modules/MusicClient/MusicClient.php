@@ -14,7 +14,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Collection;
 use Psr\Http\Message\ResponseInterface;
 use stdClass;

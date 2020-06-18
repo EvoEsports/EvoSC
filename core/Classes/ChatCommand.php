@@ -4,7 +4,6 @@ namespace EvoSC\Classes;
 
 
 use Closure;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 

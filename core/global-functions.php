@@ -7,7 +7,6 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
 use EvoSC\Controllers\ConfigController;
 use EvoSC\Controllers\PlayerController;
-use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

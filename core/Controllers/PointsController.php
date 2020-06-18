@@ -10,7 +10,6 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 
 class PointsController implements ControllerInterface

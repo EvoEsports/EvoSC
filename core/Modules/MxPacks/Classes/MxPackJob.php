@@ -9,7 +9,6 @@ use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
 use ZipArchive;
 

@@ -29,7 +29,6 @@ use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
-use EvoSC\Models\Group;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;

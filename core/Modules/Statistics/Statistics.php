@@ -18,10 +18,7 @@ use EvoSC\Modules\Statistics\Classes\StatisticWidget;
 use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Artisan;
 use Opis\Closure\SerializableClosure;
-use Spatie\Async\Pool;
-use Throwable;
 
 class Statistics extends Module implements ModuleInterface
 {

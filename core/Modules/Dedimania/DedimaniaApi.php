@@ -14,7 +14,6 @@ use EvoSC\Classes\Server;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
