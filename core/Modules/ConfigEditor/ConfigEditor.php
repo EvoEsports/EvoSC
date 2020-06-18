@@ -23,7 +23,7 @@ class ConfigEditor extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::createIfMissing('config_edit', 'Change the server config.');
+        AccessRight::add('config_edit', 'Change modules config.');
 
         ChatCommand::add('//config', [self::class, 'cmdShowEditConfig'], 'Open the Config-Editor', 'config_edit');
 

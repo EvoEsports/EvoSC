@@ -27,7 +27,7 @@ class WarmUpWidget extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::createIfMissing('warm_up_skip', 'Lets you skip the warm-up phase.');
+        AccessRight::add('warm_up_skip', 'Lets you skip the warm-up phase.');
 
         Hook::add('PlayerConnect', [self::class, 'sendWarmUpWidget']);
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);

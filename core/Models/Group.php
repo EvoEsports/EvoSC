@@ -32,12 +32,12 @@ class Group extends Model
             return true;
         }
 
-        return $this->accessRights->where('name', $accessRightName)->isNotEmpty();
+        return $this->accessRights()->where('name', $accessRightName)->exists();
     }
 
     public function accessRights()
     {
-        return $this->belongsToMany(AccessRight::class);
+        return $this->belongsToMany(AccessRight::class, 'access_right_group', 'group_id', 'access_right_name', 'id', 'name');
     }
 
     public function player()

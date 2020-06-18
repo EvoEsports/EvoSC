@@ -31,7 +31,7 @@ class LocalRecords extends Module implements ModuleInterface
         Hook::add('PlayerPb', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
 
-        AccessRight::createIfMissing('local_delete', 'Delete local-records.');
+        AccessRight::add('local_delete', 'Delete local-records.');
 
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);

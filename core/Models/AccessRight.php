@@ -3,6 +3,7 @@
 namespace EvoSC\Models;
 
 
+use EvoSC\Classes\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class AccessRight extends Model
@@ -25,11 +26,11 @@ class AccessRight extends Model
      * @param string $name
      * @param string $description
      */
-    public static function createIfMissing(string $name, string $description)
+    public static function add(string $name, string $description)
     {
-        if (AccessRight::whereName($name)->get()->isEmpty()) {
+        if (!DB::table('access-rights')->where('name', '=', $name)->exists()) {
             AccessRight::create([
-                'name'        => $name,
+                'name' => $name,
                 'description' => $description,
             ]);
         }

@@ -661,7 +661,7 @@ Void setCooldownToZero(Text uid){
 
         inSearch = False;
         currentPage = 0;
-        userCanDrop = {($localPlayer->hasAccess('queue_drop') ? 'True' : 'False')|noescape};
+        userCanDrop = {($localPlayer->hasAccess('map_queue_drop') ? 'True' : 'False')|noescape};
         cooldown = {config('server.map-cooldown')};
 
         declare Text[] ESC_Map_Favorite_Uids for This;

@@ -77,8 +77,8 @@ class Votes extends Module implements ModuleInterface
         $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
         self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
 
-        AccessRight::createIfMissing('vote_custom', 'Create a custom vote. Enter question after command.');
-        AccessRight::createIfMissing('vote_always', 'Allowed to always start a time or skip vote.');
+        AccessRight::add('vote_custom', 'Create a custom vote. Enter question after command.');
+        AccessRight::add('no_vote_limits', 'Not bound to any limitation.');
     }
 
     public static function startVote(Player $player, string $question, $action, $successRatio = 0.5): bool
@@ -175,7 +175,7 @@ class Votes extends Module implements ModuleInterface
             $secondsToAdd = floatval($time) * 60;
         }
 
-        if (!$player->hasAccess('vote_always')) {
+        if (!$player->hasAccess('no_vote_limits')) {
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
                 warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
 
@@ -237,7 +237,7 @@ class Votes extends Module implements ModuleInterface
 
         $points = intval($points) ?: PointsController::getOriginalPointsLimit();
 
-        if (!$player->hasAccess('vote_always')) {
+        if (!$player->hasAccess('no_vote_limits')) {
             if (PointsController::getCurrentPoints() >= config('votes.points.max-points')) {
                 dangerMessage('Point limit reached.')->send($player);
                 return;
@@ -289,7 +289,7 @@ class Votes extends Module implements ModuleInterface
 
         $secondsPassed = time() - self::$lastSkipVote;
 
-        if (!$player->hasAccess('vote_always')) {
+        if (!$player->hasAccess('no_vote_limits')) {
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {
                 warningMessage('Please wait ',
                     secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed) . ' seconds'),

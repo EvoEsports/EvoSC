@@ -37,23 +37,24 @@ class MatchSettingsManager extends Module implements ModuleInterface
         self::$path = Server::getMapsDirectory().'/MatchSettings/';
         self::$objects = collect();
 
-        AccessRight::createIfMissing('ms_edit', 'Change match-settings.');
+        AccessRight::add('matchsettings_load', 'Load matchsettings.');
+        AccessRight::add('matchsettings_edit', 'Edit matchsettings.');
 
-        ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'ms_edit');
+        ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'matchsettings_edit');
 
-        ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'ms_edit');
-        ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'showEditMatchsettingsMaps'], 'ms_edit');
-        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'ms_edit');
-        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'ms_edit');
+        ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.edit_maps', [self::class, 'showEditMatchsettingsMaps'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'matchsettings_edit');
 
-        ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'ms_edit');
-        ManiaLinkEvent::add('msm.add_map', [self::class, 'addMap'], 'ms_edit');
-        ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'ms_edit');
+        ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.add_map', [self::class, 'addMap'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'matchsettings_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');

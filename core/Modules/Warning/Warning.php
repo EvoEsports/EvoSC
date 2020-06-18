@@ -16,9 +16,7 @@ class Warning extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::createIfMissing('warn_player', 'Warn a player.');
-
-        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'warn_player');
+        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'player_warn');
     }
 
     public static function warnPlayer(Player $player, string $targetLogin, string $message)

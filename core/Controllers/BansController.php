@@ -35,7 +35,7 @@ class BansController implements ControllerInterface
      */
     public static function init()
     {
-        AccessRight::createIfMissing('player_ban', 'Ban and unban players.');
+        AccessRight::add('player_ban', 'Ban and unban players.');
     }
 
     /**

@@ -25,10 +25,7 @@ class InfoMessages extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-
-        AccessRight::createIfMissing('info_messages', 'Add/edit/remove reccuring info-messages.');
-
-        ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
+        AccessRight::add('info_messages', 'Add/edit/remove reccuring info-messages.');
 
         ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
@@ -36,6 +33,8 @@ class InfoMessages extends Module implements ModuleInterface
         ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
 
         Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
+
+        ChatCommand::add('//messages', [InfoMessages::class, 'showSettings'], 'Set up recurring server messages', 'info_messages');
     }
 
     public static function displayInfoMessages()

@@ -61,16 +61,17 @@ class MapController implements ControllerInterface
         self::$mapToDisable = collect();
         self::$currentMap = Map::getByUid(Server::getCurrentMapInfo()->uId);
 
-        AccessRight::createIfMissing('map_skip', 'Skip map instantly.');
-        AccessRight::createIfMissing('map_add', 'Add map permanently.');
-        AccessRight::createIfMissing('map_delete', 'Delete map (and all records) permanently.');
-        AccessRight::createIfMissing('map_disable', 'Disable map.');
-        AccessRight::createIfMissing('map_replay', 'Force a replay.');
-        AccessRight::createIfMissing('map_reset', 'Reset round.');
-        AccessRight::createIfMissing('force_end_round', 'Force the end of a round (Rounds/Laps).');
-        AccessRight::createIfMissing('matchsettings_load', 'Load matchsettings.');
-        AccessRight::createIfMissing('matchsettings_edit', 'Edit matchsettings.');
-        AccessRight::createIfMissing('time', 'Change the countdown time.');
+        AccessRight::add('map_skip', 'Skip map instantly.');
+        AccessRight::add('map_add', 'Add map permanently.');
+        AccessRight::add('map_delete', 'Delete map (and all records) permanently.');
+        AccessRight::add('map_disable', 'Disable map.');
+        AccessRight::add('map_replay', 'Force a replay.');
+        AccessRight::add('map_reset', 'Reset round.');
+        AccessRight::add('force_end_round', 'Force the end of a round (Rounds/Laps).');
+        AccessRight::add('manipulate_time', 'Change the countdown time.');
+        AccessRight::add('manipulate_points', 'Change the points-limit.');
+        AccessRight::add('matchsettings_load', 'Load matchsettings.');
+        AccessRight::add('matchsettings_edit', 'Edit matchsettings.');
     }
 
     /**

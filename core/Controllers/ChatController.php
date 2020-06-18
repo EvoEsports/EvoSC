@@ -28,8 +28,8 @@ class ChatController implements ControllerInterface
      */
     public static function init()
     {
-        AccessRight::createIfMissing('player_mute', 'Mute/unmute player.');
-        AccessRight::createIfMissing('admin_echoes', 'Receive admin messages.');
+        AccessRight::add('player_mute', 'Mute/unmute player.');
+        AccessRight::add('admin_echoes', 'Receive admin messages.');
 
         if ((self::$routingEnabled = (bool)config('server.enable-chat-routing', true))) {
             Log::info('Enabling manual chat routing.', isVerbose());

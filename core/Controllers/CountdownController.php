@@ -37,8 +37,6 @@ class CountdownController implements ControllerInterface
     public static function init()
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
-
-        AccessRight::createIfMissing('hunt', 'Enabled/disable hunt mode.');
     }
 
     /**
@@ -62,10 +60,10 @@ class CountdownController implements ControllerInterface
         Hook::add('MatchSettingsLoaded', [self::class, 'matchSettingsLoaded']);
 
         ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
-            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'time');
-        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'hunt');
+            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'manipulate_time');
+        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'manipulate_time');
 
-        InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'time');
+        InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'manipulate_time');
     }
 
     public static function beginMatch()

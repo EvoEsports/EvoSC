@@ -23,25 +23,24 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::createIfMissing('group_edit', 'Add/delete/update groups.');
-        AccessRight::createIfMissing('group_change', 'Change player group.');
+        AccessRight::add('group_edit', 'Add/delete/update groups.');
 
-        ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group');
+        ChatCommand::add('//groups', [self::class, 'showOverview'], 'Show groups manager', 'group_edit');
 
-        ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group');
-        ManiaLinkEvent::add('group.create', [self::class, 'groupCreate'], 'group');
-        ManiaLinkEvent::add('group.delete', [self::class, 'groupDelete'], 'group');
-        ManiaLinkEvent::add('group.edit_access', [self::class, 'groupEditAccess'], 'group');
-        ManiaLinkEvent::add('group.edit_group', [self::class, 'groupEdit'], 'group');
-        ManiaLinkEvent::add('group.update', [self::class, 'groupUpdate'], 'group');
-        ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group');
-        ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group');
-        ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group');
-        ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group');
-        ManiaLinkEvent::add('group.rights_update', [self::class, 'groupRightsUpdate'], 'group');
+        ManiaLinkEvent::add('group.overview', [self::class, 'showOverview'], 'group_edit');
+        ManiaLinkEvent::add('group.create', [self::class, 'groupCreate'], 'group_edit');
+        ManiaLinkEvent::add('group.delete', [self::class, 'groupDelete'], 'group_edit');
+        ManiaLinkEvent::add('group.edit_access', [self::class, 'groupEditAccess'], 'group_edit');
+        ManiaLinkEvent::add('group.edit_group', [self::class, 'groupEdit'], 'group_edit');
+        ManiaLinkEvent::add('group.update', [self::class, 'groupUpdate'], 'group_edit');
+        ManiaLinkEvent::add('group.members', [self::class, 'groupMembers'], 'group_edit');
+        ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group_edit');
+        ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group_edit');
+        ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group_edit');
+        ManiaLinkEvent::add('group.rights_update', [self::class, 'groupRightsUpdate'], 'group_edit');
 
         if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group');
+            QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group_edit');
         }
     }
 

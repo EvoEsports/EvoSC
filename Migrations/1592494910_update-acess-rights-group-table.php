@@ -16,7 +16,7 @@ class UpdateAcessRightsGroupTable extends Migration
     public function up(Builder $schemaBuilder)
     {
         $schemaBuilder->table('access_right_group', function (Blueprint $table) {
-            $table->string('access_right_name');
+            $table->string('access_right_name')->nullable();
         });
     }
 

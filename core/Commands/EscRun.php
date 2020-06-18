@@ -29,6 +29,7 @@ use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\Group;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -165,6 +166,7 @@ class EscRun extends Command
         $_onlinePlayers = collect();
 
         Database::init();
+        DB::table('access-rights')->truncate();
         RestClient::init($serverName);
         HookController::init();
         TemplateController::init();

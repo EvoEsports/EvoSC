@@ -23,7 +23,7 @@ class BanGUI extends Module implements ModuleInterfaceAlias
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::createIfMissing('player_ban', 'Ban/unban players.');
+        AccessRight::add('player_ban', 'Ban/unban players.');
 
         ChatCommand::add('//ban', [self::class, 'cmdBanPlayer'], 'Ban & blacklist player.', 'player_ban');
 

@@ -53,9 +53,7 @@ class PointsController implements ControllerInterface
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'resetPointsLimit']);
 
-        AccessRight::createIfMissing('raise_points_limit', 'Change the points limit while match is going.');
-
-        ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'raise_points_limit');
+        ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'manipulate_points');
     }
 
     /**

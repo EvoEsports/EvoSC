@@ -39,11 +39,10 @@ class PlayerController implements ControllerInterface
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
-        AccessRight::createIfMissing('player_kick', 'Kick players.');
-        AccessRight::createIfMissing('player_warn', 'Warn a player.');
-        AccessRight::createIfMissing('player_force_spec', 'Force a player into spectator mode.');
-        AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
-        AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
+        AccessRight::add('player_kick', 'Kick players.');
+        AccessRight::add('player_warn', 'Warn a player.');
+        AccessRight::add('player_force_spec', 'Force a player into spectator mode.');
+        AccessRight::add('always_print_join_msg', 'Always announce join/leave.');
     }
 
     /**
@@ -64,7 +63,7 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 
         ChatCommand::add('//setpw', [self::class, 'cmdSetServerPassword'],
-            'Set the server password, leave empty to clear it.', 'ma');
+            'Set the server password, leave empty to clear it.', 'ma')->addAlias('//password');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
@@ -130,7 +129,7 @@ class PlayerController implements ControllerInterface
 
         Log::write($message->getMessage());
 
-        if (config('server.echoes.join') || $player->hasAccess('override_join_msg')) {
+        if (config('server.echoes.join') || $player->hasAccess('always_print_join_msg')) {
             $message->sendAll();
         } else {
             $message->sendAdmin();

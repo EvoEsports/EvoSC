@@ -76,8 +76,8 @@ class ChatCommand
         $chatCommand = new ChatCommand($command, $callback, $description, $access, $hidden);
         self::$commands->put($command, $chatCommand);
 
-        if ($access && $access != 'ma') {
-            if (!AccessRight::whereName($access)->exists()) {
+        if (is_string($access) && $access != 'ma') {
+            if (!DB::table('access-rights')->where('name', '=', $access)->exists()) {
                 Log::warning("Missing access-right: $access");
             }
         }
