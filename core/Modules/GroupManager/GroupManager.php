@@ -37,7 +37,7 @@ class GroupManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('group.member_remove', [self::class, 'groupMemberRemove'], 'group_edit');
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group_edit');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group_edit');
-        ManiaLinkEvent::add('group.rights_update', [self::class, 'groupRightsUpdate'], 'group_edit');
+        ManiaLinkEvent::add('group.rights_update', [self::class, 'groupAccessRightsUpdate'], 'group_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group_edit');
@@ -54,7 +54,24 @@ class GroupManager extends Module implements ModuleInterface
         Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
     }
 
-    public function groupRightsUpdate(Player $player, $formData)
+    /**
+     * @param Player $player
+     * @param string $groupId
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function groupEditAccess(Player $player, string $groupId)
+    {
+        $group = Group::find($groupId);
+        $accessRights = AccessRight::all();
+
+        Template::show($player, 'GroupManager.edit_access', compact('group', 'accessRights'));
+    }
+
+    /**
+     * @param Player $player
+     * @param $formData
+     */
+    public function groupAccessRightsUpdate(Player $player, $formData)
     {
         $groupId = $formData->group_id;
         DB::table('access_right_group')->where('group_id', '=', $groupId)->delete();
@@ -63,7 +80,8 @@ class GroupManager extends Module implements ModuleInterface
             if ($value != "0") {
                 DB::table('access_right_group')->insert([
                     'group_id' => $groupId,
-                    'access_right_id' => $key
+                    'access_right_id' => DB::table('access-rights')->where('name', '=', $key)->first()->id, //TOD: Remove after July 2020
+                    'access_right_name' => $key
                 ]);
             }
         });
@@ -128,14 +146,6 @@ class GroupManager extends Module implements ModuleInterface
 
             self::showOverview($player);
         }
-    }
-
-    public static function groupEditAccess(Player $player, string $groupId)
-    {
-        $group = Group::find($groupId);
-        $accessRights = AccessRight::all();
-
-        Template::show($player, 'GroupManager.edit_access', compact('group', 'accessRights'));
     }
 
     public static function groupEdit(Player $player, string $groupId)

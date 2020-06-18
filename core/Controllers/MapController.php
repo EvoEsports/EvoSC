@@ -344,7 +344,7 @@ class MapController implements ControllerInterface
      */
     public static function loadMaps()
     {
-        Log::write('Loading maps...');
+        Log::write('Loading maps');
 
         DB::table('maps')
             ->where('enabled', '=', 1)

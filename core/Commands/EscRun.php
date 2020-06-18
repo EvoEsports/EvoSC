@@ -58,10 +58,12 @@ class EscRun extends Command
         global $__ManiaPlanet;
         global $asyncPool;
 
+        /*
         $asyncPool = Pool::create()
             ->concurrency(20)
             ->timeout(10)
             ->autoload(coreDir('../vendor/autoload.php'));
+        */
 
         Log::setOutput($output);
         ConfigController::init();
@@ -81,19 +83,6 @@ class EscRun extends Command
         } else {
             $migrate = $this->getApplication()->find('migrate');
             $migrate->execute($input, $output);
-        }
-
-        if (config('server.use-external-router', false)) {
-            switch (pcntl_fork()) {
-                case -1:
-                    $output->writeln('Starting chat router failed.');
-                    exit(1);
-
-                case 0:
-                    $output->writeln('Starting chat router.');
-                    pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
-                    exit(0);
-            }
         }
 
         if ($input->getOption('skip_map_check') !== false) {
