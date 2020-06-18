@@ -233,7 +233,7 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        $points = intval($points);
+        $points = intval($points) ?: PointsController::getOriginalPointsLimit();
 
         if (!$player->hasAccess('no_vote_limits')) {
             $points = PointsController::getOriginalPointsLimit();
