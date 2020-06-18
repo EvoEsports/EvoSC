@@ -107,11 +107,6 @@ class CpDiffs extends Module implements ModuleInterface
                     $player->id)->first();
             }
 
-            if (!$targetRecord) {
-                infoMessage("You don't have a PB on this map yet.")->send($player);
-                return;
-            }
-
             if ($targetRecord) {
                 self::$targets->put($player->id, $target = self::createTarget($targetRecord->Score, $targetRecord->Checkpoints, $targetRecord->Player, $map->uid));
                 Template::show($player, 'CpDiffs.widget', compact('target'));
