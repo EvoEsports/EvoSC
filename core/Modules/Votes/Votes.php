@@ -169,13 +169,11 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        if ($time == '0') {
-            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-        } else {
-            $secondsToAdd = floatval($time) * 60;
-        }
+        $secondsToAdd = floatval($time) * 60;
 
         if (!$player->hasAccess('no_vote_limits')) {
+            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
+
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
                 warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
 
@@ -235,9 +233,10 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        $points = intval($points) ?: PointsController::getOriginalPointsLimit();
+        $points = intval($points);
 
         if (!$player->hasAccess('no_vote_limits')) {
+            $points = PointsController::getOriginalPointsLimit();
             if (PointsController::getCurrentPoints() >= config('votes.points.max-points')) {
                 dangerMessage('Point limit reached.')->send($player);
                 return;
