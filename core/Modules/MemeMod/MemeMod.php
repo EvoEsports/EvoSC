@@ -10,9 +10,12 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
+use Illuminate\Support\Collection;
 
 class MemeMod extends Module implements ModuleInterface
 {
+    private static Collection $tracker;
+
     /**
      * @param string $mode
      * @param bool $isBoot
@@ -20,7 +23,10 @@ class MemeMod extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$tracker = collect();
+
         Hook::add('PlayerChat', [self::class, 'chat']);
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         InputSetup::add('pay_respects', 'Pay your respects', [self::class, 'payRespects'], 'F');
     }
 
@@ -45,6 +51,21 @@ class MemeMod extends Module implements ModuleInterface
      */
     public static function payRespects(Player $player)
     {
-        infoMessage($player, ' pays his respects.')->sendAll();
+        if (self::$tracker->has($player->id)) {
+            if (($timePassed = time() - self::$tracker->get($player->id)) < 10) {
+                $timeLeft = 10 - $timePassed;
+                warningMessage('You\'ve just paid your respects. Please wait ', secondary($timeLeft . 's'), ' before paying your respects again.')->send($player);
+                return;
+            }
+        }
+
+        infoMessage($player, ' paid her/his respects.')->sendAll();
+
+        self::$tracker->put($player->id, time());
+    }
+
+    public static function playerDisconnect(Player $player)
+    {
+        self::$tracker->forget($player->id);
     }
 }
