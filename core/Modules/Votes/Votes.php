@@ -172,7 +172,10 @@ class Votes extends Module implements ModuleInterface
         $secondsToAdd = floatval($time) * 60;
 
         if (!$player->hasAccess('no_vote_limits')) {
-            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
+            $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
+            if ($secondsToAdd > $oSecondsToAdd) {
+                $secondsToAdd = $oSecondsToAdd;
+            }
 
             if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
                 warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
@@ -236,7 +239,10 @@ class Votes extends Module implements ModuleInterface
         $points = intval($points) ?: PointsController::getOriginalPointsLimit();
 
         if (!$player->hasAccess('no_vote_limits')) {
-            $points = PointsController::getOriginalPointsLimit();
+            $opoints = PointsController::getOriginalPointsLimit();
+            if ($points > $opoints) {
+                $points = $opoints;
+            }
             if (PointsController::getCurrentPoints() >= config('votes.points.max-points')) {
                 dangerMessage('Point limit reached.')->send($player);
                 return;
@@ -303,7 +309,7 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
-            if(!self::$isRounds && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)){
+            if (!self::$isRounds && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
                 warningMessage('It is too late to skip the map.')->send($player);
 
                 return;
