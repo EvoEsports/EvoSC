@@ -59,7 +59,7 @@ class MemeMod extends Module implements ModuleInterface
             }
         }
 
-        infoMessage(secondary($player), ' pays his respects.')->sendAll();
+        infoMessage(secondary($player), ' pays their respects.')->sendAll();
 
         self::$tracker->put($player->id, time());
     }
