@@ -189,26 +189,15 @@ class GroupManager extends Module implements ModuleInterface
         $newMember = Player::find($playerLogin);
 
         if (!$newMember) {
-            $newMember = new Player();
-
-            $newMember->NickName = $playerLogin;
-            $newMember->Login = $playerLogin;
-
-            $newMember->save();
+            $newMember = Player::create([
+                'NickName' => $playerLogin,
+                'Login' => $playerLogin,
+            ]);
         }
 
-        $group = Group::find($groupId);
-
-        if ($newMember) {
-            Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
-            Hook::fire('GroupChanged', $newMember);
-            PlayerController::putPlayer(Player::whereLogin($playerLogin)->first());
-
-            if ($newMember->group->id == 3) {
-                infoMessage($player->group, ' ', $player, ' added ', $newMember, ' to group ', secondary($group))->sendAll();
-            } else {
-                infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
-            }
-        }
+        $group = Group::find(intval($groupId));
+        Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
+        Hook::fire('GroupChanged', $newMember);
+        infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
     }
 }
