@@ -169,7 +169,11 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        $secondsToAdd = floatval($time) * 60;
+        if($time == '0'){
+            $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
+        }else{
+            $secondsToAdd = floatval($time) * 60;
+        }
 
         if (!$player->hasAccess('no_vote_limits')) {
             $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
@@ -196,7 +200,7 @@ class Votes extends Module implements ModuleInterface
                 warningMessage('It is too late to start a vote.')->send($player);
                 return;
             } else if (CountdownController::getSecondsPassed() < config('votes.time.disable-in-first', 120)) {
-                warningMessage('It is too early to start a vote, please wait', secondary((config('votes.time.disable-in-first', 120) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
+                warningMessage('It is too early to start a vote, please wait ', secondary((config('votes.time.disable-in-first', 120) - CountdownController::getSecondsPassed()) . ' seconds'), '.')->send($player);
                 return;
             }
         }
