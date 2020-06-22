@@ -1,0 +1,94 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+    {include 'Components.stylesheet'}
+    <frame id="overview" pos="-60 {ceil($playerCount / 2) * 3 + 3}">
+        <quad class="bg-dark" size="120 {ceil($playerCount / 2) * 3 + 5}" pos="0 -6" opacity="0.8" z-index="-1" />
+        <quad class="bg-accent" size="120 6"/>
+        <label class="text-light" pos="2 -3" valign="center" textsize="1" text="Groups Manager - {$group->Name} Members" z-index="1" />
+        <label class="close" pos="117 -3" size="6 6" text="" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('theme.hud.text-light')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003" />
+
+        {foreach $group->player as $player}
+        <frame pos="{$iterator->counter > ceil($playerCount / 2) ? 60 : 0} {$iterator->counter * -6 - 4 + ($iterator->counter > ceil($playerCount / 2) ? $playerCount * 3 + 0 : 0)}">
+            <label pos="2 0" textsize="1" text="{$player}" valign="center" scale="0.9" />
+            <label class="remove" pos="52.5 0" size="16 5" textsize="1" text=" Remove" valign="center" scale="0.8" halign="center" ScriptEvents="1" focusareacolor1="f003" focusareacolor2="f009" data-login="{$player->Login}" data-nick="{$player}" />
+
+            <label size="60 6" focusareacolor1="0000" ScriptEvents="1" valign="center" />
+        </frame>
+        {/foreach}
+    </frame>
+
+    <frame id="confirm-dialog" pos="-40 9" z-index="10" hidden="1">
+        <quad size="80 18" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.9" z-index="-1" />
+        <quad size="80 2" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="0" />
+        <label pos="40 -6" size="76" valign="center" halign="center" text="" textsize="1" z-index="1" />
+
+        <label class="confirm" pos="32 -13" z-index="0" size="15 5" text="YES" ScriptEvents="1" focusareacolor1="07E20099" halign="center" valign="center" textsize="0.5" focusareacolor2="06BD00AA" scriptevents="1"/>
+        <label class="cancel" pos="48 -13" z-index="0" size="15 5" text="NO" ScriptEvents="1" focusareacolor1="f009" halign="center" valign="center" textsize="0.5" focusareacolor2="BD0000AA" scriptevents="1"/>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    //Open confirm dialog and return decision
+    Boolean confirm(Text question){
+        declare confirmDialogFrame <=> (Page.MainFrame.GetFirstChild("confirm-dialog") as CMlFrame);
+        declare Boolean answer = False;
+        declare Boolean decided = False;
+
+        //show confirm dialog
+        confirmDialogFrame.Show();
+
+        //Set question text
+        (confirmDialogFrame.Controls[2] as CMlLabel).SetText(question);
+
+        while(!decided){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
+                    answer = True;
+                    decided = True;
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+                    decided = True;
+                }
+            }
+        }
+
+        //hide confirm dialog
+        confirmDialogFrame.Hide();
+
+        return answer;
+    }
+
+    main(){
+        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+        declare groupId = {$group->id};
+
+        while(True){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
+                    TriggerPageAction("group.overview");
+                    continue;
+                }
+
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("remove")){
+                    declare playerLogin = event.Control.DataAttributeGet("login");
+                    declare nick = event.Control.DataAttributeGet("nick");
+
+                    if(confirm("Do you want to remove " ^ nick ^ " from $o{$group->Name|noescape}$z?")){
+                        TriggerPageAction("group.member_remove," ^ groupId ^ "," ^ playerLogin);
+                    }
+
+                    continue;
+                }
+            }
+        }
+    }
+
+    --></script>
+</manialink>

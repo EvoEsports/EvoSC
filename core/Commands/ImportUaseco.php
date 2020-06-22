@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Symfony\Component\Console\Command\Command;

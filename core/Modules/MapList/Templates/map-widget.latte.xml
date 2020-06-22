@@ -1,0 +1,123 @@
+{contentType text}
+{extends 'Components.widget-base'}
+{php $doNotPause = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}maps{/block}
+    {block size}44 8{/block}
+
+    {block content}
+    <quad id="bg" class="bg-dark" size="36 8" opacity="0.8" z-index="-1"/>
+    <quad id="header" class="bg-accent" pos="36 0" size="8 8" z-index="-1"/>
+    <label id="map-name" class="text-light" pos="35 -1.5" z-index="1" size="36 3" scale="0.8" text="Unknown Map" halign="right" textsize="1.4"/>
+    <label id="author-name" class="text-light" pos="35 -5.5" z-index="1" size="36 3" scale="0.8" text="Unknown Author" halign="right" valign="center" textsize="0.6"/>
+    <label class="text-light" pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text=""/>
+    <frame id="controls" pos="5 -8.5" z-index="10">
+        <quad class="bg-dark" pos="-5 0" size="36 8" opacity="0.75" z-index="-1"/>
+
+        <frame pos="1 -4">
+            <label class="map-control fav btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label id="fav-icon" class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label id="fav-label" class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Add" z-index="1" halign="center" valign="center"/>
+        </frame>
+
+        <frame pos="13 -4">
+            <label class="map-control details btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Details" z-index="1" halign="center" valign="center"/>
+        </frame>
+
+        <frame pos="25 -4">
+            <label class="map-control list btn-muted" textsize="1.5" size="12 8" ScriptEvents="1" focusareacolor1="0000"/>
+            <label class="text-light" pos="0 1.5" size="10 10" text="" z-index="1" halign="center" valign="center"/>
+            <label class="text-light" pos="0 -2" scale="0.6" size="10 10" text="Maps" z-index="1" halign="center" valign="center"/>
+        </frame>
+    </frame>
+    {/block}
+
+    {block script}
+    {include 'Scripts.drag'}
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
+        declare controlsVisible = False;
+        declare Text[Text][] Maps for LocalUser;
+        declare Text[Text][Integer] MapAuthors for LocalUser;
+        declare Text MapSearchQuery for LocalUser;
+        declare Integer MapUpdateTime for LocalUser = 0;
+        declare lastMapUpdate = 0;
+        declare Text[] ESC_Map_Favorite_Uids for This;
+        declare Text currentMapUid;
+
+        declare mapNameLabel <=> (Page.MainFrame.GetFirstChild("map-name") as CMlLabel);
+        declare authorNameLabel <=> (Page.MainFrame.GetFirstChild("author-name") as CMlLabel);
+        declare favIconLabel <=> (Page.MainFrame.GetFirstChild("fav-icon") as CMlLabel);
+        declare favLabelLabel <=> (Page.MainFrame.GetFirstChild("fav-label") as CMlLabel);
+
+        left__ = {config('map-list.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('map-list.ui.slot')};
+    {/block}
+
+    {block loop}
+        if(currentMapUid != Map.MapInfo.MapUid){
+            currentMapUid = Map.MapInfo.MapUid;
+            mapNameLabel.Value = Map.MapName;
+            authorNameLabel.Value = TL::RegexReplace("\\$[lh](\\[.+?\\])?", Map.AuthorNickName, "i", "");
+            if(!ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
+                favIconLabel.Value = "";
+                favLabelLabel.Value = "Add";
+            }else{
+                favIconLabel.Value = "";
+                favLabelLabel.Value = "Remove";
+            }
+        }
+
+        declare x_min = widget.RelativePosition_V3[0];
+        declare x_max = widget.RelativePosition_V3[0] + (widget.Size[0] * widget.RelativeScale);
+        declare y_min = widget.RelativePosition_V3[1];
+        declare y_max = widget.RelativePosition_V3[1] - (widget.Size[1] * widget.RelativeScale);
+        declare Boolean xInBounds = (MouseX > x_min && MouseX < x_max);
+        declare Boolean yInBounds = (MouseY < y_min && MouseY > y_max);
+
+        if(!(xInBounds && yInBounds) && controlsVisible){
+            controlsVisible = False;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 -8.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
+        if((xInBounds && yInBounds) && !controlsVisible){
+            controlsVisible = True;
+            AnimMgr.Add(widgetControls, " <frame pos='5.0 0.0' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+        }
+    {/block}
+
+    {block pendingEvents}
+            if(event.Control.HasClass("fav") && event.Type == CMlScriptEvent::Type::MouseClick){
+                if(ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
+                    TriggerPageAction("{$MODULE|classpath}::favRemove," ^ Map.Id);
+                    favIconLabel.Value = "";
+                    favLabelLabel.Value = "Add";
+                }else{
+                    TriggerPageAction("{$MODULE|classpath}::favAdd," ^ Map.Id);
+                    favIconLabel.Value = "";
+                    favLabelLabel.Value = "Remove";
+                }
+                continue;
+            }
+
+            if(event.Control.HasClass("details") && event.Type == CMlScriptEvent::Type::MouseClick){
+                TriggerPageAction("mx.details," ^ Map.Id);
+                continue;
+            }
+
+            if(event.Control.HasClass("list") && event.Type == CMlScriptEvent::Type::MouseClick){
+                MapSearchQuery = " ";
+                continue;
+            }
+    {/block}
+    --></script>
+</manialink>

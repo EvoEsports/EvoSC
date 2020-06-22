@@ -1,0 +1,54 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Const METERS_TO_DRIVE	5
+    #Const FINISH_TIMEOUT	{$timeout}
+
+    Boolean isAfk(){
+        declare startMeters = ML::NearestInteger(InputPlayer.Distance);
+        declare endTime = GameTime + FINISH_TIMEOUT;
+        while(GameTime < endTime){
+            if(InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running){
+                return False;
+            }
+            sleep(10);
+        }
+        if(ML::NearestInteger(InputPlayer.Distance) - startMeters < METERS_TO_DRIVE){
+            TriggerPageAction("{$MODULE|classpath}::mlePutMeToSpec,null");
+            sleep(2000);
+            return True;
+        }
+
+        return False;
+    }
+
+    main(){
+        declare startTime = 0;
+        declare timePassed = 0;
+
+        while(True){
+            yield;
+            if(CurrentServerModeName != "Rounds") return;
+            if(InputPlayer == Null) continue;
+
+            startTime = GameTime;
+
+            while(InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
+                timePassed = GameTime - startTime;
+
+                if(timePassed > Map.MapInfo.TMObjective_AuthorTime){
+                    if(isAfk()) break;
+                }
+
+                sleep(50);
+            }
+
+            sleep(100);
+        }
+    }
+    --></script>
+</manialink>

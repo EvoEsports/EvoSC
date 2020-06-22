@@ -1,10 +1,10 @@
 <?php
 
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Player;
+use EvoSC\Models\Player;
 
 class ScoreTracker
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Controllers\HookController;
+use EvoSC\Controllers\HookController;
 use Exception;
 use TypeError;
 
@@ -22,7 +22,7 @@ use TypeError;
  *     ... do stuff ...
  * });
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Hook
 {

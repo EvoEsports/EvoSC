@@ -13,21 +13,19 @@
     "symfony/process": "^4.2",
     "symfony/event-dispatcher": "^4.2",
     "composer/ca-bundle": "^1.1",
-    "manialib/gbx": "^4.1"
+    "manialib/gbx": "^4.1",
+    "spatie/async": "^1.4"
   },
   "scripts": {
     "pre-install-cmd": [
       "php core/required_directories.php"
-    ],
-    "post-install-cmd": [
-      "composer dumpautoload -o"
     ]
   },
   "autoload": {
-    "classmap": [
-      "core/",
-      "modules/"
-    ]
+    "psr-4": {
+      "EvoSC\\": "core/",
+      "EvoSC\\Modules\\": ["core/modules/", "modules/"]
+    }
   },
   "require-dev": {
     "phpunit/phpunit": "^9"

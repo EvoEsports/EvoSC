@@ -1,20 +1,22 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Classes\Module;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Module;
+use EvoSC\Interfaces\ControllerInterface;
 use Illuminate\Support\Collection;
 
 /**
  * Class ModuleController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class ModuleController implements ControllerInterface
 {
+    const PATTERN = '/(?:core\/Modules|modules)\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
+
     /**
      * @var Collection
      */
@@ -47,24 +49,31 @@ class ModuleController implements ControllerInterface
         return self::$loadedModules;
     }
 
-    public static function startModules(string $mode)
+    public static function startModules(string $mode, bool $isBoot)
     {
         //Boot modules
         Log::info('Starting modules...');
 
         $coreModules = File::getFilesRecursively(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
-        $allModules = $coreModules->merge(File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/'));
+        $allModules = collect([...$coreModules, ...File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/')]);
+        $totalStarted = 0;
 
         $moduleClasses = $allModules
-            ->reject(function ($file) {
-                return preg_match('/\/[Mm]odules\/[a-z\-]+\/.+\/[A-Z].+/', $file);
+            ->filter(function ($file) {
+                return preg_match(self::PATTERN, $file);
             })
             ->mapWithKeys(function ($file) {
-                $file = realpath($file);
-                return ["esc\\Modules\\" . substr(basename($file), 0, -4) => dirname($file)];
+                if(preg_match(self::PATTERN, $file, $matches)){
+                    $dir = $matches[1];
+                    $classname = $matches[2];
+                    return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                }
+
+                return null;
             })
+            ->filter()
             ->unique()
-            ->map(function ($moduleDir, $moduleClass) use ($mode) {
+            ->map(function ($moduleDir, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
                 $files = scandir($moduleDir);
                 $configId = null;
                 $config = null;
@@ -76,12 +85,13 @@ class ModuleController implements ControllerInterface
                 }
 
                 if ($configId == null) {
-                    Log::error('Missing config for module: ' . $moduleClass, true);
+                    Log::warning('No config for module: ' . $moduleClass, true);
                     return null;
                 } else {
                     $config = ConfigController::getConfig($configId, true);
                     $enabled = isset($config->enabled) ? $config->enabled : true;
                     if (!is_null($enabled) && $enabled == false) {
+                        Log::warning("Module: $moduleClass [Disabled]", isVerbose());
                         return null;
                     }
                 }
@@ -91,28 +101,31 @@ class ModuleController implements ControllerInterface
                 try {
                     $instance = new $moduleClass();
                 } catch (\Error $e) {
-                    Log::error($e->getMessage() . ', module not started.');
+                    Log::error('[MODULE ERROR] ' . $e->getMessage() . ' (not started).', true);
                     return null;
                 }
 
                 if (!($instance instanceof Module)) {
-                    Log::error("$moduleClass is not a module, but should be.", true);
+                    Log::error("$moduleClass is not a module, but should be (not started).", true);
                     return null;
                 }
 
                 /** @var $moduleClass Module */
-                $instance::start($mode);
-                $instance->setConfig($config);
+                $instance::start($mode, $isBoot);
+                $instance->setConfigId($configId);
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);
-                Log::info("Module $moduleClass started.", isVeryVerbose());
+                $instance->setName(preg_replace('#^.+[\\\]#', '', $moduleClass));
+                Log::info("Module: $moduleClass [Started]", isVerbose());
+
+                $totalStarted++;
 
                 return $instance;
             })
             ->filter();
 
         //Boot modules
-        Log::write('Finished starting modules.');
+        Log::cyan("Starting modules finished. $totalStarted modules started.");
 
         self::$loadedModules = $moduleClasses;
     }

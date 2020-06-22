@@ -1,0 +1,71 @@
+{contentType text}
+<script><!--
+declare Vec2 HS_POS;
+declare CMlFrame HS_Target;
+declare Boolean HS_Hidden;
+
+Void hs_hide(Integer duration){
+    HS_Hidden = True;
+    declare Real x;
+    if(HS_POS[0] < 0.0){
+        x = (HS_Target.Size[0] * -HS_Target.RelativeScale) - 160.5;
+    }else{
+        x = 160.5;
+    }
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+}
+
+Void hs_show(Integer duration){
+    HS_Hidden = False;
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+}
+
+Void hidescript(){
+    if(HS_Target == Null){
+        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+    }
+
+    declare UISettings settings for This;
+    declare Boolean ESC_Tab_Pressed for This;
+    declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
+
+    if(!settings.hide || InputPlayer == Null){
+        return;
+    }
+
+    declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+    if(mapFinished){
+        if(!HS_Hidden){
+            hs_hide(800);
+        }
+    }else{
+        if(ESC_Tab_Pressed == True){
+            hs_show(1);
+            wait(ESC_Tab_Pressed == False);
+            hs_hide(1);
+        }
+
+        if(InputPlayer == Null){
+            return;
+        }
+
+        {if $is_maniaplanet}
+        declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+        {/if}
+        declare Boolean overHidespeed = ML::Abs(InputPlayer.Speed * 3.6) > hideSpeed;
+
+        if(overHidespeed && !HS_Hidden {if $is_maniaplanet}&& playerIsRacing{/if}){
+            hs_hide(800);
+
+            {if !isset($doNotPause)}
+            wait(InputPlayer.Speed * 3.6 <= hideSpeed {if $is_maniaplanet}|| InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running{/if});
+            {/if}
+        }
+        if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
+            sleep(settings.showDelay);
+            hs_show(600);
+        }
+    }
+}
+--></script>

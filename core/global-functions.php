@@ -1,13 +1,13 @@
 <?php
 
 use Carbon\Carbon;
-use esc\Classes\ChatMessage;
-use esc\Classes\File;
-use esc\Classes\Log;
-use esc\Classes\Server;
-use esc\Controllers\ConfigController;
-use esc\Controllers\PlayerController;
-use esc\Models\Player;
+use EvoSC\Classes\ChatMessage;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Controllers\PlayerController;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -39,6 +39,24 @@ function infoMessage(...$message)
 function warningMessage(...$message)
 {
     return (new ChatMessage(...$message))->setIsWarning();
+}
+
+/**
+ * @param mixed ...$message
+ * @return ChatMessage
+ */
+function successMessage(...$message)
+{
+    return (new ChatMessage(...$message))->setIsSuccess();
+}
+
+/**
+ * @param mixed ...$message
+ * @return ChatMessage
+ */
+function dangerMessage(...$message)
+{
+    return (new ChatMessage(...$message))->setIsDanger();
 }
 
 /**
@@ -112,6 +130,15 @@ function cacheDir(string $filename = ''): string
 
 /**
  * @param string $filename
+ * @return string
+ */
+function mapsDir(string $filename = ''): string
+{
+    return Server::getMapsDirectory() . str_replace('/', DIRECTORY_SEPARATOR, $filename);
+}
+
+/**
+ * @param string $filename
  *
  * @return string
  */
@@ -137,8 +164,7 @@ function modulesDir(string $filename = ''): string
  */
 function ghost(string $filename = ''): string
 {
-    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR,
-            '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
+    return Server::GameDataDirectory() . str_replace('/', DIRECTORY_SEPARATOR, '/Replays/Ghosts/' . $filename . '.Replay.Gbx');
 }
 
 /**
@@ -182,10 +208,18 @@ function onlinePlayers(): Collection
     return Player::whereIn('Login', $logins)->get();
 }
 
+function accessPlayers(string $accessRight): Collection
+{
+    $logins = array_column(Server::getPlayerList(), 'login');
+
+    return Player::whereIn('Login', $logins)->get()->filter(function (Player $player) use ($accessRight) {
+        return $player->hasAccess($accessRight);
+    });
+}
+
 function ml_escape(string $string)
 {
-    $out = str_replace('{', '\u007B', str_replace('}', '\u007D', $string));
-    return str_replace('"', '\u0022', $out);
+    return str_replace('"', '”', $string);
 }
 
 /**
@@ -197,7 +231,7 @@ function ml_escape(string $string)
 function player(string $login, bool $addToOnlineIfOffline = false): Player
 {
     if (PlayerController::hasPlayer($login)) {
-        return esc\Controllers\PlayerController::getPlayer($login);
+        return EvoSC\Controllers\PlayerController::getPlayer($login);
     }
 
     $player = Player::find($login);
@@ -207,22 +241,20 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
         $data = collect(Server::getPlayerList())->where('login', $login)->first();
 
         if ($data) {
-            Player::create([
+            $player = Player::create([
                 'Login' => $data->login,
                 'NickName' => $data->nickName,
             ]);
         } else {
-            Player::create([
+            $player = Player::create([
                 'Login' => $login,
                 'NickName' => $login,
             ]);
         }
-
-        $player = Player::find($login);
     }
 
     if ($addToOnlineIfOffline) {
-        PlayerController::addPlayer($player);
+        PlayerController::putPlayer($player);
     }
 
     return $player;
@@ -256,7 +288,7 @@ function now(): Carbon
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$' . config('colors.secondary') . $str;
+    return '$z$s$' . config('theme.chat.highlight') . $str;
 }
 
 /**
@@ -264,7 +296,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.83.x';
+    return '0.90.0';
 }
 
 /**
@@ -372,4 +404,47 @@ function __(string $id, array $vars = [], string $language = 'en')
 function evo_str_slug($title)
 {
     return Str::slug($title, '-', 'en');
+}
+
+/**
+ * Restart EvoSC and keep its PID
+ */
+function restart_evosc()
+{
+    warningMessage(secondary('EvoSC v' . getEscVersion()), ' is restarting.')->sendAll();
+    Server::chatEnableManualRouting(false);
+    Log::warning('Old process is terminating.');
+    pcntl_exec(PHP_BINARY, $_SERVER['argv']);
+    warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
+    Log::error('[CRITICAL] Failed to create new process, dying...');
+    exit(56);
+}
+
+/**
+ * @param $longColorCode
+ * @return string
+ */
+function getShortColorCode($longColorCode)
+{
+    $hasHash = false;
+    if (substr($longColorCode, 0, 1) == '#') {
+        $hasHash = true;
+        $longColorCode = substr($longColorCode, 1);
+    }
+
+    if (strlen($longColorCode) == 3) {
+        return ($hasHash ? '#' : '') . $longColorCode;
+    }
+
+    $parts = str_split($longColorCode);
+    return ($hasHash ? '#' : '') . $parts[0] . $parts[2] . $parts[4];
+}
+
+/**
+ * @return \Spatie\Async\Pool
+ */
+function async_pool(): \Spatie\Async\Pool
+{
+    global $asyncPool;
+    return $asyncPool;
 }

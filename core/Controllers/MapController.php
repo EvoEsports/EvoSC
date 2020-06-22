@@ -1,25 +1,25 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Classes\ChatCommand;
-use esc\Classes\DB;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\MPS_Map;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Map;
-use esc\Models\MapFavorite;
-use esc\Models\MapQueue;
-use esc\Models\Player;
-use esc\Modules\Dedimania;
-use esc\Modules\LocalRecords;
-use esc\Modules\MxMapDetails;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\MPS_Map;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Map;
+use EvoSC\Models\MapQueue;
+use EvoSC\Models\Player;
+use EvoSC\Modules\Dedimania\Dedimania;
+use EvoSC\Modules\LocalRecords\LocalRecords;
+use EvoSC\Modules\MapList\Models\MapFavorite;
+use EvoSC\Modules\MxDetails\MxDetails;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
@@ -28,7 +28,7 @@ use stdClass;
 /**
  * Class MapController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class MapController implements ControllerInterface
 {
@@ -53,22 +53,25 @@ class MapController implements ControllerInterface
             File::makeDir(cacheDir('gbx'));
         }
 
-        self::$mapsPath = Server::getMapsDirectory();
-        self::$mapToDisable = collect();
-
         if (!$_skipMapCheck) {
             self::loadMaps();
         }
 
-        AccessRight::createIfMissing('map_skip', 'Skip map instantly.');
-        AccessRight::createIfMissing('map_add', 'Add map permanently.');
-        AccessRight::createIfMissing('map_delete', 'Delete map (and all records) permanently.');
-        AccessRight::createIfMissing('map_disable', 'Disable map.');
-        AccessRight::createIfMissing('map_replay', 'Force a replay.');
-        AccessRight::createIfMissing('map_reset', 'Reset round.');
-        AccessRight::createIfMissing('matchsettings_load', 'Load matchsettings.');
-        AccessRight::createIfMissing('matchsettings_edit', 'Edit matchsettings.');
-        AccessRight::createIfMissing('time', 'Change the countdown time.');
+        self::$mapsPath = Server::getMapsDirectory();
+        self::$mapToDisable = collect();
+        self::$currentMap = Map::getByUid(Server::getCurrentMapInfo()->uId);
+
+        AccessRight::add('map_skip', 'Skip map instantly.');
+        AccessRight::add('map_add', 'Add map permanently.');
+        AccessRight::add('map_delete', 'Delete map (and all records) permanently.');
+        AccessRight::add('map_disable', 'Disable map.');
+        AccessRight::add('map_replay', 'Force a replay.');
+        AccessRight::add('map_reset', 'Reset round.');
+        AccessRight::add('force_end_round', 'Force the end of a round (Rounds/Laps).');
+        AccessRight::add('manipulate_time', 'Change the countdown time.');
+        AccessRight::add('manipulate_points', 'Change the points-limit.');
+        AccessRight::add('matchsettings_load', 'Load matchsettings.');
+        AccessRight::add('matchsettings_edit', 'Edit matchsettings.');
     }
 
     /**
@@ -80,7 +83,7 @@ class MapController implements ControllerInterface
     {
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'processMapsToDisable']);
-        Hook::add('Maniaplanet.EndRound_Start', [self::class, 'endMatch']);
+        Hook::add('Maniaplanet.Podium_Start', [self::class, 'endMatch']);
 
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
@@ -89,11 +92,24 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
         ManiaLinkEvent::add('map.reset', [self::class, 'resetRound'], 'map_reset');
+        ManiaLinkEvent::add('force_end_round', [self::class, 'mleForceEndOfRound'], 'force_end_round');
 
-        if (config('quick-buttons.enabled')) {
-            QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-            QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+        QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
+        QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+
+        if ($mode != 'TimeAttack.Script.txt') {
+            QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function mleForceEndOfRound(Player $player)
+    {
+        Server::triggerModeScriptEventArray('Trackmania.ForceEndRound');
+        Server::triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound');
+        warningMessage(secondary($player), ' forced the round to end.')->sendAll();
     }
 
     /**
@@ -115,7 +131,7 @@ class MapController implements ControllerInterface
             'plays' => $map->plays + 1,
         ]);
 
-        MxMapDetails::loadMxDetails($map);
+        MxDetails::loadMxDetails($map);
     }
 
     /**
@@ -124,7 +140,6 @@ class MapController implements ControllerInterface
     public static function endMatch()
     {
         $request = MapQueue::getFirst();
-
         $mapUid = Server::getNextMapInfo()->uId;
 
         if ($request) {
@@ -136,7 +151,6 @@ class MapController implements ControllerInterface
                 }
             }
 
-            QueueController::dropMapSilent($request->map->uid);
             $chosen = Server::chooseNextMap($request->map->filename);
 
             if (!$chosen) {
@@ -154,14 +168,20 @@ class MapController implements ControllerInterface
      *
      * @return Map
      */
-    public static function getCurrentMap(): Map
+    public static function getCurrentMap(): ?Map
     {
         if (!isset(self::$currentMap)) {
-            Log::error('Current map is not set. Exiting...', true);
-            exit(4); //Runtime error
+            list($childClass, $caller) = debug_backtrace(false, 2);
+            Log::warning('Current map is not set, called from: ' . implode('', [basename($caller['class']), $caller['type'], $caller['function']]), true);
+            return null;
         }
 
         return self::$currentMap;
+    }
+
+    public static function current(): Map
+    {
+        return self::getCurrentMap();
     }
 
     /**
@@ -224,6 +244,24 @@ class MapController implements ControllerInterface
 
         QueueController::dropMapSilent($map->uid);
         self::$mapToDisable->push($map);
+    }
+
+    /**
+     * @param Player $player
+     * @param Map $map
+     */
+    public static function enableMap(Player $player, Map $map)
+    {
+        infoMessage($player, ' enabled map ', secondary($map))->sendAll();
+        $map->update(['enabled' => 1]);
+
+        if (!Server::isFilenameInSelection($map->filename)) {
+            try {
+                Server::addMap($map->filename);
+            } catch (Exception $e) {
+                Log::error($e);
+            }
+        }
     }
 
     public static function processMapsToDisable()
@@ -306,7 +344,7 @@ class MapController implements ControllerInterface
      */
     public static function loadMaps()
     {
-        Log::write('Loading maps...');
+        Log::write('Loading maps');
 
         DB::table('maps')
             ->where('enabled', '=', 1)

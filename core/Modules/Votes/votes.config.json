@@ -1,0 +1,28 @@
+{
+  "pos": "-25 65",
+  "scale": 0.95,
+  "duration": 25,
+  "time-multiplier": 1.0,
+  "enabled": true,
+  "time": {
+    "enabled": true,
+    "limit-votes": 2,
+    "cooldown-in-seconds": 120,
+    "success-ratio": 0.5,
+    "multiplier": 1.0,
+    "disable-in-first": 120,
+    "disable-in-last": 15
+  },
+  "points": {
+    "enabled": true,
+    "max-points": 200
+  },
+  "skip": {
+    "enabled": true,
+    "limit-votes": 2,
+    "cooldown-in-seconds": 60,
+    "success-ratio": 0.5,
+    "disable-in-first": 0,
+    "disable-in-last": 180
+  }
+}

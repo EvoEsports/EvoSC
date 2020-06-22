@@ -1,17 +1,16 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\File;
-use esc\Commands\Migrate;
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Commands\Migrate;
+use EvoSC\Commands\SetupAccessRights;
+use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -59,21 +58,19 @@ class SetupController implements ControllerInterface
 
         File::put(cacheDir('.setupfinished'), 1);
 
-        self::migrateAndRun();
-    }
-
-    private static function migrateAndRun()
-    {
-        self::printInfo('Running database migrate.');
-
         $application = new Application();
+        $application->add(new SetupAccessRights());
         $application->add(new Migrate());
+
         try {
             $application->find("migrate")
-                ->addArgument("run", InputArgument::OPTIONAL)
-                ->addOption("--setup", InputArgument::OPTIONAL)
-                ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
-                ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
+                ->run(self::$input, self::$output);
+        } catch (Exception $e) {
+            self::printError($e->getMessage());
+        }
+
+        try {
+            $application->find("setup:access-rights")
                 ->run(self::$input, self::$output);
         } catch (Exception $e) {
             self::printError($e->getMessage());

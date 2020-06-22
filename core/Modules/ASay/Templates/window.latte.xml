@@ -1,0 +1,33 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:asay" id="asay" version="3">
+    {include 'Components.stylesheet'}
+    <label class="text-light" id="text" opacity="1.0" textprefix="$s" halign="center" valign="center" size="80 120" textsize="2.5" autonewline="1" text="{$text|noescape}" pos="{config('asay.pos')|noescape}" />
+
+    <script><!--
+    main() {
+        declare textLabel <=> (Page.MainFrame.GetFirstChild("text") as CMlLabel);
+        declare hidden = False;
+
+        if(textLabel.Value == ""){
+            return;
+        }
+
+        while(True){
+            yield;
+
+            if(InputPlayer == Null) continue;
+            if(InputPlayer.Speed * 3.6 > 50 && !hidden){
+                hidden = True;
+                AnimMgr.Add(textLabel, "<label textcolor='fc20' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                continue;
+            }
+            if(InputPlayer.Speed * 3.6 < 50 && hidden){
+                hidden = False;
+                AnimMgr.Add(textLabel, "<label textcolor='fc2f' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+                continue;
+            }
+        }
+    }
+    --></script>
+</manialink>

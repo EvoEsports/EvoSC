@@ -1,10 +1,12 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
+use GuzzleHttp\Handler\CurlMultiHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
 
 /**
@@ -14,7 +16,7 @@ use GuzzleHttp\RequestOptions;
  *
  * @see     http://docs.guzzlephp.org/en/stable/request-options.html
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class RestClient
 {
@@ -23,7 +25,9 @@ class RestClient
     /**
      * @var Client
      */
-    public static Client $client;
+    private static Client $client;
+
+    private static CurlMultiHandler $curl;
 
     /**
      * Initialize the client
@@ -32,8 +36,12 @@ class RestClient
      */
     public static function init(string $serverName)
     {
-        self::$client = new Client();
+        Log::info('Initializing RestClient -> ' . $serverName, isVerbose());
 
+        self::$curl = new CurlMultiHandler();
+        $handler = HandlerStack::create(self::$curl);
+
+        self::$client = new Client(['handler' => $handler]);
         self::$serverName = stripAll($serverName);
     }
 
@@ -44,7 +52,12 @@ class RestClient
      */
     public static function getClient(): Client
     {
-        return self::getClient();
+        return self::$client;
+    }
+
+    public static function curlTick()
+    {
+        self::$curl->tick();
     }
 
     /**
@@ -57,11 +70,21 @@ class RestClient
      */
     public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        if (isDebug()) {
-            Log::write('GET: ' . $url, isDebug());
-        }
+        Log::write('GET: ' . $url, isVerbose());
 
         return self::$client->request('GET', $url, self::addUserAgentAndDefaultTimeout($options));
+    }
+
+    /**
+     * @param string $url
+     * @param array|null $options
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function getAsync(string $url, array $options = null)
+    {
+        Log::cyan('ASYNC GET: ' . $url, isVerbose());
+
+        return self::$client->getAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     /**
@@ -74,33 +97,22 @@ class RestClient
      */
     public static function post(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        if (isDebug()) {
-            Log::write('POST: ' . $url . ' with options: ' . json_encode($options),
-                isDebug());
-        }
+        Log::write('POST: ' . $url, isVerbose());
 
         return self::$client->request('POST', $url, self::addUserAgentAndDefaultTimeout($options));
     }
 
     /**
-     * Create a put-request.
-     *
      * @param string $url
      * @param array|null $options
-     *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public static function put(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
+    public static function postAsync(string $url, array $options = null)
     {
-        if (isDebug()) {
-            Log::write('PUT: ' . $url . ' with options: ' . json_encode($options),
-                isDebug());
-        }
+        Log::cyan('ASYNC POST: ' . $url, isVerbose());
 
-        return self::$client->request('PUT', $url, self::addUserAgentAndDefaultTimeout($options));
+        return self::$client->postAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
-
-    //Add user-agent to current options.
 
     /**
      * @param array|null $options
@@ -117,12 +129,8 @@ class RestClient
             $options['headers'] = [];
         }
 
-        if (!array_key_exists('connect_timeout', $options)) {
-            $options['connect_timeout'] = config('server.rest-timeout', 10);
-        }
-
         $options[RequestOptions::VERIFY] = CaBundle::getSystemCaRootBundlePath();
-        $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.2', getEscVersion());
+        $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.4', getEscVersion());
 
         return $options;
     }

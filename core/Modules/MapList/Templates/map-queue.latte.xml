@@ -1,0 +1,225 @@
+{contentType text}
+{extends 'Components.tabbed-window'}
+{php $window_width = 156;}
+{php $window_height = 110;}
+{php $doNotStop = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}map-queue{/block}
+    {block title}{$window_title ?? 'Jukebox'}{/block}
+    {block icon}{/block}
+
+    {block navbar}
+    {include 'Components.tabs', tabs => [
+    ' Maps'=>' ',
+    ' Jukebox'=>'',
+    ]
+    }
+    {/block}
+
+    {block content}
+    <framemodel id="Map">
+        <quad class="bg-light" valign="center" pos="-2 0" size="156 4.5" opacity="0"/>
+        <label class="text-light" pos="1 0" valign="center" size="40 3" text="map_name" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="52 0" valign="center" size="30 3" text="author" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="88 0" valign="center" size="30 3" halign="center" text="local" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="115.5 0" valign="center" size="3 3" text="" textsize="0.6" z-index="1" hidden="1"/>
+        <label class="text-light" pos="107 0" valign="center" size="30 3" halign="center" text="♦♦♦♦♦" textsize="0.6" z-index="1"/>
+
+        <frame id="buttons" pos="130 0" z-index="5">
+            <label class="btn drop btn-danger" data-tab="01" size="11 3" text=" Drop" textsize="0.3" ScriptEvents="1"/>
+            <label class="btn info btn-muted" data-tab="012" size="10 3" text=" Info" textsize="0.3" ScriptEvents="1"/>
+        </frame>
+    </framemodel>
+
+    <frame id="map-list-window" pos="0 -7" z-index="300">
+        <frame id="maps-all" pos="0 -2" z-index="2">
+            <label class="text-accent" pos="1  1" textsize="1" text="Name" scale="0.8"/>
+            <label class="text-accent" pos="52 1" textsize="1" text="Author" scale="0.8"/>
+            <label class="text-accent" pos="88 1" textsize="1" text="Local" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="96 1" textsize="1" text="Dedi" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="107 1" textsize="1" text="Requested by" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="117 1" textsize="1" text="Favorite" halign="center" scale="0.8" hidden="1"/>
+
+            <frame id="map-list" pos="0 -3">
+                {for $i = 0; $i<20; $i++}
+                <frameinstance pos="0 {$i * -4 - 2}" modelid="Map" hidden="0"/>
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+    {/block}
+
+    {block scriptDeclarations}
+    <script><!--
+declare Real buttonsWidth;
+    --></script>
+    {/block}
+
+    {block functions}
+    <script><!--
+Text getLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+
+    if(Locals.existskey(mapId)){
+        return TL::ToText(Locals[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+
+    if(Dedis.existskey(mapId)){
+        return TL::ToText(Dedis[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Void rearrangeButtons(){
+    declare Text listId = "";
+    declare Text buttonsId = "";
+    listId = "map-list";
+    buttonsId = "buttons";
+    declare mapList <=> (Page.MainFrame.GetFirstChild(listId) as CMlFrame);
+    declare Real padding;
+
+    buttonsWidth = 0.0;
+
+    foreach(control in mapList.Controls){
+        declare buttonsFrame = ((control as CMlFrame).GetFirstChild(buttonsId) as CMlFrame);
+        padding = 0.0;
+
+        foreach(button in buttonsFrame.Controls){
+            if(!button.Visible){
+                continue;
+            }
+
+            declare Real width = button.Size[0];
+            declare offset = width / 2.0 + padding;
+            button.RelativePosition_V3 = <offset, 0.0>;
+            padding = offset + width / 2.0 + 1.0;
+        }
+
+        if(padding > buttonsWidth){
+            buttonsWidth = padding;
+        }
+    }
+}
+
+Void updateWindow(Text[Text][] MapQueue){
+    declare mapList <=> (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare i = 0;
+
+    foreach(map in MapQueue){
+        if(mapList.Controls.count <= i){
+            break;
+        }
+
+        declare frame = (mapList.Controls[i] as CMlFrame);
+        frame.DataAttributeSet("uid", map["uid"]);
+        frame.DataAttributeSet("id", map["id"]);
+        (frame.Controls[1] as CMlLabel).Value = map["name"];
+        (frame.Controls[2] as CMlLabel).Value = map["author"];
+        (frame.Controls[3] as CMlLabel).Value = getLocal(map["id"]);
+        (frame.Controls[4] as CMlLabel).Value = getDedi(map["id"]);
+        (frame.Controls[6] as CMlLabel).Value = map["nick"];
+        ((frame.Controls[7] as CMlFrame).Controls[0] as CMlLabel).Visible = (LocalUser.Login == map["login"] || {$localPlayer->hasAccess('map_queue_drop') ? 'True' : 'False'});
+        frame.Show();
+
+        i += 1;
+    }
+
+    for(i, i, mapList.Controls.count - 1){
+        mapList.Controls[i].Hide();
+    }
+}
+
+Void buttonPressed(CMlFrame mapFrame, CMlControl control){
+    if(control.HasClass("drop")){
+        TriggerPageAction("map.drop," ^ mapFrame.DataAttributeGet("uid"));
+        return;
+    }
+
+    if(control.HasClass("info")){
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("uid"));
+        return;
+    }
+}
+--></script>
+    {/block}
+
+    <script><!--
+    {block bootScript}
+        window.Hide();
+        rearrangeButtons();
+
+        declare Text MapSearchQuery for LocalUser;
+        declare Text[Text][] MapQueue for This;
+        declare Integer lastMapQueueUpdate for This = 0;
+        declare Integer lastUpdate = 0;
+        declare Boolean showQueue for This = False;
+        declare Boolean queueVisible for This;
+        declare Boolean mapListVisible for This;
+        declare Vec2 MapWindowPos for This;
+        MapWindowPos = window.RelativePosition_V3;
+    {/block}
+
+    {block pendingEvents}
+        if(event.Control.HasClass("nav-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+            if((event.Control as CMlLabel).Value == " Maps"){
+                MapSearchQuery = " ";
+                window.Hide();
+            }
+        }
+
+        if(event.Control.HasClass("btn")){
+            declare mapFrame = (event.Control.Parent.Parent as CMlFrame);
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                buttonPressed(mapFrame, event.Control);
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOver){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.25;
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOut){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                continue;
+            }
+        }
+    {/block}
+
+    {block loop}
+    if(lastUpdate != lastMapQueueUpdate){
+        lastUpdate = lastMapQueueUpdate;
+        updateWindow(MapQueue);
+    }
+
+    if(showQueue){
+        showQueue = False;
+        window.Show();
+    }
+
+    if(mapListVisible && queueVisible){
+        window.Hide();
+    }
+    queueVisible = window.Visible;
+
+    if(MapWindowPos != window.RelativePosition_V3){
+        if(window.Visible){
+            MapWindowPos = window.RelativePosition_V3;
+        }else{
+            window.RelativePosition_V3 = MapWindowPos;
+        }
+    }
+    {/block}
+--></script>
+</manialink>

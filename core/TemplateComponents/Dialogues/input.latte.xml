@@ -1,0 +1,42 @@
+{contentType text}
+<frame id="input-dialog" z-index="99999" hidden="1">
+    <quad class="bg-blur" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
+
+    <label text="Enter something" class="text-light" pos="0 11" scale="2.4" valign="center" halign="center" z-index="1" />
+    <entry class="form" pos="0 1" scale="1.6" valign="center" halign="center" z-index="1" textsize="2" size="100 6" />
+    <label text="Confirm" class="btn-success confirm" pos="-10.5 -12" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />
+    <label text="Cancel" class="btn-danger cancel" pos="10.5 -12" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />
+</frame>
+
+<script><!--
+    Text input(Text question){
+        declare inputDialogFrame <=> (Page.MainFrame.GetFirstChild("input-dialog") as CMlFrame);
+        declare Text answer = "";
+        declare Boolean decided = False;
+
+        //Set question text
+        (inputDialogFrame.Controls[1] as CMlLabel).Value = question;
+
+        //show confirm dialog
+        inputDialogFrame.Show();
+
+        while(!decided){
+            yield;
+
+            foreach(event in PendingEvents){
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
+                    answer = (inputDialogFrame.Controls[2] as CMlEntry).Value;
+                    decided = True;
+                }
+                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+                    decided = True;
+                }
+            }
+        }
+
+        //hide confirm dialog
+        inputDialogFrame.Hide();
+
+        return TL::Trim(answer);
+    }
+--></script>

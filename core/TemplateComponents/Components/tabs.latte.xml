@@ -1,0 +1,15 @@
+{contentType text}
+<frame id="navbar" pos="0 -5.5" z-index="5">
+    {php $i=0;}
+    {foreach $tabs as $tab => $action}
+    {if $action == ''}
+    <quad id="nav-active" class="bg-accent" pos="{$i * 18 + 10} -3" size="17 4" z-index="-1" halign="center" valign="center"/>
+    {/if}
+
+    {if trim($action) == ''}
+    <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" text="{$tab}" size="17 4" ScriptEvents="1"/>
+    {else}
+    <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" textcolor="{config('theme.hud.text-light')}" text="{$tab}" size="17 4" action="{$action}"/>
+    {/if}
+    {/foreach}
+</frame>

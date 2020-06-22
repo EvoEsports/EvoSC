@@ -1,14 +1,14 @@
 <?php
 
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Pb
- * @package esc\Models
+ * @package EvoSC\Models
  *
  * @property int map_id;
  * @property int player_id;

@@ -1,9 +1,11 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Player;
+use EvoSC\Exceptions\UnauthorizedException;
+use EvoSC\Models\Player;
+use Exception;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +13,7 @@ use Illuminate\Support\Collection;
  *
  * Handle actions send from ManiaScripts (clients).
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ManiaLinkEvent
 {
@@ -90,6 +92,14 @@ class ManiaLinkEvent
         $maniaLinkEvents->push($event);
     }
 
+    /**
+     * @param Player $player
+     * @param $gameTime
+     * @param $action
+     * @param $i
+     * @param $isFinished
+     * @param mixed ...$body
+     */
     public static function maniaLinkExtended(Player $player, $gameTime, $action, $i, $isFinished, ...$body)
     {
         if (!self::$extendedMLE->has($gameTime)) {
@@ -123,24 +133,28 @@ class ManiaLinkEvent
             Log::write("$action", false);
         }
 
-        if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
+        if (preg_match('/^(.+)::(.+?),/', $action, $matches)) {
+            $callback = [$matches[1], $matches[2]];
+        } else if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 
             if (!$event) {
-                Log::warning("Calling non-existent ManiaLinkEvent $action.");
+                Log::warning("Calling undefined ManiaLinkEvent $action.");
 
                 return;
             }
+
+            if ($event->access != null && !$ply->hasAccess($event->access)) {
+                warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
+                Log::write('Player ' . $ply . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::',
+                        $event->callback));
+
+                return;
+            }
+
+            $callback = $event->callback;
         } else {
             Log::warning("Malformed ManiaLinkEvent $action.");
-
-            return;
-        }
-
-        if ($event->access != null && !$ply->hasAccess($event->access)) {
-            warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
-            Log::write('Player ' . $ply . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::',
-                    $event->callback));
 
             return;
         }
@@ -156,7 +170,15 @@ class ManiaLinkEvent
             array_push($arguments, $formValuesObject);
         }
 
-        call_user_func_array($event->callback, $arguments);
+        try {
+            call_user_func_array($callback, $arguments);
+        } catch (UnauthorizedException $e) {
+            warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
+            Log::warning($e->getMessage());
+        } catch (Exception $e) {
+            Log::error("An error occured calling " . $callback[0] . '::' . $callback[1] . ": " . $e->getMessage());
+            Log::write($e->getTraceAsString(), isVerbose());
+        }
     }
 
     public static function removeAll()

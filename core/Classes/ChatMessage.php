@@ -1,10 +1,11 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Map;
-use esc\Models\Player;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
+use Illuminate\Support\Collection;
 use stdClass;
 
 /**
@@ -12,7 +13,7 @@ use stdClass;
  *
  * Create and send chat/info/warning messages.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ChatMessage
 {
@@ -29,7 +30,7 @@ class ChatMessage
      */
     public function __construct(...$message)
     {
-        $this->color = config('colors.primary');
+        $this->color = config('theme.chat.info');
         $this->parts = $message;
     }
 
@@ -68,7 +69,7 @@ class ChatMessage
      */
     public function setIsInfoMessage(): ChatMessage
     {
-        $this->color = config('colors.info');
+        $this->color = config('theme.chat.info');
         $this->icon = '';
 
         return $this;
@@ -81,8 +82,30 @@ class ChatMessage
      */
     public function setIsWarning(): ChatMessage
     {
-        $this->color = config('colors.warning');
-        $this->icon = '';
+        $this->color = config('theme.chat.warning');
+        $this->icon = '';
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setIsDanger(): ChatMessage
+    {
+        $this->color = config('theme.chat.danger');
+        $this->icon = '';
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setIsSuccess(): ChatMessage
+    {
+        $this->color = config('theme.chat.success');
+        $this->icon = '';
 
         return $this;
     }
@@ -168,7 +191,7 @@ class ChatMessage
     /**
      * Send the message to a specific player.
      *
-     * @param Player|null|string  $player
+     * @param mixed $player
      */
     public function send($player = null)
     {
@@ -179,11 +202,12 @@ class ChatMessage
         if ($player instanceof Player) {
             Server::chatSendServerMessage($this->getMessage(), $player->Login);
             Log::info("(@$player)".$this->getMessage(), isVerbose());
-        } else {
-            if (is_string($player)) {
-                Server::chatSendServerMessage($this->getMessage(), $player);
-                Log::info("(@$player)".$this->getMessage(), isVerbose());
-            }
+        } else if (is_string($player)) {
+            Server::chatSendServerMessage($this->getMessage(), $player);
+            Log::info("(@$player)".$this->getMessage(), isVerbose());
+        } else if ($player instanceof Collection) {
+            Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
+            Log::info($this->getMessage(), isVerbose());
         }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "module": "dedimania",
+  "login": "",
+  "key": "",
+  "text-color": "4b2",
+  "ui": {
+    "position": "left",
+    "slot": 11
+  },
+  "rows": 16,
+  "showtop": 3,
+  "echo-top": 100,
+  "enabled": false
+}

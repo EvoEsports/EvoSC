@@ -1,0 +1,101 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:{include id}" id="{include id}" version="3">
+{include 'Components.stylesheet'}
+
+<frame id="window" pos="0 0" scale="1.0" hidden="{isset($startHidden) ? 1 : 0}">
+    <quad class="bg-accent" size="{$window_width ?? 120} 6" opacity="0.9" z-index="-3"/>
+    <quad class="bg-accent" pos="0 -6" size="{$window_width ?? 120} 0.4" valign="center" />
+    <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 6" z-index="5"/>
+    <quad class="bg-dark" size="{$window_width ?? 120} 6" opacity="0.4" z-index="-1"/>
+    <quad id="bg" class="bg-dark" pos="0 -6" size="{$window_width ?? 120} {$window_height ?? 77}" opacity="0.9" z-index="-1"/>
+    <label class="icon text-light" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
+    <label class="text-light" pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center"/>
+    <label class="close text-light" pos="{($window_width ?? 120) - 3} -3" size="6 6" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+
+    <frame pos="2 -8" z-index="10">
+        {include content}
+    </frame>
+</frame>
+
+<script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Integer showDelay;
+    Real scale;
+    Boolean sb_blur;
+    Boolean viewer_count;
+}
+
+{include globals}
+declare Boolean alertUnsavedChanges;
+declare Real lastScale__;
+--></script>
+
+{include 'Scripts.drag'}
+{include 'Dialogues.confirm'}
+{include 'Scripts.mle'}
+
+<script><!--
+{include functions}
+
+main() {
+    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+    declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
+    declare UISettings settings for This;
+
+    if(settings.speed == 0){
+        settings.hide = True;
+        settings.showDelay = 0;
+        settings.speed = 10;
+        settings.scale = 1.0;
+    }
+
+    if(settings.scale == 0.0){
+        settings.scale = 1.0;
+        settings.viewer_count = True;
+    }
+
+    window.Scale = settings.scale;
+    lastScale__ = settings.scale;
+
+    {include bootScript}
+
+    while(True){
+        yield;
+
+        if(window.Visible){
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+
+                if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    window.Hide();
+                    {if !isset($doNotExit)}
+                    return;
+                    {/if}
+                }
+
+                {include pendingEvents}
+            }
+
+            maniaLinkDrag();
+
+            if(lastScale__ != settings.scale){
+                lastScale__ = settings.scale;
+                AnimMgr.Add(window, """<frame scale='""" ^ lastScale__ ^ """' />""", 400, CAnimManager::EAnimManagerEasing::ExpInOut);
+                sleep(400);
+            }
+        }else{
+            sleep(250);
+        }
+
+        {include loop}
+    }
+}
+    --></script>
+</manialink>

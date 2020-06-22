@@ -1,0 +1,194 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
+    {include 'Components.stylesheet'}
+    <framemodel id="box" valign="center" halign="center">
+        <quad class="bg-dark" pos="-7.5" halign="center" valign="center" size="5 4" opacity="0.5" z-index="-1" />
+        <label class="text-light" pos="-7.5 0.25" halign="center" valign="center" textsize="0.4"/>
+        <quad class="bg-danger" pos="2.5" halign="center" valign="center" size="15 4" opacity="0.85" z-index="-1" />
+        <label class="text-light" pos="2.55 0.25" halign="center" valign="center" textsize="0.6"/>
+        <label class="text-light" text="" halign="center" valign="center" opacity="0.5" hidden="1" />
+        <label class="text-light" text="+" halign="center" valign="center" textsize="0.5" z-index="1" hidden="1" />
+    </framemodel>
+
+    <frame id="cpdiffs" pos="0 -65" scale="0.85">
+        <label id="target-label" class="text-light" pos="0 -10" text="$s{$target->name}$z$s | {$target->score|score}" opacity="1" halign="center" textsize="1"/>
+
+        <frame size="20 13" pos="-10 -10">
+            <frame pos="10 -2.25">
+                <!--suppress CheckTagEmptyBody -->
+                <frame id="boxes">
+                    {for $i=0;$i<100;$i++}
+                    <frameinstance modelid="box" pos="0 {$i * 4.25}" size="10 10" hidden="1"></frameinstance>
+                    {/for}
+                </frame>
+            </frame>
+        </frame>
+    </frame>
+
+    <script>
+        <!--
+        #Include "MathLib" as ML
+        #Include "TextLib" as TL
+
+        #Struct Target_V2 {
+            Integer score;
+            Integer[] cps;
+            Text name;
+            Text map_uid;
+        }
+
+        declare Vec3 colorGreen;
+        declare Vec3 colorRed;
+        declare Vec3 colorBlue;
+        declare Target_V2 target;
+
+        Text formatDiff(Integer diff){
+            declare Text sign;
+            declare Integer ms = diff;
+
+            if(ms < 0){
+                ms *= -1;
+            }
+
+            declare Integer minutes = ML::FloorInteger(ms / 60000.0);
+            ms -= minutes * 60000;
+            declare seconds = ML::FloorInteger(ms / 1000.0);
+            ms -= seconds * 1000;
+
+            if(diff < 0){
+                sign = "-";
+            }else{
+                sign = "+";
+            }
+
+            if(minutes > 0){
+                return sign ^ minutes ^ ":" ^ TL::FormatInteger(seconds, 2) ^ "." ^ TL::FormatInteger(ms, 3);
+            }
+
+            return sign ^ seconds ^ "." ^ TL::FormatInteger(ms, 3);
+        }
+
+        Void fillBox(Integer cpId, Integer score, Boolean finish){
+            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            declare boxFrame = (boxesFrame.Controls[cpId] as CMlFrame);
+
+            if(!target.cps.existskey(cpId)){
+                return;
+            }
+
+            declare diff = score - target.cps[cpId];
+
+            if(finish){
+                (boxFrame.Controls[1] as CMlLabel).Value = "";
+            }else{
+                (boxFrame.Controls[1] as CMlLabel).Value = (cpId + 1) ^ "";
+            }
+            (boxFrame.Controls[3] as CMlLabel).Value = formatDiff(diff);
+
+            if(diff > 0){
+                (boxFrame.Controls[2] as CMlQuad).BgColor = colorRed;
+                (boxFrame.Controls[4] as CMlLabel).TextColor = colorRed;
+                (boxFrame.Controls[5] as CMlLabel).Value = "+";
+            }else{
+                if(diff == 0){
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = colorBlue;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = colorBlue;
+                    (boxFrame.Controls[5] as CMlLabel).Value = "";
+                }else{
+                    (boxFrame.Controls[2] as CMlQuad).BgColor = colorGreen;
+                    (boxFrame.Controls[4] as CMlLabel).TextColor = colorGreen;
+                    (boxFrame.Controls[5] as CMlLabel).Value = "-";
+                }
+            }
+
+            for(i, 0, 3){
+                boxFrame.Controls[i].Show();
+            }
+            boxFrame.Controls[4].Hide();
+            boxFrame.Controls[5].Hide();
+
+            if(cpId > 0){
+                declare previousBox = (boxesFrame.Controls[cpId - 1] as CMlFrame);
+                for(i, 0, 3){
+                    previousBox.Controls[i].Hide();
+                }
+                previousBox.Controls[4].Show();
+                previousBox.Controls[5].Show();
+            }
+
+            boxFrame.Show();
+            AnimMgr.Add(boxesFrame, "<frame pos='0 " ^ (cpId * -4.25) ^ "' />", 450, CAnimManager::EAnimManagerEasing::QuintOut);
+        }
+
+        Void respawn(){
+            declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
+            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+            boxesFrame.RelativePosition_V3 = <0.0, 0.0>;
+            targetLabel.Visible = True;
+            AnimMgr.Add(targetLabel, "<label opacity='1.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+
+            foreach(box in boxesFrame.Controls){
+                box.Hide();
+            }
+        }
+
+        main(){
+            target.fromjson("""{json_encode($target)|noescape}""");
+            declare player <=> GUIPlayer;
+            declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
+            declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
+
+            colorGreen = TL::ToColor("{config('theme.form.success.bg')}");
+            colorRed = TL::ToColor("{config('theme.form.danger.bg')}");
+            colorBlue = TL::ToColor("3086bf");
+
+            while(True){
+                yield;
+
+                cpDiffs.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
+
+                if(target.map_uid != "" ^ Map.Id){
+                    cpDiffs.Hide();
+                    TriggerPageAction("request_cp_diffs");
+                    return;
+                }
+
+                if(player == Null || !cpDiffs.Visible){
+                    sleep(200);
+                    continue;
+                }
+
+                if(targetLabel.Visible && player.Speed * 3.6 > 10.0){
+                    AnimMgr.Add(targetLabel, "<label opacity='0.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+                    sleep(300);
+                    targetLabel.Visible = False;
+                }
+
+                {if $is_maniaplanet}
+                foreach(event in RaceEvents){
+                    if(event.Player.User.Login == player.Login){
+                        switch(event.Type){
+                            case CTmRaceClientEvent::EType::WayPoint: fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+                            case CTmRaceClientEvent::EType::Respawn: respawn();
+                        }
+                    }
+                }
+                {else}
+                foreach (Event in PendingEvents) {
+                    if(Event.Type == CSmModeEvent::EType::OnPlayerTriggersWaypoint){
+                        log(Event);
+                        //fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
+                        continue;
+                    }
+                    if(Event.Type == CSmModeEvent::EType::OnPlayerRequestRespawn){
+                        respawn();
+                        continue;
+                    }
+                }
+                {/if}
+            }
+        }
+        -->
+    </script>
+</manialink>

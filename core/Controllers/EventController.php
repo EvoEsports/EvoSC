@@ -1,23 +1,23 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Map;
-use esc\Models\Player;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
 use Exception;
 
 /**
  * Class EventController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class EventController implements ControllerInterface
 {
@@ -104,10 +104,7 @@ class EventController implements ControllerInterface
 
             $player->spectator_status = $playerInfo['SpectatorStatus'];
             $player->player_id = $playerInfo['PlayerId'];
-
-            if (PlayerController::hasPlayer($player->Login)) {
-                PlayerController::addPlayer($player);
-            }
+            PlayerController::putPlayer($player);
         }
     }
 
@@ -148,8 +145,13 @@ class EventController implements ControllerInterface
             }
 
             try {
-                ChatController::playerChat(player($login), $text);
                 Hook::fire('PlayerChat', player($login), $text);
+            } catch (Exception $e) {
+                Log::write("Error: " . $e->getMessage());
+            }
+
+            try {
+                ChatController::playerChat(player($login), $text);
             } catch (Exception $e) {
                 Log::write("Error: " . $e->getMessage());
             }

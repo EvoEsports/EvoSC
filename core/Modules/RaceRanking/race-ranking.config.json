@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "ui": {
+    "position": "left",
+    "slot": 9,
+    "show": 10
+  }
+}

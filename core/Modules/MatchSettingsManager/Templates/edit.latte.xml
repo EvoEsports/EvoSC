@@ -1,0 +1,159 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3">
+    <frame id="window" pos="-45 10" size="90 70">
+        <quad pos="0 0" size="90 5" bgcolor="{config('colors.ui.window.header.color')}" opacity="0.9" z-index="-1"/>
+        <quad id="handle" data-id="help" pos="0 0" size="85 5" z-index="5"/>
+        <quad id="bg" pos="0 -5" size="90 100" bgcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity')}" z-index="-1"/>
+        <label pos="5 -2.5" textsize="0.8" text="Edit {$name} (no saving)" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}"/>
+        <label pos="2 -2.5" textsize="0.8" text="" textprefix="$s" valign="center" textfont="{config('colors.ui.font')|noescape}" action="msm.overview"/>
+        <label class="close" pos="87.5 -2.5" size="5 5" textsize="0.75" text="" textfont="{config('colors.ui.font')|noescape}" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+
+        <entry id="filename" pos="2 -9" size="60 4" textsize="0.5" valign="center" textfont="{config('colors.ui.font')|noescape}" />
+        <label class="save" pos="75 -9" size="25 4" text=" Save" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+
+        <frame pos="2 -15" id="rows">
+            {php $row=0}
+            {foreach $nodes as $key => $node}
+            <frame id="r{$row}" pos="0 {$row * -4.5}" data-row="{$row}" data-nodes="{count($node)}">
+                {if !is_string($node)}
+                <label class="collapsable" pos="43 0" size="86 4" textprefix="{$key}  " text="" halign="center" valign="center" textsize="0.5" textfont="{config('colors.ui.font')|noescape}"
+                       ScriptEvents="1" focusareacolor1="{config('colors.ui.window.header.color')}3" focusareacolor2="{config('colors.ui.window.header.color')}9" />
+
+                <frame pos="0 -1.5" size="86 {count($node)*5}" z-index="100">
+                    <quad pos="0 -0.5" size="100 {count($node)*5}" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
+                    {php $i=0}
+                    {foreach $node as $subKey => $subNode}
+                    <label pos="2 {$i * -5 - 3}" size="55 4" text="{$subKey}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                    <entry class="entry" pos="84 {$i++ * -5 - 2.5}" size="35 4" default="{$subNode}" data-key="{$subKey}" data-prev="{$subNode}" data-parent="{$key}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                    {/foreach}
+                </frame>
+                {else}
+                <quad pos="0 2" size="86 4" bgcolor="{config('colors.ui.window.bg.color')}" opacity="0.5" z-index="-1" />
+                <label pos="2 0" size="55 4" text="{$key}" halign="left" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                <entry class="entry" pos="84 0" size="35 4" default="{$node}" data-key="{$key}" data-prev="{$node}" halign="right" valign="center" textsize="0.75" textfont="{config('colors.ui.font')|noescape}" />
+                {/if}
+            </frame>
+            {php $row++}
+            {/foreach}
+        </frame>
+    </frame>
+
+    {include 'Scripts.includes'}
+    {include 'Scripts.drag'}
+    {include 'Scripts.resize'}
+
+    <script><!--
+
+    Boolean isCollapsed(CMlFrame frame){
+        declare trigger = (frame.Controls[0] as CMlLabel);
+        return trigger.Value == "";
+    }
+
+    Void moveDown(Integer index, Integer nodes){
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+
+        for(i, index + 1, rows.Controls.count - 1){
+            declare row = (rows.Controls[i] as CMlFrame);
+            declare targetY = row.RelativePosition_V3[1] - (nodes * 5.0);
+            AnimMgr.Add(row, "<frame pos='0 "^targetY^"' />", 200, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }
+
+    Void moveUp(Integer index, Integer nodes){
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+
+        for(i, index + 1, rows.Controls.count - 1){
+            declare row = (rows.Controls[i] as CMlFrame);
+            declare targetY = row.RelativePosition_V3[1] + (nodes * 5.0);
+            AnimMgr.Add(row, "<frame pos='0 "^targetY^"' />", 200, CAnimManager::EAnimManagerEasing::ExpInOut);
+        }
+    }
+
+    Void save(){
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare filenameEntry <=> (Page.MainFrame.GetFirstChild("filename") as CMlEntry);
+        declare Text[Text] changedNodes = Text[Text];
+
+        Page.GetClassChildren("entry", window, True);
+
+        foreach(entryControl in Page.GetClassChildren_Result){
+            declare entry = (entryControl as CMlEntry);
+            declare key = entry.DataAttributeGet("key");
+            declare prevValue = entry.DataAttributeGet("prev");
+            declare parent = entry.DataAttributeGet("parent");
+
+            if(entry.Value != prevValue){
+                if(parent != ""){
+                    changedNodes[parent ^ "." ^ key] = entry.Value;
+                }else{
+                    changedNodes[key] = entry.Value;
+                }
+            }
+        }
+
+        TriggerPageAction("msm.update,{$name|noescape}," ^ filenameEntry.Value ^ "," ^ changedNodes.tojson());
+    }
+
+    main(){
+        declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+        declare filenameEntry <=> (Page.MainFrame.GetFirstChild("filename") as CMlEntry);
+
+        filenameEntry.SetText("{$name}", False);
+
+        foreach(row in rows.Controls){
+            declare r = (row as CMlFrame);
+
+            if(r.Controls[0].HasClass("collapsable")){
+                declare sub = (r.Controls[1] as CMlFrame);
+                r.DataAttributeSet("oy", "" ^ r.RelativePosition_V3[1]);
+                sub.DataAttributeSet("osy", "" ^ sub.Size[1]);
+                sub.Size = <sub.Size[0], 0.0>;
+            }
+        }
+
+        while(True){
+            yield;
+
+            if(window.Visible){
+                windowresize();
+
+                foreach(event in PendingEvents){
+                    if(event.Control == Null) continue;
+
+                    if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        window.Hide();
+                        return;
+                    }
+
+                    if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        save();
+                    }
+
+                    if(event.Control.HasClass("collapsable") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare label = (event.Control as CMlLabel);
+                        declare frame = (event.Control.Parent.Controls[1] as CMlFrame);
+                        declare index = TL::ToInteger(event.Control.Parent.DataAttributeGet("row"));
+                        declare nodes = TL::ToInteger(event.Control.Parent.DataAttributeGet("nodes"));
+
+                        if(isCollapsed(event.Control.Parent)){
+                            label.SetText("");
+                            declare osy = TL::ToReal(frame.DataAttributeGet("osy"));
+                            AnimMgr.Add(frame, "<frame size='"^frame.Size[0]^" "^osy^"' />", 200, CAnimManager::EAnimManagerEasing::ExpInOut);
+                            moveDown(index, nodes);
+                        }else{
+                            label.SetText("");
+                            AnimMgr.Add(frame, "<frame size='"^frame.Size[0]^" 0' />", 200, CAnimManager::EAnimManagerEasing::ExpInOut);
+                            moveUp(index, nodes);
+                        }
+                    }
+                }
+
+                maniaLinkDrag();
+            }
+        }
+    }
+
+    --></script>
+</manialink>

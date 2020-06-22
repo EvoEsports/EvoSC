@@ -1,0 +1,140 @@
+{contentType text}
+{extends 'Components.tabbed-window'}
+
+{block id}
+help-window
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Help
+{/block}
+
+
+{block navbar}
+    {include 'Components.tabs', tabs => [
+        'Commands'=>'',
+        'About'=>'help.show_about'
+    ]
+    }
+{/block}
+
+{block content}
+<frame id="commands">
+    {for $i=0; $i<20; $i++}
+    <frame pos="0 {$i * -3.5 - 8}">
+        <label class="text-light" size="20 3" textsize="0.5" text="cmd" textprefix="$s" valign="center"/>
+        <label class="text-light" pos="20 0" size="97 3" textsize="0.5" text="description" textprefix="$s" valign="center"/>
+    </frame>
+    {/for}
+</frame>
+
+<frame pos="1 -79">
+{include 'Components.pagination'}
+</frame>
+
+<label id="restricted" class="text-light" pos="115 -78.75" textsize="0.2" text=" = Restricted access" textprefix="$s" valign="center" halign="right" hidden="1"/>
+{/block}
+
+{block scriptDeclarations}
+<script><!--
+#Struct Command {
+    Text command;
+    Text description;
+    Text access;
+}
+
+declare Boolean restrictedVisible;
+declare Integer currentPage;
+declare Integer maxPage;
+declare Command[] commands;
+
+Void showRestricted(){
+    if(restrictedVisible){
+        return;
+    }
+
+    declare restrictedLabel <=> (Page.MainFrame.GetFirstChild("restricted") as CMlLabel);
+    restrictedLabel.Show();
+    restrictedVisible = True;
+}
+
+Void updateView(){
+    declare commandsFrame <=> (Page.MainFrame.GetFirstChild("commands") as CMlFrame);
+    declare skip = currentPage * 20;
+    declare skipped = 0;
+    declare filled = 0;
+
+    foreach(command in commands){
+        if(skipped < skip) {
+            skipped = skipped + 1;
+            continue;
+        }
+
+        declare row = (commandsFrame.Controls[filled] as CMlFrame);
+        row.Show();
+
+        (row.Controls[0] as CMlLabel).SetText(command.command);
+        (row.Controls[1] as CMlLabel).SetText(command.description);
+
+        if(command.access != ""){
+            (row.Controls[0] as CMlLabel).SetText((row.Controls[0] as CMlLabel).Value ^ " ${config('colors.ui.window.header.color')|noescape}");
+            showRestricted();
+        }
+
+        filled = filled + 1;
+
+        if(filled == 20){
+            return;
+        }
+    }
+
+    for(x, filled, 19){
+        (commandsFrame.Controls[x] as CMlFrame).Hide();
+    }
+}
+
+Void updatePageInfo(){
+    declare pageInfoLabel <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    pageInfoLabel.SetText((currentPage + 1) ^ "/" ^ maxPage);
+}
+--></script>
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+    declare helpFrame <=> (Page.MainFrame.GetFirstChild("help") as CMlFrame);
+
+    declare commandsJson = """{$commands|noescape}""";
+    commands.fromjson(commandsJson);
+
+    restrictedVisible = False;
+    maxPage = ML::CeilingInteger(commands.count / 20.0);
+    currentPage = 0;
+    updateView();
+    updatePageInfo();
+{/block}
+
+        {block loop}
+        {/block}
+
+{block pendingEvents}
+    if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+        currentPage = currentPage - 1;
+        if(currentPage < 0){ currentPage = maxPage; }
+        updateView();
+        updatePageInfo();
+    }
+
+    if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+        currentPage = currentPage + 1;
+        if(currentPage >= maxPage){ currentPage = 0; }
+        updateView();
+        updatePageInfo();
+    }
+{/block}

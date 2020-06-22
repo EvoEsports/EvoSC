@@ -1,11 +1,12 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Carbon\Carbon;
-use esc\Controllers\UserSettingsController;
-use esc\Modules\MxKarma;
+use EvoSC\Controllers\UserSettingsController;
+use EvoSC\Modules\Dedimania\Models\Dedi;
+use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,7 @@ use Illuminate\Support\Collection;
 /**
  * Class Player
  *
- * @package esc\Models
+ * @package EvoSC\Models
  * @property int $id
  * @property string $Login
  * @property string $NickName
@@ -61,7 +62,7 @@ class Player extends Model
     /**
      * Gets the players current time (formatted)
      *
-     * @param  boolean  $asMilliseconds
+     * @param boolean $asMilliseconds
      *
      * @return mixed|string
      */
@@ -87,7 +88,7 @@ class Player extends Model
     /**
      * Checks if a player exists by login
      *
-     * @param  string  $login
+     * @param string $login
      *
      * @return bool
      */
@@ -106,6 +107,18 @@ class Player extends Model
     public function hasFinished(): bool
     {
         return $this->Score > 0;
+    }
+
+    /**
+     * @param string $accessRightId
+     * @throws \EvoSC\Exceptions\UnauthorizedException
+     */
+    public function authorize(string $accessRightId)
+    {
+        if (!$this->hasAccess($accessRightId)) {
+            list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            throw new UnauthorizedException("$this is not authorized to call " . $caller['class'] . $caller['type'] . $caller['function']);
+        }
     }
 
     /**
@@ -147,7 +160,7 @@ class Player extends Model
      */
     public function ratings()
     {
-        return $this->hasMany(MxKarma::class, 'Player', 'id');
+        return $this->hasMany(Karma::class, 'Player', 'id');
     }
 
     /**
@@ -193,7 +206,7 @@ class Player extends Model
     /**
      * Check if the player has a specific access-right.
      *
-     * @param  string  $right
+     * @param string $right
      *
      * @return bool
      */
@@ -240,8 +253,8 @@ class Player extends Model
     /**
      * Update a user-setting.
      *
-     * @param  string  $settingName
-     * @param  mixed  $value
+     * @param string $settingName
+     * @param mixed $value
      */
     public function setSetting($settingName, $value)
     {
@@ -251,16 +264,16 @@ class Player extends Model
     /**
      * Get a user-setting.
      *
-     * @param  string  $settingName
+     * @param string $settingName
      *
-     * @param  bool  $jsonDecode
+     * @param bool $jsonDecode
      * @return mixed|null
      */
     public function setting($settingName, $jsonDecode = false)
     {
         $setting = $this->settings()->whereName($settingName)->first();
 
-        if($jsonDecode){
+        if ($jsonDecode) {
             return json_decode($setting->value ?? null);
         }
 
@@ -270,7 +283,7 @@ class Player extends Model
     /**
      * Get last visit as Carbon object.
      *
-     * @param  string  $date
+     * @param string $date
      *
      * @return Carbon
      * @throws Exception

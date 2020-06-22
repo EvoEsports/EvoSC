@@ -1,0 +1,65 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '60';}
+{php $window_height = '31';}
+
+{block id}
+pm-dialog
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Personal Message
+{/block}
+
+{block content}
+<label class="text-light" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" />
+<entry class="form" id="login" pos="11 -1" size="46 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" />
+<label class="text-light" pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center"/>
+<entry class="form" id="text" pos="11 -4" size="46 18" textsize="0.9" halign="left"/>
+
+<label class="btn-accent send" pos="18 -25" size="14 4" textsize="0.6" text=" Send" ScriptEvents="1"/>
+<label class="btn-default cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
+{/block}
+
+{include 'Scripts.mle'}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+{/block}
+
+{block pendingEvents}
+if(event.Control.HasClass("send") && event.Type == CMlScriptEvent::Type::MouseClick){
+    declare login = (Page.MainFrame.GetFirstChild("login") as CMlEntry).Value;
+    declare text = (Page.MainFrame.GetFirstChild("text") as CMlEntry).Value;
+    ManiaLinkEvent("pm", login ^ "," ^ text);
+    window.Hide();
+    return;
+}
+if(event.Control.HasClass("cancel") && event.Type == CMlScriptEvent::Type::MouseClick){
+    declare text = (Page.MainFrame.GetFirstChild("text") as CMlEntry).Value;
+    if(TL::Length(text) > 0){
+        if(confirm("Cancel PM?")){
+            window.Hide();
+            return;
+        }
+    }else{
+        window.Hide();
+        return;
+    }
+}
+{/block}
+--></script>

@@ -1,8 +1,8 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
-use esc\Classes\File;
+use EvoSC\Classes\File;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -28,21 +28,21 @@ class Migrate extends Command
         $_isVeryVerbose = $output->isVeryVerbose();
         $_isDebug = $output->isDebug();
 
-        $output->writeln('Executing migrations...');
+        $output->writeln('<fg=green>Executing migrations...</>');
 
         $config = json_decode(file_get_contents('config/database.config.json'));
 
         $capsule = new Capsule();
 
         $capsule->addConnection([
-            'driver'    => 'mysql',
-            'host'      => $config->host,
-            'database'  => $config->db,
-            'username'  => $config->user,
-            'password'  => $config->password,
-            'charset'   => 'utf8mb4',
+            'driver' => 'mysql',
+            'host' => $config->host,
+            'database' => $config->db,
+            'username' => $config->user,
+            'password' => $config->password,
+            'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix'    => $config->prefix,
+            'prefix' => $config->prefix,
         ]);
 
         $capsule->setAsGlobal();
@@ -76,13 +76,15 @@ class Migrate extends Command
         $migrations = $this->getMigrations();
         $migrationsTable = $connection->table('migrations');
         $executedMigrations = $migrationsTable->get(['file']);
+        $anyMigrationRan = false;
 
         $migrations->each(function ($migration) use (
             $executedMigrations,
             $batch,
             $schemaBuilder,
             $migrationsTable,
-            $output
+            $output,
+            $anyMigrationRan
         ) {
             if ($executedMigrations->where('file', $migration->file)->isNotEmpty()) {
                 //Skip already executed migrations
@@ -92,15 +94,21 @@ class Migrate extends Command
             $content = file_get_contents($migration->path);
 
             if (preg_match('/class (.+) extends/', $content, $matches)) {
-                $class = 'esc\\Migrations\\'.$matches[1];
+                $class = 'EvoSC\\Migrations\\' . $matches[1];
+                $output->writeln('<fg=yellow>Migrating: ' . $migration->file . '</>');
                 require_once $migration->path;
                 $instance = new $class;
                 $instance->up($schemaBuilder);
 
                 $migrationsTable->insert(['file' => $migration->file, 'batch' => $batch]);
-                $output->writeln('Migrated: '.$migration->file);
+                $output->writeln('<fg=green>Migrated: ' . $migration->file . '</>');
+                $anyMigrationRan = true;
             }
         });
+
+        if(!$anyMigrationRan){
+            $output->writeln('<fg=green>Nothing to migrate.</>');
+        }
 
         if (!file_exists(cacheDir('.setupfinished'))) {
             File::put(cacheDir('.setupfinished'), 1);
@@ -114,7 +122,7 @@ class Migrate extends Command
         $files = collect(scandir('Migrations'))->filter(function ($file) {
             return preg_match('/\.php$/', $file);
         })->filter(function ($file) {
-            $content = file_get_contents('Migrations/'.$file);
+            $content = file_get_contents('Migrations/' . $file);
 
             return preg_match('/extends Migration/', $content);
         })->map(function ($migration) {
@@ -135,7 +143,7 @@ class Migrate extends Command
             $moduleMigrations = collect(scandir("core/Modules/$moduleDir/Migrations"))->filter(function ($file) {
                 return preg_match('/\.php$/', $file);
             })->filter(function ($file) use ($moduleDir) {
-                $content = file_get_contents("core/Modules/$moduleDir/Migrations/".$file);
+                $content = file_get_contents("core/Modules/$moduleDir/Migrations/" . $file);
 
                 return preg_match('/extends Migration/', $content);
             })->map(function ($migration) use ($moduleDir) {

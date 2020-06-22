@@ -1,18 +1,18 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\DB;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Map;
-use esc\Models\MapQueue;
-use esc\Models\Player;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Map;
+use EvoSC\Models\MapQueue;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -20,7 +20,7 @@ use Illuminate\Support\Collection;
  *
  * The QueueController handles adding/removing maps to/from the queue.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class QueueController implements ControllerInterface
 {
@@ -31,10 +31,10 @@ class QueueController implements ControllerInterface
      */
     public static function init()
     {
-        AccessRight::createIfMissing('map_queue_recent', 'Drop maps from queue.');
-        AccessRight::createIfMissing('queue_drop', 'Drop maps from queue.');
-        AccessRight::createIfMissing('queue_multiple', 'Queue more than one map.');
-        AccessRight::createIfMissing('queue_keep', 'Keep maps in queue if player leaves.');
+        AccessRight::add('map_queue_recent', 'Juke recently played maps.');
+        AccessRight::add('map_queue_drop', 'Drop maps from queue.');
+        AccessRight::add('map_queue_multiple', 'Queue more than one map.');
+        AccessRight::add('map_queue_keep', 'Keep maps in queue if player leaves.');
     }
 
     /**
@@ -83,7 +83,7 @@ class QueueController implements ControllerInterface
         }
 
         if (DB::table(MapQueue::TABLE)->where('requesting_player', '=', $player->Login)->count()) {
-            if (!$player->hasAccess('queue_multiple')) {
+            if (!$player->hasAccess('map_queue_multiple')) {
                 warningMessage('You are only allowed to queue one map at a time.')->send($player);
 
                 return false;
@@ -144,7 +144,7 @@ class QueueController implements ControllerInterface
         $queueItem = MapQueue::whereMapUid($mapUid)->first();
 
         if ($queueItem) {
-            if ($queueItem->requesting_player != $player->Login && !$player->hasAccess('queue_drop')) {
+            if ($queueItem->requesting_player != $player->Login && !$player->hasAccess('map_queue_drop')) {
                 warningMessage('You can not drop others players maps.')->send($player);
 
                 return;
@@ -165,7 +165,6 @@ class QueueController implements ControllerInterface
     {
         if (DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->exists()) {
             DB::table(MapQueue::TABLE)->where('map_uid', '=', $mapUid)->delete();
-            self::chooseNextMap();
             Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
     }
@@ -199,7 +198,7 @@ class QueueController implements ControllerInterface
     public static function playerDisconnect(Player $player)
     {
         if (MapQueue::where('requesting_player', $player->Login)->exists()) {
-            if ($player->hasAccess('queue_keep')) {
+            if ($player->hasAccess('map_queue_keep')) {
                 //Keep maps of players with queue_keep right
 
                 return;

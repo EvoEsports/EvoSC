@@ -1,13 +1,13 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Group
- * @package esc\Models
+ * @package EvoSC\Models
  * @property int $id;
  * @property string $Name;
  * @property string $chat_prefix;
@@ -15,6 +15,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Group extends Model
 {
+    const MASTERADMIN = 1;
+    const ADMIN = 2;
+    const PLAYER = 3;
+
     protected $table = 'groups';
 
     protected $fillable = ['Name', 'chat_prefix', 'color'];
@@ -28,12 +32,12 @@ class Group extends Model
             return true;
         }
 
-        return $this->accessRights->where('name', $accessRightName)->isNotEmpty();
+        return $this->accessRights()->where('name', $accessRightName)->exists();
     }
 
     public function accessRights()
     {
-        return $this->belongsToMany(AccessRight::class);
+        return $this->belongsToMany(AccessRight::class, 'access_right_group', 'group_id', 'access_right_name', 'id', 'name');
     }
 
     public function player()

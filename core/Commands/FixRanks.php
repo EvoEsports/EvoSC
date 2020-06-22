@@ -1,12 +1,12 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
-use esc\Classes\Database;
-use esc\Classes\DB;
-use esc\Classes\Log;
-use esc\Controllers\ConfigController;
-use esc\Models\Map;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Log;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Models\Map;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;

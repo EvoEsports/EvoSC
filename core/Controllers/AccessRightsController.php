@@ -1,31 +1,43 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Player;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
 
 class AccessRightsController implements ControllerInterface
 {
-
     /**
      * Method called on controller boot.
      */
     public static function init()
     {
-        // TODO: Implement init() method.
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot)
     {
+        //TODO: Remove after July 2020
+        DB::table('access_right_group')->whereNull('access_right_name')->get()->each(function ($accessRightGroup) {
+            DB::table('access_right_group')
+                ->where('group_id', '=', $accessRightGroup->group_id)
+                ->where('access_right_id', '=', $accessRightGroup->access_right_id)
+                ->update([
+                    'access_right_name' => DB::table('access-rights')
+                        ->where('id', '=', $accessRightGroup->access_right_id)
+                        ->first()
+                        ->name
+                ]);
+        });
+
         $groupAccess = collect();
 
         onlinePlayers()->each(function (Player $player) use ($groupAccess) {
@@ -42,7 +54,7 @@ class AccessRightsController implements ControllerInterface
     <script><!--
         main() {
             declare Text[] ESC_Access_rights for This;
-            ESC_Access_rights.fromjson("""'.$groupAccess->get($player->Group)->toJson().'""");
+            ESC_Access_rights.fromjson("""' . $groupAccess->get($player->Group)->toJson() . '""");
         }
         --></script>
 </manialink>

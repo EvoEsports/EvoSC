@@ -1,9 +1,10 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
-use esc\Interfaces\ControllerInterface;
+use EvoSC\Classes\File;
+use EvoSC\Interfaces\ControllerInterface;
 
 class ControllerController
 {
@@ -14,13 +15,18 @@ class ControllerController
     public static function loadControllers(string $mode, bool $isBoot = false)
     {
         HookController::init();
-        $classes = get_declared_classes();
 
-        foreach ($classes as $class) {
-            if (preg_match('/^esc.Controllers./', $class)) {
-                if (new $class instanceof ControllerInterface) {
-                    $class::start($mode, $isBoot);
-                }
+        $controllers = File::getFiles(coreDir('Controllers'))->map(function ($file) {
+            $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . ']Controllers[' . DIRECTORY_SEPARATOR . ']#', '', $file);
+            $class = substr($class, 0, -4);
+            $class = "EvoSC\\Controllers\\$class";
+
+            return $class;
+        });
+
+        foreach ($controllers as $controllerClass) {
+            if (new $controllerClass instanceof ControllerInterface) {
+                $controllerClass::start($mode, $isBoot);
             }
         }
     }

@@ -1,15 +1,15 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
-use esc\Classes\Hook;
-use esc\Controllers\QueueController;
+use EvoSC\Classes\Hook;
+use EvoSC\Controllers\QueueController;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class MapQueue
- * @package esc\Models
+ * @package EvoSC\Models
  */
 class MapQueue extends Model
 {

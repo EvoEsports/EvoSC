@@ -1,11 +1,12 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
-use esc\Classes\Cache;
-use esc\Classes\Log;
-use esc\Controllers\MapController;
+use EvoSC\Classes\Cache;
+use EvoSC\Controllers\MapController;
+use EvoSC\Modules\Dedimania\Models\Dedi;
+use EvoSC\Modules\MxKarma\Models\Karma;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -14,7 +15,7 @@ use stdClass;
 /**
  * Class Map
  *
- * @package esc\Models
+ * @package EvoSC\Models
  *
  * @property string $id
  * @property string $uid
@@ -103,20 +104,6 @@ class Map extends Model
     }
 
     /**
-     * @return mixed
-     */
-    public function getAverageRatingAttribute()
-    {
-        $mxDetails = $this->mx_details;
-
-        if ($mxDetails && $mxDetails->RatingVoteCount > 0) {
-            return $mxDetails->RatingVoteAverage;
-        }
-
-        return $this->ratings()->pluck('Rating')->average();
-    }
-
-    /**
      * @return mixed|stdClass|null
      */
     public function getMxDetailsAttribute()
@@ -180,10 +167,10 @@ class Map extends Model
     /**
      * @param string $mapUid
      *
-     * @return Map|null
+     * @return Map
      */
-    public static function getByUid(string $mapUid): ?Map
+    public static function getByUid(string $mapUid): Map
     {
-        return Map::whereUid($mapUid)->first();
+        return Map::whereUid($mapUid)->firstOrFail();
     }
 }

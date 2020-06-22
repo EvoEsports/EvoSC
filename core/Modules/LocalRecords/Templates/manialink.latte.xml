@@ -1,0 +1,210 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}local-records-widget{/block}
+    {block size}44 {config('locals.rows') * 3 + 6.5}{/block}
+
+    {block content}
+    <framemodel id="record">
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78."/>
+        <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" opacity="0.25"/>
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000"/>
+        <label class="text-light" z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name"/>
+        <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+    </framemodel>
+
+    <quad class="bg-dark widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" opacity="0.8" ScriptEvents="1"/>
+    <quad class="bg-darker" z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" opacity="0.4" />
+    <quad class="bg-accent" size="45 5" opacity="0.8"/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records"/>
+
+    <frame id="records" pos="1 -7">
+        {for $i=0; $i<config('locals.rows'); $i++}
+        <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
+        {/for}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    Text[] getOnlinePlayers(){
+        declare Text[] onlinePlayers = Text[];
+        foreach(player in Players){
+            onlinePlayers.add(player.User.Login);
+        }
+        return onlinePlayers;
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Integer getMyRank(Record[] records){
+        foreach(record in records){
+            if(record.login == LocalUser.Login){
+                return record.rank;
+            }
+        }
+
+        return -1;
+    }
+
+    Void fillRecord(Integer index, Record record, Text[] onlinePlayers){
+        declare records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        if(index >= records.Controls.count){
+            return;
+        }
+
+        declare recordsFrame = (records.Controls[index] as CMlFrame);
+        (recordsFrame.Controls[0] as CMlLabel).SetText(record.rank ^ ".");
+        (recordsFrame.Controls[1] as CMlLabel).SetText(formatScoreCorrect(record.score, False));
+        (recordsFrame.Controls[2] as CMlLabel).SetText(formatScoreCorrect(record.score, True));
+        (recordsFrame.Controls[3] as CMlLabel).SetText(record.name);
+        if(onlinePlayers.exists(record.login)){
+            (recordsFrame.Controls[0] as CMlLabel).TextColor = headerColor;
+            (recordsFrame.Controls[4] as CMlLabel).Show();
+        }else{
+            (recordsFrame.Controls[0] as CMlLabel).TextColor = primaryColor;
+            (recordsFrame.Controls[4] as CMlLabel).Hide();
+        }
+        recordsFrame.Show();
+    }
+
+    Void updateWidget(Record[] records){
+        declare myRank = getMyRank(records);
+        declare filled = 0;
+        declare skipped = 0;
+        declare skip = 0;
+        declare showTop = {config('locals.showtop')};
+        declare max = {config('locals.rows')};
+        declare toFill = max - showTop;
+
+        if(myRank == -1){
+            skip = records.count - toFill - showTop;
+        }else{
+            skip = myRank - (max/2);
+
+            if(myRank + (max/2) > records.count){
+                skip = skip + records.count - (myRank + (max/2));
+            }
+        }
+
+        declare Text[] onlinePlayers = getOnlinePlayers();
+
+        foreach(record in records){
+            if(filled < showTop){
+                fillRecord(filled, record, onlinePlayers);
+                filled = filled + 1;
+                continue;
+            }
+
+            if(skipped < skip){
+                skipped = skipped + 1;
+                continue;
+            }
+
+            fillRecord(filled, record, onlinePlayers);
+
+            filled = filled + 1;
+        }
+
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare skipFilled = 0;
+
+        foreach(frame in recordsFrame.Controls){
+            if(skipFilled < filled){
+                skipFilled = skipFilled + 1;
+                continue;
+            }
+
+            frame.Hide();
+        }
+    }
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    #Struct Record {
+        Integer rank;
+        Integer[] cps;
+        Integer score;
+        Text name;
+        Text login;
+    }
+
+    declare Vec3 headerColor;
+    declare Vec3 primaryColor;
+    {/block}
+
+    {block bootScript}
+        declare Record[] LocalRecords for This;
+        declare Integer LastLocalRecordsUpdate for This = 0;
+        declare Integer lastUpdate = 0;
+        declare Integer playerCount = 0;
+
+        primaryColor = TL::ToColor("{config('theme.hud.text-light')}");
+        headerColor = TL::ToColor("{config('theme.hud.accent')}");
+
+        left__ = {config('locals.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('locals.ui.slot')};
+    {/block}
+
+    {block loop}
+            if(LastLocalRecordsUpdate != lastUpdate){
+                //update
+                lastUpdate = LastLocalRecordsUpdate;
+                updateWidget(LocalRecords);
+            }
+
+            if(playerCount != Players.count){
+                playerCount = Players.count;
+                updateWidget(LocalRecords);
+            }
+    {/block}
+
+    {block pendingEvents}
+                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    TriggerPageAction("locals.show");
+                }
+    {/block}
+--></script>
+</manialink>

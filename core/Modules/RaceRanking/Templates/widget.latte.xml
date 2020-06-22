@@ -1,0 +1,230 @@
+{contentType text}
+{extends 'Components.widget-base'}
+{php $customHidescript = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}race-ranking{/block}
+    {block size}44 {config('race-ranking.ui.show', 10)*3+7}{/block}
+
+    {block content}
+    <framemodel id="row">
+        <label class="text-light" pos="2 0" size="4 3" valign="center" textsize="0.5" text="00." />
+        <label class="text-light" pos="6 0" size="19 3" valign="center" textsize="0.6" text="" />
+        <label class="text-light" pos="36.5 0" size="10 3" valign="center" halign="right" textsize="0.5" text="000:00.000" />
+        <label class="text-light" pos="36.5 0" size="10 3" valign="center" halign="right" textsize="0.5" text="000:00.000" z-index="-1" opacity="0.5" />
+        <label class="text-accent" pos="42 0" size="40 3" valign="center" halign="right" textsize="0.5" text="+00" />
+    </framemodel>
+
+    <quad id="header" class="bg-accent" size="44 5" z-index="-1"/>
+    <quad id="bg" class="bg-dark" pos="0 -5" size="44 200" opacity="0.8" z-index="-1"/>
+    <label id="title" class="text-light" z-index="1" valign="center" pos="2 -2.5" size="44 5" textsize="0.3" text=" Race Ranking"/>
+
+    <frame id="rows" pos="0 -7.25">
+        {for $i=0; $i<config('race-ranking.ui.show', 10); $i++}
+        <frameinstance modelid="row" pos="0 {$i * -3}" />
+        {/for}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    Void hide(){
+        HS_Hidden = True;
+        AnimMgr.Add(header, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(title, "<label opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(bg, "<quad opacity='0.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void show(){
+        HS_Hidden = False;
+        AnimMgr.Add(header, "<quad opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(title, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(bg, "<quad opacity='0.8' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        if(HS_Target == Null){
+            HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+        }
+
+        declare UISettings settings for This;
+        {if $is_maniaplanet}
+        declare hideSpeed = settings.speed;
+        {else}
+        declare hideSpeed = 10;
+        {/if}
+
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
+
+        declare Boolean mapFinished = {(isset($hideOnPodium) ? "UI.UISequence == CUIConfig::EUISequence::Podium" : "False")|noescape};
+
+        if(mapFinished){
+            if(!HS_Hidden){
+                hide();
+            }
+        }else{
+            {if $is_maniaplanet}
+            declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > hideSpeed;
+            {else}
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > 10;
+            {/if}
+
+            if(overHidespeed {if $is_maniaplanet}&& playerIsRacing {/if}&& !HS_Hidden){
+                hide();
+            }
+            if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
+                show();
+            }
+        }
+    }
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Integer getAddedPoints(){
+        declare Integer p = 1;
+        if(filled < points.count){
+            p = points[filled];
+        }
+        return p;
+    }
+
+    Void updateList(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+        declare sorted = times.sort();
+
+        filled = 0;
+        EvoSC_RoundsPointsDistribution = Integer[Text];
+
+        foreach(login => score in sorted){
+            if(filled >= rows.Controls.count) break;
+
+            declare addedPoints = getAddedPoints();
+            declare row <=> (rows.Controls[filled] as CMlFrame);
+            (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
+            (row.Controls[1] as CMlLabel).Value = names[login];
+            (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(score, True);
+            (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(score, False);
+            (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
+            row.Show();
+
+            EvoSC_RoundsPointsDistribution[login] = addedPoints;
+
+            filled += 1;
+        }
+
+        for(i, filled, rows.Controls.count - 1){
+            (rows.Controls[i] as CMlFrame).Hide();
+        }
+
+        needsReset = filled > 0;
+    }
+
+    Void reset(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
+        foreach(row in rows.Controls){
+            row.Hide();
+        }
+        queueReset = False;
+        needsReset = False;
+        filled = 0;
+        times = Integer[Text];
+        names = Text[Text];
+        EvoSC_RoundsPointsDistribution = Integer[Text];
+    }
+        --></script>
+    {/block}
+
+    <script><!--
+        {block globals}
+        declare Vec2 HS_POS;
+        declare CMlFrame HS_Target;
+        declare Boolean HS_Hidden;
+        declare Integer[] points;
+        declare Integer filled;
+        declare Boolean needsReset;
+        declare Boolean queueReset;
+        declare Integer[Text] times;
+        declare Text[Text] names;
+        declare CMlQuad header;
+        declare CMlLabel title;
+        {/block}
+
+        {block bootScript}
+        header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);
+        title <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
+
+        points.fromjson("{$points}");
+        reset();
+
+        left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('race-ranking.ui.slot')};
+        {/block}
+
+        {block loop}
+        if(UI.UISequence == CUIConfig::EUISequence::EndRound && needsReset && !queueReset){
+            queueReset = True;
+        }
+        if(UI.UISequence == CUIConfig::EUISequence::Playing && queueReset){
+            reset();
+        }
+
+        foreach(Event in RaceEvents){
+            if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
+                if(Event.IsEndLap){
+                    times[Event.Player.User.Login] = Event.LapTime;
+                    names[Event.Player.User.Login] = Event.Player.User.Name;
+                    updateList();
+                }
+            }
+        }
+
+        hidescript();
+        {/block}
+
+        {block pendingEvents}
+        {/block}
+        --></script>
+</manialink>

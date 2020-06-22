@@ -1,20 +1,20 @@
 <?php
 
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
 use DOMDocument;
-use esc\Classes\ChatCommand;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Classes\Timer;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Player;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
 use SimpleXMLElement;
@@ -70,7 +70,7 @@ class MatchSettingsController implements ControllerInterface
             }
 
             ControllerController::loadControllers($mode);
-            ModuleController::startModules($mode);
+            ModuleController::startModules($mode, false);
         }
 
         MapController::loadMaps();
@@ -307,6 +307,31 @@ class MatchSettingsController implements ControllerInterface
     {
         self::addMap(self::$currentMatchSettingsFile, $filename, $uid);
         self::updateMatchSettingsModificationTime();
+    }
+
+    /**
+     * @param string $key
+     * @return int
+     */
+    public static function getValueFromCurrentMatchSettings(string $key)
+    {
+        $file = self::getCurrentMatchSettingsFile();
+        $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
+        $xml = new SimpleXMLElement($matchSettings);
+
+        if (isset($xml->mode_script_settings)) {
+            $node = $xml->mode_script_settings;
+        } else {
+            $node = $xml->script_settings;
+        }
+
+        foreach ($node->children() as $child) {
+            if ($child->attributes()['name'] == $key) {
+                return intval($child->attributes()['value']);
+            }
+        }
+
+        return -1;
     }
 
     public static function updateSetting(string $matchSettingsFile, string $setting, $value)

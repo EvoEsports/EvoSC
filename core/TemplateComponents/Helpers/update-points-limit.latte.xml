@@ -1,0 +1,13 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-points-limit" name="EvoSC:update-points-limit">
+    <script><!--
+    main(){
+        declare Integer EvoSC_PointsLimit for This;
+        declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
+
+        EvoSC_PointsLimit = {$points};
+        EvoSC_LastPointsLimitUpdate = GameTime;
+    }
+    --></script>
+</manialink>

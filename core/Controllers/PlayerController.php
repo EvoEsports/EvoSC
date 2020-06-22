@@ -1,25 +1,25 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\ChatCommand;
-use esc\Classes\DB;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\AccessRight;
-use esc\Models\Player;
-use esc\Models\Stats;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
+use Exception;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
 /**
  * Class PlayerController
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class PlayerController implements ControllerInterface
 {
@@ -39,11 +39,34 @@ class PlayerController implements ControllerInterface
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
-        AccessRight::createIfMissing('player_kick', 'Kick players.');
-        AccessRight::createIfMissing('player_warn', 'Warn a player.');
-        AccessRight::createIfMissing('player_force_spec', 'Force a player into spectator mode.');
-        AccessRight::createIfMissing('player_fake', 'Add/Remove fake player(s).');
-        AccessRight::createIfMissing('override_join_msg', 'Always announce join/leave.');
+        AccessRight::add('player_kick', 'Kick players.');
+        AccessRight::add('player_warn', 'Warn a player.');
+        AccessRight::add('player_force_spec', 'Force a player into spectator mode.');
+        AccessRight::add('always_print_join_msg', 'Always announce join/leave.');
+    }
+
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
+        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
+        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
+        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
+
+        ChatCommand::add('//setpw', [self::class, 'cmdSetServerPassword'],
+            'Set the server password, leave empty to clear it.', 'ma')->addAlias('//password');
+        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
+        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
+        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
     }
 
     public static function cacheConnectedPlayers()
@@ -61,7 +84,7 @@ class PlayerController implements ControllerInterface
      * @param Player $player
      * @param mixed ...$pw
      */
-    public static function setServerPassword(Player $player, ...$pw)
+    public static function cmdSetServerPassword(Player $player, $cmd, ...$pw)
     {
         $pw = trim(implode(' ', $pw));
 
@@ -70,7 +93,7 @@ class PlayerController implements ControllerInterface
                 infoMessage($player, ' cleared the server password.')->sendAll();
             } else {
                 infoMessage($player, ' set a server password.')->sendAll();
-                infoMessage($player, ' set the server password to "'.$pw.'".')->sendAdmin();
+                infoMessage($player, ' set the server password to ', secondary($pw))->sendAdmin();
             }
         }
 
@@ -80,9 +103,9 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerConnect
      *
-     * @param  Player  $player
+     * @param Player $player
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public static function playerConnect(Player $player)
     {
@@ -98,14 +121,15 @@ class PlayerController implements ControllerInterface
                 ' joined for the first time.')
                 ->setIcon('');
 
-            Stats::updateOrCreate(['Player' => $player->id], [
+            DB::table('stats')->insertOrIgnore([
+                'Player' => $player->id,
                 'Visits' => 1,
             ]);
         }
 
         Log::write($message->getMessage());
 
-        if (config('server.echoes.join') || $player->hasAccess('override_join_msg')) {
+        if (config('server.echoes.join') || $player->hasAccess('always_print_join_msg')) {
             $message->sendAll();
         } else {
             $message->sendAdmin();
@@ -120,7 +144,7 @@ class PlayerController implements ControllerInterface
     /**
      * Called on PlayerDisconnect
      *
-     * @param  Player  $player
+     * @param Player $player
      *
      * @throws \Exception
      */
@@ -128,7 +152,7 @@ class PlayerController implements ControllerInterface
     {
         $diff = $player->last_visit->diffForHumans();
         $playtime = substr($diff, 0, -4);
-        Log::write($player." [".$player->Login."] left the server after $playtime playtime.");
+        Log::write($player . " [" . $player->Login . "] left the server after $playtime playtime.");
         $message = infoMessage($player, ' left the server after ', secondary($playtime), ' playtime.')->setIcon('');
 
         if (config('server.echoes.leave')) {
@@ -169,8 +193,8 @@ class PlayerController implements ControllerInterface
     /**
      * Gets a player by nickname or login.
      *
-     * @param  Player  $callee
-     * @param  string  $nick
+     * @param Player $callee
+     * @param string $nick
      *
      * @return Player|null
      */
@@ -201,7 +225,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($players->count() > 1) {
-            warningMessage('Found more than one person ('.$players->pluck('NickName')->implode(', ').'), please be more specific or use login.')->send($callee);
+            warningMessage('Found more than one person (' . $players->pluck('NickName')->implode(', ') . '), please be more specific or use login.')->send($callee);
 
             return null;
         }
@@ -239,9 +263,9 @@ class PlayerController implements ControllerInterface
     /**
      * ManiaLinkEvent: kick player
      *
-     * @param  Player  $player
-     * @param  string  $login
-     * @param  string  $reason
+     * @param Player $player
+     * @param string $login
+     * @param string $reason
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
@@ -265,7 +289,7 @@ class PlayerController implements ControllerInterface
 
         if (strlen($reason) > 0) {
             warningMessage($player, ' kicked ', secondary($toBeKicked),
-                secondary(' Reason: '.$reason))->setIcon('')->sendAll();
+                secondary(' Reason: ' . $reason))->setIcon('')->sendAll();
         } else {
             warningMessage($player, ' kicked ', secondary($toBeKicked))->setIcon('')->sendAll();
         }
@@ -274,9 +298,9 @@ class PlayerController implements ControllerInterface
     /**
      * Called on players finish
      *
-     * @param  Player  $player
-     * @param  int  $score
-     * @param  string  $checkpoints
+     * @param Player $player
+     * @param int $score
+     * @param string $checkpoints
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
@@ -289,7 +313,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player."\$z finished with time ($score) ".formatScore($score));
+            Log::info($player . "\$z finished with time ($score) " . formatScore($score));
 
             $player->Score = $score;
             $player->save();
@@ -325,7 +349,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  string  $login
+     * @param string $login
      *
      * @return bool
      */
@@ -335,7 +359,7 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  string  $login
+     * @param string $login
      *
      * @return Player
      */
@@ -345,11 +369,11 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      *
      * @return Collection
      */
-    public static function addPlayer(Player $player)
+    public static function putPlayer(Player $player)
     {
         return self::$players->put($player->Login, $player);
     }
@@ -411,29 +435,5 @@ class PlayerController implements ControllerInterface
         } else {
             ChatController::mute($player, $target);
         }
-    }
-
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
-        ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
-        ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
-        ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
-
-        ChatCommand::add('//setpw', [self::class, 'setServerPassword'],
-            'Set the server password, leave empty to clear it.', 'ma');
-        ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
-        ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
-        ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
     }
 }

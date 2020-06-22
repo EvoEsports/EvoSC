@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Migrations;
+namespace EvoSC\Migrations;
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -24,9 +24,9 @@ class CreateGroupsTable extends Migration
         });
 
         $seed = [
-            ['id' => 1, 'Name' => 'Masteradmin', 'chat_prefix' => '', 'color' => 'd00', 'Protected' => true],
-            ['id' => 2, 'Name' => 'Admin', 'chat_prefix' => '', 'color' => 'd00', 'Protected' => true],
-            ['id' => 3, 'Name' => 'Player', 'chat_prefix' => '', 'color' => 'ff0', 'Protected' => true],
+            ['id' => 1, 'Name' => 'Masteradmin', 'chat_prefix' => '', 'color' => 'd44', 'Protected' => true],
+            ['id' => 2, 'Name' => 'Admin', 'chat_prefix' => '', 'color' => 'd84', 'Protected' => true],
+            ['id' => 3, 'Name' => 'Player', 'chat_prefix' => '', 'color' => 'fe1', 'Protected' => true],
         ];
 
         $schemaBuilder->getConnection()->table('groups')->insert($seed);

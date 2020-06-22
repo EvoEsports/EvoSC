@@ -1,0 +1,11 @@
+{
+  "enabled": true,
+  "columns": 6,
+  "pos": "-100 86",
+  "scale": 0.77,
+  "mode": "best-cp",
+  "Pick one of the following for mode": [
+    "best-cp",
+    "best-round"
+  ]
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Illuminate\Support\Collection;
@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
  *
  * Set/delete timers.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Timer
 {

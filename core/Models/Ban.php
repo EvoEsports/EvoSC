@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Models;
+namespace EvoSC\Models;
 
 
 use Illuminate\Database\Eloquent\Model;

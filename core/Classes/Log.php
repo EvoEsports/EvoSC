@@ -1,8 +1,7 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
-use esc\Modules\Loggerino;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -10,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Logging and colored cli-output.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Log
 {
@@ -56,9 +55,8 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
-
         if (!$caller) {
-            list($childClass, $caller) = debug_backtrace(false, 2);
+            list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         }
 
         if (isset($caller['class']) && isset($caller['type'])) {
@@ -68,23 +66,15 @@ class Log
             $callingClass = $caller['function'];
         }
 
-        if(count($caller['args']) > 0){
-            $callingClass .= '(...)';
-        }else {
-            $callingClass .= '';
-        }
-
         if (isDebug()) {
             $callingClass .= "\nData: " . json_encode($caller['args']);
         }
-
-        Loggerino::append(preg_replace('/<(?:error|info|fg=\w+|\/)>/', '', "$callingClass $string"));
 
         $date = date("Y-m-d", time());
         $time = date("H:i:s", time());
         $logFile = logDir($date . '.txt');
 
-        $line = sprintf("[%s] %s: %s", $time, $callingClass, $string);
+        $line = sprintf("[%s] %s(): %s", $time, $callingClass, $string);
 
         $line = stripAll($line);
 
@@ -103,8 +93,7 @@ class Log
      */
     public static function info($message, bool $echo = true)
     {
-
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<info>' . $message . '</>', $echo, $caller);
     }
 
@@ -116,8 +105,7 @@ class Log
      */
     public static function error($message, bool $echo = true)
     {
-
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<error>' . $message . '</>', $echo, $caller);
     }
 
@@ -129,9 +117,18 @@ class Log
      */
     public static function warning($message, bool $echo = true)
     {
-
-        list($childClass, $caller) = debug_backtrace(false, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         self::write('<fg=red>' . $message . '</>', $echo, $caller);
+    }
+
+    /**
+     * @param string $message
+     * @param bool $echo
+     */
+    public static function cyan(string $message, bool $echo = true)
+    {
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        self::write("<fg=cyan;options=bold>$message</>", $echo, $caller);
     }
 
     /**

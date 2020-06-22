@@ -1,8 +1,9 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
+use EvoSC\Exceptions\FilePathNotAbsoluteException;
 use Illuminate\Support\Collection;
 
 /**
@@ -10,7 +11,7 @@ use Illuminate\Support\Collection;
  *
  * Create/delete/update/append files, read/create directories.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class File
 {
@@ -33,7 +34,7 @@ class File
 
             return file_get_contents($fileName);
         } else {
-            Log::error("Could not load file $fileName");
+            Log::error("Could not load file '$fileName'");
         }
 
         return null;
@@ -53,8 +54,9 @@ class File
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
         $dir = str_replace(basename($fileName), '', $fileName);
 
-        if (!is_dir(realpath($dir))) {
-            mkdir(realpath($dir));
+
+        if (!self::dirExists($dir)) {
+            self::makeDir($dir);
         }
 
         if ($jsonEncode) {
@@ -77,23 +79,10 @@ class File
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
 
         if (!file_exists($fileName)) {
-            file_put_contents($fileName, $line);
+            self::put($fileName, $line);
         }
 
         file_put_contents($fileName, "\n" . $line, FILE_APPEND);
-    }
-
-    /**
-     * Creates a directory
-     *
-     * @param string $name
-     */
-    public static function createDirectory(string $name)
-    {
-        if (!is_dir($name)) {
-            Log::info("Creating directory: $name");
-            mkdir($name, true);
-        }
     }
 
     /**
@@ -106,6 +95,8 @@ class File
      */
     public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
     {
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         if (!is_dir($path)) {
             return collect();
         }
@@ -129,6 +120,7 @@ class File
      */
     public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
     {
+        $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
 
         if (!is_dir($baseDirectory)) {
@@ -141,12 +133,12 @@ class File
 
                 if (is_dir($path) && !in_array($file, ['.', '..'])) {
                     //Check directory contents
-                    $files = $files->merge(self::getFilesRecursively($path, $filterPattern));
+                    $files = collect([...$files, ...self::getFilesRecursively($path, $filterPattern)]);
                 } else {
                     //File is not directory
                     if (preg_match($filterPattern, $file)) {
                         //Add template
-                        $files->push($path);
+                        $files->push(realpath($path));
                     }
                 }
             });
@@ -156,6 +148,7 @@ class File
 
     public static function getFiles(string $baseDirectory, string $filterPattern = null)
     {
+        $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
 
         File::getDirectoryContents($baseDirectory)
@@ -223,11 +216,41 @@ class File
         return is_dir($filename);
     }
 
+    /**
+     * @param string $dir
+     * @throws FilePathNotAbsoluteException
+     */
     public static function makeDir(string $dir)
     {
         $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
 
-        mkdir($dir);
+        if (substr($dir, 0, 1) != DIRECTORY_SEPARATOR) {
+            throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
+        }
+
+        if (!is_dir($dir)) {
+            self::createDirUntilExists($dir);
+            Log::info("Directory '$dir' created.");
+        }
+    }
+
+    private static function createDirUntilExists(string $startDir)
+    {
+        $levels = collect(explode(DIRECTORY_SEPARATOR, $startDir));
+
+        if ($levels->last() == "") {
+            $levels->pop();
+        }
+
+        $toCreate = $levels->implode(DIRECTORY_SEPARATOR);
+        $levels->pop();
+        $parentDir = $levels->implode(DIRECTORY_SEPARATOR);
+
+        if(!is_dir($parentDir)){
+            self::createDirUntilExists($parentDir);
+        }
+
+        mkdir($toCreate);
     }
 
     public static function rename(string $sourceFile, string $targetFile)

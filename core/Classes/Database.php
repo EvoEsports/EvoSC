@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -12,7 +12,7 @@ use Illuminate\Database\Connection;
  * Handles all database functionality with relationships and query-builder.
  * {@see https://laravel.com/docs/5.8/queries}
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Database
 {
@@ -27,19 +27,19 @@ class Database
      */
     public static function init()
     {
-        Log::info("Connecting to database...");
+        Log::write("Connecting to database...");
 
         $capsule = new Capsule();
 
         $capsule->addConnection([
-            'driver'    => 'mysql',
-            'host'      => config('database.host'),
-            'database'  => config('database.db'),
-            'username'  => config('database.user'),
-            'password'  => config('database.password'),
-            'charset'   => 'utf8mb4',
+            'driver' => 'mysql',
+            'host' => config('database.host'),
+            'database' => config('database.db'),
+            'username' => config('database.user'),
+            'password' => config('database.password'),
+            'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix'    => config('database.prefix'),
+            'prefix' => config('database.prefix'),
         ]);
 
         $capsule->setAsGlobal();
@@ -69,7 +69,7 @@ class Database
     /**
      * Create a new database-table.
      *
-     * @param string     $table
+     * @param string $table
      * @param            $callback
      * @param array|null $seed
      */

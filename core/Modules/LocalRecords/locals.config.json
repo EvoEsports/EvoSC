@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "rows": 16,
+  "showtop": 3,
+  "limit": 200,
+  "echo-top": 100,
+  "text-color": "3d4",
+  "ui": {
+    "position": "left",
+    "slot": 10
+  }
+}

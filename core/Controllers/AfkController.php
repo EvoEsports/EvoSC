@@ -1,14 +1,14 @@
 <?php
 
-namespace esc\Controllers;
+namespace EvoSC\Controllers;
 
 
-use esc\Classes\Hook;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\Server;
-use esc\Classes\Template;
-use esc\Interfaces\ControllerInterface;
-use esc\Models\Player;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
+use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
  *
  * Automatically set afk-players to spectator.
  *
- * @package esc\Controllers
+ * @package EvoSC\Controllers
  */
 class AfkController implements ControllerInterface
 {
@@ -40,7 +40,7 @@ class AfkController implements ControllerInterface
      */
     public static function sendPinger(Player $player)
     {
-        Template::show($player, 'pinger');
+        Template::show($player, 'Scripts.pinger');
     }
 
     /**

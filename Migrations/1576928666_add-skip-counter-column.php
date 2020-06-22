@@ -1,6 +1,6 @@
 <?php
 
-namespace esc\Migrations;
+namespace EvoSC\Migrations;
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

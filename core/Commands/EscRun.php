@@ -1,39 +1,38 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
 use Error;
-use esc\Classes\ChatCommand;
-use esc\Classes\Database;
-use esc\Classes\DB;
-use esc\Classes\File;
-use esc\Classes\Hook;
-use esc\Classes\Log;
-use esc\Classes\ManiaLinkEvent;
-use esc\Classes\RestClient;
-use esc\Classes\Server;
-use esc\Classes\Timer;
-use esc\Controllers\AfkController;
-use esc\Controllers\BansController;
-use esc\Controllers\ChatController;
-use esc\Controllers\ConfigController;
-use esc\Controllers\ControllerController;
-use esc\Controllers\CountdownController;
-use esc\Controllers\EventController;
-use esc\Controllers\HookController;
-use esc\Controllers\MapController;
-use esc\Controllers\MatchSettingsController;
-use esc\Controllers\ModuleController;
-use esc\Controllers\PlanetsController;
-use esc\Controllers\PlayerController;
-use esc\Controllers\QueueController;
-use esc\Controllers\ScoreController;
-use esc\Controllers\SetupController;
-use esc\Controllers\TemplateController;
-use esc\Models\Map;
-use esc\Models\Player;
-use esc\Modules\InputSetup;
-use esc\Modules\QuickButtons;
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\DB;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Controllers\AfkController;
+use EvoSC\Controllers\BansController;
+use EvoSC\Controllers\ChatController;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Controllers\ControllerController;
+use EvoSC\Controllers\CountdownController;
+use EvoSC\Controllers\EventController;
+use EvoSC\Controllers\HookController;
+use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\MatchSettingsController;
+use EvoSC\Controllers\ModuleController;
+use EvoSC\Controllers\PlanetsController;
+use EvoSC\Controllers\PlayerController;
+use EvoSC\Controllers\QueueController;
+use EvoSC\Controllers\SetupController;
+use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\Map;
+use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,6 +54,15 @@ class EscRun extends Command
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         global $serverName;
+        global $__ManiaPlanet;
+        global $asyncPool;
+
+        /*
+        $asyncPool = Pool::create()
+            ->concurrency(20)
+            ->timeout(10)
+            ->autoload(coreDir('../vendor/autoload.php'));
+        */
 
         Log::setOutput($output);
         ConfigController::init();
@@ -69,17 +77,11 @@ class EscRun extends Command
             return;
         }
 
-        if (config('server.use-external-router', false)) {
-            switch (pcntl_fork()) {
-                case -1:
-                    $output->writeln('Starting chat router failed.');
-                    exit(1);
-
-                case 0:
-                    $output->writeln('Starting chat router.');
-                    pcntl_exec('/usr/bin/php', ['esc', 'run:chat-router']);
-                    exit(0);
-            }
+        if ($input->getOption('skip_migrate') !== false) {
+            $output->writeln('Skipping migrations.');
+        } else {
+            $migrate = $this->getApplication()->find('migrate');
+            $migrate->execute($input, $output);
         }
 
         if ($input->getOption('skip_map_check') !== false) {
@@ -107,6 +109,8 @@ class EscRun extends Command
                 Server::autoSaveReplays(true);
             }
 
+            $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
+
             //Disable all default ManiaPlanet votes
             /*
             $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
@@ -129,17 +133,8 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getOption('skip_migrate') !== false) {
-            $output->writeln('Skipping migrations.');
-        } else {
-            $migrate = $this->getApplication()->find('migrate');
-            $migrate->execute($input, $output);
-        }
-
         global $_onlinePlayers;
-        global $_restart;
         global $serverName;
-        $_restart = false;
 
         $version = getEscVersion();
         $motd = "      ______           _____ ______
@@ -158,6 +153,7 @@ class EscRun extends Command
         $_onlinePlayers = collect();
 
         Database::init();
+        DB::table('access-rights')->truncate();
         RestClient::init($serverName);
         HookController::init();
         TemplateController::init();
@@ -172,8 +168,11 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
-        ScoreController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
+
+        ChatCommand::add('//restart-evosc', function () {
+            restart_evosc();
+        }, 'Restart EvoSC', 'ma');
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
@@ -183,7 +182,7 @@ class EscRun extends Command
             Log::write('Booting core finished.', true);
         }
 
-        ModuleController::startModules(Server::getScriptName()['CurrentValue']);
+        ModuleController::startModules(Server::getScriptName()['CurrentValue'], true);
 
         if (isVerbose()) {
             Log::write('Booting modules finished.', true);
@@ -207,21 +206,17 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        infoMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->sendAdmin();
+        successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
 
         //cycle-loop
         while (true) {
             try {
                 Timer::startCycle();
-
+                RestClient::curlTick();
                 EventController::handleCallbacks(Server::executeCallbacks());
 
                 $pause = Timer::getNextCyclePause();
                 $failedConnectionRequests = 0;
-
-                if ($_restart) {
-                    return;
-                }
 
                 usleep($pause);
             } catch (Exception $e) {

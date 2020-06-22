@@ -1,0 +1,871 @@
+{contentType text}
+{extends 'Components.tabbed-window'}
+{php $window_width = 156;}
+{php $window_height = 110;}
+{php $doNotStop = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}map-list{/block}
+    {block title}{$window_title ?? 'Maps'}{/block}
+    {block icon}{/block}
+
+    {block navbar}
+    {include 'Components.tabs', tabs => [
+    ' Maps'=>'',
+    ' Jukebox'=>' ',
+    ]
+    }
+    {/block}
+
+    {block content}
+    <framemodel id="Map">
+        <quad class="bg-light" valign="center" pos="-2 0" size="156 4.5" opacity="0"/>
+        <label class="text-light" pos="1 0" valign="center" size="40 3" text="map name map name map name" textsize="0.6" z-index="1"/>
+        <label class="filter-author text-light" pos="52 0" valign="center" size="30 3" text="map author name comes here" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000"/>
+        <label class="text-light" pos="88 0" valign="center" size="30 3" halign="center" text="local" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textsize="0.6" z-index="1"/>
+        <label class="fav text-light" pos="115.5 0" valign="center" size="3 3" text="" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
+        <label class="text-light" pos="100.5 1" size="30 3" text="" textsize="0.6" z-index="1" opacity="0.3"/>
+        <frame pos="100.5 1" size="0 3" z-index="2">
+            <label class="text-lighter" size="30 3" text="" textcolor="fd0" textsize="0.6"/>
+        </frame>
+
+        <frame id="buttons" pos="120 0" z-index="5">
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn juke btn-muted" size="11 3" text=" Juke" textsize="0.3" ScriptEvents="1"/>
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn info btn-muted" size="10 3" text=" Info" textsize="0.3" ScriptEvents="1"/>
+            {if $localPlayer->hasAccess('map_disable')}
+            <label textfont="{config('colors.ui.font')|noescape}" class="btn disable btn-warning" size="4 3" text="" textsize="0.3" ScriptEvents="1"/>
+            {/if}
+            {if $localPlayer->hasAccess('map_delete')}
+            <label class="btn delete btn-danger" textfont="{config('colors.ui.font')|noescape}" size="4 3" text="" textsize="0.3" ScriptEvents="1"/>
+            {/if}
+        </frame>
+    </framemodel>
+
+    <frame id="map-list-window" pos="0 -12" z-index="300">
+        <frame id="maps-all" pos="0 -2" z-index="2">
+            <label class="text-accent" pos="1  1" text="Name" scale="0.8"/>
+            <label class="text-accent" pos="52 1" text="Author" scale="0.8"/>
+            <label class="text-accent" pos="88 1" text="Local" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="96 1" text="Dedi" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="106 1" text="Karma" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="117 1" text="Favorite" halign="center" scale="0.8"/>
+
+            <frame id="sorting-controls" pos="-1 5.25">
+                <quad valign="center" pos="-1" size="200 6" textcolor="{config('colors.ui.window.bg.color')}" opacity="{config('colors.ui.window.bg.opacity') - 0.1}" z-index="-1"/>
+                <label class="text-light" pos="2 0" textsize="1" text="Filter/Sort:" scale="0.8" valign="center"/>
+
+                <label class="filter-btn btn-accent" data-sort=" " pos="19.5" size="13 4" textsize="0.7" text="Show All" scale="0.8" ScriptEvents="1"/>
+                <label class="filter-btn btn-accent" data-sort="favorites" pos="30.75" size="13 4" textsize="0.7" text="Favorites" scale="0.8" ScriptEvents="1"/>
+
+                <frame pos="10.75">
+                    <label class="filter-btn btn-accent" data-sort="nofinish" pos="32" size="15 4" textsize="0.7"
+                           text="No Finish" scale="0.8" ScriptEvents="1"/>
+
+                    <label class="filter-btn btn-accent" data-sort="nolocal" pos="44.75" size="15 4" textsize="0.7"
+                           text="No Local" scale="0.8" ScriptEvents="1"/>
+
+                    <label class="filter-btn btn-accent" data-sort="nodedi" pos="57.5" size="15 4" textsize="0.7"
+                           text="No Dedi" scale="0.8" ScriptEvents="1"/>
+
+                    <frame pos="25.6 0">
+                        <label class="btn-accent" pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                        <label class="btn-accent" pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                        <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="worst_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="best_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+
+                        <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                        <label class="filter-btn btn-accent" data-sort="author_time_desc" pos="106.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
+                    </frame>
+                </frame>
+            </frame>
+
+            <frame id="map-list" pos="0 -3">
+                {for $i = 0; $i<20; $i++}
+                <frameinstance pos="0 {$i * -4 - 2}" modelid="Map" hidden="0"/>
+                {/for}
+            </frame>
+
+            <frame id="pagination" pos="2 -86.5" scale="0.9">
+                <entry id="page-input" class="form page-input" pos="6.05 0" size="8.4 3.5" valign="center" halign="center" text="1" textsize="0.8" ScriptEvents="1" hidden="1"/>
+                <label id="page-info" class="btn-default enable-page-input" pos="6.05 0" size="8.4 3.5" text="1/1" textsize="0.8" ScriptEvents="1"/>
+                <label class="btn-default previous-page" size="3.5 3.5" text="⏴" ScriptEvents="1"/>
+                <label class="btn-default next-page" pos="12 0" size="3.5 3.5" text="⏵" ScriptEvents="1"/>
+            </frame>
+
+            <frame id="search-frame" pos="124 -86.5" scale="0.9">
+                <label class="text-light" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍"/>
+                <entry id="search-input" class="search-input form" pos="26.5 0" size="25 3.5" halign="right" valign="center"/>
+                <label id="clear-search" class="clear-search btn-danger" size="3.5 3.5" textsize="0.25" text="" ScriptEvents="1" hidden="1"/>
+            </frame>
+        </frame>
+    </frame>
+    {/block}
+
+    {block scriptDeclarations}
+    <script><!--
+declare Text[] favorites;
+declare Text[Text][] maps;
+declare Text[Text][Integer] mapAuthors;
+declare Text[Text][] currentMapPool;
+declare Integer lastMapQueueLength;
+declare Integer currentPage;
+declare Real buttonsWidth;
+declare CMlFrame mapListFrame;
+declare Text currentMapUid;
+declare Integer cooldown;
+declare Text[Text] currentMap;
+declare Boolean inSearch;
+declare Boolean userCanDrop;
+    --></script>
+    {/block}
+
+    {block functions}
+    <script><!--
+
+Text[Text] getAuthor(Text id){
+    return mapAuthors[TL::ToInteger(id)];
+}
+
+Text[Text] findMapByUid(Text Uid){
+    foreach(map in maps){
+        if(!map.existskey("uid")){
+            log("[Maps] findMapById Error " ^ Uid);
+            return Text[Text];
+        }
+
+        if(map["uid"] == Uid){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Text[Text] findMapById(Text id){
+    foreach(map in maps){
+        if(!map.existskey("id")){
+            log("[Maps] findMapById Error " ^ id);
+            return Text[Text];
+        }
+
+        if(map["id"] == id){
+            return map;
+        }
+    }
+
+    return Text[Text];
+}
+
+Void rearrangeButtons(){
+    declare Text listId = "";
+    declare Text buttonsId = "";
+        listId = "map-list";
+        buttonsId = "buttons";
+    declare mapList <=> (Page.MainFrame.GetFirstChild(listId) as CMlFrame);
+    declare Real padding;
+
+    buttonsWidth = 0.0;
+
+    foreach(control in mapList.Controls){
+        declare buttonsFrame = ((control as CMlFrame).GetFirstChild(buttonsId) as CMlFrame);
+        padding = 0.0;
+
+        foreach(button in buttonsFrame.Controls){
+            if(!button.Visible){
+                continue;
+            }
+
+            declare Real width = button.Size[0];
+            declare offset = width / 2.0 + padding;
+            button.RelativePosition_V3 = <offset, 0.0>;
+            padding = offset + width / 2.0 + 1.0;
+        }
+
+        if(padding > buttonsWidth){
+            buttonsWidth = padding;
+        }
+    }
+}
+
+Boolean hasLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+    return Locals.existskey(mapId);
+}
+
+Boolean hasDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+    return Dedis.existskey(mapId);
+}
+
+Boolean hasRecord(Text mapId){
+    return (hasLocal(mapId) || hasDedi(mapId));
+}
+
+Text getLocal(Text mapId){
+    declare Integer[Text] Locals for LocalUser;
+
+    if(Locals.existskey(mapId)){
+        return TL::ToText(Locals[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getDedi(Text mapId){
+    declare Integer[Text] Dedis for LocalUser;
+
+    if(Dedis.existskey(mapId)){
+        return TL::ToText(Dedis[mapId]) ^ ".";
+    }
+
+    return "$999-";
+}
+
+Text getStarString(Real rating){
+    if(rating == -1){
+        return "$666";
+    }
+
+    declare Text starString = "";
+    declare Real stars = rating / 20.0;
+    declare Integer full = ML::FloorInteger(stars);
+    declare Real left = stars - full;
+
+    for(i, 0, full - 1){
+        starString = starString ^ "";
+    }
+
+    if(left >= 0.5){
+        starString = starString ^ "";
+        full = full + 1;
+    }
+
+    for(i, full + 1, 5){
+        starString = starString ^ "$666";
+    }
+
+    return starString;
+}
+
+Integer ceil(Real value){
+    if(ML::NearestInteger(value) == value){
+        return ML::NearestInteger(value);
+    }
+
+    return ML::CeilingInteger(value);
+}
+
+Void updateView(Text[Text][] mapPool, Integer page){
+    declare mapsFrame = (Page.MainFrame.GetFirstChild("map-list") as CMlFrame);
+    declare pageInfo = (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    declare Integer start = page * 20;
+    declare Integer rowsFilled = 0;
+
+    for(i, 0, 19){
+        declare Integer id = start + i;
+
+        if(id >= mapPool.count){
+            break;
+        }
+
+        declare Text[Text] map = mapPool[id];
+
+        if(!map.existskey("a") || !map.existskey("id")){
+            log("[Maps] Update view Error");
+            log(map);
+            continue;
+        }
+
+        declare Text[Text] author = getAuthor(map["a"]);
+
+        declare mapFrame <=> (mapsFrame.Controls[i] as CMlFrame);
+        mapFrame.DataAttributeSet("map-id", map["id"]);
+        mapFrame.DataAttributeSet("map-uid", map["uid"]);
+        (mapFrame.Controls[1] as CMlLabel).SetText(map["name"]);
+        (mapFrame.Controls[2] as CMlLabel).SetText(author["nick"]);
+        (mapFrame.Controls[3] as CMlLabel).SetText(getLocal(map["id"]));
+        (mapFrame.Controls[4] as CMlLabel).SetText(getDedi(map["id"]));
+
+        if(TL::ToInteger(map["c"]) < cooldown){
+            (mapFrame.Controls[1] as CMlLabel).Opacity = 0.3;
+            (mapFrame.Controls[2] as CMlLabel).Opacity = 0.3;
+        }else{
+            (mapFrame.Controls[1] as CMlLabel).Opacity = 1.0;
+            (mapFrame.Controls[2] as CMlLabel).Opacity = 1.0;
+        }
+
+        if(favorites.exists(map["uid"])){
+            (mapFrame.Controls[5] as CMlLabel).SetText("");
+        }else{
+            (mapFrame.Controls[5] as CMlLabel).SetText("");
+        }
+
+        declare width = TL::ToReal(map["r"]) * 0.113;
+        AnimMgr.Add(mapFrame.Controls[7], "<frame size='"^width^" 3' />", 150, CAnimManager::EAnimManagerEasing::Linear);
+        mapFrame.Show();
+
+        rowsFilled = rowsFilled + 1;
+    }
+
+    if(rowsFilled <= 19){
+        for(i, rowsFilled, 19){
+            (mapsFrame.Controls[i] as CMlFrame).Hide();
+        }
+    }
+
+    pageInfo.SetText((page + 1) ^ "/" ^ ceil(mapPool.count / 20.0));
+}
+
+Void search(){
+    declare Text[Text][] mapsFound = Text[Text][];
+    declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+    declare clearSearch <=> (Page.MainFrame.GetFirstChild("clear-search") as CMlLabel);
+    declare search = TL::Trim(input.Value);
+
+    switch(search){
+        case "":{
+            if(maps.count != currentMapPool.count){
+                currentMapPool = maps;
+                updateView(currentMapPool, 0);
+            }
+            clearSearch.Hide();
+            return;
+        }
+
+        case "nofinish":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasRecord(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "nolocal":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasLocal(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "nodedi":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(!hasDedi(map["id"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "favorites":{
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(favorites.exists(map["uid"])){
+                    mapsFound.add(map);
+                }
+            }
+        }
+
+        case "best":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasLocal(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] localsAsc = Text[];
+
+            declare Integer[Text] Locals for LocalUser;
+            foreach(mapId => local in Locals){
+                localsAsc.add(mapId);
+            }
+
+            declare Text[] localsDesc = localsAsc;
+
+            for(i, 0, localsAsc.count - 1){
+                localsDesc[localsAsc.count - i - 1] = localsAsc[i];
+            }
+
+            foreach(mapId in localsDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "best_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst_dedi":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(hasDedi(map["id"])){
+                    selected[map["id"]] = map;
+                }
+            }
+
+            declare Text[] dedisAsc = Text[];
+
+            declare Integer[Text] Dedis for LocalUser;
+            foreach(mapId => dedi in Dedis){
+                dedisAsc.add(mapId);
+            }
+
+            declare Text[] dedisDesc = dedisAsc;
+
+            for(i, 0, dedisAsc.count - 1){
+                dedisDesc[dedisAsc.count - i - 1] = dedisAsc[i];
+            }
+
+            foreach(mapId in dedisDesc){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "worst_karma":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["r"] != "0.0"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "best_karma":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Text[Text][] reversed = Text[Text][];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["r"] != "0.0"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    reversed.add(selected[mapId]);
+                }
+            }
+
+            for(i, 0, reversed.count - 1){
+                mapsFound.add(reversed[reversed.count - i - 1]);
+            }
+        }
+
+        case "author_time_asc":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["author_time"] != "-1"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["author_time"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    mapsFound.add(selected[mapId]);
+                }
+            }
+        }
+
+        case "author_time_desc":{
+            declare Text[Text][Text] selected = Text[Text][Text];
+            declare Text[Text][] reversed = Text[Text][];
+            declare Real[Text] sorter = Real[Text];
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+                if(map["author_time"] != "-1"){
+                    selected[map["id"]] = map;
+                    sorter[map["id"]] = TL::ToReal(map["author_time"]);
+                }
+            }
+
+            sorter = sorter.sort();
+
+            foreach(mapId => sortedKarma in sorter){
+                if(selected.existskey(mapId)){
+                    reversed.add(selected[mapId]);
+                }
+            }
+
+            for(i, 0, reversed.count - 1){
+                mapsFound.add(reversed[reversed.count - i - 1]);
+            }
+        }
+
+        default: {
+            for(i, 0, maps.count - 1){
+                declare map = maps[i];
+
+                if(!map.existskey("a")){
+                    log("[Maps] Null author for map " ^ map["id"]);
+                    continue;
+                }
+
+                declare Text[Text] author = getAuthor(map["a"]);
+                declare searchString = map["name"]^author["nick"]^author["login"];
+                if(TL::Find(input.Value, searchString, False, False)){
+                    mapsFound.add(map);
+                }
+            }
+        }
+    }
+
+    currentPage = 0;
+    currentMapPool = mapsFound;
+    updateView(mapsFound, 0);
+    clearSearch.Show();
+}
+
+Void checkMapSearchQuery(){
+    declare Text MapSearchQuery for LocalUser;
+    if(MapSearchQuery != ""){
+        declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+
+        input.SetText(TL::Trim(MapSearchQuery), True);
+        window.Show();
+        MapSearchQuery = "";
+    }
+}
+
+Void buttonPressed(CMlFrame mapFrame, CMlControl control){
+    declare uid = mapFrame.DataAttributeGet("map-uid");
+
+    if(control.HasClass("juke")){
+        TriggerPageAction("map.queue," ^ uid);
+        return;
+    }
+
+    if(control.HasClass("drop")){
+        TriggerPageAction("map.drop," ^ uid);
+        return;
+    }
+
+    if(control.HasClass("info")){
+        TriggerPageAction("mx.details," ^ mapFrame.DataAttributeGet("map-uid"));
+        return;
+    }
+}
+
+Void updateCooldown(){
+    declare Text[Text][] mapsNew = Text[Text][];
+    foreach(map in maps){
+        declare newMap = map;
+        newMap["c"] = "" ^ (TL::ToInteger(map["c"]) + 1);
+        mapsNew.add(newMap);
+    }
+    maps = mapsNew;
+
+    declare Text[Text][] mapsNew2 = Text[Text][];
+    foreach(map in currentMapPool){
+        declare newMap = map;
+        newMap["c"] = "" ^ (TL::ToInteger(map["c"]) + 1);
+        mapsNew2.add(newMap);
+    }
+    currentMapPool = mapsNew2;
+}
+
+Void setCooldownToZero(Text uid){
+    declare Text[Text][] mapsNew = Text[Text][];
+    foreach(map in maps){
+        declare newMap = map;
+        if(map["uid"] == uid){
+            newMap["c"] = "0";
+        }
+        mapsNew.add(newMap);
+    }
+    maps = mapsNew;
+
+    declare Text[Text][] mapsNew2 = Text[Text][];
+    foreach(map in currentMapPool){
+        declare newMap = map;
+        if(map["uid"] == uid){
+            newMap["c"] = "0";
+        }
+        mapsNew2.add(newMap);
+    }
+    currentMapPool = mapsNew2;
+}
+--></script>
+    {/block}
+
+    <script><!--
+    {block bootScript}
+        window.Hide();
+
+        inSearch = False;
+        currentPage = 0;
+        userCanDrop = {($localPlayer->hasAccess('map_queue_drop') ? 'True' : 'False')|noescape};
+        cooldown = {config('server.map-cooldown')};
+
+        declare Text[] ESC_Map_Favorite_Uids for This;
+        declare Integer ESC_Last_Map_Favorites_Update for This;
+        declare Boolean MapQueueShow for This = False;
+        declare lastFavoritesUpdate = 0;
+
+        mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
+        declare Text[Text][] Maps for LocalUser;
+        declare Text[Text][Integer] MapAuthors for LocalUser;
+        declare Integer MapUpdateTime for LocalUser = 0;
+        declare Boolean showQueue for This = False;
+        declare lastMapUpdate = 0;
+        declare lastUid = Map.Id;
+
+        rearrangeButtons();
+
+        declare Boolean queueVisible for This;
+        declare Boolean mapListVisible for This;
+        declare Vec2 MapWindowPos for This;
+        MapWindowPos = window.RelativePosition_V3;
+    {/block}
+
+    {block pendingEvents}
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            buttonPressed(event.Control.Parent, event.Control);
+        }
+
+        if(event.Control.HasClass("enable-page-input") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+            declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+            pageInfo.Hide();
+            pageInput.Value = "";
+            pageInput.Show();
+            pageInput.Focus();
+            continue;
+        }
+
+        if(event.Control.HasClass("clear-search") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText("", True);
+            continue;
+        }
+
+        if(event.Control.HasClass("page-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+            declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+            declare pageInput <=> (Page.MainFrame.GetFirstChild("page-input") as CMlEntry);
+            declare page = TL::ToInteger(pageInput.Value);
+
+            if(page != -1){
+                currentPage = page - 1;
+
+                if(currentPage < 0){
+                    currentPage = 0;
+                }
+                if(currentPage >= ceil(currentMapPool.count / 20.0)){
+                    currentPage = ceil(currentMapPool.count / 20.0) - 1;
+                }
+
+                updateView(currentMapPool, currentPage);
+            }
+
+            pageInfo.Show();
+            pageInput.Hide();
+
+            continue;
+        }
+
+        if(event.Control.HasClass("search-input") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+            search();
+            continue;
+        }
+
+        if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage = currentPage - 1;
+            if(currentPage < 0){
+                currentPage = ceil(currentMapPool.count / 20.0) - 1;
+            }
+            updateView(currentMapPool, currentPage);
+            continue;
+        }
+
+        if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::MouseClick){
+            currentPage = currentPage + 1;
+            if(currentPage >= ceil(currentMapPool.count / 20.0)){
+                currentPage = 0;
+            }
+            updateView(currentMapPool, currentPage);
+            continue;
+        }
+
+        if(event.Control.HasClass("filter-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText(event.Control.DataAttributeGet("sort"), True);
+            mapListFrame.Show();
+        }
+
+        if(event.Control.HasClass("filter-author") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare mapId = event.Control.Parent.DataAttributeGet("map-id");
+            declare id = findMapById(mapId)["a"];
+            declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+            input.SetText(mapAuthors[TL::ToInteger(id)]["login"], True);
+        }
+
+        if(event.Control.HasClass("fav") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare label = (event.Control as CMlLabel);
+            declare isFav = label.Value != "";
+
+            if(isFav){
+                ManiaLinkEvent("{$MODULE|classpath}::favRemove", event.Control.Parent.DataAttributeGet("map-uid"));
+            }else{
+                ManiaLinkEvent("{$MODULE|classpath}::favAdd", event.Control.Parent.DataAttributeGet("map-uid"));
+            }
+        }
+
+        if(event.Control.HasClass("nav-btn") && event.Type == CMlScriptEvent::Type::MouseClick){
+            if((event.Control as CMlLabel).Value == " Jukebox"){
+                window.Hide();
+                showQueue = True;
+            }
+        }
+
+        if(event.Control.HasClass("disable") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
+            if(confirm("Disable map?")){
+                TriggerPageAction("{$MODULE|classpath}::mleDisableMap," ^ uid);
+            }
+            continue;
+        }
+
+        if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
+            if(confirm("Delete map and all associated data?")){
+                TriggerPageAction("{$MODULE|classpath}::mleDeleteMap," ^ uid);
+            }
+            continue;
+        }
+
+        if(event.Control.HasClass("btn")){
+            declare mapFrame = (event.Control.Parent.Parent as CMlFrame);
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                buttonPressed(mapFrame, event.Control);
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOver){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.25;
+                continue;
+            }
+
+            if(event.Type == CMlScriptEvent::Type::MouseOut){
+                (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
+                continue;
+            }
+        }
+    {/block}
+
+    {block loop}
+        if(MapUpdateTime != 0 && lastMapUpdate != MapUpdateTime){
+            lastMapUpdate = MapUpdateTime;
+            mapAuthors = MapAuthors;
+            maps = Maps;
+            currentMapPool = maps;
+
+            updateView(currentMapPool, currentPage);
+
+            log("[EvoSC:update-map-list] Loaded " ^ Maps.count ^ " maps from " ^ MapAuthors.count ^ " authors.");
+        }
+
+        if(Map.Id != lastUid){
+            lastUid = Map.Id;
+            updateCooldown();
+            setCooldownToZero("" ^ lastUid);
+            updateView(currentMapPool, currentPage);
+        }
+
+        if(lastFavoritesUpdate != ESC_Last_Map_Favorites_Update){
+            lastFavoritesUpdate = ESC_Last_Map_Favorites_Update;
+            favorites = ESC_Map_Favorite_Uids;
+            updateView(currentMapPool, currentPage);
+        }
+
+        if(MapQueueShow){
+            log("show");
+            window.Show();
+            MapQueueShow = False;
+        }
+
+        if(queueVisible && mapListVisible){
+            window.Hide();
+        }
+        mapListVisible = window.Visible;
+
+        if(MapWindowPos != window.RelativePosition_V3){
+            if(window.Visible){
+                MapWindowPos = window.RelativePosition_V3;
+            }else{
+                window.RelativePosition_V3 = MapWindowPos;
+            }
+        }
+
+        checkMapSearchQuery();
+    {/block}
+--></script>
+</manialink>

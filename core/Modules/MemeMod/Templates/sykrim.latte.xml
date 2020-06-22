@@ -1,0 +1,27 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:sykrim" id="sykrim" version="3">
+    <frame>
+        <quad id="quad" pos="-160 90" size="320 180" bgcolor="000" opacity="0.5" />
+    </frame>
+
+    <script><!--
+    main() {
+        declare quad <=> (Page.MainFrame.GetFirstChild("quad") as CMlQuad);
+        declare active = False;
+
+        while(True){
+            yield;
+
+            foreach(Event in RaceEvents){
+                if(Event.Type == CTmRaceClientEvent::EType::Respawn){
+                    if(Event.Player.User.Login == LocalUser.Login){
+                        //active = False;
+                        //AnimMgr.Flush(label);
+                    }
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>

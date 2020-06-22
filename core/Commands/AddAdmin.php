@@ -1,12 +1,12 @@
 <?php
 
-namespace esc\Commands;
+namespace EvoSC\Commands;
 
-use esc\Classes\Database;
-use esc\Classes\Log;
-use esc\Controllers\ConfigController;
-use esc\Models\Group;
-use esc\Models\Player;
+use EvoSC\Classes\Database;
+use EvoSC\Classes\Log;
+use EvoSC\Controllers\ConfigController;
+use EvoSC\Models\Group;
+use EvoSC\Models\Player;
 use Exception;
 use Maniaplanet\DedicatedServer\Connection;
 use Symfony\Component\Console\Command\Command;

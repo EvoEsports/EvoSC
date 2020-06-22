@@ -1,12 +1,10 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Models\Player;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\InvalidArgumentException;
-use Maniaplanet\DedicatedServer\Structures\Map;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
@@ -18,7 +16,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  *
  * XML-RPC helper class. See {@see https://doc.maniaplanet.com/dedicated-server/references/xml-rpc-methods} for a full list of all methods and their arguments.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  *
  * @method static bool authenticate(string $string, string $string)
  * @method static bool changeAuthPassword(string $string, string $string)
@@ -46,7 +44,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool chatSendToLogin(string $string, string $string)
  * @method static bool chatSendToId(string $string, int $int)
  * @method static array getChatLines()
- * @method static bool chatEnableManualRouting(bool $boolean, bool $boolean)
+ * @method static bool chatEnableManualRouting(bool $routeMessages = true, bool $excludeServer = false) @throws FaultException
  * @method static bool chatForwardToLogin(string $string, string $string, string $string)
  * @method static bool sendNotice(string $string, string $string, int $int)
  * @method static bool sendNoticeToId(int $int, string $string, int $int, int $int)
@@ -181,14 +179,14 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static string getModeScriptText()
  * @method static bool setModeScriptText(string $string)
  * @method static object getModeScriptInfo()
- * @method static object getModeScriptSettings()
- * @method static bool setModeScriptSettings(object $struct)
+ * @method static array getModeScriptSettings()
+ * @method static bool setModeScriptSettings(array $modeScriptSettingsArray)
  * @method static bool sendModeScriptCommands(object $struct)
  * @method static bool setModeScriptSettingsAndCommands(object $struct, object $struct)
  * @method static object getModeScriptVariables()
  * @method static bool setModeScriptVariables(object $struct)
  * @method static bool triggerModeScriptEvent(string $string, array $arrayWithString)
- * @method static bool triggerModeScriptEventArray(string $string, array $array)
+ * @method static bool triggerModeScriptEventArray(string $event, array $array = [])
  * @method static object getScriptCloudVariables(string $string, string $string)
  * @method static bool setScriptCloudVariables(string $string, string $string, object $struct)
  * @method static bool restartMap()
@@ -250,8 +248,8 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool setNextMapIdent(string $string)
  * @method static bool jumpToMapIndex(int $int)
  * @method static bool jumpToMapIdent(string $string)
- * @method static Map getCurrentMapInfo()
- * @method static Map getNextMapInfo()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Map getCurrentMapInfo()
+ * @method static \Maniaplanet\DedicatedServer\Structures\Map getNextMapInfo()
  * @method static object getMapInfo(string $filename)
  * @method static bool checkMapForCurrentServerParams(string $string)
  * @method static array getMapList(int $int = 0, int $int = 0)
@@ -313,8 +311,6 @@ class Server
     {
         self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
         self::$rpc->enableCallbacks();
-
-        ChatCommand::add('//restart', [self::class, 'restartController'], 'Restart EvoSC.', 'ma');
     }
 
     /**
@@ -352,14 +348,5 @@ class Server
         }
 
         return null;
-    }
-
-    public static function restartController(Player $player)
-    {
-        global $_restart;
-
-        warningMessage($player, ' restarted EvoSC.')->sendAdmin();
-
-        $_restart = true;
     }
 }

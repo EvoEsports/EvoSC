@@ -1,11 +1,10 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
 use Closure;
-use esc\Models\AccessRight;
-use esc\Models\Player;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,7 +12,7 @@ use Illuminate\Support\Collection;
  *
  * Create chat-commands and aliases
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class ChatCommand
 {
@@ -76,8 +75,8 @@ class ChatCommand
         $chatCommand = new ChatCommand($command, $callback, $description, $access, $hidden);
         self::$commands->put($command, $chatCommand);
 
-        if ($access && $access != 'ma') {
-            if (!AccessRight::whereName($access)->exists()) {
+        if (is_string($access) && $access != 'ma') {
+            if (!DB::table('access-rights')->where('name', '=', $access)->exists()) {
                 Log::warning("Missing access-right: $access");
             }
         }

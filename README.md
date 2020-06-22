@@ -1,7 +1,7 @@
 | ⚠ Bug-Reports are only accepted for the master-branch ⚠ |
 | --- |
-| If you encounter a bug, create a [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
-| If you fail to set up EvoSC on your own, then it is probably too early for you to run EvoSC and you should wait for the official release packages, which will contain all required files. EvoSC is still in development stage and we do not have the resources to help you through the setup process. Version 1.0 is planned to relase in 2020. |
+| If you encounter a bug, create an [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
+| If you fail to set up EvoSC on your own, then it is probably too early for you to run EvoSC and you should wait for the official release packages, which will contain all required files. EvoSC is still in development stage and we do not have the resources to help you through the setup process. Version 1.0 is planned to release in 2020. |
 
 
 # EvoSC
@@ -11,7 +11,7 @@
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 [![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
 
-A server controller for Trackmania² for ManiaPlanet 4.1
+A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack

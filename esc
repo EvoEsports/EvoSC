@@ -3,17 +3,17 @@
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
-use esc\Commands\GetVersion;
-use esc\Commands\EscRun;
-use esc\Commands\AddAdmin;
-use esc\Commands\FakeLocals;
-use esc\Commands\FixRanks;
-use esc\Commands\FixScores;
-use esc\Commands\ImportUaseco;
-use esc\Commands\ImportPyplanet;
-use esc\Commands\MakeMigration;
-use esc\Commands\Migrate;
-use esc\Commands\ChatRouter;
+use EvoSC\Commands\GetVersion;
+use EvoSC\Commands\EscRun;
+use EvoSC\Commands\AddAdmin;
+use EvoSC\Commands\FakeLocals;
+use EvoSC\Commands\FixRanks;
+use EvoSC\Commands\FixScores;
+use EvoSC\Commands\ImportUaseco;
+use EvoSC\Commands\ImportPyplanet;
+use EvoSC\Commands\MakeMigration;
+use EvoSC\Commands\Migrate;
+use EvoSC\Commands\SetupAccessRights;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 
@@ -55,8 +55,8 @@ $application->add(new FixScores());
 $application->add(new GetVersion());
 $application->add(new EscRun());
 $application->add(new FakeLocals());
-$application->add(new ChatRouter());
 $application->add(new AddAdmin());
+$application->add(new SetupAccessRights());
 $application->setDefaultCommand("list");
 
 try {

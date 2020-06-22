@@ -1,0 +1,23 @@
+{
+  "addtime": {
+    "enabled": true,
+    "cost": 500,
+    "forceable": false,
+    "time-limit-in-seconds": 1800,
+    "ui": {
+      "position": "right",
+      "slot": 40,
+      "slot_horizontal": 7
+    }
+  },
+
+  "skip": {
+    "enabled": false,
+    "cost": 5000,
+    "ui": {
+      "position": "right",
+      "slot": 40,
+      "slot_horizontal": 6
+    }
+  }
+}

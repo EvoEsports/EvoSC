@@ -1,10 +1,11 @@
 <?php
 
-namespace esc\Classes;
+namespace EvoSC\Classes;
 
 
-use esc\Controllers\TemplateController;
-use esc\Models\Player;
+use EvoSC\Controllers\TemplateController;
+use EvoSC\Exceptions\InvalidArgumentException;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
 
@@ -13,7 +14,7 @@ use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
  *
  * Render manialink-templates and send them to all or single players.
  *
- * @package esc\Classes
+ * @package EvoSC\Classes
  */
 class Template
 {
@@ -28,8 +29,8 @@ class Template
     /**
      * Template constructor.
      *
-     * @param  string  $index
-     * @param  string  $template
+     * @param string $index
+     * @param string $template
      */
     public function __construct(string $index, string $template)
     {
@@ -46,6 +47,8 @@ class Template
      */
     public static function showAll(string $index, array $values = [], int $timeoutInSeconds = 0)
     {
+        global $__ManiaPlanet;
+        $values['is_maniaplanet'] = $__ManiaPlanet;
         $xml = TemplateController::getTemplate($index, $values);
         Server::sendDisplayManialinkPage('', $xml, $timeoutInSeconds * 1000);
     }
@@ -55,23 +58,29 @@ class Template
      *
      * @param Player $player
      * @param string $index
-     * @param null $values
+     * @param Collection|array|null $values
      * @param bool $multicall
      * @param int $timeoutInSeconds
+     * @throws InvalidArgumentException
      */
     public static function show(Player $player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
-        $data = [];
+        global $__ManiaPlanet;
 
         if ($values instanceof Collection) {
-            foreach ($values as $key => $value) {
-                $data[$key] = $value;
-            }
-        } else {
+            $data = $values->toArray();
+        } else if (is_array($values)) {
             $data = $values;
+        } else if (is_null($values)) {
+            $data = [];
+        } else {
+            throw new InvalidArgumentException('Values must be of type Collection or array');
         }
 
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $data['localPlayer'] = $player;
+        $data['is_maniaplanet'] = $__ManiaPlanet;
+        $data['MODULE'] = $caller['class'];
         $xml = TemplateController::getTemplate($index, $data);
 
         if ($xml != '') {
@@ -90,12 +99,12 @@ class Template
     /**
      * Hide a manialink with the given id for everyone.
      *
-     * @param  string  $id
+     * @param string $id
      */
     public static function hideAll(string $id)
     {
         Server::sendDisplayManialinkPage('', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
+<manialink version="3" name="ESC:' . $id . '" id="' . $id . '"></manialink>');
     }
 
     /**
@@ -107,7 +116,7 @@ class Template
     public static function hide(Player $player, string $id)
     {
         Server::sendDisplayManialinkPage($player->Login, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" name="ESC:'.$id.'" id="'.$id.'"></manialink>');
+<manialink version="3" name="ESC:' . $id . '" id="' . $id . '"></manialink>');
     }
 
     /**
@@ -123,8 +132,8 @@ class Template
             try {
                 Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
             } catch (Exception $e) {
-                $id = uniqid(evo_str_slug($e->getMessage())).'.xml';
-                Log::warning('Failed to render template for '.$login.'. Saving to as '.$id);
+                $id = uniqid(evo_str_slug($e->getMessage())) . '.xml';
+                Log::warning('Failed to render template for ' . $login . '. Saving to as ' . $id);
                 Cache::put($id, $xml);
             }
         });
@@ -137,8 +146,8 @@ class Template
     /**
      * Render the template and get the xml as string.
      *
-     * @param  string  $index
-     * @param  array|null  $values
+     * @param string $index
+     * @param array|null $values
      *
      * @return string
      */
