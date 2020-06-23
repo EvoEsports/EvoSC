@@ -116,12 +116,13 @@ class EscRun extends Command
             $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
             Server::setCallVoteRatios([$voteRatio]);
             */
-            Server::setCallVoteTimeOut(0);
+            //Server::setCallVoteTimeOut(0);
 
             $output->writeln("Connection established.");
         } catch (Exception $e) {
             $msg = $e->getMessage();
-            $output->writeln("<error>Connecting to server failed: $msg</error>");
+            $trace = $e->getTraceAsString();
+            $output->writeln("<error>Connecting to server failed: $msg\n$trace</error>");
             exit(1);
         }
     }

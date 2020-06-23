@@ -15,7 +15,7 @@ A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack
-* Rounds (Partially, In Progress)
+* Rounds
 * ~~Teams~~
 * ~~Chase~~
 
