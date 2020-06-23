@@ -45,7 +45,7 @@
     <!-- end components -->
 
     {if !$is_maniaplanet}
-    <quad pos="-160 90" class="bg-blur" size="320 180" z-index="9998" opacity="0" />
+    <quad pos="-160 90" class="bg-blur" size="320 180" z-index="9998" />
     {/if}
 
     <frame id="main-frame" pos="-86 30" z-index="9999">
@@ -295,7 +295,7 @@
                 LibScoresTable2_Settings["SortDisco"] &&
                 LibST_Status == C_Status_Disconnected
             ) Weight += 2 * Scores.count;
-            SortedScores[Score] = Weight;
+            SortedScores[{if $is_maniaplanet}Score{else}CSmScore{/if}] = Weight;
             c += 1;
         }
 

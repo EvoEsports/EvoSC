@@ -13,6 +13,7 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\EvoDonate\EvoDonate;
 use EvoSC\Modules\GitHubIssues\GitHubIssues;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -30,7 +31,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        GitHubIssues::showIssues($player);
+        self::sendTestManialink($player);
     }
 
     public static function sendTestManialink(Player $player)
