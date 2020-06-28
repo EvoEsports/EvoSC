@@ -59,7 +59,7 @@ class Votes extends Module implements ModuleInterface
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
 
-        self::$isRounds = $mode != 'TimeAttack.Script.txt';
+        self::$isRounds = $mode != 'TimeAttack.Script.txt' && $mode != 'Trackmania/TM_TimeAttack_Online.Script.txt';
 
         if (config('quick-buttons.enabled')) {
             ManiaLinkEvent::add('vote.approve', [self::class, 'approveVote'], 'vote_decide');
