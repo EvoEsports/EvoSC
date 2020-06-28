@@ -6,16 +6,12 @@ namespace EvoSC\Modules\TestModule;
 
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\EvoDonate\EvoDonate;
-use EvoSC\Modules\GitHubIssues\GitHubIssues;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
-use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface

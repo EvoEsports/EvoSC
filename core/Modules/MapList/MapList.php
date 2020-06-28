@@ -139,7 +139,7 @@ class MapList extends Module implements ModuleInterface
                 $authorTime = -1;
                 if (Cache::has('gbx/' . $data->uid)) {
                     $gbx = Cache::get('gbx/' . $data->uid);
-                    $authorTime = $gbx->AuthorTime;
+                    $authorTime = $gbx->AuthorTime ?? -1;
                 }
 
                 return [

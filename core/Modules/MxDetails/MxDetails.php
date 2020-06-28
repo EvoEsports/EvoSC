@@ -36,6 +36,12 @@ class MxDetails extends Module implements ModuleInterface
 
     public static function showDetails(Player $player, string $mapUid)
     {
+        global $__ManiaPlanet;
+        if (!$__ManiaPlanet) {
+            warningMessage('This feature is currently not available.')->send($player);
+            return;
+        }
+
         $map = Map::getByUid($mapUid);
 
         if (!$map) {
