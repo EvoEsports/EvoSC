@@ -27,6 +27,7 @@ Void hidescript(){
 
     declare UISettings settings for This;
     declare Boolean ESC_Tab_Pressed for This;
+    declare Boolean Net_TMxSM_ScoresTable_IsDisplayed for UI;
     declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
 
     if(!settings.hide || InputPlayer == Null){
@@ -40,9 +41,12 @@ Void hidescript(){
             hs_hide(800);
         }
     }else{
-        if(ESC_Tab_Pressed == True){
+        if({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
             hs_show(1);
-            wait(ESC_Tab_Pressed == False);
+            while({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
+                yield;
+                sleep(50);
+            }
             hs_hide(1);
         }
 
@@ -59,7 +63,10 @@ Void hidescript(){
             hs_hide(800);
 
             {if !isset($doNotPause)}
-            wait(InputPlayer.Speed * 3.6 <= hideSpeed {if $is_maniaplanet}|| InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running{/if});
+            while(InputPlayer.Speed * 3.6 > hideSpeed {if $is_maniaplanet}&& InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running{/if}){
+                yield;
+                hidescript();
+            }
             {/if}
         }
         if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){

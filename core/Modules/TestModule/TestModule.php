@@ -6,6 +6,7 @@ namespace EvoSC\Modules\TestModule;
 
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
@@ -31,7 +32,6 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        self::sendTestManialink($player);
     }
 
     public static function sendTestManialink(Player $player)

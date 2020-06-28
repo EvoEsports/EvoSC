@@ -7,8 +7,8 @@
 #Include "TextLib" as TL
 
 main() {
-    ClientUI.OverlayHideMultilapInfos = True;
-    log(ClientUI);
+    //ClientUI.OverlayHideMultilapInfos = True;
+    //ClientUI.OverlayHideAll = True;
 }
     --></script>
 </manialink>
