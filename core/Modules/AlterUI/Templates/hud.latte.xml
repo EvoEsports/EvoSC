@@ -9,6 +9,7 @@
 main() {
     //ClientUI.OverlayHideMultilapInfos = True;
     //ClientUI.OverlayHideAll = True;
+    return;
 }
     --></script>
 </manialink>

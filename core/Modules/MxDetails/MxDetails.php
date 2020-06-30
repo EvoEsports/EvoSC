@@ -18,12 +18,27 @@ use stdClass;
 
 class MxDetails extends Module implements ModuleInterface
 {
+    const MANIAPLANET_MX_API_URL = 'https://api.mania-exchange.com';
+    const MANIAPLANET_MX_URL = 'https://tm.mania-exchange.com';
+    const TRACKMANIA_MX_API_URL = 'https://api.trackmania.exchange';
+    const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
+
+    private static string $mxApiUrl;
+    private static string $mxUrl;
 
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isManiaPlanet()) {
+            self::$mxApiUrl = self::MANIAPLANET_MX_API_URL;
+            self::$mxUrl = self::MANIAPLANET_MX_URL;
+        } else {
+            self::$mxApiUrl = self::TRACKMANIA_MX_API_URL;
+            self::$mxUrl = self::TRACKMANIA_MX_URL;
+        }
+
         if (!File::dirExists(cacheDir('mx-details'))) {
             File::makeDir(cacheDir('mx-details'));
         }
@@ -36,8 +51,7 @@ class MxDetails extends Module implements ModuleInterface
 
     public static function showDetails(Player $player, string $mapUid)
     {
-        global $__ManiaPlanet;
-        if (!$__ManiaPlanet) {
+        if (isTrackmania()) {
             warningMessage('This feature is currently not available.')->send($player);
             return;
         }
@@ -99,7 +113,7 @@ class MxDetails extends Module implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            $result = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $map->uid, ['timeout' => 5]);
+            $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 5]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;
@@ -140,7 +154,7 @@ class MxDetails extends Module implements ModuleInterface
             return null;
         }
 
-        $result = RestClient::get('https://api.mania-exchange.com/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
+        $result = RestClient::get(self::$mxApiUrl . '/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
 
         if ($result->getStatusCode() != 200) {
             Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
