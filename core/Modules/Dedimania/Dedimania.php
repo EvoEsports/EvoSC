@@ -13,6 +13,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
@@ -26,8 +27,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     private static bool $offlineMode = false;
 
-    private static bool $isTimeAttack;
-
     /**
      * @inheritDoc
      */
@@ -37,8 +36,6 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         if (!$__ManiaPlanet) {
             return;
         }
-
-        self::$isTimeAttack = $mode == 'TimeAttack.Script.txt';
 
         //Add hooks
         Hook::add('PlayerConnect', [DedimaniaApi::class, 'playerConnect']);
@@ -91,7 +88,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function reportConnectedPlayers()
     {
         $map = MapController::getCurrentMap();
-        self::updateServerPlayers($map, self::$isTimeAttack);
+        self::updateServerPlayers($map, ModeController::isTimeAttack());
     }
 
     public static function checkSessionStillValid()
@@ -111,7 +108,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();
-        self::setChallengeTimes($map, self::$isTimeAttack);
+        self::setChallengeTimes($map, ModeController::isTimeAttack());
     }
 
     public static function showManialink(Player $player)
@@ -204,7 +201,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
     public static function beginMap(Map $map)
     {
-        self::getChallengeRecords($map, self::$isTimeAttack);
+        self::getChallengeRecords($map, ModeController::isTimeAttack());
     }
 
     public static function playerFinish(Player $player, int $score, string $checkpoints)

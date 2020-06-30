@@ -8,6 +8,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\CountdownController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\Votes\Votes;
@@ -22,7 +23,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if($mode == 'TimeAttack.Script.txt'){
+        if(ModeController::isTimeAttack()){
             if (!$isBoot) {
                 self::showWidget();
             }

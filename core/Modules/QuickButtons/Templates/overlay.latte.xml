@@ -22,6 +22,7 @@
         while(True){
             yield;
 
+            {$is_maniaplanet}
             if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
                 podium = True;
                 AnimMgr.Add(buttons, "<frame scale='0.85' pos='"^buttons.RelativePosition_V3[0]^" -56' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
@@ -30,6 +31,7 @@
                 podium = False;
                 AnimMgr.Add(buttons, "<frame scale='1.0' pos='"^buttons.RelativePosition_V3[0]^" -51' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
+            {/if}
 
             foreach(event in PendingEvents){
                 if(event.Type == CMlScriptEvent::Type::MouseOver){

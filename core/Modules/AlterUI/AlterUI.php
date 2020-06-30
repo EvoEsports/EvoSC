@@ -6,6 +6,7 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
@@ -21,7 +22,7 @@ class AlterUI extends Module implements ModuleInterface
     {
         global $__ManiaPlanet;
 
-        if ($mode == 'TimeAttack.Script.txt') {
+        if (ModeController::isTimeAttack()) {
             $properties = self::getTASettings();
         } else {
             $properties = self::getRoundsSettings();
