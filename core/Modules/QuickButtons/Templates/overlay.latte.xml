@@ -22,7 +22,7 @@
         while(True){
             yield;
 
-            {$is_maniaplanet}
+            {if $is_maniaplanet}
             if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
                 podium = True;
                 AnimMgr.Add(buttons, "<frame scale='0.85' pos='"^buttons.RelativePosition_V3[0]^" -56' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
