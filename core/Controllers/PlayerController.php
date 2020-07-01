@@ -67,6 +67,18 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
+        ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+    }
+
+    public static function setName(Player $player, $cmd, ...$name)
+    {
+        $name = implode(' ', $name);
+        infoMessage($player, ' changed their name to ', secondary($name), ' use ', secondary('/setname <name>'), ' to change your name.')->sendAll();
+        $player->NickName = $name;
+        $player->update([
+            'NickName' => $name
+        ]);
+        self::$players->put($player->Login, $player);
     }
 
     public static function cacheConnectedPlayers()
