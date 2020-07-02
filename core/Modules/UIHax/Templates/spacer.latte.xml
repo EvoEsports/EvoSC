@@ -3,7 +3,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
 {block id}spacer-1{/block}
-{block size}44 18{/block}
+{block size}44 48{/block}
 
 {block content}
 <quad id="bg" class="bg-dark" size="49 48" opacity="0" z-index="-1000" ScriptEvents="0" />
