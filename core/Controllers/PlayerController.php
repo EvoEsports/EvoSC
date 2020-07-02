@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
@@ -53,9 +54,9 @@ class PlayerController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
         ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
@@ -67,23 +68,28 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
-        ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+
+        if(isTrackmania()){
+            ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+        }
     }
 
     public static function setName(Player $player, $cmd, ...$name)
     {
-        $name = trim(implode(' ', $name));
-        if(strlen($name) == 0){
+        $name = str_replace("\n", '', trim(implode(' ', $name)));
+        if (strlen($name) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;
         }
-        infoMessage($player, ' changed their name to ', secondary($name))->sendAll();
-        infoMessage('This is temporarily and will reset once you rejoin.')->send($player);
         $player->NickName = $name;
         $player->update([
             'NickName' => $name
         ]);
         self::$players->put($player->Login, $player);
+        if($cmd != 'silent'){
+            infoMessage($player, ' changed their name to ', secondary($name))->sendAll();
+            Cache::put('nicknames/'.$player->Login, $name);
+        }
     }
 
     public static function cacheConnectedPlayers()
@@ -156,11 +162,6 @@ class PlayerController implements ControllerInterface
         $player->save();
 
         self::$players->put($player->Login, $player);
-
-        //TODO: Remove when nadeo allows setting nicknames in TMN
-        if (isTrackmania()) {
-            warningMessage('Use ', secondary('/setname <name>'), ' to temporarily set a name on this server.')->send($player);
-        }
     }
 
     /**

@@ -457,13 +457,3 @@ function isTrackmania(): bool
     global $__ManiaPlanet;
     return !$__ManiaPlanet;
 }
-
-/**
- * @return \Spatie\Async\Pool
- */
-function async_pool(): \Spatie\Async\Pool
-{
-    global $asyncPool;
-    return $asyncPool;
-}
-

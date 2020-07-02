@@ -55,14 +55,6 @@ class EscRun extends Command
     {
         global $serverName;
         global $__ManiaPlanet;
-        global $asyncPool;
-
-        /*
-        $asyncPool = Pool::create()
-            ->concurrency(20)
-            ->timeout(10)
-            ->autoload(coreDir('../vendor/autoload.php'));
-        */
 
         Log::setOutput($output);
         ConfigController::init();
