@@ -6,7 +6,7 @@
 {block size}44 18{/block}
 
 {block content}
-<quad id="bg" class="bg-dark" size="49 30" opacity="0" z-index="-1000" ScriptEvents="0" />
+<quad id="bg" class="bg-dark" size="49 48" opacity="0" z-index="-1000" ScriptEvents="0" />
 {/block}
 
 {block script}

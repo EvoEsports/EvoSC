@@ -62,6 +62,11 @@ class MxDownload extends Module implements ModuleInterface
                 continue;
             }
 
+            if(isTrackmania()){
+                self::addMap($player, $mxId);
+                continue;
+            }
+
             try {
                 $details = self::loadMxDetails($mxId);
                 $comment = self::parseBB($details->Comments);
@@ -84,7 +89,7 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception("Requested map with invalid id: $mxId");
         }
 
-        $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
+        $download = RestClient::get(self::$mxUrl . '/tracks/download/' . $mxId);
 
         if ($download->getStatusCode() != 200) {
             throw new Exception("Download $mxId failed: " . $download->getReasonPhrase());
