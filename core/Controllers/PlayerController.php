@@ -72,8 +72,13 @@ class PlayerController implements ControllerInterface
 
     public static function setName(Player $player, $cmd, ...$name)
     {
-        $name = implode(' ', $name);
-        infoMessage($player, ' changed their name to ', secondary($name), ' use ', secondary('/setname <name>'), ' to change your name.')->sendAll();
+        $name = trim(implode(' ', $name));
+        if(strlen($name) == 0){
+            warningMessage('Your name can not be empty.')->send($player);
+            return;
+        }
+        infoMessage($player, ' changed their name to ', secondary($name))->sendAll();
+        infoMessage('This is temporarily and will reset once you rejoin.')->send($player);
         $player->NickName = $name;
         $player->update([
             'NickName' => $name
@@ -151,6 +156,11 @@ class PlayerController implements ControllerInterface
         $player->save();
 
         self::$players->put($player->Login, $player);
+
+        //TODO: Remove when nadeo allows setting nicknames in TMN
+        if (isTrackmania()) {
+            warningMessage('Use ', secondary('/setname <name>'), ' to temporarily set a name on this server.')->send($player);
+        }
     }
 
     /**
