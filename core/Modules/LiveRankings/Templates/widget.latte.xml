@@ -184,8 +184,7 @@
             }
             {else}
             declare bestTimes = Score.BestLapTimes;
-            bestTimes = bestTimes.sortreverse();
-            if(Score.BestLapTimes.count > 0 && bestTimes[0] == -1){
+            if(bestTimes.count > 0 && bestTimes[bestTimes.count - 1] == 0){
                 continue;
             }
             {/if}

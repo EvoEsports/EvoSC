@@ -213,11 +213,11 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/10');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 50) {
+                if ($failedConnectionRequests > 10) {
                     Log::write('MPS',
                         sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 

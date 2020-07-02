@@ -46,6 +46,7 @@
 
     {if !$is_maniaplanet}
     <quad pos="-160 90" class="bg-blur" size="320 180" z-index="9998" opacity="0" />
+    <quad pos="-160 90" bgcolor="000" size="320 180" z-index="9997" opacity="0.75" />
     {/if}
 
     <frame id="main-frame" pos="-86 30" z-index="9999">

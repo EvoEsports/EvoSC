@@ -10,8 +10,12 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\AlterUI\AlterUI;
+use EvoSC\Modules\EvoDonate\EvoDonate;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
+use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\UIHax\UIHax;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -29,7 +33,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        QuickButtons::showButtons($player);
+        UIHax::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)
