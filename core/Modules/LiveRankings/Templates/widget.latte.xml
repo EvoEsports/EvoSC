@@ -111,6 +111,8 @@
     {/if}
 
     Void updateSlot(CMlFrame box, Integer rank, {if $is_maniaplanet}CTmScore{else}CSmScore{/if} Score, Integer addedPoints){
+        declare Text[Text] EvoSC_CustomNames for LocalUser;
+
         declare prefix = "";
 		declare LibST_Status for Score.User = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
@@ -137,7 +139,11 @@
         }
 
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
-        (box.Controls[3] as CMlLabel).Value = prefix ^ Score.User.Name;
+        if(EvoSC_CustomNames.existskey(Score.User.Login)){
+            (box.Controls[3] as CMlLabel).Value = prefix ^ EvoSC_CustomNames[Score.User.Login];
+        }else{
+            (box.Controls[3] as CMlLabel).Value = prefix ^ Score.User.Name;
+        }
         box.Show();
     }
 

@@ -10,6 +10,7 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
@@ -32,11 +33,14 @@ class PlayerController implements ControllerInterface
     /** @var int */
     private static int $stringEditDistanceThreshold = 8;
 
+    private static Collection $customNames;
+
     /**
      * Initialize PlayerController
      */
     public static function init()
     {
+        self::$customNames = collect();
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
@@ -86,11 +90,18 @@ class PlayerController implements ControllerInterface
         $player->update([
             'NickName' => $name
         ]);
+        self::$customNames->put($player->Login, $name);
         self::$players->put($player->Login, $player);
         if ($cmd != 'silent') {
-            infoMessage($oldName, ' changed their name to ', secondary($name))->sendAll();
+            infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
             Cache::put('nicknames/' . $player->Login, $name);
         }
+        self::sendUpdatesCustomNames();
+    }
+
+    private static function sendUpdatesCustomNames()
+    {
+        Template::showAll('Helpers.update-custom-names', ['names' => self::$customNames]);
     }
 
     public static function cacheConnectedPlayers()
@@ -100,6 +111,7 @@ class PlayerController implements ControllerInterface
 
             if (Cache::has('nicknames/' . $playerInfo->login)) {
                 $name = Cache::get('nicknames/' . $playerInfo->login);
+                self::$customNames->put($playerInfo->login, $name);
             }
 
             return Player::updateOrCreate(['Login' => $playerInfo->login], [
@@ -108,6 +120,8 @@ class PlayerController implements ControllerInterface
                 'player_id' => $playerInfo->playerId
             ]);
         })->keyBy('Login');
+
+        self::sendUpdatesCustomNames();
     }
 
     /**
@@ -197,6 +211,10 @@ class PlayerController implements ControllerInterface
         ]);
 
         self::$players = self::$players->forget($player->Login);
+
+        if(self::$customNames->has($player->Login)){
+            self::$customNames->forget($player->Login);
+        }
     }
 
     /**
