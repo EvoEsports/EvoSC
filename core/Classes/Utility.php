@@ -18,7 +18,7 @@ class Utility
     public static function getRankRange(int $baseRank, int $showTop, int $showTotal, int $total)
     {
         if ($total <= $showTop) {
-            return [$total, $showTop + 1];
+            return [$showTop + 1, $total];
         }
 
         $showBottom = $showTotal - $showTop;

@@ -85,7 +85,7 @@ class LocalRecords extends Module implements ModuleInterface
 
         foreach ($players as $player) {
             if ($playerRanks->has($player->id)) {
-                $baseRank = $playerRanks->get($player->id);
+                $baseRank = (int)$playerRanks->get($player->id);
             } else {
                 if (!is_null($defaultRecordsJson)) {
                     Template::show($player, 'LocalRecords.update', ['localsJson' => $defaultRecordsJson], true, 20);
