@@ -12,7 +12,9 @@ class LocalsBenchmark
 {
     public function run()
     {
-        $localsCount = 5;
+        return;
+
+        $localsCount = 1000;
         $simulatedPlayers = 100;
 
         while (Player::count() <= $localsCount) {

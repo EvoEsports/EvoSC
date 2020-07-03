@@ -14,6 +14,7 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\RecordsTable\RecordsTable;
+use Illuminate\Support\Collection;
 
 class LocalRecords extends Module implements ModuleInterface
 {
@@ -59,6 +60,20 @@ class LocalRecords extends Module implements ModuleInterface
         $top = config('locals.show-top', 3);
         $fill = config('locals.rows', 16);
 
+        if ($count <= $fill) {
+            $localsJson = DB::table(self::TABLE)
+                ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
+                ->where('Map', '=', $map->id)
+                ->where('Rank', '<=', $fill)
+                ->orderBy('rank')
+                ->get()
+                ->toJson();
+
+            Template::showAll('LocalRecords.update', compact('localsJson'));
+            return;
+        }
+
         $playerRanks = DB::table(self::TABLE)
             ->select(['Player', 'Rank'])
             ->where('Map', '=', $map->id)
@@ -66,64 +81,64 @@ class LocalRecords extends Module implements ModuleInterface
             ->pluck('Rank', 'Player');
 
         $defaultRecordsJson = null;
+        $defaultTopView = null;
 
         foreach ($players as $player) {
             if ($playerRanks->has($player->id)) {
                 $baseRank = $playerRanks->get($player->id);
             } else {
                 if (!is_null($defaultRecordsJson)) {
-                    Template::show($player, 'LocalRecords.update', ['localsJson' => $defaultRecordsJson], false, 20);
+                    Template::show($player, 'LocalRecords.update', ['localsJson' => $defaultRecordsJson], true, 20);
                     continue;
                 }
                 $baseRank = $count;
             }
 
-            $range = Utility::getRankRange($baseRank, $top, $fill, $count);
+            if ($baseRank <= $fill) {
+                if (is_null($defaultTopView)) {
+                    $defaultTopView = DB::table(self::TABLE)
+                        ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                        ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
+                        ->where('Map', '=', $map->id)
+                        ->WhereBetween('Rank', [$count - $fill + $top, $count])
+                        ->orWhere('Map', '=', $map->id)
+                        ->where('Rank', '<=', $top)
+                        ->orderBy('rank')
+                        ->get()
+                        ->toJson();
+                }
+                $localsJson = $defaultTopView;
+            }
 
-            $bottomRecords = DB::table(self::TABLE)
-                ->where('Map', '=', $map->id)
-                ->WhereBetween('Rank', $range)
-                ->get();
+            if (!isset($localsJson)) {
+                $range = Utility::getRankRange($baseRank, $top, $fill, $count);
 
-            $topRecords = DB::table(self::TABLE)
-                ->where('Map', '=', $map->id)
-                ->where('Rank', '<=', $top)
-                ->get();
-
-            $records = collect([...$topRecords, ...$bottomRecords]);
-
-            $players = DB::table('players')
-                ->whereIn('id', $records->pluck('Player'))
-                ->get()
-                ->keyBy('id');
-
-            $records->transform(function ($local) use ($players) {
-                $checkpoints = collect(explode(',', $local->Checkpoints));
-                $checkpoints = $checkpoints->transform(function ($time) {
-                    return intval($time);
-                });
-
-                $player = $players->get($local->Player);
-
-                return [
-                    'rank' => $local->Rank,
-                    'cps' => $checkpoints,
-                    'score' => $local->Score,
-                    'name' => $player->NickName,
-                    'login' => $player->Login,
-                ];
-            });
-
-            $localsJson = $records->sortBy('rank')->values()->toJson();
+                $localsJson = DB::table(self::TABLE)
+                    ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                    ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
+                    ->where('Map', '=', $map->id)
+                    ->WhereBetween('Rank', $range)
+                    ->orWhere('Map', '=', $map->id)
+                    ->where('Rank', '<=', $top)
+                    ->orderBy('rank')
+                    ->get()
+                    ->toJson();
+            }
 
             if ($baseRank == $count) {
                 $defaultRecordsJson = $localsJson;
             }
 
-            Template::show($player, 'LocalRecords.update', compact('localsJson'), false, 20);
+            Template::show($player, 'LocalRecords.update', compact('localsJson'), true, 20);
         }
+
+        Template::executeMulticall();
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function playerConnect(Player $player)
     {
         Template::show($player, 'LocalRecords.manialink');
@@ -140,7 +155,7 @@ class LocalRecords extends Module implements ModuleInterface
         $map = MapController::getCurrentMap();
         $newRank = Utility::getNextBetterRank(self::TABLE, $map->id, $score);
 
-        if ($newRank > config('locals.limit', 200)) {
+        if ($newRank > ($localsLimit = config('locals.limit', 200))) {
             return;
         }
 
@@ -226,6 +241,7 @@ class LocalRecords extends Module implements ModuleInterface
             }
 
             self::sendLocalsChunk();
+            DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', '>', $localsLimit)->delete();
         } else {
             DB::table(self::TABLE)
                 ->where('Map', '=', $map->id)
@@ -254,6 +270,7 @@ class LocalRecords extends Module implements ModuleInterface
             }
 
             self::sendLocalsChunk();
+            DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', '>', $localsLimit)->delete();
         }
     }
 
