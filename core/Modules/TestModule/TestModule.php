@@ -13,6 +13,7 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\AlterUI\AlterUI;
 use EvoSC\Modules\EvoDonate\EvoDonate;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\LocalRecords\LocalsBenchmark;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\UIHax\UIHax;
@@ -33,7 +34,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        UIHax::playerConnect($player);
+        $lb = new LocalsBenchmark();
+        $lb->run();
     }
 
     public static function sendTestManialink(Player $player)

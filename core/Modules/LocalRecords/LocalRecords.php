@@ -48,26 +48,33 @@ class LocalRecords extends Module implements ModuleInterface
         if (!$playerIn) {
             $players = onlinePlayers();
         } else {
-            $players = [$playerIn];
+            $players = collect([$playerIn]);
         }
 
-        if(!$map = MapController::getCurrentMap()){
+        if (!$map = MapController::getCurrentMap()) {
             return;
         }
-        $count = DB::table(self::TABLE)->where('Map', '=', $map->id)->count();
 
+        $count = DB::table(self::TABLE)->where('Map', '=', $map->id)->count();
         $top = config('locals.show-top', 3);
         $fill = config('locals.rows', 16);
 
-        foreach ($players as $player) {
-            $record = DB::table(self::TABLE)
-                ->where('Map', '=', $map->id)
-                ->where('Player', '=', $player->id)
-                ->first();
+        $playerRanks = DB::table(self::TABLE)
+            ->select(['Player', 'Rank'])
+            ->where('Map', '=', $map->id)
+            ->whereIn('Player', $players->pluck('id'))
+            ->pluck('Rank', 'Player');
 
-            if ($record) {
-                $baseRank = $record->Rank;
+        $defaultRecordsJson = null;
+
+        foreach ($players as $player) {
+            if ($playerRanks->has($player->id)) {
+                $baseRank = $playerRanks->get($player->id);
             } else {
+                if (!is_null($defaultRecordsJson)) {
+                    Template::show($player, 'LocalRecords.update', ['localsJson' => $defaultRecordsJson], false, 20);
+                    continue;
+                }
                 $baseRank = $count;
             }
 
@@ -108,6 +115,10 @@ class LocalRecords extends Module implements ModuleInterface
             });
 
             $localsJson = $records->sortBy('rank')->values()->toJson();
+
+            if ($baseRank == $count) {
+                $defaultRecordsJson = $localsJson;
+            }
 
             Template::show($player, 'LocalRecords.update', compact('localsJson'), false, 20);
         }

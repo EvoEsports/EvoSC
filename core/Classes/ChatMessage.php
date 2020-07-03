@@ -199,15 +199,19 @@ class ChatMessage
             return;
         }
 
-        if ($player instanceof Player) {
-            Server::chatSendServerMessage($this->getMessage(), $player->Login);
-            Log::info("(@$player)".$this->getMessage(), isVerbose());
-        } else if (is_string($player)) {
-            Server::chatSendServerMessage($this->getMessage(), $player);
-            Log::info("(@$player)".$this->getMessage(), isVerbose());
-        } else if ($player instanceof Collection) {
-            Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
-            Log::info($this->getMessage(), isVerbose());
+        try{
+            if ($player instanceof Player) {
+                Server::chatSendServerMessage($this->getMessage(), $player->Login);
+                Log::info("(@$player)".$this->getMessage(), isVerbose());
+            } else if (is_string($player)) {
+                Server::chatSendServerMessage($this->getMessage(), $player);
+                Log::info("(@$player)".$this->getMessage(), isVerbose());
+            } else if ($player instanceof Collection) {
+                Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
+                Log::info($this->getMessage(), isVerbose());
+            }
+        }catch (\Exception $e){
+            Log::warning('Failed to deliver message: ' . $e->getMessage());
         }
     }
 }
