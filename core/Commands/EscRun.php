@@ -213,17 +213,17 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/10');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/3');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 10) {
+                if ($failedConnectionRequests > 3) {
                     Log::write('MPS',
                         sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
                 }
-                sleep(5);
+                sleep(1);
             } catch (Error $e) {
                 $errorClass = get_class($e);
                 $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");

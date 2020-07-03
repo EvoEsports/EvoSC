@@ -69,13 +69,14 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
 
-        if(isTrackmania()){
+        if (isTrackmania()) {
             ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
         }
     }
 
     public static function setName(Player $player, $cmd, ...$name)
     {
+        $oldName = $player->NickName;
         $name = str_replace("\n", '', trim(implode(' ', $name)));
         if (strlen($name) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
@@ -86,17 +87,23 @@ class PlayerController implements ControllerInterface
             'NickName' => $name
         ]);
         self::$players->put($player->Login, $player);
-        if($cmd != 'silent'){
-            infoMessage($player, ' changed their name to ', secondary($name))->sendAll();
-            Cache::put('nicknames/'.$player->Login, $name);
+        if ($cmd != 'silent') {
+            infoMessage($oldName, ' changed their name to ', secondary($name))->sendAll();
+            Cache::put('nicknames/' . $player->Login, $name);
         }
     }
 
     public static function cacheConnectedPlayers()
     {
         self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+            $name = $playerInfo->nickName;
+
+            if (Cache::has('nicknames/' . $playerInfo->login)) {
+                $name = Cache::get('nicknames/' . $playerInfo->login);
+            }
+
             return Player::updateOrCreate(['Login' => $playerInfo->login], [
-                'NickName' => $playerInfo->nickName,
+                'NickName' => $name,
                 'spectator_status' => $playerInfo->spectatorStatus,
                 'player_id' => $playerInfo->playerId
             ]);
