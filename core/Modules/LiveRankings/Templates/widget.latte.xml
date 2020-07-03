@@ -184,7 +184,7 @@
             }
             {else}
             declare bestTimes = Score.BestLapTimes;
-            if(bestTimes.count > 0 && bestTimes[bestTimes.count - 1] == 0){
+            if(getTimeFromScore(Score) == 0){
                 continue;
             }
             {/if}
