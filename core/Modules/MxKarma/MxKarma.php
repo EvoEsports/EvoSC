@@ -26,8 +26,12 @@ use Psr\Http\Message\ResponseInterface;
 
 class MxKarma extends Module implements ModuleInterface
 {
+    const MANIAPLANET_MXKARMA_URL = 'https://karma.mania-exchange.com/api2';
+    const TRACKMANIA_MXKARMA_URL = 'https://karma.trackmania.exchange/api2';
+
     const ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
+    private static string $apiUrl;
     private static string $sessionKey;
     private static float $voteAverage = 0;
     private static int $votesTotal = 0;
@@ -38,6 +42,12 @@ class MxKarma extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isManiaPlanet()) {
+            self::$apiUrl = self::MANIAPLANET_MXKARMA_URL;
+        } else {
+            self::$apiUrl = self::TRACKMANIA_MXKARMA_URL;
+        }
+
         if ($isBoot) {
             self::startAndActivateSession();
         }
@@ -189,7 +199,7 @@ class MxKarma extends Module implements ModuleInterface
             ];
         });
 
-        $promise = RestClient::postAsync('https://karma.mania-exchange.com/api2/saveVotes', [
+        $promise = RestClient::postAsync(self::$apiUrl . '/saveVotes', [
             'query' => [
                 'sessionKey' => self::$sessionKey,
             ],
@@ -231,7 +241,7 @@ class MxKarma extends Module implements ModuleInterface
             return new Promise();
         }
 
-        return RestClient::postAsync("https://karma.mania-exchange.com/api2/getMapRating", [
+        return RestClient::postAsync(self::$apiUrl . "/getMapRating", [
             'query' => [
                 'sessionKey' => self::$sessionKey,
             ],
@@ -251,7 +261,7 @@ class MxKarma extends Module implements ModuleInterface
      */
     private static function startAndActivateSession()
     {
-        $promise = RestClient::getAsync('https://karma.mania-exchange.com/api2/startSession', [
+        $promise = RestClient::getAsync(self::$apiUrl . '/startSession', [
             'query' => [
                 'serverLogin' => config('server.login'),
                 'applicationIdentifier' => 'EvoSC v' . getEscVersion(),
@@ -269,7 +279,7 @@ class MxKarma extends Module implements ModuleInterface
 
                 Log::info("MX Karma session created. Activating...");
 
-                $activationPromise = RestClient::getAsync('https://karma.mania-exchange.com/api2/activateSession', [
+                $activationPromise = RestClient::getAsync(self::$apiUrl . '/activateSession', [
                     'query' => [
                         'sessionKey' => $mxResponse->data->sessionKey,
                         'activationHash' => hash("sha512", config('mx-karma.key') . $mxResponse->data->sessionSeed),

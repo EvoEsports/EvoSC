@@ -118,6 +118,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
 
         self::showRecords($player);
+//        self::sendUpdatedDedis();
         Template::show($player, 'Dedimania.manialink');
     }
 

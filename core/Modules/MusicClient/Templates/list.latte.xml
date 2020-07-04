@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
 {php $window_width = 130;}
-{php $window_height = 89;}
+{php $window_height = 74;}
 {php $doNotExit = true;}
 {php $startHidden = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -19,7 +19,7 @@
         <label class="btn-accent play" pos="63" size="130 4" ScriptEvents="1" focusareacolor1="0000" />
     </framemodel>
 
-    <label class="text-light" valign="center" pos="0 -78" size="120 10" textsize="0.6" textprefix="$s" text=" Due to ManiaPlanets caching-system, changing music can sometimes be difficult. A song only starts playing when it was successfully loaded into cache and that only happens when you either reset your car or open the game menu.
+    <label hidden="1" class="text-light" valign="center" pos="0 -78" size="120 10" textsize="0.6" textprefix="$s" text=" Due to ManiaPlanets caching-system, changing music can sometimes be difficult. A song only starts playing when it was successfully loaded into cache and that only happens when you either reset your car or open the game menu.
 After switching songs a blue bar will appear in the top right corner or the screen (if the song is not in cache).
 After it dissapears you can reset and the song will start to play." autonewline="1" />
 
