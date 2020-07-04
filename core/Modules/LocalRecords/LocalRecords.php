@@ -103,7 +103,7 @@ class LocalRecords extends Module implements ModuleInterface
             }
 
             if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled his/her ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
+                $chatMessage->setParts($player, ' equaled their ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
                 } else {
@@ -125,7 +125,7 @@ class LocalRecords extends Module implements ModuleInterface
                         'Checkpoints' => $checkpoints,
                     ]);
 
-                $chatMessage->setParts($player, ' secured his/her ', secondary($newRank . '.'), ' local record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
+                $chatMessage->setParts($player, ' secured their ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
 
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
@@ -148,7 +148,7 @@ class LocalRecords extends Module implements ModuleInterface
                         'Rank' => $newRank,
                     ]);
 
-                $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
+                $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
 
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
