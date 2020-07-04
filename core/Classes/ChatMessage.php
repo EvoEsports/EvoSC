@@ -26,7 +26,7 @@ class ChatMessage
      *
      * Parts can be strings, numbers, player/group/map/local/etc-objects (most objects are formatted automatically).
      *
-     * @param  mixed  ...$message
+     * @param mixed ...$message
      */
     public function __construct(...$message)
     {
@@ -37,7 +37,7 @@ class ChatMessage
     /**
      * Set the primary color of the chat message.
      *
-     * @param  string  $color
+     * @param string $color
      *
      * @return ChatMessage
      */
@@ -51,7 +51,7 @@ class ChatMessage
     /**
      * Set the icon of the chat-message, can contain color-code.
      *
-     * @param  string  $icon
+     * @param string $icon
      *
      * @return ChatMessage
      */
@@ -113,7 +113,7 @@ class ChatMessage
     /**
      * Overwrite the chat-message content.
      *
-     * @param  mixed  ...$parts
+     * @param mixed ...$parts
      *
      * @return ChatMessage
      */
@@ -131,34 +131,28 @@ class ChatMessage
      */
     public function getMessage(): string
     {
-        $message = '';
-
+        $parts = '';
         foreach ($this->parts as $part) {
-            if ($part instanceof Player || $part instanceof Map) {
-                $message .= secondary($part).'$z$s';
+            if ($part instanceof Player || $part instanceof Map || is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', "$part")) {
+                $parts .= secondary("$part");
                 continue;
             }
 
             if ($part instanceof stdClass) {
-                var_dump($part);
+                $parts .= secondary('#stdClass');
                 continue;
             }
 
-            if (is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', "$part")) {
-                $message .= secondary("$part");
-                continue;
-            }
-
-            $message .= '$z$s$'.$this->color.$part;
+            $parts .= $part;
         }
 
-        if ($this->icon) {
-            return '$fff'.$this->icon.' $z$s'.$message;
-        }
+        $message = sprintf('$s$%s$<$fff%s$> $s%s', $this->color, $this->icon, $parts);
 
         if (substr($message, -1) != '.') {
-            $message .= '$z$s$'.$this->color.'.';
+            $message .= '.';
         }
+
+        dump($message);
 
         return $message;
     }
@@ -199,18 +193,18 @@ class ChatMessage
             return;
         }
 
-        try{
+        try {
             if ($player instanceof Player) {
                 Server::chatSendServerMessage($this->getMessage(), $player->Login);
-                Log::info("(@$player)".$this->getMessage(), isVerbose());
+                Log::info("(@$player)" . $this->getMessage(), isVerbose());
             } else if (is_string($player)) {
                 Server::chatSendServerMessage($this->getMessage(), $player);
-                Log::info("(@$player)".$this->getMessage(), isVerbose());
+                Log::info("(@$player)" . $this->getMessage(), isVerbose());
             } else if ($player instanceof Collection) {
                 Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
                 Log::info($this->getMessage(), isVerbose());
             }
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             Log::warning('Failed to deliver message: ' . $e->getMessage());
         }
     }

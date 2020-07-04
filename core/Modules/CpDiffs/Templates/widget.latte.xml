@@ -12,7 +12,7 @@
     </framemodel>
 
     <frame id="cpdiffs" pos="0 -65" scale="0.85">
-        <label id="target-label" class="text-light" pos="0 -10" text="$s{$target->name}$z$s | {$target->score|score}" opacity="1" halign="center" textsize="1"/>
+        <label id="target-label" class="text-light" pos="0 -10" text="$s$<{$target->name}$> | {$target->score|score}" opacity="1" halign="center" textsize="1"/>
 
         <frame size="20 13" pos="-10 -10">
             <frame pos="10 -2.25">

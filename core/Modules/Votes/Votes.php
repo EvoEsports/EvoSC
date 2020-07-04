@@ -203,7 +203,7 @@ class Votes extends Module implements ModuleInterface
             }
         }
 
-        $question = 'Add $' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$z$s$fff minutes?';
+        $question = 'Add $<$' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$> minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {

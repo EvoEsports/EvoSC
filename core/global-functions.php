@@ -95,10 +95,10 @@ function formatScore(int $score, bool $cutZero = false): string
 function stripAll(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
-        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+        return preg_replace('/(?<![$])\${1}(?:[iwngosz<>]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz<>]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 /**
@@ -288,7 +288,7 @@ function now(): Carbon
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$' . config('theme.chat.highlight') . $str;
+    return '$<$' . config('theme.chat.highlight') . $str . '$>';
 }
 
 /**
