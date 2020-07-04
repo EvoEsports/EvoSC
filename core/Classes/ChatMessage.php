@@ -152,7 +152,7 @@ class ChatMessage
             $message .= '.';
         }
 
-        return '$z$s' . preg_replace('/(?<=[^$])[$]s/i', '', $message);
+        return '$z$s' . preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $message);
     }
 
     /**

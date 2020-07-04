@@ -145,8 +145,8 @@ class ChatController implements ControllerInterface
     {
         Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
 
-        $name = $player->NickName;
-        $text = preg_replace('/[^$]\$s/i', '', $text);
+        $name = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $player->NickName);
+        $text = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $text);
 
         if ($player->isSpectator()) {
             $name = '$<$eee$> $fff' . $name;
@@ -155,9 +155,9 @@ class ChatController implements ControllerInterface
         $chatColor = config('theme.chat.text');
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color ?? $chatColor;
-        $chatText = sprintf('$z$s$<$%s%s [$s%s]$> $%s%s', $groupColor, $groupIcon, secondary($name), $chatColor, $text) . '$z';
+        $chatText = sprintf('$<$%s%s [%s]$> $%s%s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
-        Server::ChatSendServerMessage($chatText);
+        Server::ChatSendServerMessage('$<' . $chatText . '$>');
     }
 
     /**
