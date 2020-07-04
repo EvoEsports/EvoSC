@@ -209,8 +209,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             }
 
             if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled his/her ',
-                    secondary($newRank . '.$') . config('dedimania.text-color') . ' dedimania record ' . secondary(formatScore($score)))->sendAll();
+                $chatMessage->setParts($player, ' equaled his/her ', secondary($newRank . '.'), ' dedimania record ' . secondary(formatScore($score)))->sendAll();
 
                 return;
             }
@@ -230,9 +229,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
 
                 self::saveVReplay($player, $map);
 
-                $chatMessage->setParts($player, ' secured his/her ',
-                    secondary($newRank . '.$') . config('dedimania.text-color') . ' dedimania record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
+                $chatMessage->setParts($player, ' secured his/her ', secondary($newRank . '.'), ' dedimania record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'),)->sendAll();
             } else {
                 DB::table('dedi-records')
                     ->where('Map', '=', $map->id)
@@ -253,8 +250,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
                 self::saveVReplay($player, $map);
 
                 $chatMessage->setParts($player, ' gained the ',
-                    secondary($newRank . '.$') . config('dedimania.text-color') . ' dedimania record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')')->sendAll();
+                    secondary($newRank . '.'), ' dedimania record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'))->sendAll();
             }
 
             if ($newRank == 1) {
@@ -288,8 +284,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             }
 
             if ($newRank <= config('dedimania.echo-top', 100)) {
-                chatMessage($player, ' gained the ',
-                    secondary($newRank . '.$') . config('dedimania.text-color') . ' dedimania record ' . secondary(formatScore($score)))
+                chatMessage($player, ' gained the ', secondary($newRank . '.'), ' dedimania record ', secondary(formatScore($score)))
                     ->setIcon('')
                     ->setColor(config('dedimania.text-color'))
                     ->sendAll();

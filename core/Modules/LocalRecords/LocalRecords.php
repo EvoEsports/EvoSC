@@ -81,6 +81,10 @@ class LocalRecords extends Module implements ModuleInterface
             return;
         }
 
+        $chatMessage = chatMessage()
+            ->setIcon('')
+            ->setColor(config('locals.text-color'));
+
         $playerHasLocal = DB::table(self::TABLE)
             ->where('Map', '=', $map->id)
             ->where('Player', '=', $player->id)
@@ -94,17 +98,12 @@ class LocalRecords extends Module implements ModuleInterface
 
             $oldRank = $oldRecord->Rank;
 
-            $chatMessage = chatMessage()
-                ->setIcon('')
-                ->setColor(config('locals.text-color'));
-
             if ($oldRecord->Score < $score) {
                 return;
             }
 
             if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled his/her ',
-                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)));
+                $chatMessage->setParts($player, ' equaled his/her ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
                 } else {
@@ -126,9 +125,7 @@ class LocalRecords extends Module implements ModuleInterface
                         'Checkpoints' => $checkpoints,
                     ]);
 
-                $chatMessage->setParts($player, ' secured his/her ',
-                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $chatMessage->setParts($player, ' secured his/her ', secondary($newRank . '.'), ' local record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
 
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
@@ -151,9 +148,7 @@ class LocalRecords extends Module implements ModuleInterface
                         'Rank' => $newRank,
                     ]);
 
-                $chatMessage->setParts($player, ' gained the ',
-                    secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)),
-                    ' (' . $oldRank . '. -' . formatScore($diff) . ')');
+                $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ' . secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
 
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
@@ -180,10 +175,7 @@ class LocalRecords extends Module implements ModuleInterface
                     'Rank' => $newRank,
                 ]);
 
-            $chatMessage = chatMessage($player, ' gained the ',
-                secondary($newRank . '.$') . config('locals.text-color') . ' local record ' . secondary(formatScore($score)))
-                ->setIcon('')
-                ->setColor(config('locals.text-color'));
+            $chatMessage = $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
 
             if ($newRank <= config('locals.echo-top', 100)) {
                 $chatMessage->sendAll();
