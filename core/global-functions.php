@@ -288,7 +288,7 @@ function now(): Carbon
  */
 function secondary(string $str = ""): string
 {
-    return '$<$' . config('theme.chat.highlight') . $str . '$>';
+    return '$<$fff$' . config('theme.chat.highlight') . $str . '$>';
 }
 
 /**

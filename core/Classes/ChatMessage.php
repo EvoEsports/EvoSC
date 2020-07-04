@@ -146,13 +146,13 @@ class ChatMessage
             $parts .= $part;
         }
 
-        $message = sprintf('$s$%s$<$fff%s$> $s%s', $this->color, $this->icon, $parts);
+        $message = ($this->icon ? $this->icon . ' ' : '') . sprintf('$%s%s', $this->color, $parts);
 
         if (substr($message, -1) != '.') {
             $message .= '.';
         }
 
-        return $message;
+        return '$z$s' . preg_replace('/\$s/i', '', $message);
     }
 
     /**

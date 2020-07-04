@@ -154,6 +154,9 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         Utility::sendRecordsChunk(self::TABLE, 'locals', 'LocalRecords.update', $player);
     }
 
+    /**
+     * @param Map $map
+     */
     public static function beginMap(Map $map)
     {
         self::getChallengeRecords($map, ModeController::isTimeAttack());

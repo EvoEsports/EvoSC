@@ -111,7 +111,6 @@ class Utility
         $fill = config($configId . '.rows', 16);
 
         if ($count <= $fill) {
-            dump("default");
             $recordsJson = DB::table($table)
                 ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                 ->leftJoin('players', 'players.id', '=', $table . '.Player')
