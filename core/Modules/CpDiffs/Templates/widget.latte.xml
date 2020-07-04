@@ -11,7 +11,7 @@
         <label class="text-light" text="+" halign="center" valign="center" textsize="0.5" z-index="1" hidden="1" />
     </framemodel>
 
-    <frame id="cpdiffs" pos="0 -65" scale="0.85">
+    <frame id="cpdiffs" pos="0 {if $is_maniaplanet}-65{else}-61{/if}" scale="0.85">
         <label id="target-label" class="text-light" pos="0 -10" text="$s$<{$target->name}$> | {$target->score|score}" opacity="1" halign="center" textsize="1"/>
 
         <frame size="20 13" pos="-10 -10">
@@ -134,8 +134,10 @@
         }
 
         main(){
+            declare netread Boolean Net_Race_Checkpoint_UseWaypointEvent for Teams[0];
+            log("started " ^ Net_Race_Checkpoint_UseWaypointEvent);
+
             target.fromjson("""{json_encode($target)|noescape}""");
-            declare player <=> GUIPlayer;
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
 
@@ -146,7 +148,11 @@
             while(True){
                 yield;
 
+                {if $is_maniaplanet}
                 cpDiffs.Visible = UI.UISequence != CUIConfig::EUISequence::Podium;
+                {else}
+                cpDiffs.Visible = True;
+                {/if}
 
                 if(target.map_uid != "" ^ Map.Id){
                     cpDiffs.Hide();
@@ -154,8 +160,14 @@
                     return;
                 }
 
-                if(player == Null || !cpDiffs.Visible){
-                    sleep(200);
+                declare player <=> InputPlayer;
+                while(player == Null){
+                    sleep(100);
+                    yield;
+                }
+
+                if(!cpDiffs.Visible){
+                    sleep(100);
                     continue;
                 }
 
@@ -175,15 +187,11 @@
                     }
                 }
                 {else}
-                foreach (Event in PendingEvents) {
-                    if(Event.Type == CSmModeEvent::EType::OnPlayerTriggersWaypoint){
-                        log(Event);
-                        //fillBox(event.CheckpointInLap, event.LapTime, event.IsEndLap);
-                        continue;
-                    }
-                    if(Event.Type == CSmModeEvent::EType::OnPlayerRequestRespawn){
-                        respawn();
-                        continue;
+                if (Net_Race_Checkpoint_UseWaypointEvent) {
+                    foreach (Event in PendingEvents) {
+                        if(Event.Type != CMlScriptEvent::Type::KeyPress){
+                            log(Event.Type);
+                        }
                     }
                 }
                 {/if}

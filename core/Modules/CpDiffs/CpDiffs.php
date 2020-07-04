@@ -32,10 +32,7 @@ class CpDiffs extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        global $__ManiaPlanet;
-        if(!$__ManiaPlanet){
-            return;
-        }
+        return;
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);

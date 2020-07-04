@@ -59,6 +59,8 @@ class Votes extends Module implements ModuleInterface
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
 
+        AccessRight::add('vote_decide', 'Decide the outcome of a vote.');
+
         if (config('quick-buttons.enabled')) {
             ManiaLinkEvent::add('vote.approve', [self::class, 'approveVote'], 'vote_decide');
             ManiaLinkEvent::add('vote.decline', [self::class, 'declineVote'], 'vote_decide');
@@ -167,9 +169,9 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        if($time == '0'){
+        if ($time == '0') {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-        }else{
+        } else {
             $secondsToAdd = floatval($time) * 60;
         }
 

@@ -6,9 +6,7 @@
         declare Text[Text] EvoSC_CustomNames for LocalUser;
 
         declare trans = """{$names->toJson()}""";
-        log(trans);
         EvoSC_CustomNames.fromjson(trans);
-        log(EvoSC_CustomNames);
     }
     --></script>
 </manialink>
