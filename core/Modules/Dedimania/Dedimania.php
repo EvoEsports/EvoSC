@@ -105,82 +105,32 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
     }
 
+    /**
+     *
+     */
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();
         self::setChallengeTimes($map, ModeController::isTimeAttack());
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showManialink(Player $player)
     {
         if (self::$offlineMode) {
             warningMessage('Unfortunately Dedimania is offline, new records will not be saved before it comes online again.')->send($player);
         }
 
-        self::showRecords($player);
-//        self::sendUpdatedDedis();
+        self::sendUpdatedDedis($player);
         Template::show($player, 'Dedimania.manialink');
     }
 
-    public static function showRecords(Player $player)
-    {
-        $top = config('dedimania.show-top', 3);
-        $fill = config('dedimania.rows', 16);
-        $map = MapController::getCurrentMap();
-        $count = DB::table('dedi-records')->where('Map', '=', $map->id)->count();
-
-        $record = DB::table('dedi-records')
-            ->where('Map', '=', $map->id)
-            ->where('Player', '=', $player->id)
-            ->first();
-
-        if ($record) {
-            $baseRank = $record->Rank;
-        } else {
-            $baseRank = $count;
-        }
-
-        $range = Utility::getRankRange($baseRank, $top, $fill, $count);
-
-        $bottom = DB::table('dedi-records')
-            ->where('Map', '=', $map->id)
-            ->WhereBetween('Rank', $range)
-            ->get();
-
-        $top = DB::table('dedi-records')
-            ->where('Map', '=', $map->id)
-            ->where('Rank', '<=', $top)
-            ->get();
-
-        $records = collect([...$top, ...$bottom]);
-
-        $players = DB::table('players')
-            ->whereIn('id', $records->pluck('Player'))
-            ->get()
-            ->keyBy('id');
-
-        $records->transform(function ($dedi) use ($players) {
-            $checkpoints = collect(explode(',', $dedi->Checkpoints));
-            $checkpoints = $checkpoints->transform(function ($time) {
-                return intval($time);
-            });
-
-            $player = $players->get($dedi->Player);
-
-            return [
-                'rank' => $dedi->Rank,
-                'cps' => $checkpoints,
-                'score' => $dedi->Score,
-                'name' => $player->NickName,
-                'login' => $player->Login,
-            ];
-        });
-
-        $dedisJson = $records->sortBy('rank')->values()->toJson();
-
-        Template::show($player, 'Dedimania.update', compact('dedisJson'), false, 20);
-    }
-
+    /**
+     * @param Player $player
+     */
     public static function showDedisTable(Player $player)
     {
         $map = MapController::getCurrentMap();
@@ -195,9 +145,13 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         RecordsTable::show($player, $map, $records, 'Dedimania Records');
     }
 
-    public static function sendUpdatedDedis()
+    /**
+     * @param Player|null $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function sendUpdatedDedis(Player $player = null)
     {
-        onlinePlayers()->each([self::class, 'showRecords']);
+        Utility::sendRecordsChunk(self::TABLE, 'locals', 'LocalRecords.update', $player);
     }
 
     public static function beginMap(Map $map)
@@ -205,6 +159,12 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         self::getChallengeRecords($map, ModeController::isTimeAttack());
     }
 
+    /**
+     * @param Player $player
+     * @param int $score
+     * @param string $checkpoints
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 8000) {
@@ -336,6 +296,10 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @param Map $map
+     */
     private static function saveVReplay(Player $player, Map $map)
     {
         $login = $player->Login;
@@ -346,6 +310,11 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         }
     }
 
+    /**
+     * @param int $playerId
+     * @param string $playerLogin
+     * @param int $mapId
+     */
     private static function saveGhostReplay(int $playerId, string $playerLogin, int $mapId)
     {
         $dedi = Dedi::wherePlayer($playerId)->whereMap($mapId)->first();

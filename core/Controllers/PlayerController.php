@@ -371,7 +371,7 @@ class PlayerController implements ControllerInterface
             $hasBetterTime = DB::table('pbs')
                 ->where('map_id', '=', $map->id)
                 ->where('player_id', '=', $player->id)
-                ->where('score', '<=', $score)
+                ->where('score', '<', $score)
                 ->exists();
 
             if (!$hasBetterTime) {
@@ -386,14 +386,6 @@ class PlayerController implements ControllerInterface
                 Hook::fire('PlayerPb', $player, $score, $checkpoints);
             }
         }
-    }
-
-    /**
-     * @return Collection
-     */
-    public static function getPlayers(): Collection
-    {
-        return self::$players;
     }
 
     /**

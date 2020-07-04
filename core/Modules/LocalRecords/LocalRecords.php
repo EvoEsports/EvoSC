@@ -38,104 +38,23 @@ class LocalRecords extends Module implements ModuleInterface
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
     }
 
+    /**
+     * @param Map $map
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function beginMap(Map $map)
     {
         Utility::fixRanks('local-records', $map->id, config('locals.limit', 200));
         self::sendLocalsChunk();
     }
 
+    /**
+     * @param Player|null $playerIn
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function sendLocalsChunk(Player $playerIn = null)
     {
-        if (!$map = MapController::getCurrentMap()) {
-            return;
-        }
-
-        if (!$playerIn) {
-            $players = onlinePlayers();
-        } else {
-            $players = collect([$playerIn]);
-        }
-
-        $count = DB::table(self::TABLE)->where('Map', '=', $map->id)->count();
-        $top = config('locals.show-top', 3);
-        $fill = config('locals.rows', 16);
-
-        if ($count <= $fill) {
-            dump("default");
-            $localsJson = DB::table(self::TABLE)
-                ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
-                ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
-                ->where('Map', '=', $map->id)
-                ->where('Rank', '<=', $fill)
-                ->orderBy('rank')
-                ->get()
-                ->toJson();
-
-            Template::showAll('LocalRecords.update', compact('localsJson'));
-            return;
-        }
-
-        $playerRanks = DB::table(self::TABLE)
-            ->select(['Player', 'Rank'])
-            ->where('Map', '=', $map->id)
-            ->whereIn('Player', $players->pluck('id'))
-            ->pluck('Rank', 'Player');
-
-        $defaultRecordsJson = null;
-        $defaultTopView = null;
-
-        foreach ($players as $player) {
-            $localsJson = null;
-
-            if ($playerRanks->has($player->id)) {
-                $baseRank = (int)$playerRanks->get($player->id);
-            } else {
-                if (!is_null($defaultRecordsJson)) {
-                    Template::show($player, 'LocalRecords.update', ['localsJson' => $defaultRecordsJson], true, 20);
-                    continue;
-                }
-                $baseRank = $count;
-            }
-
-            if ($baseRank <= $fill) {
-                if (is_null($defaultTopView)) {
-                    $defaultTopView = DB::table(self::TABLE)
-                        ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
-                        ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
-                        ->where('Map', '=', $map->id)
-                        ->WhereBetween('Rank', [$count - $fill + $top, $count])
-                        ->orWhere('Map', '=', $map->id)
-                        ->where('Rank', '<=', $top)
-                        ->orderBy('rank')
-                        ->get()
-                        ->toJson();
-                }
-                $localsJson = $defaultTopView;
-            }
-
-            if (!isset($localsJson)) {
-                $range = Utility::getRankRange($baseRank, $top, $fill, $count);
-
-                $localsJson = DB::table(self::TABLE)
-                    ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
-                    ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
-                    ->where('Map', '=', $map->id)
-                    ->WhereBetween('Rank', $range)
-                    ->orWhere('Map', '=', $map->id)
-                    ->where('Rank', '<=', $top)
-                    ->orderBy('rank')
-                    ->get()
-                    ->toJson();
-            }
-
-            if ($baseRank == $count) {
-                $defaultRecordsJson = $localsJson;
-            }
-
-            Template::show($player, 'LocalRecords.update', compact('localsJson'), true, 20);
-        }
-
-        Template::executeMulticall();
+        Utility::sendRecordsChunk(self::TABLE, 'locals', 'LocalRecords.update', $playerIn);
     }
 
     /**
