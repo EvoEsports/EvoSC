@@ -46,14 +46,14 @@ class LocalRecords extends Module implements ModuleInterface
 
     public static function sendLocalsChunk(Player $playerIn = null)
     {
+        if (!$map = MapController::getCurrentMap()) {
+            return;
+        }
+
         if (!$playerIn) {
             $players = onlinePlayers();
         } else {
             $players = collect([$playerIn]);
-        }
-
-        if (!$map = MapController::getCurrentMap()) {
-            return;
         }
 
         $count = DB::table(self::TABLE)->where('Map', '=', $map->id)->count();
@@ -61,6 +61,7 @@ class LocalRecords extends Module implements ModuleInterface
         $fill = config('locals.rows', 16);
 
         if ($count <= $fill) {
+            dump("default");
             $localsJson = DB::table(self::TABLE)
                 ->selectRaw('Rank as rank, `' . self::TABLE . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                 ->leftJoin('players', 'players.id', '=', self::TABLE . '.Player')
@@ -84,6 +85,8 @@ class LocalRecords extends Module implements ModuleInterface
         $defaultTopView = null;
 
         foreach ($players as $player) {
+            $localsJson = null;
+
             if ($playerRanks->has($player->id)) {
                 $baseRank = (int)$playerRanks->get($player->id);
             } else {

@@ -152,8 +152,6 @@ class ChatMessage
             $message .= '.';
         }
 
-        dump($message);
-
         return $message;
     }
 

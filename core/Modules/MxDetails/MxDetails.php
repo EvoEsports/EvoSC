@@ -113,7 +113,7 @@ class MxDetails extends Module implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 5]);
+            $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 0.75]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;
@@ -154,7 +154,7 @@ class MxDetails extends Module implements ModuleInterface
             return null;
         }
 
-        $result = RestClient::get(self::$mxApiUrl . '/tm/tracks/worldrecord/' . $map->mx_details->TrackID);
+        $result = RestClient::get(self::$mxApiUrl . '/tm/tracks/worldrecord/' . $map->mx_details->TrackID, ['timeout' => 0.75]);
 
         if ($result->getStatusCode() != 200) {
             Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
