@@ -14,6 +14,10 @@ class UIHax extends Module implements ModuleInterface
 {
     public static function start(string $mode, bool $isBoot = false)
     {
+        if(isManiaPlanet()){
+            return;
+        }
+
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
     }
 
