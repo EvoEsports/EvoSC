@@ -46,6 +46,17 @@ class ChatController implements ControllerInterface
     }
 
     /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
+        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
+    }
+
+    /**
      * Mute a player
      *
      * @param Player $admin
@@ -107,31 +118,6 @@ class ChatController implements ControllerInterface
         return collect(Server::getIgnoreList())->contains('login', '=', $player->Login);
     }
 
-    /**
-     * Chat-command: send pm to a player
-     *
-     * @param Player $player
-     * @param string $nick
-     * @param mixed ...$message
-     */
-    public static function pm(Player $player, $nick, ...$message)
-    {
-        $target = PlayerController::findPlayerByName($player, $nick);
-
-        if (!$target) {
-            //No target found
-            return;
-        }
-
-        if ($target->id == $player->id) {
-            warningMessage('You can\'t PM yourself.')->send($player);
-
-            return;
-        }
-
-        self::pmTo($player, $target->Login, implode(' ', $message));
-    }
-
     public static function pmTo(Player $player, $login, $message)
     {
         $target = player($login);
@@ -159,19 +145,15 @@ class ChatController implements ControllerInterface
     {
         Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
 
-        $nick = $player->NickName;
-
+        $name = $player->NickName;
         if ($player->isSpectator()) {
-            $nick = '$eee ' . $nick;
+            $name = '$<$eee$> $fff' . $name;
         }
 
-        $prefix = $player->group->chat_prefix;
-        $color = $player->group->color ?? config('theme.chat.text');
-        $chatText = sprintf('$%s[$z$s%s$z$s$%s] $%s$z$s%s$', $color, secondary($nick), $color, config('theme.chat.text'), $text) . config('theme.chat.text');
-
-        if ($prefix) {
-            $chatText = '$' . $color . $prefix . ' ' . $chatText;
-        }
+        $chatColor = config('theme.chat.text');
+        $groupIcon = $player->group->chat_prefix ?? '';
+        $groupColor = $player->group->color ?? $chatColor;
+        $chatText = sprintf('$<$%s%s [$<%s$>]$> $%s%s', $groupColor, $groupIcon, $name, $chatColor, $text);
 
         Server::ChatSendServerMessage($chatText);
     }
@@ -182,17 +164,5 @@ class ChatController implements ControllerInterface
     public static function getRoutingEnabled()
     {
         return self::$routingEnabled;
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
-        ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
-        ChatCommand::add('/pm', [self::class, 'pm'], 'Send a private message. Usage: /pm <partial_nick> message...');
     }
 }
