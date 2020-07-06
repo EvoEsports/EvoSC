@@ -82,11 +82,11 @@ class PlayerController implements ControllerInterface
     {
         $oldName = $player->NickName;
         $name = str_replace("\n", '', trim(implode(' ', $name)));
-        if (strlen($name) == 0) {
+        if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;
         }
-        if (strlen($name) > 28) {
+        if (strlen(stripAll($name)) > 28) {
             warningMessage('Your name can not exceed 29 characters.')->send($player);
             return;
         }
@@ -115,8 +115,8 @@ class PlayerController implements ControllerInterface
 
             if (Cache::has('nicknames/' . $playerInfo->login)) {
                 $name = Cache::get('nicknames/' . $playerInfo->login);
-                if(strlen($name) > 28){
-                    $name = substr($name, 0, 28);
+                if(strlen(stripAll($name)) > 28){
+                    $name = substr(stripAll($name), 0, 28);
                 }
                 self::$customNames->put($playerInfo->login, $name);
             }
