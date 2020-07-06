@@ -4,6 +4,9 @@
 namespace EvoSC\Classes;
 
 
+use EvoSC\Controllers\MapController;
+use EvoSC\Models\Player;
+
 class Utility
 {
     /**
@@ -18,7 +21,7 @@ class Utility
     public static function getRankRange(int $baseRank, int $showTop, int $showTotal, int $total)
     {
         if ($total <= $showTop) {
-            return [4, $total];
+            return [$showTop + 1, $total];
         }
 
         $showBottom = $showTotal - $showTop;
@@ -82,5 +85,105 @@ class Utility
         DB::raw('SET @rank=0');
         DB::raw('UPDATE `' . $table . '` SET `Rank`= @rank:=(@rank+1) WHERE `Map` = ' . $mapId . ' ORDER BY `Score`');
         DB::table($table)->where('Map', '=', $mapId)->where('Rank', '>', $deleteAbove)->delete();
+    }
+
+    /**
+     * @param string $table
+     * @param string $configId
+     * @param string $templateId
+     * @param Player|null $playerIn
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function sendRecordsChunk(string $table, string $configId, string $templateId, Player $playerIn = null)
+    {
+        if (!$map = MapController::getCurrentMap()) {
+            return;
+        }
+
+        if (!$playerIn) {
+            $players = onlinePlayers();
+        } else {
+            $players = collect([$playerIn]);
+        }
+
+        $count = DB::table($table)->where('Map', '=', $map->id)->count();
+        $top = config($configId . '.show-top', 3);
+        $fill = config($configId . '.rows', 16);
+
+        if ($count <= $fill) {
+            $recordsJson = DB::table($table)
+                ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                ->leftJoin('players', 'players.id', '=', $table . '.Player')
+                ->where('Map', '=', $map->id)
+                ->where('Rank', '<=', $fill)
+                ->orderBy('rank')
+                ->get()
+                ->toJson();
+
+            Template::showAll($templateId, compact('recordsJson'));
+            return;
+        }
+
+        $playerRanks = DB::table($table)
+            ->select(['Player', 'Rank'])
+            ->where('Map', '=', $map->id)
+            ->whereIn('Player', $players->pluck('id'))
+            ->pluck('Rank', 'Player');
+
+        $defaultRecordsJson = null;
+        $defaultTopView = null;
+
+        foreach ($players as $player) {
+            $recordsJson = null;
+
+            if ($playerRanks->has($player->id)) {
+                $baseRank = (int)$playerRanks->get($player->id);
+            } else {
+                if (!is_null($defaultRecordsJson)) {
+                    Template::show($player, $templateId, ['recordsJson' => $defaultRecordsJson], true, 20);
+                    continue;
+                }
+                $baseRank = $count;
+            }
+
+            if ($baseRank <= $fill) {
+                if (is_null($defaultTopView)) {
+                    $defaultTopView = DB::table($table)
+                        ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                        ->leftJoin('players', 'players.id', '=', $table . '.Player')
+                        ->where('Map', '=', $map->id)
+                        ->WhereBetween('Rank', [$count - $fill + $top, $count])
+                        ->orWhere('Map', '=', $map->id)
+                        ->where('Rank', '<=', $top)
+                        ->orderBy('rank')
+                        ->get()
+                        ->toJson();
+                }
+                $recordsJson = $defaultTopView;
+            }
+
+            if (!isset($recordsJson)) {
+                $range = Utility::getRankRange($baseRank, $top, $fill, $count);
+
+                $recordsJson = DB::table($table)
+                    ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                    ->leftJoin('players', 'players.id', '=', $table . '.Player')
+                    ->where('Map', '=', $map->id)
+                    ->WhereBetween('Rank', $range)
+                    ->orWhere('Map', '=', $map->id)
+                    ->where('Rank', '<=', $top)
+                    ->orderBy('rank')
+                    ->get()
+                    ->toJson();
+            }
+
+            if ($baseRank == $count) {
+                $defaultRecordsJson = $recordsJson;
+            }
+
+            Template::show($player, $templateId, compact('recordsJson'), true, 20);
+        }
+
+        Template::executeMulticall();
     }
 }

@@ -7,7 +7,7 @@
         <frame pos="{$statisticWidget->pos}" scale="{$statisticWidget->scale ?? 0.75}" data-show="{$statisticWidget->show ?? 6}">
             <quad class="bg-dark" z-index="-1" size="50 {($statisticWidget->config->show ?? 6) * 4 + 8}" opacity="0.8"/>
             <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="{$statisticWidget->title}" textsize=".8" valign="center"/>
-            <quad class="bg-accent" z-index="0" size="50 6" bgcolor="{config('colors.ui.widget.header.color')}c"/>
+            <quad class="bg-accent" z-index="0" size="50 6"/>
             <frame pos="0 -5" size="50 {($statisticWidget->config->show ?? 6) * 5}">
                 {foreach $statisticWidget->records as $player => $stat}
                 {if $statisticWidget->nameLeft}

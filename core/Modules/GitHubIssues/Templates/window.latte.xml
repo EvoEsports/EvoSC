@@ -1,0 +1,115 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '50';}
+{php $window_height = '38';}
+
+{block id}
+github-issues
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+GitHub-Issues
+{/block}
+
+{block content}
+<framemodel id="issue">
+    <label  class="text-light" size="27 3" textsize="0.6" text="Issue-Title" valign="center" />
+</framemodel>
+
+<frame pos="0 -0.5">
+    {for $i=0; $i<10; $i++}
+    <frameinstance modelid="issue" pos="0 {$i * -3.5}" />
+    {/for}
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+#Struct GitHubUser {
+    Text login;
+    Integer id;
+    Text node_id;
+    Text avatar_url;
+    Text gravatar_id;
+    Text url;
+    Text html_url;
+    Text followers_url;
+    Text following_url;
+    Text gists_url;
+    Text starred_url;
+    Text subscriptions_url;
+    Text organizations_url;
+    Text repos_url;
+    Text events_url;
+    Text received_events_url;
+    Text type;
+    Boolean site_admin;
+}
+
+#Struct GitHubLabel {
+    Integer id;
+    Text node_id;
+    Text url;
+    Text name;
+    Text color;
+    Text description;
+    Boolean isDefault;
+}
+
+#Struct GitHubIssue {
+    Text url;
+    Text repository_url;
+    Text labels_url;
+    Text comments_url;
+    Text events_url;
+    Text html_url;
+    Integer id;
+    Text node_id;
+    Integer number;
+    Text title;
+    GitHubUser user;
+    GitHubLabel[] labels;
+    Text state;
+    Boolean locked;
+    GitHubUser assignee;
+    GitHubUser[] assignees;
+    Text milestone;
+    Integer comments;
+    Text created_at;
+    Text updated_at;
+    Text closed_at;
+    Text author_association;
+    Text active_lock_reason;
+    Text body;
+}
+{/block}
+
+{block functions}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+    declare GitHubIssue issues;
+    declare response = Http.CreateGet("https://api.github.com/repos/EvoTM/EvoSC/issues");
+
+    while(!response.IsCompleted){
+        yield;
+        sleep(100);
+    }
+
+    if(response.StatusCode == 200){
+        log(TL::Replace(response.Result, """"default":""", """"isDefault":"""));
+        issues.fromjson(TL::Replace(response.Result, """"default":""", """"isDefault":"""));
+    }
+{/block}
+
+{block pendingEvents}
+{/block}
+--></script>

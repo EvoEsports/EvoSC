@@ -15,7 +15,7 @@ A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack
-* Rounds (Partially, In Progress)
+* Rounds
 * ~~Teams~~
 * ~~Chase~~
 
@@ -24,7 +24,7 @@ A server controller for Trackmania²
 
 
 ### Requirements
-* PHP 7.4
+* PHP 7.4 and simplexml, mbstring, gd, dom, mysql extension.
 * Composer
 * MySql/MariaDB Server
 

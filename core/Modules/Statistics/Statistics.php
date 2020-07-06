@@ -77,8 +77,10 @@ class Statistics extends Module implements ModuleInterface
         //Top Ranks
         $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '', '.', null, true, false));
 
-        //Top Donators
-        $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
+        //Top Planets-Donators
+        if(isManiaPlanet()){
+            $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
+        }
 
         //Round average
         if (self::$scores->count() > 0) {

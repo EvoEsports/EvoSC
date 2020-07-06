@@ -17,6 +17,12 @@ class SpeedoMeter extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        global $__ManiaPlanet;
+
+        if(!$__ManiaPlanet){
+            return;
+        }
+
         Hook::add('PlayerConnect', [self::class, 'show']);
 
         ManiaLinkEvent::add('speedo.save', [self::class, 'saveSettings']);

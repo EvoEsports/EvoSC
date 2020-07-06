@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
@@ -169,11 +170,17 @@ class EventController implements ControllerInterface
     {
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
             $details = Server::getDetailedPlayerInfo($playerInfo[0]);
+
             $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
                 'NickName' => $details->nickName,
                 'path' => $details->path,
                 'player_id' => $details->playerId,
             ]);
+
+            if(isTrackmania() && Cache::has('nicknames/' . $playerInfo[0])){
+                $name = Cache::get('nicknames/' . $playerInfo[0]);
+                PlayerController::setName($player, 'silent', $name);
+            }
 
             Hook::fire('PlayerConnect', $player);
         } else {

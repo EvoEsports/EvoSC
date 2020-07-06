@@ -97,7 +97,7 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
 
-        if ($mode != 'TimeAttack.Script.txt') {
+        if (ModeController::isRounds()) {
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }
@@ -324,7 +324,14 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . 'ManiaPlanetServer';
+        global $__ManiaPlanet;
+        $executable = $__ManiaPlanet ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+
+        if (isWindows()) {
+            $executable .= '.exe';
+        }
+
+        $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . $executable;
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
         $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
         $jsonString = shell_exec($cmd);

@@ -55,14 +55,6 @@ class EscRun extends Command
     {
         global $serverName;
         global $__ManiaPlanet;
-        global $asyncPool;
-
-        /*
-        $asyncPool = Pool::create()
-            ->concurrency(20)
-            ->timeout(10)
-            ->autoload(coreDir('../vendor/autoload.php'));
-        */
 
         Log::setOutput($output);
         ConfigController::init();
@@ -121,7 +113,8 @@ class EscRun extends Command
             $output->writeln("Connection established.");
         } catch (Exception $e) {
             $msg = $e->getMessage();
-            $output->writeln("<error>Connecting to server failed: $msg</error>");
+            $trace = $e->getTraceAsString();
+            $output->writeln("<error>Connecting to server failed: $msg\n$trace</error>");
             exit(1);
         }
     }
@@ -220,17 +213,17 @@ class EscRun extends Command
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/50');
+                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/3');
                 Log::write($e->getMessage());
 
                 $failedConnectionRequests++;
-                if ($failedConnectionRequests > 50) {
+                if ($failedConnectionRequests > 3) {
                     Log::write('MPS',
                         sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
                     return;
                 }
-                sleep(5);
+                sleep(1);
             } catch (Error $e) {
                 $errorClass = get_class($e);
                 $output->writeln("<error>$errorClass in " . $e->getFile() . " on Line " . $e->getLine() . "</error>");

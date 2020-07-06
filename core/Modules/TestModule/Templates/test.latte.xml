@@ -8,7 +8,9 @@
 #Include "TextLib" as TL
 
 main() {
-    log(Period);
+    UI.OverlayHideAll = True;
+    log(UI.OverlayHideAll);
+    log(UI);
 }
     --></script>
 </manialink>

@@ -35,7 +35,6 @@ class CountdownController implements ControllerInterface
 
     public static function init()
     {
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
     }
 
     /**
@@ -193,6 +192,7 @@ class CountdownController implements ControllerInterface
         if ($file) {
             $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
             $xml = new SimpleXMLElement($matchSettings);
+            $node = null;
 
             if (isset($xml->mode_script_settings)) {
                 $node = $xml->mode_script_settings;
@@ -200,14 +200,16 @@ class CountdownController implements ControllerInterface
                 $node = $xml->script_settings;
             }
 
-            foreach ($node->children() as $child) {
-                if ($child->attributes()['name'] == 'S_TimeLimit') {
-                    return intval($child->attributes()['value']);
+            if($node){
+                foreach ($node->children() as $child) {
+                    if ($child->attributes()['name'] == 'S_TimeLimit') {
+                        return intval($child->attributes()['value']);
+                    }
                 }
             }
         }
 
-        Log::warning("Failed to get time limit from default match-settings.");
+        Log::warning("Time limit not set in match-settings, using default.");
 
         return 600;
     }

@@ -26,7 +26,7 @@ class MatchTracker extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-//        if ($mode == 'Rounds.Script.txt') {
+//        if (ModeController::isRounds()) {
 //            if (!$isBoot) {
 //                Template::showAll('match-tracker.widget');
 //            }

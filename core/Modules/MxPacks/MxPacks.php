@@ -8,25 +8,41 @@ use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\MxPackJob;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\MxPacks\Classes\MxPackJob;
 use Exception;
 
 class MxPacks extends Module implements ModuleInterface
 {
+    const MANIAPLANET_MX_API_URL = 'https://api.mania-exchange.com';
+    const MANIAPLANET_MX_URL = 'https://tm.mania-exchange.com';
+    const TRACKMANIA_MX_API_URL = 'https://api.trackmania.exchange';
+    const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
+
+    private static string $mxApiUrl;
+    private static string $mxUrl;
+
     /**
      * @var MxPackJob
      */
-    private static MxPackJob $activeJob;
+    private static ?MxPackJob $activeJob;
 
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isManiaPlanet()) {
+            self::$mxApiUrl = self::MANIAPLANET_MX_API_URL;
+            self::$mxUrl = self::MANIAPLANET_MX_URL;
+        } else {
+            self::$mxApiUrl = self::TRACKMANIA_MX_API_URL;
+            self::$mxUrl = self::TRACKMANIA_MX_URL;
+        }
+
         if (!is_dir(cacheDir('map-packs'))) {
             mkdir(cacheDir('map-packs'));
         }
@@ -46,7 +62,7 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdInfo)) {
             $info = Cache::get($cacheIdInfo);
         } else {
-            $url = sprintf('https://api.mania-exchange.com/tm/mappacks/%d/?=%s', $packId, $secret);
+            $url = sprintf(self::$mxApiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
 
             $response = RestClient::get($url);
             $info = json_decode($response->getBody()->getContents());
@@ -65,7 +81,7 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdTracks)) {
             $trackList = Cache::get($cacheIdTracks);
         } else {
-            $url = sprintf('https://api.mania-exchange.com/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+            $url = sprintf(self::$mxApiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
 
             try {
                 $response = RestClient::get($url);

@@ -48,7 +48,7 @@ Config-Editor
                     <frame pos="0 -6.5" size="80 59">
                         {foreach $module->configs as $config}
                         <frame pos="0 {$iterator->counter * -4.5 + 1}">
-                            <label class="{array_key_exists('blank', $config) ? 'text-accent' : 'text-light'}" size="30 4" pos="2 0" text="{$config['key']}" textprefix="$999{str_repeat('—', $config['level'])}$z " textsize="0.75" valign="center"/>
+                            <label class="{array_key_exists('blank', $config) ? 'text-accent' : 'text-light'}" size="30 4" pos="2 0" text="{$config['key']}" textprefix="$<$999{str_repeat('—', $config['level'])}$> " textsize="0.75" valign="center"/>
                             {if !array_key_exists('blank', $config)}
                             {if $config['type'] == 'bool'}
                             <frame pos="31 1.5" size="8 3">

@@ -13,6 +13,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
 use EvoSC\Controllers\CountdownController;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
@@ -33,7 +34,6 @@ class Votes extends Module implements ModuleInterface
     private static int $skipVotesThisRound = 0;
     private static $onlinePlayersCount;
     private static $addTimeSuccess = null;
-    private static $isRounds = false;
 
     /**
      * @inheritDoc
@@ -59,7 +59,7 @@ class Votes extends Module implements ModuleInterface
         ManiaLinkEvent::add('votes.yes', [self::class, 'voteYes']);
         ManiaLinkEvent::add('votes.no', [self::class, 'voteNo']);
 
-        self::$isRounds = $mode != 'TimeAttack.Script.txt';
+        AccessRight::add('vote_decide', 'Decide the outcome of a vote.');
 
         if (config('quick-buttons.enabled')) {
             ManiaLinkEvent::add('vote.approve', [self::class, 'approveVote'], 'vote_decide');
@@ -164,14 +164,14 @@ class Votes extends Module implements ModuleInterface
      */
     public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
-        if (self::$isRounds) {
+        if (ModeController::isRounds()) {
             self::cmdAskMorePoints($player, $cmd, $time);
             return;
         }
 
-        if($time == '0'){
+        if ($time == '0') {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-        }else{
+        } else {
             $secondsToAdd = floatval($time) * 60;
         }
 
@@ -205,7 +205,7 @@ class Votes extends Module implements ModuleInterface
             }
         }
 
-        $question = 'Add $' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$z$s$fff minutes?';
+        $question = 'Add $<$' . config('theme.chat.text') . round($secondsToAdd / 60, 1) . '$> minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
@@ -291,7 +291,7 @@ class Votes extends Module implements ModuleInterface
      */
     public static function askSkip(Player $player)
     {
-        if (!self::$isRounds && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
+        if (ModeController::isTimeAttack() && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
             infoMessage('Can not skip the map after time was added.')->send($player);
             return;
         }
@@ -313,7 +313,7 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
-            if (!self::$isRounds && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
+            if (ModeController::isTimeAttack() && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
                 warningMessage('It is too late to skip the map.')->send($player);
 
                 return;

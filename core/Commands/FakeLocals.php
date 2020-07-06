@@ -8,6 +8,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\ConfigController;
 use EvoSC\Models\Map;
+use EvoSC\Modules\LocalRecords\LocalRecords;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;

@@ -1,0 +1,12 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-custom-names" name="EvoSC:update-custom-names">
+    <script><!--
+    main(){
+        declare Text[Text] EvoSC_CustomNames for LocalUser;
+
+        declare trans = """{$names->toJson()}""";
+        EvoSC_CustomNames.fromjson(trans);
+    }
+    --></script>
+</manialink>

@@ -26,8 +26,12 @@ use Psr\Http\Message\ResponseInterface;
 
 class MxKarma extends Module implements ModuleInterface
 {
+    const MANIAPLANET_MXKARMA_URL = 'https://karma.mania-exchange.com/api2';
+    const TRACKMANIA_MXKARMA_URL = 'https://karma.trackmania.exchange/api2';
+
     const ratings = [0 => 'Trash', 20 => 'Bad', 40 => 'Playable', 60 => 'Ok', 80 => 'Good', 100 => 'Fantastic'];
 
+    private static string $apiUrl;
     private static string $sessionKey;
     private static float $voteAverage = 0;
     private static int $votesTotal = 0;
@@ -38,23 +42,77 @@ class MxKarma extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if ($isBoot) {
-            self::startAndActivateSession();
+        if (isManiaPlanet()) {
+            self::$apiUrl = self::MANIAPLANET_MXKARMA_URL;
+        } else {
+            self::$apiUrl = self::TRACKMANIA_MXKARMA_URL;
         }
 
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('EndMap', [self::class, 'endMap']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        $promise = RestClient::getAsync(self::$apiUrl . '/startSession', [
+            'query' => [
+                'serverLogin' => config('server.login'),
+                'applicationIdentifier' => 'EvoSC v' . getEscVersion(),
+                'testMode' => 'false',
+            ]
+        ]);
 
-        ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
-        ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
-        ChatCommand::add('+++', [self::class, 'votePlusPlusPlus'], 'Rate the map fantastic', null, true);
-        ChatCommand::add('-', [self::class, 'voteMinus'], 'Rate the map playable', null, true);
-        ChatCommand::add('--', [self::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
-        ChatCommand::add('---', [self::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
-        ChatCommand::add('-----', [self::class, 'voteWorst'], 'Rate it the worst map ever', null, true);
+        $promise->then(function (ResponseInterface $response) {
+            if ($response->getStatusCode() == 200) {
+                $mxResponse = json_decode($response->getBody());
 
-        ManiaLinkEvent::add('mxk.vote', [self::class, 'vote']);
+                if (!$mxResponse->success || !isset($mxResponse->success)) {
+                    Log::warning("startSession failed: " . $response->getBody());
+                    return;
+                }
+
+                Log::info("MX Karma session created. Activating...");
+
+                $activationPromise = RestClient::getAsync(self::$apiUrl . '/activateSession', [
+                    'query' => [
+                        'sessionKey' => $mxResponse->data->sessionKey,
+                        'activationHash' => hash("sha512", config('mx-karma.key') . $mxResponse->data->sessionSeed),
+                    ]
+                ]);
+
+                $activationPromise->then(function (ResponseInterface $activationResponse) use ($mxResponse) {
+                    if ($activationResponse->getStatusCode() == 200) {
+                        $activationResponse = json_decode($activationResponse->getBody());
+
+                        if (!$activationResponse->data->activated || !isset($activationResponse->data->activated)) {
+                            Log::warning('Could not activate MxKarma session.');
+
+                            return;
+                        }
+
+                        Log::info("MX Karma session activated.");
+
+                        self::$sessionKey = $mxResponse->data->sessionKey;
+
+                        Hook::add('BeginMap', [self::class, 'beginMap']);
+                        Hook::add('EndMap', [self::class, 'endMap']);
+                        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+
+                        ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
+                        ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
+                        ChatCommand::add('+++', [self::class, 'votePlusPlusPlus'], 'Rate the map fantastic', null, true);
+                        ChatCommand::add('-', [self::class, 'voteMinus'], 'Rate the map playable', null, true);
+                        ChatCommand::add('--', [self::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
+                        ChatCommand::add('---', [self::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
+                        ChatCommand::add('-----', [self::class, 'voteWorst'], 'Rate it the worst map ever', null, true);
+
+                        ManiaLinkEvent::add('mxk.vote', [self::class, 'vote']);
+                    } else {
+                        Log::warning('Failed to activate MXKarma session: ' . $activationResponse->getReasonPhrase());
+                    }
+                }, function (RequestException $e) {
+                    Log::warning('Failed to activate MXKarma session: ' . $e->getMessage());
+                });
+            } else {
+                Log::warning('Failed to start MXKarma session: ' . $response->getReasonPhrase());
+            }
+        }, function (RequestException $e) {
+            Log::warning('Failed to start MXKarma session: ' . $e->getMessage());
+        });
     }
 
     /**
@@ -189,7 +247,7 @@ class MxKarma extends Module implements ModuleInterface
             ];
         });
 
-        $promise = RestClient::postAsync('https://karma.mania-exchange.com/api2/saveVotes', [
+        $promise = RestClient::postAsync(self::$apiUrl . '/saveVotes', [
             'query' => [
                 'sessionKey' => self::$sessionKey,
             ],
@@ -231,7 +289,7 @@ class MxKarma extends Module implements ModuleInterface
             return new Promise();
         }
 
-        return RestClient::postAsync("https://karma.mania-exchange.com/api2/getMapRating", [
+        return RestClient::postAsync(self::$apiUrl . "/getMapRating", [
             'query' => [
                 'sessionKey' => self::$sessionKey,
             ],
@@ -244,63 +302,6 @@ class MxKarma extends Module implements ModuleInterface
             ],
             'timeout' => $timeout
         ]);
-    }
-
-    /**
-     *
-     */
-    private static function startAndActivateSession()
-    {
-        $promise = RestClient::getAsync('https://karma.mania-exchange.com/api2/startSession', [
-            'query' => [
-                'serverLogin' => config('server.login'),
-                'applicationIdentifier' => 'EvoSC v' . getEscVersion(),
-                'testMode' => 'false',
-            ]
-        ]);
-
-        $promise->then(function (ResponseInterface $response) {
-            if ($response->getStatusCode() == 200) {
-                $mxResponse = json_decode($response->getBody());
-
-                if (!$mxResponse->success) {
-                    Log::warning("startSession failed: " . $response->getBody());
-                }
-
-                Log::info("MX Karma session created. Activating...");
-
-                $activationPromise = RestClient::getAsync('https://karma.mania-exchange.com/api2/activateSession', [
-                    'query' => [
-                        'sessionKey' => $mxResponse->data->sessionKey,
-                        'activationHash' => hash("sha512", config('mx-karma.key') . $mxResponse->data->sessionSeed),
-                    ]
-                ]);
-
-                $activationPromise->then(function (ResponseInterface $activationResponse) use ($mxResponse) {
-                    if ($activationResponse->getStatusCode() == 200) {
-                        $activationResponse = json_decode($activationResponse->getBody());
-
-                        if (!$activationResponse->data->activated || !isset($activationResponse->data->activated)) {
-                            Log::warning('Could not activate MxKarma session.');
-
-                            return;
-                        }
-
-                        Log::info("MX Karma session activated.");
-
-                        self::$sessionKey = $mxResponse->data->sessionKey;
-                    } else {
-                        Log::warning('Failed to activate MXKarma session: ' . $activationResponse->getReasonPhrase());
-                    }
-                }, function (RequestException $e) {
-                    Log::warning('Failed to activate MXKarma session: ' . $e->getMessage());
-                });
-            } else {
-                Log::warning('Failed to start MXKarma session: ' . $response->getReasonPhrase());
-            }
-        }, function (RequestException $e) {
-            Log::warning('Failed to start MXKarma session: ' . $e->getMessage());
-        });
     }
 
     /**

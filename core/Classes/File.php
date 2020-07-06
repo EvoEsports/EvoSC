@@ -217,6 +217,15 @@ class File
     }
 
     /**
+     * @param string $filename
+     * @return string|string[]
+     */
+    public static function anyOs(string $filename)
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $filename);
+    }
+
+    /**
      * @param string $dir
      * @throws FilePathNotAbsoluteException
      */
@@ -246,7 +255,7 @@ class File
         $levels->pop();
         $parentDir = $levels->implode(DIRECTORY_SEPARATOR);
 
-        if(!is_dir($parentDir)){
+        if (!is_dir($parentDir)) {
             self::createDirUntilExists($parentDir);
         }
 

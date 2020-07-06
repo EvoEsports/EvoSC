@@ -14,11 +14,11 @@
 
     <frame pos="40 -4" scale="0.75">
         <quad id="circle" size="5 5" halign="center" valign="center"
-              image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/ring.png"/>
+              image="https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/Clock/Resources/ring.png"/>
         <quad id="big" size="5 5" halign="center" valign="center"
-              image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/long.png"/>
+              image="https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/Clock/Resources/long.png"/>
         <quad id="small" size="5 5" halign="center" valign="center"
-              image="https://raw.githubusercontent.com/EvoTM/EvoSC/master/core/Modules/clock/Resources/short.png"
+              image="https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/Clock/Resources/short.png"
               opacity="0.9"/>
     </frame>
     {/block}
@@ -75,7 +75,10 @@
             if(overHidespeed {if $is_maniaplanet}&& playerIsRacing {/if}&& !HS_Hidden){
                 hide();
                 {if !isset($doNotPause)}
-                wait(InputPlayer.Speed * 3.6 < hideSpeed {if $is_maniaplanet}|| InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running{/if});
+                while(InputPlayer.Speed * 3.6 > hideSpeed {if $is_maniaplanet}&& InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running{/if}){
+                    yield;
+                    hidescript();
+                }
                 {/if}
             }
             if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){

@@ -149,9 +149,9 @@ class TemplateController implements ControllerInterface
      */
     private static function getTemplateId($relativePath): string
     {
-        if (preg_match('/([A-Z][a-zA-Z0-9]+)\/Templates\/(.+?)\.latte\.xml$/', $relativePath, $matches)) {
+        if (preg_match('/([A-Z][a-zA-Z0-9]+)[\/\\\]Templates[\/\\\](.+?)\.latte\.xml$/', $relativePath, $matches)) {
             return sprintf('%s.%s', $matches[1], $matches[2]);
-        } else if (preg_match('/TemplateComponents\/(\w+)\/(.+?)\.latte\.xml$/', $relativePath, $matches)) {
+        } else if (preg_match('/TemplateComponents[\/\\\](\w+)[\/\\\](.+?)\.latte\.xml$/', $relativePath, $matches)) {
             return sprintf('%s.%s', $matches[1], $matches[2]);
         } else {
             throw new TemplateNameInvalidException("The template ID for '$relativePath' could not be detected. Please check that your naming is correct.");

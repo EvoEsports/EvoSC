@@ -15,6 +15,7 @@ class ControllerController
     public static function loadControllers(string $mode, bool $isBoot = false)
     {
         HookController::init();
+        ModeController::setMode($mode);
 
         $controllers = File::getFiles(coreDir('Controllers'))->map(function ($file) {
             $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . ']Controllers[' . DIRECTORY_SEPARATOR . ']#', '', $file);

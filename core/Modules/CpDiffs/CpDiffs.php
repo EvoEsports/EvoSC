@@ -32,6 +32,8 @@ class CpDiffs extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        return;
+
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerConnect', [self::class, 'requestCpDiffs']);

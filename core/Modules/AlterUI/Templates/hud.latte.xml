@@ -6,9 +6,17 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 
+CSmPlayer Utils_GetOwner() {
+	if (GUIPlayer != Null) return GUIPlayer;
+	return InputPlayer;
+}
+
 main() {
-    ClientUI.OverlayHideMultilapInfos = True;
-    log(ClientUI);
+    //ClientUI.OverlayHideAll = True;
+    //ClientUI.OverlayHideAll = False;
+    ClientUI.OverlayHideCountdown = True;
+
+    return;
 }
     --></script>
 </manialink>

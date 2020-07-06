@@ -318,6 +318,7 @@ class MatchSettingsController implements ControllerInterface
         $file = self::getCurrentMatchSettingsFile();
         $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
         $xml = new SimpleXMLElement($matchSettings);
+        $node = null;
 
         if (isset($xml->mode_script_settings)) {
             $node = $xml->mode_script_settings;
@@ -325,9 +326,11 @@ class MatchSettingsController implements ControllerInterface
             $node = $xml->script_settings;
         }
 
-        foreach ($node->children() as $child) {
-            if ($child->attributes()['name'] == $key) {
-                return intval($child->attributes()['value']);
+        if($node){
+            foreach ($node->children() as $child) {
+                if ($child->attributes()['name'] == $key) {
+                    return intval($child->attributes()['value']);
+                }
             }
         }
 

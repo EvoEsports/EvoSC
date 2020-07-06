@@ -25,11 +25,27 @@ use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
 {
+    const MANIAPLANET_MX_API_URL = 'https://api.mania-exchange.com';
+    const MANIAPLANET_MX_URL = 'https://tm.mania-exchange.com';
+    const TRACKMANIA_MX_API_URL = 'https://api.trackmania.exchange';
+    const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
+
+    private static string $mxApiUrl;
+    private static string $mxUrl;
+
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isManiaPlanet()) {
+            self::$mxApiUrl = self::MANIAPLANET_MX_API_URL;
+            self::$mxUrl = self::MANIAPLANET_MX_URL;
+        } else {
+            self::$mxApiUrl = self::TRACKMANIA_MX_API_URL;
+            self::$mxUrl = self::TRACKMANIA_MX_URL;
+        }
+
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
 
         ManiaLinkEvent::add('mx.add', [self::class, 'addMap'], 'map_add');
@@ -43,6 +59,11 @@ class MxDownload extends Module implements ModuleInterface
     {
         foreach ($arguments as $mxId) {
             if (intval($mxId) == 0) {
+                continue;
+            }
+
+            if(isTrackmania()){
+                self::addMap($player, $mxId);
                 continue;
             }
 
@@ -68,7 +89,7 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception("Requested map with invalid id: $mxId");
         }
 
-        $download = RestClient::get('http://tm.mania-exchange.com/tracks/download/' . $mxId);
+        $download = RestClient::get(self::$mxUrl . '/tracks/download/' . $mxId);
 
         if ($download->getStatusCode() != 200) {
             throw new Exception("Download $mxId failed: " . $download->getReasonPhrase());
@@ -222,7 +243,7 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$mxId}");
         }
 
-        $infoResponse = RestClient::get('https://api.mania-exchange.com/tm/maps/' . $mxId);
+        $infoResponse = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $mxId);
 
         if ($infoResponse->getStatusCode() != 200) {
             throw new Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());

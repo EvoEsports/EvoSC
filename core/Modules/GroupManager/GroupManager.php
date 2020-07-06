@@ -9,7 +9,6 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
-use EvoSC\Controllers\PlayerController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Group;
@@ -171,7 +170,7 @@ class GroupManager extends Module implements ModuleInterface
 
         if ($member) {
             Player::whereLogin($memberLogin)->update(['Group' => 3]);
-            infoMessage($player, ' removed ', $member, '\'s access rights.')->sendAll();
+            infoMessage($player, ' removed access rights from ', $member)->sendAll();
             self::groupMembers($player, $groupId);
         }
     }
@@ -198,6 +197,6 @@ class GroupManager extends Module implements ModuleInterface
         $group = Group::find(intval($groupId));
         Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
         Hook::fire('GroupChanged', $newMember);
-        infoMessage($player->group, ' ', $player, ' changed ', $newMember, '\'s group to ', secondary($group))->sendAll();
+        infoMessage($player->group, ' ', $player, ' changed ', secondary($newMember.'s'), ' group to ', secondary($group))->sendAll();
     }
 }

@@ -3,12 +3,14 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
@@ -31,11 +33,14 @@ class PlayerController implements ControllerInterface
     /** @var int */
     private static int $stringEditDistanceThreshold = 8;
 
+    private static Collection $customNames;
+
     /**
      * Initialize PlayerController
      */
     public static function init()
     {
+        self::$customNames = collect();
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
@@ -53,9 +58,9 @@ class PlayerController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
         ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
@@ -67,17 +72,56 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
+
+        if (isTrackmania()) {
+            ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+        }
+    }
+
+    public static function setName(Player $player, $cmd, ...$name)
+    {
+        $oldName = $player->NickName;
+        $name = str_replace("\n", '', trim(implode(' ', $name)));
+        if (strlen($name) == 0) {
+            warningMessage('Your name can not be empty.')->send($player);
+            return;
+        }
+        $player->NickName = $name;
+        $player->update([
+            'NickName' => $name
+        ]);
+        self::$customNames->put($player->Login, $name);
+        self::$players->put($player->Login, $player);
+        if ($cmd != 'silent') {
+            infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
+            Cache::put('nicknames/' . $player->Login, $name);
+        }
+        self::sendUpdatesCustomNames();
+    }
+
+    private static function sendUpdatesCustomNames()
+    {
+        Template::showAll('Helpers.update-custom-names', ['names' => self::$customNames]);
     }
 
     public static function cacheConnectedPlayers()
     {
         self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+            $name = $playerInfo->nickName;
+
+            if (Cache::has('nicknames/' . $playerInfo->login)) {
+                $name = Cache::get('nicknames/' . $playerInfo->login);
+                self::$customNames->put($playerInfo->login, $name);
+            }
+
             return Player::updateOrCreate(['Login' => $playerInfo->login], [
-                'NickName' => $playerInfo->nickName,
+                'NickName' => $name,
                 'spectator_status' => $playerInfo->spectatorStatus,
                 'player_id' => $playerInfo->playerId
             ]);
         })->keyBy('Login');
+
+        self::sendUpdatesCustomNames();
     }
 
     /**
@@ -167,6 +211,10 @@ class PlayerController implements ControllerInterface
         ]);
 
         self::$players = self::$players->forget($player->Login);
+
+        if(self::$customNames->has($player->Login)){
+            self::$customNames->forget($player->Login);
+        }
     }
 
     /**
@@ -313,7 +361,7 @@ class PlayerController implements ControllerInterface
         }
 
         if ($score > 0) {
-            Log::info($player . "\$z finished with time ($score) " . formatScore($score));
+            Log::info(stripAll($player) . " finished with time ($score) " . formatScore($score));
 
             $player->Score = $score;
             $player->save();
@@ -323,7 +371,7 @@ class PlayerController implements ControllerInterface
             $hasBetterTime = DB::table('pbs')
                 ->where('map_id', '=', $map->id)
                 ->where('player_id', '=', $player->id)
-                ->where('score', '<=', $score)
+                ->where('score', '<', $score)
                 ->exists();
 
             if (!$hasBetterTime) {
@@ -338,14 +386,6 @@ class PlayerController implements ControllerInterface
                 Hook::fire('PlayerPb', $player, $score, $checkpoints);
             }
         }
-    }
-
-    /**
-     * @return Collection
-     */
-    public static function getPlayers(): Collection
-    {
-        return self::$players;
     }
 
     /**

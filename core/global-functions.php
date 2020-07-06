@@ -95,10 +95,10 @@ function formatScore(int $score, bool $cutZero = false): string
 function stripAll(?string $styled = '', bool $keepLinks = false): string
 {
     if ($keepLinks) {
-        return preg_replace('/(?<![$])\${1}(?:[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+        return preg_replace('/(?<![$])\${1}(?:[iwngosz<>]{1}|[\w\d]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz<>]{1}|[\w\d]{1,3})/i', '', $styled);
 }
 
 /**
@@ -288,7 +288,7 @@ function now(): Carbon
  */
 function secondary(string $str = ""): string
 {
-    return '$z$s$' . config('theme.chat.highlight') . $str;
+    return '$<$fff$' . config('theme.chat.highlight') . $str . '$>';
 }
 
 /**
@@ -296,7 +296,7 @@ function secondary(string $str = ""): string
  */
 function getEscVersion(): string
 {
-    return '0.90.0';
+    return '0.91.0';
 }
 
 /**
@@ -441,10 +441,19 @@ function getShortColorCode($longColorCode)
 }
 
 /**
- * @return \Spatie\Async\Pool
+ * @return bool
  */
-function async_pool(): \Spatie\Async\Pool
+function isManiaPlanet(): bool
 {
-    global $asyncPool;
-    return $asyncPool;
+    global $__ManiaPlanet;
+    return $__ManiaPlanet;
+}
+
+/**
+ * @return bool
+ */
+function isTrackmania(): bool
+{
+    global $__ManiaPlanet;
+    return !$__ManiaPlanet;
 }

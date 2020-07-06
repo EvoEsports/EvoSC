@@ -10,7 +10,7 @@ class MPS_Map extends \stdClass
     public int $NbLaps;
     public int $DisplayCost;
     public int $LightmapVersion;
-    public int $AuthorTime;
+    public int $AuthorTime = -1;
     public int $GoldTime;
     public int $SilverTime;
     public int $BronzeTime;
