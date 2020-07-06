@@ -37,6 +37,8 @@ class MxKarma extends Module implements ModuleInterface
     private static int $votesTotal = 0;
     private static Collection $newVotes;
 
+    private static bool $offline = true;
+
     /**
      * @inheritDoc
      */
@@ -86,21 +88,10 @@ class MxKarma extends Module implements ModuleInterface
 
                         Log::info("MX Karma session activated.");
 
+                        self::$offline = false;
                         self::$sessionKey = $mxResponse->data->sessionKey;
 
-                        Hook::add('BeginMap', [self::class, 'beginMap']);
-                        Hook::add('EndMap', [self::class, 'endMap']);
-                        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-
-                        ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
-                        ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
-                        ChatCommand::add('+++', [self::class, 'votePlusPlusPlus'], 'Rate the map fantastic', null, true);
-                        ChatCommand::add('-', [self::class, 'voteMinus'], 'Rate the map playable', null, true);
-                        ChatCommand::add('--', [self::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
-                        ChatCommand::add('---', [self::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
-                        ChatCommand::add('-----', [self::class, 'voteWorst'], 'Rate it the worst map ever', null, true);
-
-                        ManiaLinkEvent::add('mxk.vote', [self::class, 'vote']);
+                        self::registerEvents();
                     } else {
                         Log::warning('Failed to activate MXKarma session: ' . $activationResponse->getReasonPhrase());
                     }
@@ -112,7 +103,30 @@ class MxKarma extends Module implements ModuleInterface
             }
         }, function (RequestException $e) {
             Log::warning('Failed to start MXKarma session: ' . $e->getMessage());
+            self::registerEvents();
         });
+    }
+
+    /**
+     *
+     */
+    private static function registerEvents()
+    {
+        self::$newVotes = collect();
+
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('EndMap', [self::class, 'endMap']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+
+        ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
+        ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
+        ChatCommand::add('+++', [self::class, 'votePlusPlusPlus'], 'Rate the map fantastic', null, true);
+        ChatCommand::add('-', [self::class, 'voteMinus'], 'Rate the map playable', null, true);
+        ChatCommand::add('--', [self::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
+        ChatCommand::add('---', [self::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
+        ChatCommand::add('-----', [self::class, 'voteWorst'], 'Rate it the worst map ever', null, true);
+
+        ManiaLinkEvent::add('mxk.vote', [self::class, 'vote']);
     }
 
     /**
@@ -122,28 +136,43 @@ class MxKarma extends Module implements ModuleInterface
     {
         $map = MapController::getCurrentMap();
 
-        self::getMapRatingAsync($map->uid, [$player->Login])
-            ->then(function (ResponseInterface $response) use ($player, $map) {
-                if ($response->getStatusCode() == 200) {
-                    $mxResponse = json_decode($response->getBody());
-                    $ratings = new MxKarmaMapRating($mxResponse->data);
+        if (!self::$offline) {
+            self::getMapRatingAsync($map->uid, [$player->Login])
+                ->then(function (ResponseInterface $response) use ($player, $map) {
+                    if ($response->getStatusCode() == 200) {
+                        $mxResponse = json_decode($response->getBody());
+                        $ratings = new MxKarmaMapRating($mxResponse->data);
 
-                    $vote = $ratings->getVotes()->first();
-                    if (!$vote) {
-                        $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                        $vote = $ratings->getVotes()->first();
+                        if (!$vote) {
+                            $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                        }
+
+                        Template::show($player, 'MxKarma.update-my-rating', [
+                            'rating' => $vote,
+                            'uid' => $map->uid
+                        ]);
+                    } else {
+                        Log::cyan('oops: ' . $response->getReasonPhrase());
                     }
+                }, function (RequestException $e) use ($player) {
+                    warningMessage('Failed to load MxKarma vote.')->send($player);
+                    Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
+                });
+        } else {
+            $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->first();
 
-                    Template::show($player, 'MxKarma.update-my-rating', [
-                        'rating' => $vote,
-                        'uid' => $map->uid
-                    ]);
-                } else {
-                    Log::cyan('oops: ' . $response->getReasonPhrase());
-                }
-            }, function (RequestException $e) use ($player) {
-                warningMessage('Failed to load MxKarma vote.')->send($player);
-                Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
-            });
+            if (!$vote) {
+                $vote = self::playerCanVote($player, $map) ? -1 : -2;
+            }
+
+            if ($vote) {
+                Template::show($player, 'MxKarma.update-my-rating', [
+                    'rating' => $vote,
+                    'uid' => $map->uid
+                ]);
+            }
+        }
 
         Template::show($player, 'MxKarma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
     }
@@ -160,6 +189,16 @@ class MxKarma extends Module implements ModuleInterface
             ->where('new', '=', 1)
             ->get()
             ->keyBy('Player');
+
+        if (self::$offline) {
+            $data = DB::table('mx-karma')->select(['COUNT(*) as total_votes', 'AVG(Rating) as avg_rating'])->where('Map', '=', $map->id)->get();
+
+            Template::showAll('MxKarma.update-karma', [
+                'average' => $data->avg_rating,
+                'total' => $data->total_votes,
+                'uid' => $map->uid
+            ]);
+        }
 
         self::getMapRatingAsync($map->uid, $players->pluck('Login')->toArray())
             ->then(function (ResponseInterface $response) use ($players, $map) {
@@ -233,6 +272,10 @@ class MxKarma extends Module implements ModuleInterface
      */
     public static function endMap(Map $map)
     {
+        if (self::$offline) {
+            return;
+        }
+
         $ratings = $map->ratings()->where('new', '=', 1)->get();
 
         if ($ratings->isEmpty()) {
@@ -285,7 +328,7 @@ class MxKarma extends Module implements ModuleInterface
      */
     private static function getMapRatingAsync($mapUid, $playerLogins = [], $timeout = 25)
     {
-        if (!isset(self::$sessionKey)) {
+        if (!isset(self::$sessionKey) || self::$offline) {
             return new Promise();
         }
 

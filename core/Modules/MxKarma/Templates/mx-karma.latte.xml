@@ -7,7 +7,7 @@
 
     {block content}
     <quad class="bg-dark" z-index="-1" size="50 12" opacity="0.8"/>
-    <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  MX KARMA" textsize=".3" valign="center"/>
+    <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  {if $is_maniaplanet}MX{else}TMX{/if} KARMA" textsize=".3" valign="center"/>
 
     <frame z-index="2" pos="0 -6">
         <label class="text-lighter" id="stars-bg" pos="31 4" text="" z-index="1" size="25 4" textsize="0.5" opacity="0.3" hidden="1"/>
@@ -164,6 +164,7 @@ Void updateMyRating(Integer myRating){
             currentMapId = Map.Id;
             EvoSC_MxKarma_MyRating = -2;
             updateMyRating(EvoSC_MxKarma_MyRating);
+            updateKarma(0.0, 0);
         }
 
         if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){
@@ -174,12 +175,14 @@ Void updateMyRating(Integer myRating){
 
         if(InputPlayer == Null) continue;
         if(InputPlayer.Score == Null) continue;
+        {if $is_maniaplanet}
         if(InputPlayer.Score.BestRace == Null) continue;
 
         if(InputPlayer.Score.BestRace.Time != -1 && EvoSC_MxKarma_MyRating == -2){
             EvoSC_MxKarma_MyRating = -1;
             updateMyRating(EvoSC_MxKarma_MyRating);
         }
+        {/if}
     {/block}
 
     {block pendingEvents}
