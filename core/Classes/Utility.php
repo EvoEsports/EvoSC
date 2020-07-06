@@ -112,7 +112,7 @@ class Utility
 
         if ($count <= $fill) {
             $recordsJson = DB::table($table)
-                ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                 ->leftJoin('players', 'players.id', '=', $table . '.Player')
                 ->where('Map', '=', $map->id)
                 ->where('Rank', '<=', $fill)
@@ -149,7 +149,7 @@ class Utility
             if ($baseRank <= $fill) {
                 if (is_null($defaultTopView)) {
                     $defaultTopView = DB::table($table)
-                        ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                        ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                         ->leftJoin('players', 'players.id', '=', $table . '.Player')
                         ->where('Map', '=', $map->id)
                         ->WhereBetween('Rank', [$count - $fill + $top, $count])
@@ -166,7 +166,7 @@ class Utility
                 $range = Utility::getRankRange($baseRank, $top, $fill, $count);
 
                 $recordsJson = DB::table($table)
-                    ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                    ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                     ->leftJoin('players', 'players.id', '=', $table . '.Player')
                     ->where('Map', '=', $map->id)
                     ->WhereBetween('Rank', $range)
