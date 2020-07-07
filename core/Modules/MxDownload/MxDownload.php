@@ -6,6 +6,7 @@ namespace EvoSC\Modules\MxDownload;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
+use EvoSC\Classes\Exchange;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -25,11 +26,6 @@ use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
 {
-    const MANIAPLANET_MX_API_URL = 'https://api.mania-exchange.com';
-    const MANIAPLANET_MX_URL = 'https://tm.mania-exchange.com';
-    const TRACKMANIA_MX_API_URL = 'https://api.trackmania.exchange';
-    const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
-
     private static string $mxApiUrl;
     private static string $mxUrl;
 
@@ -39,11 +35,11 @@ class MxDownload extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (isManiaPlanet()) {
-            self::$mxApiUrl = self::MANIAPLANET_MX_API_URL;
-            self::$mxUrl = self::MANIAPLANET_MX_URL;
+            self::$mxApiUrl = Exchange::MANIAPLANET_MX_API_URL;
+            self::$mxUrl = Exchange::MANIAPLANET_MX_URL;
         } else {
-            self::$mxApiUrl = self::TRACKMANIA_MX_API_URL;
-            self::$mxUrl = self::TRACKMANIA_MX_URL;
+            self::$mxApiUrl = Exchange::TRACKMANIA_MX_API_URL;
+            self::$mxUrl = Exchange::TRACKMANIA_MX_URL;
         }
 
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
@@ -62,18 +58,15 @@ class MxDownload extends Module implements ModuleInterface
                 continue;
             }
 
-            if(isTrackmania()){
-                self::addMap($player, $mxId);
-                continue;
-            }
-
             try {
                 $details = self::loadMxDetails($mxId);
                 $comment = self::parseBB($details->Comments);
 
                 Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
             } catch (Exception $e) {
-                Log::write($e->getMessage());
+                Log::error($e->getMessage());
+                warningMessage('Failed to load map details, adding.')->send($player);
+                self::addMap($player, $mxId);
             }
         }
     }

@@ -41,7 +41,10 @@ class RestClient
         self::$curl = new CurlMultiHandler();
         $handler = HandlerStack::create(self::$curl);
 
-        self::$client = new Client(['handler' => $handler]);
+        self::$client = new Client([
+            'handler' => $handler,
+            RequestOptions::VERIFY => CaBundle::getSystemCaRootBundlePath()
+        ]);
         self::$serverName = stripAll($serverName);
     }
 
