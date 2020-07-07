@@ -46,6 +46,10 @@ class CpDiffs extends Module implements ModuleInterface
 
     public static function requestCpDiffs(Player $player)
     {
+        if(isTrackmania()){
+            return;
+        }
+
         self::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 

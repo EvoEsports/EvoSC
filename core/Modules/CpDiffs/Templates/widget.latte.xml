@@ -134,9 +134,6 @@
         }
 
         main(){
-            declare netread Boolean Net_Race_Checkpoint_UseWaypointEvent for Teams[0];
-            log("started " ^ Net_Race_Checkpoint_UseWaypointEvent);
-
             target.fromjson("""{json_encode($target)|noescape}""");
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
