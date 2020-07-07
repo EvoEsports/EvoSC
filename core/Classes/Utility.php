@@ -152,9 +152,7 @@ class Utility
                         ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                         ->leftJoin('players', 'players.id', '=', $table . '.Player')
                         ->where('Map', '=', $map->id)
-                        ->WhereBetween('Rank', [$count - $fill + $top, $count])
-                        ->orWhere('Map', '=', $map->id)
-                        ->where('Rank', '<=', $top)
+                        ->where('`Rank`', '<=', $fill)
                         ->orderBy('rank')
                         ->get()
                         ->toJson();

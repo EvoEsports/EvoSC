@@ -187,13 +187,6 @@
                     }
                 }
                 {else}
-                if (Net_Race_Checkpoint_UseWaypointEvent) {
-                    foreach (Event in PendingEvents) {
-                        if(Event.Type != CMlScriptEvent::Type::KeyPress){
-                            log(Event.Type);
-                        }
-                    }
-                }
                 {/if}
             }
         }
