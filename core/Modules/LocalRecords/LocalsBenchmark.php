@@ -12,7 +12,7 @@ class LocalsBenchmark
 {
     public function run()
     {
-        return;
+//        return;
 
         $localsCount = 1000;
         $simulatedPlayers = 100;
