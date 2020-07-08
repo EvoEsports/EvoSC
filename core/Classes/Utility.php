@@ -140,7 +140,7 @@ class Utility
                 $baseRank = (int)$playerRanks->get($player->id);
             } else {
                 if (!is_null($defaultRecordsJson)) {
-                    Template::show($player, $templateId, ['recordsJson' => $defaultRecordsJson], true, 20);
+                    Template::show($player, $templateId, ['recordsJson' => $defaultRecordsJson], true);
                     continue;
                 }
                 $baseRank = $count;
@@ -179,7 +179,7 @@ class Utility
                 $defaultRecordsJson = $recordsJson;
             }
 
-            Template::show($player, $templateId, compact('recordsJson'), true, 20);
+            Template::show($player, $templateId, compact('recordsJson'), true);
         }
 
         Template::executeMulticall();
