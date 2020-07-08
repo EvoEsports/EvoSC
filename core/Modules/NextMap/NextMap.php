@@ -33,14 +33,9 @@ class NextMap extends Module implements ModuleInterface
         $map = MapController::getNextMap();
 
         if (Server::isFilenameInSelection($map->filename)) {
-            if (isManiaPlanet()) {
-                $author = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first();
-                infoMessage('Upcoming map ', secondary(trim(stripAll($map->name))), ' by ', secondary(trim(stripAll($author->NickName)) . '$z'))->setIcon('')->sendAll();
-                Template::showAll('NextMap.widget', compact('map', 'author'));
-            } else {
-                infoMessage('Upcoming map ', secondary(trim(stripAll($map->name))))->setIcon('')->sendAll();
-                Template::showAll('NextMap.widget', compact('map', 'author'));
-            }
+            $authorNick = DB::table('players')->select('NickName')->where('id', '=', $map->author)->first()->NickName;
+            infoMessage('Upcoming map ', secondary(trim(stripAll($map->name))), ' by ', secondary(trim(stripAll($authorNick)) . '$z'))->setIcon('')->sendAll();
+            Template::showAll('NextMap.widget', compact('map', 'authorNick'));
         }
     }
 
