@@ -324,8 +324,7 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        global $__ManiaPlanet;
-        $executable = $__ManiaPlanet ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+        $executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
 
         if (isWindows()) {
             $executable .= '.exe';
@@ -333,17 +332,22 @@ class MapController implements ControllerInterface
 
         $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . $executable;
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
-        $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
-        $jsonString = shell_exec($cmd);
 
-        if ($asString) {
-            return $jsonString;
+        if(File::exists($mapFile)){
+            $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
+            $jsonString = shell_exec($cmd);
+
+            if ($asString) {
+                return $jsonString;
+            }
+
+            $data = json_decode($jsonString);
+            $data->fileName = $filename;
+
+            return MPS_Map::fromObject($data);
+        }else{
+            return MPS_Map::fromObject(Server::getMapInfo($filename));
         }
-
-        $data = json_decode($jsonString);
-        $data->fileName = $filename;
-
-        return MPS_Map::fromObject($data);
     }
 
     /**

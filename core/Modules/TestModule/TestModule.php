@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\AlterUI\AlterUI;
 use EvoSC\Modules\CpDiffs\CpDiffs;
@@ -38,7 +39,9 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        (new LocalsBenchmark())->run();
+        $map = Map::first();
+        $gbx = MapController::getGbxInformation($map->filename);
+        dump($gbx->MapUid);
     }
 
     public static function sendTestManialink(Player $player)
