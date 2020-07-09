@@ -145,9 +145,13 @@ class EscRun extends Command
 
         $_onlinePlayers = collect();
 
+        if(is_null($serverName)){
+            Log::error('Server name is NULL');
+        }
+
         Database::init();
         DB::table('access-rights')->truncate();
-        RestClient::init($serverName);
+        RestClient::init($serverName ?: '');
         HookController::init();
         TemplateController::init();
         ChatController::init();
