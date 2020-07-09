@@ -41,7 +41,7 @@ class Ranks extends Module implements ModuleInterface
         $end = $start + $perPage;
 
         $ranks = DB::table('stats')
-            ->select(['players.NickName as name', 'players.Login as login', 'stats.Score as score', 'stats.`Rank` as `rank`'])
+            ->select(['players.NickName as name', 'players.Login as login', 'stats.Score as score', 'stats.Rank as `rank`'])
             ->leftJoin('players', 'stats.Player', '=', 'players.id')
             ->whereBetween('stats.Rank', [$start + 1, $end])
             ->where('stats.Score', '>', 0)
