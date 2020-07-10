@@ -39,9 +39,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        $map = Map::first();
-        $gbx = MapController::getGbxInformation($map->filename);
-        dump($gbx->MapUid);
+        self::sendTestManialink($player);
     }
 
     public static function sendTestManialink(Player $player)
