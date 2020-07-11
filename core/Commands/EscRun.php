@@ -3,6 +3,7 @@
 namespace EvoSC\Commands;
 
 use Error;
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Database;
 use EvoSC\Classes\DB;
@@ -170,6 +171,13 @@ class EscRun extends Command
         ChatCommand::add('//restart-evosc', function () {
             restart_evosc();
         }, 'Restart EvoSC', 'ma');
+
+        Timer::create('watch_for_restart_file', function(){
+            if(Cache::has('restart_evosc')){
+                Cache::forget('restart_evosc');
+                restart_evosc();
+            }
+        }, '2m', true);
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
