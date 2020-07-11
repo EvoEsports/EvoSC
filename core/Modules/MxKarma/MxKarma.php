@@ -191,7 +191,10 @@ class MxKarma extends Module implements ModuleInterface
             ->keyBy('Player');
 
         if (self::$offline) {
-            $data = DB::table('mx-karma')->select(['COUNT(*) as total_votes', 'AVG(Rating) as avg_rating'])->where('Map', '=', $map->id)->get();
+            $data = DB::table('mx-karma')
+                ->selectRaw('COUNT(*) as total_votes, AVG(Rating) as avg_rating')
+                ->where('Map', '=', $map->id)
+                ->get();
 
             Template::showAll('MxKarma.update-karma', [
                 'average' => $data->avg_rating,

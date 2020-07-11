@@ -39,7 +39,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        self::sendTestManialink($player);
+        CpDiffs::sendInitialCpDiff($player, MapController::getCurrentMap());
     }
 
     public static function sendTestManialink(Player $player)

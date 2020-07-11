@@ -43,6 +43,11 @@
         declare Vec3 colorBlue;
         declare Target_V2 target;
 
+        {if $is_maniaplanet}CTmPlayer{else}CSmPlayer{/if} GetOwner() {
+            if (GUIPlayer != Null) return GUIPlayer;
+            return InputPlayer;
+        }
+
         Text formatDiff(Integer diff){
             declare Text sign;
             declare Integer ms = diff;
@@ -142,6 +147,8 @@
             colorRed = TL::ToColor("{config('theme.form.danger.bg')}");
             colorBlue = TL::ToColor("3086bf");
 
+            declare LastCpCount = -1;
+
             while(True){
                 yield;
 
@@ -151,21 +158,21 @@
                 cpDiffs.Visible = True;
                 {/if}
 
+                if(!cpDiffs.Visible){
+                    sleep(100);
+                    continue;
+                }
+
                 if(target.map_uid != "" ^ Map.Id){
                     cpDiffs.Hide();
                     TriggerPageAction("request_cp_diffs");
                     return;
                 }
 
-                declare player <=> InputPlayer;
+                declare player <=> GetOwner();
                 while(player == Null){
                     sleep(100);
                     yield;
-                }
-
-                if(!cpDiffs.Visible){
-                    sleep(100);
-                    continue;
                 }
 
                 if(targetLabel.Visible && player.Speed * 3.6 > 10.0){
@@ -184,6 +191,33 @@
                     }
                 }
                 {else}
+                if(player != Null){
+                    declare wayPointTimesCount = player.RaceWaypointTimes.count;
+
+                    if(!targetLabel.Visible && player.Speed * 3.6 < 10.0 && wayPointTimesCount == 0){
+                        targetLabel.Visible = True;
+                        AnimMgr.Add(targetLabel, "<label opacity='1.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+                        continue;
+                    }
+
+                    if(LastCpCount != wayPointTimesCount){
+                        if(wayPointTimesCount == 0){
+                            respawn();
+                        }else{
+                            if (player.StartTime >= 0) {
+                                declare timeAtCp = player.RaceWaypointTimes[wayPointTimesCount - 1];
+                                declare isEndLap = False;
+                                sleep(25);
+                                if (UI.UISequence == CUIConfig::EUISequence::Finish) {
+                                    isEndLap = True;
+                                }
+                                fillBox(wayPointTimesCount - 1, timeAtCp, isEndLap);
+                            }
+                        }
+
+                        LastCpCount = wayPointTimesCount;
+                    }
+                }
                 {/if}
             }
         }
