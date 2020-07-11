@@ -20,6 +20,7 @@ use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\LocalRecords\LocalsBenchmark;
 use EvoSC\Modules\QuickButtons\QuickButtons;
+use EvoSC\Modules\RaceRanking\RaceRanking;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\UIHax\UIHax;
 use Illuminate\Support\Collection;
@@ -39,7 +40,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CpDiffs::sendInitialCpDiff($player, MapController::getCurrentMap());
+        RaceRanking::start($player);
     }
 
     public static function sendTestManialink(Player $player)

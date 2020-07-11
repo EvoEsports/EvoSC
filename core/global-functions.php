@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 function getEscVersion(): string
 {
-    return file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION');
+    return str_replace("\n", '', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION'));
 }
 
 /**
