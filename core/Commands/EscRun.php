@@ -104,11 +104,6 @@ class EscRun extends Command
 
             $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
-            //Disable all default ManiaPlanet votes
-            /*
-            $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
-            Server::setCallVoteRatios([$voteRatio]);
-            */
             Server::setCallVoteTimeOut(0);
 
             $output->writeln("Connection established.");
