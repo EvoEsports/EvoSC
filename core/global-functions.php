@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 function getEscVersion(): string
 {
-    return '0.92.0';
+    return file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION');
 }
 
 /**
