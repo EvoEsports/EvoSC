@@ -66,7 +66,7 @@ class MxDownload extends Module implements ModuleInterface
             } catch (Exception $e) {
                 Log::error($e->getMessage());
                 warningMessage('Failed to load map details, adding.')->send($player);
-                self::addMap($player, $mxId);
+                //self::addMap($player, $mxId);
             }
         }
     }
@@ -236,7 +236,7 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$mxId}");
         }
 
-        $infoResponse = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $mxId);
+        $infoResponse = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $mxId);
 
         if ($infoResponse->getStatusCode() != 200) {
             throw new Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());
