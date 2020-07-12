@@ -40,7 +40,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        RaceRanking::start($player);
+        RaceRanking::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

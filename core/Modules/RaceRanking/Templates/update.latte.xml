@@ -1,0 +1,18 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:push-new-race-rankings" id="push-new-race-rankings" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_RaceRankingEntry {
+            Text login;
+            Text name;
+            Integer time;
+        }
+
+        main(){
+            declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for LocalUser;
+            EvoSC_RaceRankings.fromjson("""{$data}""");
+        }
+        -->
+    </script>
+</manialink>
