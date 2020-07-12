@@ -167,6 +167,9 @@ class EscRun extends Command
             restart_evosc();
         }, 'Restart EvoSC', 'ma');
 
+        if(Cache::has('restart_evosc')){
+            Cache::forget('restart_evosc');
+        }
         Timer::create('watch_for_restart_file', function(){
             if(Cache::has('restart_evosc')){
                 Cache::forget('restart_evosc');

@@ -11,9 +11,9 @@
         <label class="text-light close" pos="107 -3" size="3 3" text="" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.header.text')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
 
         <frame pos="16 -10" scale="0.95">
-            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-ID" halign="right" valign="center" />
+            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="{if $is_maniascript}MX-ID{else}TMX-ID{/if}" halign="right" valign="center" />
             {if $map->mx_id}
-            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="$l[https://tm.mania-exchange.com/tracks/{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="$l[{if $is_maniascript}https://tm.mania-exchange.com/tracks/{else}https://trackmania.exchange.com/tracks/{/if}{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
             {else}
             <label class="text-light" pos="+1 0" size="20 5" textsize="1" textcolor="{config('colors.warning')}" text="Map not on MX" valign="center" />
             {/if}
