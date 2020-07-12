@@ -167,10 +167,10 @@ class Map extends Model
     /**
      * @param string $mapUid
      *
-     * @return Map
+     * @return Map|null
      */
-    public static function getByUid(string $mapUid): Map
+    public static function getByUid(string $mapUid): ?Map
     {
-        return Map::whereUid($mapUid)->firstOrFail();
+        return Map::whereUid($mapUid)->first();
     }
 }

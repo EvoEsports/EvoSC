@@ -45,11 +45,21 @@ class MxDetails extends Module implements ModuleInterface
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
     }
 
-    public static function showDetails(Player $player, string $mapUid)
+    public static function showDetails(Player $player, $mapIdOrUid)
     {
-        $map = Map::getByUid($mapUid);
+        if (empty($mapIdOrUid)) {
+            return;
+        }
 
-        if (!$map) {
+        $map = null;
+        if (intval($mapIdOrUid) > 0) {
+            $map = Map::whereId($mapIdOrUid)->first();
+        } else {
+            $map = Map::whereUid($mapIdOrUid)->first();
+        }
+
+        if (is_null($map)) {
+            warningMessage('Unknown map.')->send($player);
             return;
         }
 
@@ -57,7 +67,7 @@ class MxDetails extends Module implements ModuleInterface
             self::loadMxDetails($map);
         }
 
-        if (!$map->mx_world_record) {
+        if (!$map->mx_world_record && isManiaPlanet()) {
             self::loadMxWordlRecord($map);
         }
 
@@ -104,11 +114,7 @@ class MxDetails extends Module implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            if(isManiaPlanet()) {
-                $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 1]);
-            }else{
-                $result = RestClient::get(self::$mxApiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
-            }
+            $result = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;

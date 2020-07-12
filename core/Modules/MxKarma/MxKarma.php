@@ -50,6 +50,11 @@ class MxKarma extends Module implements ModuleInterface
             self::$apiUrl = self::TRACKMANIA_MXKARMA_URL;
         }
 
+        if(isTrackmania()){
+            self::registerEvents();
+            return;
+        }
+
         $promise = RestClient::getAsync(self::$apiUrl . '/startSession', [
             'query' => [
                 'serverLogin' => config('server.login'),
@@ -194,11 +199,11 @@ class MxKarma extends Module implements ModuleInterface
             $data = DB::table('mx-karma')
                 ->selectRaw('COUNT(*) as total_votes, AVG(Rating) as avg_rating')
                 ->where('Map', '=', $map->id)
-                ->get();
+                ->first();
 
             Template::showAll('MxKarma.update-karma', [
-                'average' => $data->avg_rating,
-                'total' => $data->total_votes,
+                'average' => $data->total_votes == 0 ? 0 : $data->avg_rating,
+                'total' => $data->total_votes ?? 0,
                 'uid' => $map->uid
             ]);
         }
