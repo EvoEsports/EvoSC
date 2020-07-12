@@ -1,0 +1,51 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '80';}
+{php $window_height = '60';}
+
+{block id}
+motd
+{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Message of the day
+{/block}
+
+{block content}
+<frame pos="1 -1">
+    <label id="text" class="text-light" text="{$motd}" textsize="1.5" size="75 20" autonewline="1" />
+    <label id="dnsa" class="btn-muted dnsa" text="Do not show again" size="26 4" pos="10.5" ScriptEvents="1" scale="0.8" />
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+declare text <=> (Page.MainFrame.GetFirstChild("text") as CMlLabel);
+declare dnsa <=> (Page.MainFrame.GetFirstChild("dnsa") as CMlLabel);
+
+window.Size[1] = text.ComputeHeight(text.Value) + 17.0;
+dnsa.RelativePosition_V3[1] = -text.ComputeHeight(text.Value) - 4.0;
+{/block}
+
+{block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("dnsa")){
+        TriggerPageAction("motd.dnsa");
+        window.Hide();
+        return;
+    }
+{/block}
+--></script>

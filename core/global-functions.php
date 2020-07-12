@@ -112,8 +112,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 /**
  * @param string $id
  * @param null $default
- *
- * @return null
+ * @return bool|mixed|null
  */
 function config(string $id, $default = null)
 {

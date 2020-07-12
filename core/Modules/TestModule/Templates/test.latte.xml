@@ -11,32 +11,11 @@ CSmPlayer GetOwner() {
 
 main() {
     declare Owner <=> GetOwner();
-    declare LastCpCount = -1;
 
-    while(True){
-        yield;
-
-        if(Owner != Null){
-            declare lastWaypointTimesCount = Owner.RaceWaypointTimes.count;
-
-            if(LastCpCount != lastWaypointTimesCount){
-                if(lastWaypointTimesCount == 0){
-                    //player_reset();
-                }else{
-                    if (Owner.StartTime >= 0) {
-                        declare timeAtCp = Owner.RaceWaypointTimes[lastWaypointTimesCount - 1];
-                        //player_checkpoint(timeAtCp);
-                        sleep(50);
-                        if (UI.UISequence == CUIConfig::EUISequence::Finish) {
-                            //player_finish(timeAtCp);
-                        }
-                    }
-                }
-
-                LastCpCount = lastWaypointTimesCount;
-            }
-        }
-    }
+    UI.CountdownCoord = <0.0, 0.0>;
+    UI.OverlayHideAll = True;
+    log("ayyy"^GameTime);
+    log(UI.UILayers);
 }
     --></script>
 </manialink>
