@@ -3,6 +3,7 @@
 namespace EvoSC\Commands;
 
 use Error;
+use EvoSC\Classes\AwaitAction;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Database;
@@ -162,6 +163,8 @@ class EscRun extends Command
         PlanetsController::init();
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
+
+        AwaitAction::createQueueAndStartCheckCycle();
 
         ChatCommand::add('//restart-evosc', function () {
             restart_evosc();

@@ -1,0 +1,16 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:dialogue" id="dialogue" version="3">
+    {include 'Components.stylesheet'}
+    {if $type == 'confirm'}
+{include 'Dialogues.confirm'}
+    {/if}
+
+    <script><!--
+main() {
+    if(confirm("{$message}")){
+        TriggerPageAction("await_action.respond,{$id}");
+    }
+}
+--></script>
+</manialink>
