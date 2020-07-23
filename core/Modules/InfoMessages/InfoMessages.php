@@ -13,6 +13,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InfoMessages\Models\InfoMessage;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Illuminate\Support\Collection;
 
 class InfoMessages extends Module implements ModuleInterface
@@ -27,10 +28,11 @@ class InfoMessages extends Module implements ModuleInterface
     {
         AccessRight::add('info_messages', 'Add/edit/remove reccuring info-messages.');
 
-        ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages');
         ManiaLinkEvent::add('info.update', [self::class, 'update'], 'info_messages');
         ManiaLinkEvent::add('info.delete', [self::class, 'delete'], 'info_messages');
         ManiaLinkEvent::add('info.show_create', [self::class, 'showCreate'], 'info_messages');
+        ManiaLinkEvent::add('info.show', [self::class, 'showSettings'], 'info_messages')
+            ->withScoreTableButton('', 'Info Messages');
 
         Timer::create('display_info_messages', [self::class, 'displayInfoMessages'], '1m', true);
 

@@ -5,6 +5,7 @@ namespace EvoSC\Classes;
 
 use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Models\Player;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -75,10 +76,11 @@ class ManiaLinkEvent
      * Add a manialink event. Callback must be of type [MyClass::class, 'methodToCall'].
      *
      * @param string $id
-     * @param callable|array $callback
+     * @param $callback
      * @param string|null $access
+     * @return ManiaLinkEvent
      */
-    public static function add(string $id, $callback, string $access = null)
+    public static function add(string $id, $callback, string $access = null): ManiaLinkEvent
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 
@@ -90,6 +92,7 @@ class ManiaLinkEvent
         }
 
         $maniaLinkEvents->push($event);
+        return $event;
     }
 
     /**
@@ -189,5 +192,10 @@ class ManiaLinkEvent
     public function __toString()
     {
         return $this->id . '(' . serialize($this->callback) . ')';
+    }
+
+    public function withScoreTableButton(string $icon, string $name)
+    {
+        QuickButtons::addButton($icon, $name, $this->id, $this->access);
     }
 }
