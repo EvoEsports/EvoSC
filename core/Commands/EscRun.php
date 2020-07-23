@@ -3,6 +3,8 @@
 namespace EvoSC\Commands;
 
 use Error;
+use EvoSC\Classes\AwaitAction;
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Database;
 use EvoSC\Classes\DB;
@@ -103,11 +105,6 @@ class EscRun extends Command
 
             $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
-            //Disable all default ManiaPlanet votes
-            /*
-            $voteRatio = new \Maniaplanet\DedicatedServer\Structures\VoteRatio(\Maniaplanet\DedicatedServer\Structures\VoteRatio::COMMAND_DEFAULT, -1.0);
-            Server::setCallVoteRatios([$voteRatio]);
-            */
             Server::setCallVoteTimeOut(0);
 
             $output->writeln("Connection established.");
@@ -145,9 +142,13 @@ class EscRun extends Command
 
         $_onlinePlayers = collect();
 
+        if(is_null($serverName)){
+            Log::error('Server name is NULL');
+        }
+
         Database::init();
         DB::table('access-rights')->truncate();
-        RestClient::init($serverName);
+        RestClient::init($serverName ?: '');
         HookController::init();
         TemplateController::init();
         ChatController::init();
@@ -163,9 +164,21 @@ class EscRun extends Command
         CountdownController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
+        AwaitAction::createQueueAndStartCheckCycle();
+
         ChatCommand::add('//restart-evosc', function () {
             restart_evosc();
         }, 'Restart EvoSC', 'ma');
+
+        if(Cache::has('restart_evosc')){
+            Cache::forget('restart_evosc');
+        }
+        Timer::create('watch_for_restart_file', function(){
+            if(Cache::has('restart_evosc')){
+                Cache::forget('restart_evosc');
+                restart_evosc();
+            }
+        }, '2m', true);
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);

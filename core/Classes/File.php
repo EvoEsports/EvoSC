@@ -217,15 +217,6 @@ class File
     }
 
     /**
-     * @param string $filename
-     * @return string|string[]
-     */
-    public static function anyOs(string $filename)
-    {
-        return str_replace('/', DIRECTORY_SEPARATOR, $filename);
-    }
-
-    /**
      * @param string $dir
      * @throws FilePathNotAbsoluteException
      */
@@ -233,7 +224,7 @@ class File
     {
         $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
 
-        if (substr($dir, 0, 1) != DIRECTORY_SEPARATOR) {
+        if ((isWindows() && !preg_match('/^\w:(\\|\/)/', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
             throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
         }
 

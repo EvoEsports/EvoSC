@@ -30,6 +30,15 @@ class HookController implements ControllerInterface
     }
 
     /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+    }
+
+    /**
      * Get all hooks, or all by name
      *
      * @param  string|null  $eventName
@@ -45,6 +54,9 @@ class HookController implements ControllerInterface
         return self::$hooks;
     }
 
+    /**
+     * @param Hook $hook
+     */
     static function removeHook(Hook $hook)
     {
         if (self::$hooks->has($hook->getEvent())) {
@@ -83,14 +95,5 @@ class HookController implements ControllerInterface
                 Log::write("Added ".$callback[0]."::".$callback[1], isDebug());
             }
         }
-    }
-
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
     }
 }

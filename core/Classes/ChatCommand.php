@@ -30,11 +30,11 @@ class ChatCommand
     /**
      * ChatCommand constructor.
      *
-     * @param  string  $command
+     * @param string $command
      * @param             $callback
-     * @param  string  $description
-     * @param  string|null  $access
-     * @param  bool  $hidden
+     * @param string $description
+     * @param string|null $access
+     * @param bool $hidden
      */
     public function __construct(
         string $command,
@@ -42,7 +42,8 @@ class ChatCommand
         string $description = '',
         string $access = null,
         bool $hidden = false
-    ) {
+    )
+    {
         $this->command = $command;
         $this->callback = $callback;
         $this->description = $description;
@@ -53,11 +54,11 @@ class ChatCommand
     /**
      * Add chat-command
      *
-     * @param  string  $command
-     * @param  callable  $callback
-     * @param  string  $description
-     * @param  string|null  $access
-     * @param  bool  $hidden
+     * @param string $command
+     * @param callable $callback
+     * @param string $description
+     * @param string|null $access
+     * @param bool $hidden
      *
      * @return ChatCommand
      */
@@ -67,7 +68,8 @@ class ChatCommand
         string $description = '-',
         string $access = null,
         bool $hidden = false
-    ): ChatCommand {
+    ): ChatCommand
+    {
         if (!self::$commands) {
             self::$commands = collect();
         }
@@ -87,7 +89,7 @@ class ChatCommand
     /**
      * Add chat-command alias (chainable)
      *
-     * @param  string  $alias
+     * @param string $alias
      *
      * @return ChatCommand
      */
@@ -102,7 +104,7 @@ class ChatCommand
     /**
      * Checks if a command already exists.
      *
-     * @param  string  $command
+     * @param string $command
      *
      * @return bool
      */
@@ -114,7 +116,7 @@ class ChatCommand
     /**
      * Gets the command-object by the chat-command
      *
-     * @param  string  $command
+     * @param string $command
      *
      * @return ChatCommand
      */
@@ -137,7 +139,7 @@ class ChatCommand
      * Method is called when a chat-command is detected by {@see ChatController::playerChat()}
      *
      * @param Player $player
-     * @param  string  $text
+     * @param string $text
      */
     public function execute(Player $player, string $text)
     {
@@ -167,13 +169,19 @@ class ChatCommand
         //Set calling player as first argument
         array_unshift($arguments, $player);
 
-        if ($this->callback instanceof Closure) {
-            $callback = $this->callback;
-            $callback(...$arguments);
-        } else {
-            Log::write(sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)),
-                isVeryVerbose());
-            call_user_func_array($this->callback, $arguments);
+        try {
+            if ($this->callback instanceof Closure) {
+                $callback = $this->callback;
+
+                $callback(...$arguments);
+            } else {
+                Log::write(sprintf('Call: %s -> %s(%s)', $this->callback[0], $this->callback[1], implode(', ', $arguments)),
+                    isVeryVerbose());
+                call_user_func_array($this->callback, $arguments);
+            }
+        } catch (\ArgumentCountError $e) {
+            Log::warning($e->getMessage());
+            warningMessage('Wrong number of arguments, see ', secondary('/help'), ' for a list of all commands.')->send($player);
         }
     }
 

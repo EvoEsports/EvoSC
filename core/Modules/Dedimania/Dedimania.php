@@ -151,7 +151,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
      */
     public static function sendUpdatedDedis(Player $player = null)
     {
-        Utility::sendRecordsChunk(self::TABLE, 'locals', 'LocalRecords.update', $player);
+        Utility::sendRecordsChunk(self::TABLE, 'dedi-records', 'Dedimania.update', $player);
     }
 
     /**

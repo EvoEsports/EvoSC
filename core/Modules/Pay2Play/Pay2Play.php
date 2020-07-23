@@ -23,6 +23,10 @@ class Pay2Play extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if(isTrackmania()){
+            return;
+        }
+
         self::$priceAddTime = config('pay2play.addtime.cost') ?? 500;
         self::$priceSkip = config('pay2play.skip.cost') ?? 5000;
 

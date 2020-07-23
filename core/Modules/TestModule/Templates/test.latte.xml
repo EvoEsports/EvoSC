@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:test-script" id="test-script" version="3">
-    <frame>
+    <frame id="frame-global">
     </frame>
 
     <script><!--
-#Include "MathLib" as ML
-#Include "TextLib" as TL
+CSmPlayer GetOwner() {
+	if (GUIPlayer != Null) return GUIPlayer;
+	return InputPlayer;
+}
 
 main() {
+    declare Owner <=> GetOwner();
+
+    UI.CountdownCoord = <0.0, 0.0>;
     UI.OverlayHideAll = True;
-    log(UI.OverlayHideAll);
-    log(UI);
+    log("ayyy"^GameTime);
+    log(UI.UILayers);
 }
     --></script>
 </manialink>

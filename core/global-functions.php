@@ -12,6 +12,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 /**
+ * @return string
+ */
+function getEscVersion(): string
+{
+    return str_replace("\n", '', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION'));
+}
+
+/**
  * @param mixed ...$message
  *
  * @return ChatMessage
@@ -104,8 +112,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
 /**
  * @param string $id
  * @param null $default
- *
- * @return null
+ * @return bool|mixed|null
  */
 function config(string $id, $default = null)
 {
@@ -289,14 +296,6 @@ function now(): Carbon
 function secondary(string $str = ""): string
 {
     return '$<$fff$' . config('theme.chat.highlight') . $str . '$>';
-}
-
-/**
- * @return string
- */
-function getEscVersion(): string
-{
-    return '0.91.0';
 }
 
 /**

@@ -14,12 +14,14 @@
         <quad class="bg-accent" pos="0 -0.25" size="42 4" valign="center" opacity="0" z-index="2"/>
     </framemodel>
 
-    <frame id="widget" pos="{config('cp-records.pos')}" scale="{config('cp-records.scale')}">
-        <!--suppress CheckTagEmptyBody -->
-        <frame id="records">
-            {for $i=0; $i<100; $i++}
-            <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>
-            {/for}
+    <frame id="mf" pos="{config('cp-records.pos')}" size="1000 1000" scale="{config('cp-records.scale')}">
+        <frame id="widget">
+            <!--suppress CheckTagEmptyBody -->
+            <frame id="records">
+                {for $i=0; $i<1000; $i++}
+                <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>
+                {/for}
+            </frame>
         </frame>
     </frame>
 
@@ -127,6 +129,11 @@
         }
     }
 
+    {if $is_maniaplanet}CTmPlayer{else}CSmPlayer{/if} GetOwner() {
+        if (GUIPlayer != Null) return GUIPlayer;
+        return InputPlayer;
+    }
+
     main() {
         declare EvoSC_CP_Tracker_V2[] EvoSC_CP_Records_V2 for This;
         declare Ident EvoSC_CP_MapId for This;
@@ -134,7 +141,12 @@
         declare Integer EvoSC_CP_Update for This;
         declare lastUpdate = 0;
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare mf <=> (Page.MainFrame.GetFirstChild("mf") as CMlFrame);
         declare currentMapId = "";
+        declare player <=> GetOwner();
+        declare oldRow = -1;
+        declare driving = False;
+        declare waitForTime = GameTime;
 
         columns = {config('cp-records.columns')};
         padding = 0.5;
@@ -152,6 +164,28 @@
             if(Map.MapInfo.MapUid != currentMapId){
                 currentMapId = Map.MapInfo.MapUid;
                 reset();
+            }
+
+            if(player != Null){
+                if(InputPlayer.Speed > 2 && !driving){
+                    driving = True;
+                    AnimMgr.Add(mf, """<frame size="1000 8.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
+                    waitForTime = GameTime + 1500; //wait 1.5s before showing again
+                }
+                if(InputPlayer.Speed <= 2 && driving && waitForTime < GameTime){
+                    driving = False;
+                    AnimMgr.Add(mf, """<frame size="1000 70.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
+                }
+
+                declare row = player.RaceWaypointTimes.count / columns;
+                if(row > 0) row -= 1;
+
+                if(oldRow != row){
+                    oldRow = row;
+                    declare newY = row * (4.0 + padding) - 1.5;
+                    AnimMgr.Add(widget, """<frame pos="0 """ ^ newY ^ """" />""", 170, CAnimManager::EAnimManagerEasing::QuartOut);
+                    sleep(10);
+                }
             }
 
             if(UI.UISequence == CUIConfig::EUISequence::Podium){

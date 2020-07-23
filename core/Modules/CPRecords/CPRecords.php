@@ -2,12 +2,16 @@
 
 namespace EvoSC\Modules\CPRecords;
 
+use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\CPRecords\Classes\CPRecordsTracker;
+use EvoSC\Modules\LocalRecords\LocalRecords;
 use Illuminate\Support\Collection;
 
 class CPRecords extends Module implements ModuleInterface
@@ -16,6 +20,11 @@ class CPRecords extends Module implements ModuleInterface
      * @var Collection
      */
     private static Collection $tracker;
+
+    /**
+     * @var int
+     */
+    private static int $checkpointsPerLap = -1;
 
     /**
      * Called when the module is loaded
@@ -37,7 +46,30 @@ class CPRecords extends Module implements ModuleInterface
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('EndMap', [self::class, 'beginMatch']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
+    }
+
+    /**
+     * @param Map $map
+     */
+    public static function beginMap(Map $map)
+    {
+        $checkpoints = MapController::getCurrentMap()->gbx->CheckpointsPerLaps;
+
+        if ($checkpoints == -1) {
+            $record = DB::table(LocalRecords::TABLE)->where('Map', '=', $map->id)->first();
+
+            if ($record) {
+                $checkpoints = count(explode(',', $record->Checkpoints));
+            }
+        }
+
+        if ($checkpoints == -1) {
+            $checkpoints = 50;
+        }
+
+        self::$checkpointsPerLap = $checkpoints;
     }
 
     /**
@@ -48,7 +80,7 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function playerCheckpoint(Player $player, int $time, int $cpId, bool $isFinish)
     {
-        if ($time < 500) {
+        if ($time < 500 || $cpId > self::$checkpointsPerLap) {
             return;
         }
 
@@ -75,7 +107,6 @@ class CPRecords extends Module implements ModuleInterface
 
         if (self::$tracker->count() > 0) {
             if (self::$tracker->last()->time <= $time_) {
-                dump("nope");
                 return;
             }
         }
@@ -104,7 +135,7 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function sendUpdatedCpRecords(int $updatedCpId = -1)
     {
-        $data = self::$tracker->values()->toJson();
+        $data = self::$tracker->take(self::$checkpointsPerLap)->values()->toJson();
         Template::showAll('CPRecords.update', compact('data', 'updatedCpId'));
     }
 

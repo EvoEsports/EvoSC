@@ -116,7 +116,12 @@ class ModuleController implements ControllerInterface
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);
                 $instance->setName(preg_replace('#^.+[\\\]#', '', $moduleClass));
-                Log::info("Module: $moduleClass [Started]", isVerbose());
+
+                if(isVerbose()){
+                    Log::info("Module: $moduleClass [Started]");
+                }else{
+                    Log::getOutput()->write('<fg=cyan;options=bold>.</>');
+                }
 
                 $totalStarted++;
 
@@ -125,6 +130,7 @@ class ModuleController implements ControllerInterface
             ->filter();
 
         //Boot modules
+        echo "\n";
         Log::cyan("Starting modules finished. $totalStarted modules started.");
 
         self::$loadedModules = $moduleClasses;

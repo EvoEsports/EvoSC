@@ -32,8 +32,6 @@ class CpDiffs extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        return;
-
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('PlayerConnect', [self::class, 'requestCpDiffs']);
@@ -101,8 +99,10 @@ class CpDiffs extends Module implements ModuleInterface
             self::$targets->put($player->id, $target = self::createTarget($pb->score, $pb->checkpoints, $player->id, $map->uid));
             Template::show($player, 'CpDiffs.widget', compact('target'));
         } else {
-            $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
-                $player->id)->first();
+            if (isManiaPlanet()) {
+                $targetRecord = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Player', '=',
+                    $player->id)->first();
+            }
 
             if (!$targetRecord) {
                 $targetRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
@@ -134,6 +134,10 @@ class CpDiffs extends Module implements ModuleInterface
             case 'wr':
                 $id = 1;
             case 'dedi':
+                if (isTrackmania()) {
+                    warningMessage('Selecting dedis as target is only available in TM².')->send($player);
+                    return;
+                }
                 $record = DB::table('dedi-records')->where('Map', '=', $map->id)->where('Rank', '=', $id)->first();
                 break;
 

@@ -4,6 +4,7 @@ namespace EvoSC\Modules\MxDetails;
 
 
 use EvoSC\Classes\Cache;
+use EvoSC\Classes\Exchange;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
@@ -18,11 +19,6 @@ use stdClass;
 
 class MxDetails extends Module implements ModuleInterface
 {
-    const MANIAPLANET_MX_API_URL = 'https://api.mania-exchange.com';
-    const MANIAPLANET_MX_URL = 'https://tm.mania-exchange.com';
-    const TRACKMANIA_MX_API_URL = 'https://api.trackmania.exchange';
-    const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
-
     private static string $mxApiUrl;
     private static string $mxUrl;
 
@@ -32,11 +28,11 @@ class MxDetails extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (isManiaPlanet()) {
-            self::$mxApiUrl = self::MANIAPLANET_MX_API_URL;
-            self::$mxUrl = self::MANIAPLANET_MX_URL;
+            self::$mxApiUrl = Exchange::MANIAPLANET_MX_API_URL;
+            self::$mxUrl = Exchange::MANIAPLANET_MX_URL;
         } else {
-            self::$mxApiUrl = self::TRACKMANIA_MX_API_URL;
-            self::$mxUrl = self::TRACKMANIA_MX_URL;
+            self::$mxApiUrl = Exchange::TRACKMANIA_MX_API_URL;
+            self::$mxUrl = Exchange::TRACKMANIA_MX_URL;
         }
 
         if (!File::dirExists(cacheDir('mx-details'))) {
@@ -49,16 +45,21 @@ class MxDetails extends Module implements ModuleInterface
         ManiaLinkEvent::add('mx.details', [self::class, 'showDetails']);
     }
 
-    public static function showDetails(Player $player, string $mapUid)
+    public static function showDetails(Player $player, $mapIdOrUid)
     {
-        if (isTrackmania()) {
-            warningMessage('This feature is currently not available.')->send($player);
+        if (empty($mapIdOrUid)) {
             return;
         }
 
-        $map = Map::getByUid($mapUid);
+        $map = null;
+        if (intval($mapIdOrUid) > 0) {
+            $map = Map::whereId($mapIdOrUid)->first();
+        } else {
+            $map = Map::whereUid($mapIdOrUid)->first();
+        }
 
-        if (!$map) {
+        if (is_null($map)) {
+            warningMessage('Unknown map.')->send($player);
             return;
         }
 
@@ -66,7 +67,7 @@ class MxDetails extends Module implements ModuleInterface
             self::loadMxDetails($map);
         }
 
-        if (!$map->mx_world_record) {
+        if (!$map->mx_world_record && isManiaPlanet()) {
             self::loadMxWordlRecord($map);
         }
 
@@ -113,7 +114,7 @@ class MxDetails extends Module implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 0.75]);
+            $result = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;

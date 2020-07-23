@@ -81,6 +81,11 @@ class LocalRecords extends Module implements ModuleInterface
             return;
         }
 
+        if ($localsLimit == 0) {
+            throw new \RuntimeException("Locals limit is zero!");
+            return;
+        }
+
         $chatMessage = chatMessage()
             ->setIcon('')
             ->setColor(config('locals.text-color'));

@@ -148,16 +148,24 @@ class ChatController implements ControllerInterface
         $name = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $player->NickName);
         $text = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $text);
 
+        if (strlen(trim(stripAll($text))) == 0) {
+            return;
+        }
+
         if ($player->isSpectator()) {
             $name = '$<$eee$> $fff' . $name;
         }
 
-        $chatColor = config('theme.chat.text');
-        $groupIcon = $player->group->chat_prefix ?? '';
-        $groupColor = $player->group->color ?? $chatColor;
-        $chatText = sprintf('$<$%s%s [%s]$> $%s%s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
+        if (preg_match('/\$l(https?:\/\/[^ ]+) ?/', $text, $matches)) {
+            $link = sprintf('[%s]%s', $matches[1], $matches[1]);
+            $text = str_replace($matches[1], $link, $text);
+        }
 
-        Server::ChatSendServerMessage('$<' . $chatText . '$>');
+        $groupIcon = $player->group->chat_prefix ?? '';
+        $groupColor = $player->group->color;
+        $chatText = sprintf('$z$s$%s%s[$<%s$>]$z$s %s $z', $groupColor, $groupIcon, secondary($name), $text);
+
+        Server::ChatSendServerMessage($chatText);
     }
 
     /**

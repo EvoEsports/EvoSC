@@ -18,7 +18,7 @@
             <frame pos="10 -2.25">
                 <!--suppress CheckTagEmptyBody -->
                 <frame id="boxes">
-                    {for $i=0;$i<100;$i++}
+                    {for $i=0;$i<1000;$i++}
                     <frameinstance modelid="box" pos="0 {$i * 4.25}" size="10 10" hidden="1"></frameinstance>
                     {/for}
                 </frame>
@@ -42,6 +42,11 @@
         declare Vec3 colorRed;
         declare Vec3 colorBlue;
         declare Target_V2 target;
+
+        {if $is_maniaplanet}CTmPlayer{else}CSmPlayer{/if} GetOwner() {
+            if (GUIPlayer != Null) return GUIPlayer;
+            return InputPlayer;
+        }
 
         Text formatDiff(Integer diff){
             declare Text sign;
@@ -134,9 +139,6 @@
         }
 
         main(){
-            declare netread Boolean Net_Race_Checkpoint_UseWaypointEvent for Teams[0];
-            log("started " ^ Net_Race_Checkpoint_UseWaypointEvent);
-
             target.fromjson("""{json_encode($target)|noescape}""");
             declare targetLabel <=> (Page.MainFrame.GetFirstChild("target-label") as CMlLabel);
             declare cpDiffs <=> (Page.MainFrame.GetFirstChild("cpdiffs") as CMlFrame);
@@ -144,6 +146,8 @@
             colorGreen = TL::ToColor("{config('theme.form.success.bg')}");
             colorRed = TL::ToColor("{config('theme.form.danger.bg')}");
             colorBlue = TL::ToColor("3086bf");
+
+            declare LastCpCount = -1;
 
             while(True){
                 yield;
@@ -154,21 +158,21 @@
                 cpDiffs.Visible = True;
                 {/if}
 
+                if(!cpDiffs.Visible){
+                    sleep(100);
+                    continue;
+                }
+
                 if(target.map_uid != "" ^ Map.Id){
                     cpDiffs.Hide();
                     TriggerPageAction("request_cp_diffs");
                     return;
                 }
 
-                declare player <=> InputPlayer;
+                declare player <=> GetOwner();
                 while(player == Null){
                     sleep(100);
                     yield;
-                }
-
-                if(!cpDiffs.Visible){
-                    sleep(100);
-                    continue;
                 }
 
                 if(targetLabel.Visible && player.Speed * 3.6 > 10.0){
@@ -187,11 +191,31 @@
                     }
                 }
                 {else}
-                if (Net_Race_Checkpoint_UseWaypointEvent) {
-                    foreach (Event in PendingEvents) {
-                        if(Event.Type != CMlScriptEvent::Type::KeyPress){
-                            log(Event.Type);
+                if(player != Null){
+                    declare wayPointTimesCount = player.RaceWaypointTimes.count;
+
+                    if(!targetLabel.Visible && player.Speed * 3.6 < 10.0 && wayPointTimesCount == 0){
+                        targetLabel.Visible = True;
+                        AnimMgr.Add(targetLabel, "<label opacity='1.0' />", 300, CAnimManager::EAnimManagerEasing::QuintOut);
+                        continue;
+                    }
+
+                    if(LastCpCount != wayPointTimesCount){
+                        if(wayPointTimesCount == 0){
+                            respawn();
+                        }else{
+                            if (player.StartTime >= 0) {
+                                declare timeAtCp = player.RaceWaypointTimes[wayPointTimesCount - 1];
+                                declare isEndLap = False;
+                                sleep(25);
+                                if (UI.UISequence == CUIConfig::EUISequence::Finish) {
+                                    isEndLap = True;
+                                }
+                                fillBox(wayPointTimesCount - 1, timeAtCp, isEndLap);
+                            }
                         }
+
+                        LastCpCount = wayPointTimesCount;
                     }
                 }
                 {/if}

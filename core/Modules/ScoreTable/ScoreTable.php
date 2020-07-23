@@ -4,6 +4,7 @@
 namespace EvoSC\Modules\ScoreTable;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
@@ -19,11 +20,16 @@ class ScoreTable extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if(isTrackmania()){
-            return;
+        if (isTrackmania()) {
+            ChatCommand::add('/scoreboard', [self::class, 'showEvoSCScoreTable'], 'Show EvoSC scoreboard.');
+        }else{
+            Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
         }
+    }
 
-        Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
+    public static function showEvoSCScoreTable(Player $player, $cmd)
+    {
+        self::sendScoreTable($player);
     }
 
     public static function sendScoreTable(Player $player)

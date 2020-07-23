@@ -112,7 +112,7 @@ class Utility
 
         if ($count <= $fill) {
             $recordsJson = DB::table($table)
-                ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                 ->leftJoin('players', 'players.id', '=', $table . '.Player')
                 ->where('Map', '=', $map->id)
                 ->where('Rank', '<=', $fill)
@@ -140,7 +140,7 @@ class Utility
                 $baseRank = (int)$playerRanks->get($player->id);
             } else {
                 if (!is_null($defaultRecordsJson)) {
-                    Template::show($player, $templateId, ['recordsJson' => $defaultRecordsJson], true, 20);
+                    Template::show($player, $templateId, ['recordsJson' => $defaultRecordsJson], true);
                     continue;
                 }
                 $baseRank = $count;
@@ -149,12 +149,10 @@ class Utility
             if ($baseRank <= $fill) {
                 if (is_null($defaultTopView)) {
                     $defaultTopView = DB::table($table)
-                        ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                        ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                         ->leftJoin('players', 'players.id', '=', $table . '.Player')
                         ->where('Map', '=', $map->id)
-                        ->WhereBetween('Rank', [$count - $fill + $top, $count])
-                        ->orWhere('Map', '=', $map->id)
-                        ->where('Rank', '<=', $top)
+                        ->where('Rank', '<=', $fill)
                         ->orderBy('rank')
                         ->get()
                         ->toJson();
@@ -166,7 +164,7 @@ class Utility
                 $range = Utility::getRankRange($baseRank, $top, $fill, $count);
 
                 $recordsJson = DB::table($table)
-                    ->selectRaw('Rank as rank, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
+                    ->selectRaw('`Rank` as `rank`, `' . $table . '`.Score as score, NickName as name, Login as login, "[]" as cps')
                     ->leftJoin('players', 'players.id', '=', $table . '.Player')
                     ->where('Map', '=', $map->id)
                     ->WhereBetween('Rank', $range)
@@ -181,7 +179,7 @@ class Utility
                 $defaultRecordsJson = $recordsJson;
             }
 
-            Template::show($player, $templateId, compact('recordsJson'), true, 20);
+            Template::show($player, $templateId, compact('recordsJson'), true);
         }
 
         Template::executeMulticall();

@@ -128,96 +128,66 @@
         }
         return p;
     }
-
-    Void updateList(){
-        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
-        declare sorted = times.sort();
-
-        filled = 0;
-        EvoSC_RoundsPointsDistribution = Integer[Text];
-
-        foreach(login => score in sorted){
-            if(filled >= rows.Controls.count) break;
-
-            declare addedPoints = getAddedPoints();
-            declare row <=> (rows.Controls[filled] as CMlFrame);
-            (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
-            (row.Controls[1] as CMlLabel).Value = names[login];
-            (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(score, True);
-            (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(score, False);
-            (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
-            row.Show();
-
-            EvoSC_RoundsPointsDistribution[login] = addedPoints;
-
-            filled += 1;
-        }
-
-        for(i, filled, rows.Controls.count - 1){
-            (rows.Controls[i] as CMlFrame).Hide();
-        }
-
-        needsReset = filled > 0;
-    }
-
-    Void reset(){
-        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
-        foreach(row in rows.Controls){
-            row.Hide();
-        }
-        queueReset = False;
-        needsReset = False;
-        filled = 0;
-        times = Integer[Text];
-        names = Text[Text];
-        EvoSC_RoundsPointsDistribution = Integer[Text];
-    }
         --></script>
     {/block}
 
     <script><!--
         {block globals}
+        #Struct EvoSC_RaceRankingEntry {
+            Text login;
+            Text name;
+            Integer time;
+        }
+
         declare Vec2 HS_POS;
         declare CMlFrame HS_Target;
         declare Boolean HS_Hidden;
         declare Integer[] points;
         declare Integer filled;
-        declare Boolean needsReset;
-        declare Boolean queueReset;
-        declare Integer[Text] times;
-        declare Text[Text] names;
         declare CMlQuad header;
         declare CMlLabel title;
         {/block}
 
         {block bootScript}
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for LocalUser;
+        declare lastRaceRankingsSize = -1;
+        declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);
         title <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
 
         points.fromjson("{$points}");
-        reset();
 
         left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('race-ranking.ui.slot')};
         {/block}
 
         {block loop}
-        if(UI.UISequence == CUIConfig::EUISequence::EndRound && needsReset && !queueReset){
-            queueReset = True;
-        }
-        if(UI.UISequence == CUIConfig::EUISequence::Playing && queueReset){
-            reset();
-        }
+        if(EvoSC_RaceRankings.count != lastRaceRankingsSize){
+            lastRaceRankingsSize = EvoSC_RaceRankings.count;
 
-        foreach(Event in RaceEvents){
-            if(Event.Type == CTmRaceClientEvent::EType::WayPoint){
-                if(Event.IsEndLap){
-                    times[Event.Player.User.Login] = Event.LapTime;
-                    names[Event.Player.User.Login] = Event.Player.User.Name;
-                    updateList();
-                }
+            filled = 0;
+            EvoSC_RoundsPointsDistribution = Integer[Text];
+
+            foreach(raceRanking in EvoSC_RaceRankings){
+                if(filled >= rows.Controls.count) break;
+
+                declare addedPoints = getAddedPoints();
+                declare row <=> (rows.Controls[filled] as CMlFrame);
+                (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
+                (row.Controls[1] as CMlLabel).Value = raceRanking.name;
+                (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, True);
+                (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, False);
+                (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
+                row.Show();
+
+                EvoSC_RoundsPointsDistribution[raceRanking.login] = addedPoints;
+
+                filled += 1;
+            }
+
+            for(i, filled, rows.Controls.count - 1){
+                (rows.Controls[i] as CMlFrame).Hide();
             }
         }
 

@@ -3,6 +3,7 @@
 namespace EvoSC\Commands;
 
 use EvoSC\Classes\File;
+use EvoSC\Classes\Log;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -53,13 +54,18 @@ class Migrate extends Command
         $schemaBuilder = $connection->getSchemaBuilder();
         $schemaBuilder::defaultStringLength(191);
 
-        if (!$schemaBuilder->hasTable('migrations')) {
-            $output->writeln('Creating migrations table');
-            $schemaBuilder->create('migrations', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('file')->unique();
-                $table->integer('batch');
-            });
+        try{
+            if (!$schemaBuilder->hasTable('migrations')) {
+                $output->writeln('Creating migrations table');
+                $schemaBuilder->create('migrations', function (Blueprint $table) {
+                    $table->increments('id');
+                    $table->string('file')->unique();
+                    $table->integer('batch');
+                });
+            }
+        }catch(\Exception $e){
+            Log::error('Check that your database config is correct and that it is running.');
+            exit(1);
         }
 
         $previousBatch = $connection->table('migrations')

@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\AwaitAction;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
@@ -82,8 +83,12 @@ class PlayerController implements ControllerInterface
     {
         $oldName = $player->NickName;
         $name = str_replace("\n", '', trim(implode(' ', $name)));
-        if (strlen($name) == 0) {
+        if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
+            return;
+        }
+        if (strlen(stripAll($name)) > 28) {
+            warningMessage('Your name can not exceed 29 characters.')->send($player);
             return;
         }
         $player->NickName = $name;
@@ -111,6 +116,9 @@ class PlayerController implements ControllerInterface
 
             if (Cache::has('nicknames/' . $playerInfo->login)) {
                 $name = Cache::get('nicknames/' . $playerInfo->login);
+                if (strlen(stripAll($name)) > 28) {
+                    $name = substr(stripAll($name), 0, 28);
+                }
                 self::$customNames->put($playerInfo->login, $name);
             }
 
@@ -212,7 +220,7 @@ class PlayerController implements ControllerInterface
 
         self::$players = self::$players->forget($player->Login);
 
-        if(self::$customNames->has($player->Login)){
+        if (self::$customNames->has($player->Login)) {
             self::$customNames->forget($player->Login);
         }
     }
@@ -248,37 +256,28 @@ class PlayerController implements ControllerInterface
      */
     public static function findPlayerByName(Player $callee, $nick): ?Player
     {
-        $online = onlinePlayers();
-        $nicknamesByLogin = [];
+        $found = collect();
 
-        foreach ($online->all() as $player) {
-            $nicknamesByLogin[$player->Login] = stripAll($player->NickName);
+        foreach (onlinePlayers() as $player) {
+            $stripped = strtolower(stripAll($player->NickName));
+            if (strpos($stripped, strtolower($nick)) !== false || $nick == $player->Login) {
+                $found->add($player);
+            }
         }
 
-        $fuzzyLogin = self::findClosestMatchingString($nick, $nicknamesByLogin);
-
-        $players = $online->filter(function (Player $player) use ($nick, $fuzzyLogin) {
-            if ($player->Login == $nick || ($fuzzyLogin !== null && $player->Login == $fuzzyLogin)) {
-                return true;
-            }
-
-            return false;
-        });
-
-
-        if ($players->count() == 0) {
+        if ($found->count() == 0) {
             warningMessage('No player found.')->send($callee);
 
             return null;
         }
 
-        if ($players->count() > 1) {
-            warningMessage('Found more than one person (' . $players->pluck('NickName')->implode(', ') . '), please be more specific or use login.')->send($callee);
+        if ($found->count() > 1) {
+            warningMessage('Found more than one person (' . $found->pluck('NickName')->implode(', ') . '), please be more specific or use login.')->send($callee);
 
             return null;
         }
 
-        return $players->first();
+        return $found->first();
     }
 
     /**
@@ -286,13 +285,13 @@ class PlayerController implements ControllerInterface
      *
      * @param Player $player
      * @param        $nick
-     * @param mixed ...$message
+     * @param mixed ...$reason
      */
-    public static function kickPlayer(Player $player, $nick, ...$message)
+    public static function kickPlayer(Player $player, $cmd, $nick, ...$reason)
     {
         $playerToBeKicked = self::findPlayerByName($player, $nick);
 
-        if (!$playerToBeKicked) {
+        if ($playerToBeKicked == null) {
             return;
         }
 
@@ -302,10 +301,13 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        $reason = implode(" ", $message);
-        Server::kick($playerToBeKicked->Login, $reason);
-        warningMessage($player, ' kicked ', $playerToBeKicked, '. Reason: ',
-            secondary($reason))->setIcon('')->sendAll();
+        $reason = implode(' ', $reason);
+
+        AwaitAction::add($player, "Kick \$<$playerToBeKicked->NickName\$>?", function () use ($playerToBeKicked, $reason, $player) {
+            Server::kick($playerToBeKicked->Login, $reason);
+            warningMessage($player, ' kicked ', $playerToBeKicked->NickName, '. Reason: ',
+                secondary($reason))->setIcon('')->sendAll();
+        });
     }
 
     /**
