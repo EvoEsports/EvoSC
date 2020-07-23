@@ -14,6 +14,7 @@ use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\AlterUI\AlterUI;
 use EvoSC\Modules\CpDiffs\CpDiffs;
+use EvoSC\Modules\CPRecords\CPRecords;
 use EvoSC\Modules\EvoDonate\EvoDonate;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
@@ -41,7 +42,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MOTD::playerConnect($player);
+        CPRecords::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)
