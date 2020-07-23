@@ -47,7 +47,7 @@ class InfoMessages extends Module implements ModuleInterface
         }
     }
 
-    public static function update(Player $player, Collection $formData)
+    public static function update(Player $player, $formData)
     {
         $interval = $formData->interval;
 
