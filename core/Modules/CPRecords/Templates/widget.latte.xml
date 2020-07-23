@@ -177,6 +177,7 @@
                     AnimMgr.Add(mf, """<frame size="1000 70.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
                 }
 
+                {if !$is_maniaplanet}
                 declare row = player.RaceWaypointTimes.count / columns;
                 if(row > 0) row -= 1;
 
@@ -186,6 +187,7 @@
                     AnimMgr.Add(widget, """<frame pos="0 """ ^ newY ^ """" />""", 170, CAnimManager::EAnimManagerEasing::QuartOut);
                     sleep(10);
                 }
+                {/if}
             }
 
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
