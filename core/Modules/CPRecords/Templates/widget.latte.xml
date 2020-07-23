@@ -14,7 +14,7 @@
         <quad class="bg-accent" pos="0 -0.25" size="42 4" valign="center" opacity="0" z-index="2"/>
     </framemodel>
 
-    <frame id="mf" pos="{config('cp-records.pos')}" size="1000 1000" scale="{config('cp-records.scale')}">
+    <frame id="mf" pos="{config('cp-records.pos')}" {if !$is_maniaplanet}size="1000 1000"{/if} scale="{config('cp-records.scale')}">
         <frame id="widget">
             <!--suppress CheckTagEmptyBody -->
             <frame id="records">
@@ -129,7 +129,7 @@
         }
     }
 
-    {if $is_maniaplanet}CTmPlayer{else}CSmPlayer{/if} GetOwner() {
+    {if $is_maniaplanet}CTmMlPlayer{else}CSmPlayer{/if} GetOwner() {
         if (GUIPlayer != Null) return GUIPlayer;
         return InputPlayer;
     }
