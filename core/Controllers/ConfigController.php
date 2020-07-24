@@ -107,12 +107,12 @@ class ConfigController implements ControllerInterface
             ...File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern),
             ...File::getFilesRecursively(modulesDir(), self::$configFilePattern)
         ];
-
+        
         foreach ($defaultConfigFiles as $configFile) {
             $name = basename($configFile);
 
             if (!File::exists(configDir($name))) {
-                File::copy($configFile, configDir($name));
+                File::copy($configFile, configDir($name));  // on fresh installs throws many warnings on Windows (mkdir), no big issues though
             } else {
                 $sourceJson = File::get($configFile, true);
                 $targetJson = File::get(configDir($name), true);
