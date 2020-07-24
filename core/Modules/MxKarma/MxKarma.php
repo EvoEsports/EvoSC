@@ -166,10 +166,12 @@ class MxKarma extends Module implements ModuleInterface
                     Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
                 });
         } else {
-            $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->first();
+            $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->first();
 
             if (!$vote) {
                 $vote = self::playerCanVote($player, $map) ? -1 : -2;
+            } else {
+                $vote = $vote->Rating;
             }
 
             if ($vote) {
@@ -189,7 +191,7 @@ class MxKarma extends Module implements ModuleInterface
             return;
         }
         $map = MapController::getCurrentMap();
-        $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->first();
+        $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->exists();
         if (!$vote) {
             Template::show($player, 'MxKarma.update-my-rating', ['rating' => -1, 'uid' => $map->uid]);
         }
