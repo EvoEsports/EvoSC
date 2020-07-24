@@ -18,7 +18,12 @@ class ControllerController
         ModeController::setMode($mode);
 
         $controllers = File::getFiles(coreDir('Controllers'))->map(function ($file) {
-            $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . ']Controllers[' . DIRECTORY_SEPARATOR . ']#', '', $file);
+            if (isWindows()) {
+                $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . '\]Controllers[' . DIRECTORY_SEPARATOR . '\]#', '', $file); // Throws an error of missing ']' otherwise
+            }
+            else {
+                $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . ']Controllers[' . DIRECTORY_SEPARATOR . ']#', '', $file);
+            }
             $class = substr($class, 0, -4);
             $class = "EvoSC\\Controllers\\$class";
 

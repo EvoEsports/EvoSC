@@ -19,8 +19,8 @@ use stdClass;
 
 class MxDetails extends Module implements ModuleInterface
 {
-    private static string $mxApiUrl;
-    private static string $mxUrl;
+    private static ?string $mxApiUrl = null;  // prevents the "typed static property must not be accessed before initialization" error on Windows
+    private static ?string $mxUrl = null;
 
     /**
      * @inheritDoc

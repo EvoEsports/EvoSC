@@ -353,7 +353,7 @@ function isDebug(): bool
  */
 function isWindows(): bool
 {
-    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    return strtoupper(substr(PHP_OS_FAMILY, 0, 3)) === 'WIN';
 }
 
 /**
