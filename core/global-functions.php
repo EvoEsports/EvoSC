@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 function getEscVersion(): string
 {
-    return str_replace("\n", '', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION'));
+    return str_replace("\n", '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }
 
 /**
@@ -132,7 +132,7 @@ function config(string $id, $default = null)
  */
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/cache/' . $filename);
 }
 
 /**
@@ -151,7 +151,7 @@ function mapsDir(string $filename = ''): string
  */
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/logs/' . $filename);
 }
 
 /**
@@ -161,7 +161,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules/' . $filename);
 }
 
 /**
@@ -191,7 +191,7 @@ function coreDir(string $filename = ''): string
  */
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/config/' . $filename);
 }
 
 /**
@@ -201,7 +201,7 @@ function configDir(string $filename = ''): string
  */
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 /**
