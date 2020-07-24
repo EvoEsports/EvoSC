@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
 class ModuleController implements ControllerInterface
 {
     const PATTERN = '/(?:core\/Modules|modules)\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
+    const PATTERNW = '/(?:core\\\\Modules|modules)\\\\([A-Z][a-zA-Z0-9]+)\\\\([A-Z][a-zA-Z0-9]+)\.php/';
 
     /**
      * @var Collection
@@ -51,22 +52,37 @@ class ModuleController implements ControllerInterface
 
     public static function startModules(string $mode, bool $isBoot)
     {
+        
         //Boot modules
         Log::info('Starting modules...');
 
-        $coreModules = File::getFilesRecursively(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
+        $coreModules = File::getFilesRecursively(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'Modules', '/^[A-Z].+\.php$/');
         $allModules = collect([...$coreModules, ...File::getFilesRecursively(modulesDir(), '/^[A-Z].+\.php$/')]);
         $totalStarted = 0;
 
         $moduleClasses = $allModules
             ->filter(function ($file) {
-                return preg_match(self::PATTERN, $file);
+                if (isWindows()) {
+                    return preg_match(self::PATTERNW, $file);
+                }
+                else {
+                    return preg_match(self::PATTERN, $file);
+                }
             })
             ->mapWithKeys(function ($file) {
-                if(preg_match(self::PATTERN, $file, $matches)){
-                    $dir = $matches[1];
-                    $classname = $matches[2];
-                    return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                if (isWindows()) {
+                    if(preg_match(self::PATTERNW, $file, $matches)){
+                        $dir = $matches[1];
+                        $classname = $matches[2];
+                        return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                    }
+                }
+                else {
+                    if(preg_match(self::PATTERN, $file, $matches)){
+                        $dir = $matches[1];
+                        $classname = $matches[2];
+                        return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                    }
                 }
 
                 return null;
