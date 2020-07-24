@@ -122,6 +122,7 @@ class MxKarma extends Module implements ModuleInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerPb', [self::class, 'playerPb']);
 
         ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
         ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
@@ -180,6 +181,18 @@ class MxKarma extends Module implements ModuleInterface
         }
 
         Template::show($player, 'MxKarma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
+    }
+
+    public static function playerPb(Player $player, int $score)
+    {
+        if ($score == 0) {
+            return;
+        }
+        $map = MapController::getCurrentMap();
+        $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->first();
+        if (!$vote) {
+            Template::show($player, 'MxKarma.update-my-rating', ['rating' => -1, 'uid' => $map->uid]);
+        }
     }
 
     /**
