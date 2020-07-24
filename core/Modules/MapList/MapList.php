@@ -136,6 +136,17 @@ class MapList extends Module implements ModuleInterface
                     }
                 }
 
+                // Check local Karma if we don't have data from MX
+                if ($voteAverage == 0) {
+                    $localKarma = DB::table('mx-karma')
+                                ->selectRaw('COUNT(*) as total_votes, AVG(Rating) as avg_rating')
+                                ->where('Map', '=', $data->id)
+                                ->first();
+                    if ($localKarma && $localKarma->total_votes > 0) {
+                        $voteAverage = $localKarma->avg_rating;
+                    }
+                }
+
                 $authorTime = -1;
                 if (Cache::has('gbx/' . $data->uid)) {
                     $gbx = Cache::get('gbx/' . $data->uid);
