@@ -221,6 +221,22 @@ class MxKarma extends Module implements ModuleInterface
                 'total' => $data->total_votes ?? 0,
                 'uid' => $map->uid
             ]);
+            // If there are no records, then nobody can vote anyway. Defaults to -2 so no need to loop and send anyone updates
+            $data = DB::table('pbs')->selectRaw('COUNT(*) as record_count')->where('map_id', '=', $map->id)->first();
+            if ($data->record_count > 0) {
+                $votes = DB::table('mx-karma')->where('Map', '=', $map->id)->get();
+                foreach ($players as $player) {
+                    $vote = $votes->where('Player', '=', $player->id)->first();
+                    if ($vote) {
+                        $vote = $vote->Rating;
+                    } else {
+                        $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                    }
+                    if ($vote > -2) {
+                        Template::show($player, 'MxKarma.update-my-rating', ['rating' => $vote, 'uid' => $map->uid]);
+                    }
+                }
+            }
         }
 
         self::getMapRatingAsync($map->uid, $players->pluck('Login')->toArray())
