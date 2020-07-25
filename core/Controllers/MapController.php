@@ -50,7 +50,7 @@ class MapController implements ControllerInterface
         }
 
         if (!File::dirExists(cacheDir('gbx'))) {
-            File::makeDir(cacheDir('gbx'));
+            File::makeDir(cacheDir('gbx'));  // Throws an error in Windows system with the original regex settings
         }
 
         if (!$_skipMapCheck) {
