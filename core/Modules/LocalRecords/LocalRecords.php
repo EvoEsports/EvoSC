@@ -2,10 +2,12 @@
 
 namespace EvoSC\Modules\LocalRecords;
 
+use EvoSC\Classes\AwaitAction;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
@@ -193,13 +195,19 @@ class LocalRecords extends Module implements ModuleInterface
         }
     }
 
-    //Called on local.delete
+    /**
+     * @param Player $player
+     * @param string $localRank
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function delete(Player $player, string $localRank)
     {
         $map = MapController::getCurrentMap();
-        DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', $localRank)->delete();
-        warningMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
-        self::sendLocalsChunk();
+        AwaitAction::add($player, "Delete \$<" . secondary("$localRank. local record") . "\$>?", function () use ($localRank, $map, $player) {
+            DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', $localRank)->delete();
+            dangerMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
+            self::sendLocalsChunk();
+        });
     }
 
     /**
