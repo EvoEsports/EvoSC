@@ -122,6 +122,7 @@ class MxKarma extends Module implements ModuleInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerPb', [self::class, 'playerPb']);
 
         ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
         ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
@@ -165,10 +166,12 @@ class MxKarma extends Module implements ModuleInterface
                     Log::warning('Failed to load MxKarma vote: ' . $e->getMessage());
                 });
         } else {
-            $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->first();
+            $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->first();
 
             if (!$vote) {
                 $vote = self::playerCanVote($player, $map) ? -1 : -2;
+            } else {
+                $vote = $vote->Rating;
             }
 
             if ($vote) {
@@ -180,6 +183,18 @@ class MxKarma extends Module implements ModuleInterface
         }
 
         Template::show($player, 'MxKarma.mx-karma', ['total' => self::$votesTotal, 'average' => self::$voteAverage]);
+    }
+
+    public static function playerPb(Player $player, int $score)
+    {
+        if ($score == 0) {
+            return;
+        }
+        $map = MapController::getCurrentMap();
+        $vote = DB::table('mx-karma')->where('Player', '=', $player->id)->where('map', '=', $map->id)->exists();
+        if (!$vote) {
+            Template::show($player, 'MxKarma.update-my-rating', ['rating' => -1, 'uid' => $map->uid]);
+        }
     }
 
     /**
@@ -206,6 +221,22 @@ class MxKarma extends Module implements ModuleInterface
                 'total' => $data->total_votes ?? 0,
                 'uid' => $map->uid
             ]);
+            // If there are no records, then nobody can vote anyway. Defaults to -2 so no need to loop and send anyone updates
+            $data = DB::table('pbs')->selectRaw('COUNT(*) as record_count')->where('map_id', '=', $map->id)->first();
+            if ($data->record_count > 0) {
+                $votes = DB::table('mx-karma')->where('Map', '=', $map->id)->get();
+                foreach ($players as $player) {
+                    $vote = $votes->where('Player', '=', $player->id)->first();
+                    if ($vote) {
+                        $vote = $vote->Rating;
+                    } else {
+                        $vote = self::playerCanVote($player, $map) ? -1 : -2;
+                    }
+                    if ($vote > -2) {
+                        Template::show($player, 'MxKarma.update-my-rating', ['rating' => $vote, 'uid' => $map->uid]);
+                    }
+                }
+            }
         }
 
         self::getMapRatingAsync($map->uid, $players->pluck('Login')->toArray())
