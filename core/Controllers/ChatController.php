@@ -23,6 +23,8 @@ class ChatController implements ControllerInterface
     /** @var boolean */
     private static bool $routingEnabled;
 
+    private static string $primary;
+
     /**
      * Initialize ChatController.
      */
@@ -52,6 +54,8 @@ class ChatController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
+        self::$primary = (string)config('theme.chat.default');
+
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
     }
@@ -161,9 +165,16 @@ class ChatController implements ControllerInterface
             $text = str_replace($matches[1], $link, $text);
         }
 
+        $chatColor = self::$primary;
+        if (empty($chatColor)) {
+            $chatColor = '$z$s';
+        }else{
+            $chatColor = '$z$s$'.$chatColor;
+        }
+
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color;
-        $chatText = sprintf('$z$s$%s%s[$<%s$>]$z$s %s $z', $groupColor, $groupIcon, secondary($name), $text);
+        $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s$z', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
         Server::ChatSendServerMessage($chatText);
     }
