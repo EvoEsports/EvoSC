@@ -227,7 +227,7 @@ class File
         /** Have to use a preg_match like this on Windows, seems to work (also delimeters # were required) - I don't even...
          * Also, this fixes the !preg_match to be as before
          */
-        if ((isWindows() && !preg_match('#^[a-zA-Z]:[\\\/]#', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
+        if ((isWindows() && !preg_match('/^[a-z]:(\\|\/)/i', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
             throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
         }
 
