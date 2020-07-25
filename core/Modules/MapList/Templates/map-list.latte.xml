@@ -48,7 +48,7 @@
             <label class="text-accent" pos="52 1" text="Author" scale="0.8"/>
             <label class="text-accent" pos="88 1" text="Local" halign="center" scale="0.8"/>
             <label class="text-accent" pos="96 1" text="Dedi" halign="center" scale="0.8"/>
-            <label class="text-accent" pos="106 1" text="Karma" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="106 1" text="MX Karma" halign="center" scale="0.8"/>
             <label class="text-accent" pos="117 1" text="Favorite" halign="center" scale="0.8"/>
 
             <frame id="sorting-controls" pos="-1 5.25">
@@ -101,6 +101,11 @@
                 <label class="btn-default next-page" pos="12 0" size="3.5 3.5" text="⏵" ScriptEvents="1"/>
             </frame>
 
+            <frame id="lower-buttons" pos="25 -86.5" scale="0.9">
+                <label class="btn-accent btn-karma-switch" data-karma="local" text="Local Karma" pos="90" size="16 4" textsize="0.7" ScriptEvents="1"/>
+                <label class="btn-accent btn-karma-switch" data-karma="global" text="Global Karma" pos="90" size="16 4" textsize="0.7" ScriptEvents="1" hidden="1"/>
+            </frame>
+
             <frame id="search-frame" pos="124 -86.5" scale="0.9">
                 <label class="text-light" pos="30 0" halign="right" valign="center" textsize="0.9" text="🔍"/>
                 <entry id="search-input" class="search-input form" pos="26.5 0" size="25 3.5" halign="right" valign="center"/>
@@ -125,6 +130,7 @@ declare Integer cooldown;
 declare Text[Text] currentMap;
 declare Boolean inSearch;
 declare Boolean userCanDrop;
+declare Text karmaIndex;
     --></script>
     {/block}
 
@@ -309,7 +315,7 @@ Void updateView(Text[Text][] mapPool, Integer page){
             (mapFrame.Controls[5] as CMlLabel).SetText("");
         }
 
-        declare width = TL::ToReal(map["r"]) * 0.113;
+        declare width = TL::ToReal(map[karmaIndex]) * 0.113;
         AnimMgr.Add(mapFrame.Controls[7], "<frame size='"^width^" 3' />", 150, CAnimManager::EAnimManagerEasing::Linear);
         mapFrame.Show();
 
@@ -474,9 +480,9 @@ Void search(){
             declare Real[Text] sorter = Real[Text];
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
-                if(map["r"] != "0.0"){
+                if(map[karmaIndex] != "0.0"){
                     selected[map["id"]] = map;
-                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                    sorter[map["id"]] = TL::ToReal(map[karmaIndex]);
                 }
             }
 
@@ -495,9 +501,9 @@ Void search(){
             declare Real[Text] sorter = Real[Text];
             for(i, 0, maps.count - 1){
                 declare map = maps[i];
-                if(map["r"] != "0.0"){
+                if(map[karmaIndex] != "0.0"){
                     selected[map["id"]] = map;
-                    sorter[map["id"]] = TL::ToReal(map["r"]);
+                    sorter[map["id"]] = TL::ToReal(map[karmaIndex]);
                 }
             }
 
@@ -659,6 +665,7 @@ Void setCooldownToZero(Text uid){
     {block bootScript}
         window.Hide();
 
+        karmaIndex = "r";
         inSearch = False;
         currentPage = 0;
         userCanDrop = {($localPlayer->hasAccess('map_queue_drop') ? 'True' : 'False')|noescape};
@@ -818,6 +825,24 @@ Void setCooldownToZero(Text uid){
                 (mapFrame.Controls[0] as CMlQuad).Opacity = 0.0;
                 continue;
             }
+        }
+
+        if (event.Control.HasClass("btn-karma-switch") && event.Type == CMlScriptEvent::Type::MouseClick) {
+            declare btnFrame = (event.Control.Parent as CMlFrame);
+            declare show = event.Control.DataAttributeGet("karma");
+            log("[EvoSC::karma-switch] Switched to display " ^ show ^ " karma");
+            if (show == "global") {
+                btnFrame.Controls[0].Show();
+                btnFrame.Controls[1].Hide();
+                ((btnFrame.Parent as CMlFrame).Controls[4] as CMlLabel).SetText("MX Karma");
+                karmaIndex = "r";
+            } else if (show == "local") {
+                btnFrame.Controls[0].Hide();
+                btnFrame.Controls[1].Show();
+                ((btnFrame.Parent as CMlFrame).Controls[4] as CMlLabel).SetText("Karma");
+                karmaIndex = "lr";
+            }
+            updateView(currentMapPool, currentPage);
         }
     {/block}
 

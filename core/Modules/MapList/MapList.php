@@ -136,15 +136,14 @@ class MapList extends Module implements ModuleInterface
                     }
                 }
 
-                // Check local Karma if we don't have data from MX
-                if ($voteAverage == 0) {
-                    $localKarma = DB::table('mx-karma')
-                                ->selectRaw('COUNT(*) as total_votes, AVG(Rating) as avg_rating')
-                                ->where('Map', '=', $data->id)
-                                ->first();
-                    if ($localKarma && $localKarma->total_votes > 0) {
-                        $voteAverage = $localKarma->avg_rating;
-                    }
+                $localKarma = DB::table('mx-karma')
+                            ->selectRaw('COUNT(*) as total_votes, AVG(Rating) as avg_rating')
+                            ->where('Map', '=', $data->id)
+                            ->first();
+                if ($localKarma && $localKarma->total_votes > 0) {
+                    $localKarma = $localKarma->avg_rating;
+                } else {
+                    $localKarma = 0;
                 }
 
                 $authorTime = -1;
@@ -158,6 +157,7 @@ class MapList extends Module implements ModuleInterface
                     'name' => $data->name,
                     'a' => $data->author,
                     'r' => sprintf('%.1f', $voteAverage),
+                    'lr' => sprintf('%.1f', $localKarma),
                     'uid' => $data->uid,
                     'c' => $data->cooldown,
                     'author_time' => $authorTime
