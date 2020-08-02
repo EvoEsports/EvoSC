@@ -1,12 +1,12 @@
 .idea/
-vendor/
-modules/
-music/
-maps/
-logs/
-cache/
+/vendor/
+/modules/
+/music/
+/maps/
+/logs/
+/cache/
 
-config/*
-!config/default
+/config/*
+!/config/default
 *.pid
 .phpunit.result.cache
