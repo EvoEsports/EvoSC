@@ -123,6 +123,7 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        global $__bootedVersion;
         global $_onlinePlayers;
         global $serverName;
 
@@ -213,6 +214,8 @@ class EscRun extends Command
         $failedConnectionRequests = 0;
 
         successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
+
+        $__bootedVersion = getEscVersion();
 
         //cycle-loop
         while (true) {

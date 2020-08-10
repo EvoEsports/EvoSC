@@ -410,7 +410,8 @@ function evo_str_slug($title)
  */
 function restart_evosc()
 {
-    warningMessage(secondary('EvoSC v' . getEscVersion()), ' is restarting.')->sendAll();
+    global $__bootedVersion;
+    warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
     Server::chatEnableManualRouting(false);
     Log::warning('Old process is terminating.');
     pcntl_exec(PHP_BINARY, $_SERVER['argv']);
