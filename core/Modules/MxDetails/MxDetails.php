@@ -115,7 +115,7 @@ class MxDetails extends Module implements ModuleInterface
     {
         try {
             if(isManiaPlanet()) {
-                $result = RestClient::get(self::$mxApiUrl . '/maps/' . $map->uid, ['timeout' => 1]);
+                $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 1]);
             }else{
                 $result = RestClient::get(self::$mxApiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
             }
