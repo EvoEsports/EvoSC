@@ -42,7 +42,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CPRecords::playerConnect($player);
+        EvoDonate::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

@@ -114,7 +114,12 @@ class MxDetails extends Module implements ModuleInterface
     public static function loadMxDetails(Map $map)
     {
         try {
-            $result = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
+            if(isManiaPlanet()) {
+                $result = RestClient::get(self::$mxApiUrl . '/maps/' . $map->uid, ['timeout' => 1]);
+            }else{
+                $result = RestClient::get(self::$mxApiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
+            }
+//            $result = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;
