@@ -56,14 +56,14 @@ class Template
     /**
      * Render and send a template to a player.
      *
-     * @param Player $player
+     * @param Player|string $player
      * @param string $index
      * @param Collection|array|null $values
      * @param bool $multicall
      * @param int $timeoutInSeconds
      * @throws InvalidArgumentException
      */
-    public static function show(Player $player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
+    public static function show($player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
         global $__ManiaPlanet;
 
@@ -83,15 +83,20 @@ class Template
         $data['MODULE'] = $caller['class'];
         $xml = TemplateController::getTemplate($index, $data);
 
+        $playerLogin = $player;
+        if($player instanceof Player){
+            $playerLogin = $player->Login;
+        }
+
         if ($xml != '') {
             if ($multicall) {
                 if (!isset(self::$multiCalls)) {
                     self::$multiCalls = collect();
                 }
 
-                self::$multiCalls->put($player->Login, $xml);
+                self::$multiCalls->put($playerLogin, $xml);
             } else {
-                Server::sendDisplayManialinkPage($player->Login, $xml, $timeoutInSeconds * 1000);
+                Server::sendDisplayManialinkPage($playerLogin, $xml, $timeoutInSeconds * 1000);
             }
         }
     }

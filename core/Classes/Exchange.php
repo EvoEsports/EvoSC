@@ -11,5 +11,5 @@ class Exchange
     const MANIAPLANET_MX_API_URL = 'https://api.mania.exchange'; //deprecated use above when available
 
     const TRACKMANIA_MX_URL = 'https://trackmania.exchange';
-    const TRACKMANIA_MX_API_URL = 'https://trackmania.exchange/api';
+    const TRACKMANIA_MX_API_URL = 'https://trackmania.exchange';
 }

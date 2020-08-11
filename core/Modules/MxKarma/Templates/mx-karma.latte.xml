@@ -7,7 +7,7 @@
 
     {block content}
     <quad class="bg-dark" z-index="-1" size="50 12" opacity="0.8"/>
-    <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  {if $is_maniaplanet}MX{else}TMX{/if} KARMA" textsize=".3" valign="center"/>
+    <label class="text-light" pos="2 -3" z-index="1" size="48 3" text="  MAP KARMA" textsize=".3" valign="center"/>
 
     <frame z-index="2" pos="0 -6">
         <label class="text-lighter" id="stars-bg" pos="31 4" text="" z-index="1" size="25 4" textsize="0.5" opacity="0.3" hidden="1"/>
@@ -77,10 +77,10 @@ Void stopLoading(){
     (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Hide();
 }
 
-Void updateKarma(Real average, Integer total){
+Void updateKarma(Real average){
     declare starFrame <=> (Page.MainFrame.GetFirstChild("star-frame") as CMlFrame);
     declare width = 0.0;
-    if(total == 0){
+    if(average == -1){
         (Page.MainFrame.GetFirstChild("stars-bg") as CMlLabel).Hide();
         (Page.MainFrame.GetFirstChild("no-votes") as CMlLabel).Show();
     }else{
@@ -138,16 +138,16 @@ Void updateMyRating(Integer myRating){
 
     {block bootScript}
         declare Real EvoSC_MxKarma_VotesAverage for This;
-        declare Integer EvoSC_MxKarma_VotesTotal for This = 0;
         declare Integer EvoSC_MxKarma_MyRating for This;
         declare Integer EvoSC_MxKarma_MyRating_Update for This;
+        declare Integer EvoSC_MxKarma_LastUpdate2 for This;
         declare Text EvoSC_MxKarma_MyRating_MapUid for This;
         declare Text EvoSC_MxKarma_MapUid for This;
         declare Integer lastMyRatingUpdate = 0;
-        declare Real lastKarma = 0.0;
+        declare lastUpdate = 0;
         declare currentMapId = Map.Id;
 
-        updateKarma({sprintf('%.02f',$average)}, {$total});
+        updateKarma({sprintf('%.02f',$average)});
         updateMyRating(-2);
 
         left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
@@ -155,16 +155,16 @@ Void updateMyRating(Integer myRating){
     {/block}
 
     {block loop}
-        if(EvoSC_MxKarma_VotesAverage != lastKarma && EvoSC_MxKarma_MapUid == "" ^ Map.Id){
-            updateKarma(EvoSC_MxKarma_VotesAverage, EvoSC_MxKarma_VotesTotal);
-            lastKarma = EvoSC_MxKarma_VotesAverage;
+        if(EvoSC_MxKarma_LastUpdate2 != lastUpdate && EvoSC_MxKarma_MapUid == "" ^ Map.Id){
+            updateKarma(EvoSC_MxKarma_VotesAverage);
+            lastUpdate = EvoSC_MxKarma_LastUpdate2;
         }
 
         if(currentMapId != Map.Id){
             currentMapId = Map.Id;
             EvoSC_MxKarma_MyRating = -2;
             updateMyRating(EvoSC_MxKarma_MyRating);
-            updateKarma(0.0, 0);
+            updateKarma(0.0);
         }
 
         if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){
