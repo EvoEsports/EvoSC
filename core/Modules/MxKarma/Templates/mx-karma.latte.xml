@@ -55,9 +55,9 @@
 
         <frame id="loading-frame" pos="3.5 0" scale="0.85">
             <frame id="spinner-frame" pos="15 -1.75" halign="center" valign="center" scale="0.9">
-                <label class="text-warning" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
+                <label class="text-accent" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
             </frame>
-            <label class="text-warning" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
+            <label class="text-accent" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
         </frame>
     </frame>
     {/block}
@@ -145,44 +145,42 @@ Void updateMyRating(Integer myRating){
         declare Text EvoSC_MxKarma_MapUid for This;
         declare Integer lastMyRatingUpdate = 0;
         declare lastUpdate = 0;
-        declare currentMapId = Map.Id;
+        declare currentMapId = "" ^ Map.Id;
 
-        updateKarma({sprintf('%.02f',$average)});
-        updateMyRating(-2);
+        declare buttonsFrame <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+        declare finishNotice <=> (Page.MainFrame.GetFirstChild("finish-notice") as CMlFrame);
+
+        updateKarma(0.0);
+        buttonsFrame.Hide();
+        finishNotice.Hide();
+        startLoading();
 
         left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('mx-karma.ui.slot')};
     {/block}
 
     {block loop}
-        if(EvoSC_MxKarma_LastUpdate2 != lastUpdate && EvoSC_MxKarma_MapUid == "" ^ Map.Id){
+        if(EvoSC_MxKarma_LastUpdate2 != lastUpdate){
             updateKarma(EvoSC_MxKarma_VotesAverage);
             lastUpdate = EvoSC_MxKarma_LastUpdate2;
+            currentMapId = EvoSC_MxKarma_MapUid;
         }
 
-        if(currentMapId != Map.Id){
-            currentMapId = Map.Id;
-            EvoSC_MxKarma_MyRating = -2;
-            updateMyRating(EvoSC_MxKarma_MyRating);
-            updateKarma(0.0);
-        }
-
-        if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate && EvoSC_MxKarma_MyRating_Update > 0){
+        if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate){
+            log("update my rating " ^ EvoSC_MxKarma_MyRating);
             lastMyRatingUpdate = EvoSC_MxKarma_MyRating_Update;
             stopLoading();
             updateMyRating(EvoSC_MxKarma_MyRating);
+            currentMapId = EvoSC_MxKarma_MyRating_MapUid;
         }
 
-        if(InputPlayer == Null) continue;
-        if(InputPlayer.Score == Null) continue;
-        {if $is_maniaplanet}
-        if(InputPlayer.Score.BestRace == Null) continue;
-
-        if(InputPlayer.Score.BestRace.Time != -1 && EvoSC_MxKarma_MyRating == -2){
-            EvoSC_MxKarma_MyRating = -1;
-            updateMyRating(EvoSC_MxKarma_MyRating);
+        if(currentMapId != "" ^ Map.Id){
+            currentMapId = "" ^ Map.Id;
+            updateKarma(0.0);
+            buttonsFrame.Hide();
+            finishNotice.Hide();
+            startLoading();
         }
-        {/if}
     {/block}
 
     {block pendingEvents}

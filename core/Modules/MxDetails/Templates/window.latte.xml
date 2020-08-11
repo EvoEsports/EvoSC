@@ -71,7 +71,7 @@
             <label class="text-light" pos="+1 -10" size="20 5" textsize="1" text="{$map->dedis->first() ? formatScore($map->dedis->first()->Score) : '-'}" valign="center" />
 
 
-            <label class="text-light" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="MX-Karma" halign="center" valign="center" scale="0.75" />
+            <label class="text-light" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="Karma" halign="center" valign="center" scale="0.75" />
             {if $map->mx_id && $map->mx_details->RatingVoteCount > 0}
             <label class="text-light" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="{sprintf('%.1f', $map->mx_details->RatingVoteAverage)}% - {$map->mx_details->RatingVoteCount} Votes" halign="center" valign="center" />
             <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="{$rating}" valign="center" halign="center" textcolor="{config('colors.ui.window.header.color')}" z-index="1" />

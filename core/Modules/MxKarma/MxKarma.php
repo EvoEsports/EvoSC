@@ -141,6 +141,7 @@ class MxKarma extends Module implements ModuleInterface
         }
 
         self::sendVoteData($map, $player);
+        Template::show($player, 'MxKarma.mx-karma');
     }
 
     /**
@@ -179,18 +180,18 @@ class MxKarma extends Module implements ModuleInterface
             ->groupBy(['players.id', 'Login', 'Rating', 'Map'])
             ->get();
 
-        dump($votes);
-
         foreach ($votes as $vote) {
             if (is_null($vote->Rating)) {
-                if(is_null($vote->Score)){
-                    Template::show($vote->Login, 'MxKarma.update-my-rating', ['rating' => -2, 'uid' => $map->uid], true);
-                }else{
-                    Template::show($vote->Login, 'MxKarma.update-my-rating', ['rating' => -1, 'uid' => $map->uid], true);
+                if (is_null($vote->Score)) {
+                    $rating = -2;
+                } else {
+                    $rating = -1;
                 }
             } else {
-                Template::show($vote->Login, 'MxKarma.update-my-rating', ['rating' => $vote->Rating, 'uid' => $map->uid], true);
+                $rating = $vote->Rating;
             }
+
+            Template::show($vote->Login, 'MxKarma.update-my-rating', ['rating' => $rating, 'uid' => $map->uid], true);
         }
 
         Template::executeMulticall();

@@ -21,6 +21,7 @@ use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\LocalRecords\LocalsBenchmark;
 use EvoSC\Modules\MOTD\MOTD;
+use EvoSC\Modules\MxKarma\MxKarma;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\RaceRanking\RaceRanking;
 use EvoSC\Modules\ScoreTable\ScoreTable;
@@ -42,7 +43,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        EvoDonate::playerConnect($player);
+        MxKarma::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)
