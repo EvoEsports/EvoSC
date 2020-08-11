@@ -847,7 +847,6 @@ Void setCooldownToZero(Text uid){
         }
 
         if(MapQueueShow){
-            log("show");
             window.Show();
             MapQueueShow = False;
         }

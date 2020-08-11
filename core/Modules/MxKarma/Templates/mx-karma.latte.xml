@@ -167,7 +167,6 @@ Void updateMyRating(Integer myRating){
         }
 
         if(EvoSC_MxKarma_MyRating_Update != lastMyRatingUpdate){
-            log("update my rating " ^ EvoSC_MxKarma_MyRating);
             lastMyRatingUpdate = EvoSC_MxKarma_MyRating_Update;
             stopLoading();
             updateMyRating(EvoSC_MxKarma_MyRating);
