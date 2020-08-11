@@ -143,9 +143,18 @@ class Template
             }
         });
 
-        self::$multiCalls = collect();
+        try{
+            Server::executeMulticall();
+        }catch(\Exception $e){
+            self::$multiCalls->each(function ($xml, $login) {
+                try {
+                    Server::sendDisplayManialinkPage($login, $xml, 0, false);
+                } catch (Exception $e) {
+                }
+            });
+        }
 
-        Server::executeMulticall();
+        self::$multiCalls = collect();
     }
 
     /**
