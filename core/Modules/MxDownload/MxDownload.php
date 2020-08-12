@@ -26,8 +26,8 @@ use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
 {
-    private static string $mxApiUrl;
-    private static string $mxUrl;
+    private static string $apiUrl;
+    private static string $exchangeUrl;
 
     /**
      * @inheritDoc
@@ -35,11 +35,11 @@ class MxDownload extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (isManiaPlanet()) {
-            self::$mxApiUrl = Exchange::MANIAPLANET_MX_API_URL;
-            self::$mxUrl = Exchange::MANIAPLANET_MX_URL;
+            self::$apiUrl = Exchange::MANIAPLANET_MX_API_URL;
+            self::$exchangeUrl = Exchange::MANIAPLANET_MX_URL;
         } else {
-            self::$mxApiUrl = Exchange::TRACKMANIA_MX_API_URL;
-            self::$mxUrl = Exchange::TRACKMANIA_MX_URL;
+            self::$apiUrl = Exchange::TRACKMANIA_MX_API_URL;
+            self::$exchangeUrl = Exchange::TRACKMANIA_MX_URL;
         }
 
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
@@ -82,7 +82,7 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception("Requested map with invalid id: $mxId");
         }
 
-        $download = RestClient::get(self::$mxUrl . '/tracks/download/' . $mxId);
+        $download = RestClient::get(self::$exchangeUrl . '/tracks/download/' . $mxId);
 
         if ($download->getStatusCode() != 200) {
             throw new Exception("Download $mxId failed: " . $download->getReasonPhrase());
@@ -236,7 +236,11 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$mxId}");
         }
 
-        $infoResponse = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $mxId);
+        if(isManiaPlanet()) {
+            $infoResponse = RestClient::get(self::$apiUrl . '/tm/maps/' . $mxId, ['timeout' => 3]); //deprecated, remove once new TMX API is available, only keep else-branch
+        }else{
+            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mxId, ['timeout' => 3]);
+        }
 
         if ($infoResponse->getStatusCode() != 200) {
             throw new Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());

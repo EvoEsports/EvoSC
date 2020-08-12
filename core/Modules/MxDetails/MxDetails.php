@@ -19,8 +19,8 @@ use stdClass;
 
 class MxDetails extends Module implements ModuleInterface
 {
-    private static ?string $mxApiUrl = null;  // prevents the "typed static property must not be accessed before initialization" error on Windows
-    private static ?string $mxUrl = null;
+    private static ?string $apiUrl = null;  // prevents the "typed static property must not be accessed before initialization" error on Windows
+    private static ?string $exchangeUrl = null;
 
     /**
      * @inheritDoc
@@ -28,11 +28,11 @@ class MxDetails extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (isManiaPlanet()) {
-            self::$mxApiUrl = Exchange::MANIAPLANET_MX_API_URL;
-            self::$mxUrl = Exchange::MANIAPLANET_MX_URL;
+            self::$apiUrl = Exchange::MANIAPLANET_MX_API_URL;
+            self::$exchangeUrl = Exchange::MANIAPLANET_MX_URL;
         } else {
-            self::$mxApiUrl = Exchange::TRACKMANIA_MX_API_URL;
-            self::$mxUrl = Exchange::TRACKMANIA_MX_URL;
+            self::$apiUrl = Exchange::TRACKMANIA_MX_API_URL;
+            self::$exchangeUrl = Exchange::TRACKMANIA_MX_URL;
         }
 
         if (!File::dirExists(cacheDir('mx-details'))) {
@@ -115,11 +115,10 @@ class MxDetails extends Module implements ModuleInterface
     {
         try {
             if(isManiaPlanet()) {
-                $result = RestClient::get(self::$mxApiUrl . '/tm/maps/' . $map->uid, ['timeout' => 1]);
+                $result = RestClient::get(self::$apiUrl . '/tm/maps/' . $map->uid, ['timeout' => 1]); //deprecated, remove once new TMX API is available, only keep else-branch
             }else{
-                $result = RestClient::get(self::$mxApiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
+                $result = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
             }
-//            $result = RestClient::get(self::$mxApiUrl . '/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
             return null;
@@ -160,7 +159,7 @@ class MxDetails extends Module implements ModuleInterface
             return null;
         }
 
-        $result = RestClient::get(self::$mxApiUrl . '/tm/tracks/worldrecord/' . $map->mx_details->TrackID, ['timeout' => 0.75]);
+        $result = RestClient::get(self::$apiUrl . '/tm/tracks/worldrecord/' . $map->mx_details->TrackID, ['timeout' => 0.75]);
 
         if ($result->getStatusCode() != 200) {
             Log::write('Failed to fetch MX world record: ' . $result->getReasonPhrase());
