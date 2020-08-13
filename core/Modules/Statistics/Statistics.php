@@ -77,7 +77,7 @@ class Statistics extends Module implements ModuleInterface
         $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '', '.', null, true, false));
 
         //Top Planets-Donators
-        if(isManiaPlanet()){
+        if (isManiaPlanet()) {
             $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
         }
 
@@ -120,26 +120,50 @@ class Statistics extends Module implements ModuleInterface
          */
         $limit = config('locals.limit');
 
-        $data = DB::table('local-records')
-            ->join('players', 'local-records.Player', '=', 'players.id')
-            ->join('maps', 'local-records.Map', '=', 'maps.id')
-            ->selectRaw('Player as id, Login, SUM(Rank) as rank_sum, COUNT(Rank) as locals')
-            ->where('maps.enabled', '=', 1)
-            ->whereIn('Login', $players->pluck('login'))
-            ->groupBy('Login')
-            ->get();
+        DB::raw('UPDATE stats SET Score = 0, Locals = 0, Rank = -1 WHERE 1=1;');
 
-        foreach ($data as $stat) {
-            DB::table('stats')->updateOrInsert([
-                'Player' => $stat->id
-            ], [
-                'Score' => $limit * $stat->locals - intval($stat->rank_sum),
-                'Locals' => $stat->locals
-            ]);
-        }
+        DB::raw('UPDATE stats
+JOIN (
+    SELECT Player, COUNT(`Rank`) AS total_locals FROM `local-records`
+    LEFT JOIN maps ON maps.id = `local-records`.Map
+    WHERE maps.enabled = 1
+    GROUP BY Player
+        ) s
+ON s.Player = stats.Player
+SET stats.Locals = s.total_locals
+WHERE 1=1;');
+
+        DB::raw('UPDATE stats
+JOIN (
+        SELECT stats.Player, ((' . $limit . '*Locals)-SUM(`local-records`.`Rank`)) AS score FROM `local-records`
+        LEFT JOIN maps ON maps.id = `local-records`.Map
+        LEFT JOIN stats ON stats.Player = `local-records`.Player
+        WHERE maps.enabled = 1
+        GROUP BY Player
+        ) s
+ON s.Player = stats.Player
+SET stats.Score = s.score
+WHERE 1=1;');
 
         self::$totalRankedPlayers = DB::table('stats')->where('Score', '>', 0)->count();
-        self::updatePlayerRanks($players);
+
+        DB::raw('SET @rank=0');
+        DB::raw('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
+
+        $scores = DB::table('players')
+            ->join('stats', 'players.id', '=', 'stats.Player')
+            ->select(['Login', 'Rank', 'stats.Score'])
+            ->whereIn('Login', $players->pluck('login'))
+            ->get();
+
+        foreach ($scores as $score) {
+            if($score->Rank == -1){
+                infoMessage('You need at least one local record before receiving a rank.')->send($score->Login);
+            }else{
+                infoMessage('Your server rank is ',
+                    secondary($score->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $score->Score . ')'))->send($score->Login);
+            }
+        }
     }
 
     /**
@@ -149,27 +173,6 @@ class Statistics extends Module implements ModuleInterface
      */
     public static function updatePlayerRanks(Collection $players)
     {
-        DB::raw('SET @rank=0');
-        DB::raw('UPDATE `stats` SET `Rank`= @rank:=(@rank+1) WHERE `Score` > 0 ORDER BY `Score` DESC');
-
-        $playerLogins = $players->pluck('login')->toArray();
-
-        $scores = DB::table('players')
-            ->join('stats', 'players.id', '=', 'stats.Player')
-            ->whereIn('Login', $playerLogins)
-            ->select(['Login', 'Player', 'Rank', 'stats.Score'])
-            ->get();
-
-        foreach ($scores as $score) {
-            infoMessage('Your server rank is ',
-                secondary($score->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $score->Score . ')'))->send($score->Login);
-        }
-
-        $playersWithoutScores = onlinePlayers()->whereNotIn('Login', $scores->pluck('Login'));
-
-        foreach ($playersWithoutScores as $player) {
-            infoMessage('You need at least one local record before receiving a rank.')->send($player->Login);
-        }
     }
 
     public static function showRank(Player $player)
