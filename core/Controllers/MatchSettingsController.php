@@ -12,6 +12,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Timer;
+use EvoSC\Classes\Utility;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\QuickButtons\QuickButtons;
@@ -26,14 +27,14 @@ class MatchSettingsController implements ControllerInterface
      */
     private static string $currentMatchSettingsFile;
 
-    private static $lastMatchSettingsModification;
+    private static string $lastMatchSettingsModification;
 
     /**
      *
      */
     public static function init()
     {
-        self::$currentMatchSettingsFile = config('server.default-matchsettings');
+        self::$currentMatchSettingsFile = (string)config('server.default-matchsettings');
 
         if (!File::exists(self::getPath(self::$currentMatchSettingsFile))) {
             Log::error('MatchSettings "' . self::getPath(self::$currentMatchSettingsFile) . '" not found.');
@@ -41,6 +42,25 @@ class MatchSettingsController implements ControllerInterface
         }
     }
 
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.', 'map_add');
+
+        self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
+
+        Timer::create('detect_match_settings_changes', [self::class, 'detectMatchSettingsChanges'], '5s', true);
+    }
+
+    /**
+     * @param bool $rebootClasses
+     * @param Player|null $player
+     * @param string|null $matchSettingsFile
+     */
     public static function loadMatchSettings(bool $rebootClasses = false, Player $player = null, string $matchSettingsFile = null)
     {
         if ($player) {
@@ -154,12 +174,12 @@ class MatchSettingsController implements ControllerInterface
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
-        infoMessage('The map-list gets shuffled after the map finished.')->sendAdmin();
+        infoMessage($player, ' shuffled the map list.')->sendAll();
+        infoMessage('The map list gets shuffled at the end of the map.')->sendAdmin();
 
         Hook::add('Maniaplanet.EndMap_Start', function () use ($player) {
             MatchSettingsController::shuffleCurrentMapList();
-            infoMessage($player, ' shuffled the map-list.')->sendAll();
-            Server::loadMatchSettings(MatchSettingsController::getPath(MatchSettingsController::$currentMatchSettingsFile));
+            successMessage('Map list shuffled.')->sendAdmin();
         }, true);
     }
 
@@ -180,20 +200,14 @@ class MatchSettingsController implements ControllerInterface
         }
 
         unset($settings->map);
-        unset($settings->startindex);
-        $settings->addChild('startindex', 0);
 
-        $maps->shuffle()->each(function ($map) use ($settings) {
-            $mapNode = $settings->addChild('map');
-            $mapNode->addChild('file', $map['file']);
-            $mapNode->addChild('ident', $map['ident']);
-        });
-
-        try {
-            self::saveMatchSettings($file, $settings);
-        } catch (Exception $e) {
-            Log::error("Failed to shuffle map-list: " . $e->getMessage());
+        foreach ($maps->shuffle() as $map){
+            $entry = $settings->addChild('map');
+            $entry->addChild('file', $map['file']);
+            $entry->addChild('ident', $map['ident']);
         }
+
+        File::put($file, Utility::simpleXmlPrettyPrint($settings));
     }
 
     /**
@@ -429,20 +443,5 @@ class MatchSettingsController implements ControllerInterface
     public static function updateMatchSettingsModificationTime()
     {
         self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        ChatCommand::add('//shuffle', [self::class, 'shuffleCurrentMapListCommand'], 'Shuffle the current map-pool.',
-            'map_add');
-
-        self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
-
-        Timer::create('detect_match_settings_changes', [self::class, 'detectMatchSettingsChanges'], '5s', true);
     }
 }
