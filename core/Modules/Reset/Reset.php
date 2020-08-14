@@ -22,12 +22,14 @@ class Reset extends Module implements ModuleInterface
 
     public static function reset(Player $player)
     {
+        $player->stats()->decrement('Visits');
         Hook::fire('PlayerConnect', $player);
     }
 
     public static function resetAll()
     {
         onlinePlayers()->each(function (Player $player) {
+            $player->stats()->decrement('Visits');
             Hook::fire('PlayerConnect', $player);
         });
     }
