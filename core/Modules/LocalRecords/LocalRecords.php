@@ -7,7 +7,6 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
@@ -16,7 +15,6 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\RecordsTable\RecordsTable;
-use Illuminate\Support\Collection;
 
 class LocalRecords extends Module implements ModuleInterface
 {

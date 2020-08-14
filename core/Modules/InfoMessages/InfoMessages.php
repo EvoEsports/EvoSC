@@ -13,8 +13,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InfoMessages\Models\InfoMessage;
-use EvoSC\Modules\QuickButtons\QuickButtons;
-use Illuminate\Support\Collection;
 
 class InfoMessages extends Module implements ModuleInterface
 {
