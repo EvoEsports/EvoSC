@@ -84,6 +84,8 @@
                 continue;
             }
 
+            log(map);
+
             declare row = (rows.Controls[filled] as CMlFrame);
             (row.Controls[1] as CMlLabel).Value = map["name"];
             (row.Controls[2] as CMlLabel).Value = map["author_name"];

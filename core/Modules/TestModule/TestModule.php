@@ -20,6 +20,7 @@ use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\LocalRecords\LocalsBenchmark;
+use EvoSC\Modules\MatchSettingsManager\MatchSettingsManager;
 use EvoSC\Modules\MOTD\MOTD;
 use EvoSC\Modules\MxKarma\MxKarma;
 use EvoSC\Modules\QuickButtons\QuickButtons;
@@ -43,7 +44,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxKarma::playerConnect($player);
+        MatchSettingsManager::showEditMatchsettingsMaps($player, 'example');
     }
 
     public static function sendTestManialink(Player $player)

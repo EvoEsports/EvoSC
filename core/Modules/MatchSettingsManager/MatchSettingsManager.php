@@ -146,7 +146,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
                     'id' => $map->id,
                     'enabled' => $enabledMapUids->contains($map->uid),
                     'environment' => $map->environment,
-                    'title_id' => $map->title_id,
+                    'title_id' => $map->title_id ?? "?",
                     'name' => $map->name,
                     'author_name' => $map->author->NickName,
                     'author_login' => $map->author->Login
