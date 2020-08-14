@@ -120,7 +120,7 @@ class Statistics extends Module implements ModuleInterface
          */
         $limit = config('locals.limit');
 
-        DB::raw('UPDATE stats SET Score = 0, Locals = 0, Rank = -1 WHERE 1=1;');
+        DB::raw('UPDATE stats SET Score = 0, Locals = 0, `Rank` = -1 WHERE 1=1;');
 
         DB::raw('UPDATE stats
 JOIN (
