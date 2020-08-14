@@ -10,6 +10,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
@@ -32,9 +33,15 @@ class MatchSettingsManager extends Module implements ModuleInterface
         'Chase' => 'chase.xml',
     ];
 
-    public function __construct()
+    /**
+     * Called when the module is loaded
+     *
+     * @param string $mode
+     * @param bool $isBoot
+     */
+    public static function start(string $mode, bool $isBoot = false)
     {
-        self::$path = Server::getMapsDirectory().'/MatchSettings/';
+        self::$path = Server::getMapsDirectory() . '/MatchSettings/';
         self::$objects = collect();
 
         AccessRight::add('matchsettings_load', 'Load matchsettings.');
@@ -51,16 +58,50 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'matchsettings_edit');
-
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
-        ManiaLinkEvent::add('msm.add_map', [self::class, 'addMap'], 'matchsettings_edit');
-        ManiaLinkEvent::add('msm.remove_map', [self::class, 'removeMap'], 'matchsettings_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'map.edit');
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $data
+     */
+    public static function saveMaps(Player $player, $data)
+    {
+        $matchsettings = $data->matchsettings;
+
+        $enabledMapIds = collect($data)->map(function ($value, $key) {
+            if (preg_match('/^map_.+/', $key) && $value == '1') {
+                return preg_replace('/^map_/', '', $key);
+            }
+
+            return null;
+        })->filter()->values();
+
+        $file = mapsDir("MatchSettings/$matchsettings.txt");
+
+        $settings = new SimpleXMLElement(File::get($file));
+        unset($settings->map);
+
+        foreach(Map::whereIn('id', $enabledMapIds)->get() as $map){
+            $entry = $settings->addChild('map');
+            $entry->addChild('file', $map->filename);
+            $entry->addChild('ident', $map->uid);
+        }
+
+        File::put($file, Utility::simpleXmlPrettyPrint($settings));
+
+        successMessage('MatchSettings ', secondary($matchsettings), ' saved.')->send($player);
+        self::showEditMatchsettingsMaps($player, $matchsettings);
+    }
+
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showOverview(Player $player)
     {
         $matchsettings = self::getMatchsettings()->values();
@@ -68,36 +109,26 @@ class MatchSettingsManager extends Module implements ModuleInterface
         Template::show($player, 'MatchSettingsManager.overview', compact('matchsettings'));
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showCreateMatchsettings(Player $player)
     {
         $modes = collect(self::$modes)->keys();
 
         Template::show($player, 'MatchSettingsManager.create', compact('modes'));
+
     }
 
-    public static function addMap(Player $player, string $matchSettingsName, string $mapId)
-    {
-        $map = Map::find($mapId);
-
-        if ($map) {
-            MatchSettingsController::addMap("$matchSettingsName.txt", $map->filename, $map->uid);
-            Log::info($player.' added "'.$map.'" to "'.$matchSettingsName.'"');
-        }
-    }
-
-    public static function removeMap(Player $player, string $matchSettingsName, string $mapId)
-    {
-        $map = Map::find($mapId);
-
-        if ($map) {
-            MatchSettingsController::removeByUid("$matchSettingsName.txt", $map->uid);
-            Log::info($player.' removed "'.$map.'" from "'.$matchSettingsName.'"');
-        }
-    }
-
+    /**
+     * @param Player $player
+     * @param string $name
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showEditMatchsettings(Player $player, string $name)
     {
-        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
+        $file = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
         $data = File::get($file);
         $nodes = collect();
         $xml = new SimpleXMLElement($data);
@@ -110,15 +141,15 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
                     foreach ($node as $item) {
                         if ($nodeName == 'mode_script_settings' || $nodeName == 'script_settings') {
-                            $items->put(''.$item['name'], ''.$item['value']);
+                            $items->put('' . $item['name'], '' . $item['value']);
                         } else {
-                            $items->put($item->getName(), ''.$item[0]);
+                            $items->put($item->getName(), '' . $item[0]);
                         }
                     }
 
                     $nodes->put($nodeName, $items);
                 } else {
-                    $nodes->put($node->getName(), ''.$node[0]);
+                    $nodes->put($node->getName(), '' . $node[0]);
                 }
             }
         }
@@ -126,10 +157,14 @@ class MatchSettingsManager extends Module implements ModuleInterface
         @Template::show($player, 'MatchSettingsManager.edit-settings', compact('name', 'nodes'));
     }
 
+    /**
+     * @param Player $player
+     * @param string $name
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showEditMatchsettingsMaps(Player $player, string $name)
     {
-        $perPage = 19;
-        $file = Server::getMapsDirectory().'MatchSettings/'.$name.'.txt';
+        $file = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
         $data = File::get($file);
         $enabledMapUids = collect();
         $xml = new SimpleXMLElement($data);
@@ -140,114 +175,112 @@ class MatchSettingsManager extends Module implements ModuleInterface
             }
         }
 
-        $mapChunks = Map::all()
-            ->map(function (Map $map) use ($enabledMapUids) {
-                return [
-                    'id' => $map->id,
-                    'enabled' => $enabledMapUids->contains($map->uid),
-                    'environment' => $map->environment,
-                    'title_id' => $map->title_id ?? "?",
-                    'name' => $map->name,
-                    'author_name' => $map->author->NickName,
-                    'author_login' => $map->author->Login
-                ];
-            })
-            ->sortByDesc('enabled')
-            ->chunk(250);
+        $mapChunks = Map::all()->sortByDesc('enabled')->chunk(19);
 
-        for ($i = 0; $i < $mapChunks->count(); $i++) {
-            Template::show($player, 'MatchSettingsManager.send-maps',
-                ['maps' => $mapChunks->get($i)->values(), 'chunks' => $mapChunks->count(), 'i' => $i]);
-        }
-
-        $totalMaps = Map::count();
-        $totalPages = ceil($totalMaps / $perPage);
-
-        Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'totalPages', 'totalMaps'));
+        Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'mapChunks', 'enabledMapUids'));
     }
 
+    /**
+     * @param Player $player
+     * @param string $oldFilename
+     * @param string $filename
+     * @param mixed ...$settings
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function updateMatchsettings(Player $player, string $oldFilename, string $filename, ...$settings)
     {
         $settings = json_decode(implode(',', $settings));
         $filename = trim($filename);
 
         foreach ($settings as $setting => $value) {
-            MatchSettingsController::updateSetting($oldFilename.'.txt', $setting, $value);
-            Log::info($player.' set "'.$setting.'" to "'.$value.'" in "'.$oldFilename.'"');
+            MatchSettingsController::updateSetting($oldFilename . '.txt', $setting, $value);
+            Log::info($player . ' set "' . $setting . '" to "' . $value . '" in "' . $oldFilename . '"');
         }
 
         if ($oldFilename != $filename) {
-            MatchSettingsController::rename($oldFilename.'.txt', $filename.'.txt');
-            Log::info($player.' renamed "'.$oldFilename.'" to "'.$filename.'"');
+            MatchSettingsController::rename($oldFilename . '.txt', $filename . '.txt');
+            Log::info($player . ' renamed "' . $oldFilename . '" to "' . $filename . '"');
         }
 
         self::showOverview($player);
     }
 
+    /**
+     * @param Player $player
+     * @param string $modeName
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function createNewMatchsettings(Player $player, string $modeName)
     {
         $modeFile = self::$modes[$modeName];
         $modeBaseName = str_replace('.xml', '', $modeFile);
-        $sourceMatchsettings = __DIR__.'/MatchSettingsRepo/'.$modeFile;
-        $matchsettingsDirectory = Server::getMapsDirectory().'MatchSettings/';
+        $sourceMatchsettings = __DIR__ . '/MatchSettingsRepo/' . $modeFile;
+        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
         $i = 0;
 
         do {
             $filename = sprintf('%s_%d.txt', $modeBaseName, $i);
             $i++;
-        } while (File::exists($matchsettingsDirectory.$filename));
+        } while (File::exists($matchsettingsDirectory . $filename));
 
-        File::copy($sourceMatchsettings, $matchsettingsDirectory.$filename);
-        Log::info($player.' created new "'.$filename.'" with mode "'.$modeName.'"');
+        File::copy($sourceMatchsettings, $matchsettingsDirectory . $filename);
+        Log::info($player . ' created new "' . $filename . '" with mode "' . $modeName . '"');
 
         self::showOverview($player);
     }
 
+    /**
+     * @param Player $player
+     * @param string $matchsettingsFile
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function duplicateMatchsettings(Player $player, string $matchsettingsFile)
     {
-        $file = $matchsettingsFile.'.txt';
-        $targetFile = $matchsettingsFile.'_copy.txt';
-        $matchsettingsDirectory = Server::getMapsDirectory().'MatchSettings/';
+        $file = $matchsettingsFile . '.txt';
+        $targetFile = $matchsettingsFile . '_copy.txt';
+        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
 
-        File::copy($matchsettingsDirectory.$file, $matchsettingsDirectory.$targetFile);
-        Log::info($player.' duplicated "'.$file.'" as "'.$targetFile.'"');
+        File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
+        Log::info($player . ' duplicated "' . $file . '" as "' . $targetFile . '"');
 
         self::showOverview($player);
     }
 
+    /**
+     * @param Player $player
+     * @param string $matchsettingsFile
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function deleteMatchsettings(Player $player, string $matchsettingsFile)
     {
-        if (config('server.default-matchsettings') == $matchsettingsFile.'.txt') {
+        if (config('server.default-matchsettings') == $matchsettingsFile . '.txt') {
             warningMessage('Can not delete default match-settings.')->send($player);
 
             return;
         }
 
-        File::delete(Server::getMapsDirectory().'MatchSettings/'.$matchsettingsFile.'.txt');
-        Log::warning($player.' deleted "'.$matchsettingsFile.'"');
+        File::delete(Server::getMapsDirectory() . 'MatchSettings/' . $matchsettingsFile . '.txt');
+        Log::warning($player . ' deleted "' . $matchsettingsFile . '"');
 
         self::showOverview($player);
     }
 
+    /**
+     * @param Player $player
+     * @param string $matchsettingsFile
+     */
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
-        MatchSettingsController::loadMatchSettings(true, $player, $matchsettingsFile.'.txt');
-    }
-
-    public static function getMatchsettings()
-    {
-        return File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (String $file) {
-            return preg_replace('/\.txt$/', '', $file);
-        });
+        MatchSettingsController::loadMatchSettings(true, $player, $matchsettingsFile . '.txt');
     }
 
     /**
-     * Called when the module is loaded
-     *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @return \Illuminate\Support\Collection
      */
-    public static function start(string $mode, bool $isBoot = false)
+    public static function getMatchsettings()
     {
+        return File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (string $file) {
+            return preg_replace('/\.txt$/', '', $file);
+        });
     }
 }

@@ -2,6 +2,6 @@
 <frame id="pagination">
     <entry id="page-input" class="form page-input" pos="6.05 0" size="8.4 3.5" valign="center" halign="center" text="1" textsize="0.8" ScriptEvents="1" hidden="1"/>
     <label id="page-info" class="btn-default enable-page-input" pos="6.05 0" size="8.4 3.5" text="1/1" textsize="0.8" ScriptEvents="1"/>
-    <label class="btn-default previous-page" size="3.5 3.5" text="⏴" ScriptEvents="1"/>
+    <label class="btn-default previous-page" pos="0.03" size="3.5 3.5" text="⏴" ScriptEvents="1"/>
     <label class="btn-default next-page" pos="12 0" size="3.5 3.5" text="⏵" ScriptEvents="1"/>
 </frame>

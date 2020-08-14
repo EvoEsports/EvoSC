@@ -4,6 +4,7 @@
 namespace EvoSC\Classes;
 
 
+use DOMDocument;
 use EvoSC\Controllers\MapController;
 use EvoSC\Models\Player;
 
@@ -183,5 +184,18 @@ class Utility
         }
 
         Template::executeMulticall();
+    }
+
+    /**
+     * @param \SimpleXMLElement $simpleXMLElement
+     * @return string
+     */
+    public static function simpleXmlPrettyPrint(\SimpleXMLElement $simpleXMLElement): string
+    {
+        $dom = new DOMDocument("1.0");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+        $dom->loadXML($simpleXMLElement->asXML());
+        return $dom->saveXML();
     }
 }
