@@ -76,4 +76,12 @@ class Module
     {
         $this->name = $name;
     }
+
+    /**
+     *
+     */
+    public function stop()
+    {
+
+    }
 }

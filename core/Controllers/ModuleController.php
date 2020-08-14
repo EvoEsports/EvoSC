@@ -52,7 +52,6 @@ class ModuleController implements ControllerInterface
 
     public static function startModules(string $mode, bool $isBoot)
     {
-        
         //Boot modules
         Log::info('Starting modules...');
 
@@ -64,21 +63,19 @@ class ModuleController implements ControllerInterface
             ->filter(function ($file) {
                 if (isWindows()) {
                     return preg_match(self::PATTERNW, $file);
-                }
-                else {
+                } else {
                     return preg_match(self::PATTERN, $file);
                 }
             })
             ->mapWithKeys(function ($file) {
                 if (isWindows()) {
-                    if(preg_match(self::PATTERNW, $file, $matches)){
+                    if (preg_match(self::PATTERNW, $file, $matches)) {
                         $dir = $matches[1];
                         $classname = $matches[2];
                         return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
                     }
-                }
-                else {
-                    if(preg_match(self::PATTERN, $file, $matches)){
+                } else {
+                    if (preg_match(self::PATTERN, $file, $matches)) {
                         $dir = $matches[1];
                         $classname = $matches[2];
                         return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
@@ -133,9 +130,9 @@ class ModuleController implements ControllerInterface
                 $instance->setNamespace($moduleClass);
                 $instance->setName(preg_replace('#^.+[\\\]#', '', $moduleClass));
 
-                if(isVerbose()){
+                if (isVerbose()) {
                     Log::info("Module: $moduleClass [Started]");
-                }else{
+                } else {
                     Log::getOutput()->write('<fg=cyan;options=bold>.</>');
                 }
 
@@ -150,5 +147,19 @@ class ModuleController implements ControllerInterface
         Log::cyan("Starting modules finished. $totalStarted modules started.");
 
         self::$loadedModules = $moduleClasses;
+    }
+
+    /**
+     *
+     */
+    public static function stopModules()
+    {
+        self::$loadedModules->each(function (Module $module){
+            try {
+                $module->stop();
+            } catch (\Exception $e) {
+                Log::error('Failed to stop module: ' . $e->getMessage());
+            }
+        });
     }
 }
