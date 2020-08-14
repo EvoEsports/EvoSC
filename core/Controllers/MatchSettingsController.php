@@ -13,6 +13,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Timer;
 use EvoSC\Classes\Utility;
+use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\QuickButtons\QuickButtons;
@@ -91,6 +92,7 @@ class MatchSettingsController implements ControllerInterface
 
             ControllerController::loadControllers($mode);
             ModuleController::startModules($mode, false);
+            EscRun::addBootCommands();
         }
 
         MapController::loadMaps();
