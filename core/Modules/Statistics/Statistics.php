@@ -274,5 +274,7 @@ WHERE 1=1;');
     public static function beginMap()
     {
         self::$scores = collect();
+
+        Template::hideAll('Statistics');
     }
 }
