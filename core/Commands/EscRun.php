@@ -31,6 +31,7 @@ use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -247,9 +248,11 @@ class EscRun extends Command
     {
         AwaitAction::createQueueAndStartCheckCycle();
 
+        AccessRight::add('restart_evosc', 'Allows you to restart EvoSC.');
+
         ChatCommand::add('//restart-evosc', function () {
             restart_evosc();
-        }, 'Restart EvoSC', 'ma');
+        }, 'Restart EvoSC', 'restart_evosc');
 
         Timer::create('watch_for_restart_file', function () {
             if (Cache::has('restart_evosc')) {
