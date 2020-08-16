@@ -25,7 +25,7 @@ use stdClass;
 
 class Votes extends Module implements ModuleInterface
 {
-    private static ?Collection $vote;
+    private static $vote;
     private static Collection $voters;
 
     private static $lastTimeVote;
@@ -105,13 +105,13 @@ class Votes extends Module implements ModuleInterface
         self::$onlinePlayersCount = onlinePlayers()->count();
         self::$voters = collect();
         self::$lastTimeVote = time();
-        $vote = collect([
+        $vote = (object)[
             'question' => $question,
             'success_ratio' => $successRatio,
             'start_time' => time(),
             'duration' => $duration,
             'action' => $action,
-        ]);
+        ];
         self::$vote = $vote;
 
         Timer::create('vote.check_state', [self::class, 'checkVoteState'], '1s', true);
@@ -131,21 +131,21 @@ class Votes extends Module implements ModuleInterface
         }
 
         $voteCount = self::$voters->count();
-        $timerRanOut = (time() - self::$vote['start_time']) > self::$vote['duration'];
+        $timerRanOut = (time() - self::$vote->start_time) > self::$vote->duration;
         $everyoneVoted = $voteCount == self::$onlinePlayersCount;
 
         $voteState = self::getVoteState();
-        $voteRatioReached = ($voteState['yes'] / self::$onlinePlayersCount) > self::$vote['success_ratio'];
+        $voteRatioReached = ($voteState['yes'] / self::$onlinePlayersCount) > self::$vote->success_ratio;
 
         if ($timerRanOut || $everyoneVoted || $voteRatioReached) {
             if ($voteRatioReached) {
                 $success = true;
             } else {
-                $success = ($voteState['yes'] / $voteCount) > self::$vote['success_ratio'];
+                $success = ($voteState['yes'] / $voteCount) > self::$vote->success_ratio;
             }
 
             Timer::destroy('vote.check_state');
-            $action = self::$vote['action'];
+            $action = self::$vote->action;
             $action($success);
             self::$vote = null;
             self::$voters = collect();

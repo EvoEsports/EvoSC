@@ -2,24 +2,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
     {include 'Components.stylesheet'}
-    <frame id="widget" size="50 16.5" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
-        <quad class="bg-light" pos="0 -6" z-index="1" size="50 3" opacity="0.2"/>
 
-        <quad pos="0 -6" z-index="2" size="1 3" bgcolor="1f8" opacity="0.5"/>
-        <quad pos="50 -6" z-index="2" size="1 3" halign="right" bgcolor="f33" opacity="0.5"/>
+    <frame id="widget" size="50 50" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
+        <label id="question" class="text-light" pos="25 -2.25" z-index="1" size="48 5" textprefix="$s" autonewline="1" text="{$vote->question}" halign="center" textsize="1.25"/>
 
-        <quad opacity="0.68" pos="48 -6" z-index="3" size="0.3 3" halign="center" bgcolor="fffe"/>
-        <label opacity="0.68" class="text-light" pos="25 -7.5" z-index="3" size="49 2.8" halign="right" text="{$vote->success_ratio * 100}%" valign="center" textsize="0.4"/>
+        <frame id="main">
+            <frame pos="0 -7">
+                <quad id="bar_bg" class="bg-darker" pos="0 0" z-index="1" size="50 4" opacity="0.5"/>
+                <quad id="bar_success" class="bg-success" pos="0 0" z-index="2" size="1 4" opacity="0.85"/>
+                <quad id="bar_fail" class="bg-danger" pos="50 0" z-index="2" size="1 4" halign="right" opacity="0.85"/>
 
-        <label class="btn-muted yes" pos="2 -3" z-index="1" size="12 3.5" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000"/>
-        <label class="btn-muted no" pos="48 -3" z-index="1" size="12 3.5" halign="right" textprefix="$aaaF6 $fff" text="0 NO" valign="center" textsize="1.2" ScriptEvents="1" focusareacolor1="0000"/>
+                <frame hidden="{$vote->success_ratio == 0.5 ? '1' : '0'}" z-index="3">
+                    <quad id="ratio_marker" opacity="0.5" pos="48 0" z-index="3" size="0.3 4" halign="center" bgcolor="fffe"/>
+                    <label id="ratio_label" opacity="0.5" class="text-light" pos="25 -1.8" z-index="3" size="49 2.8" halign="right" text="{$vote->success_ratio * 100}%" valign="center" textsize="0.4"/>
+                </frame>
+            </frame>
 
-        <label class="text-light" opacity="0.9" pos="25 -3" z-index="1" size="49 2.8" halign="center" text="{$vote->duration}" valign="center" textsize="0.6"/>
-        <label class="text-light" id="question" pos="25 -11.5" z-index="1" size="48 5" textprefix="$s" autonewline="1" text="{$vote->question}" halign="center" textsize="1.25"/>
+            <frame pos="0 -13.5">
+                <label id="label_yes" class="btn-muted yes" opacity="0.86" pos="2 0" z-index="1" size="12 3.5" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
+                <label id="label_no" class="btn-muted no" opacity="0.86" pos="48 0" z-index="1" size="12 3.5" halign="right" textprefix="$aaaF6 $fff" text="0 NO" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
+                <label id="time_left" class="text-light" opacity="0.9" pos="25 0" z-index="1" size="49 2.8" halign="center" text="{$vote->duration}" valign="center" textsize="0.6"/>
+            </frame>
+        </frame>
 
-        <quad class="bg-blur" id="bg1" size="50 50" z-index="-1" />
-        <quad class="bg-darker" pos="0 -5" size="50 5" opacity="0" z-index="-3" />
-        <quad class="bg-dark" id="bg2" pos="0 0" size="50 50" opacity="0.2" z-index="-2" />
+        <quad id="bg1" class="bg-blur" size="50 16.5" z-index="-1" />
+        <quad id="bg2" class="bg-dark" pos="0 0" size="50 16.5" opacity="0.4" z-index="-3" />
+        <quad id="bg3" class="bg-light" pos="0 0" size="50 7" opacity="0" z-index="-2" />
 
         <script><!--
     #Include "MathLib" as ML
@@ -27,24 +35,27 @@
 
     main() {
         declare Integer[Text] VoteState for LocalUser = Integer[Text];
+        declare mainFr <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
-        declare backgroundBar = (widget.Controls[0] as CMlQuad);
-        declare yesBar = (widget.Controls[1] as CMlQuad);
-        declare noBar = (widget.Controls[2] as CMlQuad);
-        declare ratioMarker = (widget.Controls[3] as CMlQuad);
-        declare ratioLabel = (widget.Controls[4] as CMlLabel);
-        declare yesLabel = (widget.Controls[5] as CMlLabel);
-        declare noLabel = (widget.Controls[6] as CMlLabel);
-        declare timeLeftLabel = (widget.Controls[7] as CMlLabel);
+        declare backgroundBar = (Page.MainFrame.GetFirstChild("bar_bg") as CMlQuad);
+        declare yesBar = (Page.MainFrame.GetFirstChild("bar_success") as CMlQuad);
+        declare noBar = (Page.MainFrame.GetFirstChild("bar_fail") as CMlQuad);
+        declare ratioMarker = (Page.MainFrame.GetFirstChild("ratio_marker") as CMlQuad);
+        declare ratioLabel = (Page.MainFrame.GetFirstChild("ratio_label") as CMlLabel);
+        declare yesLabel = (Page.MainFrame.GetFirstChild("label_yes") as CMlLabel);
+        declare noLabel = (Page.MainFrame.GetFirstChild("label_no") as CMlLabel);
+        declare timeLeftLabel = (Page.MainFrame.GetFirstChild("time_left") as CMlLabel);
         declare Real backgroundBarWidth = backgroundBar.Size[0];
         declare Integer duration = {$vote->duration};
         declare bg1 <=> (Page.MainFrame.GetFirstChild("bg1") as CMlQuad);
         declare bg2 <=> (Page.MainFrame.GetFirstChild("bg2") as CMlQuad);
         declare questionLabel <=> (Page.MainFrame.GetFirstChild("question") as CMlLabel);
 
+        declare questionHeight = questionLabel.ComputeHeight(questionLabel.Value);
         if(TL::Length(questionLabel.Value) > 32){
-            bg1.Size = <50.0, bg1.Size[1] + 3.0>;
-            bg2.Size = <50.0, bg2.Size[1] + 3.0>;
+            bg1.Size[1] = bg1.Size[1] + questionHeight;
+            bg2.Size[1] = bg2.Size[1] + questionHeight;
+            mainFr.RelativePosition_V3[1] = questionHeight * -1.0 + 3.0;
         }
 
         widget.RelativePosition_V3 = <(widget.Size[0]*widget.RelativeScale)/-2.0, widget.RelativePosition_V3[1]>;
