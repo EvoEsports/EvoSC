@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\AddedTimeInfo\AddedTimeInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MatchSettingsManager\MatchSettingsManager;
 use Illuminate\Support\Collection;
@@ -29,16 +30,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-
-        $vote = (object)[
-            'question' => "Skip the map?",
-            'success_ratio' => 0.8,
-            'start_time' => time(),
-            'duration' => 30,
-            'action' => '',
-        ];
-
-        Template::showAll('Votes.vote', compact('vote'));
+        AddedTimeInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

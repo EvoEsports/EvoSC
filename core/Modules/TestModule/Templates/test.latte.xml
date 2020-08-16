@@ -12,8 +12,10 @@ CSmPlayer GetOwner() {
 main() {
     declare Owner <=> GetOwner();
 
-    UI.CountdownCoord = <0.0, 0.0>;
-    UI.OverlayHideAll = True;
+    UI.OverlayHideBackground = True;
+
+    log("meh"^GameTime);
+    log(UI.UILayers);
 }
     --></script>
 </manialink>
