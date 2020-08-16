@@ -36,12 +36,8 @@
     {include 'Scripts.hide'}
 
     <script><!--
-    Text timeLeft(){
-        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
-        return TL::TimeToText(Net_Race_Countdown_CutOffTimeLimit - GameTime +1000);
-    }
-
     main() {
+        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
         declare Real AddedTimeR for This = 0.0;
         declare Real currentAddedTime = -1.0;
         declare cd <=> (Page.MainFrame.GetFirstChild("cd") as CMlLabel);
@@ -52,14 +48,16 @@
         declare UISettings settings for This;
         declare Text sign = "";
 
-        HS_POS = <106.5, 2.5>;
+        HS_POS = <108.5, 2.75>;
 
         while(True){
             yield;
 
-            cd.Value = timeLeft();
+            cd.Value = TL::TimeToText(Net_Race_Countdown_CutOffTimeLimit - GameTime +1000);
             declare width = cd.ComputeWidth(cd.Value) * 0.75;
             content.RelativePosition_V3[0] = cd.RelativePosition_V3[0] - width - 33;
+
+            buttons.Visible = Net_Race_Countdown_CutOffTimeLimit-GameTime > 15000;
 
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
