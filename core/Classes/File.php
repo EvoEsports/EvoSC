@@ -224,9 +224,6 @@ class File
     {
         $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
 
-        /** Have to use a preg_match like this on Windows, seems to work (also delimeters # were required) - I don't even...
-         * Also, this fixes the !preg_match to be as before
-         */
         if ((isWindows() && !preg_match('/^\\w:(\\\|\\/)/i', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
             throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
         }
@@ -261,8 +258,8 @@ class File
         $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
-        if (!is_dir(baseDir($targetFile))) {
-            mkdir(is_dir(baseDir($targetFile)));
+        if (!self::dirExists(baseDir($targetFile))) {
+            self::makeDir(baseDir($targetFile));
         }
 
         rename($sourceFile, $targetFile);
@@ -273,8 +270,8 @@ class File
         $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
         $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
 
-        if (!is_dir(baseDir($target))) {
-            mkdir(is_dir(baseDir($target)));
+        if (!self::dirExists(baseDir($target))) {
+            self::makeDir(baseDir($target));
         }
 
         copy($source, $target);

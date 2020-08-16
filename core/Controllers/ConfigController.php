@@ -112,7 +112,7 @@ class ConfigController implements ControllerInterface
             $name = basename($configFile);
 
             if (!File::exists(configDir($name))) {
-                File::copy($configFile, configDir($name));  // on fresh installs throws many warnings on Windows (mkdir), no big issues though
+                File::copy($configFile, configDir($name));
             } else {
                 $sourceJson = File::get($configFile, true);
                 $targetJson = File::get(configDir($name), true);
