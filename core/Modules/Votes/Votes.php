@@ -445,7 +445,7 @@ class Votes extends Module implements ModuleInterface
     public static function approveVote(Player $player)
     {
         Timer::destroy('vote.check_state');
-        $action = self::$vote['action'];
+        $action = self::$vote->action;
 
         try {
             $action(true);
@@ -466,7 +466,7 @@ class Votes extends Module implements ModuleInterface
     public static function declineVote(Player $player)
     {
         Timer::destroy('vote.check_state');
-        $action = self::$vote['action'];
+        $action = self::$vote->action;
 
         try {
             $action(false);
@@ -485,7 +485,7 @@ class Votes extends Module implements ModuleInterface
     {
         if (isset(self::$vote)) {
             Timer::destroy('vote.check_state');
-            $action = self::$vote['action'];
+            $action = self::$vote->action;
 
             try {
                 $action(false);
