@@ -29,7 +29,16 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchSettingsManager::showEditMatchsettingsMaps($player, 'example');
+
+        $vote = (object)[
+            'question' => "Skip the map?",
+            'success_ratio' => 0.8,
+            'start_time' => time(),
+            'duration' => 30,
+            'action' => '',
+        ];
+
+        Template::showAll('Votes.vote', compact('vote'));
     }
 
     public static function sendTestManialink(Player $player)

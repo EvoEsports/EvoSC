@@ -105,20 +105,21 @@ class Votes extends Module implements ModuleInterface
         self::$onlinePlayersCount = onlinePlayers()->count();
         self::$voters = collect();
         self::$lastTimeVote = time();
-        self::$vote = collect([
+        $vote = collect([
             'question' => $question,
             'success_ratio' => $successRatio,
             'start_time' => time(),
             'duration' => $duration,
             'action' => $action,
         ]);
+        self::$vote = $vote;
 
         Timer::create('vote.check_state', [self::class, 'checkVoteState'], '1s', true);
 
         $voteStateJson = '{"yes":0,"no":0}';
         Template::showAll('Votes.update-vote', compact('voteStateJson'));
 
-        Template::showAll('Votes.vote', compact('question', 'duration'));
+        Template::showAll('Votes.vote', compact('question', 'duration', 'vote'));
 
         return true;
     }
