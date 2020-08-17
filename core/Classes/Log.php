@@ -58,7 +58,7 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
-        if (isset(self::$singleFileMode)) {
+        if (!isset(self::$singleFileMode)) {
             self::$singleFileMode = (bool)config('server.logs.single-file', false);
             self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
         }
