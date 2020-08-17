@@ -18,6 +18,9 @@ class Log
      */
     private static OutputInterface $output;
 
+    private static bool $singleFileMode;
+    private static string $logPrefix;
+
     /**
      * Get the output-interface
      *
@@ -55,6 +58,11 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
+        if (is_null(self::$singleFileMode)) {
+            self::$singleFileMode = (bool)config('server.logs.single-file', false);
+            self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
+        }
+
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         }
@@ -70,9 +78,13 @@ class Log
             $callingClass .= "\nData: " . json_encode($caller['args']);
         }
 
-        $date = date("Y-m-d", time());
-        $time = date("H:i:s", time());
-        $logFile = logDir($date . '.txt');
+        if (self::$singleFileMode) {
+            $logFile = logDir(self::$logPrefix . '.txt');
+        } else {
+            $date = date("Y-m-d", time());
+            $time = date("H:i:s", time());
+            $logFile = logDir(self::$logPrefix . '_' . $date . '.txt');
+        }
 
         $line = sprintf("[%s] %s(): %s", $time, $callingClass, $string);
 

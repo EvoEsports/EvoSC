@@ -205,7 +205,7 @@ class File
     /**
      * Check if a directory exists.
      *
-     * @param string $filename
+     * @param string $filename-
      *
      * @return bool
      */
