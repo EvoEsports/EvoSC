@@ -78,11 +78,12 @@ class Log
             $callingClass .= "\nData: " . json_encode($caller['args']);
         }
 
+        $time = date("H:i:s", time());
+
         if (self::$singleFileMode) {
             $logFile = logDir(self::$logPrefix . '.txt');
         } else {
             $date = date("Y-m-d", time());
-            $time = date("H:i:s", time());
             $logFile = logDir(self::$logPrefix . '_' . $date . '.txt');
         }
 
