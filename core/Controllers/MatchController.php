@@ -35,7 +35,7 @@ class MatchController extends Controller implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         if (Cache::has(self::CACHE_ID)) {
-            self::$tracker = Cache::get(self::CACHE_ID);
+            self::$tracker = collect(Cache::get(self::CACHE_ID));
             Cache::forget(self::CACHE_ID);
         }
 
@@ -50,7 +50,7 @@ class MatchController extends Controller implements ControllerInterface
      */
     public static function stop()
     {
-        Cache::put(self::CACHE_ID, self::$tracker, now()->addMinute());
+        Cache::put(self::CACHE_ID, self::$tracker->toArray(), now()->addMinute());
     }
 
     /**

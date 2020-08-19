@@ -414,6 +414,7 @@ function restart_evosc()
     warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
     Server::chatEnableManualRouting(false);
     \EvoSC\Controllers\ModuleController::stopModules();
+    \EvoSC\Controllers\ControllerController::stopControllers();
     Log::warning('Old process is terminating.');
     pcntl_exec(PHP_BINARY, $_SERVER['argv']);
     warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();

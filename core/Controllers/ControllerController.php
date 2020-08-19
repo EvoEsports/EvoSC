@@ -3,8 +3,10 @@
 
 namespace EvoSC\Controllers;
 
+use EvoSC\Classes\Controller;
 use EvoSC\Classes\File;
 use EvoSC\Interfaces\ControllerInterface;
+use Illuminate\Support\Collection;
 
 class ControllerController
 {
@@ -17,11 +19,34 @@ class ControllerController
         HookController::init();
         ModeController::setMode($mode);
 
-        $controllers = File::getFiles(coreDir('Controllers'))->map(function ($file) {
+        foreach (self::getControllers() as $controllerClass) {
+            if (new $controllerClass instanceof ControllerInterface) {
+                $controllerClass::start($mode, $isBoot);
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    public static function stopControllers()
+    {
+        foreach (self::getControllers() as $controllerClass) {
+            if (is_subclass_of(new $controllerClass, Controller::class)) {
+                $controllerClass::stop();
+            }
+        }
+    }
+
+    /**
+     * @return Collection
+     */
+    private static function getControllers(): Collection
+    {
+        return File::getFiles(coreDir('Controllers'))->map(function ($file) {
             if (isWindows()) {
                 $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . '\]Controllers[' . DIRECTORY_SEPARATOR . '\]#', '', $file); // Throws an error of missing ']' otherwise
-            }
-            else {
+            } else {
                 $class = preg_replace('#^.+[' . DIRECTORY_SEPARATOR . ']Controllers[' . DIRECTORY_SEPARATOR . ']#', '', $file);
             }
             $class = substr($class, 0, -4);
@@ -29,11 +54,5 @@ class ControllerController
 
             return $class;
         });
-
-        foreach ($controllers as $controllerClass) {
-            if (new $controllerClass instanceof ControllerInterface) {
-                $controllerClass::start($mode, $isBoot);
-            }
-        }
     }
 }
