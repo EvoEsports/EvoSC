@@ -24,6 +24,7 @@ use EvoSC\Controllers\CountdownController;
 use EvoSC\Controllers\EventController;
 use EvoSC\Controllers\HookController;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\MatchController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Controllers\ModuleController;
 use EvoSC\Controllers\PlanetsController;
@@ -164,6 +165,7 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+        MatchController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         self::addBootCommands();
