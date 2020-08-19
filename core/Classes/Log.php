@@ -58,6 +58,7 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
+
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         }
@@ -74,6 +75,12 @@ class Log
         }
 
         $time = date("H:i:s", time());
+        $line = sprintf("[%s] %s(): %s", $time, $callingClass, $string);
+
+        if (!isset(self::$singleFileMode)) {
+            echo $line . "\n";
+            return;
+        }
 
         if (self::$singleFileMode) {
             $logFile = logDir(self::$logPrefix . '.txt');
@@ -81,8 +88,6 @@ class Log
             $date = date("Y-m-d", time());
             $logFile = logDir(self::$logPrefix . '_' . $date . '.txt');
         }
-
-        $line = sprintf("[%s] %s(): %s", $time, $callingClass, $string);
 
         $line = stripAll($line);
 
