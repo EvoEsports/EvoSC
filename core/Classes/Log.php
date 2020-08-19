@@ -58,11 +58,6 @@ class Log
      */
     public static function write(string $string, $echo = true, $caller = null)
     {
-        if (!isset(self::$singleFileMode)) {
-            self::$singleFileMode = (bool)config('server.logs.single-file', false);
-            self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
-        }
-
         if (!$caller) {
             list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         }
@@ -151,6 +146,9 @@ class Log
      */
     public static function setOutput(OutputInterface $output)
     {
+        self::$singleFileMode = (bool)config('server.logs.single-file', false);
+        self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
+
         self::$output = $output;
     }
 }

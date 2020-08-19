@@ -59,8 +59,8 @@ class EscRun extends Command
         global $serverName;
         global $__ManiaPlanet;
 
-        Log::setOutput($output);
         ConfigController::init();
+        Log::setOutput($output);
 
         ChatCommand::removeAll();
         Timer::destroyAll();

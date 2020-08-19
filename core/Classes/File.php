@@ -253,25 +253,35 @@ class File
         mkdir($toCreate);
     }
 
+    /**
+     * @param string $sourceFile
+     * @param string $targetFile
+     * @throws FilePathNotAbsoluteException
+     */
     public static function rename(string $sourceFile, string $targetFile)
     {
         $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
         $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
 
-        if (!self::dirExists(baseDir($targetFile))) {
-            self::makeDir(baseDir($targetFile));
+        if (!self::dirExists($targetFile)) {
+            self::makeDir($targetFile);
         }
 
         rename($sourceFile, $targetFile);
     }
 
+    /**
+     * @param string $source
+     * @param string $target
+     * @throws FilePathNotAbsoluteException
+     */
     public static function copy(string $source, string $target)
     {
         $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
         $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
 
-        if (!self::dirExists(baseDir($target))) {
-            self::makeDir(baseDir($target));
+        if (!self::dirExists($target)) {
+            self::makeDir($target);
         }
 
         copy($source, $target);
