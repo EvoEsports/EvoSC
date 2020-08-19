@@ -34,6 +34,7 @@ class LiveRankings extends Module implements ModuleInterface
     {
         self::sendUpdatedValues(MatchController::getTracker());
 
+        $originalPointsLimit = PointsController::getOriginalPointsLimit();
         Template::show($player, 'LiveRankings.widget', compact('originalPointsLimit'));
     }
 
