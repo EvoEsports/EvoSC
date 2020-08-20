@@ -173,6 +173,10 @@ class MapList extends Module implements ModuleInterface
     public static function mapQueueUpdated(Collection $queueItems)
     {
         $mapQueue = $queueItems->map(function (MapQueue $item) {
+            if (is_null($item->map->uid)) {
+                return null;
+            }
+
             return [
                 'id' => $item->map->id,
                 'uid' => $item->map->uid,
