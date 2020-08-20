@@ -108,7 +108,7 @@ class LocalRecords extends Module implements ModuleInterface
             }
 
             if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled their ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
+                $chatMessage->setParts($player, ' equaled their ', secondary($oldRank . '.'), ' local record ', secondary(formatScore($score)));
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
                 } else {
