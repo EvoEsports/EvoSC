@@ -7,7 +7,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Xmlrpc\Exception;
+use Exception;
 
 /**
  * Class Template
@@ -137,19 +137,19 @@ class Template
             try {
                 Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
             } catch (Exception $e) {
-                $id = uniqid(evo_str_slug($e->getMessage())) . '.xml';
-                Log::warning('Failed to render template for ' . $login . '. Saving to as ' . $id);
-                Cache::put($id, $xml);
+                Log::warning('Failed to render template for ' . $login);
             }
         });
 
         try{
             Server::executeMulticall();
         }catch(\Exception $e){
+            //resend all manialinks individually (slower)
             self::$multiCalls->each(function ($xml, $login) {
                 try {
                     Server::sendDisplayManialinkPage($login, $xml, 0, false);
                 } catch (Exception $e) {
+                    Log::warning($e->getMessage());
                 }
             });
         }
