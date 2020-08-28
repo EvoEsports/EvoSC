@@ -113,11 +113,30 @@ class MxDetails extends Module implements ModuleInterface
      */
     public static function loadMxDetails(Map $map)
     {
+        $data = self::loadMxDetailsByUid($map->uid);
+
+        if ($data) {
+            if (!$map->mx_id) {
+                $map->update([
+                    'mx_id' => $data->TrackID
+                ]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param $mapUid
+     * @return mixed|null
+     */
+    public static function loadMxDetailsByUid($mapUid)
+    {
         try {
-            if(isManiaPlanet()) {
-                $result = RestClient::get(self::$apiUrl . '/tm/maps/' . $map->uid, ['timeout' => 1]); //deprecated, remove once new TMX API is available, only keep else-branch
-            }else{
-                $result = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $map->uid, ['timeout' => 1]);
+            if (isManiaPlanet()) {
+                $result = RestClient::get(self::$apiUrl . '/tm/maps/' . $mapUid, ['timeout' => 1]); //deprecated, remove once new TMX API is available, only keep else-branch
+            } else {
+                $result = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mapUid, ['timeout' => 1]);
             }
         } catch (ConnectException $e) {
             Log::error($e->getMessage(), true);
@@ -135,12 +154,6 @@ class MxDetails extends Module implements ModuleInterface
         $data = json_decode($data);
 
         if (count($data) > 0) {
-            if (!$map->mx_id) {
-                $map->update([
-                    'mx_id' => $data[0]->TrackID
-                ]);
-            }
-
             Cache::put('mx-details/' . $data[0]->TrackID, $data[0]);
 
             return $data[0];
