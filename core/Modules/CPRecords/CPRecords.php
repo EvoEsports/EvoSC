@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\CPRecords;
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
@@ -34,7 +35,12 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        self::$tracker = collect();
+        if (Cache::has('cp_records_current')) {
+            self::$tracker = collect(Cache::get('cp_records_current'));
+            Cache::forget('cp_records_current');
+        } else {
+            self::$tracker = collect();
+        }
 
         $cpMode = config('cp-records.mode', 'best-cp');
 
@@ -48,6 +54,14 @@ class CPRecords extends Module implements ModuleInterface
         Hook::add('EndMap', [self::class, 'beginMatch']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
+    }
+
+    /**
+     *
+     */
+    public function stop()
+    {
+        Cache::put('cp_records_current', self::$tracker->toArray(), now()->addMinute());
     }
 
     /**

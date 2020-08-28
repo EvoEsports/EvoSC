@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  */
 function getEscVersion(): string
 {
-    return str_replace("\n", '', file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'VERSION'));
+    return str_replace("\n", '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }
 
 /**
@@ -132,7 +132,7 @@ function config(string $id, $default = null)
  */
 function cacheDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../cache/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/cache/' . $filename);
 }
 
 /**
@@ -151,7 +151,7 @@ function mapsDir(string $filename = ''): string
  */
 function logDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../logs/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/logs/' . $filename);
 }
 
 /**
@@ -161,7 +161,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../modules/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules/' . $filename);
 }
 
 /**
@@ -191,7 +191,7 @@ function coreDir(string $filename = ''): string
  */
 function configDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../config/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/config/' . $filename);
 }
 
 /**
@@ -201,7 +201,7 @@ function configDir(string $filename = ''): string
  */
 function baseDir(string $filename = ''): string
 {
-    return __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, '/../' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
 }
 
 /**
@@ -353,7 +353,7 @@ function isDebug(): bool
  */
 function isWindows(): bool
 {
-    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    return strtoupper(substr(PHP_OS_FAMILY, 0, 3)) === 'WIN';
 }
 
 /**
@@ -410,8 +410,11 @@ function evo_str_slug($title)
  */
 function restart_evosc()
 {
-    warningMessage(secondary('EvoSC v' . getEscVersion()), ' is restarting.')->sendAll();
+    global $__bootedVersion;
+    warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
     Server::chatEnableManualRouting(false);
+    \EvoSC\Controllers\ModuleController::stopModules();
+    \EvoSC\Controllers\ControllerController::stopControllers();
     Log::warning('Old process is terminating.');
     pcntl_exec(PHP_BINARY, $_SERVER['argv']);
     warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();

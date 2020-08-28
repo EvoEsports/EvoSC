@@ -24,6 +24,7 @@ use EvoSC\Controllers\CountdownController;
 use EvoSC\Controllers\EventController;
 use EvoSC\Controllers\HookController;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\MatchController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Controllers\ModuleController;
 use EvoSC\Controllers\PlanetsController;
@@ -31,6 +32,7 @@ use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
+use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -58,8 +60,8 @@ class EscRun extends Command
         global $serverName;
         global $__ManiaPlanet;
 
-        Log::setOutput($output);
         ConfigController::init();
+        Log::setOutput($output);
 
         ChatCommand::removeAll();
         Timer::destroyAll();
@@ -123,6 +125,7 @@ class EscRun extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        global $__bootedVersion;
         global $_onlinePlayers;
         global $serverName;
 
@@ -142,7 +145,7 @@ class EscRun extends Command
 
         $_onlinePlayers = collect();
 
-        if(is_null($serverName)){
+        if (is_null($serverName)) {
             Log::error('Server name is NULL');
         }
 
@@ -162,23 +165,14 @@ class EscRun extends Command
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+        MatchController::init();
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
-        AwaitAction::createQueueAndStartCheckCycle();
+        self::addBootCommands();
 
-        ChatCommand::add('//restart-evosc', function () {
-            restart_evosc();
-        }, 'Restart EvoSC', 'ma');
-
-        if(Cache::has('restart_evosc')){
+        if (Cache::has('restart_evosc')) {
             Cache::forget('restart_evosc');
         }
-        Timer::create('watch_for_restart_file', function(){
-            if(Cache::has('restart_evosc')){
-                Cache::forget('restart_evosc');
-                restart_evosc();
-            }
-        }, '2m', true);
 
         onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
             $_onlinePlayers->put($player->Login, $player);
@@ -214,6 +208,8 @@ class EscRun extends Command
 
         successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
 
+        $__bootedVersion = getEscVersion();
+
         //cycle-loop
         while (true) {
             try {
@@ -248,5 +244,23 @@ class EscRun extends Command
                 Log::write($e->getTraceAsString(), false);
             }
         }
+    }
+
+    public static function addBootCommands()
+    {
+        AwaitAction::createQueueAndStartCheckCycle();
+
+        AccessRight::add('restart_evosc', 'Allows you to restart EvoSC.');
+
+        ChatCommand::add('//restart-evosc', function () {
+            restart_evosc();
+        }, 'Restart EvoSC', 'restart_evosc');
+
+        Timer::create('watch_for_restart_file', function () {
+            if (Cache::has('restart_evosc')) {
+                Cache::forget('restart_evosc');
+                restart_evosc();
+            }
+        }, '2m', true);
     }
 }

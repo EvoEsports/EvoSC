@@ -18,7 +18,7 @@
     <label class="text-light" pos="0 -9" size="8 4" textsize="0.5" text="Name:" valign="center"/>
     <entry id="filename" class="form" pos="8 -9" size="108 4" textsize="0.5" valign="center"/>
 
-    <label class="save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="0006" />
+    <label class="text-light save" pos="109 -2.4" size="16 4" textsize="0.6" halign="center" valign="center" text=" SAVE" ScriptEvents="1" z-index="20" focusareacolor1="0000" focusareacolor2="0006" />
 
     <frame pos="0 -15" id="rows">
     {php $row=0}

@@ -1,0 +1,115 @@
+{contentType text}
+{php $zIndex }
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="ESC:add-time" name="add-time" version="3">
+    {include 'Components.stylesheet'}
+    <frame id="widget" pos="108.5 2.75" scale="0.95">
+        <label id="cd" pos="54 -2.5" z-index="2" halign="right" valign="center" textsize="9" text="24:00" hidden="1"/>
+        <frame id="content">
+            <frame pos="20.5 0">
+                <label class="open-controls text-light" id="time" z-index="2" size="20 3" text="+0 min." halign="center" valign="center" textprefix="$s"/>
+            </frame>
+            <frame pos="-8 -3" id="buttons" scale="0.75" z-index="5">
+                {foreach $buttons as $i => $button}
+                <label class="add btn-light" textcolor="fff" textprefix="$s" data-value="{$button}" pos="{(count($buttons) - $i) * -10 + 44.9} -2.75" size="10 5.5" text="+{$button}" textsize="1.1" scriptevents="1"/>
+                {/foreach}
+                <label id="icon2" class="btn-light" textcolor="fff" textprefix="$s" pos="44 -2.75" size="8 5.5" textsize="1.3" scriptevents="1" focusareacolor2="{config('theme.hud.text-light')}5"/>
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct UISettings {
+        Boolean hide;
+        Integer speed;
+        Integer showDelay;
+        Real scale;
+        Boolean sb_blur;
+        Boolean viewer_count;
+    }
+
+    --></script>
+
+    {include 'Scripts.hide'}
+
+    <script><!--
+    main() {
+        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+        declare Real AddedTimeR for This = 0.0;
+        declare Real currentAddedTime = -1.0;
+        declare cd <=> (Page.MainFrame.GetFirstChild("cd") as CMlLabel);
+        declare buttons <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+        declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
+        declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
+        declare icon2 <=> (Page.MainFrame.GetFirstChild("icon2") as CMlLabel);
+        declare UISettings settings for This;
+        declare Text sign = "";
+
+        HS_POS = <108.5, 2.75>;
+
+        while(True){
+            yield;
+
+            cd.Value = TL::TimeToText(Net_Race_Countdown_CutOffTimeLimit - GameTime +1000);
+            declare width = cd.ComputeWidth(cd.Value) * 0.75;
+            content.RelativePosition_V3[0] = cd.RelativePosition_V3[0] - width - 33;
+
+            buttons.Visible = Net_Race_Countdown_CutOffTimeLimit-GameTime > 15000;
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                timeLabel.Hide();
+                buttons.Hide();
+                wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+                sleep(200);
+                buttons.Show();
+            }
+
+            if(icon2.Value != "" && !MouseRightButton){
+                icon2.Value = "";
+            }
+            if(icon2.Value != "" && MouseRightButton){
+                icon2.Value = "";
+            }
+
+            if(currentAddedTime != AddedTimeR){
+                currentAddedTime = AddedTimeR;
+
+                if(currentAddedTime == 0){
+                    timeLabel.Hide();
+                }else{
+                    if(currentAddedTime < 0){
+                        sign = "";
+                    }else{
+                        sign = "+";
+                    }
+
+                    if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
+                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                    }else{
+                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
+                    }
+
+                    timeLabel.Show();
+                }
+            }
+
+            foreach(event in PendingEvents){
+                if(event.Control == Null) continue;
+                if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare value = event.Control.DataAttributeGet("value");
+                    if(MouseRightButton){
+                        TriggerPageAction("time.add," ^ value);
+                    }else{
+                        TriggerPageAction("time.vote," ^ value);
+                    }
+                }
+            }
+
+            hidescript();
+        }
+    }
+    --></script>
+</manialink>

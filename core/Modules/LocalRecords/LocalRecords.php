@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\LocalRecords;
 
+use EvoSC\Classes\AwaitAction;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
@@ -14,7 +15,6 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\RecordsTable\RecordsTable;
-use Illuminate\Support\Collection;
 
 class LocalRecords extends Module implements ModuleInterface
 {
@@ -108,7 +108,7 @@ class LocalRecords extends Module implements ModuleInterface
             }
 
             if ($oldRecord->Score == $score) {
-                $chatMessage->setParts($player, ' equaled their ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));
+                $chatMessage->setParts($player, ' equaled their ', secondary($oldRank . '.'), ' local record ', secondary(formatScore($score)));
                 if ($newRank <= config('locals.echo-top', 100)) {
                     $chatMessage->sendAll();
                 } else {
@@ -193,13 +193,19 @@ class LocalRecords extends Module implements ModuleInterface
         }
     }
 
-    //Called on local.delete
+    /**
+     * @param Player $player
+     * @param string $localRank
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function delete(Player $player, string $localRank)
     {
         $map = MapController::getCurrentMap();
-        DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', $localRank)->delete();
-        warningMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
-        self::sendLocalsChunk();
+        AwaitAction::add($player, "Delete \$<" . secondary("$localRank. local record") . "\$>?", function () use ($localRank, $map, $player) {
+            DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', $localRank)->delete();
+            dangerMessage($player, ' deleted ', secondary("$localRank. local record"), ".")->sendAdmin();
+            self::sendLocalsChunk();
+        });
     }
 
     /**

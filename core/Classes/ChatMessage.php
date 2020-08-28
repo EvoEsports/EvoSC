@@ -134,7 +134,7 @@ class ChatMessage
         $parts = '';
         foreach ($this->parts as $part) {
             if ($part instanceof Player || $part instanceof Map || is_numeric($part) || preg_match('/(\d:)?\d{2}\.\d{3}/', "$part")) {
-                $parts .= secondary("$part");
+                $parts .= secondary("\$<$part\$>");
                 continue;
             }
 

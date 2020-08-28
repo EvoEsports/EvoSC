@@ -129,7 +129,6 @@
                     declare prefix = "";
                     if(set["finished"] == "True" && i < Points.count - 1 && set["score"] != "-1"){
                         prefix = "$fc0+" ^ Points[i];
-                        log(set["score"]);
                     }else{
                         prefix = "$888CP" ^ set["cp"];
                     }

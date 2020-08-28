@@ -15,5 +15,9 @@
   "echoes": {
     "join": true,
     "leave": true
+  },
+  "logs": {
+    "prefix": "evosc",
+    "single-file": false
   }
 }

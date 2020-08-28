@@ -115,7 +115,7 @@ Void updateWindow(Text[Text][] MapQueue){
     declare i = 0;
 
     foreach(map in MapQueue){
-        if(mapList.Controls.count <= i){
+        if(i >= mapList.Controls.count){
             break;
         }
 

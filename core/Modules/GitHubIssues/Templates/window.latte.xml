@@ -105,7 +105,6 @@ GitHub-Issues
     }
 
     if(response.StatusCode == 200){
-        log(TL::Replace(response.Result, """"default":""", """"isDefault":"""));
         issues.fromjson(TL::Replace(response.Result, """"default":""", """"isDefault":"""));
     }
 {/block}

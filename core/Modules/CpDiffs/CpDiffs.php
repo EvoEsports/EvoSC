@@ -104,7 +104,7 @@ class CpDiffs extends Module implements ModuleInterface
                     $player->id)->first();
             }
 
-            if (!$targetRecord) {
+            if (!isset($targetRecord) || is_null($targetRecord)) {
                 $targetRecord = DB::table('local-records')->where('Map', '=', $map->id)->where('Player', '=',
                     $player->id)->first();
             }

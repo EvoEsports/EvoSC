@@ -22,8 +22,8 @@
         <quad class="bg-light" valign="center" pos="-2 0" size="156 4.5" opacity="0"/>
         <label class="text-light" pos="1 0" valign="center" size="40 3" text="map name map name map name" textsize="0.6" z-index="1"/>
         <label class="filter-author text-light" pos="52 0" valign="center" size="30 3" text="map author name comes here" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000"/>
-        <label class="text-light" pos="88 0" valign="center" size="30 3" halign="center" text="local" textsize="0.6" z-index="1"/>
-        <label class="text-light" pos="96 0" valign="center" size="30 3" halign="center" text="dedi" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="{$is_maniaplanet ? 88 : 92} 0" valign="center" size="30 3" halign="center" text="local" textsize="0.6" z-index="1"/>
+        <label class="text-light" pos="96 0" valign="center" size="30 3" hidden="{$is_maniaplanet ? 0 : 1}" halign="center" text="dedi" textsize="0.6" z-index="1"/>
         <label class="fav text-light" pos="115.5 0" valign="center" size="3 3" text="" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000"/>
         <label class="text-light" pos="100.5 1" size="30 3" text="" textsize="0.6" z-index="1" opacity="0.3"/>
         <frame pos="100.5 1" size="0 3" z-index="2">
@@ -46,8 +46,8 @@
         <frame id="maps-all" pos="0 -2" z-index="2">
             <label class="text-accent" pos="1  1" text="Name" scale="0.8"/>
             <label class="text-accent" pos="52 1" text="Author" scale="0.8"/>
-            <label class="text-accent" pos="88 1" text="Local" halign="center" scale="0.8"/>
-            <label class="text-accent" pos="96 1" text="Dedi" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="{$is_maniaplanet ? 88 : 92} 1" text="Local" halign="center" scale="0.8"/>
+            <label class="text-accent" pos="96 1" text="Dedi" hidden="{$is_maniaplanet ? 0 : 1}" halign="center" scale="0.8"/>
             <label class="text-accent" pos="106 1" text="Karma" halign="center" scale="0.8"/>
             <label class="text-accent" pos="117 1" text="Favorite" halign="center" scale="0.8"/>
 
@@ -847,7 +847,6 @@ Void setCooldownToZero(Text uid){
         }
 
         if(MapQueueShow){
-            log("show");
             window.Show();
             MapQueueShow = False;
         }

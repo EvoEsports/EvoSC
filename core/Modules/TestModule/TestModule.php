@@ -7,24 +7,13 @@ namespace EvoSC\Modules\TestModule;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
-use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\Map;
 use EvoSC\Models\Player;
-use EvoSC\Modules\AlterUI\AlterUI;
-use EvoSC\Modules\CpDiffs\CpDiffs;
-use EvoSC\Modules\CPRecords\CPRecords;
-use EvoSC\Modules\EvoDonate\EvoDonate;
+use EvoSC\Modules\AddedTimeInfo\AddedTimeInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
-use EvoSC\Modules\LocalRecords\LocalRecords;
-use EvoSC\Modules\LocalRecords\LocalsBenchmark;
-use EvoSC\Modules\MOTD\MOTD;
-use EvoSC\Modules\QuickButtons\QuickButtons;
-use EvoSC\Modules\RaceRanking\RaceRanking;
-use EvoSC\Modules\ScoreTable\ScoreTable;
-use EvoSC\Modules\UIHax\UIHax;
+use EvoSC\Modules\MatchSettingsManager\MatchSettingsManager;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -42,7 +31,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CPRecords::playerConnect($player);
+        LiveRankings::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

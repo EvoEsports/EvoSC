@@ -205,7 +205,7 @@ class File
     /**
      * Check if a directory exists.
      *
-     * @param string $filename
+     * @param string $filename-
      *
      * @return bool
      */
@@ -224,7 +224,7 @@ class File
     {
         $dir = str_replace('/', DIRECTORY_SEPARATOR, $dir);
 
-        if ((isWindows() && !preg_match('/^\w:(\\|\/)/', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
+        if ((isWindows() && !preg_match('/^\\w:(\\\|\\/)/i', $dir)) || (!isWindows() && substr($dir, 0, 1) != DIRECTORY_SEPARATOR)) {
             throw new FilePathNotAbsoluteException("Directory path '$dir' is not absolute.");
         }
 
@@ -234,6 +234,47 @@ class File
         }
     }
 
+    /**
+     * @param string $sourceFile
+     * @param string $targetFile
+     * @throws FilePathNotAbsoluteException
+     */
+    public static function rename(string $sourceFile, string $targetFile)
+    {
+        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
+        $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
+
+        if (!self::dirExists(dirname($targetFile))) {
+            self::makeDir(dirname($targetFile));
+        }
+
+        rename($sourceFile, $targetFile);
+    }
+
+    /**
+     * @param string $source
+     * @param string $target
+     * @throws FilePathNotAbsoluteException
+     */
+    public static function copy(string $source, string $target)
+    {
+        $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
+        $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
+
+        if (!self::dirExists(dirname($target))) {
+            self::makeDir(dirname($target));
+        }
+
+        copy($source, $target);
+    }
+
+    /**
+     * PRIVATE METHODS
+     */
+
+    /**
+     * @param string $startDir
+     */
     private static function createDirUntilExists(string $startDir)
     {
         $levels = collect(explode(DIRECTORY_SEPARATOR, $startDir));
@@ -251,29 +292,5 @@ class File
         }
 
         mkdir($toCreate);
-    }
-
-    public static function rename(string $sourceFile, string $targetFile)
-    {
-        $sourceFile = str_replace('/', DIRECTORY_SEPARATOR, $sourceFile);
-        $targetFile = str_replace('/', DIRECTORY_SEPARATOR, $targetFile);
-
-        if (!is_dir(baseDir($targetFile))) {
-            mkdir(is_dir(baseDir($targetFile)));
-        }
-
-        rename($sourceFile, $targetFile);
-    }
-
-    public static function copy(string $source, string $target)
-    {
-        $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
-        $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
-
-        if (!is_dir(baseDir($target))) {
-            mkdir(is_dir(baseDir($target)));
-        }
-
-        copy($source, $target);
     }
 }

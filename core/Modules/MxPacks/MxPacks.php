@@ -18,8 +18,8 @@ use Exception;
 
 class MxPacks extends Module implements ModuleInterface
 {
-    private static string $mxApiUrl;
-    private static string $mxUrl;
+    private static string $apiUrl;
+    private static string $exchangeUrl;
 
     /**
      * @var MxPackJob
@@ -32,11 +32,11 @@ class MxPacks extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         if (isManiaPlanet()) {
-            self::$mxApiUrl = Exchange::MANIAPLANET_MX_API_URL;
-            self::$mxUrl = Exchange::MANIAPLANET_MX_URL;
+            self::$apiUrl = Exchange::MANIAPLANET_MX_API_URL;
+            self::$exchangeUrl = Exchange::MANIAPLANET_MX_URL;
         } else {
-            self::$mxApiUrl = Exchange::TRACKMANIA_MX_API_URL;
-            self::$mxUrl = Exchange::TRACKMANIA_MX_URL;
+            self::$apiUrl = Exchange::TRACKMANIA_MX_API_URL;
+            self::$exchangeUrl = Exchange::TRACKMANIA_MX_URL;
         }
 
         if (!is_dir(cacheDir('map-packs'))) {
@@ -58,7 +58,7 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdInfo)) {
             $info = Cache::get($cacheIdInfo);
         } else {
-            $url = sprintf(self::$mxApiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+            $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
 
             $response = RestClient::get($url);
             $info = json_decode($response->getBody()->getContents());
@@ -77,7 +77,7 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdTracks)) {
             $trackList = Cache::get($cacheIdTracks);
         } else {
-            $url = sprintf(self::$mxApiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+            $url = sprintf(self::$apiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
 
             try {
                 $response = RestClient::get($url);

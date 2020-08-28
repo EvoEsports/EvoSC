@@ -175,7 +175,6 @@
     {block loop}
             if(lastUpdate != ESC_LastCpPosUpdate){
                 lastUpdate = ESC_LastCpPosUpdate;
-                log("cps-> " ^ ESC_CpPos);
                 updateView(ESC_CpPos);
             }
 

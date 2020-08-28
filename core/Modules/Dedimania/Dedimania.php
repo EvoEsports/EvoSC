@@ -3,6 +3,7 @@
 namespace EvoSC\Modules\Dedimania;
 
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
@@ -49,6 +50,11 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
         Timer::create('dedimania.report_players', [self::class, 'reportConnectedPlayers'], '5m', true);
 
         ManiaLinkEvent::add('dedis.show', [self::class, 'showDedisTable']);
+    }
+
+    public function stop()
+    {
+        Cache::put('dedimania_hot_reload', '', now()->addMinute());
     }
 
     public function __construct()
@@ -159,6 +165,11 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
      */
     public static function beginMap(Map $map)
     {
+        if(Cache::has('dedimania_hot_reload')){
+            Cache::forget('dedimania_hot_reload');
+            return;
+        }
+
         self::getChallengeRecords($map, ModeController::isTimeAttack());
     }
 

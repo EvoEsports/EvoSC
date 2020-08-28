@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:push-live-rankings" id="push-live-rankings" version="3">
+    <script>
+        <!--
+        #Struct Entry {
+            Text name;
+            Text login;
+            Integer points;
+            Integer score;
+            Text checkpoints;
+        }
+
+        main(){
+            declare Entry[] EvoSC_LiveRankings_Values for This;
+            declare Integer EvoSC_LiveRankings_LastUpdate for This;
+
+            EvoSC_LiveRankings_Values.fromjson("""{$top|noescape}""");
+            EvoSC_LiveRankings_LastUpdate = GameTime;
+        }
+        -->
+    </script>
+</manialink>

@@ -122,20 +122,12 @@ class MapList extends Module implements ModuleInterface
     private static function getMapList(): Collection
     {
         return DB::table('maps')
-            ->select('maps.id', 'name', 'author', 'uid', 'cooldown', 'mx_id')
+            ->selectRaw('maps.id, name, author, uid, cooldown, mx_id, AVG(Rating) as avg_rating')
+            ->leftJoin('mx-karma', 'mx-karma.Map', '=', 'maps.id')
             ->where('enabled', '=', 1)
+            ->groupBy(['maps.id', 'name', 'author', 'uid', 'cooldown', 'mx_id'])
             ->get()
             ->transform(function ($data) {
-                $voteAverage = 0;
-
-                if (Cache::has('mx-details/' . $data->mx_id)) {
-                    $mxDetails = Cache::get('mx-details/' . $data->mx_id);
-
-                    if ($mxDetails->RatingVoteCount > 0) {
-                        $voteAverage = $mxDetails->RatingVoteAverage;
-                    }
-                }
-
                 $authorTime = -1;
                 if (Cache::has('gbx/' . $data->uid)) {
                     $gbx = Cache::get('gbx/' . $data->uid);
@@ -146,7 +138,7 @@ class MapList extends Module implements ModuleInterface
                     'id' => (string)$data->id,
                     'name' => $data->name,
                     'a' => $data->author,
-                    'r' => sprintf('%.1f', $voteAverage),
+                    'r' => sprintf('%.1f', $data->avg_rating),
                     'uid' => $data->uid,
                     'c' => $data->cooldown,
                     'author_time' => $authorTime
@@ -181,6 +173,10 @@ class MapList extends Module implements ModuleInterface
     public static function mapQueueUpdated(Collection $queueItems)
     {
         $mapQueue = $queueItems->map(function (MapQueue $item) {
+            if (is_null($item->map->uid)) {
+                return null;
+            }
+
             return [
                 'id' => $item->map->id,
                 'uid' => $item->map->uid,

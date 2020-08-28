@@ -3,11 +3,11 @@
     <script><!--
 main(){
     declare Real EvoSC_MxKarma_VotesAverage for This;
-    declare Integer EvoSC_MxKarma_VotesTotal for This;
     declare Text EvoSC_MxKarma_MapUid for This;
+    declare Integer EvoSC_MxKarma_LastUpdate2 for This;
     EvoSC_MxKarma_VotesAverage = {sprintf('%.2f', $average)|noescape};
-    EvoSC_MxKarma_VotesTotal = {$total};
     EvoSC_MxKarma_MapUid = {$uid};
+    EvoSC_MxKarma_LastUpdate2 = GameTime;
 }
     --></script>
 </manialink>

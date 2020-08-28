@@ -72,8 +72,8 @@ main() {
             if(event.Control == Null) continue;
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
-                if(alertUnsavedChanges == True){
-                    if(!confirm("You have unsaved changes, do you want to close without saving?")){
+                if(alertUnsavedChanges){
+                    if(!confirm("You have unsaved changes, close without saving?")){
                         continue;
                     }
                 }
@@ -81,6 +81,16 @@ main() {
                 {if !isset($doNotStop)}
                 return;
                 {/if}
+            }
+
+            if(event.Control.HasClass("switch-tab") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare action = event.Control.DataAttributeGet("action");
+                if(alertUnsavedChanges){
+                    if(!confirm("You have unsaved changes, continue without saving?")){
+                        continue;
+                    }
+                }
+                TriggerPageAction(action);
             }
 
             {include pendingEvents}

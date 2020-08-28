@@ -165,8 +165,14 @@ class PlayerController implements ControllerInterface
         $stats = $player->stats;
 
         if ($stats) {
+            $serverRank = $stats->Rank;
+
+            if($serverRank == -1){
+                $serverRank = 'unranked';
+            }
+
             $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
-                ' joined, rank: ', secondary($stats->Rank), ' last visit ', secondary($diffString), '.')
+                ' joined, rank: ', secondary($serverRank), ' last visit ', secondary($diffString), '.')
                 ->setIcon('');
         } else {
             $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),

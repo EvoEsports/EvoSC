@@ -50,7 +50,7 @@ class MapController implements ControllerInterface
         }
 
         if (!File::dirExists(cacheDir('gbx'))) {
-            File::makeDir(cacheDir('gbx'));
+            File::makeDir(cacheDir('gbx'));  // Throws an error in Windows system with the original regex settings
         }
 
         if (!$_skipMapCheck) {
@@ -334,7 +334,7 @@ class MapController implements ControllerInterface
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
 
         if(File::exists($mapFile)){
-            $cmd = $mps . sprintf(' /parsegbx="%s"', $mapFile);
+            $cmd = $mps . sprintf(' /parsegbx=\'%s\'', $mapFile);
             $jsonString = shell_exec($cmd);
 
             if ($asString) {

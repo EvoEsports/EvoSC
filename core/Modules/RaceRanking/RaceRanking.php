@@ -11,7 +11,6 @@ use EvoSC\Controllers\ModeController;
 use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use Illuminate\Support\Collection;
 
 class RaceRanking extends Module implements ModuleInterface
 {

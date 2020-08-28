@@ -1,7 +1,7 @@
 {contentType text}
 <stylesheet>
     <!-- Text -->
-    <style class="text" textfont="{config('theme.font')}" textcolor="{config('theme.chat.text')}" textsize="1"/>
+    <style class="text" textfont="{config('theme.font')}" textcolor="{config('theme.chat.default')}" textsize="1"/>
     <style class="text-accent" textfont="{config('theme.font')}" textcolor="{config('theme.hud.accent')}" textsize="1"/>
     <style class="text-success" textfont="{config('theme.font')}" textcolor="{config('theme.form.success.bg')}" textsize="1"/>
     <style class="text-warning" textfont="{config('theme.font')}" textcolor="{config('theme.form.warning.bg')}" textsize="1"/>

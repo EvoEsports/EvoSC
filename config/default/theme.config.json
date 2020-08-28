@@ -1,7 +1,7 @@
 {
   "font": "RajdhaniMono",
   "chat": {
-    "text": "fd6",
+    "default": "",
     "info": "29b",
     "highlight": "eee",
     "success": "5b6",

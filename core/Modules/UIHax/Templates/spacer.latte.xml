@@ -19,6 +19,8 @@
 {/block}
 
 {block bootScript}
+    widget.ZIndex = 0.0;
+
     left__ = {$position == 'left' ? 'True' : 'False'};
     slot__ = {$slot};
 {/block}

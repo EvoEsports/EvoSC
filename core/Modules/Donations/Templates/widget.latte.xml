@@ -48,7 +48,6 @@
     {block loop}
                 if(barVisible){
                     declare posX = MouseX - widget.RelativePosition_V3[0];
-                    log(posX);
 
                     if(posX > 0){
                         declare posCoef = posX / 44.0;

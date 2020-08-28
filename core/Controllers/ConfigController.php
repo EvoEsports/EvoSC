@@ -107,7 +107,7 @@ class ConfigController implements ControllerInterface
             ...File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern),
             ...File::getFilesRecursively(modulesDir(), self::$configFilePattern)
         ];
-
+        
         foreach ($defaultConfigFiles as $configFile) {
             $name = basename($configFile);
 
