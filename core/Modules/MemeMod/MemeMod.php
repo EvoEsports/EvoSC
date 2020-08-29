@@ -51,17 +51,44 @@ class MemeMod extends Module implements ModuleInterface
      */
     public static function payRespects(Player $player)
     {
-        if (self::$tracker->has($player->id)) {
-            if (($timePassed = time() - self::$tracker->get($player->id)) < 10) {
-                $timeLeft = 10 - $timePassed;
-                warningMessage('You\'ve just paid your respects. Please wait ', secondary($timeLeft . 's'), ' before paying your respects again.')->send($player);
-                return;
-            }
+        $tracker = self::$tracker->get($player->id);
+        $time = 0;
+
+        if (is_null($tracker)) {
+            $tracker = (object)['last' => 0, 'total' => 0];
+        } else if ($tracker->total > 100) {
+            self::stopSpam($player);
+            $tracker->total = 0;
+        } else {
+            $time = $tracker->last;
         }
 
-        infoMessage(secondary($player), ' pays their respects.')->sendAll();
+        if (($timePassed = time() - $tracker->last) < 3) {
+            warningMessage('You\'ve just paid your respects. Please wait ', secondary((3 - $timePassed) . 's'), ' before paying your respects again.')->send($player);
+        } else {
+            infoMessage(secondary($player), ' pays their respects.')->sendAll();
+            $time = time();
+        }
 
-        self::$tracker->put($player->id, time());
+        self::$tracker->put($player->id, (object)[
+            'last' => $time,
+            'total' => $tracker->total + 1
+        ]);
+    }
+
+    private static function stopSpam(Player $player)
+    {
+        $newBindJson = json_encode([
+            'code' => 41,
+            'name' => 'F4',
+            'def' => 'F',
+            'id' => 'pay_respects'
+        ]);
+
+        dangerMessage('You have paid too many respects. The key to pay respects have been rebound to ', secondary('F4'), '. You can change it back in Input-Setup.')->send($player);
+
+        InputSetup::updateBind($player, ...explode(',', $newBindJson));
+        InputSetup::sendScript($player);
     }
 
     public static function playerDisconnect(Player $player)

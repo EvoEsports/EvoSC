@@ -14,6 +14,9 @@
 
     main(){
         declare Bind[] KeyBinds;
+        declare lastKeyStroke = 0;
+        declare spamCounter = 0;
+
         KeyBinds.fromjson("""{$binds->toJson()|noescape}""");
 
         while (True) {
@@ -24,11 +27,33 @@
                     foreach(bind in KeyBinds){
                         if(bind.code != 0){
                             if(event.KeyCode == bind.code){
+                                if(GameTime - lastKeyStroke < 40){
+                                    spamCounter += 40;
+                                }else{
+                                    if(spamCounter > 0){
+                                        if(GameTime - lastKeyStroke > 3000){
+                                            spamCounter = 0;
+                                        }else{
+                                            spamCounter -= (GameTime - lastKeyStroke);
+                                            if(spamCounter < 0) spamCounter = 0;
+                                        }
+                                    }
+                                }
+
+                                log(spamCounter);
+                                lastKeyStroke = GameTime;
+
+                                if(spamCounter > 20){
+                                    sleep(750);
+                                    break;
+                                }
+
                                 TriggerPageAction("bound_key_pressed," ^ bind.id);
                                 break;
                             }
                         }else{
                             if(event.KeyName == bind.def){
+                                log("def");
                                 TriggerPageAction("bound_key_pressed," ^ bind.id);
                                 break;
                             }
