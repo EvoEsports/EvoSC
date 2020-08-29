@@ -23,6 +23,15 @@ class ModeScriptEventController implements ControllerInterface
     }
 
     /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+    }
+
+    /**
      * Process mode-script-callbacks (send from mode-script, not dedicated -> callback list in docs does not apply).
      *
      * @param $modescriptCallbackArray
@@ -105,9 +114,11 @@ class ModeScriptEventController implements ControllerInterface
 
             default:
                 Hook::fire($callback, $arguments);
-                Log::write('Calling unhandled ' . $callback, isVerbose());
-                if (isDebug()) {
-                    var_dump($arguments);
+                if (isVeryVerbose()) {
+                    Log::write('Calling unmapped ' . $callback, true);
+                    if (isDebug()) {
+                        var_dump($arguments);
+                    }
                 }
         }
     }
@@ -233,15 +244,5 @@ class ModeScriptEventController implements ControllerInterface
         $player = player($playerData->login);
 
         Hook::fire('PlayerDisconnect', $player);
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        // TODO: Implement start() method.
     }
 }

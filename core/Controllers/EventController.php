@@ -30,6 +30,15 @@ class EventController implements ControllerInterface
     }
 
     /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+    }
+
+    /**
      * @param $executedCallbacks
      *
      * @throws Exception
@@ -275,15 +284,5 @@ class EventController implements ControllerInterface
     {
         $file = cacheDir('round_start_time.txt');
         File::put($file, time());
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        // TODO: Implement start() method.
     }
 }
