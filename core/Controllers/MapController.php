@@ -203,6 +203,8 @@ class MapController implements ControllerInterface
         DB::table(LocalRecords::TABLE)->where('Map', '=', $map->id)->delete();
         DB::table(Dedimania::TABLE)->where('Map', '=', $map->id)->delete();
         MapFavorite::whereMapId($map->id)->delete();
+        QueueController::dropMapSilent($map->uid);
+        Hook::fire('MapPoolUpdated');
         $deleted = File::delete(self::$mapsPath . $map->filename);
 
         if ($deleted) {
@@ -215,9 +217,7 @@ class MapController implements ControllerInterface
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
 
-            Hook::fire('MapPoolUpdated');
             warningMessage($player, ' deleted map ', $map)->sendAll();
-            QueueController::dropMapSilent($map->uid);
         } else {
             Log::write('Failed to delete map "' . $map->filename);
         }
