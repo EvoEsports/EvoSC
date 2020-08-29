@@ -52,28 +52,39 @@ class MemeMod extends Module implements ModuleInterface
     public static function payRespects(Player $player)
     {
         $tracker = self::$tracker->get($player->id);
-        $time = 0;
 
         if (is_null($tracker)) {
-            $tracker = (object)['last' => 0, 'total' => 0];
-        } else if ($tracker->total > 100) {
+            $tracker = collect();
+        }
+
+        if (self::isSpamming($tracker)) {
             self::stopSpam($player);
-            $tracker->total = 0;
-        } else {
-            $time = $tracker->last;
+            return;
         }
 
-        if (($timePassed = time() - $tracker->last) < 3) {
-            warningMessage('You\'ve just paid your respects. Please wait ', secondary((3 - $timePassed) . 's'), ' before paying your respects again.')->send($player);
-        } else {
-            infoMessage(secondary($player), ' pays their respects.')->sendAll();
-            $time = time();
+        infoMessage(secondary($player), ' pays their respects.')->sendAll();
+
+        $tracker->push(time());
+
+        if ($tracker->count() > 5) {
+            $tracker->shift();
         }
 
-        self::$tracker->put($player->id, (object)[
-            'last' => $time,
-            'total' => $tracker->total + 1
-        ]);
+        self::$tracker->put($player->id, $tracker);
+    }
+
+    private static function isSpamming(Collection $entries): bool
+    {
+        $threshold = 4;
+        $underLimit = 0;
+
+        foreach ($entries as $entry) {
+            if (time() - $entry < $threshold) {
+                $underLimit++;
+            }
+        }
+
+        return $underLimit == $threshold;
     }
 
     private static function stopSpam(Player $player)
