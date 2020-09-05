@@ -75,7 +75,7 @@ class MemeMod extends Module implements ModuleInterface
 
     private static function isSpamming(Collection $entries): bool
     {
-        $threshold = 4;
+        $threshold = 3;
         $underLimit = 0;
 
         foreach ($entries as $entry) {
