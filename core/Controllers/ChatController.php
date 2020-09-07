@@ -160,11 +160,6 @@ class ChatController implements ControllerInterface
             $name = '$<$eee$> $fff' . $name;
         }
 
-        if (preg_match('/\$l(https?:\/\/[^ ]+) ?/', $text, $matches)) {
-            $link = sprintf('[%s]%s', $matches[1], $matches[1]);
-            $text = str_replace($matches[1], $link, $text);
-        }
-
         $chatColor = self::$primary;
         if (empty($chatColor)) {
             $chatColor = '$z$s';
@@ -174,7 +169,7 @@ class ChatController implements ControllerInterface
 
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color;
-        $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s$z', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
+        $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s $z', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
         Server::ChatSendServerMessage($chatText);
     }
