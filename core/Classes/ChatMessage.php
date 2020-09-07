@@ -161,7 +161,10 @@ class ChatMessage
     public function sendAll()
     {
         Server::chatSendServerMessage($this->getMessage());
-        Log::info($this->getMessage());
+
+        if(isVerbose()){
+            Log::info($this->getMessage());
+        }
     }
 
     /**

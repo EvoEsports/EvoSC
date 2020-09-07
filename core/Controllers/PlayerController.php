@@ -114,11 +114,8 @@ class PlayerController implements ControllerInterface
         self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
             $name = $playerInfo->nickName;
 
-            if (Cache::has('nicknames/' . $playerInfo->login)) {
+            if (isTrackmania() && Cache::has('nicknames/' . $playerInfo->login)) {
                 $name = Cache::get('nicknames/' . $playerInfo->login);
-                if (strlen(stripAll($name)) > 28) {
-                    $name = substr(stripAll($name), 0, 28);
-                }
                 self::$customNames->put($playerInfo->login, $name);
             }
 
@@ -431,26 +428,6 @@ class PlayerController implements ControllerInterface
         Server::forceSpectator($targetLogin, 3);
 
         infoMessage($player, ' forced ', player($targetLogin), ' into spectator mode.')->sendAll();
-    }
-
-    private static function findClosestMatchingString(string $search, array $array)
-    {
-        $closestDistanceThusFar = self::$stringEditDistanceThreshold + 1;
-        $closestMatchValue = null;
-
-        foreach ($array as $key => $value) {
-            $editDistance = levenshtein($value, $search);
-
-            if ($editDistance == 0) {
-                return $key;
-
-            } elseif ($editDistance <= $closestDistanceThusFar) {
-                $closestDistanceThusFar = $editDistance;
-                $closestMatchValue = $key;
-            }
-        }
-
-        return $closestMatchValue; // possible to return null if threshold hasn't been met
     }
 
     public static function addFakePlayer(Player $player, string $cmd, string $count = '1')

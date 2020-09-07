@@ -412,7 +412,7 @@ function restart_evosc()
 {
     global $__bootedVersion;
 
-    if (!function_exists('pcntl_exec')) {
+    if (function_exists('pcntl_exec')) {
         warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
         Server::chatEnableManualRouting(false);
         \EvoSC\Controllers\ModuleController::stopModules();
