@@ -169,7 +169,7 @@ class ChatController implements ControllerInterface
 
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color;
-        $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s $z', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
+        $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
         Server::ChatSendServerMessage($chatText);
     }
