@@ -28,7 +28,7 @@ class ServerHopper extends Module implements ModuleInterface
         self::$servers = collect(config('server-hopper.servers'));
 
         if (count(self::$servers)) {
-            self::updateServerInformation();
+            self::sendUpdatedServerInformations();
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
@@ -36,54 +36,50 @@ class ServerHopper extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showWidget(Player $player)
     {
         self::sendUpdatedServerInformations($player);
         Template::show($player, 'ServerHopper.widget');
     }
 
+    /**
+     * @param Player|null $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function sendUpdatedServerInformations(Player $player = null)
     {
-        $serversJson = self::$servers->map(function ($server) {
-            if (isset($server->online) && $server->online) {
+        $serversJson = collect(config('server-hopper.servers'))->map(function ($server) {
+            try {
+                $connection = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
+                $systemInfo = $connection->getSystemInfo();
+
                 return [
                     'login' => $server->login,
-                    'name' => $server->name,
-                    'players' => $server->players,
-                    'max' => $server->maxPlayers,
-                    'title' => $server->titlePack,
-                    'pw' => $server->hasPassword,
+                    'name' => $connection->getServerName(),
+                    'players' => count($connection->getPlayerList()),
+                    'max' => $connection->getMaxPlayers()['CurrentValue'],
+                    'title' => $connection->getVersion()->titleId,
+                    'pw' => isManiaPlanet() ? $connection->getServerPassword() != false : false,
+                    'ip' => $systemInfo->publishedIp,
+                    'port' => $systemInfo->port,
                 ];
+            } catch (Exception $e) {
+                return null;
             }
-
-            return null;
-        })->filter()->sortByDesc('players')->values()->toJson();
+        })
+            ->filter()
+            ->sortByDesc('players')
+            ->values()
+            ->toJson();
 
         if ($player != null) {
-            Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 20);
+            Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 5);
         } else {
             Template::showAll('ServerHopper.update', compact('serversJson'));
         }
-    }
-
-    public static function updateServerInformation()
-    {
-        self::$servers->transform(function ($server) {
-            try {
-                $connection = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
-                $server->online = true;
-                $server->name = $connection->getServerName();
-                $server->players = count($connection->getPlayerList());
-                $server->maxPlayers = $connection->getMaxPlayers()['CurrentValue'];
-                $server->titlePack = $connection->getVersion()->titleId;
-                $server->hasPassword = $connection->getServerPassword() != false;
-            } catch (Exception $e) {
-                $server->online = false;
-            }
-
-            return $server;
-        });
-
-        self::sendUpdatedServerInformations();
     }
 }

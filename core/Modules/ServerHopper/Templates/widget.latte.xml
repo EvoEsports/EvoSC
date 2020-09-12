@@ -29,19 +29,26 @@
 
     {block script}
     <script><!--
-    Text getJoinLink(Text login, Text title, Text name, Boolean hasPassword){
+    Text getJoinLink(Text[Text] server){
         declare Text youAreHere = "";
         declare Text pw = "";
+        declare joinLink = "";
 
-        if(login == CurrentServerLogin){
+        if(server["login"] == CurrentServerLogin){
             youAreHere = "$z  $999 you";
         }
 
-        if(hasPassword){
+        if(server["pw"] == "True"){
             pw = " $fff";
         }
 
-        return "$p[#join=" ^ login ^ "@" ^ title ^ "]" ^ name ^ pw ^ youAreHere;
+        {if $is_maniaplanet}
+            joinLink = "$p[#join=" ^ server["login"] ^ "@" ^ server["title"] ^ "]";
+        {else}
+            joinLink = "$l[uplay://launch/5595/0/#join=" ^ server["ip"] ^ "::" ^ server["port"] ^ "@Trackmania]";
+        {/if}
+
+        return joinLink ^ server["name"] ^ pw ^ youAreHere;
     }
 
     Integer getTotalPages(Integer itemCount, Integer itemsPerPage){
@@ -87,7 +94,7 @@
             }
 
             (frame.Controls[1] as CMlLabel).SetText(server["max"]);
-            (frame.Controls[2] as CMlLabel).SetText(getJoinLink(server["login"], server["title"], server["name"], server["pw"] == "True"));
+            (frame.Controls[2] as CMlLabel).SetText(getJoinLink(server));
 
             filled += 1;
         }
