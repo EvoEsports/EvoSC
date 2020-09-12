@@ -36,13 +36,18 @@ class MapList extends Module implements ModuleInterface
         Hook::add('GroupChanged', [self::class, 'playerConnect']);
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
-            ->addAlias('/list');
+            ->addAlias('/list')
+            ->addAlias('/juke');
         ChatCommand::add('/disabled', [self::class, 'mleShowDisableMaps'], 'Open disabled map-list.');
         ChatCommand::add('/jukebox', [self::class, 'showMapQueue'], 'Open jukebox/map-queue.')
             ->addAlias('/queue')
             ->addAlias('/jb');
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function playerConnect(Player $player)
     {
         self::sendFavorites($player);
@@ -54,6 +59,33 @@ class MapList extends Module implements ModuleInterface
         Template::show($player, 'MapList.map-list');
     }
 
+    /**
+     * @param Player $player
+     * @param $flag
+     * @param $firstValue
+     * @param null $secondOptionalValue
+     */
+    public static function mleJuke(Player $player, $flag, $firstValue, $secondOptionalValue = null)
+    {
+        switch ($flag) {
+            case '0':
+                warningMessage('No maps found matching ', secondary($firstValue))->send($player);
+                break;
+
+            case '1':
+                QueueController::manialinkQueueMap($player, $firstValue);
+                break;
+
+            case '2':
+                warningMessage(secondary($secondOptionalValue), ' maps found matching ', secondary($firstValue), ', please be more specific.')->send($player);
+                break;
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function sendFavorites(Player $player)
     {
         $favorites = $player->favorites()->where('enabled', true)->pluck('uid')->toJson();
@@ -61,6 +93,10 @@ class MapList extends Module implements ModuleInterface
         Template::show($player, 'MapList.update-favorites', compact('favorites'), false, 20);
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function sendRecordsJson(Player $player)
     {
         $locals = DB::table(LocalRecords::TABLE)->where('Player', '=', $player->id)->orderBy('Rank')->pluck('Rank', 'Map')->toJson();
@@ -69,8 +105,18 @@ class MapList extends Module implements ModuleInterface
         Template::show($player, 'MapList.update-records', compact('locals', 'dedis'), false, 20);
     }
 
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param string $query
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function searchMap(Player $player, $cmd, $query = "")
     {
+        if ($cmd == '/juke') {
+            $query = 'juke:' . $query;
+        }
+
         Template::show($player, 'MapList.update-search-query', compact('query'), false, 20);
     }
 
@@ -119,6 +165,9 @@ class MapList extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @return Collection
+     */
     private static function getMapList(): Collection
     {
         return DB::table('maps')

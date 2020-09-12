@@ -583,11 +583,45 @@ Void search(){
     clearSearch.Show();
 }
 
+Void jukeMapByCommand(Text query){
+    declare Text[Text][] mapsFound = Text[Text][];
+
+    for(i, 0, maps.count - 1){
+        declare map = maps[i];
+
+        if(!map.existskey("a")){
+            log("[Maps] Null author for map " ^ map["id"]);
+            continue;
+        }
+
+        declare Text[Text] author = getAuthor(map["a"]);
+        declare searchString = map["name"]^author["nick"]^author["login"];
+        if(TL::Find(query, searchString, False, False)){
+            mapsFound.add(map);
+        }
+    }
+
+    if(mapsFound.count == 1){
+        TriggerPageAction("{$MODULE|classpath}::mleJuke,1," ^ mapsFound[0]["uid"]);
+    }else if(mapsFound.count == 0){
+        TriggerPageAction("{$MODULE|classpath}::mleJuke,0," ^ query);
+    }else{
+        TriggerPageAction("{$MODULE|classpath}::mleJuke,2," ^ query ^ "," ^ mapsFound.count);
+    }
+}
+
 Void checkMapSearchQuery(){
     declare Text MapSearchQuery for LocalUser;
     if(MapSearchQuery != ""){
-        declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
+        if(TL::SubString(MapSearchQuery, 0, 5) == "juke:"){
+            declare length = TL::Length(MapSearchQuery) - 5;
+            jukeMapByCommand(TL::SubString(MapSearchQuery, 5, length));
+            MapSearchQuery = "";
 
+            return;
+        }
+
+        declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
         input.SetText(TL::Trim(MapSearchQuery), True);
         window.Show();
         MapSearchQuery = "";

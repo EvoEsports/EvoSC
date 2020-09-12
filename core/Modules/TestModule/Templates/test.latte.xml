@@ -12,7 +12,12 @@ CSmPlayer GetOwner() {
 main() {
     declare Owner <=> GetOwner();
 
-    log(Race);
+    while(True){
+        yield;
+
+        log(UI);
+        return;
+    }
 }
     --></script>
 </manialink>
