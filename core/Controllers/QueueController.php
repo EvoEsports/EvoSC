@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -52,6 +53,8 @@ class QueueController implements ControllerInterface
 
         ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
         ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
+
+        ChatCommand::add('/drop', [self::class, 'cmdDropMapFromQueue'], 'Drops your upmost map on the queue.');
     }
 
     /**
@@ -115,6 +118,26 @@ class QueueController implements ControllerInterface
     {
         if (self::queueMapByUid($player, $map->uid, $map->cooldown)) {
             infoMessage(secondary($player), ' queued map ', secondary($map->name))->sendAll();
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @throws \Exception
+     */
+    public static function cmdDropMapFromQueue(Player $player, $cmd)
+    {
+        /**
+         * @var MapQueue $mapQueueItem
+         */
+        $mapQueueItem = MapQueue::where('requesting_player', '=', $player->Login)
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($mapQueueItem) {
+            infoMessage($player, ' dropped map ', secondary($mapQueueItem->map), ' from the queue.')->sendAll();
+            $mapQueueItem->delete();
         }
     }
 
