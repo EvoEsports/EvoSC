@@ -170,7 +170,7 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        if ($time == '0') {
+        if (floatval($time) == 0) {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
         } else {
             $secondsToAdd = floatval($time) * 60;

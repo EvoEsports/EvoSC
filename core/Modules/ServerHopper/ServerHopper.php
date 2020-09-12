@@ -10,24 +10,16 @@ use EvoSC\Classes\Timer;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Exception;
-use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Connection;
 
 class ServerHopper extends Module implements ModuleInterface
 {
     /**
-     * @var Collection
-     */
-    private static $servers;
-
-    /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        self::$servers = collect(config('server-hopper.servers'));
-
-        if (count(self::$servers)) {
+        if (count(config('server-hopper.servers'))) {
             self::sendUpdatedServerInformations();
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
