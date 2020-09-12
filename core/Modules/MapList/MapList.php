@@ -65,7 +65,7 @@ class MapList extends Module implements ModuleInterface
      * @param $firstValue
      * @param null $secondOptionalValue
      */
-    public static function mleJuke(Player $player, $flag, $firstValue, $secondOptionalValue = null)
+    public static function mleJuke(Player $player, $flag, $firstValue = null, $secondOptionalValue = null)
     {
         switch ($flag) {
             case '0':
