@@ -82,7 +82,7 @@ class CpDiffs extends Module implements ModuleInterface
 
         if ($pb) {
             $cps = collect(explode(',', $pb->checkpoints))->map(function ($cp, $key) {
-                return '$666' . ($key + 1) . '|$fff' . formatScore($cp, true);
+                return '$666' . ($key + 1) . '|$fff' . formatScore(intval($cp), true);
             })->implode(', ');
 
             infoMessage('Your PB is ', secondary(formatScore($pb->score, true)), ', checkpoints: ', secondary($cps))->send($player);
