@@ -4,6 +4,7 @@ namespace EvoSC\Models;
 
 
 use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
 use EvoSC\Controllers\QueueController;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,21 +22,50 @@ class MapQueue extends Model
         'map_uid',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function player()
     {
         return $this->hasOne(Player::class, 'Login', 'requesting_player');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function map()
     {
         return $this->hasOne(Map::class, 'uid', 'map_uid');
     }
 
+    /**
+     * @return MapQueue|null
+     */
     public static function getFirst(): ?MapQueue
     {
-        return self::orderBy('created_at')->first();
+        /**
+         * @var MapQueue $mapQueue
+         */
+        $mapQueue = self::orderBy('created_at')->first();
+
+        if (!$mapQueue->map()->exists()) {
+            try {
+                $mapQueue->delete();
+
+                if (self::count() > 0) {
+                    return self::getFirst();
+                }
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
+        }
+
+        return $mapQueue;
     }
 
+    /**
+     *
+     */
     public static function removeFirst()
     {
         self::orderBy('created_at')->first()->delete();
