@@ -191,6 +191,9 @@ class EscRun extends Command
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         Server::disableServiceAnnounces(true);
 
+        //Enabled checkpoint events
+        Server::triggerModeScriptEvent('Trackmania.Event.SetCurLapCheckpointsMode', [config('server.checkpoints.CurLapCheckpointsMode')]);
+
         $failedConnectionRequests = 0;
 
         successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();

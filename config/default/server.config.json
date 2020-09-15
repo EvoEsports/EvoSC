@@ -19,5 +19,9 @@
   "logs": {
     "prefix": "evosc",
     "single-file": false
+  },
+  "checkpoints": {
+    "CurLapCheckpointsMode": "always",
+    "CurRaceCheckpointsMode": "never"
   }
 }
