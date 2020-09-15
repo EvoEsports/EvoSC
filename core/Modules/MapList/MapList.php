@@ -234,7 +234,9 @@ class MapList extends Module implements ModuleInterface
                 'login' => $item->player->Login,
                 'nick' => $item->player->NickName,
             ];
-        })->filter();
+        })
+            ->filter()
+            ->values();
 
         Template::showAll('MapList.update-map-queue', compact('mapQueue'));
     }
