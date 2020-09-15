@@ -48,7 +48,7 @@ class MapQueue extends Model
          */
         $mapQueue = self::orderBy('created_at')->first();
 
-        if (!$mapQueue->map()->exists()) {
+        if (!$mapQueue->map()->exists() || $mapQueue->map->enabled == 0) {
             try {
                 $mapQueue->delete();
 
