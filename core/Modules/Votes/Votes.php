@@ -207,33 +207,32 @@ class Votes extends Module implements ModuleInterface
         }
 
         if (!$player->hasAccess('no_vote_limits')) {
+            $diffInSeconds = self::getSecondsSinceLastTimeVote();
+            if ($diffInSeconds < config('votes.time.cooldown-in-seconds')) {
+                $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
+                warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
+                    ' before voting again.')->send($player);
+                return;
+            }
+
             $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
             if ($secondsToAdd > $oSecondsToAdd) {
                 $secondsToAdd = $oSecondsToAdd;
             }
 
             $totalSeconds = CountdownController::getOriginalTimeLimitInSeconds() + CountdownController::getAddedSeconds();
-            $newTimeLimitInMinutes = ($totalSeconds + $secondsToAdd) / 60;
             $timeLimitInMinutes = config('votes.time.limit-minutes');
             if ($totalSeconds / 60 >= $timeLimitInMinutes) {
                 warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
                 return;
-            } else if ($newTimeLimitInMinutes > $timeLimitInMinutes) {
-                warningMessage('Asking for ', secondary($time . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
+            } else if (($totalSeconds + $secondsToAdd) / 60 > $timeLimitInMinutes) {
+                warningMessage('Asking for ', secondary(($secondsToAdd/60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
                 return;
             }
 
             $voteCountLimit = config('votes.time.limit-votes');
             if ($voteCountLimit != -1 && self::$timeVotesThisRound >= $voteCountLimit) {
                 warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
-                return;
-            }
-
-            $diffInSeconds = self::getSecondsSinceLastTimeVote();
-            if ($diffInSeconds < config('votes.time.cooldown-in-seconds')) {
-                $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
-                warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
-                    ' before voting again.')->send($player);
                 return;
             }
 
