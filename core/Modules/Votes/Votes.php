@@ -88,14 +88,14 @@ class Votes extends Module implements ModuleInterface
 
     public function __construct()
     {
+        self::$voters = collect();
+
         if (Cache::has('vote-cache')) {
             $data = Cache::get('vote-cache');
 
-            self::$voters = $data->voters;
             self::$lastTimeVote = $data->lastTimeVote;
             self::$lastSkipVote = $data->lastSkipVote;
         } else {
-            self::$voters = collect();
             self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
             self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
             $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
