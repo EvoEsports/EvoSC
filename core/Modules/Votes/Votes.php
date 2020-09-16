@@ -91,14 +91,9 @@ class Votes extends Module implements ModuleInterface
         if (Cache::has('vote-cache')) {
             $data = Cache::get('vote-cache');
 
-            self::$vote = $data->vote;
             self::$voters = $data->voters;
             self::$lastTimeVote = $data->lastTimeVote;
             self::$lastSkipVote = $data->lastSkipVote;
-            self::$timeVotesThisRound = $data->timeVotesThisRound;
-            self::$skipVotesThisRound = $data->skipVotesThisRound;
-            self::$onlinePlayersCount = $data->onlinePlayersCount;
-            self::$addTimeSuccess = $data->addTimeSuccess;
         } else {
             self::$voters = collect();
             self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
