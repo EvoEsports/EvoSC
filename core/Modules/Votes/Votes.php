@@ -4,6 +4,7 @@ namespace EvoSC\Modules\Votes;
 
 
 use Error;
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -69,13 +70,42 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
+    public function stop()
+    {
+        $data = (object)[
+            'vote' => self::$vote,
+            'voters' => self::$voters,
+            'lastTimeVote' => self::$lastTimeVote,
+            'lastSkipVote' => self::$lastSkipVote,
+            'timeVotesThisRound' => self::$timeVotesThisRound,
+            'skipVotesThisRound' => self::$skipVotesThisRound,
+            'onlinePlayersCount' => self::$onlinePlayersCount,
+            'addTimeSuccess' => self::$addTimeSuccess
+        ];
+
+        Cache::put('vote-cache', $data, now()->addMinutes(2));
+    }
+
     public function __construct()
     {
-        self::$voters = collect();
-        self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
-        self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
-        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+        if(Cache::has('vote-cache')){
+            $data = Cache::get('vote-cache');
+
+            self::$vote = $data->vote;
+            self::$voters = $data->voters;
+            self::$lastTimeVote = $data->lastTimeVote;
+            self::$lastSkipVote = $data->lastSkipVote;
+            self::$timeVotesThisRound = $data->timeVotesThisRound;
+            self::$skipVotesThisRound = $data->skipVotesThisRound;
+            self::$onlinePlayersCount = $data->onlinePlayersCount;
+            self::$addTimeSuccess = $data->addTimeSuccess;
+        }else{
+            self::$voters = collect();
+            self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
+            self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
+            $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
+            self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+        }
 
         AccessRight::add('vote_custom', 'Create a custom vote. Enter question after command.');
         AccessRight::add('no_vote_limits', 'Not bound to any limitation.');

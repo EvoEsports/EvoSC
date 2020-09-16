@@ -177,12 +177,8 @@ class MatchSettingsController implements ControllerInterface
     public static function shuffleCurrentMapListCommand(Player $player)
     {
         infoMessage($player, ' shuffled the map list.')->sendAll();
-        infoMessage('The map list gets shuffled at the end of the map.')->sendAdmin();
-
-        Hook::add('Maniaplanet.EndMap_Start', function () use ($player) {
-            MatchSettingsController::shuffleCurrentMapList();
-            successMessage('Map list shuffled.')->sendAdmin();
-        }, true);
+        MatchSettingsController::shuffleCurrentMapList();
+        successMessage('Map list shuffled.')->sendAdmin();
     }
 
     /**

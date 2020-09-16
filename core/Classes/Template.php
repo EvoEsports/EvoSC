@@ -6,8 +6,8 @@ namespace EvoSC\Classes;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Models\Player;
-use Illuminate\Support\Collection;
 use Exception;
+use Illuminate\Support\Collection;
 
 /**
  * Class Template

@@ -7,6 +7,7 @@ namespace EvoSC\Controllers;
 use Carbon\Carbon;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Controller;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -16,7 +17,7 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use SimpleXMLElement;
 
-class CountdownController implements ControllerInterface
+class CountdownController extends Controller implements ControllerInterface
 {
     /**
      * @var int
@@ -38,18 +39,18 @@ class CountdownController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
     {
         self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
 
-        if(Cache::has('match-start')){
+        if (Cache::has('match-start')) {
             self::$matchStart = Cache::get('match-start');
         }
-        if(Cache::has('added-time')){
+        if (Cache::has('added-time')) {
             self::$addedSeconds = Cache::get('added-time');
         }
 
@@ -62,6 +63,12 @@ class CountdownController implements ControllerInterface
         ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'manipulate_time');
 
         InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'manipulate_time');
+    }
+
+    public static function stop()
+    {
+        Cache::put('added-time', self::$addedSeconds, now()->addMinute());
+        Cache::put('match-start', self::$matchStart, now()->addMinute());
     }
 
     public static function beginMatch()
@@ -91,8 +98,8 @@ class CountdownController implements ControllerInterface
     }
 
     /**
-     * @param  int  $seconds
-     * @param  Player|null  $player
+     * @param int $seconds
+     * @param Player|null $player
      */
     public static function addTime(int $seconds, Player $player = null)
     {
@@ -107,11 +114,11 @@ class CountdownController implements ControllerInterface
 
         if ($player != null) {
             if ($seconds > 0) {
-                infoMessage($player, ' added ', secondary(round($seconds / 60, 1).' minutes'),
+                infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'),
                     ' of playtime.')->sendAdmin();
             } else {
 
-                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1).' minutes'),
+                infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'),
                     ' of playtime.')->sendAdmin();
             }
         }
@@ -128,7 +135,7 @@ class CountdownController implements ControllerInterface
     }
 
     /**
-     * @param  Player  $player
+     * @param Player $player
      */
     public static function addMinute(Player $player)
     {
@@ -136,7 +143,7 @@ class CountdownController implements ControllerInterface
     }
 
     /**
-     * @param  bool  $getAsCarbon
+     * @param bool $getAsCarbon
      *
      * @return Carbon|int
      */
@@ -180,7 +187,7 @@ class CountdownController implements ControllerInterface
     /**
      * Load the time limit from the default match-settings.
      *
-     * @param  string|null  $file
+     * @param string|null $file
      * @return int
      */
     private static function getTimeLimitFromMatchSettings(string $file = null): int
@@ -190,7 +197,7 @@ class CountdownController implements ControllerInterface
         }
 
         if ($file) {
-            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/'.$file));
+            $matchSettings = File::get(MapController::getMapsPath('MatchSettings/' . $file));
             $xml = new SimpleXMLElement($matchSettings);
             $node = null;
 
@@ -200,7 +207,7 @@ class CountdownController implements ControllerInterface
                 $node = $xml->script_settings;
             }
 
-            if($node){
+            if ($node) {
                 foreach ($node->children() as $child) {
                     if ($child->attributes()['name'] == 'S_TimeLimit') {
                         return intval($child->attributes()['value']);
@@ -238,7 +245,7 @@ class CountdownController implements ControllerInterface
     /**
      * Set a new time limit in seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
      */
     public static function setTimeLimit(int $seconds)
     {
