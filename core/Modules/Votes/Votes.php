@@ -222,12 +222,14 @@ class Votes extends Module implements ModuleInterface
 
             $totalSeconds = CountdownController::getOriginalTimeLimitInSeconds() + CountdownController::getAddedSeconds();
             $timeLimitInMinutes = config('votes.time.limit-minutes');
-            if ($totalSeconds / 60 >= $timeLimitInMinutes) {
-                warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
-                return;
-            } else if (($totalSeconds + $secondsToAdd) / 60 > $timeLimitInMinutes) {
-                warningMessage('Asking for ', secondary(($secondsToAdd/60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
-                return;
+            if($timeLimitInMinutes != -1){
+                if ($totalSeconds / 60 >= $timeLimitInMinutes) {
+                    warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
+                    return;
+                } else if (($totalSeconds + $secondsToAdd) / 60 > $timeLimitInMinutes) {
+                    warningMessage('Asking for ', secondary(($secondsToAdd/60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
+                    return;
+                }
             }
 
             $voteCountLimit = config('votes.time.limit-votes');
