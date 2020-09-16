@@ -88,7 +88,7 @@ class Votes extends Module implements ModuleInterface
 
     public function __construct()
     {
-        if(Cache::has('vote-cache')){
+        if (Cache::has('vote-cache')) {
             $data = Cache::get('vote-cache');
 
             self::$vote = $data->vote;
@@ -99,7 +99,7 @@ class Votes extends Module implements ModuleInterface
             self::$skipVotesThisRound = $data->skipVotesThisRound;
             self::$onlinePlayersCount = $data->onlinePlayersCount;
             self::$addTimeSuccess = $data->addTimeSuccess;
-        }else{
+        } else {
             self::$voters = collect();
             self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
             self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
@@ -212,9 +212,20 @@ class Votes extends Module implements ModuleInterface
                 $secondsToAdd = $oSecondsToAdd;
             }
 
-            if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
-                warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
+            $totalSeconds = CountdownController::getOriginalTimeLimitInSeconds() + CountdownController::getAddedSeconds();
+            $newTimeLimitInMinutes = ($totalSeconds + $secondsToAdd) / 60;
+            $timeLimitInMinutes = config('votes.time.limit-minutes');
+            if ($totalSeconds / 60 >= $timeLimitInMinutes) {
+                warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
+                return;
+            } else if ($newTimeLimitInMinutes > $timeLimitInMinutes) {
+                warningMessage('Asking for ', secondary($time . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
+                return;
+            }
 
+            $voteCountLimit = config('votes.time.limit-votes');
+            if ($voteCountLimit != -1 && self::$timeVotesThisRound >= $voteCountLimit) {
+                warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
                 return;
             }
 
@@ -223,7 +234,6 @@ class Votes extends Module implements ModuleInterface
                 $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
                 warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
-
                 return;
             }
 

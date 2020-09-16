@@ -48,15 +48,17 @@ class MapQueue extends Model
          */
         $mapQueue = self::orderBy('created_at')->first();
 
-        if (is_null($mapQueue->map) || $mapQueue->map->enabled == 0) {
-            try {
-                $mapQueue->delete();
+        if($mapQueue){
+            if (is_null($mapQueue->map) || $mapQueue->map->enabled == 0) {
+                try {
+                    $mapQueue->delete();
 
-                if (self::count() > 0) {
-                    return self::getFirst();
+                    if (self::count() > 0) {
+                        return self::getFirst();
+                    }
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
                 }
-            } catch (\Exception $e) {
-                Log::error($e->getMessage());
             }
         }
 

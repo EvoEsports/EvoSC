@@ -176,9 +176,18 @@ class MatchSettingsController implements ControllerInterface
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
-        infoMessage($player, ' shuffled the map list.')->sendAll();
-        MatchSettingsController::shuffleCurrentMapList();
-        successMessage('Map list shuffled.')->sendAdmin();
+        if (CountdownController::getAddedSeconds() > 0) {
+            Hook::add('EndMatch', function () use ($player) {
+                self::shuffleCurrentMapList();
+                MatchSettingsController::shuffleCurrentMapList();
+                infoMessage($player, ' shuffled the map list.')->sendAll();
+            }, true);
+            
+            successMessage('Map list gets shuffled on map end.')->sendAdmin();
+        } else {
+            MatchSettingsController::shuffleCurrentMapList();
+            infoMessage($player, ' shuffled the map list.')->sendAll();
+        }
     }
 
     /**
@@ -199,13 +208,14 @@ class MatchSettingsController implements ControllerInterface
 
         unset($settings->map);
 
-        foreach ($maps->shuffle() as $map){
+        foreach ($maps->shuffle() as $map) {
             $entry = $settings->addChild('map');
             $entry->addChild('file', $map['file']);
             $entry->addChild('ident', $map['ident']);
         }
 
         File::put($file, Utility::simpleXmlPrettyPrint($settings));
+        MatchSettingsController::loadMatchSettings();
     }
 
     /**
@@ -338,7 +348,7 @@ class MatchSettingsController implements ControllerInterface
             $node = $xml->script_settings;
         }
 
-        if($node){
+        if ($node) {
             foreach ($node->children() as $child) {
                 if ($child->attributes()['name'] == $key) {
                     return intval($child->attributes()['value']);
