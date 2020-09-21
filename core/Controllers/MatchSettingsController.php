@@ -16,6 +16,7 @@ use EvoSC\Classes\Utility;
 use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
@@ -86,6 +87,7 @@ class MatchSettingsController implements ControllerInterface
             ChatCommand::removeAll();
             Timer::destroyAll();
             ManiaLinkEvent::removeAll();
+            InputSetup::clearAll();
             if (config('quick-buttons.enabled')) {
                 QuickButtons::removeAll();
             }
