@@ -69,14 +69,14 @@
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Boolean isRounds(){
-        return CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online";
+    Boolean isTimeAttack(){
+        return CurrentServerModeName == "TimeAttack" || CurrentServerModeName == "TM_TimeAttack_Online";
     }
 
     Void updateSlot(CMlFrame box, Integer rank, Entry entry, Integer addedPoints){
         declare prefix = "";
 
-        if(isRounds()){
+        if(!isTimeAttack()){
             (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.points, 3) ^ " PTS";
             (box.Controls[2] as CMlLabel).Value = entry.points ^ " PTS";
             if(addedPoints > 0){
@@ -101,7 +101,7 @@
         declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
         declare rankingFrame <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
         declare filled = 0;
-        declare isInRoundsMode = isRounds();
+        declare isInRoundsMode = !isTimeAttack();
 
         pointsLimitLabel.Visible = isInRoundsMode;
 
@@ -147,6 +147,8 @@
         declare Integer EvoSC_LiveRankings_LastUpdate for This;
         declare lastUpdate = 0;
         declare lastPointLimitUpdate = 0;
+
+        log(CurrentServerModeName);
 
         max = {config('live-rankings.show', 14)};
 
