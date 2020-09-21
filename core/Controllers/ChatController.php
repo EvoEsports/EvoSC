@@ -5,6 +5,7 @@ namespace EvoSC\Controllers;
 
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Log;
+use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
@@ -147,6 +148,15 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
+        $questions = Question::getQuestions();
+        if ($questions->has($player->id)) {
+            $question = $questions->get($player->id);
+            $callable = $question->callback;
+            $callable($player, $text);
+            Question::forget($player->id);
+            return;
+        }
+
         Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
 
         $name = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $player->NickName);
@@ -163,8 +173,8 @@ class ChatController implements ControllerInterface
         $chatColor = self::$primary;
         if (empty($chatColor)) {
             $chatColor = '$z$s';
-        }else{
-            $chatColor = '$z$s$'.$chatColor;
+        } else {
+            $chatColor = '$z$s$' . $chatColor;
         }
 
         $groupIcon = $player->group->chat_prefix ?? '';

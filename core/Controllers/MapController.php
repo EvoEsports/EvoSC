@@ -20,6 +20,7 @@ use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\MapList\Models\MapFavorite;
 use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\QuickButtons\QuickButtons;
+use EvoSC\Modules\Statistics\Statistics;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Collection;
@@ -440,6 +441,7 @@ class MapController implements ControllerInterface
         infoMessage($player, ' resets the round.')->sendAll();
 
         Server::restartMap();
+        Statistics::beginMap();
     }
 
     /**
