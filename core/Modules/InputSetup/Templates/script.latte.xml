@@ -40,7 +40,6 @@
                                     }
                                 }
 
-                                log(spamCounter);
                                 lastKeyStroke = GameTime;
 
                                 if(spamCounter > 20){
@@ -53,7 +52,6 @@
                             }
                         }else{
                             if(event.KeyName == bind.def){
-                                log("def");
                                 TriggerPageAction("bound_key_pressed," ^ bind.id);
                                 break;
                             }

@@ -5,18 +5,33 @@ namespace EvoSC\Modules\GameModeChanger;
 
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
-use Exception;
 
 class GameModeChanger extends Module implements ModuleInterface
 {
-    private static array $gameModes = [
-        'Script', 'Rounds', 'TimeAttack', 'Team', 'Laps', 'Cup', 'Stunts'
+    private static array $gameModesManiaplanet = [
+        'TimeAttack' => 'TimeAttack.Script.txt',
+        'Rounds' => 'Rounds.Script.txt',
+        'Team' => 'Team.Script.txt',
+        'Cup' => 'Cup.Script.txt',
+        'Laps' => 'Laps.Script.txt',
+        'Chase' => 'Chase.Script.txt',
+    ];
+
+    private static array $gameModesTrackmania = [
+        'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
+        'Rounds' => 'Trackmania/TM_Rounds_Online.Script.txt',
+        'Team' => 'Trackmania/TM_Team_Online.Script.txt',
+        'Cup' => 'Trackmania/TM_Cup_Online.Script.txt',
+        'Laps' => 'Trackmania/TM_Laps_Online.Script.txt',
+        'Champion' => 'Trackmania/TM_Champion_Online.Script.txt',
+        'Knockout' => 'Trackmania/TM_Knockout_Online.Script.txt',
     ];
 
     /**
@@ -29,40 +44,37 @@ class GameModeChanger extends Module implements ModuleInterface
         AccessRight::add('change_mode', 'Allows to change the current mode.');
 
         ChatCommand::add('//mode', [self::class, 'cmdChangeGameMode'], 'Select a different mode.', 'change_mode');
+
+        ManiaLinkEvent::add('game_mode.select', [self::class, 'mleSelectMode'], 'change_mode');
     }
 
     /**
      * @param Player $player
-     * @param $cmd
-     * @param int $mode
+     * @param null $cmd
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function cmdChangeGameMode(Player $player, $cmd)
+    public static function cmdChangeGameMode(Player $player, $cmd = null)
     {
-        $modes = '';
-        foreach (self::$gameModes as $key => $mode) {
-            $modes .= "\$ff0[$key] \$fff$mode, ";
+        if (isManiaPlanet()) {
+            $options = self::$gameModesManiaplanet;
+        } else {
+            $options = self::$gameModesTrackmania;
         }
-        $modes = substr($modes, 0, -2);
-        Question::ask("Please select a mode:\n" . secondary($modes), $player, function (Player $player, $answer) {
-            self::selectGameMode(intval($answer), $player);
-        });
+
+        Template::show($player, 'GameModeChanger.select', ['options' => $options]);
     }
 
     /**
-     * @param int $modeId
      * @param Player $player
+     * @param $name
+     * @param $gameModeId
      */
-    private static function selectGameMode(int $modeId, Player $player)
+    public static function mleSelectMode(Player $player, $name, $gameModeId)
     {
-        if ($modeId < -1 || $modeId >= count(self::$gameModes)) {
-            warningMessage('Invalid mode selected.')->send($player);
-            return;
-        }
-
         try {
-            Server::setGameMode($modeId);
-            infoMessage($player, ' changed game mode to ', secondary(self::$gameModes[$modeId]))->sendAll();
-        } catch (Exception $e) {
+            Server::setScriptName($gameModeId);
+            infoMessage($player, ' changed the game-mode to ', secondary($name))->sendAll();
+        } catch (\Exception $e) {
             dangerMessage($e->getMessage())->send($player);
         }
     }

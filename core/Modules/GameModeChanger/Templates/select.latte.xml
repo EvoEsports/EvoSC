@@ -1,0 +1,46 @@
+{contentType text}
+{extends 'Components.window'}
+{php $window_width = 40;}
+{php $window_height = 50;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}select-game-mode{/block}
+    {block icon}🔧{/block}
+    {block title}Select game-mode{/block}
+
+    {block content}
+    <frame pos="-2 4.5">
+        {foreach $options as $mode => $id}
+        <label class="btn-muted select" pos="20 {$iterator->counter * -5}" size="40 5" textsize="1" text="{$mode}" data-name="{$mode}" data-id="{$id}" ScriptEvents="1"/>
+        {/foreach}
+    </frame>
+    {/block}
+
+    {include 'Scripts.mle'}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    declare Integer count = {count($options)};
+    window.Size[1] = count * 5.0 + 6.0;
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("select")){
+        declare name = event.Control.DataAttributeGet("name");
+        declare id = event.Control.DataAttributeGet("id");
+        ManiaLinkEvent("game_mode.select", name, id);
+        window.Hide();
+        return;
+    }
+    {/block}
+    --></script>
+</manialink>
