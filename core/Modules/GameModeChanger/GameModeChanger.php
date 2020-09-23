@@ -27,7 +27,7 @@ class GameModeChanger extends Module implements ModuleInterface
     private static array $gameModesTrackmania = [
         'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
         'Rounds' => 'Trackmania/TM_Rounds_Online.Script.txt',
-        'Team' => 'Trackmania/TM_Team_Online.Script.txt',
+        'Teams' => 'Trackmania/TM_Teams_Online.Script.txt',
         'Cup' => 'Trackmania/TM_Cup_Online.Script.txt',
         'Laps' => 'Trackmania/TM_Laps_Online.Script.txt',
         'Champion' => 'Trackmania/TM_Champion_Online.Script.txt',
