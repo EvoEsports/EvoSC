@@ -19,7 +19,7 @@ Server Ranking
 {block content}
 <frame pos="1 -1">
     {foreach $ranks[0] as $i => $rank}
-    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75" valign="center" halign="right" />
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->Rank}." textsize="0.75" valign="center" halign="right" />
     <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" valign="center" halign="left" />
     <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75"  valign="center" halign="right" />
     {/foreach}
@@ -27,7 +27,7 @@ Server Ranking
 {if isset($ranks[1])}
 <frame pos="46 76">
     {foreach $ranks[1] as $i => $rank}
-    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75"  valign="center" halign="right" />
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->Rank}." textsize="0.75"  valign="center" halign="right" />
     <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" valign="center" halign="left" />
     <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75"  valign="center" halign="right" />
     {/foreach}
@@ -36,7 +36,7 @@ Server Ranking
 {if isset($ranks[2])}
 <frame pos="91 153">
     {foreach $ranks[2] as $i => $rank}
-    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->rank}." textsize="0.75"  valign="center" halign="right" />
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$rank->Rank}." textsize="0.75"  valign="center" halign="right" />
     <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($rank->name ?: ($rank->login ?: '$666n/a')))}" valign="center" halign="left" />
     <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="({$rank->score})" textsize="0.75"  valign="center" halign="right" />
     {/foreach}

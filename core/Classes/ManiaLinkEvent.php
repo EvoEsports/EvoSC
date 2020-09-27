@@ -132,8 +132,8 @@ class ManiaLinkEvent
             return;
         }
 
-        if (isVerbose()) {
-            Log::write("$action", false);
+        if (isVeryVerbose()) {
+            Log::write("$action", true);
         }
 
         if (preg_match('/^(.+)::(.+?),/', $action, $matches)) {

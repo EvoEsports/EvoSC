@@ -73,7 +73,9 @@ class RestClient
      */
     public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        Log::write('GET: ' . $url, isVerbose());
+        if(isVeryVerbose()){
+            Log::write('GET: ' . $url);
+        }
 
         return self::$client->request('GET', $url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -85,7 +87,9 @@ class RestClient
      */
     public static function getAsync(string $url, array $options = null)
     {
-        Log::cyan('ASYNC GET: ' . $url, isVerbose());
+        if(isVeryVerbose()){
+            Log::write('ASYNC GET: ' . $url);
+        }
 
         return self::$client->getAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -100,7 +104,9 @@ class RestClient
      */
     public static function post(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {
-        Log::write('POST: ' . $url, isVerbose());
+        if(isVeryVerbose()){
+            Log::write('POST: ' . $url);
+        }
 
         return self::$client->request('POST', $url, self::addUserAgentAndDefaultTimeout($options));
     }
@@ -112,7 +118,9 @@ class RestClient
      */
     public static function postAsync(string $url, array $options = null)
     {
-        Log::cyan('ASYNC POST: ' . $url, isVerbose());
+        if(isVeryVerbose()){
+            Log::write('ASYNC POST: ' . $url);
+        }
 
         return self::$client->postAsync($url, self::addUserAgentAndDefaultTimeout($options));
     }

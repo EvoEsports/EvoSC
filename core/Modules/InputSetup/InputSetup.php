@@ -37,17 +37,30 @@ class InputSetup extends Module implements ModuleInterface
         QuickButtons::addButton('🎮', 'Input-Setup', 'show_key_bind_settings');
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showSettings(Player $player)
     {
-        $binds = self::$binds->filter(function ($bind) use ($player) {
+        $binds = self::getBinds($player)->values();
+
+        Template::show($player, 'InputSetup.settings', compact('binds'));
+    }
+
+    /**
+     * @param Player $player
+     * @return Collection
+     */
+    public static function getBinds(Player $player)
+    {
+        return self::$binds->filter(function ($bind) use ($player) {
             if ($bind['access']) {
                 return $player->hasAccess($bind['access']);
             }
 
             return true;
-        })->values();
-
-        Template::show($player, 'InputSetup.settings', compact('binds'));
+        });
     }
 
     /**
@@ -94,13 +107,13 @@ class InputSetup extends Module implements ModuleInterface
             $binds = collect(json_decode($binds->value));
         }
 
-        $data = json_decode(implode(',', $data));
+        $data = json_decode(implode(',', $data)); //new bind data
 
         if ($binds->isNotEmpty()) {
-            $binds = $binds->where('id', '!=', $data->id);
+            $binds = $binds->where('id', '!=', $data->id); //get rid of old bind
         }
 
-        $binds->push($data);
+        $binds->push($data); //push new bind
 
         DB::table('user-settings')
             ->updateOrInsert([

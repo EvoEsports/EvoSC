@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -24,7 +25,7 @@ use Illuminate\Support\Collection;
  */
 class QueueController implements ControllerInterface
 {
-    private static bool $preCache = true;
+    private static bool $preCache = false;
 
     /**
      * @inheritDoc
@@ -46,12 +47,16 @@ class QueueController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
+        self::$preCache = (bool)config('server.pre-cache-maps', false);
+
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
 
         ManiaLinkEvent::add('map.queue', [self::class, 'manialinkQueueMap']);
         ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
+
+        ChatCommand::add('/drop', [self::class, 'cmdDropMapFromQueue'], 'Drops your upmost map on the queue.');
     }
 
     /**
@@ -119,6 +124,26 @@ class QueueController implements ControllerInterface
     }
 
     /**
+     * @param Player $player
+     * @param $cmd
+     * @throws \Exception
+     */
+    public static function cmdDropMapFromQueue(Player $player, $cmd)
+    {
+        /**
+         * @var MapQueue $mapQueueItem
+         */
+        $mapQueueItem = MapQueue::where('requesting_player', '=', $player->Login)
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($mapQueueItem) {
+            infoMessage($player, ' dropped map ', secondary($mapQueueItem->map), ' from the queue.')->sendAll();
+            $mapQueueItem->delete();
+        }
+    }
+
+    /**
      * @param Map $map
      */
     public static function beginMap(Map $map)
@@ -152,7 +177,10 @@ class QueueController implements ControllerInterface
 
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             self::dropMapSilent($mapUid);
-            self::chooseNextMap();
+
+            if(self::$preCache){
+                self::chooseNextMap();
+            }
         }
     }
 
@@ -249,6 +277,8 @@ class QueueController implements ControllerInterface
                 } catch (\Exception $e) {
                     Log::error('Failed to pre-cache map ' . $map->name . ': ' . $e->getMessage(), true);
                     Log::write($e->getMessage(), isVerbose());
+
+                    self::dropMapSilent($map->uid);
                 }
             }
         }

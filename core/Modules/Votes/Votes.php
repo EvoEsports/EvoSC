@@ -4,6 +4,7 @@ namespace EvoSC\Modules\Votes;
 
 
 use Error;
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -69,13 +70,37 @@ class Votes extends Module implements ModuleInterface
         }
     }
 
+    public function stop()
+    {
+        $data = (object)[
+            'vote' => self::$vote,
+            'voters' => self::$voters,
+            'lastTimeVote' => self::$lastTimeVote,
+            'lastSkipVote' => self::$lastSkipVote,
+            'timeVotesThisRound' => self::$timeVotesThisRound,
+            'skipVotesThisRound' => self::$skipVotesThisRound,
+            'onlinePlayersCount' => self::$onlinePlayersCount,
+            'addTimeSuccess' => self::$addTimeSuccess
+        ];
+
+        Cache::put('vote-cache', $data, now()->addMinutes(2));
+    }
+
     public function __construct()
     {
         self::$voters = collect();
-        self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
-        self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
-        $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
-        self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+
+        if (Cache::has('vote-cache')) {
+            $data = Cache::get('vote-cache');
+
+            self::$lastTimeVote = $data->lastTimeVote;
+            self::$lastSkipVote = $data->lastSkipVote;
+        } else {
+            self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
+            self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
+            $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
+            self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+        }
 
         AccessRight::add('vote_custom', 'Create a custom vote. Enter question after command.');
         AccessRight::add('no_vote_limits', 'Not bound to any limitation.');
@@ -170,30 +195,41 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
-        if ($time == '0') {
+        if (floatval($time) == 0) {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
         } else {
             $secondsToAdd = floatval($time) * 60;
         }
 
         if (!$player->hasAccess('no_vote_limits')) {
-            $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
-            if ($secondsToAdd > $oSecondsToAdd) {
-                $secondsToAdd = $oSecondsToAdd;
-            }
-
-            if (self::$timeVotesThisRound >= config('votes.time.limit-votes')) {
-                warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
-
-                return;
-            }
-
             $diffInSeconds = self::getSecondsSinceLastTimeVote();
             if ($diffInSeconds < config('votes.time.cooldown-in-seconds')) {
                 $waitTime = config('votes.time.cooldown-in-seconds') - $diffInSeconds;
                 warningMessage('There already was a vote recently, please ', secondary('wait ' . $waitTime . ' seconds'),
                     ' before voting again.')->send($player);
+                return;
+            }
 
+            $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
+            if ($secondsToAdd > $oSecondsToAdd) {
+                $secondsToAdd = $oSecondsToAdd;
+            }
+
+            $totalSeconds = CountdownController::getOriginalTimeLimitInSeconds() + CountdownController::getAddedSeconds();
+            $timeLimitInMinutes = config('votes.time.limit-minutes');
+            if($timeLimitInMinutes != -1){
+                if ($totalSeconds / 60 >= $timeLimitInMinutes) {
+                    warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
+                    return;
+                } else if (($totalSeconds + $secondsToAdd) / 60 > $timeLimitInMinutes) {
+                    warningMessage('Asking for ', secondary(($secondsToAdd/60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
+                    return;
+                }
+            }
+
+            $voteCountLimit = config('votes.time.limit-votes');
+            if ($voteCountLimit != -1 && self::$timeVotesThisRound >= $voteCountLimit) {
+                warningMessage('The maximum time-vote-limit is reached, sorry.')->send($player);
                 return;
             }
 

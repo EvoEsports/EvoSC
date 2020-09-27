@@ -43,6 +43,10 @@ class ConfigController implements ControllerInterface
      */
     public static function getConfig(string $id, bool $getRaw = false)
     {
+        if (!isset(self::$rawConfigs) || !isset(self::$config)) {
+            return null;
+        }
+
         if ($getRaw) {
             if (self::$rawConfigs->has($id)) {
                 return self::$rawConfigs->get($id);
@@ -107,7 +111,7 @@ class ConfigController implements ControllerInterface
             ...File::getFilesRecursively(coreDir('Modules'), self::$configFilePattern),
             ...File::getFilesRecursively(modulesDir(), self::$configFilePattern)
         ];
-        
+
         foreach ($defaultConfigFiles as $configFile) {
             $name = basename($configFile);
 

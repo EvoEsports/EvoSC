@@ -41,6 +41,13 @@
 
     <script><!--
     {block globals}
+        #Struct EvoSC_Map_Info {
+            Text name;
+            Text uid;
+            Integer id;
+            Text authorName;
+            Text authorLogin;
+        }
     {/block}
 
     {block bootScript}
@@ -54,6 +61,9 @@
         declare lastMapUpdate = 0;
         declare Text[] ESC_Map_Favorite_Uids for This;
         declare Text currentMapUid;
+        declare EvoSC_Map_Info EvoSC_Current_Map for This;
+        declare Integer EvoSC_Current_Map_Update for This = 0;
+        declare Integer lastMapInfoUpdate = 0;
 
         declare mapNameLabel <=> (Page.MainFrame.GetFirstChild("map-name") as CMlLabel);
         declare authorNameLabel <=> (Page.MainFrame.GetFirstChild("author-name") as CMlLabel);
@@ -67,9 +77,13 @@
     {block loop}
         if(currentMapUid != Map.MapInfo.MapUid){
             currentMapUid = Map.MapInfo.MapUid;
-            mapNameLabel.Value = Map.MapName;
-            authorNameLabel.Value = TL::RegexReplace("\\$[lh](\\[.+?\\])?", Map.AuthorNickName, "i", "");
-            if(!ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
+        }
+
+        if(lastMapInfoUpdate != EvoSC_Current_Map_Update){
+            lastMapInfoUpdate = EvoSC_Current_Map_Update;
+            mapNameLabel.Value = EvoSC_Current_Map.name;
+            authorNameLabel.Value = TL::RegexReplace("\\$[lh](\\[.+?\\])?", EvoSC_Current_Map.authorName, "i", "");
+            if(!ESC_Map_Favorite_Uids.exists("" ^ EvoSC_Current_Map.uid)){
                 favIconLabel.Value = "";
                 favLabelLabel.Value = "Add";
             }else{

@@ -20,10 +20,10 @@ class CreateUserSettingsTable extends Migration
         });
 
         $schemaBuilder->create('user-settings', function (Blueprint $table) {
-            $table->string('player_Login');
-            $table->string('name');
+            $table->string('player_Login', 64);
+            $table->string('name', 50);
             $table->string('value');
-            $table->unique(['player_Login', 'name']);
+            $table->unique(['player_Login', 'name'], 'login_setting_unique');
         });
     }
 

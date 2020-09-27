@@ -12,10 +12,12 @@ CSmPlayer GetOwner() {
 main() {
     declare Owner <=> GetOwner();
 
-    UI.OverlayHideBackground = True;
+    while(True){
+        yield;
 
-    log("meh"^GameTime);
-    log(UI.UILayers);
+        log(UI);
+        return;
+    }
 }
     --></script>
 </manialink>

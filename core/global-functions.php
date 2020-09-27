@@ -411,14 +411,27 @@ function evo_str_slug($title)
 function restart_evosc()
 {
     global $__bootedVersion;
-    warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
-    Server::chatEnableManualRouting(false);
-    \EvoSC\Controllers\ModuleController::stopModules();
-    \EvoSC\Controllers\ControllerController::stopControllers();
-    Log::warning('Old process is terminating.');
-    pcntl_exec(PHP_BINARY, $_SERVER['argv']);
-    warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
-    Log::error('[CRITICAL] Failed to create new process, dying...');
+
+    if (function_exists('pcntl_exec')) {
+        warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
+        Server::chatEnableManualRouting(false);
+        \EvoSC\Controllers\ModuleController::stopModules();
+        \EvoSC\Controllers\ControllerController::stopControllers();
+        Log::warning('Old process is terminating.');
+        pcntl_exec(PHP_BINARY, $_SERVER['argv']);
+        warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
+        Log::error('[CRITICAL] Failed to create new process, dying...');
+    } else {
+        Log::warning('Missing required php-extension pcntl, EvoSC will restart with a new PID and detached!');
+
+        $cmd = PHP_BINARY . ' ' . implode(' ', $_SERVER['argv']);
+        if (isWindows()){
+            pclose(popen("start /B ". $cmd, "r"));
+        } else {
+            exec($cmd . " > /dev/null &");
+        }
+    }
+
     exit(56);
 }
 

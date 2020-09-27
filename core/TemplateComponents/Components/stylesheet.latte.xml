@@ -33,4 +33,4 @@
 
     <!-- Form-Elements -->
     <style class="form" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}3" focusareacolor2="{config('theme.form.default.bg')}c" textcolor="{config('theme.form.default.text')}" textsize="1"/>
-</stylesheet>
+</stylesheet>a

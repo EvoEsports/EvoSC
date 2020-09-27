@@ -34,7 +34,6 @@ use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
-use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
@@ -174,10 +173,6 @@ class EscRun extends Command
             Cache::forget('restart_evosc');
         }
 
-        onlinePlayers()->each(function (Player $player) use ($_onlinePlayers) {
-            $_onlinePlayers->put($player->Login, $player);
-        });
-
         if (isVerbose()) {
             Log::write('Booting core finished.', true);
         }
@@ -191,18 +186,12 @@ class EscRun extends Command
         $map = Map::where('filename', Server::getCurrentMapInfo()->fileName)->first();
         Hook::fire('BeginMap', $map);
 
-        //Set connected players online
-        $playerList = collect(Server::getPlayerList());
-
-        foreach ($playerList as $maniaPlayer) {
-            DB::table('players')->updateOrInsert(['Login' => $maniaPlayer->login], [
-                'NickName' => $maniaPlayer->nickName,
-            ]);
-        }
-
         //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         Server::disableServiceAnnounces(true);
+
+        //Enabled checkpoint events
+        Server::triggerModeScriptEvent('Trackmania.Event.SetCurLapCheckpointsMode', [config('server.checkpoints.CurLapCheckpointsMode')]);
 
         $failedConnectionRequests = 0;
 

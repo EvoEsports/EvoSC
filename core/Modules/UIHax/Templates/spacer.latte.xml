@@ -26,6 +26,12 @@
 {/block}
 
 {block loop}
+    if(UI.UISequence == CUIConfig::EUISequence::Podium){
+        widgetSetHeight__(0.0);
+        wait(UI.UISequence != CUIConfig::EUISequence::Podium);
+        sleep(200);
+        widgetSetHeight__(32.0);
+    }
 {/block}
 
 {block pendingEvents}

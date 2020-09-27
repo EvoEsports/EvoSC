@@ -16,6 +16,7 @@ use EvoSC\Classes\Utility;
 use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
@@ -86,6 +87,7 @@ class MatchSettingsController implements ControllerInterface
             ChatCommand::removeAll();
             Timer::destroyAll();
             ManiaLinkEvent::removeAll();
+            InputSetup::clearAll();
             if (config('quick-buttons.enabled')) {
                 QuickButtons::removeAll();
             }
@@ -176,13 +178,18 @@ class MatchSettingsController implements ControllerInterface
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
-        infoMessage($player, ' shuffled the map list.')->sendAll();
-        infoMessage('The map list gets shuffled at the end of the map.')->sendAdmin();
-
-        Hook::add('Maniaplanet.EndMap_Start', function () use ($player) {
+        if (CountdownController::getAddedSeconds() > 0) {
+            Hook::add('EndMatch', function () use ($player) {
+                self::shuffleCurrentMapList();
+                MatchSettingsController::shuffleCurrentMapList();
+                infoMessage($player, ' shuffled the map list.')->sendAll();
+            }, true);
+            
+            successMessage('Map list gets shuffled on map end.')->sendAdmin();
+        } else {
             MatchSettingsController::shuffleCurrentMapList();
-            successMessage('Map list shuffled.')->sendAdmin();
-        }, true);
+            infoMessage($player, ' shuffled the map list.')->sendAll();
+        }
     }
 
     /**
@@ -203,13 +210,14 @@ class MatchSettingsController implements ControllerInterface
 
         unset($settings->map);
 
-        foreach ($maps->shuffle() as $map){
+        foreach ($maps->shuffle() as $map) {
             $entry = $settings->addChild('map');
             $entry->addChild('file', $map['file']);
             $entry->addChild('ident', $map['ident']);
         }
 
         File::put($file, Utility::simpleXmlPrettyPrint($settings));
+        MatchSettingsController::loadMatchSettings();
     }
 
     /**
@@ -342,7 +350,7 @@ class MatchSettingsController implements ControllerInterface
             $node = $xml->script_settings;
         }
 
-        if($node){
+        if ($node) {
             foreach ($node->children() as $child) {
                 if ($child->attributes()['name'] == $key) {
                     return intval($child->attributes()['value']);
