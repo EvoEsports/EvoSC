@@ -12,12 +12,8 @@ CSmPlayer GetOwner() {
 main() {
     declare Owner <=> GetOwner();
 
-    while(True){
-        yield;
-
-        log(UI);
-        return;
-    }
+    UI.OverlayHideAll = True;
+    log(UI);
 }
     --></script>
 </manialink>
