@@ -90,6 +90,7 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+        ChatCommand::add('/next', [self::class, 'cmdNextMap'], 'Print the upcoming map to chat.');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
         ManiaLinkEvent::add('map.replay', [self::class, 'forceReplay'], 'map_replay');
@@ -115,6 +116,23 @@ class MapController implements ControllerInterface
     }
 
     /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdNextMap(Player $player, $cmd)
+    {
+        $queue = QueueController::getMapQueue();
+
+        if ($queue->isNotEmpty()) {
+            $queueItem = $queue->first();
+            infoMessage('The next map is ', secondary($queueItem->map->name), ' requested by ', secondary($queueItem->player->NickName))->send($player);
+        } else {
+            $nextMap = Server::getNextMapInfo()->name;
+            infoMessage('The next map is ', secondary($nextMap))->send($player);
+        }
+    }
+
+    /**
      * @param Map $map
      * @throws GuzzleException
      * @throws Exception
@@ -133,7 +151,7 @@ class MapController implements ControllerInterface
             'plays' => $map->plays + 1,
         ]);
 
-        if(!$map->mx_details){
+        if (!$map->mx_details) {
             MxDownload::loadMxDetails($map);
         }
     }
@@ -337,7 +355,7 @@ class MapController implements ControllerInterface
         $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . $executable;
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
 
-        if(File::exists($mapFile)){
+        if (File::exists($mapFile)) {
             $cmd = $mps . sprintf(' /parsegbx=\'%s\'', $mapFile);
             $jsonString = shell_exec($cmd);
 
@@ -349,7 +367,7 @@ class MapController implements ControllerInterface
             $data->fileName = $filename;
 
             return MPS_Map::fromObject($data);
-        }else{
+        } else {
             return MPS_Map::fromObject(Server::getMapInfo($filename));
         }
     }
