@@ -40,7 +40,7 @@
 
         <frame pos="54 -10" scale="0.95">
             <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="TitlePack" halign="right" valign="center" />
-            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="{$map->title_id}" valign="center" />
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="{isManiaplanet() ? $map->title_id : '$i$999only available in TM²'}" valign="center" />
 
             <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="Style" halign="right" valign="center" />
             <label class="text-light" n:if="$map->mx_id" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_details->StyleName}" valign="center" />
@@ -80,7 +80,7 @@
             <frame pos="0 -1">
                 <frame id="stars" size="0 10" pos="-11 -20">
                     <quad size="100 100" bgcolor="0000" />
-                    <label class="text-light" pos="11 -5" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="ff0" z-index="1" />
+                    <label class="text-light" pos="11 -5" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fd0" z-index="1" />
                 </frame>
                 <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
                 <label class="text-light" pos="0 -30" size="30 5" textsize="0.75" text="Total votes: {$totalVotes}" valign="center" halign="center" textcolor="fffc" />
@@ -101,7 +101,7 @@
 
     {block bootScript}
     declare CMlFrame starsFrame = (Page.MainFrame.GetFirstChild("stars") as CMlFrame);
-    declare Real rating = {$rating};
+    declare Real rating = {sprintf('%.2f', $rating)};
 
     if(rating != -1){
         starsFrame.Size[0] = 22.0 * rating / 100.0;

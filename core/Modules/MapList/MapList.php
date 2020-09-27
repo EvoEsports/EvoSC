@@ -34,6 +34,7 @@ class MapList extends Module implements ModuleInterface
         Hook::add('MapQueueUpdated', [self::class, 'mapQueueUpdated']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'playerConnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
             ->addAlias('/list')
@@ -80,6 +81,22 @@ class MapList extends Module implements ModuleInterface
                 warningMessage(secondary($secondOptionalValue), ' maps found matching ', secondary($firstValue), ', please be more specific.')->send($player);
                 break;
         }
+    }
+
+    /**
+     * @param Map $map
+     */
+    public static function beginMap(Map $map)
+    {
+        $mapInfo = json_encode((object)[
+            'name' => $map->name,
+            'id' => $map->id,
+            'uid' => $map->uid,
+            'authorLogin' => $map->author->Login,
+            'authorName' => $map->author->NickName,
+        ]);
+
+        Template::showAll('MapList.update-current-map', compact('mapInfo'));
     }
 
     /**

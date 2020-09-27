@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-current-map" id="update-current-map" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_Map_Info {
+            Text name;
+            Text uid;
+            Integer id;
+            Text authorName;
+            Text authorLogin;
+        }
+
+        main(){
+            declare EvoSC_Map_Info EvoSC_Current_Map for This;
+            declare Integer EvoSC_Current_Map_Update for This = 0;
+
+            EvoSC_Current_Map.fromjson("""{$mapInfo|noescape}""");
+            EvoSC_Current_Map_Update = GameTime;
+        }
+        -->
+    </script>
+</manialink>
