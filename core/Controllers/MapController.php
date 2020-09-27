@@ -19,6 +19,7 @@ use EvoSC\Modules\Dedimania\Dedimania;
 use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\MapList\Models\MapFavorite;
 use EvoSC\Modules\MxDetails\MxDetails;
+use EvoSC\Modules\MxDownload\MxDownload;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\Statistics\Statistics;
 use Exception;
@@ -132,7 +133,9 @@ class MapController implements ControllerInterface
             'plays' => $map->plays + 1,
         ]);
 
-        MxDetails::loadMxDetails($map);
+        if(!$map->mx_details){
+            MxDownload::loadMxDetails($map);
+        }
     }
 
     /**

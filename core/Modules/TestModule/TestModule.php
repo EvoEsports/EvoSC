@@ -7,12 +7,14 @@ namespace EvoSC\Modules\TestModule;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\GameModeChanger\GameModeChanger;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
+use EvoSC\Modules\MxDetails\MxDetails;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -30,7 +32,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        GameModeChanger::cmdChangeGameMode($player);
+        MxDetails::showDetails($player, MapController::getCurrentMap()->uid);
     }
 
     public static function sendTestManialink(Player $player)

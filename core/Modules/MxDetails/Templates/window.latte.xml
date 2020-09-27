@@ -1,19 +1,20 @@
 {contentType text}
+{extends 'Components.window'}
+{php $window_width = 113;}
+{php $window_height = 40;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MXDetails" id="MXDetails" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
-    {include 'Components.stylesheet'}
-    <frame id="overview" pos="-60 19" z-index="450">
-        <quad id="handle" data-id="mxdetails" size="104 6" z-index="5"/>
-        <quad class="bg-dark" size="110 38" pos="0 -6" opacity="0.8" z-index="-1" ScriptEvents="1"/>
-        <quad class="bg-blur" size="110 38" pos="0 -6" z-index="-1"/>
-        <quad class="bg-accent" size="110 6"/>
-        <label class="text-light" pos="2 -3" valign="center" textsize="1" text="Map Details" z-index="1" />
-        <label class="text-light close" pos="107 -3" size="3 3" text="" textsize="1.2" z-index="2" halign="center" valign="center" textcolor="{config('colors.ui.window.header.text')}" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+<manialink version="3">
+    {block id}mx-details{/block}
+    {block icon}{/block}
+    {block title}Map-Details: {$map->name}{/block}
+
+    {block content}
+    <frame pos="-1 7">
 
         <frame pos="16 -10" scale="0.95">
-            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="{if $is_maniascript}MX-ID{else}TMX-ID{/if}" halign="right" valign="center" />
+            <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="{if isManiaplanet()}MX-ID{else}TMX-ID{/if}" halign="right" valign="center" />
             {if $map->mx_id}
-            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="$l[{if $is_maniascript}https://tm.mania-exchange.com/tracks/{else}https://trackmania.exchange/tracks/{/if}{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
+            <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="$l[{if isManiaplanet()}https://tm.mania-exchange.com/tracks/{else}https://trackmania.exchange/tracks/{/if}{$map->mx_details->TrackID}]{$map->mx_details->TrackID} " valign="center" />
             {else}
             <label class="text-light" pos="+1 0" size="20 5" textsize="1" textcolor="{config('colors.warning')}" text="Map not on MX" valign="center" />
             {/if}
@@ -64,46 +65,53 @@
             <label class="text-light" pos="-1 0" size="20 5" textprefix="$o$n" textsize="0.6" text="Author-Time" halign="right" valign="center" />
             <label class="text-light" pos="+1 0" size="20 5" textsize="1" text="{formatScore($map->gbx->AuthorTime)}" valign="center" />
 
-            <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="MX-World-Record" halign="right" valign="center" />
+            {if !empty($map->mx_world_record)}
+            <label class="text-light" pos="-1 -5" size="20 5" textprefix="$o$n" textsize="0.6" text="World-Record" halign="right" valign="center" />
             <label class="text-light" n:if="$map->mx_id" pos="+1 -5" size="20 5" textsize="1" text="{$map->mx_world_record ? formatScore($map->mx_world_record->ReplayTime) : '0'}" valign="center" />
+            {/if}
 
+            {if isManiaplanet()}
             <label class="text-light" pos="-1 -10" size="20 5" textprefix="$o$n" textsize="0.6" text="1. Dedi" halign="right" valign="center" />
             <label class="text-light" pos="+1 -10" size="20 5" textsize="1" text="{$map->dedis->first() ? formatScore($map->dedis->first()->Score) : '-'}" valign="center" />
-
-
-            <label class="text-light" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="Karma" halign="center" valign="center" scale="0.75" />
-            {if $map->mx_id && $map->mx_details->RatingVoteCount > 0}
-            <label class="text-light" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="{sprintf('%.1f', $map->mx_details->RatingVoteAverage)}% - {$map->mx_details->RatingVoteCount} Votes" halign="center" valign="center" />
-            <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="{$rating}" valign="center" halign="center" textcolor="{config('colors.ui.window.header.color')}" z-index="1" />
-            {else}
-            <label class="text-light" pos="0 -30" size="30 5" textprefix="$o$n" textsize="0.6" text="This map was not rated yet" halign="center" valign="center" textcolor="fff3" />
             {/if}
-            <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+
+
+            <label class="text-light" pos="0 -20" size="30 5" textprefix="$o$n" textsize="1" text="Karma" halign="center" valign="center" />
+            <frame pos="0 -1">
+                <frame id="stars" size="0 10" pos="-11 -20">
+                    <quad size="100 100" bgcolor="0000" />
+                    <label class="text-light" pos="11 -5" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="ff0" z-index="1" />
+                </frame>
+                <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+                <label class="text-light" pos="0 -30" size="30 5" textsize="0.75" text="Total votes: {$totalVotes}" valign="center" halign="center" textcolor="fffc" />
+            </frame>
         </frame>
+
     </frame>
+    {/block}
+
+    {include 'Scripts.mle'}
 
     <script><!--
-    #Include "MathLib" as ML
-    #Include "TextLib" as TL
+    {block globals}
+    {/block}
 
-    {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
+    {block functions}
+    {/block}
 
-    main(){
-        declare overview <=> (Page.MainFrame.GetFirstChild("overview") as CMlFrame);
+    {block bootScript}
+    declare CMlFrame starsFrame = (Page.MainFrame.GetFirstChild("stars") as CMlFrame);
+    declare Real rating = {$rating};
 
-        while(True){
-            yield;
-
-            foreach(event in PendingEvents){
-                if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("close")){
-                    overview.Hide();
-                    continue;
-                }
-            }
-
-            maniaLinkDrag();
-        }
+    if(rating != -1){
+        starsFrame.Size[0] = 22.0 * rating / 100.0;
     }
+    {/block}
 
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    {/block}
     --></script>
 </manialink>

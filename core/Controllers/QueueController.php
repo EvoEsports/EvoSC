@@ -25,7 +25,7 @@ use Illuminate\Support\Collection;
  */
 class QueueController implements ControllerInterface
 {
-    private static bool $preCache = true;
+    private static bool $preCache = false;
 
     /**
      * @inheritDoc
@@ -47,6 +47,8 @@ class QueueController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
+        self::$preCache = (bool)config('server.pre-cache-maps', false);
+
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'endMatch']);
@@ -175,7 +177,10 @@ class QueueController implements ControllerInterface
 
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             self::dropMapSilent($mapUid);
-            self::chooseNextMap();
+
+            if(self::$preCache){
+                self::chooseNextMap();
+            }
         }
     }
 
@@ -272,6 +277,8 @@ class QueueController implements ControllerInterface
                 } catch (\Exception $e) {
                     Log::error('Failed to pre-cache map ' . $map->name . ': ' . $e->getMessage(), true);
                     Log::write($e->getMessage(), isVerbose());
+
+                    self::dropMapSilent($map->uid);
                 }
             }
         }

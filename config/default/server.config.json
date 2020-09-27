@@ -23,5 +23,6 @@
   "checkpoints": {
     "CurLapCheckpointsMode": "always",
     "CurRaceCheckpointsMode": "never"
-  }
+  },
+  "pre-cache-maps": false
 }
