@@ -26,6 +26,9 @@ use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
 {
+    const MAP_SIZE_LIMIT_ONLINE = 4194304;
+    const MAP_SIZE_LIMIT_ONLINE_HUMAN_READABLE = '4mb';
+
     private static string $apiUrl;
     private static string $exchangeUrl;
 
@@ -60,6 +63,12 @@ class MxDownload extends Module implements ModuleInterface
 
             try {
                 $details = self::loadMxDetails($mxId);
+
+                if (isset($details->Downloadable) && $details->Downloadable == false) {
+                    warningMessage('Downloading this map has been disabled, sorry.')->send($player);
+                    return;
+                }
+
                 $comment = self::parseBB($details->Comments);
 
                 Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
@@ -125,6 +134,16 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         $filename = self::downloadMapAndGetFilename(intval($mxId));
+
+        if (!isManiaPlanet() && Server::getSystemInfo()->isDedicated) {
+            $absoluteFilename = mapsDir($filename);
+            if (filesize($absoluteFilename) > self::MAP_SIZE_LIMIT_ONLINE) {
+                warningMessage('The map filesize is over ', secondary(self::MAP_SIZE_LIMIT_ONLINE_HUMAN_READABLE), ', the map can not be played online.')->send($player);
+                unlink($absoluteFilename);
+                return;
+            }
+        }
+
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
 
         if (!isset($gbx->MapUid)) {
@@ -236,9 +255,9 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$mxId}");
         }
 
-        if(isManiaPlanet()) {
+        if (isManiaPlanet()) {
             $infoResponse = RestClient::get(self::$apiUrl . '/tm/maps/' . $mxId, ['timeout' => 3]); //deprecated, remove once new TMX API is available, only keep else-branch
-        }else{
+        } else {
             $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mxId, ['timeout' => 3]);
         }
 
