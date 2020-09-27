@@ -24,13 +24,40 @@ class MatchSettingsManager extends Module implements ModuleInterface
     private static string $path;
     private static $objects;
 
-    private static array $modes = [
+    private static array $modeTemplatesManiaplanet = [
         'TimeAttack' => 'timeattack.xml',
         'Team' => 'team.xml',
         'Rounds' => 'rounds.xml',
         'Laps' => 'laps.xml',
         'Cup' => 'cup.xml',
         'Chase' => 'chase.xml',
+    ];
+
+    private static array $modeTemplatesTrackmania = [
+        'TimeAttack' => 'timeattack.xml',
+        'Team' => 'team.xml',
+        'Rounds' => 'rounds.xml',
+        'Laps' => 'laps.xml',
+        'Cup' => 'cup.xml',
+    ];
+
+    private static array $gameModesManiaplanet = [
+        'TimeAttack' => 'TimeAttack.Script.txt',
+        'Rounds' => 'Rounds.Script.txt',
+        'Team' => 'Team.Script.txt',
+        'Cup' => 'Cup.Script.txt',
+        'Laps' => 'Laps.Script.txt',
+        'Chase' => 'Chase.Script.txt',
+    ];
+
+    private static array $gameModesTrackmania = [
+        'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
+        'Rounds' => 'Trackmania/TM_Rounds_Online.Script.txt',
+        'Teams' => 'Trackmania/TM_Teams_Online.Script.txt',
+        'Cup' => 'Trackmania/TM_Cup_Online.Script.txt',
+        'Laps' => 'Trackmania/TM_Laps_Online.Script.txt',
+        'Champion' => 'Trackmania/TM_Champion_Online.Script.txt',
+        'Knockout' => 'Trackmania/TM_Knockout_Online.Script.txt',
     ];
 
     /**
@@ -86,7 +113,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $settings = new SimpleXMLElement(File::get($file));
         unset($settings->map);
 
-        foreach(Map::whereIn('id', $enabledMapIds)->get() as $map){
+        foreach (Map::whereIn('id', $enabledMapIds)->get() as $map) {
             $entry = $settings->addChild('map');
             $entry->addChild('file', $map->filename);
             $entry->addChild('ident', $map->uid);
@@ -115,7 +142,11 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function showCreateMatchsettings(Player $player)
     {
-        $modes = collect(self::$modes)->keys();
+        if (isManiaPlanet()) {
+            $modes = collect(self::$modeTemplatesManiaplanet)->keys();
+        } else {
+            $modes = collect(self::$modeTemplatesTrackmania)->keys();
+        }
 
         Template::show($player, 'MatchSettingsManager.create', compact('modes'));
 
@@ -212,7 +243,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function createNewMatchsettings(Player $player, string $modeName)
     {
-        $modeFile = self::$modes[$modeName];
+        $modeFile = self::$modeTemplatesManiaplanet[$modeName];
         $modeBaseName = str_replace('.xml', '', $modeFile);
         $sourceMatchsettings = __DIR__ . '/MatchSettingsRepo/' . $modeFile;
         $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
@@ -221,9 +252,21 @@ class MatchSettingsManager extends Module implements ModuleInterface
         do {
             $filename = sprintf('%s_%d.txt', $modeBaseName, $i);
             $i++;
+            $targetFile = $matchsettingsDirectory . $filename;
         } while (File::exists($matchsettingsDirectory . $filename));
 
-        File::copy($sourceMatchsettings, $matchsettingsDirectory . $filename);
+        if (isManiaPlanet()) {
+            $scriptName = self::$gameModesManiaplanet[$modeName];
+        } else {
+            $scriptName = self::$gameModesTrackmania[$modeName];
+        }
+
+        dump($modeName, $scriptName);
+
+        $content = File::get($sourceMatchsettings);
+        $content = str_replace('%script_name%', $scriptName, $content);
+
+        File::put($targetFile, $content);
         Log::info($player . ' created new "' . $filename . '" with mode "' . $modeName . '"');
 
         self::showOverview($player);

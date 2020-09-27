@@ -7,7 +7,7 @@
         <allwarmupduration>0</allwarmupduration>
         <disablerespawn>0</disablerespawn>
         <forceshowallopponents>0</forceshowallopponents>
-        <script_name><![CDATA[TimeAttack.Script.txt]]></script_name>
+        <script_name>%script_name%</script_name>
     </gameinfos>
     <filter>
         <is_lan>1</is_lan>
