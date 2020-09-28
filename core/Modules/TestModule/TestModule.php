@@ -15,6 +15,7 @@ use EvoSC\Modules\GameModeChanger\GameModeChanger;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MxDetails\MxDetails;
+use EvoSC\Modules\ServerHopper\ServerHopper;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -32,7 +33,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        self::sendTestManialink($player);
+        ServerHopper::mleShowJoinWindow($player, 'BAijtqLETC2cYehn2OBbBA');
     }
 
     public static function sendTestManialink(Player $player)

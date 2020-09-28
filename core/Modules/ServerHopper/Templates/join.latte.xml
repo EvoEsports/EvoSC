@@ -1,0 +1,53 @@
+{contentType text}
+{extends 'Components.window'}
+{php $window_width = 80;}
+{php $window_height = 40;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}join-server{/block}
+    {block icon}🏃{/block}
+    {block title}Join server{/block}
+
+    {block content}
+    <frame pos="0 0">
+        <label class="text-light" pos="38 -2" size="76 8" text="{$server->name}" halign="center" textsize="3" />
+        <label id="description" class="text-light" pos="38 -8" size="76 20" text="{$server->description ?: '$iNo description available'}" halign="center" autonewline="1" />
+
+        <frame id="buttons">
+            <label class="btn-accent join" pos="27 -13" size="20 6" text="JOIN" ScriptEvents="1" />
+            <label class="btn-danger cancel" pos="49 -13" size="20 6" text="CANCEL" ScriptEvents="1" />
+        </frame>
+    </frame>
+    {/block}
+
+    {include 'Scripts.mle'}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    declare buttonsFrame <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
+    declare descriptionLabel <=> (Page.MainFrame.GetFirstChild("description") as CMlLabel);
+
+    buttonsFrame.RelativePosition_V3[1] -= descriptionLabel.ComputeHeight(descriptionLabel.Value);
+    window.Size[1] = 27.0 + (buttonsFrame.RelativePosition_V3[1] * -1);
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+        window.Hide();
+        return;
+    }
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("join")){
+        OpenLink("maniaplanet://#qjoin={$server->login}@Trackmania", CMlScript::LinkType::ManialinkBrowser);
+    }
+    {/block}
+    --></script>
+</manialink>

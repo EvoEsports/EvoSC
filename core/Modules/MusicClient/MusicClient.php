@@ -59,7 +59,7 @@ class MusicClient extends Module implements ModuleInterface
                 self::$song = self::$music->where('file', '=', urldecode(preg_replace('/^.+\?song=/', '', $forcedUrl)))->first();
             }
 
-            Log::info('Music-library loaded successfully.');
+            Log::info('Music-library loaded successfully.', isVerbose());
 
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
             Hook::add('BeginMap', [self::class, 'setNextSong']);
