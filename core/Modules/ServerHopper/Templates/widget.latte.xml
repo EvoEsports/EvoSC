@@ -98,7 +98,9 @@
 
             (frame.Controls[1] as CMlLabel).SetText(server["max"]);
             (frame.Controls[2] as CMlLabel).SetText(getJoinLink(server));
+            {if !isManiaplanet()}
             frame.Controls[3].DataAttributeSet("login", server["login"]);
+            {/if}
 
             filled += 1;
         }
