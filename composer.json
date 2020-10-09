@@ -13,7 +13,8 @@
     "symfony/process": "^4.2",
     "symfony/event-dispatcher": "^4.2",
     "composer/ca-bundle": "^1.1",
-    "manialib/gbx": "^4.1"
+    "manialib/gbx": "^4.1",
+    "larapack/dd": "^1.1"
   },
   "scripts": {
     "pre-install-cmd": [
