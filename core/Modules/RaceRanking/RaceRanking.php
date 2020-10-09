@@ -26,7 +26,7 @@ class RaceRanking extends Module implements ModuleInterface
     {
         self::$tracker = [];
 
-        if (ModeController::isRounds()) {
+        if (ModeController::isRoundsType()) {
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);

@@ -94,7 +94,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function reportConnectedPlayers()
     {
         $map = MapController::getCurrentMap();
-        self::updateServerPlayers($map, ModeController::isTimeAttack());
+        self::updateServerPlayers($map, ModeController::isTimeAttackType());
     }
 
     public static function checkSessionStillValid()
@@ -117,7 +117,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
     public static function endMatch()
     {
         $map = MapController::getCurrentMap();
-        self::setChallengeTimes($map, ModeController::isTimeAttack());
+        self::setChallengeTimes($map, ModeController::isTimeAttackType());
     }
 
     /**
@@ -170,7 +170,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
             return;
         }
 
-        self::getChallengeRecords($map, ModeController::isTimeAttack());
+        self::getChallengeRecords($map, ModeController::isTimeAttackType());
     }
 
     /**
