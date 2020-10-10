@@ -100,7 +100,7 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
 
-        if (ModeController::isRounds()) {
+        if (ModeController::isRoundsType()) {
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }

@@ -37,7 +37,7 @@ class PointsController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
-        if (ModeController::isTimeAttack()) {
+        if (ModeController::isTimeAttackType()) {
             return;
         }
 

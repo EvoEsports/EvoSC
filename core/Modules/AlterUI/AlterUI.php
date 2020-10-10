@@ -22,7 +22,7 @@ class AlterUI extends Module implements ModuleInterface
     {
         global $__ManiaPlanet;
 
-        if (ModeController::isTimeAttack()) {
+        if (ModeController::isTimeAttackType()) {
             $properties = self::getTASettings();
         } else {
             $properties = self::getRoundsSettings();

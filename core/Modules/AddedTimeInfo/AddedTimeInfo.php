@@ -23,7 +23,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if(ModeController::isTimeAttack()){
+        if(ModeController::isTimeAttackType()){
             if (!$isBoot) {
                 self::showWidget();
             }
