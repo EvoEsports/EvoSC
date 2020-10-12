@@ -163,7 +163,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules' . $filename);
 }
 
 /**
