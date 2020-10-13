@@ -8,6 +8,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
@@ -33,7 +34,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ServerHopper::mleShowJoinWindow($player, 'BAijtqLETC2cYehn2OBbBA');
+        self::sendTestManialink($player);
     }
 
     public static function sendTestManialink(Player $player)
