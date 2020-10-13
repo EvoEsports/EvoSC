@@ -12,6 +12,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\GroupManager\GroupManager;
+use EvoSC\Classes\Log;
 
 class ScoreTable extends Module implements ModuleInterface
 {
@@ -20,11 +21,10 @@ class ScoreTable extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (isTrackmania()) {
-            ChatCommand::add('/scoreboard', [self::class, 'showEvoSCScoreTable'], 'Show EvoSC scoreboard.');
-        }else{
-            Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
-        }
+      if (config('scoretable.isDefault') || isManiaPlanet())
+        Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
+      else
+        ChatCommand::add('/scoreboard', [self::class, 'showEvoSCScoreTable'], 'Show EvoSC scoreboard.');
     }
 
     public static function showEvoSCScoreTable(Player $player, $cmd)
