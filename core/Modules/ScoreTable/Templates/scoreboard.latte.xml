@@ -486,8 +486,13 @@
                         continue;
                     }
                     if(Event.Control.HasClass("profile")){
+                    {if $is_maniaplanet}
                         ShowProfile(targetLogin);
                         continue;
+                    {else}
+                        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
+                        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+                    {/if}
                     }
                 }
             }
