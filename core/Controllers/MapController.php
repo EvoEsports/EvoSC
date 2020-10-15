@@ -346,7 +346,8 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        $executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+        //$executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+        $executable = config('server.executeable');
 
         if (isWindows()) {
             $executable .= '.exe';

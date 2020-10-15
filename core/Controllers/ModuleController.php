@@ -15,8 +15,8 @@ use Illuminate\Support\Collection;
  */
 class ModuleController implements ControllerInterface
 {
-    const PATTERN = '/(?:core\/Modules|modules)\/([A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
-    const PATTERNW = '/(?:core\\\\Modules|modules)\\\\([A-Z][a-zA-Z0-9]+)\\\\([A-Z][a-zA-Z0-9]+)\.php/';
+    const PATTERN = '/(?:core\/Modules|modules)\/([A-Z][a-zA-Z0-9]+|[a-z0-9]+\/[A-Z][a-zA-Z0-9]+)\/([A-Z][a-zA-Z0-9]+)\.php/';
+    const PATTERNW = '/(?:core\\\\Modules|modules)\\\\([A-Z][a-zA-Z0-9]+|[a-z0-9]+\\\\[A-Z][a-zA-Z0-9]+)\\\\([A-Z][a-zA-Z0-9]+)\.php/';
 
     /**
      * @var Collection
@@ -72,16 +72,15 @@ class ModuleController implements ControllerInterface
                     if (preg_match(self::PATTERNW, $file, $matches)) {
                         $dir = $matches[1];
                         $classname = $matches[2];
-                        return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                        return ["EvoSC\\Modules\\" . str_replace('/', '\\', $dir) . "\\$classname" => dirname($file)];
                     }
                 } else {
                     if (preg_match(self::PATTERN, $file, $matches)) {
                         $dir = $matches[1];
                         $classname = $matches[2];
-                        return ["EvoSC\\Modules\\$dir\\$classname" => dirname($file)];
+                        return ["EvoSC\\Modules\\" . str_replace('/', '\\', $dir) . "\\$classname" => dirname($file)];
                     }
                 }
-
                 return null;
             })
             ->filter()
