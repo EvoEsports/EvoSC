@@ -45,8 +45,7 @@
     <!-- end components -->
 
     {if !$is_maniaplanet}
-    <quad pos="-160 90" class="bg-blur" size="320 180" z-index="70" opacity="0" />
-    <quad pos="-104.5 56.5" bgcolor="0a965e" size="225 129" z-index="70" opacity="1" />
+    <quad size="260 164.5" pos="0 5.5" halign="center" valign="center" image="file://Media/Manialinks/Nadeo/TMNext/Modes/Race/HUD_scorestable_body.dds" z-index="100" />
     {/if}
 
     <frame id="main-frame" pos="-86 30" z-index="9999">

@@ -7,17 +7,11 @@ namespace EvoSC\Modules\TestModule;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
-use EvoSC\Controllers\MapController;
-use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\GameModeChanger\GameModeChanger;
 use EvoSC\Modules\InputSetup\InputSetup;
-use EvoSC\Modules\LiveRankings\LiveRankings;
-use EvoSC\Modules\MxDetails\MxDetails;
-use EvoSC\Modules\ServerHopper\ServerHopper;
-use EvoSC\Modules\TryCount\TryCount;
+use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -37,7 +31,7 @@ class TestModule extends Module implements ModuleInterface
         TemplateController::loadTemplates();
         self::sendTestManialink($player);
 
-        TryCount::show($player);
+        ScoreTable::sendScoreTable($player);
     }
 
     public static function sendTestManialink(Player $player)

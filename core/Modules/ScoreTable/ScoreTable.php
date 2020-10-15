@@ -21,10 +21,7 @@ class ScoreTable extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-      if (config('scoretable.isDefault') || isManiaPlanet())
         Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
-      else
-        ChatCommand::add('/scoreboard', [self::class, 'showEvoSCScoreTable'], 'Show EvoSC scoreboard.');
     }
 
     public static function showEvoSCScoreTable(Player $player, $cmd)
