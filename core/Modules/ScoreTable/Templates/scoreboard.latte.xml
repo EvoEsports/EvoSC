@@ -252,8 +252,12 @@
             }
         }
 
+        {if $is_maniaplanet}
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
         flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+        {else}
+        avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+        {/if}
 
 		declare Zone = "Other";
 		declare ZoneArray = TL::Split("|", Score.User.LadderZoneName);
