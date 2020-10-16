@@ -16,8 +16,8 @@
         <label class="text-light" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
         <label class="text-light" pos="25 -7" size="35 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
-        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
+        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" {if !$is_maniaplanet} hidden="1" {/if}/> <!-- Flag -->
+        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" {if !$is_maniaplanet} hidden="1" {/if}/> <!-- Region -->
         <label class="text-light" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
         <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
         <label class="text-light" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
