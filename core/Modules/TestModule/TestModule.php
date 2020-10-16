@@ -32,8 +32,7 @@ class TestModule extends Module implements ModuleInterface
         TemplateController::loadTemplates();
         self::sendTestManialink($player);
 
-        QuickButtons::showButtons($player);
-        ScoreTable::sendScoreTable($player);
+        InputSetup::sendScript($player);
     }
 
     public static function sendTestManialink(Player $player)

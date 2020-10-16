@@ -15,6 +15,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
+use EvoSC\Modules\InputSetup\InputSetup;
 use Exception;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
@@ -68,6 +69,8 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
 
+        InputSetup::add('leave_spec', 'Leave spectator mode.', [self::class, 'leaveSpec'], 'Delete');
+
         ChatCommand::add('//setpw', [self::class, 'cmdSetServerPassword'],
             'Set the server password, leave empty to clear it.', 'ma')->addAlias('//password');
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
@@ -76,6 +79,16 @@ class PlayerController implements ControllerInterface
 
         if (isTrackmania()) {
             ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function leaveSpec(Player $player){
+        if($player->isSpectator()){
+            Server::forceSpectator($player->Login, 2);
+            Server::forceSpectator($player->Login, 0);
         }
     }
 
