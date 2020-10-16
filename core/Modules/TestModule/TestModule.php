@@ -11,6 +11,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
@@ -31,6 +32,7 @@ class TestModule extends Module implements ModuleInterface
         TemplateController::loadTemplates();
         self::sendTestManialink($player);
 
+        QuickButtons::showButtons($player);
         ScoreTable::sendScoreTable($player);
     }
 

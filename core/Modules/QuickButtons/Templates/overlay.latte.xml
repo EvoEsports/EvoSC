@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="QuickButtons" name="ESC:QuickButtons">
     {include 'Components.stylesheet'}
-    <frame id="buttons" pos="89 -50.5" halign="center" valign="center" scale="1.1" z-index="999999999">
+    <frame id="buttons" pos="{$is_maniaplanet ? '89 -50.5' : '98 -63'}" halign="center" valign="center" scale="{$is_maniaplanet ? '1.1' : '1.3'}" z-index="999999999">
         {foreach $buttons as $button}
         <frame pos="{$iterator->counter * -6} 0" data-action="{$button->action}">
             <label class="btn-muted" size="5.5 5.5" textsize="1.25" text="$s{$button->icon}" z-index="1" ScriptEvents="1" focusareacolor1="0000" />
@@ -22,6 +22,7 @@
         while(True){
             yield;
 
+            {if $is_maniaplanet}
             if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
                 podium = True;
                 AnimMgr.Add(buttons, "<frame scale='0.85' pos='"^buttons.RelativePosition_V3[0]^" -56' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
@@ -30,6 +31,7 @@
                 podium = False;
                 AnimMgr.Add(buttons, "<frame scale='1.0' pos='"^buttons.RelativePosition_V3[0]^" -51' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
+            {/if}
 
             foreach(event in PendingEvents){
                 if(event.Type == CMlScriptEvent::Type::MouseOver){
