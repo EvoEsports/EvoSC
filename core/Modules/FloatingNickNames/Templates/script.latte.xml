@@ -38,7 +38,7 @@
                     //todo: implement teams colors
                     markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' icon='"^ marker.prefix ^"' />";
                 }else{
-                    markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' color='"^ marker.color ^"' icon='"^ marker.prefix ^"' />";
+                    markersXml = markersXml ^ "<marker label='$"^marker.color^marker.prefix^" $fff"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' color='"^ marker.color ^"' icon='"^ marker.prefix ^"' />";
                 }
             }
         }

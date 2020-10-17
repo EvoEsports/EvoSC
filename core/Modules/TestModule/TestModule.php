@@ -12,6 +12,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\FloatingNickNames\FloatingNickNames;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -30,7 +31,7 @@ class TestModule extends Module implements ModuleInterface
     {
         TemplateController::loadTemplates();
 
-        FloatingNickNames::sendScript($player);
+        ScoreTable::sendScoreTable($player);
     }
 
     public static function sendTestManialink(Player $player)
