@@ -1,0 +1,73 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:floating-nicks" id="floating-nicks" version="3">
+    <script><!--
+    #Include "TextLib" as TL
+
+    #Struct EvoSC_Marker2 {
+        Text login;
+        Text name;
+        Text prefix;
+        Text color;
+    }
+
+    Boolean isTimeAttack(){
+        return CurrentServerModeName == "TimeAttack" || CurrentServerModeName == "TM_TimeAttack_Online";
+    }
+
+    Boolean isTeams(){
+        return CurrentServerModeName == "Teams" || CurrentServerModeName == "TM_Teams_Online";
+    }
+
+    Void setMarkersInit(EvoSC_Marker2[] markers){
+        declare Text markersXml = "";
+        foreach(marker in markers){
+            markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' />";
+        }
+        ClientUI.MarkersXML = markersXml;
+    }
+
+    Void setMarkers(EvoSC_Marker2[] markers){
+        declare Text markersXml = "";
+        declare isTimeAttack = isTimeAttack();
+        declare isTeams = isTeams();
+
+        foreach(marker in markers){
+            if(LocalUser.Login != marker.login){
+                if(isTeams){
+                    //todo: implement teams colors
+                    markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' icon='"^ marker.prefix ^"' />";
+                }else{
+                    markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' color='"^ marker.color ^"' icon='"^ marker.prefix ^"' />";
+                }
+            }
+        }
+
+        ClientUI.OverrideMarkers = True;
+        ClientUI.MarkersXML = markersXml;
+    }
+
+    main(){
+        declare EvoSC_Marker2[] EvoSC_MarkerNames2 for This;
+        declare Integer EvoSC_MarkerNames_Update2 for This;
+        declare lastUpdate = 0;
+        declare initialized = False;
+
+        wait(InputPlayer != Null);
+
+        while(True){
+            yield;
+
+            if(lastUpdate != EvoSC_MarkerNames_Update2){
+                lastUpdate = EvoSC_MarkerNames_Update2;
+                if(initialized == False){
+                    initialized = True;
+                    setMarkersInit(EvoSC_MarkerNames2);
+                    yield;
+                }
+                setMarkers(EvoSC_MarkerNames2);
+            }
+        }
+    }
+    --></script>
+</manialink>

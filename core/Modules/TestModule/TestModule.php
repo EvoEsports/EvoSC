@@ -10,9 +10,8 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\FloatingNickNames\FloatingNickNames;
 use EvoSC\Modules\InputSetup\InputSetup;
-use EvoSC\Modules\QuickButtons\QuickButtons;
-use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -30,9 +29,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        self::sendTestManialink($player);
 
-        InputSetup::sendScript($player);
+        FloatingNickNames::sendScript($player);
     }
 
     public static function sendTestManialink(Player $player)

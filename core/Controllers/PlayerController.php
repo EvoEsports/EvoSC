@@ -115,6 +115,7 @@ class PlayerController implements ControllerInterface
             Cache::put('nicknames/' . $player->Login, $name);
         }
         self::sendUpdatesCustomNames();
+        Hook::fire('PlayerChangedName', $player);
     }
 
     private static function sendUpdatesCustomNames()
