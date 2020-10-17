@@ -555,8 +555,6 @@
             boxes.add((Control as CMlFrame));
         }
 
-        ClientUI.ScoreTableVisibility = CUIConfig::EVisibility::ForcedVisible; //TODO: remove line
-
         while(True){
             yield;
 
