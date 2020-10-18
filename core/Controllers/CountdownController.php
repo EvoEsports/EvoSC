@@ -49,6 +49,8 @@ class CountdownController extends Controller implements ControllerInterface
             return;
         }
 
+        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+
         if (Cache::has('match-start')) {
             self::$matchStart = Cache::get('match-start');
         }
