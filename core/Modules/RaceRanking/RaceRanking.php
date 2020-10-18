@@ -29,7 +29,8 @@ class RaceRanking extends Module implements ModuleInterface
         if (ModeController::isRoundsType()) {
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);
+            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'clearWidget']);
+            Hook::add('EndMatch', [self::class, 'clearWidget']);
 
             if (!$isBoot) {
                 self::showWidget();
@@ -80,7 +81,7 @@ class RaceRanking extends Module implements ModuleInterface
     /**
      *
      */
-    public static function startPlayLoop()
+    public static function clearWidget()
     {
         self::$tracker = [];
         $data = '[]';
