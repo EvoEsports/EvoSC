@@ -53,6 +53,8 @@ class PointsController implements ControllerInterface
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'resetPointsLimit']);
 
         ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'manipulate_points');
+
+        Template::showAll('Helpers.update-points-limit', ['points' => self::$currentPointsLimit]);
     }
 
     /**
@@ -61,8 +63,7 @@ class PointsController implements ControllerInterface
      */
     public static function playerConnect(Player $player)
     {
-        $points = self::$currentPointsLimit;
-        Template::show($player, 'Helpers.update-points-limit', compact('points'));
+        Template::show($player, 'Helpers.update-points-limit', ['points' => self::$currentPointsLimit]);
     }
 
     /**

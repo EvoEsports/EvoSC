@@ -24,6 +24,10 @@ class LiveRankings extends Module implements ModuleInterface
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('MatchTrackerUpdated', [self::class, 'sendUpdatedValues']);
+
+        if(!$isBoot){
+            Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
+        }
     }
 
     /**

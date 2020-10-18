@@ -45,7 +45,9 @@ class CountdownController extends Controller implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
-        self::$originalTimeLimit = self::getTimeLimitFromMatchSettings();
+        if(ModeController::isRoundsType()){
+            return;
+        }
 
         if (Cache::has('match-start')) {
             self::$matchStart = Cache::get('match-start');
