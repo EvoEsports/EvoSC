@@ -242,17 +242,20 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "Rounds"){
+        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online"){
             if(Score.Points > 0){
-                scoreLabel.Value = "$ddd" ^ Score.Points ^ " Points";
+                scoreLabel.Opacity = 1.0;
             }else{
-                scoreLabel.Value = "$aaaNo Points";
+                scoreLabel.Opacity = 0.1;
             }
+            scoreLabel.Value = Score.Points ^ " Pts";
         }else{
             if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
-                scoreLabel.Value = "$fff" ^ formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
+                scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
+                scoreLabel.Opacity = 1.0;
             }else{
-                scoreLabel.Value = "$cccNo finish";
+                scoreLabel.Value = "--:--.---";
+                scoreLabel.Opacity = 0.1;
             }
         }
 
@@ -279,7 +282,7 @@
 			scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}" ^ lpGainLabel.Value;
 		}else{
 		    if(addedPoints > 0){
-                scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}+" ^ addedPoints;
+                scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}$s(+" ^ addedPoints ^ ")";
 		    }
 		}
 
@@ -343,7 +346,7 @@
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        if(CurrentServerModeName == "Rounds"){
+        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online"){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
         }
 
@@ -403,7 +406,6 @@
         declare Text[] EvoSC_Access_Rights for This;
         declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
         declare widths = 0.0;
-
 
         foreach(Control in buttonsFrame.Controls){
             declare buttonFrame <=> (Control as CMlFrame);

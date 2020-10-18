@@ -4,6 +4,7 @@ namespace EvoSC\Modules\LiveRankings;
 
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MatchController;
 use EvoSC\Controllers\ModeController;
@@ -25,7 +26,7 @@ class LiveRankings extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('MatchTrackerUpdated', [self::class, 'sendUpdatedValues']);
 
-        if(!$isBoot){
+        if(!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
         }
     }
