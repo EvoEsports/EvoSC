@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Statistics" id="Statistics" version="3">
     {include 'Components.stylesheet'}
-    <frame id="main" z-index="1000" scale="0.98" pos="-1.5 0.25">
+    <frame id="main" z-index="9999" scale="0.98" pos="-1.5 0.25">
         {foreach $statCollection as $statisticWidget}
         <frame pos="{$statisticWidget->pos}" scale="{$statisticWidget->scale ?? 0.75}" data-show="{$statisticWidget->show ?? 6}">
             <quad class="bg-dark" z-index="-1" size="50 {($statisticWidget->config->show ?? 6) * 4 + 8}" opacity="0.8"/>

@@ -59,7 +59,7 @@
     </frame>
 
     <frame id="main-frame" pos="-102 30" z-index="7100" scale="1.15">
-        <frame pos="8 27">
+        <frame id="header-frame" pos="8 27">
             {if !empty($logoUrl)}
             <quad pos="180 11" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
                   image="{$logoUrl|noescape}" scale="0.8"/>
@@ -540,6 +540,7 @@
         declare podium = False;
         declare lastPointsLimitUpdate = 0;
 
+        declare headerFrame = (Page.MainFrame.GetFirstChild("header-frame") as CMlFrame);
         declare prevPage = (Page.MainFrame.GetFirstChild("prev-page") as CMlLabel);
         declare nextPage = (Page.MainFrame.GetFirstChild("next-page") as CMlLabel);
         declare me = (Page.MainFrame.GetFirstChild("me") as CMlLabel);
@@ -559,6 +560,8 @@
             yield;
 
             ESC_Tab_Pressed = PageIsVisible;
+
+            headerFrame.Visible = (UI.UISequence != CUIConfig::EUISequence::Podium);
 
             if(lastPointsLimitUpdate < EvoSC_LastPointsLimitUpdate){
                 lastPointsLimitUpdate = EvoSC_LastPointsLimitUpdate;
