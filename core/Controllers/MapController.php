@@ -406,9 +406,10 @@ class MapController implements ControllerInterface
 
     /**
      * @param string $login
+     * @param string|null $name
      * @return int|mixed
      */
-    public static function createOrGetAuthor(string $login)
+    public static function createOrGetAuthor(string $login, string $name = null)
     {
         $author = DB::table('players')->where('Login', '=', $login)->first();
 
@@ -417,7 +418,7 @@ class MapController implements ControllerInterface
         } else {
             $authorId = DB::table('players')->insertGetId([
                 'Login' => $login,
-                'NickName' => $login
+                'NickName' => $name ?: $login
             ]);
         }
 

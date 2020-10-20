@@ -144,6 +144,7 @@ class MxDownload extends Module implements ModuleInterface
             }
         }
 
+        $mxDetails = self::loadMxDetails($mxId);
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
 
         if (!isset($gbx->MapUid)) {
@@ -162,7 +163,7 @@ class MxDownload extends Module implements ModuleInterface
         DB::table(Map::TABLE)->updateOrInsert([
             'uid' => $gbx->MapUid
         ], [
-            'author' => MapController::createOrGetAuthor($gbx->AuthorLogin),
+            'author' => MapController::createOrGetAuthor($gbx->AuthorLogin, $mxDetails->Username),
             'filename' => $filename,
             'name' => $gbx->Name,
             'environment' => $gbx->Environment,
@@ -175,7 +176,6 @@ class MxDownload extends Module implements ModuleInterface
         if (!Server::isFilenameInSelection($filename)) {
             try {
                 Server::addMap($filename);
-                Server::rpc()->addMap($filename);
                 Log::info("Added $filename to the selection.");
             } catch (Exception $e) {
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool: ' . $e->getMessage())->send($player);
