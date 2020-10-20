@@ -59,30 +59,35 @@ class Statistics extends Module implements ModuleInterface
         $statCollection = collect();
 
         //Top visitors
-        $statCollection->push(new StatisticWidget('Visits', " Top visitors"));
+        if (config('statistics.Visits.enabled'))
+          $statCollection->push(new StatisticWidget('Visits', " Top visitors"));
 
         //Most played
-        $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($sec) {
-            //Get playtime as hours
-            return round(($sec / 60) / 60, 1);
-        }));
+        if (config('statistics.Playtime.enabled'))
+          $statCollection->push(new StatisticWidget('Playtime', " Most played", '', 'h', function ($sec) {
+              //Get playtime as hours
+              return round(($sec / 60) / 60, 1);
+          }));
 
         //Most finishes
-        $statCollection->push(new StatisticWidget('Finishes', "🏁 Most Finishes"));
+        if (config('statistics.Finishes.enabled'))
+          $statCollection->push(new StatisticWidget('Finishes', "🏁 Most Finishes"));
 
         //Top winners
-        $statCollection->push(new StatisticWidget('Wins', " Top Winners"));
+        if (config('statistics.Wins.enabled'))
+          $statCollection->push(new StatisticWidget('Wins', " Top Winners"));
 
         //Top Ranks
-        $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '', '.', null, true, false));
+        if (config('statistics.Rank.enabled'))
+          $statCollection->push(new StatisticWidget('Rank', " Top Ranks", '', '.', null, true, false));
 
         //Top Planets-Donators
-        if (isManiaPlanet()) {
+        if (config('statistics.Donations.enabled') && isManiaPlanet()) {
             $statCollection->push(new StatisticWidget('Donations', " Top Donators", '', ' Planets'));
         }
 
         //Round average
-        if (self::$scores->count() > 0) {
+        if (config('statistics.RoundAvg.enabled') && self::$scores->count() > 0) {
             $averageScores = self::$scores->groupBy('nick')->map(function ($scoresArray) {
                 $scores = [];
 
@@ -93,23 +98,26 @@ class Statistics extends Module implements ModuleInterface
                 return sprintf('%.3f', (array_sum($scores) / count($scores)) / 1000);
             })->sort()->take(config('statistics.RoundAvg.show'));
 
-            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true,
-                $averageScores));
+            $statCollection->push(new StatisticWidget('RoundAvg', " Round Average", '', '', null, true, true, $averageScores));
             self::$scores = collect();
         }
 
         //Popular Maps
-        $popularMaps = DB::table('maps')->orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
-        $statCollection->push(new StatisticWidget('PopularMaps', " Most played maps", '', ' plays', null, true, true,
-            $popularMaps));
+        if (config('statistics.PopularMaps.enabled'))
+        {
+          $popularMaps = DB::table('maps')->orderByDesc('plays')->where('enabled', 1)->take(6)->pluck('plays', 'name');
+          $statCollection->push(new StatisticWidget('PopularMaps', " Most played maps", '', ' plays', null, true, true, $popularMaps));
+        }
+
 
         //Least recently played tracks
-        $popularMaps = DB::table('maps')->orderBy('last_played')->whereNotNull('name')->where('enabled',
-            1)->take(6)->pluck('last_played', 'name');
-        $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '',
-            function ($last_played) {
-                return $last_played ? (new Carbon($last_played))->diffForHumans() : 'never';
-            }, true, true, $popularMaps));
+        if (config('statistics.LeastRecentlyPlayed.enabled'))
+        {
+          $popularMaps = DB::table('maps')->orderBy('last_played')->whereNotNull('name')->where('enabled', 1)->take(6)->pluck('last_played', 'name');
+          $statCollection->push(new StatisticWidget('LeastRecentlyPlayed', " Least recently played", '', '', function ($last_played) {
+                  return $last_played ? (new Carbon($last_played))->diffForHumans() : 'never';
+              }, true, true, $popularMaps));
+        }
 
         $currentMapUid = MapController::getCurrentMap()->uid;
 
@@ -119,6 +127,7 @@ class Statistics extends Module implements ModuleInterface
          * Calculate scores
          */
         $limit = config('locals.limit');
+
 
         DB::raw('UPDATE stats SET Score = 0, Locals = 0, `Rank` = -1 WHERE 1=1;');
 
