@@ -3,6 +3,7 @@
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
+use EvoSC\Commands\LoadAuthorNamesTMX;
 use EvoSC\Commands\GetVersion;
 use EvoSC\Commands\EscRun;
 use EvoSC\Commands\AddAdmin;
@@ -53,6 +54,7 @@ $application->add(new EscRun());
 $application->add(new FakeLocals());
 $application->add(new AddAdmin());
 $application->add(new SetupAccessRights());
+$application->add(new LoadAuthorNamesTMX());
 $application->setDefaultCommand("list");
 
 try {
