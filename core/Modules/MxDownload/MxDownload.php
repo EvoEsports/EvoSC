@@ -175,7 +175,6 @@ class MxDownload extends Module implements ModuleInterface
         if (!Server::isFilenameInSelection($filename)) {
             try {
                 Server::addMap($filename);
-                Server::rpc()->addMap($filename);
                 Log::info("Added $filename to the selection.");
             } catch (Exception $e) {
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool: ' . $e->getMessage())->send($player);
