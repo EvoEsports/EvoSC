@@ -144,6 +144,7 @@ class MxDownload extends Module implements ModuleInterface
             }
         }
 
+        $mxDetails = self::loadMxDetails($mxId);
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
 
         if (!isset($gbx->MapUid)) {
@@ -162,7 +163,7 @@ class MxDownload extends Module implements ModuleInterface
         DB::table(Map::TABLE)->updateOrInsert([
             'uid' => $gbx->MapUid
         ], [
-            'author' => MapController::createOrGetAuthor($gbx->AuthorLogin),
+            'author' => MapController::createOrGetAuthor($gbx->AuthorLogin, $mxDetails->Username),
             'filename' => $filename,
             'name' => $gbx->Name,
             'environment' => $gbx->Environment,
