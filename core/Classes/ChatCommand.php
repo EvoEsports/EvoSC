@@ -70,7 +70,7 @@ class ChatCommand
         bool $hidden = false
     ): ChatCommand
     {
-        if (!self::$commands) {
+        if (!isset(self::$commands)) {
             self::$commands = collect();
         }
 
