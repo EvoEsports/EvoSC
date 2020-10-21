@@ -28,13 +28,15 @@ class ServerHopper extends Module implements ModuleInterface
                 self::sendUpdatedServerInformations();
             } catch (Exception $e) {
                 Log::error($e->getMessage());
+                Log::error('Stopping module ' . self::class);
+                return;
             }
 
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
             ManiaLinkEvent::add('server_hopper_join', [self::class, 'mleShowJoinWindow']);
 
-            Timer::create('refresh_server_list', [self::class, 'updateServerInformation'], '1m', true);
+            Timer::create('refresh_server_list', [self::class, 'sendUpdatedServerInformations'], '1m', true);
         }
     }
 
