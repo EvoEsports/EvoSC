@@ -1,0 +1,76 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = 140;}
+{php $window_height = 85;}
+
+{block id}
+lastvisits
+{/block}
+
+{block icon}
+🔥
+{/block}
+
+{block title}
+Last Visits
+{/block}
+
+{block content}
+<frame pos="1 -1">
+    {foreach $lastVisits[0] as $i => $lastVisit}
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$i+1+$page*66}." textsize="0.75" valign="center" halign="right" />
+    <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($lastVisit->name ?: ($lastvisit->login ?: '$666n/a')))}" valign="center" halign="left" />
+    <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="{$lastVisit->lastvisit}" textsize="0.75"  valign="center" halign="right" />
+    {/foreach}
+</frame>
+{if isset($lastVisits[1])}
+<frame pos="46 76">
+    {foreach $lastVisits[1] as $i => $lastVisit}
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$i+1+$page*66}." textsize="0.75"  valign="center" halign="right" />
+    <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($lastVisit->name ?: ($lastvisit->login ?: '$666n/a')))}" valign="center" halign="left" />
+    <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="{$lastVisit->lastvisit}" textsize="0.75"  valign="center" halign="right" />
+    {/foreach}
+</frame>
+{/if}
+{if isset($lastVisits[2])}
+<frame pos="91 153">
+    {foreach $lastVisits[2] as $i => $lastVisit}
+    <label class="text-light" pos="6 {$i * -3.5}" size="8 20" text="{$i+1+$page*66}." textsize="0.75"  valign="center" halign="right" />
+    <label class="text-light" pos="8 {$i * -3.5}" size="16 20" text="{ml_escape(($lastVisit->name ?: ($lastvisit->login ?: '$666n/a')))}" valign="center" halign="left" />
+    <label class="text-light" pos="43 {$i * -3.5}" size="16 20" text="{$lastVisit->lastvisit}" textsize="0.75"  valign="center" halign="right" />
+    {/foreach}
+</frame>
+{/if}
+<frame pos="2 -79.5" scale="0.9">
+{include 'Components.pagination'}
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block bootScript}
+    declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
+    pageInfo.Value = "{$pageInfo}";
+    declare page = {intval($page)};
+{/block}
+
+{block loop}
+{/block}
+
+{block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next-page")){
+        ManiaLinkEvent("lastvisits.list", "" ^ (page + 1));
+        continue;
+    }
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("previous-page")){
+        ManiaLinkEvent("lastvisits.list", "" ^ (page - 1));
+        continue;
+    }
+{/block}
+--></script>
