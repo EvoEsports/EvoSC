@@ -24,6 +24,10 @@ class LiveRankings extends Module implements ModuleInterface
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('MatchTrackerUpdated', [self::class, 'sendUpdatedValues']);
+
+        if(!$isBoot) {
+            Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
+        }
     }
 
     /**
@@ -45,7 +49,7 @@ class LiveRankings extends Module implements ModuleInterface
     {
         $showTop = config('live-rankings.show', 14);
 
-        if(ModeController::isTimeAttack()){
+        if(ModeController::isTimeAttackType()){
             $top = $top->sortBy('score')->take($showTop)->values()->toJson();
         }else{
             $top = $top->sortByDesc('points')->take($showTop)->values()->toJson();

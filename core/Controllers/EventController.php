@@ -186,7 +186,7 @@ class EventController implements ControllerInterface
                 'player_id' => $details->playerId,
             ]);
 
-            if(isTrackmania() && Cache::has('nicknames/' . $playerInfo[0])){
+            if (isTrackmania() && Cache::has('nicknames/' . $playerInfo[0])) {
                 $name = Cache::get('nicknames/' . $playerInfo[0]);
                 PlayerController::setName($player, 'silent', $name);
             }

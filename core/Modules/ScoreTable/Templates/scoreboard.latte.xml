@@ -16,16 +16,16 @@
         <label class="text-light" pos="6.85 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Rank -->
         <label class="text-light" pos="25 -7" size="35 3"/> <!-- Score -->
         <quad pos="15 -6" valign="center" size="8 8"/> <!-- Avatar -->
-        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85"/> <!-- Flag -->
-        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Region -->
+        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" {if !$is_maniaplanet} hidden="1" {/if}/> <!-- Flag -->
+        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" {if !$is_maniaplanet} hidden="1" {/if}/> <!-- Region -->
         <label class="text-light" pos="66.25 -3.7" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
         <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
         <label class="text-light" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
         <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
-        <quad class="bg-dark" pos="1 0" size="86 12" z-index="-15" opacity="0.5" ScriptEvents="1"/> <!-- Primary BG -->
-        <quad class="bg-dark" pos="1 0" size="12 12" z-index="-11" opacity="0.15"/> <!-- Rank BG -->
+        <quad {if $is_maniaplanet} class="bg-dark" opacity="0.5" {else} class="bg-accent" opacity="0.1" {/if} pos="1 0" size="86 12" z-index="-15" ScriptEvents="1"/> <!-- Primary BG -->
+        <quad {if $is_maniaplanet} class="bg-dark" opacity="0.15" {else} class="bg-accent" opacity="0.1" {/if} pos="1 0" size="12 12" z-index="-11"/> <!-- Rank BG -->
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -7.75" hidden="1" z-index="9999">
@@ -45,11 +45,12 @@
     <!-- end components -->
 
     {if !$is_maniaplanet}
-    <quad pos="-160 90" class="bg-blur" size="320 180" z-index="9998" opacity="0" />
-    <quad pos="-160 90" bgcolor="000" size="320 180" z-index="9997" opacity="0.75" />
+    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://i.imgur.com/Ikw7gGK.png" colorize="{config('theme.hud.bg-darker')}" z-index="102" />
+    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://i.imgur.com/qtWSs35.png" colorize="{config('theme.hud.accent')}" z-index="101" scale="0.999" />
+    <quad size="260 164.5" pos="0 5.5" halign="center" valign="center" image="file://Media/Manialinks/Nadeo/TMNext/Modes/Race/HUD_scorestable_body.dds" z-index="100" />
     {/if}
 
-    <frame id="main-frame" pos="-86 30" z-index="9999">
+    <frame id="main-frame" pos="{$is_maniaplanet ? '-86' : '-102'} 30" z-index="9999" scale="{$is_maniaplanet ? '1.0' : '1.15'}">
         {if !empty($logoUrl)}
         <quad pos="170 11" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
               image="{$logoUrl|noescape}" scale="0.8"/>
@@ -75,7 +76,8 @@
         <label class="floating prev-page" text="" pos="4 -81" ScriptEvents="1" />
         <label id="page" class="floating" text="1/1" pos="11 -81" textsize="2.5" size="10 5" ScriptEvents="1" />
         <label class="floating next-page" text="" pos="18 -81" ScriptEvents="1" />
-        <label class="floating me" text="" pos="24.3 -81" textsize="1.95" size="5 5" ScriptEvents="1" />
+        <label class="me" pos="22 -78.75" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" z-index="200" />
+        <label class="floating" text="" pos="24.3 -81" textsize="1.95" size="5 5" />
     </frame>
 
     <script><!--
@@ -250,8 +252,12 @@
             }
         }
 
+        {if $is_maniaplanet}
         avatarQuad.ImageUrl = "file://Avatars/" ^ user.Login ^ "/Default";
         flagQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+        {else}
+        avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
+        {/if}
 
 		declare Zone = "Other";
 		declare ZoneArray = TL::Split("|", Score.User.LadderZoneName);
@@ -441,8 +447,8 @@
         box.Controls[16].Show();
 
         declare Real xMin = box.AbsolutePosition_V3[0];
-        declare Real xMax = box.AbsolutePosition_V3[0] + box.Size[0];
-        declare Real yMin = box.AbsolutePosition_V3[1] - box.Size[1];
+        declare Real xMax = box.AbsolutePosition_V3[0] + box.Size[0] * mainFrame.RelativeScale;
+        declare Real yMin = box.AbsolutePosition_V3[1] - box.Size[1] * mainFrame.RelativeScale;
         declare Real yMax = box.AbsolutePosition_V3[1];
 
         while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin){
@@ -486,8 +492,13 @@
                         continue;
                     }
                     if(Event.Control.HasClass("profile")){
+                    {if $is_maniaplanet}
                         ShowProfile(targetLogin);
                         continue;
+                    {else}
+                        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
+                        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+                    {/if}
                     }
                 }
             }
@@ -545,6 +556,7 @@
                 SB_Last_Update = GameTime;
             }
 
+            {if $is_maniaplanet}
             if(UI.UISequence == CUIConfig::EUISequence::Podium && !podium){
                 podium = True;
                 AnimMgr.Add(mainFrame, "<frame scale='0.95' pos='-82 20.5' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
@@ -553,6 +565,7 @@
                 podium = False;
                 AnimMgr.Add(mainFrame, "<frame scale='1.0' pos='-86 30' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
             }
+            {/if}
 
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;

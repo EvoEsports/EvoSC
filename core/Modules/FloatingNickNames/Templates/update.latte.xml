@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-player-markers" id="update-player-markers" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_Marker2 {
+            Text login;
+            Text name;
+            Text prefix;
+            Text color;
+        }
+
+        main(){
+            declare EvoSC_Marker2[] EvoSC_MarkerNames2 for This;
+            declare Integer EvoSC_MarkerNames_Update2 for This;
+
+            sleep(500);
+
+            EvoSC_MarkerNames2.fromjson("""{$data|noescape}""");
+            EvoSC_MarkerNames_Update2 = GameTime + 99;
+        }
+        -->
+    </script>
+</manialink>

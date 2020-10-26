@@ -152,6 +152,7 @@ class ModeScriptEventController implements ControllerInterface
         $playerLogin = json_decode($arguments[0])->login;
 
         Hook::fire('PlayerFinish', player($playerLogin), 0, "");
+        Hook::fire('PlayerGiveUp', player($playerLogin));
     }
 
     /**

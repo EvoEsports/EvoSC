@@ -37,6 +37,10 @@ class Question
      */
     public static function getQuestions(): Collection
     {
+        if(!isset(self::$questions)){
+            return collect();
+        }
+
         return self::$questions;
     }
 

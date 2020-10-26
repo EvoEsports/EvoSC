@@ -8,8 +8,11 @@ use EvoSC\Interfaces\ControllerInterface;
 
 class ModeController implements ControllerInterface
 {
-    private static bool $isTimeAttack;
-    private static bool $isRounds;
+    private static bool $isTimeAttackType;
+    private static bool $isRoundsType;
+    private static bool $laps;
+    private static bool $teams;
+    private static bool $cup;
 
     /**
      *
@@ -32,17 +35,39 @@ class ModeController implements ControllerInterface
      */
     public static function setMode(string $mode)
     {
+        self::$teams = false;
+        self::$laps = false;
+        self::$cup = false;
+        self::$isTimeAttackType = false;
+        self::$isRoundsType = false;
+
         switch ($mode) {
             case 'TimeAttack.Script.txt':
             case 'Trackmania/TM_TimeAttack_Online.Script.txt':
-                self::$isRounds = false;
-                self::$isTimeAttack = true;
+                self::$isTimeAttackType = true;
                 break;
 
             case 'Rounds.Script.txt':
             case 'Trackmania/TM_Rounds_Online.Script.txt':
-                self::$isRounds = true;
-                self::$isTimeAttack = false;
+                self::$isRoundsType = true;
+                break;
+
+            case 'Laps.Script.txt':
+            case 'Trackmania/TM_Laps_Online.Script.Script.txt':
+                self::$laps = true;
+                self::$isRoundsType = true;
+                break;
+
+            case 'Teams.Script.txt':
+            case 'Trackmania/TM_Teams_Online.Script.Script.txt':
+                self::$teams = true;
+                self::$isRoundsType = true;
+                break;
+
+            case 'Cup.Script.txt':
+            case 'Trackmania/TM_Cup_Online.Script.Script.txt':
+                self::$cup = true;
+                self::$isRoundsType = true;
                 break;
         }
     }
@@ -50,16 +75,40 @@ class ModeController implements ControllerInterface
     /**
      * @return bool
      */
-    public static function isRounds(): bool
+    public static function isRoundsType(): bool
     {
-        return self::$isRounds;
+        return self::$isRoundsType;
     }
 
     /**
      * @return bool
      */
-    public static function isTimeAttack(): bool
+    public static function isTimeAttackType(): bool
     {
-        return self::$isTimeAttack;
+        return self::$isTimeAttackType;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function laps(): bool
+    {
+        return self::$laps;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function teams(): bool
+    {
+        return self::$teams;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function cup(): bool
+    {
+        return self::$cup;
     }
 }

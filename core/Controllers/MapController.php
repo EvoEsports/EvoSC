@@ -18,7 +18,6 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\Dedimania\Dedimania;
 use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\MapList\Models\MapFavorite;
-use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\MxDownload\MxDownload;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\Statistics\Statistics;
@@ -100,7 +99,7 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
 
-        if (ModeController::isRounds()) {
+        if (ModeController::isRoundsType()) {
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }
@@ -346,7 +345,8 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        $executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+        //$executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
+        $executable = config('server.executeable');
 
         if (isWindows()) {
             $executable .= '.exe';
@@ -405,9 +405,10 @@ class MapController implements ControllerInterface
 
     /**
      * @param string $login
+     * @param string|null $name
      * @return int|mixed
      */
-    public static function createOrGetAuthor(string $login)
+    public static function createOrGetAuthor(string $login, string $name = null)
     {
         $author = DB::table('players')->where('Login', '=', $login)->first();
 
@@ -416,7 +417,7 @@ class MapController implements ControllerInterface
         } else {
             $authorId = DB::table('players')->insertGetId([
                 'Login' => $login,
-                'NickName' => $login
+                'NickName' => $name ?: $login
             ]);
         }
 

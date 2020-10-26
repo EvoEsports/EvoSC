@@ -4,7 +4,6 @@
 namespace EvoSC\Modules\ScoreTable;
 
 
-use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
@@ -15,21 +14,20 @@ use EvoSC\Modules\GroupManager\GroupManager;
 
 class ScoreTable extends Module implements ModuleInterface
 {
+    private static string $scoreboardTemplate;
+
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (isTrackmania()) {
-            ChatCommand::add('/scoreboard', [self::class, 'showEvoSCScoreTable'], 'Show EvoSC scoreboard.');
-        }else{
-            Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
+        if (isManiaPlanet()) {
+            self::$scoreboardTemplate = 'ScoreTable.scoreboard';
+        } else {
+            self::$scoreboardTemplate = 'ScoreTable.scoreboard_2020';
         }
-    }
 
-    public static function showEvoSCScoreTable(Player $player, $cmd)
-    {
-        self::sendScoreTable($player);
+        Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);
     }
 
     public static function sendScoreTable(Player $player)
@@ -56,6 +54,6 @@ class ScoreTable extends Module implements ModuleInterface
         GroupManager::sendGroupsInformation($player);
         Template::showAll('ScoreTable.update', ['players' => $joinedPlayerInfo], 20);
         Template::show($player, 'ScoreTable.update', ['players' => $playerInfo], false, 20);
-        Template::show($player, 'ScoreTable.scoreboard', compact('logoUrl', 'maxPlayers'));
+        Template::show($player, self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers'));
     }
 }

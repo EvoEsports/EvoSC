@@ -6,6 +6,7 @@ namespace EvoSC\Models;
 use Carbon\Carbon;
 use EvoSC\Controllers\UserSettingsController;
 use EvoSC\Modules\Dedimania\Models\Dedi;
+use EvoSC\Modules\MxKarma\Models\Karma;
 use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Database\Eloquent\Model;

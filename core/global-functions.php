@@ -11,6 +11,8 @@ use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
+require 'vendor/larapack/dd/src/helper.php';
+
 /**
  * @return string
  */
@@ -161,7 +163,7 @@ function logDir(string $filename = ''): string
  */
 function modulesDir(string $filename = ''): string
 {
-    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules/' . $filename);
+    return dirname(__DIR__) . str_replace('/', DIRECTORY_SEPARATOR, '/modules' . $filename);
 }
 
 /**
@@ -296,23 +298,6 @@ function now(): Carbon
 function secondary(string $str = ""): string
 {
     return '$<$fff$' . config('theme.chat.highlight') . $str . '$>';
-}
-
-/**
- * @param mixed ...$objects
- */
-function dd(...$objects)
-{
-    var_dump(...$objects);
-    exit(0);
-}
-
-/**
- * @param mixed ...$objects
- */
-function dump(...$objects)
-{
-    var_dump(...$objects);
 }
 
 /**

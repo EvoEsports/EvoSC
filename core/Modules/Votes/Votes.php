@@ -190,7 +190,7 @@ class Votes extends Module implements ModuleInterface
      */
     public static function cmdAskMoreTime(Player $player, $cmd, $time = '0')
     {
-        if (ModeController::isRounds()) {
+        if (ModeController::isRoundsType()) {
             self::cmdAskMorePoints($player, $cmd, $time);
             return;
         }
@@ -328,7 +328,7 @@ class Votes extends Module implements ModuleInterface
      */
     public static function askSkip(Player $player)
     {
-        if (ModeController::isTimeAttack() && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
+        if (ModeController::isTimeAttackType() && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
             infoMessage('Can not skip the map after time was added.')->send($player);
             return;
         }
@@ -350,7 +350,7 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
-            if (ModeController::isTimeAttack() && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
+            if (ModeController::isTimeAttackType() && CountdownController::getSecondsLeft() < config('votes.skip.disable-in-last', 180)) {
                 warningMessage('It is too late to skip the map.')->send($player);
 
                 return;

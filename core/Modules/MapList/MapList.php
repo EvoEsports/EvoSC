@@ -58,6 +58,17 @@ class MapList extends Module implements ModuleInterface
         Template::show($player, 'MapList.map-queue');
         Template::show($player, 'MapList.map-widget');
         Template::show($player, 'MapList.map-list');
+
+        $map = MapController::getCurrentMap();
+        $mapInfo = json_encode((object)[
+            'name' => $map->name,
+            'id' => $map->id,
+            'uid' => $map->uid,
+            'authorLogin' => $map->author->Login,
+            'authorName' => $map->author->NickName,
+        ]);
+
+        Template::show($player, 'MapList.update-current-map', compact('mapInfo'));
     }
 
     /**

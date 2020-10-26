@@ -18,10 +18,13 @@
 
     <frame id="data" pos="-1.25 -7.25" scale="0.9">
         {for $i=0; $i<config('server-hopper.ui.servers-per-page'); $i++}
-        <frame pos="0 {$i * -3.5}">
+        <frame pos="1 {$i * -3.5}">
             <label class="text-light" pos="5.5 0" size="8 4" halign="right" valign="center" textsize="0.8" textprefix="$s" />
             <label class="text-light" pos="5.6 -0.35" size="6 4" halign="left" valign="center" scale="0.65" textprefix="/" opacity="0.75" />
             <label class="text-light" pos="10.5 0" size="38 4" valign="center" textsize="0.8"/>
+            {if !isManiaplanet()}
+            <label class="btn-muted join" pos="24" size="60 4" ScriptEvents="1" focusareacolor1="0000" />
+            {/if}
         </frame>
         {/for}
     </frame>
@@ -45,7 +48,7 @@
         {if $is_maniaplanet}
             joinLink = "$p[#join=" ^ server["login"] ^ "@" ^ server["title"] ^ "]";
         {else}
-            joinLink = "$l[uplay://launch/5595/0/#join=" ^ server["ip"] ^ "::" ^ server["port"] ^ "@Trackmania]";
+            joinLink = "";
         {/if}
 
         return joinLink ^ server["name"] ^ pw ^ youAreHere;
@@ -95,6 +98,9 @@
 
             (frame.Controls[1] as CMlLabel).SetText(server["max"]);
             (frame.Controls[2] as CMlLabel).SetText(getJoinLink(server));
+            {if !isManiaplanet()}
+            frame.Controls[3].DataAttributeSet("login", server["login"]);
+            {/if}
 
             filled += 1;
         }
@@ -106,6 +112,8 @@
         widgetSetHeight__(perPage * 3.5 + 5.5);
     }
     --></script>
+
+    {include 'Scripts.mle'}
     {/block}
 
     <script><!--
@@ -142,6 +150,9 @@
             page += 1;
             if(page >= totalPages) page = 0;
             updateWidget(ServersWidgetInfo);
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("join")){
+            ManiaLinkEvent("server_hopper_join", event.Control.DataAttributeGet("login"));
         }
     {/block}
 --></script>
