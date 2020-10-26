@@ -16,7 +16,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxDownload\MxDownload;
-use GuzzleHttp\Exception\ConnectException;
 use stdClass;
 
 class MxDetails extends Module implements ModuleInterface

@@ -4,7 +4,6 @@ namespace EvoSC\Modules\LiveRankings;
 
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MatchController;
 use EvoSC\Controllers\ModeController;

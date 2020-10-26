@@ -110,7 +110,7 @@ class MatchController extends Controller implements ControllerInterface
             }
         }
 
-        Hook::fire('MatchTrackerUpdated', self::$tracker);
+        Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
 
     /**
@@ -121,7 +121,7 @@ class MatchController extends Controller implements ControllerInterface
         self::$tracker = collect();
         self::$roundTracker = collect();
 
-        Hook::fire('MatchTrackerUpdated', self::$tracker);
+        Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
 
     /**

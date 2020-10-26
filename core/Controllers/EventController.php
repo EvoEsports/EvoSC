@@ -9,7 +9,6 @@ use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
-use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Map;

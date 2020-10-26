@@ -4,7 +4,6 @@
 namespace EvoSC\Modules\ScoreTable;
 
 
-use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
@@ -12,7 +11,6 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\GroupManager\GroupManager;
-use EvoSC\Classes\Log;
 
 class ScoreTable extends Module implements ModuleInterface
 {
