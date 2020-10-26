@@ -23,8 +23,7 @@ class LastVisits extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        ChatCommand::add('/lastvisits', [self::class, 'showLastVisits'], 'Shows the lately connected players');
-        ChatCommand::add('/lv', [self::class, 'showLastVisits'], 'Shows the lately connected players');
+        ChatCommand::add('/lastvisits', [self::class, 'showLastVisits'], 'Shows the lately connected players')->addAlias('/lv');
 
         ManiaLinkEvent::add('lastvisits.list', [self::class, 'showLastVisits']);
     }
