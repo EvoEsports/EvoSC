@@ -1,6 +1,6 @@
 <?php
 
-namespace EvoSC\Modules\nouseforname\LastVisits;
+namespace EvoSC\Modules\LastVisits;
 
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
