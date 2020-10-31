@@ -25,5 +25,6 @@
     "CurLapCheckpointsMode": "always",
     "CurRaceCheckpointsMode": "never"
   },
-  "pre-cache-maps": false
+  "pre-cache-maps": false,
+  "pidfile": ""
 }

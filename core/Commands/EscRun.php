@@ -119,7 +119,13 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
+      $pidPath = config('server.pidfile');
+
+      // if no config given, use original
+      if (empty($pidPath))
+        $pidPath = baseDir(config('server.login') . '_evosc.pid');
+
+      file_put_contents($pidPath, getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -131,8 +137,8 @@ class EscRun extends Command
         $version = getEscVersion();
         $motd = "      ______           _____ ______
      / ____/  _______ / ___// ____/
-    / __/| | / / __ \\__ \/ /     
-   / /___| |/ / /_/ /__/ / /___   
+    / __/| | / / __ \\__ \/ /
+   / /___| |/ / /_/ /__/ / /___
   /_____/|___/\____/____/\____/  $version
 ";
 
