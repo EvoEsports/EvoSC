@@ -86,9 +86,9 @@
                     }
 
                     if(ML::NearestInteger(currentAddedTime) == currentAddedTime){
-                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
+                        timeLabel.SetText(" " ^ sign ^ ML::NearestInteger(currentAddedTime) ^ " min.");
                     }else{
-                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
+                        timeLabel.SetText(" " ^ sign ^ currentAddedTime ^ " min.");
                     }
 
                     timeLabel.Show();

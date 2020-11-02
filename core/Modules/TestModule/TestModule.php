@@ -11,6 +11,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\AddedTimeInfo\AddedTimeInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MapDetails\MapDetails;
@@ -33,8 +34,8 @@ class TestModule extends Module implements ModuleInterface
     {
         TemplateController::loadTemplates();
 
-        ScoreTable::sendScoreTable($player);
-        MapDetails::showMapDetails($player, Map::first());
+        AddedTimeInfo::showWidget($player);
+        MapDetails::showMapDetails($player, Map::whereUid('UFc5XKCopC3JjJYq2qnPkXi4Y8l')->first());
     }
 
     public static function sendTestManialink(Player $player)

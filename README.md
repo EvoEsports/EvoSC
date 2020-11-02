@@ -45,3 +45,15 @@ Get all available commands with `php esc list`
 | Import data from PyPlanet | Run `php esc import:pyplanet {host} {database} {user} {password}` optionally add `{table_prefix}` |
 | Fix player scores and ranking | Run `php esc fix:scores` to re-calculate all scores and fix the player ranks. |
 | Creating a database migration | Run `php esc make:migration <MigrationClassName>`. The migration is saved to to /Migrations. Copy it to your module if necessary. |
+
+---
+
+## Ingame Fonts
+* RajdhaniMono (default)
+* Oswald
+* OswaldMono
+* GameFontBlack
+* GameFontRegular
+* GameFontSemiBold
+* RobotoCondensed
+* RobotoCondensedBold
