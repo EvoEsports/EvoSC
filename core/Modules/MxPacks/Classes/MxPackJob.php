@@ -3,7 +3,6 @@
 
 namespace EvoSC\Modules\MxPacks\Classes;
 
-
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Models\Map;
@@ -11,6 +10,13 @@ use EvoSC\Models\Player;
 use Exception;
 use Illuminate\Support\Collection;
 use ZipArchive;
+use EvoSC\Classes\Cache;
+use EvoSC\Classes\File;
+use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Exchange;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
 
 class MxPackJob
 {
@@ -38,7 +44,7 @@ class MxPackJob
         }
 
         $this->info = Cache::get("map-packs/".$packId."_info");
-        $this->name = $this->info->ID.'_'.$this->info->Shortname;
+        $this->name = $this->info->ID.'_'. (isManiaPlanet()  ? $this->info->Shortname : $this->info->ShortName);
         $this->path = $this->packsDir.'/'.$this->name.'.zip';
         $this->issuer = $player;
         $this->id = $packId;
@@ -60,8 +66,12 @@ class MxPackJob
             return;
         }
 
-        $url = sprintf('https://tm.mania-exchange.com/mappack/download/%s?%s', $this->info->ID, $this->info->Secret);
+        $url = Exchange::TRACKMANIA_MX_API_URL;
+        if (isManiaPlanet())
+          $url = Exchange::MANIAPLANET_MX_API_URL;
 
+        $secret = (isset($this->info->Secret) ? $this->info->Secret : '');
+        $url = sprintf($url . '/mappack/download/%s?%s', $this->info->ID, $secret);
         $response = RestClient::get($url);
 
         if ($response->getStatusCode() != 200) {
@@ -105,8 +115,8 @@ class MxPackJob
     {
         $files->each(function ($value) {
             $name = basename($value);
-            preg_match('/\((\d+)\)\.Gbx$/', $name, $matches);
-            $mx_id = $matches[1];
+            preg_match('/\((\d+).*\)\.Gbx$/', $name, $matches);
+            $mx_id = (isset($matches[1]) ?  $matches[1] : '');
             $filename = 'MXPacks/'.$this->name.'/'.$name;
 
             $gbx = MapController::getGbxInformation($filename, false);
@@ -153,8 +163,12 @@ class MxPackJob
 
         Hook::fire('MapPoolUpdated');
 
+        $url = Exchange::TRACKMANIA_MX_URL;
+        if (isManiaPlanet())
+          $url = Exchange::MANIAPLANET_MX_URL;
+
         infoMessage($this->issuer, ' added map-pack ',
-            '$l[https://tm.mania-exchange.com/mappack/view/'.$this->id.']'.secondary($this->info->Name),
+            '$l[' . $url . '/mappack/view/'.$this->id.']'.secondary($this->info->Name),
             ' from Mania-Exchange.')->sendAll();
     }
 }

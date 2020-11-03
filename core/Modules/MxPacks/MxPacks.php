@@ -15,6 +15,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxPacks\Classes\MxPackJob;
 use Exception;
+use EvoSC\Classes\Log;
 
 class MxPacks extends Module implements ModuleInterface
 {
@@ -50,7 +51,7 @@ class MxPacks extends Module implements ModuleInterface
         ManiaLinkEvent::add('mappack.aprove', [self::class, 'downloadMapPack'], 'map_add');
     }
 
-    public static function showAddMapPack(Player $player, string $packId, string $secret = null)
+    public static function showAddMapPack(Player $player, $cmd, $packId, $secret = '')
     {
         $cacheIdInfo = 'map-packs/'.$packId.'_info';
         $cacheIdTracks = 'map-packs/'.$packId.'_trackslist';
@@ -58,7 +59,9 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdInfo)) {
             $info = Cache::get($cacheIdInfo);
         } else {
-            $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+            $url = sprintf(self::$apiUrl . '/api/mappack/get_info/%d/?=%s', $packId, $secret);
+            if (isManiaPlanet())
+              $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
 
             $response = RestClient::get($url);
             $info = json_decode($response->getBody()->getContents());
@@ -69,7 +72,7 @@ class MxPacks extends Module implements ModuleInterface
                 return;
             }
 
-            $info = $info[0];
+            $info = isManiaPlanet() ? $info[0] : $info;
 
             Cache::put($cacheIdInfo, $info, now()->addDay());
         }
@@ -77,7 +80,9 @@ class MxPacks extends Module implements ModuleInterface
         if (Cache::has($cacheIdTracks)) {
             $trackList = Cache::get($cacheIdTracks);
         } else {
-            $url = sprintf(self::$apiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+            $url = sprintf(self::$apiUrl . '/api/mappack/get_mappack_tracks/%d/?=%s', $packId, $secret);
+            if (isManiaPlanet())
+                $url = sprintf(self::$apiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
 
             try {
                 $response = RestClient::get($url);
@@ -96,7 +101,7 @@ class MxPacks extends Module implements ModuleInterface
             }
         }
 
-        Template::show($player, 'mx-packs.confirm', compact('trackList', 'info'));
+        Template::show($player, 'MxPacks.confirm', compact('trackList', 'info'));
     }
 
     public static function downloadMapPack(Player $player, $mapPackId)
