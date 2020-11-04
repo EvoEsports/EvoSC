@@ -115,8 +115,13 @@ class MxPackJob
     {
         $files->each(function ($value) {
             $name = basename($value);
-            preg_match('/\((\d+).*\)\.Gbx$/', $name, $matches);
-            $mx_id = (isset($matches[1]) ?  $matches[1] : '');
+
+            $pattern = '/\((\d+)\)\.Map.Gbx$/';
+            if (isManiaPlanet())
+              $pattern = '/\((\d+)\)\.Gbx$/';
+
+            preg_match($pattern, $name, $matches);
+            $mx_id = $matches[1];
             $filename = 'MXPacks/'.$this->name.'/'.$name;
 
             $gbx = MapController::getGbxInformation($filename, false);
