@@ -28,8 +28,11 @@
 
     {block loop}
         timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
-        cd.Value = TL::TimeToText(timeRemaining);
-        log(TL::TimeToText(timeRemaining));
+        if(timeRemaining > 0){
+            cd.Value = TL::TimeToText(timeRemaining);
+        }else{
+            cd.Value = "";
+        }
     {/block}
 
     {block pendingEvents}
