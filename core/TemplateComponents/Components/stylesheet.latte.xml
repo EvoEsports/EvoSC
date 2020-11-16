@@ -12,7 +12,7 @@
     <style class="text-darker" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-darker')}" textsize="1"/>
 
     <!-- Backgrounds -->
-    <style class="bg-blur" style="Bgs1" substyle="BgDialogBlur"/>
+    <style class="bg-blur" bluramount="1.0" style="Bgs1" substyle="BgDialogBlur"/>
     <style class="bg-accent" bgcolor="{config('theme.hud.accent')}"/>
     <style class="bg-dark" bgcolor="{config('theme.hud.bg-dark')}"/>
     <style class="bg-darker" bgcolor="{config('theme.hud.bg-darker')}"/>

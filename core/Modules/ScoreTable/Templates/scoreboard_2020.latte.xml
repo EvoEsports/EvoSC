@@ -132,6 +132,22 @@
         return ceiled;
     }
 
+//nadeo
+Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
+	switch (_Level) {
+		case 1: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze1}}}";
+		case 2: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze2}}}";
+		case 3: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze3}}}";
+		case 4: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver1}}}";
+		case 5: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver2}}}";
+		case 6: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver3}}}";
+		case 7: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold1}}}";
+		case 8: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold2}}}";
+		case 9: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold3}}}";
+		default: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_None}}}";
+	}
+}
+
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
         declare Text msString;

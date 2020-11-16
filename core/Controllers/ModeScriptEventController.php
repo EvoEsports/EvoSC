@@ -46,9 +46,6 @@ class ModeScriptEventController implements ControllerInterface
         }
     }
 
-    //Maniaplanet.StartMap_Start
-    //Maniaplanet.EndMap_Start
-
     //Decide if the callback should be transformed and fire the hooks.
     /**
      * @param $callback

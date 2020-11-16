@@ -4,13 +4,92 @@
     </frame>
 
     <script><!--
-CSmPlayer GetOwner() {
-	if (GUIPlayer != Null) return GUIPlayer;
-	return InputPlayer;
+#Include "Libs/Nadeo/System/Notifications/NotificationStructs.Script.txt" as Structs
+
+/** Create an image struct.
+ *
+ *	@param	_URL	Image source URL.
+ *	@param	_Ratio	Image size ratio (X/Y).
+ */
+Structs::SImage CreateImage(Text _URL, Real _Ratio) {
+	declare Structs::SImage Image;
+
+	Image.URL	= _URL;
+	Image.Ratio	= _Ratio;
+
+	return Image;
+}
+
+/** Create an image of 1:1 ratio.
+ *
+ *	@param	_URL	Image source URL.
+ */
+Structs::SImage CreateImage1x1(Text _URL) {
+	return CreateImage(_URL, 1.);
+}
+
+/** Create an image of 16:9 ratio.
+ *
+ *	@param	_URL	Image source URL.
+ */
+Structs::SImage CreateImage16x9(Text _URL) {
+	return CreateImage(_URL, 16/9.);
+}
+
+/** Create a notification action.
+ *
+ *	@param	_Name		Custom action name.
+ *	@param	_Params		Custom action parameters.
+ */
+Structs::SAction CreateAction(Text _Name, Text[] _Params) {
+	declare Structs::SAction Action;
+
+	Action.Name		= _Name;
+	Action.Params	= _Params;
+
+	return Action;
+}
+
+/** Send a new notification.
+ *
+ *	@param	_AppName		Name of the sender application.
+ *	@param	_Title			Notification title.
+ *	@param	_Description	Detailed description (eg. chat message body).
+ *	@param	_Color			Color of the notification frame.
+ *	@param	_Duration		Display duration (0 = infinite).
+ *	@param	_Image			Image struct.
+ *	@param	_Action			Action fired when notification is clicked.
+ */
+Void SendNotification(Text _AppName, Text _Title, Text _Description, Vec3 _Color, Integer _Duration, Structs::SImage _Image, Structs::SAction _Action) {
+	if (!(This is CManiaplanetPlugin) || _AppName == "" || _Title == "" || _Description == "") return;
+
+	declare Structs::SNotification Notification;
+
+	declare EndTime = -1;
+	if (_Duration > 0) EndTime = Now + _Duration;
+
+	Notification.AppName		= _AppName;
+	Notification.Title			= _Title;
+	Notification.Description	= _Description;
+	Notification.Color			= _Color;
+	Notification.EndTime		= EndTime;
+	Notification.Image			= _Image;
+	Notification.Action			= _Action;
+
+	declare Structs::SNotification[] LibNotificationsController_InternalNotifications for ManiaPlanet;
+	LibNotificationsController_InternalNotifications.add(Notification);
+}
+
+Void SendNotification(Text _AppName, Text _Title, Text _Description, Vec3 _Color, Integer _Duration, Structs::SImage _Image) {
+	SendNotification(_AppName, _Title, _Description, _Color, _Duration, _Image, CreateAction("", Text[]));
+}
+
+Void SendNotification(Text _AppName, Text _Title, Text _Description, Vec3 _Color, Integer _Duration) {
+	SendNotification(_AppName, _Title, _Description, _Color, _Duration, CreateImage("", 1.));
 }
 
 main() {
-    declare Owner <=> GetOwner();
+    SendNotification("EvoSC", "ayy", "lmao", <0.1,0.1,0.1>, 5);
 }
     --></script>
 </manialink>
