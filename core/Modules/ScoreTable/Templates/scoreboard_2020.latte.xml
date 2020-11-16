@@ -51,15 +51,14 @@
 
     <!-- end components -->
 
-    <frame z-index="9990">
-        <quad size="2417 300" scale="0.0955" pos="10.5 70.75" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_header_2417x300.png" colorize="{config('theme.hud.bg-darker')}" z-index="3" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.bg-darker')}" z-index="2" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.accent')}" z-index="1" scale="0.999" opacity="0.9" />
-        <quad size="260 164.5" pos="0 5.5" halign="center" valign="center" image="file://Media/Manialinks/Nadeo/TMNext/Modes/Race/HUD_scorestable_body.dds" z-index="0" />
+    <frame z-index="9990" pos="0 -10" scale="0.85">
+        <quad size="2417 300" scale="0.0955" pos="10.5 70.75" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_header_2417x300.png" colorize="{config('theme.hud.bg-dark')}" z-index="3" opacity="0.96" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.1" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.98" />
     </frame>
 
-    <frame id="main-frame" pos="-102 30" z-index="9998" scale="1.15">
-        <frame id="header-frame" pos="8 27">
+    <frame id="main-frame" pos="-87.5 17.5" z-index="9998" scale="1">
+        <frame id="header-frame" pos="8 25">
             {if !empty($logoUrl)}
             <quad pos="180 11" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
                   image="{$logoUrl|noescape}" scale="0.8"/>
@@ -84,7 +83,7 @@
         </frame>
     </frame>
 
-    <frame pos="-120 -63.5" z-index="9999" scale="1.15">
+    <frame pos="-104 -64" z-index="9999" scale="1">
         <label id="prev-page" class="floating prev-page" text="" pos="4 0" size="5 5" ScriptEvents="1" />
         <label id="page" class="floating" text="1/1" pos="11 0" textsize="2.5" size="10 5" ScriptEvents="1" />
         <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" />
@@ -135,16 +134,16 @@
 //nadeo
 Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
 	switch (_Level) {
-		case 1: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze1}}}";
-		case 2: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze2}}}";
-		case 3: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Bronze3}}}";
-		case 4: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver1}}}";
-		case 5: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver2}}}";
-		case 6: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Silver3}}}";
-		case 7: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold1}}}";
-		case 8: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold2}}}";
-		case 9: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_Gold3}}}";
-		default: _Quad_Tropy.ImageUrl = "{{{Constants::C_ImageUrl_Trophy_128_None}}}";
+		case 1: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze1";
+		case 2: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze2";
+		case 3: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze3";
+		case 4: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver1";
+		case 5: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver2";
+		case 6: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver3";
+		case 7: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold1";
+		case 8: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold2";
+		case 9: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold3";
+		default: _Quad_Tropy.ImageUrl= "Constants::C_ImageUrl_Trophy_128_None";
 	}
 }
 
@@ -591,52 +590,48 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
                 SB_Last_Update = GameTime;
             }
 
-            if(MouseLeftButton){
-                if(MouseY >= (me.AbsolutePosition_V3[1] - me.Size[1] * 0.5) && (MouseY <= me.AbsolutePosition_V3[1] + me.Size[1] * 0.5)){
-                    if(MouseX >= (me.AbsolutePosition_V3[0] + me.Size[0] * 0.75) && (MouseX <= me.AbsolutePosition_V3[0] + me.Size[0] * 1.5)){
-                        declare i = 0;
-                        foreach(Score => Weight in GetSortedScores()){
-                            if(Score.User.Login == LocalUser.Login){
-                                break;
-                            }
-                            i += 1;
-                        }
-                        page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
-                        forceUpdate = True;
-                        updateScoreTable();
-                        sleep(80);
-                        flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
-                        continue;
-                    }
-                    if(MouseX >= (prevPage.AbsolutePosition_V3[0] + me.Size[0] * 0.75) && (MouseX <= prevPage.AbsolutePosition_V3[0] + me.Size[0] * 1.5)){
-                        page -= 1;
-                        if(page < 1){
-                            page = getMaxPage();
-                        }
-                        forceUpdate = True;
-                        updateScoreTable();
-                        wait(!MouseLeftButton);
-                        continue;
-                    }
-                    if(MouseX >= (nextPage.AbsolutePosition_V3[0] + me.Size[0] * 0.75) && (MouseX <= nextPage.AbsolutePosition_V3[0] + me.Size[0] * 1.5)){
-                        page += 1;
-                        if(page > getMaxPage()){
-                            page = 1;
-                        }
-                        forceUpdate = True;
-                        updateScoreTable();
-                        wait(!MouseLeftButton);
-                        continue;
-                    }
-                }
-            }
-
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
                 declare control = Event.Control;
 
                 if(control.HasClass("trigger") && Event.Type == CMlScriptEvent::Type::MouseOver){
                     showControls((Event.Control.Parent as CMlFrame));
+                    continue;
+                }
+
+                if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    page -= 1;
+                    if(page < 1){
+                        page = getMaxPage();
+                    }
+                    forceUpdate = True;
+                    updateScoreTable();
+                    continue;
+                }
+
+                if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    page += 1;
+                    if(page > getMaxPage()){
+                        page = 1;
+                    }
+                    forceUpdate = True;
+                    updateScoreTable();
+                    continue;
+                }
+
+                if(control.HasClass("me") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                    declare i = 0;
+                    foreach(Score => Weight in GetSortedScores()){
+                        if(Score.User.Login == LocalUser.Login){
+                            break;
+                        }
+                        i += 1;
+                    }
+                    page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
+                    forceUpdate = True;
+                    updateScoreTable();
+                    sleep(80);
+                    flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
                     continue;
                 }
             }

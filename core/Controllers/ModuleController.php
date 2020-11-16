@@ -3,6 +3,7 @@
 namespace EvoSC\Controllers;
 
 use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Module;
 use EvoSC\Interfaces\ControllerInterface;
@@ -146,6 +147,8 @@ class ModuleController implements ControllerInterface
         Log::cyan("Starting modules finished. $totalStarted modules started.");
 
         self::$loadedModules = $moduleClasses;
+
+        Hook::fire('ModulesStarted');
     }
 
     /**

@@ -6,7 +6,7 @@
     {block size}29 9{/block}
 
     {block content}
-    <frame pos="20.5 -1" z-index="2">
+    <frame pos="21.5 -1" z-index="2">
         <label class="open-controls text-light" id="time" z-index="2" size="20 5" text="+0 min." halign="center" valign="center" textprefix="$s"/>
     </frame>
     <frame pos="0.5 -4" scale="0.6" id="buttons">

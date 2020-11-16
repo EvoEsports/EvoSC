@@ -6,12 +6,14 @@ namespace EvoSC\Modules\TestModule;
 
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\AddedTimeInfo\AddedTimeInfo;
+use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\HUD\HUD;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
@@ -34,8 +36,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-
-        self::sendTestManialink($player);
+        CountDown::showCountdown($player);
     }
 
     public static function sendTestManialink(Player $player)

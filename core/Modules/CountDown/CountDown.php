@@ -14,8 +14,8 @@ class CountDown extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -24,6 +24,6 @@ class CountDown extends Module implements ModuleInterface
 
     public static function showCountdown(Player $player)
     {
-        Template::show($player, 'CountDown.widget');
+        Template::show($player, 'CountDown.widget' . (isTrackmania() ? '_2020' : ''));
     }
 }

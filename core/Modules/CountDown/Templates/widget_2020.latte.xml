@@ -1,0 +1,38 @@
+{contentType text}
+{extends 'Components.widget-base'}
+{php $dontHide = true;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}countdown{/block}
+    {block size}44 10{/block}
+
+    {block content}
+    <label id="cd" pos="44 -1" class="text-lighter" textprefix="$s" scale="3.0" halign="right" value="ayylmao" />
+    {/block}
+
+    {block script}
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+        declare timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        declare cd <=> (Page.MainFrame.GetFirstChild("cd") as CMlLabel);
+
+        left__ = {config('countdown.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('countdown.ui.slot')};
+    {/block}
+
+    {block loop}
+        timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        cd.Value = TL::TimeToText(timeRemaining);
+        log(TL::TimeToText(timeRemaining));
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
+</manialink>
