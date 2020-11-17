@@ -2,10 +2,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     {include 'Components.stylesheet'}
-    <stylesheet>
-        <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('theme.hud.text-light')}"/>
-    </stylesheet>
-
     <framemodel id="button">
         <quad class="btn" size="260 142" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_button_260x142.png" colorize="{config('theme.hud.bg-light')}" opacity="0.05" ScriptEvents="1" />
         <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -1.65" textsize="0.3" z-index="1"/>
@@ -45,50 +41,53 @@
             <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
         </frame>
 
-        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_button_260x142.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
+        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
     </framemodel>
 
     <!-- end components -->
 
-    <frame z-index="9990" pos="0 -10" scale="0.85">
-        <quad size="2417 300" scale="0.0955" pos="10.5 70.75" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_header_2417x300.png" colorize="{config('theme.hud.bg-dark')}" z-index="3" opacity="0.96" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.1" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.98" />
-    </frame>
-
-    <frame id="main-frame" pos="-87.5 17.5" z-index="9998" scale="1">
-        <frame id="header-frame" pos="8 25">
+    <frame id="main-frame" pos="-87.5 14" scale="1">
+        <frame z-index="0" pos="90 -12.5" scale="0.85">
+            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.12" />
+            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.94" />
+        </frame>
+        <frame id="header-frame" pos="5.5 17" z-index="1">
             {if !empty($logoUrl)}
-            <quad pos="180 11" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
+            <quad pos="175 8" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
                   image="{$logoUrl|noescape}" scale="0.8"/>
             {/if}
-            <label id="server-name" class="text-light" pos="1 15" size="60 6" scale="2"/>
-            <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="1.2" textprefix="$sMode: "/>
-            <label id="player-info" class="text-light" pos="-0.25 3.8" size="60 6" textprefix="$s "/>
+            <label id="server-name" class="text-light" pos="1 14" size="60 6" scale="1.8"/>
+            <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>
+            <label id="player-info" class="text-light" pos="-0.25 4.8" size="60 6" textprefix="$s "/>
         </frame>
-        <frame id="boxes-frame" pos="0 15">
-            {for $i=0;$i<7;$i++}
+        <frame id="boxes-frame" pos="0 15" z-index="1">
+            {for $i=0;$i<6;$i++}
             <frameinstance modelid="box" pos="{$i*-2.3 + 1} {$i * -13}"></frameinstance>
             {/for}
-            {for $i=0;$i<7;$i++}
+            {for $i=0;$i<6;$i++}
             <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}"></frameinstance>
             {/for}
-            {for $i=0;$i<7;$i++}
+            {for $i=0;$i<6;$i++}
             <quad size="2294 300" pos="{$i*-2.3 + 1} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
             {/for}
-            {for $i=0;$i<7;$i++}
+            {for $i=0;$i<6;$i++}
             <quad size="2294 300" pos="{$i*-2.3 + 92} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
             {/for}
         </frame>
+        <frame pos="-14 -68" z-index="10">
+            <label class="prev-page" pos="3.5 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label class="next-page" pos="18 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label class="me" pos="23 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        </frame>
+        <frame pos="-14 -66" scale="1" z-index="1" hidden="0">
+            <label id="prev-page" class="floating" text="" pos="4 0" size="5 5"/>
+            <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5"/>
+            <label id="next-page" class="floating" text="" pos="18 0" size="5 5"/>
+            <label id="me" class="floating" text="" pos="24.3 0" textsize="2.5" size="5 5" />
+        </frame>
     </frame>
 
-    <frame pos="-104 -64" z-index="9999" scale="1">
-        <label id="prev-page" class="floating prev-page" text="" pos="4 0" size="5 5" ScriptEvents="1" />
-        <label id="page" class="floating" text="1/1" pos="11 0" textsize="2.5" size="10 5" ScriptEvents="1" />
-        <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" />
-        <label id="me" class="floating" text="" pos="24.3 0" textsize="1.95" size="5 5" />
-    </frame>
 
     <script><!--
     #Include "MathLib" as ML
@@ -96,7 +95,7 @@
 
     #Const SB_Update_Interval 250
     #Const SB_Button_Padding 1
-    #Const SB_Per_Page 14
+    #Const SB_Per_Page 12
     #Const C_Status_Disconnected	0
     #Const C_Status_Spawned			1
     #Const C_Status_NotSpawned		2
@@ -561,6 +560,8 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
         declare nextPage = (Page.MainFrame.GetFirstChild("next-page") as CMlLabel);
         declare me = (Page.MainFrame.GetFirstChild("me") as CMlLabel);
 
+        declare Boolean findMe for This = False;
+
         mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
         boxes = CMlFrame[];
         page = 1;
@@ -577,8 +578,6 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
 
             ESC_Tab_Pressed = PageIsVisible;
 
-            headerFrame.Visible = (UI.UISequence != CUIConfig::EUISequence::Podium);
-
             if(lastPointsLimitUpdate < EvoSC_LastPointsLimitUpdate){
                 lastPointsLimitUpdate = EvoSC_LastPointsLimitUpdate;
                 updateScoreTable();
@@ -588,6 +587,22 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
                 forceUpdate = True;
                 updateScoreTable();
                 SB_Last_Update = GameTime;
+            }
+
+            if(findMe){
+                findMe = False;
+                declare i = 0;
+                foreach(Score => Weight in GetSortedScores()){
+                    if(Score.User.Login == LocalUser.Login){
+                        break;
+                    }
+                    i += 1;
+                }
+                page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
+                forceUpdate = True;
+                updateScoreTable();
+                sleep(80);
+                flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
             }
 
             foreach(Event in PendingEvents){

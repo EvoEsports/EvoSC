@@ -14,10 +14,10 @@
       "id": "Race_RespawnHelper",
       "position": [
         157,
-        15
+        -80
       ],
       "scale": 1,
-      "visible": false,
+      "visible": true,
       "visible_update": true
     },
     {

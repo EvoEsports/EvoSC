@@ -18,6 +18,7 @@ use EvoSC\Modules\HUD\HUD;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MapDetails\MapDetails;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
@@ -36,7 +37,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CountDown::showCountdown($player);
+        ScoreTable::sendScoreTable($player);
+        QuickButtons::showButtons($player);
     }
 
     public static function sendTestManialink(Player $player)
