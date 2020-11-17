@@ -17,7 +17,7 @@
         -80
       ],
       "scale": 1,
-      "visible": true,
+      "visible": false,
       "visible_update": true
     },
     {
@@ -101,7 +101,7 @@
         30
       ],
       "scale": 1,
-      "visible": true,
+      "visible": false,
       "visible_update": true
     },
     {
