@@ -33,6 +33,12 @@
         }else{
             cd.Value = "";
         }
+
+        if(timeRemaining <= 31000) 
+          cd.TextColor = <0.98, 0.149, 0.149>;
+        else 
+          cd.TextColor = <1., 1., 1.>;
+
     {/block}
 
     {block pendingEvents}
