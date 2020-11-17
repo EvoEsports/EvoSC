@@ -16,9 +16,11 @@
         157,
         -80
       ],
-      "scale": 1,
+      "scale": 0.9,
       "visible": false,
-      "visible_update": true
+      "visible_update": true,
+      "position_update": true,
+      "scale_update": true
     },
     {
       "id": "Race_Checkpoint",
