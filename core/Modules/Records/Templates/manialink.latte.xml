@@ -15,8 +15,8 @@
         <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
     </framemodel>
 
-    <quad class="bg-dark widget" size="45 {config('world-records.rows') * 3 + 6.5}" opacity="0.8" ScriptEvents="1"/>
-    <quad class="bg-darker" pos="0 -5" size="45 {config('world-records.showtop') * 3 + 0.7}" opacity="0.4" />
+    <quad class="bg-dark widget" size="45 30.5" opacity="0.8" ScriptEvents="1"/>
+    <quad class="bg-darker" pos="0 -5" size="45 15.7" opacity="0.4" />
     <quad class="bg-accent" size="45 5" z-index="1" opacity="0.8"/>
     <label class="text-light" z-index="2" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Records"/>
 
@@ -27,7 +27,7 @@
     </frame>
 
     <frame id="records" pos="1 -7" z-index="5">
-        {for $i=0; $i<config('world-records.rows'); $i++}
+        {for $i=0; $i<8; $i++}
         <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
         {/for}
     </frame>
@@ -187,8 +187,8 @@ Void stopLoading(){
         primaryColor = TL::ToColor("{config('theme.hud.text-light')|noescape}");
         headerColor = TL::ToColor("{config('theme.hud.accent')|noescape}");
 
-        left__ = {config('world-records.ui.position') == 'left' ? 'True' : 'False'};
-        slot__ = {config('world-records.ui.slot')};
+        left__ = {config('records.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('records.ui.slot')};
 
         declare K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
         declare Boolean Race_Record_LoadingRecords for ClientUI;
