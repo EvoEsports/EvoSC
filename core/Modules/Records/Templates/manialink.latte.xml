@@ -20,7 +20,7 @@
     <quad class="bg-accent" size="45 5" z-index="1" opacity="0.8"/>
     <label class="text-light" z-index="2" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Records"/>
 
-    <frame id="pagination" pos="11.5 -2.5" scale="0.95" z-index="10">
+    <frame id="pagination" pos="11 -2.5" scale="0.95" z-index="10">
         <label class="text-light previous" id="prev-zone" pos="29 0" size="3 3" valign="center" halign="center" text="" z-index="5555" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" opacity="0.5" />
         <label id="page-label" class="text-light" pos="29 0.05" valign="center" halign="right" text="World" z-index="-1" textsize="0.75" />
         <label class="text-light next" id="next-zone" pos="31.5 0" size="3 3" valign="center" halign="center" text="" z-index="5" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
@@ -94,15 +94,21 @@ Void stopLoading(){
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Void updateRow(CMlFrame row, K_TMxSM_Record_Record record){
+    Void updateRow(CMlFrame row, Record::K_TMxSM_Record_Record record){
+        declare K_State Race_Record_State for UI;
         (row.Controls[0] as CMlLabel).Value = record.Rank ^ ".";
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
         (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
         (row.Controls[3] as CMlLabel).Value = record.DisplayName;
-        (row.Controls[4] as CMlLabel).Opacity = 0.25;
+        if(Race_Record_State.LoadedRecordGhosts.existskey(record.AccountId)){
+            (row.Controls[4] as CMlLabel).Opacity = 1.0;
+        }else{
+            (row.Controls[4] as CMlLabel).Opacity = 0.25;
+        }
+        (row.Controls[4] as CMlLabel).DataAttributeSet("account-id", record.AccountId);
     }
 
-    Void setRows(K_TMxSM_Record_Records records){
+    Void setRows(Record::K_TMxSM_Record_Records records){
         declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
 
         declare i = 0;
@@ -138,7 +144,7 @@ Void stopLoading(){
         updateSelectedZone();
     }
 
-    Void update(K_TMxSM_Record_Records[] zoneRecords){
+    Void update(Record::K_TMxSM_Record_Records[] zoneRecords){
         stopLoading();
         records = zoneRecords;
         if(zoneRecords.count == 0) return;
@@ -150,35 +156,208 @@ Void stopLoading(){
         availableZones = zones;
         changeZone("World");
     }
+
+K_Scope GetScope(K_State _State) {
+	declare K_Scope Scope = K_Scope {
+		Type = _State.ScopeNotSeason,
+		Id = ""
+	};
+	if (_State.SeasonIds.existskey(_State.CurrentMapUid)) {
+		Scope.Type = _State.ScopeSeason;
+		Scope.Id = _State.SeasonIds[_State.CurrentMapUid];
+	}
+	return Scope;
+}
+
+K_State ReleaseRecordGhost(K_State _State, Text _AccountId) {
+	declare K_State State = _State;
+
+	declare K_RecordGhost[] Records;
+	if (State.LoadingRecordGhosts.existskey(_AccountId)) Records.add(State.LoadingRecordGhosts[_AccountId]);
+	if (State.LoadedRecordGhosts.existskey(_AccountId)) Records.add(State.LoadedRecordGhosts[_AccountId]);
+
+	foreach (Record in Records) {
+		if (Record.TaskIdRetrieveRecords != NullId && ScoreMgr.TaskResults.existskey(Record.TaskIdRetrieveRecords)) {
+			ScoreMgr.TaskResult_Release(Record.TaskIdRetrieveRecords);
+		}
+		if (Record.TaskIdRetrieveGhost != NullId && DataFileMgr.TaskResults.existskey(Record.TaskIdRetrieveGhost)) {
+			DataFileMgr.TaskResult_Release(Record.TaskIdRetrieveGhost);
+		}
+		if (Record.GhostInstanceId != NullId) {
+			//GhostMgr.Ghost_Remove(Record.GhostInstanceId);
+		}
+		if (Record.GhostId != NullId && DataFileMgr.Ghosts.existskey(Record.GhostId)) {
+			DataFileMgr.Ghost_Release(Record.GhostId);
+		}
+	}
+
+	State.LoadingRecordGhosts.removekey(_AccountId);
+	State.LoadedRecordGhosts.removekey(_AccountId);
+
+	return State;
+}
+Void SendRecordsStatusToML(K_State _State) {
+	declare Integer[Text] Race_Record_RecordsStatus for ClientUI;
+	declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
+
+	Race_Record_RecordsStatus = [];
+
+	foreach (AccountId => Record in _State.LoadingRecordGhosts) {
+		Race_Record_RecordsStatus[AccountId] = C_RecordStatus_Loading;
+	}
+	foreach (AccountId => Record in _State.LoadedRecordGhosts) {
+		Race_Record_RecordsStatus[AccountId] = C_RecordStatus_Loaded;
+	}
+
+	Race_Record_RecordsStatusUpdate += 1;
+}
+K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
+	declare K_State State = _State;
+
+	// Release previous record if any
+	//State = ReleaseRecordGhost(State, _AccountId);
+
+	declare K_RecordGhost Record = K_RecordGhost {
+		AccountId = _AccountId
+	};
+	declare K_Scope Scope;
+	if (C_ForceRecordScope != "") {
+		Scope = K_Scope {
+			Type = C_ForceRecordScope,
+			Id = ""
+		};
+	} else {
+		Scope = GetScope(_State);
+	}
+
+	declare Task = ScoreMgr.Map_GetPlayerListRecordList(UserMgr.MainUser.Id, [Record.AccountId], State.CurrentMapUid, Scope.Type, Scope.Id, State.ModeName, State.CustomData);
+	if (Task != Null) {
+		Record.TaskIdRetrieveRecords = Task.Id;
+	}
+
+	State.LoadingRecordGhosts[Record.AccountId] = Record;
+	SendRecordsStatusToML(State);
+
+	return State;
+}
+    Boolean hasClubAccess(){
+        return True;
+    }
     --></script>
     {/block}
 
     <script><!--
     {block globals}
-        #Struct K_TMxSM_Record_Record {
-            Integer Rank;
-            Text AccountId;
-            Text DisplayName;
-            Integer Time;
-        }
-        #Struct K_TMxSM_Record_Records {
-            Text ZoneName;
-            Integer WorstTime;
-            Boolean IsFull;
-            Integer Type;
-            K_TMxSM_Record_Record[] Records;
-        }
+#Include "Libs/Nadeo/MenuLibs/Common/Manialink/ManiaView2.Script.txt" as MV
+#Include "Libs/Nadeo/ModeLibs/TrackMania/MV_Utils.Script.txt" as MV_Utils
+#Include "Libs/Nadeo/MenuLibs/Common/Menu/Components/MedalStack.Script.txt" as MedalStack
+#Include "Libs/Nadeo/MenuLibs/Common/Modes/Medals.Script.txt" as Medals
+#Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
+#Include "Libs/Nadeo/MenuLibs/Common/Menu/Components/LoadingSpinner.Script.txt" as LoadingSpinner
+#Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/Record_Common.Script.txt" as Record
+#Include "Libs/Nadeo/CommonLibs/Common/Http.Script.txt" as Http
+#Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Const
+#Include "Libs/Nadeo/TMNext/TrackMania/API/LeaderboardAPI.Script.txt" as LeaderboardAPI
+#Include "Libs/Nadeo/TMNext/TrackMania/Stores/ClubStore.Script.txt" as ClubStore
+#Include "Libs/Nadeo/TMNext/TrackMania/API/ClubAPI.Script.txt" as ClubAPI
+#Include "Libs/Nadeo/TMNext/TrackMania/Structures/ClubStruct.Script.txt" as ClubStruct
+#Include "Libs/Nadeo/TMNext/TrackMania/Stores/UserStore.Script.txt" as UserStore
+#Include "Libs/Nadeo/TMNext/TrackMania/RBAC.Script.txt" as RBAC
+#Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
+#Include "Libs/Nadeo/CommonLibs/Common/AudioManager.Script.txt" as AudioManager
+
+#Struct K_Scope {
+	Text Type;
+	Text Id;
+}
+
+#Struct K_Celebration {
+	Boolean IsActive;
+	Integer PrevTime;
+	Integer BestTime;
+	Integer PrevMedal;
+	Integer BestMedal;
+}
+
+#Struct K_RecordGhost {
+	Text AccountId;
+	Ident TaskIdRetrieveRecords;
+	Ident TaskIdRetrieveGhost;
+	Ident GhostId;
+	Ident GhostInstanceId;
+}
+
+#Struct K_State {
+	Integer SetupUpdate;
+	Integer ForceMapUpdate;
+	Boolean AlwaysDisplayRecords;
+	Boolean ReloadRecords;
+	Boolean PBGhostEnabled;
+	Boolean MedalEnabled;
+	Boolean CelebratePB;
+	Boolean CelebrateMedal;
+	Text CurrentMapUid;
+	Ident TaskIdGetRecordGhost;
+	Ident PBGhostId;
+	Ident PBGhostInstanceId;
+	Ident PBCpSyncedGhostInstanceId;
+	Text ScopeSeason;
+	Text ScopeNotSeason;
+	Text ModeName;
+	Text CustomData;
+	Text[Text] SeasonIds;
+	Boolean RequestCelebration;
+	K_Celebration Celebration;
+	Integer CurrentMedal;
+	Boolean RecordsEnabled;
+	Boolean PlayerIsDisplayingRecords;
+	Integer RecordsSelectedZone;
+	Integer RecordsPlayerTime;
+	Integer RecordsServerUpdate;
+	Integer[] RecordsAreDirty;
+	Integer[] RecordsNeedInit;
+	Boolean RequestRecordsInProgress;
+	Integer[] RecordsErrorCodes;
+	Http::LibCommonHttp_K_Request RequestZonesTopRecords;
+	Http::LibCommonHttp_K_Request RequestZonesSurroundingRecords;
+	Http::LibCommonHttp_K_Request RequestClubTopRecords;
+	Http::LibCommonHttp_K_Request RequestClubSurroundingRecords;
+	Http::LibCommonHttp_K_Request RequestClubVIPList;
+	Http::LibCommonHttp_K_Request RequestGlobalVIPList;
+	Ident TaskIdGetClubVIPRecords;
+	Ident TaskIdGetGlobalVIPRecords;
+	LeaderboardAPI::LibLeaderboardAPI_K_ResponseFromGetMapTopRankings ResponseZonesTopRecords;
+	LeaderboardAPI::LibLeaderboardAPI_K_ResponseFromGetSurroundingRankings ResponseZonesSurroundingRecords;
+	LeaderboardAPI::LibLeaderboardAPI_K_ResponseFromGetMapTopRankingsInClub ResponseClubTopRecords;
+	LeaderboardAPI::LibLeaderboardAPI_K_ResponseFromGetMapSurroundingRankingsInClub ResponseClubSurroundingRecords;
+	Integer[Text] ResponseClubVIPRecords;
+	Integer[Text] ResponseGlobalVIPRecords;
+	Boolean LoadingRecords;
+	Text RecordsLoadedForMapUid;
+	Text RecordsLoadingForMapUid;
+	Ident TaskIdRetrieveDisplayName;
+	Integer RecordsClubId;
+	Text RecordsClubName;
+	Record::K_TMxSM_Record_Records[] ZonesRecords;
+	K_RecordGhost[Text] LoadingRecordGhosts;
+	K_RecordGhost[Text] LoadedRecordGhosts;
+}
+
         #Struct Player {
             Text Login;
             Text Name;
             Boolean Online;
         }
 
+#Const C_ForceRecordScope "PersonalBest"
+#Const C_RecordStatus_Loading 0
+#Const C_RecordStatus_Loaded 1
+
         declare Vec3 headerColor;
         declare Vec3 primaryColor;
         declare Integer selectedZone;
         declare Text[] availableZones;
-        declare K_TMxSM_Record_Records[] records;
+        declare Record::K_TMxSM_Record_Records[] records;
     {/block}
 
     {block bootScript}
@@ -190,27 +369,45 @@ Void stopLoading(){
         left__ = {config('records.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('records.ui.slot')};
 
-        declare K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
+        declare K_State Race_Record_State for UI;
+
+        declare Record::K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
         declare Boolean Race_Record_LoadingRecords for ClientUI;
         declare Integer Race_Record_ZonesRecordsUpdate for ClientUI;
         declare Integer[Text] Race_Record_RecordsStatus for ClientUI;
         declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
         declare lastRecordsUpdate = -1;
+        declare lastRaceRecordRecordsStatusUpdate = -1;
         selectedZone = 0;
     {/block}
 
     {block loop}
+        declare K_State Race_Record_State for UI;
+
         if(lastRecordsUpdate != Race_Record_ZonesRecordsUpdate){
             lastRecordsUpdate = Race_Record_ZonesRecordsUpdate;
+            update(Race_Record_ZonesRecords);
+        }
+
+        if(lastRaceRecordRecordsStatusUpdate != Race_Record_RecordsStatusUpdate){
+            lastRaceRecordRecordsStatusUpdate = Race_Record_RecordsStatusUpdate;
+            //log(Race_Record_State);
             update(Race_Record_ZonesRecords);
         }
     {/block}
 
     {block pendingEvents}
         if(event.Control.HasClass("ghost") && event.Type == CMlScriptEvent::Type::MouseClick){
-            //declare icon = (event.Control as CMlLabel);
-            //icon.Opacity = 1.0;
-            TriggerPageAction("mle_ghost_notice");
+            declare icon = (event.Control as CMlLabel);
+            declare Text AccountId = icon.DataAttributeGet("account-id");
+
+            if (Race_Record_State.LoadedRecordGhosts.existskey(AccountId)) {
+                //disable ghost
+                //Race_Record_State = ReleaseRecordGhost(Race_Record_State, AccountId);
+                //SendRecordsStatusToML(Race_Record_State);
+            } else if (!Race_Record_State.LoadingRecordGhosts.existskey(AccountId) && hasClubAccess()) {
+                Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
+            }
         }
         if(event.Control.HasClass("next") && event.Type == CMlScriptEvent::Type::MouseClick){
             selectedZone += 1;
