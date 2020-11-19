@@ -100,11 +100,13 @@
       "id": "Race_Record",
       "position": [
         -160,
-        30
+        0
       ],
-      "scale": 1,
-      "visible": false,
-      "visible_update": true
+      "scale": 0.9,
+      "scale_update": true,
+      "visible": true,
+      "visible_update": true,
+      "position_update": true
     },
     {
       "id": "Race_BigMessage",

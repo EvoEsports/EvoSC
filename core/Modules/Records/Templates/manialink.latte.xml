@@ -1,0 +1,245 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}world-records{/block}
+    {block size}44 30.5{/block}
+
+    {block content}
+    <framemodel id="record">
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="78."/>
+        <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text="" opacity="0.25"/>
+        <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text=""/>
+        <label class="text-light" z-index="1" valign="center" halign="left" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text=""/>
+        <label class="btn-muted ghost" z-index="1" valign="center" halign="center" pos="40 0" size="3 3" textsize="0.4" text="🎮" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" opacity="0.15" />
+        <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+    </framemodel>
+
+    <quad class="bg-dark widget" size="45 {config('world-records.rows') * 3 + 6.5}" opacity="0.8" ScriptEvents="1"/>
+    <quad class="bg-darker" pos="0 -5" size="45 {config('world-records.showtop') * 3 + 0.7}" opacity="0.4" />
+    <quad class="bg-accent" size="45 5" z-index="1" opacity="0.8"/>
+    <label class="text-light" z-index="2" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Records"/>
+
+    <frame id="pagination" pos="11.5 -2.5" scale="0.95" z-index="10">
+        <label class="text-light previous" id="prev-zone" pos="29 0" size="3 3" valign="center" halign="center" text="" z-index="5555" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" opacity="0.5" />
+        <label id="page-label" class="text-light" pos="29 0.05" valign="center" halign="right" text="World" z-index="-1" textsize="0.75" />
+        <label class="text-light next" id="next-zone" pos="31.5 0" size="3 3" valign="center" halign="center" text="" z-index="5" textsize="0.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+    </frame>
+
+    <frame id="records" pos="1 -7" z-index="5">
+        {for $i=0; $i<config('world-records.rows'); $i++}
+        <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
+        {/for}
+    </frame>
+
+    <frame id="loading-frame" pos="0 -15" scale="1" z-index="100">
+        <frame id="spinner-frame" pos="15 -1.75" halign="center" valign="center" scale="0.9">
+            <label class="text-accent" pos="0.02 0.25" z-index="1" size="4 4" text="" halign="center" valign="center"/>
+        </frame>
+        <label class="text-accent" pos="17.25 -1.4" z-index="1" size="24 4" text="Loading" valign="center"/>
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+Void startLoading(){
+    declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
+    AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1900, CAnimManager::EAnimManagerEasing::Linear);
+    (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Show();
+}
+
+Void stopLoading(){
+    declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
+    AnimMgr.Flush(spinner);
+    (Page.MainFrame.GetFirstChild("loading-frame") as CMlFrame).Hide();
+}
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Void updateRow(CMlFrame row, K_TMxSM_Record_Record record){
+        (row.Controls[0] as CMlLabel).Value = record.Rank ^ ".";
+        (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
+        (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
+        (row.Controls[3] as CMlLabel).Value = record.DisplayName;
+        (row.Controls[4] as CMlLabel).Opacity = 0.25;
+    }
+
+    Void setRows(K_TMxSM_Record_Records records){
+        declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+
+        declare i = 0;
+        foreach(record in records.Records){
+            updateRow((recordsFrame.Controls[i] as CMlFrame), record);
+            recordsFrame.Controls[i].Show();
+            i += 1;
+        }
+
+        for(x, i, 7){
+            recordsFrame.Controls[x].Hide();
+        }
+    }
+
+    Void updateSelectedZone(){
+        declare Text zoneName = availableZones[selectedZone];
+        declare pageLabel <=> (Page.MainFrame.GetFirstChild("page-label") as CMlLabel);
+        declare prevZoneLabel <=> (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel);
+        pageLabel.Value = zoneName;
+        declare width = pageLabel.ComputeWidth(zoneName);
+        prevZoneLabel.RelativePosition_V3[0] = pageLabel.RelativePosition_V3[0] - width - 2.5;
+    }
+
+    Void changeZone(Text zoneTarget){
+        declare i = 0;
+        foreach(batch in records){
+            if(batch.ZoneName == zoneTarget){
+                selectedZone = i;
+                setRows(batch);
+            }
+            i += 1;
+        }
+        updateSelectedZone();
+    }
+
+    Void update(K_TMxSM_Record_Records[] zoneRecords){
+        stopLoading();
+        records = zoneRecords;
+        if(zoneRecords.count == 0) return;
+
+        declare Text[] zones;
+        foreach(records in zoneRecords){
+            zones.add(records.ZoneName);
+        }
+        availableZones = zones;
+        changeZone("World");
+    }
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+        #Struct K_TMxSM_Record_Record {
+            Integer Rank;
+            Text AccountId;
+            Text DisplayName;
+            Integer Time;
+        }
+        #Struct K_TMxSM_Record_Records {
+            Text ZoneName;
+            Integer WorstTime;
+            Boolean IsFull;
+            Integer Type;
+            K_TMxSM_Record_Record[] Records;
+        }
+        #Struct Player {
+            Text Login;
+            Text Name;
+            Boolean Online;
+        }
+
+        declare Vec3 headerColor;
+        declare Vec3 primaryColor;
+        declare Integer selectedZone;
+        declare Text[] availableZones;
+        declare K_TMxSM_Record_Records[] records;
+    {/block}
+
+    {block bootScript}
+        startLoading();
+
+        primaryColor = TL::ToColor("{config('theme.hud.text-light')|noescape}");
+        headerColor = TL::ToColor("{config('theme.hud.accent')|noescape}");
+
+        left__ = {config('world-records.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('world-records.ui.slot')};
+
+        declare K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
+        declare Boolean Race_Record_LoadingRecords for ClientUI;
+        declare Integer Race_Record_ZonesRecordsUpdate for ClientUI;
+        declare Integer[Text] Race_Record_RecordsStatus for ClientUI;
+        declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
+        declare lastRecordsUpdate = -1;
+        selectedZone = 0;
+    {/block}
+
+    {block loop}
+        if(lastRecordsUpdate != Race_Record_ZonesRecordsUpdate){
+            lastRecordsUpdate = Race_Record_ZonesRecordsUpdate;
+            update(Race_Record_ZonesRecords);
+        }
+    {/block}
+
+    {block pendingEvents}
+        if(event.Control.HasClass("ghost") && event.Type == CMlScriptEvent::Type::MouseClick){
+            //declare icon = (event.Control as CMlLabel);
+            //icon.Opacity = 1.0;
+            TriggerPageAction("mle_ghost_notice");
+        }
+        if(event.Control.HasClass("next") && event.Type == CMlScriptEvent::Type::MouseClick){
+            selectedZone += 1;
+            (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
+            (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
+            if(selectedZone + 1 == availableZones.count){
+                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
+            }
+            if(selectedZone >= availableZones.count){
+                selectedZone = 0;
+                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+            }
+            changeZone(availableZones[selectedZone]);
+            continue;
+        }
+        if(event.Control.HasClass("previous") && event.Type == CMlScriptEvent::Type::MouseClick){
+            selectedZone -= 1;
+            (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
+            (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
+            if(selectedZone == 0){
+                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+            }
+            if(selectedZone < 0){
+                selectedZone = availableZones.count - 1;
+                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
+            }
+            changeZone(availableZones[selectedZone]);
+            continue;
+        }
+    {/block}
+--></script>
+</manialink>
