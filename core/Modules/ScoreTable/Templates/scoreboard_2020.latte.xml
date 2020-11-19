@@ -75,16 +75,11 @@
             <quad size="2294 300" pos="{$i*-2.3 + 92} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
             {/for}
         </frame>
-        <frame pos="-14 -68" z-index="10">
-            <label class="prev-page" pos="3.5 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-            <label class="next-page" pos="18 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-            <label class="me" pos="23 2" size="9 4.5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-        </frame>
         <frame pos="-14 -66" scale="1" z-index="1" hidden="0">
-            <label id="prev-page" class="floating" text="" pos="4 0" size="5 5"/>
-            <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5"/>
-            <label id="next-page" class="floating" text="" pos="18 0" size="5 5"/>
-            <label id="me" class="floating" text="" pos="24.3 0" textsize="2.5" size="5 5" />
+            <label id="prev-page" class="floating prev-page" text="" pos="4 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+            <label id="me" class="floating me" text="" pos="24.3 0" textsize="2.5" size="5 5"  ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
         </frame>
     </frame>
 
