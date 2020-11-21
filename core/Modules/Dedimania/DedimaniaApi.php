@@ -64,7 +64,7 @@ class DedimaniaApi extends Module
             'ServerVersion' => Server::getVersion()->version,
             'ServerBuild' => Server::getVersion()->build,
             'Tool' => 'EvoSC',
-            'Version' => getEscVersion(),
+            'Version' => getEvoSCVersion(),
             /* Optional
             'ServerIP'      => ,
             'ServerPort'    => ,

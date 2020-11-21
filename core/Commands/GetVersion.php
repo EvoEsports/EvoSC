@@ -16,6 +16,6 @@ class GetVersion extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        printf("EvoSC-Version %s\n", getEscVersion());
+        printf("EvoSC-Version %s\n", getEvoSCVersion());
     }
 }

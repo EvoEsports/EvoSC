@@ -16,7 +16,7 @@ require 'vendor/larapack/dd/src/helper.php';
 /**
  * @return string
  */
-function getEscVersion(): string
+function getEvoSCVersion(): string
 {
     return str_replace("\n", '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }

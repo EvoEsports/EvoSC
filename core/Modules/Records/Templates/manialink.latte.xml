@@ -42,6 +42,10 @@
 
     {block script}
     <script><!--
+CUILayer::EUILayerType GetLayerType() {
+	return Record::C_LayerType;
+}
+
 Void startLoading(){
     declare spinner <=> (Page.MainFrame.GetFirstChild("spinner-frame") as CMlFrame);
     AnimMgr.Add(spinner, "<frame rot='359640' />", 999*1900, CAnimManager::EAnimManagerEasing::Linear);
@@ -410,39 +414,48 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
     {/block}
 
     {block pendingEvents}
-        if(event.Control.HasClass("ghost") && event.Type == CMlScriptEvent::Type::MouseClick){
-            declare icon = (event.Control as CMlLabel);
-            declare Text AccountId = icon.DataAttributeGet("account-id");
-            SendCustomEvent(C_Event_ToggleGhost, [AccountId]);
-            continue;
-        }
-        if(event.Control.HasClass("next") && event.Type == CMlScriptEvent::Type::MouseClick){
-            selectedZone += 1;
-            (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
-            (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
-            if(selectedZone + 1 == availableZones.count){
-                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            if(event.Control.HasClass("ghost")){
+                declare icon = (event.Control as CMlLabel);
+                declare Text AccountId = icon.DataAttributeGet("account-id");
+                if (Race_Record_State.LoadedRecordGhosts.existskey(AccountId)) {
+                    //Race_Record_State = ReleaseRecordGhost(Race_Record_State, AccountId);
+                    //SendRecordsStatusToML(Race_Record_State);
+                } else if (!Race_Record_State.LoadingRecordGhosts.existskey(AccountId)) {
+                    if (hasClubAccess()) {
+                        Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
+                    }
+                }
+                continue;
             }
-            if(selectedZone >= availableZones.count){
-                selectedZone = 0;
-                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+            if(event.Control.HasClass("next")){
+                selectedZone += 1;
+                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
+                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
+                if(selectedZone + 1 == availableZones.count){
+                    (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
+                }
+                if(selectedZone >= availableZones.count){
+                    selectedZone = 0;
+                    (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+                }
+                changeZone(availableZones[selectedZone]);
+                continue;
             }
-            changeZone(availableZones[selectedZone]);
-            continue;
-        }
-        if(event.Control.HasClass("previous") && event.Type == CMlScriptEvent::Type::MouseClick){
-            selectedZone -= 1;
-            (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
-            (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
-            if(selectedZone == 0){
-                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+            if(event.Control.HasClass("previous")){
+                selectedZone -= 1;
+                (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 1.0;
+                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 1.0;
+                if(selectedZone == 0){
+                    (Page.MainFrame.GetFirstChild("prev-zone") as CMlLabel).Opacity = 0.5;
+                }
+                if(selectedZone < 0){
+                    selectedZone = availableZones.count - 1;
+                    (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
+                }
+                changeZone(availableZones[selectedZone]);
+                continue;
             }
-            if(selectedZone < 0){
-                selectedZone = availableZones.count - 1;
-                (Page.MainFrame.GetFirstChild("next-zone") as CMlLabel).Opacity = 0.5;
-            }
-            changeZone(availableZones[selectedZone]);
-            continue;
         }
     {/block}
 --></script>

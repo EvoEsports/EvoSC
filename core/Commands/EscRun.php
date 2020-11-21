@@ -134,7 +134,7 @@ class EscRun extends Command
         global $_onlinePlayers;
         global $serverName;
 
-        $version = getEscVersion();
+        $version = getEvoSCVersion();
         $motd = "      ______           _____ ______
      / ____/  _______ / ___// ____/
     / __/| | / / __ \\__ \/ /
@@ -201,9 +201,9 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
+        successMessage(secondary('EvoSC v' . getEvoSCVersion()), ' started.')->setIcon('')->sendAll();
 
-        $__bootedVersion = getEscVersion();
+        $__bootedVersion = getEvoSCVersion();
 
         //cycle-loop
         while (true) {
