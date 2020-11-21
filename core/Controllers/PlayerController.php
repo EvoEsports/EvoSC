@@ -36,6 +36,7 @@ class PlayerController implements ControllerInterface
     private static int $stringEditDistanceThreshold = 8;
 
     private static Collection $customNames;
+    private static Collection $customNamesByUbiname;
 
     /**
      * Initialize PlayerController
@@ -43,6 +44,7 @@ class PlayerController implements ControllerInterface
     public static function init()
     {
         self::$customNames = collect();
+        self::$customNamesByUbiname = collect();
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
@@ -78,24 +80,30 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
 
         if (isTrackmania()) {
-            ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+            ChatCommand::add('/setname', [self::class, 'cmdSetName'], 'Change NickName.');
         }
     }
 
     /**
      * @param Player $player
      */
-    public static function leaveSpec(Player $player){
-        if($player->isSpectator()){
+    public static function leaveSpec(Player $player)
+    {
+        if ($player->isSpectator()) {
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
         }
     }
 
-    public static function setName(Player $player, $cmd, ...$name)
+    public static function cmdSetName(Player $player, $cmd, ...$name)
+    {
+        $name = str_replace("\n", '', trim(implode(' ', $name)));
+        self::setName($player, $name);
+    }
+
+    public static function setName(Player $player, $name, $silent = false, $fromCache = false)
     {
         $oldName = $player->NickName;
-        $name = str_replace("\n", '', trim(implode(' ', $name)));
         if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;
@@ -109,18 +117,25 @@ class PlayerController implements ControllerInterface
             'NickName' => $name
         ]);
         self::$customNames->put($player->Login, $name);
+        self::$customNamesByUbiname->put($player->ubisoft_name, $name);
         self::$players->put($player->Login, $player);
-        if ($cmd != 'silent') {
+        if (!$silent) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
             Cache::put('nicknames/' . $player->Login, $name);
         }
         self::sendUpdatesCustomNames();
-        Hook::fire('PlayerChangedName', $player);
+
+        if (!$fromCache) {
+            Hook::fire('PlayerChangedName', $player);
+        }
     }
 
-    private static function sendUpdatesCustomNames()
+    public static function sendUpdatesCustomNames()
     {
-        Template::showAll('Helpers.update-custom-names', ['names' => self::$customNames]);
+        Template::showAll('Helpers.update-custom-names', [
+            'keyedByLogin' => self::$customNames,
+            'keyedByUbiname' => self::$customNamesByUbiname
+        ]);
     }
 
     public static function cacheConnectedPlayers()
@@ -178,7 +193,7 @@ class PlayerController implements ControllerInterface
         if ($stats) {
             $serverRank = $stats->Rank;
 
-            if($serverRank == -1){
+            if ($serverRank == -1) {
                 $serverRank = 'unranked';
             }
 

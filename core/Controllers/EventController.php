@@ -114,6 +114,10 @@ class EventController implements ControllerInterface
 
             $player->spectator_status = $playerInfo['SpectatorStatus'];
             $player->player_id = $playerInfo['PlayerId'];
+            $player->ubisoft_name = $playerInfo['NickName'];
+            if($player->isDirty()){
+                $player->save();
+            }
             PlayerController::putPlayer($player);
         }
     }
@@ -188,7 +192,7 @@ class EventController implements ControllerInterface
 
             if (isTrackmania() && Cache::has('nicknames/' . $playerInfo[0])) {
                 $name = Cache::get('nicknames/' . $playerInfo[0]);
-                PlayerController::setName($player, 'silent', $name);
+                PlayerController::setName($player, $name, true, true);
             }
 
             Hook::fire('PlayerConnect', $player);

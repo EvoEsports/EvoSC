@@ -94,26 +94,38 @@ Void stopLoading(){
         return minutes ^ ":" ^ secondString ^ "." ^ msString;
     }
 
-    Void updateRow(CMlFrame row, Record::K_TMxSM_Record_Record record){
+    Void updateRow(CMlFrame row, Record::K_TMxSM_Record_Record record, Boolean isOnline){
+        declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
         declare K_State Race_Record_State for UI;
         (row.Controls[0] as CMlLabel).Value = record.Rank ^ ".";
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
         (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
-        (row.Controls[3] as CMlLabel).Value = record.DisplayName;
+
+        declare name = record.DisplayName;
+        if(EvoSC_CustomNamesByUbiname.existskey(name)){
+            name = EvoSC_CustomNamesByUbiname[name];
+        }
+
+        (row.Controls[3] as CMlLabel).Value = name;
         if(Race_Record_State.LoadedRecordGhosts.existskey(record.AccountId)){
             (row.Controls[4] as CMlLabel).Opacity = 1.0;
         }else{
             (row.Controls[4] as CMlLabel).Opacity = 0.25;
         }
         (row.Controls[4] as CMlLabel).DataAttributeSet("account-id", record.AccountId);
+        row.Controls[5].Visible = isOnline;
     }
 
     Void setRows(Record::K_TMxSM_Record_Records records){
         declare recordsFrame <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        declare Text[] onlinePlayers;
+        foreach(player in Players){
+            onlinePlayers.add(player.User.Name);
+        }
 
         declare i = 0;
         foreach(record in records.Records){
-            updateRow((recordsFrame.Controls[i] as CMlFrame), record);
+            updateRow((recordsFrame.Controls[i] as CMlFrame), record, onlinePlayers.exists(record.DisplayName));
             recordsFrame.Controls[i].Show();
             i += 1;
         }
@@ -349,6 +361,7 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
             Boolean Online;
         }
 
+#Const C_Event_ToggleGhost "TMxSM_Race_Record_ToggleGhost"
 #Const C_ForceRecordScope "PersonalBest"
 #Const C_RecordStatus_Loading 0
 #Const C_RecordStatus_Loaded 1
@@ -400,14 +413,8 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
         if(event.Control.HasClass("ghost") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare icon = (event.Control as CMlLabel);
             declare Text AccountId = icon.DataAttributeGet("account-id");
-
-            if (Race_Record_State.LoadedRecordGhosts.existskey(AccountId)) {
-                //disable ghost
-                //Race_Record_State = ReleaseRecordGhost(Race_Record_State, AccountId);
-                //SendRecordsStatusToML(Race_Record_State);
-            } else if (!Race_Record_State.LoadingRecordGhosts.existskey(AccountId) && hasClubAccess()) {
-                Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
-            }
+            SendCustomEvent(C_Event_ToggleGhost, [AccountId]);
+            continue;
         }
         if(event.Control.HasClass("next") && event.Type == CMlScriptEvent::Type::MouseClick){
             selectedZone += 1;

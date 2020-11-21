@@ -4,9 +4,12 @@
     <script><!--
     main(){
         declare Text[Text] EvoSC_CustomNames for LocalUser;
+        declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
 
-        declare trans = """{$names->toJson()}""";
+        declare trans = """{$keyedByLogin->toJson()}""";
         EvoSC_CustomNames.fromjson(trans);
+        trans = """{$keyedByUbiname->toJson()}""";
+        EvoSC_CustomNamesByUbiname.fromjson(trans);
     }
     --></script>
 </manialink>

@@ -22,6 +22,7 @@ use Illuminate\Support\Collection;
  * @property int $id
  * @property string $Login
  * @property string $NickName
+ * @property string $ubisoft_name
  * @property mixed $Score
  * @property integer $player_id
  * @property boolean $Afk
