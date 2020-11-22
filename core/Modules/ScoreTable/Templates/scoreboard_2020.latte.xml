@@ -7,6 +7,10 @@
         <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -1.65" textsize="0.3" z-index="1"/>
         <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -3.8" scale="0.75" z-index="1"/>
     </framemodel>
+    <framemodel id="framemodel-trophy">
+        <label id="label-trophy" class="text-default" pos="-2.5" z-index="1" halign="center" text="ayy" size="5 5" textprefix="$i" />
+        <quad id="quad-trophy" class="quad-base" z-index="0" pos="-2 0.2" size="7 7" halign="left" autoscale="0" />
+    </framemodel>
 
     <framemodel id="box" data-size="100 12">
         <label class="text-light" pos="26.25 -2.5" size="25 3" scale="1.3"/> <!-- Name -->
@@ -27,7 +31,7 @@
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
         <quad class="bg-accent" opacity="0" pos="1 0" size="86 12" z-index="-15" ScriptEvents="1" hidden="1"/> <!-- Primary BG -->
-        <quad size="355 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
+        <quad size="355 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" opacity="0.2" />
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
 
         <frame pos="8 -5.5" hidden="1" z-index="10">
@@ -41,16 +45,29 @@
             <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
         </frame>
 
+        <frame id="frame-trophies" pos="83 -7" scale="0.5" hidden="0">
+            <frame id="frame-trophies-style-2" pos="5 0">
+                <frameinstance modelid="framemodel-trophy" pos="-24 0" />
+                <frameinstance modelid="framemodel-trophy" pos="-14 0" />
+                <frameinstance modelid="framemodel-trophy" pos="-4 0" />
+            </frame>
+            <frame id="frame-trophies-style-1" pos="-7 0">
+                <quad id="quad-best-trophy" class="text-light" halign="center" valign="center" pos="1.5 0.2" z-index="1" size="9 9" autoscale="0" />
+                <label id="label-big-trophy" class="text-light" valign="center2" pos="-14.5 0" z-index="2" halign="right" size="7 10" textprefix="$i" />
+                <label id="label-small-trophy" class="text-light" valign="center2" pos="-15 -0.4" z-index="2" halign="left" size="7 10" textprefix="$i" textsize="2" />
+            </frame>
+        </frame>
+
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
-        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
+        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.45" />
     </framemodel>
 
     <!-- end components -->
 
     <frame id="main-frame" pos="-87.5 14" scale="1">
         <frame z-index="0" pos="90 -12.5" scale="0.85">
-            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.12" />
-            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.94" />
+            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.25" />
+            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
         </frame>
         <frame id="header-frame" pos="5.5 17" z-index="1">
             {if !empty($logoUrl)}
@@ -69,10 +86,10 @@
             <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}"></frameinstance>
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad size="2294 300" pos="{$i*-2.3 + 1} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
+            <quad size="2294 300" pos="{$i*-2.3 + 1} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.25" />
             {/for}
             {for $i=0;$i<6;$i++}
-            <quad size="2294 300" pos="{$i*-2.3 + 92} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" opacity="0.1" />
+            <quad size="2294 300" pos="{$i*-2.3 + 92} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.25" />
             {/for}
         </frame>
         <frame pos="-14 -66" scale="1" z-index="1" hidden="0">
@@ -87,6 +104,8 @@
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
+    #Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
+    #Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
 
     #Const SB_Update_Interval 250
     #Const SB_Button_Padding 1
@@ -108,6 +127,11 @@
         Integer groupId;
     }
 
+    #Struct K_Trophy {
+        Integer Level;
+        Integer Amount;
+    }
+
     declare CMlFrame mainFrame;
     declare CMlFrame[] boxes;
     declare Integer page;
@@ -124,22 +148,6 @@
 
         return ceiled;
     }
-
-//nadeo
-Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
-	switch (_Level) {
-		case 1: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze1";
-		case 2: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze2";
-		case 3: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Bronze3";
-		case 4: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver1";
-		case 5: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver2";
-		case 6: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Silver3";
-		case 7: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold1";
-		case 8: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold2";
-		case 9: _Quad_Tropy.ImageUrl = "Constants::C_ImageUrl_Trophy_128_Gold3";
-		default: _Quad_Tropy.ImageUrl= "Constants::C_ImageUrl_Trophy_128_None";
-	}
-}
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -210,6 +218,21 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
+    Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
+        switch (_Level) {
+            case 1: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Bronze1;
+            case 2: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Bronze2;
+            case 3: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Bronze3;
+            case 4: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Silver1;
+            case 5: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Silver2;
+            case 6: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Silver3;
+            case 7: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold1;
+            case 8: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold2;
+            case 9: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
+            default: _Quad_Tropy.ImageUrl = Constants::C_ImageUrl_Trophy_128_None;
+        }
+    }
+
     Void updateBox(CMlFrame box, CSmScore Score, Integer rank, Integer addedPoints){
         declare CUser user <=> Score.User;
         declare EvoSC_Group group = getGroup(Score.User.Login);
@@ -227,6 +250,35 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
         declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
         declare lpGainLabel <=> (box.Controls[11] as CMlLabel);
         declare Text[Text] EvoSC_CustomNames for LocalUser;
+
+        declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
+        declare Frame_Trophies <=> (box.GetFirstChild("frame-trophies") as CMlFrame);
+        declare Frame_TrophiesGroup <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-1") as CMlFrame);
+        declare Frame_TrophiesDetails <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-2") as CMlFrame);
+
+        declare _TrophyStyle = 2;
+        Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
+        Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
+
+        if (Frame_TrophiesDetails.Visible) {
+            foreach (Key => Control in Frame_TrophiesDetails.Controls) {
+                // Show the best trophies
+                declare Integer TrophyKey = Key;
+                if (LibTMxSM_ScoresTable_Trophies.count < Frame_TrophiesDetails.Controls.count) {
+                    TrophyKey = Key - (Frame_TrophiesDetails.Controls.count - LibTMxSM_ScoresTable_Trophies.count);
+                }
+                if (LibTMxSM_ScoresTable_Trophies.existskey(TrophyKey)) {
+                    declare CMlFrame Frame_Trophy <=> (Control as CMlFrame);
+                    declare CMlQuad Quad_Trophy <=> (Frame_Trophy.GetFirstChild("quad-trophy") as CMlQuad);
+                    declare CMlLabel Label_Trophy <=> (Frame_Trophy.GetFirstChild("label-trophy") as CMlLabel);
+                    ApplyTrophyImage(Quad_Trophy, LibTMxSM_ScoresTable_Trophies[TrophyKey].Level);
+                    Label_Trophy.Value = ""^LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount;
+                    Frame_Trophy.Visible = True;
+                } else {
+                    Control.Visible = False;
+                }
+            }
+        }
 
 		declare LibST_Status for user = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
@@ -563,6 +615,9 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
         forceUpdate = True;
 
         declare Integer EvoSC_PointsLimit for This = 0;
+        declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
+        declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
+        declare TrophiesUpdate = -1;
 
         foreach(Control in (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame).Controls){
             boxes.add((Control as CMlFrame));
@@ -582,6 +637,29 @@ Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
                 forceUpdate = True;
                 updateScoreTable();
                 SB_Last_Update = GameTime;
+            }
+
+            if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {
+                TrophiesUpdate = Net_TMxSM_ScoresTable_TrophiesUpdate;
+                foreach (Score in Scores) {
+                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
+                    LibTMxSM_ScoresTable_Trophies = [];
+                    if (Net_TMxSM_ScoresTable_Trophies.existskey(Score.User.WebServicesUserId)) {
+                        declare Integer[Integer] NewTrophies = Net_TMxSM_ScoresTable_Trophies[Score.User.WebServicesUserId].sortkeyreverse();
+                        foreach (TrophyLevel => TrophyAmount in NewTrophies) {
+                            if (TrophyAmount > 0) {
+                                LibTMxSM_ScoresTable_Trophies.add(K_Trophy {
+                                    Level = TrophyLevel,
+                                    Amount = TrophyAmount
+                                });
+                            }
+                        }
+                    }
+                }
+
+                log(Net_TMxSM_ScoresTable_Trophies);
+                //UpdateTrophy(Frame_Trophy, Net_TMxSM_ScoresTable_Trophies);
+                //NeedStepRankingUpdate = True;
             }
 
             if(findMe){
