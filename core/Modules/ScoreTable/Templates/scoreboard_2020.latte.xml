@@ -13,20 +13,20 @@
     </framemodel>
 
     <framemodel id="box" data-size="100 12">
-        <label class="text-light" pos="26.25 -2.5" size="25 3" scale="1.3"/> <!-- Name -->
-        <label class="text-light" pos="27 -8" scale="0.9" size="3 3" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
-        <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="-1" scale="1.1">
+        <label class="text-light" pos="26.25 -2.5" size="25 3" z-index="5" scale="1.3"/> <!-- Name -->
+        <label class="text-light" pos="27 -8" scale="0.9" size="3 3" z-index="5" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
+        <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="5" scale="1.1">
             <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2" opacity="0"/>
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
-        <label class="text-light" pos="7 -5.5" size="10 10" textsize="1.1" scale="2" halign="center" valign="center"/> <!-- Pos/Rank -->
-        <label class="text-light" pos="87 -2.5" size="15 3" scale="1.3" halign="right"/> <!-- Score -->
-        <quad pos="14.75 -6" valign="center" size="9.75 8" /> <!-- Avatar -->
-        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" hidden="1" /> <!-- Flag -->
-        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" hidden="1"/> <!-- Region -->
-        <label class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75"/> <!-- Group -->
-        <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="2" rot="90"/> <!-- Fame Stars -->
-        <label class="text-light" pos="25 -7" size="11 3"/> <!-- Score BG-Layer -->
+        <label class="text-light" pos="7 -5.5" size="10 10" textsize="1.1" scale="2" z-index="5" halign="center" valign="center"/> <!-- Pos/Rank -->
+        <label class="text-light" pos="87 -2.5" size="15 3" scale="1.3" z-index="5" halign="right"/> <!-- Score -->
+        <quad pos="14.75 -6" valign="center" size="9.75 8" z-index="5" /> <!-- Avatar -->
+        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" hidden="1" z-index="5" /> <!-- Flag -->
+        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" hidden="1" z-index="5"/> <!-- Region -->
+        <label class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75" z-index="5"/> <!-- Group -->
+        <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="6" rot="90"/> <!-- Fame Stars -->
+        <label class="text-light" pos="25 -7" size="11 3" z-index="5"/> <!-- Score BG-Layer -->
         <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
@@ -78,12 +78,12 @@
             <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>
             <label id="player-info" class="text-light" pos="-0.25 4.8" size="60 6" textprefix="$s "/>
         </frame>
-        <frame id="boxes-frame" pos="0 15" z-index="1">
+        <frame id="boxes-frame" pos="0 15" z-index="100">
             {for $i=0;$i<6;$i++}
-            <frameinstance modelid="box" pos="{$i*-2.3 + 1} {$i * -13}"></frameinstance>
+            <frameinstance modelid="box" pos="{$i*-2.3 + 1} {$i * -13}" z-index="100"></frameinstance>
             {/for}
             {for $i=0;$i<6;$i++}
-            <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}"></frameinstance>
+            <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}" z-index="100"></frameinstance>
             {/for}
             {for $i=0;$i<6;$i++}
             <quad size="2294 300" pos="{$i*-2.3 + 1} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.25" />
