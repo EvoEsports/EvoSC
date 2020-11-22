@@ -8,8 +8,8 @@
         <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -3.8" scale="0.75" z-index="1"/>
     </framemodel>
     <framemodel id="framemodel-trophy">
-        <label id="label-trophy" class="text-default" pos="-2.5" z-index="1" halign="center" text="ayy" size="5 5" textprefix="$i" />
-        <quad id="quad-trophy" class="quad-base" z-index="0" pos="-2 0.2" size="7 7" halign="left" autoscale="0" />
+        <label id="label-trophy" class="text-default text-light" pos="-3.5 -2.5" z-index="1" halign="center" size="5 5" textsize="2.2" textprefix="$i" opacity="0.9" />
+        <quad id="quad-trophy" class="quad-base" z-index="0" pos="-2 0.2" size="8 7" halign="left" />
     </framemodel>
 
     <framemodel id="box" data-size="100 12">
@@ -45,10 +45,10 @@
             <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
         </frame>
 
-        <frame id="frame-trophies" pos="83 -7" scale="0.5" hidden="0">
-            <frame id="frame-trophies-style-2" pos="5 0">
-                <frameinstance modelid="framemodel-trophy" pos="-24 0" />
-                <frameinstance modelid="framemodel-trophy" pos="-14 0" />
+        <frame id="frame-trophies" pos="86 -6.25" scale="0.7">
+            <frame id="frame-trophies-style-2">
+                <frameinstance modelid="framemodel-trophy" pos="-26 0" />
+                <frameinstance modelid="framemodel-trophy" pos="-15 0" />
                 <frameinstance modelid="framemodel-trophy" pos="-4 0" />
             </frame>
             <frame id="frame-trophies-style-1" pos="-7 0">
@@ -66,7 +66,7 @@
 
     <frame id="main-frame" pos="-87.5 14" scale="1">
         <frame z-index="0" pos="90 -12.5" scale="0.85">
-            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.25" />
+            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
             <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
         </frame>
         <frame id="header-frame" pos="5.5 17" z-index="1">
@@ -271,8 +271,9 @@
                     declare CMlFrame Frame_Trophy <=> (Control as CMlFrame);
                     declare CMlQuad Quad_Trophy <=> (Frame_Trophy.GetFirstChild("quad-trophy") as CMlQuad);
                     declare CMlLabel Label_Trophy <=> (Frame_Trophy.GetFirstChild("label-trophy") as CMlLabel);
+                    Quad_Trophy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
                     ApplyTrophyImage(Quad_Trophy, LibTMxSM_ScoresTable_Trophies[TrophyKey].Level);
-                    Label_Trophy.Value = ""^LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount;
+                    Label_Trophy.Value = LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount ^ "x";
                     Frame_Trophy.Visible = True;
                 } else {
                     Control.Visible = False;
