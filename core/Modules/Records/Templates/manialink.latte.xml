@@ -11,7 +11,7 @@
         <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text="" opacity="0.25"/>
         <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text=""/>
         <label class="text-light" z-index="1" valign="center" halign="left" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text=""/>
-        <label class="btn-muted ghost" z-index="1" valign="center" halign="center" pos="40 0" size="3 3" textsize="0.4" text="🎮" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" opacity="0.15" />
+        <label hidden="1" class="btn-muted ghost" z-index="1" valign="center" halign="center" pos="40 0" size="3 3" textsize="0.4" text="🎮" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" opacity="0.15" />
         <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
     </framemodel>
 

@@ -35,6 +35,7 @@ class Records extends Module implements ModuleInterface
     public static function sendWidget(Player $player)
     {
         Template::show($player, 'Records.manialink');
+//        Template::show($player, 'Records.nadeo-records-mover');
     }
 
     /**

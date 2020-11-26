@@ -1,0 +1,55 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}race-ranking{/block}
+    {block size}44 10{/block}
+
+    {block content}
+    <quad bgcolor="f00" size="5 5" />
+    {/block}
+
+    {block script}
+    <script><!--
+        --></script>
+    {/block}
+
+    <script><!--
+        {block globals}
+#Struct ComponentModeLibsUIModules_K_ModuleProperties {
+	Vec2 Position;
+	Real Scale;
+	Boolean Visible;
+}
+
+#Struct ComponentModeLibsUIModules_K_ModuleConfig {
+	Text Id;
+	Boolean IsCustomizable;
+	ComponentModeLibsUIModules_K_ModuleProperties Properties;
+}
+        {/block}
+
+        {block bootScript}
+        declare netread ComponentModeLibsUIModules_K_ModuleProperties[Text] Net_LibUI3_CustomizableModule_Properties for Teams[0];
+        declare netread Integer Net_LibUI3_CustomizableModule_PropertiesUpdate for Teams[0];
+        declare lastPos = 0.0;
+
+
+        Net_LibUI3_CustomizableModule_Properties["Race_Record"].Position[1] = 50.0;
+        return;
+
+        left__ = {config('records.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('records.ui.slot') + 1};
+        {/block}
+
+        {block loop}
+        if(lastPos != widget.AbsolutePosition_V3[1]){
+            lastPos = widget.AbsolutePosition_V3[1];
+            log("update y to " ^ lastPos);
+        }
+        {/block}
+
+        {block pendingEvents}
+        {/block}
+        --></script>
+</manialink>
