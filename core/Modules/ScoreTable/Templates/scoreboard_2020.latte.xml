@@ -303,8 +303,8 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online"){
-            if(Score.Points > 0){
+        if(CurrentServerModeName == "TM_Rounds_Online"){
+            if(Score.Points > 0 || addedPoints > 0){
                 scoreLabel.Opacity = 1.0;
             }else{
                 scoreLabel.Opacity = 0.1;

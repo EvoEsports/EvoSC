@@ -4,7 +4,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}race-ranking{/block}
-    {block size}44 {config('race-ranking.ui.show', 10)*3+7}{/block}
+    {block size}44 0{/block}
 
     {block content}
     <framemodel id="row">
@@ -156,6 +156,8 @@
         header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);
         title <=> (Page.MainFrame.GetFirstChild("title") as CMlLabel);
 
+        declare lastCurrentServerModeName = "";
+
         points.fromjson("{$points}");
 
         left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
@@ -163,6 +165,21 @@
         {/block}
 
         {block loop}
+        if(CurrentServerModeName != lastCurrentServerModeName){
+            lastCurrentServerModeName = CurrentServerModeName;
+            if(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack"){
+                widgetSetHeight__(0.0);
+                widget.Hide();
+            }else{
+                widgetSetHeight__({config('race-ranking.ui.show', 10)*3+7} * 1.0);
+                widget.Show();
+            }
+        }
+
+        if(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack"){
+            continue;
+        }
+
         if(EvoSC_RaceRankings.count != lastRaceRankingsSize){
             lastRaceRankingsSize = EvoSC_RaceRankings.count;
 
@@ -174,14 +191,21 @@
 
                 declare addedPoints = getAddedPoints();
                 declare row <=> (rows.Controls[filled] as CMlFrame);
-                (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
-                (row.Controls[1] as CMlLabel).Value = raceRanking.name;
-                (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, True);
-                (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, False);
-                (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
+                if(raceRanking.time > 0){
+                    (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
+                    (row.Controls[1] as CMlLabel).Value = raceRanking.name;
+                    (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, True);
+                    (row.Controls[3] as CMlLabel).Value = formatScoreCorrect(raceRanking.time, False);
+                    (row.Controls[4] as CMlLabel).Value = "+" ^ addedPoints;
+                    EvoSC_RoundsPointsDistribution[raceRanking.login] = addedPoints;
+                }else{
+                    (row.Controls[0] as CMlLabel).Value = (filled + 1) ^ ".";
+                    (row.Controls[1] as CMlLabel).Value = raceRanking.name;
+                    (row.Controls[2] as CMlLabel).Value = "DNF";
+                    (row.Controls[3] as CMlLabel).Value = "";
+                    (row.Controls[4] as CMlLabel).Value = "";
+                }
                 row.Show();
-
-                EvoSC_RoundsPointsDistribution[raceRanking.login] = addedPoints;
 
                 filled += 1;
             }

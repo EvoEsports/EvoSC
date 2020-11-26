@@ -42,7 +42,9 @@ class MatchController extends Controller implements ControllerInterface
         self::$pointsRepartition = PointsController::getPointsRepartition();
 
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('BeginMatch', [self::class, 'beginMatch']);
+        Hook::add('BeginMatch', [self::class, 'resetWidget']);
+        Hook::add('BeginMap', [self::class, 'resetWidget']);
+        Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'resetRoundTracker']);
     }
 
     /**
@@ -60,12 +62,10 @@ class MatchController extends Controller implements ControllerInterface
      */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
-        if ($score == 0) {
-            return;
-        }
-
         if (ModeController::isTimeAttackType()) {
-            if (self::$tracker->has($player->id)) {
+            if ($score == 0) {
+                return;
+            } else if (self::$tracker->has($player->id)) {
                 if (self::$tracker->get($player->id)->score <= $score) {
                     return;
                 }
@@ -79,21 +79,19 @@ class MatchController extends Controller implements ControllerInterface
                 'points' => 0
             ]);
         } else {
-            $pointsRepartitionSize = count(self::$pointsRepartition);
-            $roundPlacement = self::$roundTracker->count();
             $gainedPoints = 0;
-
-            if ($pointsRepartitionSize > 0 && $roundPlacement < $pointsRepartitionSize) {
-                $gainedPoints = self::$pointsRepartition[$roundPlacement];
-            }
-
             self::$roundTracker->push($player->id);
 
-            if (self::$tracker->has($player->id)) {
-                if ($gainedPoints == 0) {
-                    return;
-                }
+            if($score > 0){
+                $pointsRepartitionSize = count(self::$pointsRepartition);
+                $roundPlacement = self::$roundTracker->count() - 1;
 
+                if ($pointsRepartitionSize > 0 && $roundPlacement < $pointsRepartitionSize) {
+                    $gainedPoints = self::$pointsRepartition[$roundPlacement];
+                }
+            }
+
+            if (self::$tracker->has($player->id)) {
                 $tracker = self::$tracker->get($player->id);
                 $tracker->points += $gainedPoints;
                 $tracker->score = $score;
@@ -113,10 +111,15 @@ class MatchController extends Controller implements ControllerInterface
         Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
 
+    public static function resetRoundTracker()
+    {
+        self::$roundTracker = collect();
+    }
+
     /**
-     *
+     * @param null $map
      */
-    public static function beginMatch()
+    public static function resetWidget($map = null)
     {
         self::$tracker = collect();
         self::$roundTracker = collect();

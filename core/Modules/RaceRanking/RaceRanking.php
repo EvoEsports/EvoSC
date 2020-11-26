@@ -35,8 +35,6 @@ class RaceRanking extends Module implements ModuleInterface
             if (!$isBoot) {
                 self::showWidget();
             }
-        } else {
-            Template::hideAll('race-ranking'); //TODO: clear slot so widgets align properly
         }
     }
 

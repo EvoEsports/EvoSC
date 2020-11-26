@@ -231,33 +231,52 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
 	declare K_State State = _State;
 
 	// Release previous record if any
-	//State = ReleaseRecordGhost(State, _AccountId);
+	State = ReleaseRecordGhost(State, _AccountId);
 
+/*
 	declare K_RecordGhost Record = K_RecordGhost {
 		AccountId = _AccountId
 	};
-	declare K_Scope Scope;
-	if (C_ForceRecordScope != "") {
-		Scope = K_Scope {
-			Type = C_ForceRecordScope,
-			Id = ""
-		};
-	} else {
-		Scope = GetScope(_State);
-	}
+	State.LoadingRecordGhosts[AccountId] = Record;
+    declare MapRecord <=> Result.MapRecordList[0];
+    declare Task = DataFileMgr.Ghost_Download(MapRecord.FileName, MapRecord.ReplayUrl);
+    if (Task != Null) {
+        State.LoadingRecordGhosts[AccountId].TaskIdRetrieveGhost = Task.Id;
+    }
+*/
 
-	declare Task = ScoreMgr.Map_GetPlayerListRecordList(UserMgr.MainUser.Id, [Record.AccountId], State.CurrentMapUid, Scope.Type, Scope.Id, State.ModeName, State.CustomData);
-	if (Task != Null) {
-		Record.TaskIdRetrieveRecords = Task.Id;
-	}
+	return State;
+}
+K_State ReleaseAllRecordGhosts(K_State _State) {
+	declare K_State State = _State;
 
-	State.LoadingRecordGhosts[Record.AccountId] = Record;
+	declare TmpLoadingRecordGhosts = State.LoadingRecordGhosts;
+	foreach (AccountId => Record in TmpLoadingRecordGhosts) {
+		State = ReleaseRecordGhost(State, AccountId);
+	}
+	State.LoadingRecordGhosts = [];
+
+	declare TmpLoadedRecordGhosts = State.LoadedRecordGhosts;
+	foreach (AccountId => Record in TmpLoadedRecordGhosts) {
+		State = ReleaseRecordGhost(State, AccountId);
+	}
+	State.LoadedRecordGhosts = [];
 	SendRecordsStatusToML(State);
 
 	return State;
 }
     Boolean hasClubAccess(){
         return True;
+    }
+
+    Void modeChanged(Text mode){
+        if(mode == "TM_TimeAttack_Online"){
+            widgetSetHeight__(30.5);
+            widget.Show();
+        }else{
+            widgetSetHeight__(0.0);
+            widget.Hide();
+        }
     }
     --></script>
     {/block}
@@ -387,7 +406,6 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
         slot__ = {config('records.ui.slot')};
 
         declare K_State Race_Record_State for UI;
-
         declare Record::K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
         declare Boolean Race_Record_LoadingRecords for ClientUI;
         declare Integer Race_Record_ZonesRecordsUpdate for ClientUI;
@@ -395,11 +413,17 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
         declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
         declare lastRecordsUpdate = -1;
         declare lastRaceRecordRecordsStatusUpdate = -1;
+        declare lastCurrentServerModeName = "";
         selectedZone = 0;
+
+        Race_Record_State = ReleaseAllRecordGhosts(Race_Record_State);
     {/block}
 
     {block loop}
-        declare K_State Race_Record_State for UI;
+        if(CurrentServerModeName != lastCurrentServerModeName){
+            lastCurrentServerModeName = CurrentServerModeName;
+            modeChanged(CurrentServerModeName);
+        }
 
         if(lastRecordsUpdate != Race_Record_ZonesRecordsUpdate){
             lastRecordsUpdate = Race_Record_ZonesRecordsUpdate;
@@ -418,14 +442,9 @@ K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
             if(event.Control.HasClass("ghost")){
                 declare icon = (event.Control as CMlLabel);
                 declare Text AccountId = icon.DataAttributeGet("account-id");
-                if (Race_Record_State.LoadedRecordGhosts.existskey(AccountId)) {
-                    //Race_Record_State = ReleaseRecordGhost(Race_Record_State, AccountId);
-                    //SendRecordsStatusToML(Race_Record_State);
-                } else if (!Race_Record_State.LoadingRecordGhosts.existskey(AccountId)) {
-                    if (hasClubAccess()) {
-                        Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
-                    }
-                }
+                Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
+                //log(Race_Record_State);
+                log(DataFileMgr.TaskResults);
                 continue;
             }
             if(event.Control.HasClass("next")){

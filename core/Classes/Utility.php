@@ -119,6 +119,7 @@ class Utility
                 ->where('Rank', '<=', $fill)
                 ->orderBy('rank')
                 ->get()
+                ->values()
                 ->toJson();
 
             Template::showAll($templateId, compact('recordsJson'));
@@ -156,6 +157,7 @@ class Utility
                         ->where('Rank', '<=', $fill)
                         ->orderBy('rank')
                         ->get()
+                        ->values()
                         ->toJson();
                 }
                 $recordsJson = $defaultTopView;
@@ -173,6 +175,7 @@ class Utility
                     ->where('Rank', '<=', $top)
                     ->orderBy('rank')
                     ->get()
+                    ->values()
                     ->toJson();
             }
 

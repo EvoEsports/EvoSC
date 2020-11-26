@@ -14,7 +14,7 @@
             declare Entry[] EvoSC_LiveRankings_Values for This;
             declare Integer EvoSC_LiveRankings_LastUpdate for This;
 
-            EvoSC_LiveRankings_Values.fromjson("""{$top|noescape}""");
+            EvoSC_LiveRankings_Values.fromjson("""{$top->toJson()|noescape}""");
             EvoSC_LiveRankings_LastUpdate = GameTime;
         }
         -->
