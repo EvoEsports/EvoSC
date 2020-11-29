@@ -65,6 +65,7 @@
     <!-- end components -->
 
     <frame id="main-frame" pos="-87.5 14" scale="1">
+        <quad id="bg-dark" class="bg-dark" hidden="1" />
         <frame z-index="0" pos="90 -12.5" scale="0.85">
             <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
             <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
@@ -97,6 +98,14 @@
             <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
             <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
             <label id="me" class="floating me" text="" pos="24.3 0" textsize="2.5" size="5 5"  ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        </frame>
+        <frame id="teams-frame" pos="3 15" z-index="10" hidden="1">
+            <!-- team 1 -->
+            <label id="team-one-label" class="text-light" textsize="4" textprefix="$i" text="Team 1" pos="0 0" />
+            <label id="team-one-points" class="text-light" textsize="2" textprefix="$i" text="0 Points" pos="-0.25 -6.5" />
+            <!-- team 2 -->
+            <label id="team-two-label" class="text-light" textsize="4" textprefix="$i" text="Team 2" pos="91 0" />
+            <label id="team-two-points" class="text-light" textsize="2" textprefix="$i" text="0 Points" pos="90.75 -6.5" />
         </frame>
     </frame>
 
@@ -303,7 +312,7 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "TM_Rounds_Online"){
+        if(CurrentServerModeName == "TM_Rounds_Online" || UseClans){
             if(Score.Points > 0 || addedPoints > 0){
                 scoreLabel.Opacity = 1.0;
             }else{
@@ -407,8 +416,18 @@
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online"){
+        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online" || UseClans){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
+
+            if(UseClans){
+                declare teamOneLabel <=> (Page.MainFrame.GetFirstChild("team-one-label") as CMlLabel);
+                declare teamOnePointsLabel <=> (Page.MainFrame.GetFirstChild("team-one-points") as CMlLabel);
+                declare teamTwoLabel <=> (Page.MainFrame.GetFirstChild("team-two-label") as CMlLabel);
+                declare teamTwoPointsLabel <=> (Page.MainFrame.GetFirstChild("team-two-points") as CMlLabel);
+
+                teamOnePointsLabel.Value = ClanScores[1] ^ " Points";
+                teamTwoPointsLabel.Value = ClanScores[2] ^ " Points";
+            }
         }
 
         declare rank = 1;
@@ -495,6 +514,43 @@
                 declare Real width = 9.75;
                 buttonFrame.RelativePosition_V3[0] = widths - 5.5;
                 widths += width + SB_Button_Padding;
+            }
+        }
+    }
+
+    Void changeMode(Text mode){
+        switch(mode){
+            case "TM_Teams_Online": {
+                Page.MainFrame.GetFirstChild("teams-frame").Show();
+                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
+                boxesFrame.RelativePosition_V3 = <-2.0, 2.0>;
+                boxesFrame.Controls[17].Hide();
+                boxesFrame.Controls[23].Hide();
+                for(i, 12, 16){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[0].ColorPrimary;
+                }
+                for(i, 17, 22){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[1].ColorPrimary;
+                }
+            }
+
+            default: {
+                Page.MainFrame.GetFirstChild("teams-frame").Hide();
+                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
+                declare bgDark = (Page.MainFrame.GetFirstChild("bg-dark") as CMlQuad);
+                boxesFrame.RelativePosition_V3 = <0.0, 15.0>;
+                declare lastBoxInColumn = (boxesFrame.Controls[17] as CMlQuad);
+                lastBoxInColumn.Show();
+                lastBoxInColumn.BgColor = bgDark.BgColor;
+                lastBoxInColumn = (boxesFrame.Controls[23] as CMlQuad);
+                lastBoxInColumn.Show();
+                lastBoxInColumn.BgColor = bgDark.BgColor;
+                for(i, 12, 16){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
+                }
+                for(i, 17, 22){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
+                }
             }
         }
     }
@@ -602,6 +658,7 @@
         declare SB_Last_Update = 0;
         declare podium = False;
         declare lastPointsLimitUpdate = 0;
+        declare lastCurrentServerModeName = "";
 
         declare headerFrame = (Page.MainFrame.GetFirstChild("header-frame") as CMlFrame);
         declare prevPage = (Page.MainFrame.GetFirstChild("prev-page") as CMlLabel);
@@ -628,6 +685,11 @@
             yield;
 
             ESC_Tab_Pressed = PageIsVisible;
+
+            if(CurrentServerModeName != lastCurrentServerModeName){
+                lastCurrentServerModeName = CurrentServerModeName;
+                changeMode(CurrentServerModeName);
+            }
 
             if(lastPointsLimitUpdate < EvoSC_LastPointsLimitUpdate){
                 lastPointsLimitUpdate = EvoSC_LastPointsLimitUpdate;
