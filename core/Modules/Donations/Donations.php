@@ -19,6 +19,10 @@ class Donations extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isTrackmania()) {
+            return;
+        }
+
         Hook::add('PlayerConnect', [self::class, 'show']);
 
         ManiaLinkEvent::add('donate', [self::class, 'donate']);
