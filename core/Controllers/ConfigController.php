@@ -197,6 +197,10 @@ class ConfigController implements ControllerInterface
 
     private static function createPathsRecursively(string $base, $values)
     {
+        if (is_null($values)) {
+            return null;
+        }
+
         $base = strtolower($base);
         $paths = collect();
 
