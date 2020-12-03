@@ -155,12 +155,6 @@ class ConfigController implements ControllerInterface
                     }
                 }
             }
-
-            foreach ($targetJson as $key => $value) {
-                if (!isset($sourceJson->{$key})) {
-                    unset($targetJson->{$key});
-                }
-            }
         }
 
         return $targetJson;
