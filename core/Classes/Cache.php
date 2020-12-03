@@ -26,6 +26,10 @@ class Cache
         try {
             $cacheObject = File::get(cacheDir($id), true);
 
+            if (is_null($cacheObject) || !isset($cacheObject->expires)) {
+                return false;
+            }
+
             if (!$cacheObject->expires) {
                 return true;
             }
