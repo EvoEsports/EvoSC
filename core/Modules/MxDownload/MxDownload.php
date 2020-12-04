@@ -257,9 +257,9 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         if (isManiaPlanet()) {
-            $infoResponse = RestClient::get(self::$apiUrl . '/tm/maps/' . $mxId, ['timeout' => 3]); //deprecated, remove once new TMX API is available, only keep else-branch
+            $infoResponse = RestClient::get(self::$apiUrl . '/tm/maps/' . $mxId->uid, ['timeout' => 3]); //deprecated, remove once new TMX API is available, only keep else-branch
         } else {
-            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mxId, ['timeout' => 3]);
+            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mxId->uid, ['timeout' => 3]);
         }
 
         if ($infoResponse->getStatusCode() != 200) {
