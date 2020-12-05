@@ -151,7 +151,7 @@ class MapController implements ControllerInterface
         ]);
 
         if (!$map->mx_details) {
-            MxDownload::loadMxDetails($map);
+            MxDownload::loadMxDetails($map->uid);
         }
     }
 

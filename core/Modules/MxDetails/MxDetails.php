@@ -70,7 +70,7 @@ class MxDetails extends Module implements ModuleInterface
         }
 
         if (!$map->mx_details) {
-            MxDownload::loadMxDetails($map);
+            MxDownload::loadMxDetails($mapIdOrUid);
         }
 
         if (!$map->mx_world_record && isManiaPlanet()) {
