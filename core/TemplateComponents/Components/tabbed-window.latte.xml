@@ -54,7 +54,7 @@ main() {
     declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
     declare UISettings settings for This;
     declare Boolean[Text] EvoSC_Window_Focus for This;
-    declare windowIsInFocus = True;
+    declare windowIsInFocus = False;
     __dragSetFocus(EVO_SCRIPT_ID);
 
     if(settings.speed == 0){
