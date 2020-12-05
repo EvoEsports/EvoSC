@@ -8,6 +8,7 @@
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
     <quad id="bg" class="bg-dark" size="{$window_width ?? 120} {$window_height ?? 88}" opacity="0.6" z-index="-1" />
     <quad class="bg-blur" size="{$window_width ?? 120} {$window_height ?? 88}" opacity="0.9" z-index="-2" />
+    <quad id="focus-trigger" class="bg-accent focus-trigger" size="{$window_width ?? 120} {$window_height ?? 77}" opacity="0.15" z-index="10000" ScriptEvents="1" />
     <label class="icon text-light" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
     <label class="text-light" pos="5.5 -3" textsize="0.8" text="{include title}" textprefix="$s" valign="center"/>
     <label class="close text-light" pos="{($window_width ?? 120) - 2.5} -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
@@ -22,6 +23,7 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+#Const EVO_SCRIPT_ID "{include id}"
 
 #Struct UISettings {
     Boolean hide;
@@ -51,6 +53,9 @@ main() {
     window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
     declare icon <=> (Page.MainFrame.GetFirstChild("icon") as CMlFrame);
     declare UISettings settings for This;
+    declare Boolean[Text] EvoSC_Window_Focus for This;
+    declare windowIsInFocus = True;
+    __dragSetFocus(EVO_SCRIPT_ID);
 
     if(settings.speed == 0){
         settings.hide = True;
@@ -67,9 +72,26 @@ main() {
     while(True){
         yield;
 
+        if(windowIsInFocus != EvoSC_Window_Focus[EVO_SCRIPT_ID]){
+            windowIsInFocus = EvoSC_Window_Focus[EVO_SCRIPT_ID];
+            declare focusTrigger <=> (Page.MainFrame.GetFirstChild("focus-trigger") as CMlQuad);
+            if(windowIsInFocus){
+                focusTrigger.Hide();
+                window.ZIndex = 300.0;
+            }else{
+                focusTrigger.Show();
+                window.ZIndex = 200.0;
+            }
+        }
+
         foreach(event in PendingEvents){
             if(event == Null) continue;
             if(event.Control == Null) continue;
+
+            if(event.Control.HasClass("focus-trigger") && event.Type == CMlScriptEvent::Type::MouseClick){
+                __dragSetFocus(EVO_SCRIPT_ID);
+                continue;
+            }
 
             if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                 if(alertUnsavedChanges){

@@ -1,0 +1,38 @@
+{contentType text}
+{extends 'Components.window'}
+{php $window_width = 113;}
+{php $window_height = 40;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}mx-details{/block}
+    {block icon}{/block}
+    {block title}Map Details{/block}
+
+    {block content}
+    <frame pos="1 -2">
+
+        <label class="text-light" pos="0 0" size="20 5" textsize="2" text="{$map->name}" valign="center" />
+
+    </frame>
+    {/block}
+
+    {include 'Scripts.mle'}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    log(EVO_SCRIPT_ID);
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+    --></script>
+</manialink>

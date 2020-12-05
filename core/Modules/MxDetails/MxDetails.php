@@ -22,6 +22,7 @@ class MxDetails extends Module implements ModuleInterface
 {
     private static ?string $apiUrl = null;  // prevents the "typed static property must not be accessed before initialization" error on Windows
     private static ?string $exchangeUrl = null;
+    private static string $template = 'MxDetails.window';
 
     /**
      * @inheritDoc
@@ -34,6 +35,7 @@ class MxDetails extends Module implements ModuleInterface
         } else {
             self::$apiUrl = Exchange::TRACKMANIA_MX_API_URL;
             self::$exchangeUrl = Exchange::TRACKMANIA_MX_URL;
+            self::$template .= '_2020';
         }
 
         if (!File::dirExists(cacheDir('mx-details'))) {
@@ -90,7 +92,7 @@ class MxDetails extends Module implements ModuleInterface
             $totalVotes = $data->total_votes;
         }
 
-        Template::show($player, 'MxDetails.window', compact('map', 'rating', 'totalVotes'));
+        Template::show($player, self::$template, compact('map', 'rating', 'totalVotes'));
     }
 
     /**

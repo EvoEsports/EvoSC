@@ -36,7 +36,6 @@
     {/block}
 
     {block script}
-    {include 'Scripts.drag'}
     {/block}
 
     <script><!--
