@@ -31,12 +31,18 @@
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare icon2 <=> (Page.MainFrame.GetFirstChild("icon2") as CMlLabel);
             declare Text sign = "";
+            declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+            declare timeRemaining = 0;
 
             left__ = {config('added-time-info.ui.position') == 'left' ? 'True' : 'False'};
             slot__ = {config('added-time-info.ui.slot')};
         {/block}
 
         {block loop}
+            timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+            buttons.Visible = timeRemaining > 0;
+            timeLabel.Visible = timeRemaining > 0;
+
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
                 buttons.Hide();
