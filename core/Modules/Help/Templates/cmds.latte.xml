@@ -1,9 +1,7 @@
 {contentType text}
 {extends 'Components.tabbed-window'}
 
-{block id}
-help-window
-{/block}
+{block id}help-window{/block}
 
 {block icon}
 

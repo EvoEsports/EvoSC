@@ -4,9 +4,7 @@
 {php $window_width = 140;}
 {php $window_height = 85;}
 
-{block id}
-ranks
-{/block}
+{block id}ranks{/block}
 
 {block icon}
 🔥

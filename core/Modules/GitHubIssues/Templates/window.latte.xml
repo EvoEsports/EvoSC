@@ -4,9 +4,7 @@
 {php $window_width = '50';}
 {php $window_height = '38';}
 
-{block id}
-github-issues
-{/block}
+{block id}github-issues{/block}
 
 {block icon}
 

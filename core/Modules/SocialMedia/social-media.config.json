@@ -8,7 +8,7 @@
     {
       "title": "Website",
       "url": "https://trackmania.com/",
-      "icon": "https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/SocialMedia/website.png",
+      "icon": "",
       "color": "$theme.hud.accent"
     }
   ]
