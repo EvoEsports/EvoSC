@@ -1,0 +1,65 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}social-media{/block}
+    {block size}44 {ceil($links->count() / 5) * 11 - 1}{/block}
+
+    {block content}
+    <frame pos="45">
+        {foreach $links->chunk(5) as $ci => $chunk}
+        <frame pos="0 {$ci * -11}">
+            {foreach $chunk->values() as $i => $link}
+            <frame pos="{($i + 1) * -9} 0" size="8 10">
+                <quad class="bg-dark link" size="8 10" opacity="0.8" ScriptEvents="1" data-link="{$link->url}" />
+                <quad pos="-8.1 0" size="8 10" bgcolor="{$link->color}" opacity="0.9" z-index="1" />
+                <quad pos="4 -4" size="4 4" halign="center" valign="center" image="{$link->icon}" z-index="6"/>
+                <label class="text-light" pos="4 -8.2" size="6 1" valign="center" halign="center" textsize="0.002" text="{$link->title}" z-index="5"/>
+            </frame>
+            {/foreach}
+        </frame>
+        {/foreach}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        left__ = {config('social-media.ui.position') == 'left' ? 'True' : 'False'};
+        slot__ = {config('social-media.ui.slot')};
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+        if(event.Control.HasClass("link")){
+            declare bg = (event.Control.Parent.Controls[1] as CMlQuad);
+            declare icon = (event.Control.Parent.Controls[2] as CMlQuad);
+
+            if(event.Type == CMlScriptEvent::Type::MouseClick){
+                OpenLink(event.Control.DataAttributeGet("link"), ::LinkType::ExternalBrowser);
+                continue;
+            }
+            if(event.Type == CMlScriptEvent::Type::MouseOver){
+                bg.RelativePosition_V3[0] = -8.05;
+                AnimMgr.Add(bg, "<quad pos='0 0' />", 350, CAnimManager::EAnimManagerEasing::ExpOut);
+                AnimMgr.Add(icon, "<quad scale='1.3' />", 350, CAnimManager::EAnimManagerEasing::ExpOut);
+                continue;
+            }
+            if(event.Type == CMlScriptEvent::Type::MouseOut){
+                AnimMgr.Add(bg, "<quad pos='8.05 0' />", 350, CAnimManager::EAnimManagerEasing::ExpOut);
+                AnimMgr.Add(icon, "<quad scale='1' />", 350, CAnimManager::EAnimManagerEasing::ExpOut);
+                continue;
+            }
+        }
+    {/block}
+--></script>
+</manialink>

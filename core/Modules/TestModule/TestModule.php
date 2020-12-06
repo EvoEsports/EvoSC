@@ -16,6 +16,7 @@ use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\RaceRanking\RaceRanking;
 use EvoSC\Modules\Records\Records;
 use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\SocialMedia\SocialMedia;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -33,7 +34,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        EvoCupInfo::showWidget($player);
+        SocialMedia::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

@@ -1,0 +1,15 @@
+{
+  "enabled": false,
+  "ui": {
+    "position": "right",
+    "slot": 41
+  },
+  "links": [
+    {
+      "title": "Website",
+      "url": "https://trackmania.com/",
+      "icon": "https://raw.githubusercontent.com/EvoTM/EvoSC/develop/core/Modules/SocialMedia/website.png",
+      "color": "$theme.hud.accent"
+    }
+  ]
+}
