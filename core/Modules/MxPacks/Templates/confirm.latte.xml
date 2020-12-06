@@ -1,9 +1,8 @@
 {contentType text}
 {extends 'Components.window'}
+{php $window_height = 78;}
 
-{block id}
-add-mx-map-pack
-{/block}
+{block id}add-mx-map-pack{/block}
 
 {block icon}
 

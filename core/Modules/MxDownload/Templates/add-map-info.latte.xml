@@ -3,9 +3,7 @@
 
 {php $window_height = -1;}
 
-{block id}
-add-mx-map
-{/block}
+{block id}add-mx-map{/block}
 
 {block icon}
 

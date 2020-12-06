@@ -35,7 +35,7 @@ class MxPackJob
 
     public function __construct(Player $player, $packId)
     {
-        infoMessage('Downloading map pack ', secondary($packId), ' from Mania-Exchange.')->sendAdmin();
+        infoMessage('Downloading map pack ', secondary($packId), ' from Exchange.')->sendAdmin();
 
         $this->packsDir = MapController::getMapsPath('MXPacks');
 
@@ -174,6 +174,6 @@ class MxPackJob
 
         infoMessage($this->issuer, ' added map-pack ',
             '$l[' . $url . '/mappack/view/'.$this->id.']'.secondary($this->info->Name),
-            ' from Mania-Exchange.')->sendAll();
+            '$l from Exchange.')->sendAll();
     }
 }
