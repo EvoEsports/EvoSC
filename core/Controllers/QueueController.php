@@ -57,6 +57,7 @@ class QueueController implements ControllerInterface
         ManiaLinkEvent::add('map.drop', [self::class, 'dropMap']);
 
         ChatCommand::add('/drop', [self::class, 'cmdDropMapFromQueue'], 'Drops your upmost map on the queue.');
+        ChatCommand::add('//dropall', [self::class, 'cmdDropAllMapsFromQueue'], 'Drops all maps from queue.', 'map_queue_drop');
     }
 
     /**
@@ -140,7 +141,19 @@ class QueueController implements ControllerInterface
         if ($mapQueueItem) {
             infoMessage($player, ' dropped map ', secondary($mapQueueItem->map), ' from the queue.')->sendAll();
             $mapQueueItem->delete();
+            Hook::fire('MapQueueUpdated', self::getMapQueue());
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdDropAllMapsFromQueue(Player $player, $cmd)
+    {
+        MapQueue::truncate();
+        warningMessage($player, ' cleared the jukebox.')->sendAll();
+        Hook::fire('MapQueueUpdated', self::getMapQueue());
     }
 
     /**
@@ -178,7 +191,7 @@ class QueueController implements ControllerInterface
             infoMessage($player, ' drops ', secondary($queueItem->map), ' from queue.')->sendAll();
             self::dropMapSilent($mapUid);
 
-            if(self::$preCache){
+            if (self::$preCache) {
                 self::chooseNextMap();
             }
         }
