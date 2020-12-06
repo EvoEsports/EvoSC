@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\RaceRanking\RaceRanking;
@@ -32,7 +33,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxDetails::showDetails($player, 1);
+        EvoCupInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

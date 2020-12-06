@@ -5,6 +5,7 @@
     <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+#Include "TimeLib" as TimeLib
 
 #Struct WidgetRow {
     Real height;
@@ -159,6 +160,7 @@ declare Integer slot__;
             if(height > grid_.left[slot__].height){
                 grid_.left[slot__].height = height;
             }
+            widgetSetHeight__(height);
             grid_.left[slot__].visible = True;
             {if isset($slotHorizontal)}
             declare width = widget.Size[0] * widget.RelativeScale;
@@ -179,6 +181,7 @@ declare Integer slot__;
             if(height > grid_.right[slot__].height){
                 grid_.right[slot__].height = height;
             }
+            widgetSetHeight__(height);
             grid_.right[slot__].visible = True;
             {if isset($slotHorizontal)}
             declare width = widget.Size[0] * widget.RelativeScale;
