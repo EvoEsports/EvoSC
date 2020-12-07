@@ -253,7 +253,6 @@ class EscRun extends Command
 
         Timer::create('watch_for_restart_file', function () {
             if (Cache::has('restart_evosc')) {
-                Cache::forget('restart_evosc');
                 restart_evosc();
             }
         }, '2m', true);
