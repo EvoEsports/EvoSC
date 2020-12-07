@@ -9,14 +9,10 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\Map;
 use EvoSC\Models\Player;
-use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
-use EvoSC\Modules\RaceRanking\RaceRanking;
-use EvoSC\Modules\Records\Records;
-use EvoSC\Modules\ScoreTable\ScoreTable;
-use EvoSC\Modules\SocialMedia\SocialMedia;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -34,7 +30,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        SocialMedia::showWidget($player);
+        MxDetails::showDetails($player, Map::all()->random()->uid);
     }
 
     public static function sendTestManialink(Player $player)

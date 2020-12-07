@@ -71,6 +71,11 @@ class MxDetails extends Module implements ModuleInterface
             return;
         }
 
+        if (is_null($map->mx_id)) {
+            warningMessage('Exchange-ID for map not found.')->send($player);
+            return;
+        }
+
         if (!$map->mx_details) {
             $map->mx_details = MxDownload::loadMxDetails($map->mx_id);
         }

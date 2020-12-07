@@ -178,7 +178,8 @@ class MxDownload extends Module implements ModuleInterface
             'title_id' => $gbx->TitleId,
             'enabled' => 1,
             'cooldown' => config('server.map-cooldown', 10),
-            'mx_id' => $mxId
+            'mx_id' => $mxId,
+            'exchange_version' => $mxDetails->UpdatedAt
         ]);
 
         if (!Server::isFilenameInSelection($filename)) {
@@ -268,9 +269,9 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$tmxIdOrMapUid}");
         }
 
-        if(isManiaPlanet()){
+        if (isManiaPlanet()) {
             $infoResponse = RestClient::get(self::$exchangeUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
-        }else{
+        } else {
             $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
         }
 
@@ -285,8 +286,10 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception("Unknown map '$tmxIdOrMapUid'.");
         }
 
-        Cache::put("mx-details/{$tmxIdOrMapUid}", $info[0], now()->addMinutes(30));
+        $info = $info[0];
 
-        return $info[0];
+        Cache::put("mx-details/{$tmxIdOrMapUid}", $info, now()->addMinutes(30));
+
+        return $info;
     }
 }

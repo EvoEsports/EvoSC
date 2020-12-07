@@ -151,7 +151,18 @@ class MapController implements ControllerInterface
         ]);
 
         if (!$map->mx_details) {
-            MxDownload::loadMxDetails($map->uid);
+            $mx_details = MxDownload::loadMxDetails($map->uid);
+
+            if (!is_null($mx_details)) {
+                if (is_null($map->exchange_version)) {
+                    $map->update(['exchange_version' => $mx_details->UpdatedAt]);
+                    $map->exchange_version = $mx_details->UpdatedAt;
+                }
+
+                if (strtotime($mx_details->UpdatedAt) > strtotime($map->exchange_version)) {
+                    dangerMessage('There is an update available for this map! Call ', secondary('//add ' . $map->mx_id), ' to update.')->sendAdmin();
+                }
+            }
         }
     }
 

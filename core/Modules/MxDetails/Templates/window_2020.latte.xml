@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
-{php $window_width = 113;}
-{php $window_height = 40;}
+{php $window_width = 100;}
+{php $window_height = 52;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}mx-details{/block}
@@ -9,10 +9,24 @@
     {block title}Map Details{/block}
 
     {block content}
-    <frame pos="1 -2">
+    <frame>
+        <label class="text-light" pos="48 -5" size="94" textsize="4" text="{$map->name}" valign="center" halign="center" />
+        <label class="text-light" pos="48 -11" size="80" textsize="1.8" text="by {$map->author->NickName}" valign="center" halign="center" />
+        <label class="text-light" pos="62 -20" size="80" textsize="3.3" text="{formatScore($map->gbx->AuthorTime)}" valign="center" halign="center" />
+        <label class="text-light" pos="62 -25" size="30 5" textsize="0.75" text="Author Time" valign="center" halign="center" textcolor="fffc" />
+        <label class="text-light" pos="46 -32" size="30 5" textsize="0.75" text="First upload: {preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" halign="right" textcolor="fffe" />
+        <label class="text-light" pos="50 -32" size="30 5" textsize="0.75" text="Latest version: {preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" halign="left" textcolor="fffe" />
 
-        <label class="text-light" pos="0 0" size="20 5" textsize="2" text="{$map->name}" valign="center" />
+        <label class="btn-muted" pos="48 -43" size="40 4" text="View on trackmania.exchange" ScriptEvents="1" />
 
+        <frame pos="34 5">
+            <frame id="stars" size="0 10" pos="-11 -20">
+                <quad size="100 100" bgcolor="0000" />
+                <label class="text-light" pos="11 -5" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fd0" z-index="1" />
+            </frame>
+            <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+            <label class="text-light" pos="0 -30" size="30 5" textsize="0.75" text="Total votes: {$totalVotes}" valign="center" halign="center" textcolor="fffc" />
+        </frame>
     </frame>
     {/block}
 
@@ -26,7 +40,12 @@
     {/block}
 
     {block bootScript}
-    log(EVO_SCRIPT_ID);
+    declare CMlFrame starsFrame = (Page.MainFrame.GetFirstChild("stars") as CMlFrame);
+    declare Real rating = {sprintf('%.2f', $rating)};
+
+    if(rating != -1){
+        starsFrame.Size[0] = 22.0 * rating / 100.0;
+    }
     {/block}
 
     {block loop}
