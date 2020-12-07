@@ -60,7 +60,7 @@ class MxPacks extends Module implements ModuleInterface
             $info = Cache::get($cacheIdInfo);
         } else {
             if (isManiaPlanet()) {
-                $url = sprintf(self::$exchangeUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+                $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
             } else {
                 $url = sprintf(self::$apiUrl . '/api/mappack/get_info/%d/?=%s', $packId, $secret);
             }
@@ -79,9 +79,11 @@ class MxPacks extends Module implements ModuleInterface
             Cache::put($cacheIdInfo, $info, now()->addMinute());
         }
 
-        $url = sprintf(self::$exchangeUrl . '/api/mappack/get_mappack_tracks/%d/?=%s', $packId, $secret);
-        if (isManiaPlanet())
+        if (isManiaPlanet()){
             $url = sprintf(self::$apiUrl . '/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+        }else{
+            $url = sprintf(self::$exchangeUrl . '/api/mappack/get_mappack_tracks/%d/?=%s', $packId, $secret);
+        }
 
         try {
             $response = RestClient::get($url);
