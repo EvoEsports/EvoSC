@@ -151,7 +151,9 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         $mxDetails = self::loadMxDetails($mxId);
+        Log::write(json_encode($mxDetails));
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
+        Log::write(json_encode($gbx));
 
         if (!isset($gbx->MapUid)) {
             warningMessage('Could not load UID for map.')->send($player);
@@ -266,7 +268,11 @@ class MxDownload extends Module implements ModuleInterface
             return Cache::get("mx-details/{$tmxIdOrMapUid}");
         }
 
-        $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
+        if(isManiaPlanet()){
+            $infoResponse = RestClient::get(self::$exchangeUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
+        }else{
+            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
+        }
 
         if ($infoResponse->getStatusCode() != 200) {
             throw new Exception('Failed to get mx-details: ' . $infoResponse->getReasonPhrase());

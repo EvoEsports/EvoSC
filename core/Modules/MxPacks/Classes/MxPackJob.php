@@ -44,7 +44,7 @@ class MxPackJob
         }
 
         $this->info = Cache::get("map-packs/".$packId."_info");
-        $this->name = $this->info->ID.'_'. (isManiaPlanet()  ? $this->info->Shortname : $this->info->ShortName);
+        $this->name = $this->info->ID.'_'. $this->info->ShortName;
         $this->path = $this->packsDir.'/'.$this->name.'.zip';
         $this->issuer = $player;
         $this->id = $packId;
@@ -66,9 +66,11 @@ class MxPackJob
             return;
         }
 
-        $url = Exchange::TRACKMANIA_MX_API_URL;
-        if (isManiaPlanet())
-          $url = Exchange::MANIAPLANET_MX_API_URL;
+        if (isManiaPlanet()){
+            $url = Exchange::MANIAPLANET_MX_URL;
+        }else{
+            $url = Exchange::TRACKMANIA_MX_API_URL;
+        }
 
         $secret = (isset($this->info->Secret) ? $this->info->Secret : '');
         $url = sprintf($url . '/mappack/download/%s?%s', $this->info->ID, $secret);
@@ -168,9 +170,12 @@ class MxPackJob
 
         Hook::fire('MapPoolUpdated');
 
-        $url = Exchange::TRACKMANIA_MX_URL;
-        if (isManiaPlanet())
-          $url = Exchange::MANIAPLANET_MX_URL;
+        if (isManiaPlanet()){
+            $url = Exchange::MANIAPLANET_MX_URL;
+        }else{
+
+            $url = Exchange::TRACKMANIA_MX_URL;
+        }
 
         infoMessage($this->issuer, ' added map-pack ',
             '$l[' . $url . '/mappack/view/'.$this->id.']'.secondary($this->info->Name),
