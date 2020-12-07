@@ -15,6 +15,8 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\LocalRecords\LocalRecords;
+use EvoSC\Modules\MapList\MapList;
 use EvoSC\Modules\MxDownload\MxDownload;
 use stdClass;
 
@@ -77,7 +79,12 @@ class MxDetails extends Module implements ModuleInterface
         }
 
         if (!$map->mx_details) {
-            $map->mx_details = MxDownload::loadMxDetails($map->mx_id);
+            MxDownload::loadMxDetails($map->mx_id);
+        }
+
+        if ($map->author->Login == $map->author->NickName) {
+            $map->author->update(['NickName' => $map->mx_details->Username]);
+            $map->author->NickName = $map->mx_details->Username;
         }
 
         if (!$map->mx_world_record && isManiaPlanet()) {
@@ -97,7 +104,22 @@ class MxDetails extends Module implements ModuleInterface
             $totalVotes = $data->total_votes;
         }
 
-        Template::show($player, self::$template, compact('map', 'rating', 'totalVotes'));
+        $data = compact('map', 'rating', 'totalVotes');
+
+        if (isTrackmania()) {
+            $data['locals'] = $recordsJson = DB::table('local-records')
+                ->selectRaw('`Rank` as `rank`, `local-records`.Score as score, NickName as name, Login as login, "[]" as cps')
+                ->leftJoin('players', 'players.id', '=', 'local-records.Player')
+                ->where('Map', '=', $map->id)
+                ->orderBy('rank')
+                ->limit(5)
+                ->get()
+                ->values()
+                ->toArray();
+            $data['map_list_class'] = MapList::class;
+        }
+
+        Template::show($player, self::$template, $data);
     }
 
     /**

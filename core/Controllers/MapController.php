@@ -154,6 +154,10 @@ class MapController implements ControllerInterface
             $mx_details = MxDownload::loadMxDetails($map->uid);
 
             if (!is_null($mx_details)) {
+                if ($map->author->Login == $map->author->NickName) {
+                    $map->author->update(['NickName' => $mx_details->Username]);
+                }
+
                 if (is_null($map->exchange_version)) {
                     $map->update(['exchange_version' => $mx_details->UpdatedAt]);
                     $map->exchange_version = $mx_details->UpdatedAt;
