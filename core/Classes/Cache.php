@@ -30,7 +30,7 @@ class Cache
                 return false;
             }
 
-            if (!$cacheObject->expires) {
+            if (is_null($cacheObject->expires)) {
                 return true;
             }
 

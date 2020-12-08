@@ -10,6 +10,7 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
@@ -17,6 +18,7 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
@@ -95,15 +97,25 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param mixed ...$name
+     */
     public static function cmdSetName(Player $player, $cmd, ...$name)
     {
         $name = str_replace("\n", '', trim(implode(' ', $name)));
         self::setName($player, $name);
     }
 
+    /**
+     * @param Player $player
+     * @param $name
+     * @param false $silent
+     * @param false $fromCache
+     */
     public static function setName(Player $player, $name, $silent = false, $fromCache = false)
     {
-        $oldName = $player->NickName;
         if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;
@@ -112,10 +124,9 @@ class PlayerController implements ControllerInterface
             warningMessage('Your name can not exceed 29 characters.')->send($player);
             return;
         }
+        $oldName = $player->NickName;
         $player->NickName = $name;
-        $player->update([
-            'NickName' => $name
-        ]);
+        $player->save();
         self::$customNames->put($player->Login, $name);
         self::$customNamesByUbiname->put($player->ubisoft_name, $name);
         self::$players->put($player->Login, $player);
@@ -130,6 +141,9 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * Sends custom nicknames to the players
+     */
     public static function sendUpdatesCustomNames()
     {
         Template::showAll('Helpers.update-custom-names', [
@@ -186,6 +200,44 @@ class PlayerController implements ControllerInterface
      * @throws Exception
      */
     public static function playerConnect(Player $player)
+    {
+        if (isManiaPlanet()) {
+            self::announceConnect($player, $player->NickName);
+            return;
+        }
+
+        RestClient::postAsync(sprintf('https://service.evotm.com/api/nicknames/%s/get', $player->Login), [
+            'connect_timeout' => 1.5
+        ])->then(function (Response $response) use ($player) {
+            if ($response->getStatusCode() == 200) {
+                $data = json_decode($response->getBody()->getContents());
+                $name = 'error_loading_name';
+
+                if ($data == new \stdClass()) {
+                    $name = $player->NickName;
+                } else if ($player->NickName != $data->name) {
+                    $name = $data->name;
+                    self::setName($player, $data->name, true, true);
+                }
+
+                self::announceConnect($player, $name);
+            }
+        }, function () use ($player) {
+            //connection to service failed
+            $name = $player->NickName;
+            if (Cache::has('nicknames/' . $player->Login)) {
+                $name = Cache::get('nicknames/' . $player->Login);
+            }
+            self::announceConnect($player, $name);
+        });
+    }
+
+    /**
+     * @param Player $player
+     * @param $name
+     * @throws Exception
+     */
+    private static function announceConnect(Player $player, $name)
     {
         $diffString = $player->last_visit->diffForHumans();
         $stats = $player->stats;
