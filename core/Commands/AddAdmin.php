@@ -24,7 +24,7 @@ class AddAdmin extends Command
         $this->setName('add:admin')
             ->setDescription('Adds player to AdminGroups')
             ->addArgument('login', InputArgument::REQUIRED, 'Player login to add')
-            ->addArgument('groupId', InputArgument::OPTIONAL, 'Group id to add');
+            ->addArgument('groupId', InputArgument::OPTIONAL, 'Group id to add, 1 = Masteradmin');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
@@ -40,11 +40,10 @@ class AddAdmin extends Command
         $groupId = $input->getArgument('groupId');
         $helper = new QuestionHelper();
 
-
         $player = Player::find($login);
 
         if ($player === null) {
-            $output->writeln("No player found with login '{$login}'.");
+            $output->writeln("No player found with login '{$login}'. Please make sure the player/you joined the server at least once.");
             exit(1);
         }
         if (!$groupId) {

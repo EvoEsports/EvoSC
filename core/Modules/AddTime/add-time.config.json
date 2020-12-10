@@ -1,9 +1,11 @@
 {
   "enabled": true,
   "buttons": [
+    5,
+    10
   ],
   "ui": {
     "position": "right",
-    "slot": 60
+    "slot": 49
   }
 }

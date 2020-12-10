@@ -1,44 +1,125 @@
 {contentType text}
 {extends 'Components.widget-base'}
-{php $dontHide = true;}
+{php $customHidescript = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}countdown{/block}
-    {block size}44 10{/block}
+    {block size}50 8{/block}
 
     {block content}
-    <label id="cd" pos="44 -1" class="text-lighter" textprefix="$s" scale="3.0" halign="right" value="ayylmao" />
+    <frame pos="-2 1">
+        <label id="cd" pos="50 -1" class="text-lighter" textprefix="$s" scale="3.0" halign="right" />
+        <frame id="added-time-frame" pos="0 -0.25">
+            <label id="label" class="text-lighter" pos="0 -2" text="ADDED TIME" textprefix="$s" textsize="0.7" halign="right" z-index="5" />
+            <label id="added-time" class="text-lighter" pos="0 -4.5" text="" textprefix="$s" halign="right" textsize="1.8" z-index="5" />
+        </frame>
+    </frame>
     {/block}
 
     {block script}
+    <script><!--
+    Void hide(){
+        HS_Hidden = True;
+        declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
+        declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
+        AnimMgr.Add(label, "<label opacity='0.0' />", 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(addedTimeLabel, "<label opacity='0.0' />", 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void show(){
+        HS_Hidden = False;
+        declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
+        declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
+        AnimMgr.Add(label, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(addedTimeLabel, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hidescript(){
+        declare UISettings settings for This;
+        declare hideSpeed = settings.speed;
+
+        if(hideSpeed == -1 || InputPlayer == Null){
+            return;
+        }
+
+        if(UI.UISequence == CUIConfig::EUISequence::Podium){
+            if(!HS_Hidden){
+                hide();
+            }
+        }else{
+            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > 10;
+            if(overHidespeed && !HS_Hidden){
+                hide();
+            }
+            if((!overHidespeed) && HS_Hidden){
+                show();
+            }
+        }
+    }
+    --></script>
     {/block}
 
     <script><!--
     {block globals}
+        declare Vec2 HS_POS;
+        declare CMlFrame HS_Target;
+        declare Boolean HS_Hidden;
     {/block}
 
     {block bootScript}
+        HS_Target <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare Real AddedTimeR for This = 0.0;
         declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
         declare timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
         declare cd <=> (Page.MainFrame.GetFirstChild("cd") as CMlLabel);
+        declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
+        declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
+        declare addedTimeFrame <=> (Page.MainFrame.GetFirstChild("added-time-frame") as CMlFrame);
+        declare sign = "";
+        declare currentMapId = Map.Id;
 
         left__ = {config('countdown.ui.position') == 'left' ? 'True' : 'False'};
         slot__ = {config('countdown.ui.slot')};
     {/block}
 
     {block loop}
+        if(currentMapId != Map.Id){
+            currentMapId = Map.Id;
+            AddedTimeR = 0.0;
+        }
+
         timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
         if(timeRemaining > 0){
             cd.Value = TL::TimeToText(timeRemaining);
+
+            if(AddedTimeR != 0){
+                if(AddedTimeR < 0){
+                    sign = "";
+                }else{
+                    sign = "+";
+                }
+
+                if(ML::NearestInteger(AddedTimeR) == AddedTimeR){
+                    addedTimeLabel.Value = sign ^ ML::NearestInteger(AddedTimeR) ^ " min";
+                }else{
+                    addedTimeLabel.Value = sign ^ AddedTimeR ^ " min";
+                }
+                addedTimeFrame.RelativePosition_V3[0] = 48.0 - (cd.ComputeWidth(cd.Value) * cd.Scale);
+                addedTimeFrame.Visible = True;
+            }else{
+                addedTimeFrame.Visible = False;
+            }
         }else{
             cd.Value = "";
         }
 
-        if(timeRemaining <= 31000) 
-          cd.TextColor = <0.98, 0.149, 0.149>;
-        else 
-          cd.TextColor = <1., 1., 1.>;
+        if(timeRemaining <= 31000){
+            cd.TextColor = <0.98, 0.149, 0.149>;
+        }else{
+            cd.TextColor = <1., 1., 1.>;
+        }
 
+        hidescript();
     {/block}
 
     {block pendingEvents}

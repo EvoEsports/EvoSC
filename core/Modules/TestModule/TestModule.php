@@ -11,6 +11,8 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\AddTime\AddTime;
+use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
 use Illuminate\Support\Collection;
@@ -30,7 +32,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MxDetails::showDetails($player, Map::all()->random()->uid);
+        AddTime::showWidget($player);
+        CountDown::showCountdown($player);
     }
 
     public static function sendTestManialink(Player $player)

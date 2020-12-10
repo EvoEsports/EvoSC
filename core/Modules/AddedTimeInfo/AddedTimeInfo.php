@@ -18,12 +18,16 @@ class AddedTimeInfo extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if(ModeController::isTimeAttackType()){
+        if (isTrackmania()) {
+            return;
+        }
+
+        if (ModeController::isTimeAttackType()) {
             if (!$isBoot) {
                 self::showWidget();
             }
@@ -35,7 +39,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
 
             ManiaLinkEvent::add('time.vote', [self::class, 'voteTime']);
             ManiaLinkEvent::add('time.add', [self::class, 'addTime'], 'manipulate_time');
-        }else{
+        } else {
             Template::hideAll('add-time');
         }
     }
@@ -56,10 +60,10 @@ class AddedTimeInfo extends Module implements ModuleInterface
         $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
         $buttons = config('added-time-info.buttons');
 
-        if($player){
+        if ($player) {
             Template::show($player, 'AddedTimeInfo.update', compact('addedTime'), false, 20);
             Template::show($player, 'AddedTimeInfo.widget', compact('buttons'));
-        }else{
+        } else {
             Template::showAll('AddedTimeInfo.update', compact('addedTime'));
             Template::showAll('AddedTimeInfo.widget', compact('buttons'));
         }
