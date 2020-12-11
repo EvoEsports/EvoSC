@@ -219,8 +219,7 @@
     }
 
     Void flashBox(CMlFrame box){
-        declare quad <=> (box.Controls[17] as CMlQuad);
-
+        declare quad <=> (box.Controls[18] as CMlQuad);
         AnimMgr.Add(quad, "<quad opacity='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
         sleep(220);
         AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
@@ -481,6 +480,24 @@
         }
     }
 
+    Void goPageLeft(){
+        page -= 1;
+        if(page < 1){
+            page = getMaxPage();
+        }
+        forceUpdate = True;
+        updateScoreTable();
+    }
+
+    Void goPageRight(){
+        page += 1;
+        if(page > getMaxPage()){
+            page = 1;
+        }
+        forceUpdate = True;
+        updateScoreTable();
+    }
+
     Void setupButtons(CMlFrame box){
         declare Text[] EvoSC_Access_Rights for This;
         declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
@@ -554,6 +571,32 @@
         }
     }
 
+    Void handlePadEvents(){
+        declare Boolean findMe for This = False;
+        foreach (Event in Input.PendingEvents) {
+            if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
+                if(Event.Button == CInputEvent::EButton::Left || Event.Button == CInputEvent::EButton::LeftStick_Left){
+                    goPageLeft();
+                    continue;
+                }
+                if(Event.Button == CInputEvent::EButton::Right || Event.Button == CInputEvent::EButton::LeftStick_Right){
+                    goPageRight();
+                    continue;
+                }
+                if(Event.Button == CInputEvent::EButton::Down){
+                    findMe = True;
+                    continue;
+                }
+                if(Event.Button == CInputEvent::EButton::Up){
+                    page = 1;
+                    forceUpdate = True;
+                    updateScoreTable();
+                    continue;
+                }
+            }
+        }
+    }
+
     Void showControls(CMlFrame _box){
         declare CMlFrame box = _box;
         setupButtons(box);
@@ -577,7 +620,11 @@
         declare Real yMin = box.AbsolutePosition_V3[1] - 12.0 * mainFrame.RelativeScale;
         declare Real yMax = box.AbsolutePosition_V3[1];
 
-        while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin){
+        declare Boolean ESC_Tab_Pressed for This;
+
+        while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin && ESC_Tab_Pressed){
+            handlePadEvents();
+
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
                 if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseOver){
@@ -651,24 +698,6 @@
         box.Controls[16].Hide();
     }
 
-    Void goPageLeft(){
-        page -= 1;
-        if(page < 1){
-            page = getMaxPage();
-        }
-        forceUpdate = True;
-        updateScoreTable();
-    }
-
-    Void goPageRight(){
-        page += 1;
-        if(page > getMaxPage()){
-            page = 1;
-        }
-        forceUpdate = True;
-        updateScoreTable();
-    }
-
     main() {
         declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
         declare Boolean ESC_Tab_Pressed for This;
@@ -736,10 +765,6 @@
                         }
                     }
                 }
-
-                log(Net_TMxSM_ScoresTable_Trophies);
-                //UpdateTrophy(Frame_Trophy, Net_TMxSM_ScoresTable_Trophies);
-                //NeedStepRankingUpdate = True;
             }
 
             if(findMe){
@@ -758,16 +783,7 @@
                 flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
             }
 
-            foreach (Event in Input.PendingEvents) {
-                if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Button == CInputEvent::EButton::Left && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
-                    goPageLeft();
-                    continue;
-                }
-                if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Button == CInputEvent::EButton::Right && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
-                    goPageRight();
-                    continue;
-                }
-            }
+            handlePadEvents();
 
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
