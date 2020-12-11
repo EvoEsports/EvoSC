@@ -26,5 +26,6 @@
     "CurRaceCheckpointsMode": "never"
   },
   "pre-cache-maps": false,
-  "pidfile": ""
+  "pidfile": "",
+  "load-nicknames-from-evo-service": false
 }

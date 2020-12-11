@@ -130,12 +130,16 @@ declare Integer slot__;
     Void widgetSetHeight__(Real newHeight){
         declare Integer LastUiUpdate for This = 0;
         declare WidgetGrid grid_ for This;
+        declare Real height = newHeight;
+        if(height == 0.0){
+            height = -1.0;
+        }
         if(left__){
             if(!grid_.left.existskey(slot__)) return;
-            grid_.left[slot__].height = newHeight;
+            grid_.left[slot__].height = height;
         }else{
             if(!grid_.right.existskey(slot__)) return;
-            grid_.right[slot__].height = newHeight;
+            grid_.right[slot__].height = height;
         }
         widget.Size[1] = newHeight;
         LastUiUpdate = GameTime;

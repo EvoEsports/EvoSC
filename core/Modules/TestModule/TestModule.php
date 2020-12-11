@@ -13,6 +13,7 @@ use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\AddTime\AddTime;
 use EvoSC\Modules\CountDown\CountDown;
+use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
 use Illuminate\Support\Collection;
@@ -32,8 +33,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        AddTime::showWidget($player);
-        CountDown::showCountdown($player);
+        EvoCupInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

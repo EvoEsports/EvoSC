@@ -255,6 +255,6 @@ class EscRun extends Command
             if (Cache::has('restart_evosc')) {
                 restart_evosc();
             }
-        }, '2m', true);
+        }, '30s', true);
     }
 }

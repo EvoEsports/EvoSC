@@ -36,7 +36,7 @@ class PlayerController implements ControllerInterface
 
     /** @var int */
     private static int $stringEditDistanceThreshold = 8;
-
+    private static bool $loadNicknamesFromEvoService = false;
     private static Collection $customNames;
     private static Collection $customNamesByUbiname;
 
@@ -47,6 +47,7 @@ class PlayerController implements ControllerInterface
     {
         self::$customNames = collect();
         self::$customNamesByUbiname = collect();
+        self::$loadNicknamesFromEvoService = (bool)config('server.load-nicknames-from-evo-service', false);
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
@@ -132,8 +133,8 @@ class PlayerController implements ControllerInterface
         self::$players->put($player->Login, $player);
         if (!$silent) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
-            Cache::put('nicknames/' . $player->Login, $name);
         }
+        Cache::put('nicknames/' . $player->Login, $name);
         self::sendUpdatesCustomNames();
 
         if (!$fromCache) {
@@ -201,7 +202,7 @@ class PlayerController implements ControllerInterface
      */
     public static function playerConnect(Player $player)
     {
-        if (isManiaPlanet()) {
+        if (isManiaPlanet() || !self::$loadNicknamesFromEvoService) {
             self::announceConnect($player, $player->NickName);
             return;
         }
