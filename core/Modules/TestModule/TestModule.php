@@ -16,6 +16,7 @@ use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
+use EvoSC\Modules\ScoreTable\ScoreTable;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -33,7 +34,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        EvoCupInfo::showWidget($player);
+        ScoreTable::sendScoreTable($player);
     }
 
     public static function sendTestManialink(Player $player)

@@ -145,7 +145,6 @@
     declare CMlFrame[] boxes;
     declare Integer page;
     declare Boolean forceUpdate;
-
     --></script>
 
     {include 'Dialogues.confirm'}
@@ -652,6 +651,24 @@
         box.Controls[16].Hide();
     }
 
+    Void goPageLeft(){
+        page -= 1;
+        if(page < 1){
+            page = getMaxPage();
+        }
+        forceUpdate = True;
+        updateScoreTable();
+    }
+
+    Void goPageRight(){
+        page += 1;
+        if(page > getMaxPage()){
+            page = 1;
+        }
+        forceUpdate = True;
+        updateScoreTable();
+    }
+
     main() {
         declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
         declare Boolean ESC_Tab_Pressed for This;
@@ -741,6 +758,17 @@
                 flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
             }
 
+            foreach (Event in Input.PendingEvents) {
+                if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Button == CInputEvent::EButton::Left && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
+                    goPageLeft();
+                    continue;
+                }
+                if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Button == CInputEvent::EButton::Right && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
+                    goPageRight();
+                    continue;
+                }
+            }
+
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
                 declare control = Event.Control;
@@ -751,22 +779,12 @@
                 }
 
                 if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    page -= 1;
-                    if(page < 1){
-                        page = getMaxPage();
-                    }
-                    forceUpdate = True;
-                    updateScoreTable();
+                    goPageLeft();
                     continue;
                 }
 
                 if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    page += 1;
-                    if(page > getMaxPage()){
-                        page = 1;
-                    }
-                    forceUpdate = True;
-                    updateScoreTable();
+                    goPageRight();
                     continue;
                 }
 
