@@ -72,7 +72,7 @@ class MatchSettingsController implements ControllerInterface
             Log::info('Automatically loading matchsettings ' . $matchSettingsFile);
         }
 
-        if (!$matchSettingsFile) {
+        if (is_null($matchSettingsFile)) {
             $matchSettingsFile = self::getCurrentMatchSettingsFile();
         }
 
@@ -81,20 +81,7 @@ class MatchSettingsController implements ControllerInterface
         self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
         if ($rebootClasses) {
-            $mode = Server::getScriptName()['NextValue'];
-
-            HookController::init();
-            ChatCommand::removeAll();
-            Timer::destroyAll();
-            ManiaLinkEvent::removeAll();
-            InputSetup::clearAll();
-            if (config('quick-buttons.enabled')) {
-                QuickButtons::removeAll();
-            }
-
-            ControllerController::loadControllers($mode);
-            ModuleController::startModules($mode, false);
-            EscRun::addBootCommands();
+            ModeController::rebootModules();
         }
 
         MapController::loadMaps();
@@ -184,7 +171,7 @@ class MatchSettingsController implements ControllerInterface
                 MatchSettingsController::shuffleCurrentMapList();
                 infoMessage($player, ' shuffled the map list.')->sendAll();
             }, true);
-            
+
             successMessage('Map list gets shuffled on map end.')->sendAdmin();
         } else {
             MatchSettingsController::shuffleCurrentMapList();

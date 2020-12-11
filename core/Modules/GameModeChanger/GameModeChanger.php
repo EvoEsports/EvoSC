@@ -9,6 +9,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
@@ -73,7 +74,9 @@ class GameModeChanger extends Module implements ModuleInterface
     {
         try {
             Server::setScriptName($gameModeId);
-            infoMessage($player, ' changed the game-mode to ', secondary($name))->sendAll();
+            warningMessage($player, ' changed the game-mode to ', secondary($name))->sendAll();
+            Server::restartMap();
+            ModeController::rebootModules();
         } catch (\Exception $e) {
             dangerMessage($e->getMessage())->send($player);
         }

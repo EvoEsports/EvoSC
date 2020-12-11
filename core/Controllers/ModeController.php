@@ -4,7 +4,14 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 
 class ModeController implements ControllerInterface
 {
@@ -70,6 +77,24 @@ class ModeController implements ControllerInterface
                 self::$isRoundsType = true;
                 break;
         }
+    }
+
+    public static function rebootModules()
+    {
+        $mode = Server::getScriptName()['NextValue'];
+
+        HookController::init();
+        ChatCommand::removeAll();
+        Timer::destroyAll();
+        ManiaLinkEvent::removeAll();
+        InputSetup::clearAll();
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::removeAll();
+        }
+
+        ControllerController::loadControllers($mode);
+        ModuleController::startModules($mode, false);
+        EscRun::addBootCommands();
     }
 
     /**

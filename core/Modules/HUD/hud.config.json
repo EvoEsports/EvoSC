@@ -130,10 +130,11 @@
       "id": "Race_BestRaceViewer",
       "position": [
         139,
-        -10
+        -50
       ],
       "scale": 1,
-      "visible": true
+      "visible": false,
+      "visible_update": true
     }
   ]
 }
