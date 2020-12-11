@@ -34,11 +34,6 @@ class MatchController extends Controller implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
-        if (Cache::has(self::CACHE_ID)) {
-            self::$tracker = collect(Cache::get(self::CACHE_ID));
-            Cache::forget(self::CACHE_ID);
-        }
-
         self::$pointsRepartition = PointsController::getPointsRepartition();
 
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
@@ -52,7 +47,7 @@ class MatchController extends Controller implements ControllerInterface
      */
     public static function stop()
     {
-        Cache::put(self::CACHE_ID, self::$tracker->toArray(), now()->addMinute());
+        Cache::put(self::CACHE_ID, [self::$tracker->toArray(), self::$roundTracker->toArray()], now()->addMinute());
     }
 
     /**
@@ -114,6 +109,9 @@ class MatchController extends Controller implements ControllerInterface
         Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
 
+    /**
+     * Reset stats for the current run
+     */
     public static function resetRoundTracker()
     {
         self::$roundTracker = collect();
@@ -129,8 +127,15 @@ class MatchController extends Controller implements ControllerInterface
      */
     public static function resetWidget($map = null)
     {
-        self::$tracker = collect();
-        self::$roundTracker = collect();
+        if (Cache::has(self::CACHE_ID)) {
+            $data = Cache::get(self::CACHE_ID);
+            self::$tracker = collect($data[0]);
+            self::$roundTracker = collect($data[1]);
+            Cache::forget(self::CACHE_ID);
+        } else {
+            self::$tracker = collect();
+            self::$roundTracker = collect();
+        }
 
         Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
