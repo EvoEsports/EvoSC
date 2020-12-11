@@ -163,9 +163,10 @@ class Votes extends Module implements ModuleInterface
         $voteRatioReached = ($voteState['yes'] / self::$onlinePlayersCount) > self::$vote->success_ratio;
 
         if ($timerRanOut || $everyoneVoted || $voteRatioReached) {
+            $success = false;
             if ($voteRatioReached) {
                 $success = true;
-            } else {
+            } else if ($voteCount > 0) {
                 $success = ($voteState['yes'] / $voteCount) > self::$vote->success_ratio;
             }
 

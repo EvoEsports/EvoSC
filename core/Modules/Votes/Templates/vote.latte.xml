@@ -19,8 +19,8 @@
             </frame>
 
             <frame pos="0 -13.5">
-                <label id="label_yes" class="btn-muted yes" opacity="0.86" pos="2 0" z-index="1" size="12 3.5" halign="left" textprefix="$fff" text="0 YES $aaaF5" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
-                <label id="label_no" class="btn-muted no" opacity="0.86" pos="48 0" z-index="1" size="12 3.5" halign="right" textprefix="$aaaF6 $fff" text="0 NO" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
+                <label id="label_yes" class="btn-muted yes" opacity="0.86" pos="2 0" z-index="1" size="12 3.5" halign="left" textcolor="fff" text="0 YES $aaaF5" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
+                <label id="label_no" class="btn-muted no" opacity="0.86" pos="48 0" z-index="1" size="12 3.5" halign="right" textcolor="fff" text="$aaaF6 0 NO" valign="center" textsize="0.75" ScriptEvents="1" focusareacolor1="0000"/>
                 <label id="time_left" class="text-light" opacity="0.9" pos="25 0" z-index="1" size="49 2.8" halign="center" text="{$vote->duration}" valign="center" textsize="0.6"/>
             </frame>
         </frame>
@@ -51,6 +51,9 @@
         declare bg2 <=> (Page.MainFrame.GetFirstChild("bg2") as CMlQuad);
         declare questionLabel <=> (Page.MainFrame.GetFirstChild("question") as CMlLabel);
 
+        declare yesSuffix = "$aaaF5";
+        declare noPrefix = "$aaaF6";
+
         declare questionHeight = questionLabel.ComputeHeight(questionLabel.Value);
         if(TL::Length(questionLabel.Value) > 32){
             bg1.Size[1] = bg1.Size[1] + questionHeight;
@@ -64,6 +67,7 @@
         AnimMgr.Add(widget, targetScale, 500, CAnimManager::EAnimManagerEasing::ElasticOut);
         declare originalScale = {config('votes.scale')};
         declare startTime = GameTime;
+        declare usesPad = False;
 
         ratioMarker.RelativePosition_V3[0] = {$vote->success_ratio} * 46.0 + 2.0;
         ratioLabel.RelativePosition_V3[0] = ratioMarker.RelativePosition_V3[0] - 1.0;
@@ -71,15 +75,37 @@
         while(True){
             yield;
 
+            foreach (Event in Input.PendingEvents) {
+                if(!usesPad && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
+                    usesPad = True;
+                    yesSuffix = "$aaa";
+                    noPrefix = "$aaa";
+                    yesLabel.SetText("0 YES " ^ yesSuffix);
+                    noLabel.SetText(noPrefix ^ " $fff0 NO");
+                }
+                if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
+                    if(Event.Button == CInputEvent::EButton::L1){
+                        TriggerPageAction("votes.yes");
+                        continue;
+                    }
+                    if(Event.Button == CInputEvent::EButton::R1){
+                        TriggerPageAction("votes.no");
+                        continue;
+                    }
+                }
+            }
+
             foreach(event in PendingEvents){
                 if(event.Control == Null) continue;
 
                 if(event.Control.HasClass("yes") && event.Type == CMlScriptEvent::Type::MouseClick){
                     TriggerPageAction("votes.yes");
+                    continue;
                 }
 
                 if(event.Control.HasClass("no") && event.Type == CMlScriptEvent::Type::MouseClick){
                     TriggerPageAction("votes.no");
+                    continue;
                 }
             }
 
@@ -110,8 +136,8 @@
                 yesBar.Size = <yesWidth, yesBar.Size[1]>;
                 noBar.Size = <noWidth, noBar.Size[1]>;
 
-                yesLabel.SetText(yes ^ " YES $aaaF5");
-                noLabel.SetText(no ^ " NO");
+                yesLabel.SetText(yes ^ " YES " ^ yesSuffix);
+                noLabel.SetText(noPrefix ^ " " ^ no ^ " NO");
 
                 VoteState = Integer[Text];
             }

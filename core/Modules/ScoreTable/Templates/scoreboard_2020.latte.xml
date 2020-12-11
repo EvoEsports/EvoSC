@@ -575,11 +575,11 @@
         declare Boolean findMe for This = False;
         foreach (Event in Input.PendingEvents) {
             if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
-                if(Event.Button == CInputEvent::EButton::Left || Event.Button == CInputEvent::EButton::LeftStick_Left){
+                if(Event.Button == CInputEvent::EButton::Left){
                     goPageLeft();
                     continue;
                 }
-                if(Event.Button == CInputEvent::EButton::Right || Event.Button == CInputEvent::EButton::LeftStick_Right){
+                if(Event.Button == CInputEvent::EButton::Right){
                     goPageRight();
                     continue;
                 }

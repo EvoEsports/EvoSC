@@ -17,6 +17,7 @@ use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\Votes\Votes;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -34,7 +35,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ScoreTable::sendScoreTable($player);
+        Votes::cmdAskMoreTime($player, null, 5);
     }
 
     public static function sendTestManialink(Player $player)
