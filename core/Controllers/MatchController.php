@@ -76,13 +76,14 @@ class MatchController extends Controller implements ControllerInterface
                 'name' => $player->NickName,
                 'score' => $score,
                 'checkpoints' => $checkpoints,
-                'points' => 0
+                'points' => 0,
+                'gained' => 0,
             ]);
         } else {
             $gainedPoints = 0;
             self::$roundTracker->push($player->id);
 
-            if($score > 0){
+            if ($score > 0) {
                 $pointsRepartitionSize = count(self::$pointsRepartition);
                 $roundPlacement = self::$roundTracker->count() - 1;
 
@@ -94,6 +95,7 @@ class MatchController extends Controller implements ControllerInterface
             if (self::$tracker->has($player->id)) {
                 $tracker = self::$tracker->get($player->id);
                 $tracker->points += $gainedPoints;
+                $tracker->gained = $gainedPoints;
                 $tracker->score = $score;
                 $tracker->checkpoints = $checkpoints;
                 self::$tracker->put($player->id, $tracker);
@@ -103,7 +105,8 @@ class MatchController extends Controller implements ControllerInterface
                     'name' => $player->NickName,
                     'score' => $score,
                     'checkpoints' => $checkpoints,
-                    'points' => $gainedPoints
+                    'points' => $gainedPoints,
+                    'gained' => $gainedPoints,
                 ]);
             }
         }
@@ -114,6 +117,11 @@ class MatchController extends Controller implements ControllerInterface
     public static function resetRoundTracker()
     {
         self::$roundTracker = collect();
+        self::$tracker->transform(function ($tracker) {
+            $tracker->gained = 0;
+            return $tracker;
+        });
+        Hook::fire('MatchTrackerUpdated', self::$tracker->values());
     }
 
     /**
