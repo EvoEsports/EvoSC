@@ -13,6 +13,7 @@ use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\AddTime\AddTime;
 use EvoSC\Modules\CountDown\CountDown;
+use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MxDetails\MxDetails;
@@ -35,7 +36,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        EvoCupInfo::showWidget($player);
+        CpDiffs::cmdSetTarget($player, '', 'me');
     }
 
     public static function sendTestManialink(Player $player)
