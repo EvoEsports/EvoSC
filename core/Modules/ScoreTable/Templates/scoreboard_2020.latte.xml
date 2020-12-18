@@ -459,8 +459,6 @@
         declare teamTwoLabel <=> (Page.MainFrame.GetFirstChild("team-two-label") as CMlLabel);
         declare teamTwoPointsLabel <=> (Page.MainFrame.GetFirstChild("team-two-points") as CMlLabel);
 
-        log(Teams[1]);
-
         teamOneLabel.Value = Teams[0].ColorizedName;
         teamTwoLabel.Value = Teams[1].ColorizedName;
         teamOnePointsLabel.Value = ClanScores[1] ^ " Points";
@@ -529,8 +527,6 @@
                     boxes[i + fillOffset].Hide();
                 }
             }
-
-            log("done " ^GameTime);
         }
     }
 
@@ -872,7 +868,7 @@
                 page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
                 forceUpdate = True;
                 updateScoreTable();
-                sleep(80);
+                sleep(40);
                 flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
             }
 

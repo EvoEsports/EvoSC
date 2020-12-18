@@ -75,6 +75,7 @@
         while(True){
             yield;
 
+/*
             foreach (Event in Input.PendingEvents) {
                 if(!usesPad && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
                     usesPad = True;
@@ -94,6 +95,7 @@
                     }
                 }
             }
+            */
 
             foreach(event in PendingEvents){
                 if(event.Control == Null) continue;
