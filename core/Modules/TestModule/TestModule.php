@@ -35,7 +35,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Votes::cmdAskMoreTime($player, null, 5);
+        EvoCupInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

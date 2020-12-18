@@ -22,7 +22,7 @@ About EvoSC
 
 {block content}
 <label class="text-light" pos="55 -16" textsize="6" text="$i$oEvoSC" autonewline="1" valign="center" halign="center" />
-<label class="text-light" pos="55 -21" textsize="0.5" text="$o$n{getEscVersion()} BETA" autonewline="1" valign="center" halign="center" />
+<label class="text-light" pos="55 -21" textsize="0.5" text="$o$n{getEvoSCVersion()} BETA" autonewline="1" valign="center" halign="center" />
 
 <label class="text-light" pos="55 -22" textsize="0.5" size="70 200" text="
 EvoSC is a server-controller designed for TM²/TMN and build with PHP7.4. It is developed by Evo and the source is available at $l[https://github.com/EvoTM/EvoSC]GitHub$z. Primarily developed by Braker with great help from the community and especially phenom, snix and reaby. If you encounter bugs you can report them on the issue page on $l[https://github.com/EvoTM/EvoSC]GitHub$z.
