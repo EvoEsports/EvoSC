@@ -300,7 +300,12 @@
             badgeLabel.Value = "";
 		}
 
-        rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
+        if(UseClans){
+            declare Integer TRank for Score = 0;
+            rankLabel.Value = "" ^ (TRank);
+        }else{
+            rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
+        }
         if(EvoSC_CustomNames.existskey(user.Login)){
             nameLabel.Value = EvoSC_CustomNames[user.Login];
         }else{
@@ -391,54 +396,20 @@
         return (ceil(Scores.count / SB_Per_Page * 1.0));
     }
 
-    Void updateScoreTable(){
+    Void updateScoreTable_Default(){
         declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
-
-        foreach (Player in Players) {
-            declare LibST_LastTick for Player.User = -1;
-            LibST_LastTick = Now;
-            declare LibST_Status for Player.User = C_Status_Disconnected;
-            if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
-                LibST_Status = C_Status_Spectating;
-            }
-            if (!Player.RequestsSpectate && LibST_Status != C_Status_Spawned) {
-                LibST_Status = C_Status_Spawned;
-            }
-        }
-
-        (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
-        (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
-
-        declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);
-        declare Integer EvoSC_PointsLimit for This = 0;
-        modeLabel.Value = CurrentServerModeName;
-
-        if(CurrentServerModeName == "Rounds" || CurrentServerModeName == "TM_Rounds_Online" || UseClans){
-            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
-
-            if(UseClans){
-                declare teamOneLabel <=> (Page.MainFrame.GetFirstChild("team-one-label") as CMlLabel);
-                declare teamOnePointsLabel <=> (Page.MainFrame.GetFirstChild("team-one-points") as CMlLabel);
-                declare teamTwoLabel <=> (Page.MainFrame.GetFirstChild("team-two-label") as CMlLabel);
-                declare teamTwoPointsLabel <=> (Page.MainFrame.GetFirstChild("team-two-points") as CMlLabel);
-
-                teamOnePointsLabel.Value = ClanScores[1] ^ " Points";
-                teamTwoPointsLabel.Value = ClanScores[2] ^ " Points";
-            }
-        }
-
         declare rank = 1;
         declare filled = 0;
         declare skipped = 0;
         declare toSkip = (page - 1) * SB_Per_Page;
+
         foreach(Score => Weight in GetSortedScores()){
             if(skipped < toSkip){
                 skipped += 1;
                 continue;
             }
 
-            if(filled >= boxes.count / 2){
+            if(filled >= boxes.count / 2){ // divided by two because of background boxes
                 return;
             }
 
@@ -477,6 +448,122 @@
             for(i, filled, SB_Per_Page - 1){
                 boxes[i].Hide();
             }
+        }
+    }
+
+    Void updateScoreTable_Teams(){
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        declare CSmScore[Integer][Integer] sortedByTeams;
+        declare teamOneLabel <=> (Page.MainFrame.GetFirstChild("team-one-label") as CMlLabel);
+        declare teamOnePointsLabel <=> (Page.MainFrame.GetFirstChild("team-one-points") as CMlLabel);
+        declare teamTwoLabel <=> (Page.MainFrame.GetFirstChild("team-two-label") as CMlLabel);
+        declare teamTwoPointsLabel <=> (Page.MainFrame.GetFirstChild("team-two-points") as CMlLabel);
+
+        log(Teams[1]);
+
+        teamOneLabel.Value = Teams[0].ColorizedName;
+        teamTwoLabel.Value = Teams[1].ColorizedName;
+        teamOnePointsLabel.Value = ClanScores[1] ^ " Points";
+        teamTwoPointsLabel.Value = ClanScores[2] ^ " Points";
+
+        if(UseClans){
+            sortedByTeams[1] = CSmScore[Integer];
+            sortedByTeams[2] = CSmScore[Integer];
+            declare i = 1;
+
+            foreach(Score => Weight in GetSortedScores()){
+                declare Integer TRank for Score = 0;
+                TRank = i;
+                sortedByTeams[Score.TeamNum][Weight] <=> Score;
+                i += 1;
+            }
+
+            for(teamId, 1, 2){
+                declare filled = 0;
+                declare skipped = 0;
+                declare scores = sortedByTeams[teamId];
+                declare toSkip = (page - 1) * ((SB_Per_Page / 2) - 2);
+                declare fillOffset = (teamId - 1) * (SB_Per_Page / 2);
+
+                foreach(Score in scores){
+                    if(toSkip > 0){
+                        if(skipped <= toSkip){
+                            skipped += 1;
+                            continue;
+                        }
+                    }
+                    if(filled >= (SB_Per_Page / 2) - 1){
+                        break;
+                    }
+
+                    declare SlotNeedUpdate = False;
+                    declare LibST_LastTick for Score.User = -1;
+                    declare LibST_Status for Score.User = C_Status_Disconnected;
+                    if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
+                        LibST_Status = C_Status_Disconnected;
+                        SlotNeedUpdate = True;
+                    }
+
+                    declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
+                    if (LibST_PrevStatus != LibST_Status) {
+                        LibST_PrevStatus = LibST_Status;
+                        SlotNeedUpdate = True;
+                    }
+
+                    declare addedPoints = 0;
+                    if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
+                        addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
+                    }
+
+                    declare LibST_PrevUpdate for Score = -1;
+                    declare netread Integer Net_LibST_Update for Score;
+                    if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
+                        LibST_PrevUpdate = Net_LibST_Update;
+                        updateBox(boxes[filled + fillOffset], Score, 0, 0);
+                    }
+
+                    filled += 1;
+                }
+
+                for(i, filled, (SB_Per_Page / 2) - 1){
+                    boxes[i + fillOffset].Hide();
+                }
+            }
+
+            log("done " ^GameTime);
+        }
+    }
+
+    Void updateScoreTable(){
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
+
+        foreach (Player in Players) {
+            declare LibST_LastTick for Player.User = -1;
+            LibST_LastTick = Now;
+            declare LibST_Status for Player.User = C_Status_Disconnected;
+            if (Player.RequestsSpectate && LibST_Status != C_Status_Spectating) {
+                LibST_Status = C_Status_Spectating;
+            }
+            if (!Player.RequestsSpectate && LibST_Status != C_Status_Spawned) {
+                LibST_Status = C_Status_Spawned;
+            }
+        }
+
+        (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
+        (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+
+        declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);
+        declare Integer EvoSC_PointsLimit for This = 0;
+        modeLabel.Value = CurrentServerModeName;
+
+        if(CurrentServerModeName == "Rounds" || UseClans){
+            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
+        }
+
+        if(UseClans){
+            updateScoreTable_Teams();
+        }else{
+            updateScoreTable_Default();
         }
     }
 
@@ -540,13 +627,17 @@
                 Page.MainFrame.GetFirstChild("teams-frame").Show();
                 declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
                 boxesFrame.RelativePosition_V3 = <-2.0, 2.0>;
+                boxesFrame.Controls[5].Hide();
+                boxesFrame.Controls[11].Hide();
                 boxesFrame.Controls[17].Hide();
                 boxesFrame.Controls[23].Hide();
                 for(i, 12, 16){
                     (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[0].ColorPrimary;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
                 }
                 for(i, 17, 22){
                     (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[1].ColorPrimary;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
                 }
             }
 
@@ -563,9 +654,11 @@
                 lastBoxInColumn.BgColor = bgDark.BgColor;
                 for(i, 12, 16){
                     (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.25;
                 }
                 for(i, 17, 22){
                     (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.25;
                 }
             }
         }

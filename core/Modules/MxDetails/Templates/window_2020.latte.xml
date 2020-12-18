@@ -16,7 +16,7 @@
 
         <frame pos="66 -21">
             <label class="btn-muted" pos="0 -18" size="28 5" textsize="0.9" text=" View on TMX" valign="center" halign="center" url="https://trackmania.exchange/tracks/{$map->mx_details->TrackID}" />
-            <label class="btn-muted id" pos="23 -18" size="16 5" textsize="0.9" text=" Copy ID" data-value="{$map->mx_details->TrackID}" valign="center" halign="center" ScriptEvents="1" />
+            <label class="btn-muted id" pos="23 -18" size="16 5" textsize="0.9" text=" TMX-ID" data-value="{$map->mx_details->TrackID}" valign="center" halign="center" ScriptEvents="1" />
             <label class="btn-muted login" pos="0 -24" size="28 5" textsize="0.9" text=" Copy author login" data-value="{$map->author->Login}" valign="center" halign="center" ScriptEvents="1" />
             <label class="btn-accent juke" pos="0 -30" size="28 5" textsize="0.9" text=" Add to queue" data-value="{$map->uid}" valign="center" halign="center" ScriptEvents="1" />
             {if $localPlayer->hasAccess('map_disable')}
