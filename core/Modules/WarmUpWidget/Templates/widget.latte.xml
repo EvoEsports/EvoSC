@@ -29,7 +29,7 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('warmup.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('warmup.ui.position') == 'left'|ms_bool};
         slot__ = {config('warmup.ui.slot')};
     {/block}
 

@@ -68,7 +68,7 @@ Void HideDuringIntro(CMlFrame _Frame) {
 
   declare PrevCountdownVisible = True;
 
-        left__ = {config('countdown.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('countdown.ui.position') == 'left'|ms_bool};
         slot__ = {config('countdown.ui.slot')};
     {/block}
 

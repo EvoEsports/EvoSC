@@ -129,7 +129,7 @@
 
         page = 0;
 
-        left__ = {config('server-hopper.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('server-hopper.ui.position') == 'left'|ms_bool};
         slot__ = {config('server-hopper.ui.slot')};
     {/block}
 

@@ -47,7 +47,7 @@ Void startLoading(){
         declare Integer EvoSC_Update_LastUpdate for This;
         declare lastUpdate = GameTime;
 
-        left__ = {config('controller-updater.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('controller-updater.ui.position') == 'left'|ms_bool};
         slot__ = {config('controller-updater.ui.slot')};
         {/block}
 

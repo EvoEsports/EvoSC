@@ -25,6 +25,7 @@ class ScoreTable extends Module implements ModuleInterface
             self::$scoreboardTemplate = 'ScoreTable.scoreboard';
         } else {
             self::$scoreboardTemplate = 'ScoreTable.scoreboard_2020';
+            //Server::rpc()->setForcedClubLinks(); TODO: implement club links
         }
 
         Hook::add('PlayerConnect', [self::class, 'sendScoreTable']);

@@ -143,7 +143,7 @@
 
         max = {config('live-rankings.show', 14)};
 
-        left__ = {config('live-rankings.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('live-rankings.ui.position') == 'left'|ms_bool};
         slot__ = {config('live-rankings.ui.slot')};
 
         widgetSetHeight__(5.0 + (max * 3));

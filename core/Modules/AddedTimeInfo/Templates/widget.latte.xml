@@ -34,7 +34,7 @@
             declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
             declare timeRemaining = 0;
 
-            left__ = {config('added-time-info.ui.position') == 'left' ? 'True' : 'False'};
+            left__ = {config('added-time-info.ui.position') == 'left'|ms_bool};
             slot__ = {config('added-time-info.ui.slot')};
         {/block}
 

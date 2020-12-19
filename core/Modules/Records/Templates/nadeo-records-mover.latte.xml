@@ -38,7 +38,7 @@
         Net_LibUI3_CustomizableModule_Properties["Race_Record"].Position[1] = 50.0;
         return;
 
-        left__ = {config('records.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('records.ui.position') == 'left'|ms_bool};
         slot__ = {config('records.ui.slot') + 1};
         {/block}
 

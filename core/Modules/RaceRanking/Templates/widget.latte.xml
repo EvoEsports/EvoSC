@@ -160,7 +160,7 @@
 
         points.fromjson("{$points}");
 
-        left__ = {config('race-ranking.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('race-ranking.ui.position') == 'left'|ms_bool};
         slot__ = {config('race-ranking.ui.slot')};
         {/block}
 

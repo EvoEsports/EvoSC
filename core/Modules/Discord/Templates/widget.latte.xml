@@ -25,7 +25,7 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('discord.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('discord.ui.position') == 'left'|ms_bool};
         slot__ = {config('discord.ui.slot')};
     {/block}
 

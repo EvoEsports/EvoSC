@@ -25,11 +25,26 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('add-time.ui.position') == 'left' ? 'True' : 'False'};
+        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+        declare hidden = False;
+
+        left__ = {config('add-time.ui.position') == 'left'|ms_bool};
         slot__ = {config('add-time.ui.slot')};
     {/block}
 
     {block loop}
+        declare timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        declare shouldBeHidden = timeRemaining <= 0;
+
+        if(shouldBeHidden && !hidden){
+            hidden = True;
+            widgetSetHeight__(0.0);
+        }else if(!shouldBeHidden && hidden){
+            hidden = False;
+            widgetSetHeight__(5.0);
+        }
+
+        sleep(50);
     {/block}
 
     {block pendingEvents}

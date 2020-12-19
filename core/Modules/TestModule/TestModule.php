@@ -16,8 +16,10 @@ use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\Symbols\Symbols;
 use EvoSC\Modules\Votes\Votes;
 use Illuminate\Support\Collection;
 
@@ -36,7 +38,8 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ScoreTable::sendScoreTable($player);
+        MatchMakerWidget::showWidget($player);
+        Symbols::showSymbolsWindow($player);
     }
 
     public static function sendTestManialink(Player $player)

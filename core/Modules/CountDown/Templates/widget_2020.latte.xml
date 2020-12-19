@@ -78,7 +78,7 @@
         declare sign = "";
         declare currentMapId = Map.Id;
 
-        left__ = {config('countdown.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('countdown.ui.position') == 'left'|ms_bool};
         slot__ = {config('countdown.ui.slot')};
     {/block}
 
@@ -111,6 +111,12 @@
             }
         }else{
             cd.Value = "";
+        }
+
+        if(cd.Value == "" && widget.Size[1] > 0.0){
+            widgetSetHeight__(0.0);
+        }else if(widget.Size[1] == 0.0 && cd.Value != ""){
+            widgetSetHeight__(8.0);
         }
 
         if(timeRemaining <= 31000){

@@ -32,7 +32,7 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('social-media.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('social-media.ui.position') == 'left'|ms_bool};
         slot__ = {config('social-media.ui.slot')};
     {/block}
 

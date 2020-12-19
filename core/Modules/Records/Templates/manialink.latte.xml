@@ -402,7 +402,7 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
         primaryColor = TL::ToColor("{config('theme.hud.text-light')|noescape}");
         headerColor = TL::ToColor("{config('theme.hud.accent')|noescape}");
 
-        left__ = {config('records.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('records.ui.position') == 'left'|ms_bool};
         slot__ = {config('records.ui.slot')};
 
         declare K_State Race_Record_State for UI;
