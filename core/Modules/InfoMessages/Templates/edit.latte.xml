@@ -1,6 +1,6 @@
 {contentType text}
 {extends 'Components.window'}
-{php $window_height = 29;}
+{php $window_height = 30;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}info-msg-window{/block}
@@ -12,13 +12,13 @@
         <entry name="id" pos="-1000" default="{$id}" />
 
         <label class="text-light" text="Message:" textsize="0.5" pos="2 -2" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
-        <entry class="form" name="message" textsize="0.5" pos="2 -5" size="92 4" textfont="{config('colors.ui.font')|noescape}" textprefix="${config('colors.info')}" default="{$message}" />
+        <entry id="message" class="form" name="message" textsize="0.5" pos="2 -5" size="92 4" textfont="{config('colors.ui.font')|noescape}" textprefix="${config('colors.info')}" />
 
-        <label class="text-light" text="Show every (minutes):" textsize="0.5" pos="2 -9" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
-        <entry class="form" name="interval" textsize="0.5" pos="2 -12" size="92 4" textfont="{config('colors.ui.font')|noescape}" default="{$interval}" />
+        <label class="text-light" text="Show every (minutes):" textsize="0.5" pos="2 -10" size="112 4" textfont="{config('colors.ui.font')|noescape}" />
+        <entry class="form" name="interval" textsize="0.5" pos="2 -13" size="20 4" textfont="{config('colors.ui.font')|noescape}" default="{$interval}" />
 
-        <label class="btn-success add" action="info.update" pos="8 -19" size="15 4" text="{$id == null ? 'ADD' : 'UPDATE'}" textsize="0.5" scale="0.9" ScriptEvents="1"/>
-        <label class="btn-danger cancel" action="info.show" pos="23 -19" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" ScriptEvents="1"/>
+        <label class="btn-success add" action="info.update" pos="8 -20" size="15 4" text="{$id == null ? 'ADD' : 'UPDATE'}" textsize="0.5" scale="0.9" ScriptEvents="1"/>
+        <label class="btn-danger cancel" action="info.show" pos="23 -20" size="15 4" text="CANCEL" textsize="0.5" scale="0.9" ScriptEvents="1"/>
     </frame>
     {/block}
 
@@ -30,6 +30,7 @@
     {/block}
 
     {block bootScript}
+    (Page.MainFrame.GetFirstChild("message") as CMlEntry).Value = """{$message}""";
     {/block}
 
     {block pendingEvents}

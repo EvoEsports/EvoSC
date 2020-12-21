@@ -15,6 +15,7 @@ use EvoSC\Modules\AddTime\AddTime;
 use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
+use EvoSC\Modules\InfoMessages\InfoMessages;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\MxDetails\MxDetails;
@@ -38,8 +39,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        MatchMakerWidget::showWidget($player);
-        Symbols::showSymbolsWindow($player);
+        InfoMessages::showSettings($player);
     }
 
     public static function sendTestManialink(Player $player)

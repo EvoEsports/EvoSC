@@ -148,7 +148,7 @@ class ChatMessage
 
         $message = ($this->icon ? '$fff' . $this->icon . ' ' : '') . sprintf('$%s%s', $this->color, $parts);
 
-        if (substr($message, -1) != '.') {
+        if (!in_array(substr($message, -1), ['.', '!', '?'])) {
             $message .= '.';
         }
 
@@ -162,7 +162,7 @@ class ChatMessage
     {
         Server::chatSendServerMessage($this->getMessage());
 
-        if(isVerbose()){
+        if (isVerbose()) {
             Log::info($this->getMessage());
         }
     }
