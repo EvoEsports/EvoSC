@@ -17,6 +17,7 @@ use EvoSC\Modules\CpDiffs\CpDiffs;
 use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\InfoMessages\InfoMessages;
 use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\MxDetails\MxDetails;
 use EvoSC\Modules\ScoreTable\ScoreTable;
@@ -39,7 +40,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        InfoMessages::showSettings($player);
+        LiveRankings::playerConnect($player);
     }
 
     public static function sendTestManialink(Player $player)

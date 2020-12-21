@@ -37,6 +37,9 @@ class MatchController extends Controller implements ControllerInterface
         self::$pointsRepartition = PointsController::getPointsRepartition();
 
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('PlayerInfoChanged', [self::class, 'updatePlayerInfo']);
+        Hook::add('PlayerDisconnect', [self::class, 'setPlayerOffline']);
+        Hook::add('PlayerConnect', [self::class, 'setPlayerOnline']);
         Hook::add('BeginMatch', [self::class, 'resetWidget']);
         Hook::add('BeginMap', [self::class, 'resetWidget']);
         Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'resetRoundTracker']);
@@ -73,9 +76,12 @@ class MatchController extends Controller implements ControllerInterface
                 'checkpoints' => $checkpoints,
                 'points' => 0,
                 'gained' => 0,
+                'online' => $player->player_id > 0,
+                'spectator' => $player->spectator_status > 0
             ]);
         } else {
             $gainedPoints = 0;
+
             self::$roundTracker->push($player->id);
 
             if ($score > 0) {
@@ -93,6 +99,9 @@ class MatchController extends Controller implements ControllerInterface
                 $tracker->gained = $gainedPoints;
                 $tracker->score = $score;
                 $tracker->checkpoints = $checkpoints;
+                $tracker->team = $player->team;
+                $tracker->online = $player->player_id > 0;
+                $tracker->spectator = $player->spectator_status > 0;
                 self::$tracker->put($player->id, $tracker);
             } else {
                 self::$tracker->put($player->id, (object)[
@@ -102,11 +111,50 @@ class MatchController extends Controller implements ControllerInterface
                     'checkpoints' => $checkpoints,
                     'points' => $gainedPoints,
                     'gained' => $gainedPoints,
+                    'online' => $player->player_id > 0,
+                    'spectator' => $player->spectator_status > 0
                 ]);
             }
         }
 
         Hook::fire('MatchTrackerUpdated', self::$tracker->values());
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function updatePlayerInfo(Player $player)
+    {
+        if (self::$tracker->has($player->id)) {
+            $tracker = self::$tracker->get($player->id);
+            $tracker->team = $player->team;
+            $tracker->online = $player->player_id > 0;
+            $tracker->spectator = $player->spectator_status > 0;
+            self::$tracker->put($player->id, $tracker);
+            Hook::fire('MatchTrackerUpdated', self::$tracker->values());
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function setPlayerOffline(Player $player)
+    {
+        if (self::$tracker->has($player->id)) {
+            self::$tracker->get($player->id)->online = false;
+            Hook::fire('MatchTrackerUpdated', self::$tracker->values());
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function setPlayerOnline(Player $player)
+    {
+        if (self::$tracker->has($player->id)) {
+            self::$tracker->get($player->id)->online = true;
+            Hook::fire('MatchTrackerUpdated', self::$tracker->values());
+        }
     }
 
     /**

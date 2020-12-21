@@ -163,11 +163,14 @@ class PlayerController implements ControllerInterface
                 self::$customNames->put($playerInfo->login, $name);
             }
 
-            return Player::updateOrCreate(['Login' => $playerInfo->login], [
+            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
                 'NickName' => $name,
                 'spectator_status' => $playerInfo->spectatorStatus,
-                'player_id' => $playerInfo->playerId
+                'player_id' => $playerInfo->playerId,
+                'team' => $playerInfo->teamId
             ]);
+
+            return $player;
         })->keyBy('Login');
 
         self::sendUpdatesCustomNames();

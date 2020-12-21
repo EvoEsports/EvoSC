@@ -18,6 +18,7 @@
         <label class="text-light" z-index="2" valign="center" halign="right" pos="13 0" size="12 2" textsize="0.4" text="0:00.000"/>
         <label class="text-light" z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name"/>
         <label class="text-accent" z-index="2" valign="center" pos="41 0" size="23 2" halign="right" textsize="0.4" text="+00"/>
+        <label pos="13.9 0" text="" textsize="1.1" valign="center" />
     </framemodel>
 
     <frame id="ranking" pos="1 -7">
@@ -73,10 +74,24 @@
         return CurrentServerModeName == "TimeAttack" || CurrentServerModeName == "TM_TimeAttack_Online";
     }
 
-    Void updateSlot(CMlFrame box, Integer rank, EvoSC_MatchTrackerEntry entry){
+    Void updateSlot(CMlFrame box, Integer rank, EvoSC_MatchTrackerEntry_V3 entry){
         declare prefix = "";
 
-        if(!isTimeAttack()){
+        if(entry.spectator){
+            prefix = "$ddd";
+        }else if(!entry.online){
+            prefix = "$ddd";
+        }
+
+        if(isTimeAttack()){
+            (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(entry.score, False);
+            (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(entry.score, True);
+            (box.Controls[4] as CMlLabel).Hide();
+            (box.Controls[5] as CMlLabel).Hide();
+            if(prefix != ""){
+                prefix = prefix ^ "  ";
+            }
+        }else{
             (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.points, 3) ^ " PTS";
             (box.Controls[2] as CMlLabel).Value = entry.points ^ " PTS";
             if(entry.gained > 0){
@@ -85,10 +100,20 @@
             }else{
                 (box.Controls[4] as CMlLabel).Hide();
             }
-        }else{
-            (box.Controls[1] as CMlLabel).Value = formatScoreCorrect(entry.score, False);
-            (box.Controls[2] as CMlLabel).Value = formatScoreCorrect(entry.score, True);
-            (box.Controls[4] as CMlLabel).Hide();
+
+            if(UseClans){
+                (box.Controls[5] as CMlLabel).Show();
+                if(entry.team == -1){
+                    (box.Controls[5] as CMlLabel).TextColor = <0.5,0.5,0.5>;
+                }else{
+                    (box.Controls[5] as CMlLabel).TextColor = Teams[entry.team].ColorPrimary;
+                }
+                if(prefix == ""){
+                    prefix = "      " ^ prefix;
+                }else{
+                    prefix = prefix ^ "  ";
+                }
+            }
         }
 
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
@@ -96,7 +121,7 @@
         box.Show();
     }
 
-    Void updateWidget(EvoSC_MatchTrackerEntry[] ranking){
+    Void updateWidget(EvoSC_MatchTrackerEntry_V3[] ranking){
         declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
         declare rankingFrame <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
@@ -120,13 +145,18 @@
 
     <script><!--
     {block globals}
-    #Struct EvoSC_MatchTrackerEntry {
+    #Include "ColorLib" as CL
+
+    #Struct EvoSC_MatchTrackerEntry_V3 {
         Text name;
         Text login;
         Integer points;
         Integer gained;
         Integer score;
+        Integer team;
         Text checkpoints;
+        Boolean online;
+        Boolean spectator;
     }
 
     declare Integer max;
@@ -136,7 +166,7 @@
         declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
         declare Integer EvoSC_PointsLimit for This;
         declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
-        declare EvoSC_MatchTrackerEntry[] EvoSC_LiveRankings for This;
+        declare EvoSC_MatchTrackerEntry_V3[] EvoSC_LiveRankings_V3 for This;
         declare Integer EvoSC_LiveRankings_LastUpdate for This;
         declare lastUpdate = 0;
         declare lastPointLimitUpdate = 0;
@@ -152,7 +182,7 @@
     {block loop}
     if(lastUpdate != EvoSC_LiveRankings_LastUpdate){
         lastUpdate = EvoSC_LiveRankings_LastUpdate;
-        updateWidget(EvoSC_LiveRankings);
+        updateWidget(EvoSC_LiveRankings_V3);
     }
 
     if(lastPointLimitUpdate != EvoSC_LastPointsLimitUpdate){

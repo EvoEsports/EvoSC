@@ -115,9 +115,12 @@ class EventController implements ControllerInterface
             $player->spectator_status = $playerInfo['SpectatorStatus'];
             $player->player_id = $playerInfo['PlayerId'];
             $player->ubisoft_name = $playerInfo['NickName'];
+            $player->team = $playerInfo['TeamId'];
             if ($player->isDirty()) {
                 $player->save();
+                Hook::fire('PlayerInfoChanged', $player);
             }
+
             PlayerController::putPlayer($player);
         }
     }
@@ -189,12 +192,13 @@ class EventController implements ControllerInterface
                     'NickName' => $details->nickName,
                     'path' => $details->path,
                     'player_id' => $details->playerId,
+                    'team' => $details->teamId
                 ]);
             } else {
-                $name = $details->nickName;
-
                 if ($name_ = Cache::get('nicknames/' . $playerInfo[0])) {
                     $name = $name_;
+                } else {
+                    $name = $details->nickName;
                 }
 
                 $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
@@ -202,6 +206,7 @@ class EventController implements ControllerInterface
                     'ubisoft_name' => $details->nickName,
                     'path' => $details->path,
                     'player_id' => $details->playerId,
+                    'team' => $details->teamId
                 ]);
 
                 $player->NickName = $name;
@@ -221,7 +226,11 @@ class EventController implements ControllerInterface
     private static function mpPlayerDisconnect($arguments)
     {
         if (count($arguments) == 2 && is_string($arguments[0])) {
-            Hook::fire('PlayerDisconnect', player($arguments[0]), 0);
+            $player = Player::updateOrCreate(['Login' => $arguments[0]], [
+                'player_id' => 0
+            ]);
+
+            Hook::fire('PlayerDisconnect', $player, 0);
         } else {
             throw new Exception('Malformed callback');
         }

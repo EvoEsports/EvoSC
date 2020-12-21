@@ -29,6 +29,7 @@ use Illuminate\Support\Collection;
  * @property string $path
  * @property string $spectator_status
  * @property integer $MaxRank
+ * @property integer $team
  * @property boolean $banned
  * @property carbon $last_visit
  * @property Group $group
