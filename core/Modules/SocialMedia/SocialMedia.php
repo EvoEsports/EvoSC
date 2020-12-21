@@ -36,7 +36,7 @@ class SocialMedia extends Module implements ModuleInterface
             }
 
             return $link;
-        })->reverse()->values();
+        })->values();
 
         Template::show($player, 'SocialMedia.widget', compact('links'));
     }
@@ -54,7 +54,9 @@ class SocialMedia extends Module implements ModuleInterface
                     'title' => 'Discord',
                     'url' => $data->url,
                     'icon' => 'https://i.imgur.com/RxQLC4y.png',
-                    'color' => '7289da'
+                    'color' => '7289da',
+                    'size' => '1x1',
+                    'bg_image' => ''
                 ];
 
                 $existing = config('social-media.links');
@@ -71,7 +73,9 @@ class SocialMedia extends Module implements ModuleInterface
                     'title' => 'Website',
                     'url' => $data->url,
                     'icon' => 'https://i.imgur.com/PY8VOiI.png',
-                    'color' => config('theme.hud.accent')
+                    'color' => config('theme.hud.accent'),
+                    'size' => '1x1',
+                    'bg_image' => ''
                 ];
 
                 $existing = config('social-media.links');
@@ -88,7 +92,9 @@ class SocialMedia extends Module implements ModuleInterface
                     'title' => 'PayPal',
                     'url' => $data->url,
                     'icon' => 'https://i.imgur.com/c0zQ2of.png',
-                    'color' => '1f264f'
+                    'color' => '1f264f',
+                    'size' => '1x1',
+                    'bg_image' => ''
                 ];
 
                 $existing = config('social-media.links');
@@ -105,7 +111,9 @@ class SocialMedia extends Module implements ModuleInterface
                     'title' => 'Patreon',
                     'url' => $data->url,
                     'icon' => 'https://i.imgur.com/0TXj7E9.png',
-                    'color' => 'ff424d'
+                    'color' => 'ff424d',
+                    'size' => '1x1',
+                    'bg_image' => ''
                 ];
 
                 $existing = config('social-media.links');

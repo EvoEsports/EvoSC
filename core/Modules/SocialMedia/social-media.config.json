@@ -9,7 +9,9 @@
       "title": "Website",
       "url": "https://trackmania.com/",
       "icon": "",
-      "color": "$theme.hud.accent"
+      "color": "$theme.hud.accent",
+      "size": "1x1",
+      "bg_image": ""
     }
   ]
 }

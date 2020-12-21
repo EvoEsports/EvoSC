@@ -26,8 +26,6 @@ class RaceRanking extends Module implements ModuleInterface
     {
         self::$tracker = [];
 
-        dump(ModeController::isRoundsType());
-
         if (ModeController::isRoundsType()) {
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
