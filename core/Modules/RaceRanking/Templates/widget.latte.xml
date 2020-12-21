@@ -159,6 +159,7 @@
         declare lastCurrentServerModeName = "";
 
         points.fromjson("{$points}");
+        sleep(10);
 
         left__ = {config('race-ranking.ui.position') == 'left'|ms_bool};
         slot__ = {config('race-ranking.ui.slot')};
