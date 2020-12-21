@@ -66,7 +66,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Teams.Script.txt':
-            case 'Trackmania/TM_Teams_Online.Script.Script.txt':
+            case 'Trackmania/TM_Teams_Online.Script.txt':
                 self::$teams = true;
                 self::$isRoundsType = true;
                 break;
@@ -93,6 +93,7 @@ class ModeController implements ControllerInterface
         }
 
         ControllerController::loadControllers($mode);
+        self::setMode($mode);
         ModuleController::startModules($mode, false);
         EscRun::addBootCommands();
     }
