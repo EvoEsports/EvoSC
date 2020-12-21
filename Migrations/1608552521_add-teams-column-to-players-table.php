@@ -16,7 +16,8 @@ class AddTeamsColumnToPlayersTable extends Migration
     public function up(Builder $schemaBuilder)
     {
         $schemaBuilder->table('players', function (Blueprint $table) {
-            $table->tinyInteger('team')->default(-1)->change();
+            $table->dropColumn('team');
+            $table->tinyInteger('team')->default(-1);
         });
     }
 
