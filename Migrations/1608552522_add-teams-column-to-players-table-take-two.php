@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 
-class AddTeamsColumnToPlayersTable extends Migration
+class AddTeamsColumnToPlayersTableTakeTwo extends Migration
 {
     /**
      * Run the migrations.
