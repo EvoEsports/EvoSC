@@ -29,7 +29,7 @@
         <label class="text-light" pos="25 -7" size="11 3" z-index="5"/> <!-- Score BG-Layer -->
         <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
-        <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0"/> <!-- Primary BG -->
+        <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0" hidden="1"/> <!-- Primary BG -->
         <quad class="bg-accent" opacity="0" pos="1 0" size="86 12" z-index="-15" ScriptEvents="1" hidden="1"/> <!-- Primary BG -->
         <quad size="355 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" opacity="0.2" />
         <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
