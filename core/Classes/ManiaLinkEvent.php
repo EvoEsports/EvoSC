@@ -133,7 +133,7 @@ class ManiaLinkEvent
         }
 
         if (isVeryVerbose()) {
-            Log::write("$action", true);
+            Log::write("$action");
         }
 
         if (preg_match('/^(.+)::(.+?),/', $action, $matches)) {
@@ -170,6 +170,7 @@ class ManiaLinkEvent
             foreach ($formValues as $value) {
                 $formValuesObject->{$value['Name']} = $value['Value'];
             }
+            $formValuesObject = self::mapFormValues($formValuesObject);
             array_push($arguments, $formValuesObject);
         }
 
@@ -182,6 +183,29 @@ class ManiaLinkEvent
             Log::error("An error occured calling " . $callback[0] . '::' . $callback[1] . ": " . $e->getMessage());
             Log::write($e->getTraceAsString(), isVerbose());
         }
+    }
+
+    private static function mapFormValues(\stdClass $values): \stdClass
+    {
+        $arrays = [];
+        $out = $values;
+
+        foreach ($values as $key => $value) {
+            if (preg_match('/^(.+)\[([0-9]+)]$/', $key, $matches)) {
+                $name = $matches[1];
+                if (!array_key_exists($name, $arrays)) {
+                    $arrays[$name] = [];
+                }
+                $arrays[$name][intval($matches[2])] = ($value instanceof \stdClass) ? self::mapFormValues($value) : $value;
+                unset($out->{$key});
+            }
+        }
+
+        foreach ($arrays as $key => $mappedArray) {
+            $out->{$key} = $mappedArray;
+        }
+
+        return $out;
     }
 
     public static function removeAll()
