@@ -795,6 +795,9 @@
         declare lastPointsLimitUpdate = 0;
         declare lastCurrentServerModeName = "";
 
+        declare lastTeam1Name = "";
+        declare lastTeam2Name = "";
+
         declare headerFrame = (Page.MainFrame.GetFirstChild("header-frame") as CMlFrame);
         declare prevPage = (Page.MainFrame.GetFirstChild("prev-page") as CMlLabel);
         declare nextPage = (Page.MainFrame.GetFirstChild("next-page") as CMlLabel);
@@ -818,6 +821,12 @@
 
         while(True){
             yield;
+
+            if(Teams[0].ColorizedName != lastTeam1Name || Teams[1].ColorizedName != lastTeam2Name){
+                lastTeam1Name = Teams[0].ColorizedName;
+                lastTeam2Name = Teams[1].ColorizedName;
+                changeMode(CurrentServerModeName);
+            }
 
             ESC_Tab_Pressed = PageIsVisible;
 

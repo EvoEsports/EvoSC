@@ -11,9 +11,8 @@
 
     <frame id="content" pos="-6.5 -2" z-index="10">
         <label class="text-light" pos="44.5 0" text="" textsize="1.6" z-index="5" />
-        <label id="teamNames" class="text-light" pos="23 0.25" size="34" halign="center" textsize="2.2" z-index="5" />
-        <label id="teamNames2" class="text-light" pos="23 0.25" size="34" halign="center" textsize="2.2" z-index="6" opacity="0.25" />
-        <label class="btn-muted" pos="24.5 -6.5" size="33 4" text=" Setup Teams" ScriptEvents="1" textsize="0.5" />
+        <label id="teamNames" class="text-light" pos="24.5 0.25" size="33" halign="center" textsize="2.2" z-index="5" />
+        <label class="btn-muted" pos="24.5 -6.5" size="33 4" text=" Setup Teams" action="show_teams_setup" textsize="0.5" />
         <label class="btn-muted" pos="11.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" />
         <label class="btn-muted" pos="20.25 -11.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" />
         <label class="btn-muted" pos="28.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" />
@@ -44,9 +43,7 @@
     Void updateTeamNames(){
         declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
         declare teamNames <=> (content.GetFirstChild("teamNames") as CMlLabel);
-        declare teamNames2 <=> (content.GetFirstChild("teamNames2") as CMlLabel);
         teamNames.Value = Teams[0].ColorizedName ^ " vs " ^ Teams[1].ColorizedName;
-        teamNames2.Value = Teams[0].Name ^ " vs " ^ Teams[1].Name;
 
         for(teamId, 1, 2){
             Page.GetClassChildren("team" ^ teamId, content, True);
