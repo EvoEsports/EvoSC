@@ -7,7 +7,7 @@
 
     {block content}
     <framemodel id="link">
-        <quad class="bg-dark link" size="100 100" opacity="0.8" ScriptEvents="1" data-link="http://evotm.com" />
+        <quad class="bg-dark link" size="100 100" opacity="0.8" ScriptEvents="1" />
         <quad pos="-100 0" size="8 10" bgcolor="000" opacity="0.9" z-index="5" />
         <quad pos="4 -4" size="4 4" halign="center" valign="center" image="ICON" z-index="15"/>
         <label class="text-light" pos="4 -7.5" valign="center" halign="center" textsize="0.002" text="TITLE" z-index="15"/>
@@ -55,6 +55,8 @@
             frame.RelativePosition_V3[0] = widths * -1.0;
             frame.RelativePosition_V3[1] = heights * -1;
             frame.Size = <COLUMN_WIDTH * width + (width - 1 * GUTTER), ROW_HEIGHT * height>;
+
+            frame.Controls[0].DataAttributeSet("link", link["url"]);
 
             declare highlight = (frame.Controls[1] as CMlQuad);
             highlight.BgColor = CL::HexToRgb(link["color"]);
