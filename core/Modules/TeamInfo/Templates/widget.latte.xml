@@ -1,0 +1,77 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:team-info" id="team-info" version="3">
+    {include 'Components.stylesheet'}
+
+    <frame pos="0 90">
+        <quad size="150 18" pos="0 7.5" halign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />
+
+        <quad id="team1quad" size="18 15" pos="16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
+        <quad id="team2quad" size="18 15" pos="-16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
+
+        <quad size="18 15" pos="15 2" halign="center" z-index="3" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
+        <quad size="18 15" pos="-15 2" halign="center" z-index="3" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
+
+        <quad size="18 15" pos="0.4 2" halign="center" z-index="4" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
+        <quad size="18 15" pos="-0.4 2" halign="center" z-index="4" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
+
+        <quad size="18 15" pos="0 2" halign="center" z-index="19" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-dark')}" />
+
+        <frame pos="0 2" z-index="20">
+            <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.5" />
+            <label class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.5" />
+
+            <label id="team1label" class="text-lighter" pos="-45 -4.5" halign="center" text="Team 1" textsize="4" />
+            <label id="team2label" class="text-lighter" pos="45 -4.5" halign="center" text="Team 2" textsize="4" />
+
+            <label id="team1points" class="text-lighter" pos="-15.5 -7.25" halign="center" text="1" textsize="6" valign="center" />
+            <label id="team2points" class="text-lighter" pos="15.5 -7.25" halign="center" text="2" textsize="6" valign="center" />
+
+            <quad id="team1bar" class="bg-lighter" size="5 0.5" pos="-15.5 -12"  halign="center"/>
+            <quad id="team2bar" class="bg-lighter" size="5 0.5" pos="15.5 -12"  halign="center"/>
+
+            <quad hidden="1" size="7 7" pos="-66 -7" bgcolor="f00" valign="center" halign="center" image="https://liquipedia.net/commons/images/thumb/2/26/Numelopslogo.png/600px-Numelopslogo.png" />
+            <quad hidden="1" size="7 7" pos="66 -7" bgcolor="f00" valign="center" halign="center" image="https://liquipedia.net/commons/images/thumb/1/11/MTKTM.png/600px-MTKTM.png" />
+        </frame>
+    </frame>
+
+    <script><!--
+    Void setup(){
+        declare team1Label <=> (Page.MainFrame.GetFirstChild("team1label") as CMlLabel);
+        declare team2Label <=> (Page.MainFrame.GetFirstChild("team2label") as CMlLabel);
+        declare team1Quad <=> (Page.MainFrame.GetFirstChild("team1quad") as CMlQuad);
+        declare team2Quad <=> (Page.MainFrame.GetFirstChild("team2quad") as CMlQuad);
+
+        team1Label.Value = Teams[0].Name;
+        team2Label.Value = Teams[1].Name;
+        team1Quad.Colorize = Teams[1].ColorPrimary;
+        team2Quad.Colorize = Teams[0].ColorPrimary;
+    }
+
+    Void updateValues(){
+        declare team1Points <=> (Page.MainFrame.GetFirstChild("team1points") as CMlLabel);
+        declare team2Points <=> (Page.MainFrame.GetFirstChild("team2points") as CMlLabel);
+        declare team1Bar <=> (Page.MainFrame.GetFirstChild("team1bar") as CMlQuad);
+        declare team2Bar <=> (Page.MainFrame.GetFirstChild("team2bar") as CMlQuad);
+
+        team1Points.Value = ClanScores[1] ^ "";
+        team2Points.Value = ClanScores[2] ^ "";
+
+        if(ClanScores[1] > ClanScores[2]){
+            team1Bar.Opacity = 1.0;
+            team2Bar.Opacity = 0.1;
+        }else if(ClanScores[1] < ClanScores[2]){
+            team1Bar.Opacity = 0.1;
+            team2Bar.Opacity = 1.0;
+        }else{
+            team1Bar.Opacity = 0.1;
+            team2Bar.Opacity = 0.1;
+        }
+    }
+
+    main(){
+        setup();
+        updateValues();
+    }
+    --></script>
+</manialink>
