@@ -73,6 +73,7 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
+        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'player_warn');
 
         InputSetup::add('leave_spec', 'Leave spectator mode.', [self::class, 'leaveSpec'], 'Delete');
 
@@ -544,6 +545,15 @@ class PlayerController implements ControllerInterface
             ChatController::unmute($player, $target);
         } else {
             ChatController::mute($player, $target);
+        }
+    }
+
+    public static function warnPlayer(Player $player, string $targetLogin, string $message)
+    {
+        $target = Player::whereLogin($targetLogin)->first();
+
+        if ($target) {
+            warningMessage("You have been warned by $player ", secondary($message))->send($target);
         }
     }
 }
