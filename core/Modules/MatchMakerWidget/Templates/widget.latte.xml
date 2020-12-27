@@ -13,10 +13,10 @@
         <label class="text-light" pos="44.5 0" text="" textsize="1.6" z-index="5" />
         <label id="teamNames" class="text-light" pos="24.5 0.25" size="33" halign="center" textsize="2.2" z-index="5" />
         <label class="btn-muted" pos="24.5 -6.5" size="33 4" text=" Setup Teams" action="show_teams_setup" textsize="0.5" />
-        <label class="btn-muted" pos="11.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" />
-        <label class="btn-muted" pos="20.25 -11.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" />
-        <label class="btn-muted" pos="28.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" />
-        <label class="btn-muted" pos="37.25 -11.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" />
+        <label class="btn-muted" pos="11.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" action="change_point_team,0,-1" />
+        <label class="btn-muted" pos="20.25 -11.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" action="change_point_team,0,1" />
+        <label class="btn-muted" pos="28.75 -11.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" action="change_point_team,1,-1" />
+        <label class="btn-muted" pos="37.25 -11.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" action="change_point_team,1,1" />
         <quad class="bg-light team1" pos="11.75 -13.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
         <quad class="bg-light team1" pos="20.25 -13.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
         <quad class="bg-light team2" pos="28.75 -13.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
@@ -25,15 +25,15 @@
         <frame pos="0 -8">
             <quad class="bg-light" pos="-1 -8" size="100 0.1" opacity="0.5" />
             <label class="text-light" pos="44.75 -10.25" text="" textsize="1.6" z-index="5" />
-            <label id="horns" class="btn-muted horns" pos="24.5 -12" size="33 4" text=" Disable Horns" ScriptEvents="1" textsize="0.5" />
+            <label id="horns" class="btn-muted horns" pos="16 -12" size="16 4" text=" Disable Horns" ScriptEvents="1" textsize="0.5" />
         </frame>
         <frame pos="0 -16">
             <quad class="bg-light" pos="-1 -8" size="100 0.1" opacity="0.5" />
             <label class="text-light" pos="44.75 -10.25" text="🏁" textsize="1.6" z-index="5" />
             <label class="btn-success" pos="16 -12" size="16 4" text=" Start Match" ScriptEvents="1" textsize="0.25" />
             <label class="btn-danger" pos="33 -12" size="16 4" text=" Stop Match" ScriptEvents="1" textsize="0.25" />
-            <label class="btn-warning" pos="16 -17" size="16 4" text=" Reset Map" ScriptEvents="1" textsize="0.25" />
-            <label class="btn-warning" pos="33 -17" size="16 4" text=" Skip Map" ScriptEvents="1" textsize="0.25" />
+            <label class="btn-warning" pos="16 -17" size="16 4" text=" Reset Map" ScriptEvents="1" textsize="0.25" action="map.reset" />
+            <label class="btn-warning" pos="33 -17" size="16 4" text=" Skip Map" ScriptEvents="1" textsize="0.25" action="map.skip" />
         </frame>
     </frame>
     {/block}
@@ -56,10 +56,10 @@
 
     Void updateHornsButton(CMlLabel control){
         if(control.DataAttributeGet("enabled") == ""){
-            control.Value = " Enable Horns";
+            control.Value = "Horns ";
             control.DataAttributeSet("enabled", "true");
         }else{
-            control.Value = " Disable Horns";
+            control.Value = "Horns ";
             control.DataAttributeSet("enabled", "");
         }
     }

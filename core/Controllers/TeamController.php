@@ -20,6 +20,6 @@ class TeamController implements ControllerInterface
 
     public static function getClubLinkUrl($name, $primaryColor = '000', $secondaryColor = '000'): string
     {
-        return sprintf('https://service.evotm.com/api/club-link?name=%s&primary=%s&secondary=%s&.xml', urlencode($name), $primaryColor, $secondaryColor);
+        return sprintf('https://club-link.evotm.workers.dev/?name=%s&primary=%s&secondary=%s', urlencode($name), $primaryColor, $secondaryColor);
     }
 }

@@ -13,7 +13,6 @@ use EvoSC\Controllers\TeamController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
-use Illuminate\Support\Collection;
 
 class MatchMakerWidget extends Module implements ModuleInterface
 {
@@ -27,6 +26,7 @@ class MatchMakerWidget extends Module implements ModuleInterface
         ManiaLinkEvent::add('toggle_horns', [self::class, 'mleToggleHorns'], 'match_maker');
         ManiaLinkEvent::add('show_teams_setup', [self::class, 'mleShowTeamsSetup']);
         ManiaLinkEvent::add('setup_teams', [self::class, 'mleSetupTeams']);
+        ManiaLinkEvent::add('change_point_team', [self::class, 'mleChangeTeamPoint']);
 
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
@@ -37,6 +37,39 @@ class MatchMakerWidget extends Module implements ModuleInterface
                 Template::show($player, 'MatchMakerWidget.widget', compact('hornsEnabled'));
             }
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param $teamId
+     * @param $points
+     */
+    public static function mleChangeTeamPoint(Player $player, $teamId, $points)
+    {
+        $team = intval($teamId);
+        $points = intval($points);
+
+        if ($points == 0) {
+            return;
+        }
+
+        Server::triggerModeScriptEventArray('Trackmania.GetScores');
+        Hook::add('Scores', function ($data) use ($player, $team, $points) {
+            $action = $points < 0 ? ' removed ' : ' added ';
+            $direction = $points < 0 ? ' from ' : ' to ';
+            $roundPoints = $data->teams[$team]->roundpoints;
+            $mapPoints = $data->teams[$team]->mappoints;
+            $matchPoints = $data->teams[$team]->matchpoints;
+            $teamName = $data->teams[$team]->name;
+
+            $mapPoints += $points;
+            $matchPoints += $points;
+            $points = abs($points);
+
+            Server::triggerModeScriptEventArray('Trackmania.SetTeamPoints', ["$team", "$roundPoints", "$mapPoints", "$matchPoints"]);
+
+            warningMessage($player, $action, secondary("$points points"), $direction, secondary("Team $teamName"))->sendAll();
+        }, true);
     }
 
     /**
@@ -86,6 +119,20 @@ class MatchMakerWidget extends Module implements ModuleInterface
         } else {
             Server::disableHorns(true);
             dangerMessage($player, ' disabled horns.')->sendAll();
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function mleToggleTeamBalance(Player $player)
+    {
+        if (Server::autoTeamBalance()) {
+            //TODO: disable
+            dangerMessage($player, ' disabled auto team balance.')->sendAll();
+        } else {
+            //TODO: enable
+            successMessage($player, ' enabled auto team balance.')->sendAll();
         }
     }
 }
