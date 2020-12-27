@@ -24,9 +24,10 @@ class MatchMakerWidget extends Module implements ModuleInterface
         AccessRight::add('match_maker', 'Control matches and view the admin panel for it.');
 
         ManiaLinkEvent::add('toggle_horns', [self::class, 'mleToggleHorns'], 'match_maker');
-        ManiaLinkEvent::add('show_teams_setup', [self::class, 'mleShowTeamsSetup']);
-        ManiaLinkEvent::add('setup_teams', [self::class, 'mleSetupTeams']);
-        ManiaLinkEvent::add('change_point_team', [self::class, 'mleChangeTeamPoint']);
+        ManiaLinkEvent::add('balance_teams', [self::class, 'mleToggleTeamBalance'], 'match_maker');
+        ManiaLinkEvent::add('show_teams_setup', [self::class, 'mleShowTeamsSetup'], 'match_maker');
+        ManiaLinkEvent::add('setup_teams', [self::class, 'mleSetupTeams'], 'match_maker');
+        ManiaLinkEvent::add('change_point_team', [self::class, 'mleChangeTeamPoint'], 'match_maker');
 
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
@@ -127,12 +128,7 @@ class MatchMakerWidget extends Module implements ModuleInterface
      */
     public static function mleToggleTeamBalance(Player $player)
     {
-        if (Server::autoTeamBalance()) {
-            //TODO: disable
-            dangerMessage($player, ' disabled auto team balance.')->sendAll();
-        } else {
-            //TODO: enable
-            successMessage($player, ' enabled auto team balance.')->sendAll();
-        }
+        infoMessage($player, ' balances the teams.')->sendAll();
+        Server::autoTeamBalance();
     }
 }
