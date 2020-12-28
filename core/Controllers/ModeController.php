@@ -52,29 +52,34 @@ class ModeController implements ControllerInterface
             case 'TimeAttack.Script.txt':
             case 'Trackmania/TM_TimeAttack_Online.Script.txt':
                 self::$isTimeAttackType = true;
+                self::$isRoundsType = false;
                 break;
 
             case 'Rounds.Script.txt':
             case 'Trackmania/TM_Rounds_Online.Script.txt':
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
                 break;
 
             case 'Laps.Script.txt':
             case 'Trackmania/TM_Laps_Online.Script.Script.txt':
-                self::$laps = true;
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$laps = true;
                 break;
 
             case 'Teams.Script.txt':
             case 'Trackmania/TM_Teams_Online.Script.txt':
-                self::$teams = true;
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$teams = true;
                 break;
 
             case 'Cup.Script.txt':
             case 'Trackmania/TM_Cup_Online.Script.Script.txt':
-                self::$cup = true;
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$cup = true;
                 break;
         }
     }
