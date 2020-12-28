@@ -315,7 +315,7 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "TM_Rounds_Online" || UseClans){
+        if(CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans){
             if(Score.Points > 0 || addedPoints > 0){
                 scoreLabel.Opacity = 1.0;
             }else{

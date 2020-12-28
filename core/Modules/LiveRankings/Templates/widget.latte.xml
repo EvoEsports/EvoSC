@@ -113,6 +113,8 @@
                 }else{
                     prefix = prefix ^ "  ";
                 }
+            }else{
+                box.Controls[5].Hide();
             }
         }
 
