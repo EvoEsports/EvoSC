@@ -155,7 +155,7 @@ Void updateMyRating(Integer myRating){
         finishNotice.Hide();
         startLoading();
 
-        left__ = {config('mx-karma.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('mx-karma.ui.position') == 'left'|ms_bool};
         slot__ = {config('mx-karma.ui.slot')};
     {/block}
 

@@ -166,7 +166,7 @@ Void playRandomSong(){
         controlsVisible = False;
         declare musicPlaying = True;
 
-        left__ = {config('music.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('music.ui.position') == 'left'|ms_bool};
         slot__ = {config('music.ui.slot')};
 
         AnimMgr.Add(widgetControls, " <frame pos='5.0 -8.5' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);

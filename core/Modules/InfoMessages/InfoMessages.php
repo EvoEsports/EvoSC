@@ -72,8 +72,10 @@ class InfoMessages extends Module implements ModuleInterface
 
     public static function showSettings(Player $player)
     {
-        $messages = InfoMessage::all();
-        Template::show($player, 'InfoMessages.manialink', compact('messages'));
+        $messages = InfoMessage::all()->values();
+        $count = $messages->count();
+        $messages = $messages->toJson();
+        Template::show($player, 'InfoMessages.manialink', compact('messages', 'count'));
     }
 
     public static function showCreate(Player $player, $id = null)

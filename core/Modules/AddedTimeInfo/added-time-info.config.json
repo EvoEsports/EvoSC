@@ -1,8 +1,6 @@
 {
   "enabled": true,
   "buttons": [
-    5,
-    10
   ],
   "ui": {
     "position": "right",

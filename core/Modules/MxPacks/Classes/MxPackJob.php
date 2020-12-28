@@ -3,7 +3,6 @@
 
 namespace EvoSC\Modules\MxPacks\Classes;
 
-
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Models\Map;
@@ -11,6 +10,13 @@ use EvoSC\Models\Player;
 use Exception;
 use Illuminate\Support\Collection;
 use ZipArchive;
+use EvoSC\Classes\Cache;
+use EvoSC\Classes\File;
+use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Exchange;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
 
 class MxPackJob
 {
@@ -29,7 +35,7 @@ class MxPackJob
 
     public function __construct(Player $player, $packId)
     {
-        infoMessage('Downloading map pack ', secondary($packId), ' from Mania-Exchange.')->sendAdmin();
+        infoMessage('Downloading map pack ', secondary($packId), ' from Exchange.')->sendAdmin();
 
         $this->packsDir = MapController::getMapsPath('MXPacks');
 
@@ -38,7 +44,7 @@ class MxPackJob
         }
 
         $this->info = Cache::get("map-packs/".$packId."_info");
-        $this->name = $this->info->ID.'_'.$this->info->Shortname;
+        $this->name = $this->info->ID.'_'. $this->info->ShortName;
         $this->path = $this->packsDir.'/'.$this->name.'.zip';
         $this->issuer = $player;
         $this->id = $packId;
@@ -60,8 +66,14 @@ class MxPackJob
             return;
         }
 
-        $url = sprintf('https://tm.mania-exchange.com/mappack/download/%s?%s', $this->info->ID, $this->info->Secret);
+        if (isManiaPlanet()){
+            $url = Exchange::MANIAPLANET_MX_URL;
+        }else{
+            $url = Exchange::TRACKMANIA_MX_API_URL;
+        }
 
+        $secret = (isset($this->info->Secret) ? $this->info->Secret : '');
+        $url = sprintf($url . '/mappack/download/%s?%s', $this->info->ID, $secret);
         $response = RestClient::get($url);
 
         if ($response->getStatusCode() != 200) {
@@ -105,7 +117,12 @@ class MxPackJob
     {
         $files->each(function ($value) {
             $name = basename($value);
-            preg_match('/\((\d+)\)\.Gbx$/', $name, $matches);
+
+            $pattern = '/\((\d+)\)\.Map.Gbx$/';
+            if (isManiaPlanet())
+              $pattern = '/\((\d+)\)\.Gbx$/';
+
+            preg_match($pattern, $name, $matches);
             $mx_id = $matches[1];
             $filename = 'MXPacks/'.$this->name.'/'.$name;
 
@@ -153,8 +170,15 @@ class MxPackJob
 
         Hook::fire('MapPoolUpdated');
 
+        if (isManiaPlanet()){
+            $url = Exchange::MANIAPLANET_MX_URL;
+        }else{
+
+            $url = Exchange::TRACKMANIA_MX_URL;
+        }
+
         infoMessage($this->issuer, ' added map-pack ',
-            '$l[https://tm.mania-exchange.com/mappack/view/'.$this->id.']'.secondary($this->info->Name),
-            ' from Mania-Exchange.')->sendAll();
+            '$l[' . $url . '/mappack/view/'.$this->id.']'.secondary($this->info->Name),
+            '$l from Exchange.')->sendAll();
     }
 }

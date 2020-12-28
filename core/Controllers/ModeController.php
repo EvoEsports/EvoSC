@@ -4,7 +4,14 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\Server;
+use EvoSC\Classes\Timer;
+use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Modules\InputSetup\InputSetup;
+use EvoSC\Modules\QuickButtons\QuickButtons;
 
 class ModeController implements ControllerInterface
 {
@@ -45,31 +52,55 @@ class ModeController implements ControllerInterface
             case 'TimeAttack.Script.txt':
             case 'Trackmania/TM_TimeAttack_Online.Script.txt':
                 self::$isTimeAttackType = true;
+                self::$isRoundsType = false;
                 break;
 
             case 'Rounds.Script.txt':
             case 'Trackmania/TM_Rounds_Online.Script.txt':
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
                 break;
 
             case 'Laps.Script.txt':
             case 'Trackmania/TM_Laps_Online.Script.Script.txt':
-                self::$laps = true;
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$laps = true;
                 break;
 
             case 'Teams.Script.txt':
-            case 'Trackmania/TM_Teams_Online.Script.Script.txt':
-                self::$teams = true;
+            case 'Trackmania/TM_Teams_Online.Script.txt':
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$teams = true;
                 break;
 
             case 'Cup.Script.txt':
             case 'Trackmania/TM_Cup_Online.Script.Script.txt':
-                self::$cup = true;
+                self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
+                self::$cup = true;
                 break;
         }
+    }
+
+    public static function rebootModules()
+    {
+        $mode = Server::getScriptName()['NextValue'];
+
+        HookController::init();
+        ChatCommand::removeAll();
+        Timer::destroyAll();
+        ManiaLinkEvent::removeAll();
+        InputSetup::clearAll();
+        if (config('quick-buttons.enabled')) {
+            QuickButtons::removeAll();
+        }
+
+        ControllerController::loadControllers($mode);
+        self::setMode($mode);
+        ModuleController::startModules($mode, false);
+        EscRun::addBootCommands();
     }
 
     /**

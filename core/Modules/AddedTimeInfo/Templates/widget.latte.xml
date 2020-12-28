@@ -6,7 +6,7 @@
     {block size}29 9{/block}
 
     {block content}
-    <frame pos="20.5 -1" z-index="2">
+    <frame pos="21.5 -1" z-index="2">
         <label class="open-controls text-light" id="time" z-index="2" size="20 5" text="+0 min." halign="center" valign="center" textprefix="$s"/>
     </frame>
     <frame pos="0.5 -4" scale="0.6" id="buttons">
@@ -31,12 +31,18 @@
             declare timeLabel <=> (Page.MainFrame.GetFirstChild("time") as CMlLabel);
             declare icon2 <=> (Page.MainFrame.GetFirstChild("icon2") as CMlLabel);
             declare Text sign = "";
+            declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+            declare timeRemaining = 0;
 
-            left__ = {config('added-time-info.ui.position') == 'left' ? 'True' : 'False'};
+            left__ = {config('added-time-info.ui.position') == 'left'|ms_bool};
             slot__ = {config('added-time-info.ui.slot')};
         {/block}
 
         {block loop}
+            timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+            buttons.Visible = timeRemaining > 0;
+            timeLabel.Visible = timeRemaining > 0;
+
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();
                 buttons.Hide();

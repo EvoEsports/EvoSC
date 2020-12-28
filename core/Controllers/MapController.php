@@ -99,7 +99,7 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
 
-        if (ModeController::isRoundsType()) {
+        if (ModeController::isRoundsType() || ModeController::teams()) {
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }
@@ -151,7 +151,22 @@ class MapController implements ControllerInterface
         ]);
 
         if (!$map->mx_details) {
-            MxDownload::loadMxDetails($map);
+            $mx_details = MxDownload::loadMxDetails($map->uid);
+
+            if (!is_null($mx_details)) {
+                if ($map->author->Login == $map->author->NickName) {
+                    $map->author->update(['NickName' => $mx_details->Username]);
+                }
+
+                if (is_null($map->exchange_version)) {
+                    $map->update(['exchange_version' => $mx_details->UpdatedAt]);
+                    $map->exchange_version = $mx_details->UpdatedAt;
+                }
+
+                if (strtotime($mx_details->UpdatedAt) > strtotime($map->exchange_version)) {
+                    dangerMessage('There is an update available for this map! Call ', secondary('//add ' . $map->mx_id), ' to update.')->sendAdmin();
+                }
+            }
         }
     }
 
@@ -345,8 +360,14 @@ class MapController implements ControllerInterface
      */
     public static function getGbxInformation($filename, bool $asString = true)
     {
-        //$executable = isManiaPlanet() ? 'ManiaPlanetServer' : 'TrackmaniaServer';
         $executable = config('server.executeable');
+
+        if ($executable == 'TrackmaniaServer' && isManiaPlanet()) {
+            $executable = 'ManiaPlanetServer';
+        }
+        if ($executable == 'ManiaPlanetServer' && isTrackmania()) {
+            $executable = 'TrackmaniaServer';
+        }
 
         if (isWindows()) {
             $executable .= '.exe';

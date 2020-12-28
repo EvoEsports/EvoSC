@@ -1,0 +1,96 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}match-maker{/block}
+    {block size}44 39{/block}
+
+    {block content}
+    <quad class="bg-dark" size="100 100" opacity="0.8" z-index="-2" ScriptEvents="1" />
+    <quad class="bg-accent" pos="36" size="8 100" opacity="0.9" z-index="-1" ScriptEvents="1" />
+
+    <frame id="content" pos="-6.5 3" z-index="10">
+        <label class="text-light" pos="44.5 -5" text="" textsize="1.6" z-index="5" />
+        <label class="btn-muted" pos="11.75 -6.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" action="change_point_team,0,-1" />
+        <label class="btn-muted" pos="20.25 -6.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" action="change_point_team,0,1" />
+        <label class="btn-muted" pos="28.75 -6.5" size="7.5 4" text="-1" ScriptEvents="1" textsize="0.5" action="change_point_team,1,-1" />
+        <label class="btn-muted" pos="37.25 -6.5" size="7.5 4" text="+1" ScriptEvents="1" textsize="0.5" action="change_point_team,1,1" />
+        <quad class="bg-light team1" pos="11.75 -8.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
+        <quad class="bg-light team1" pos="20.25 -8.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
+        <quad class="bg-light team2" pos="28.75 -8.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
+        <quad class="bg-light team2" pos="37.25 -8.5" size="7.5 0.5" text="+1" ScriptEvents="1" textsize="0.5" opacity="0.75" halign="center" />
+        <label class="btn-muted" pos="24.5 -12" size="33 4" text=" Setup Teams" action="show_teams_setup" textsize="0.5" />
+        <label class="btn-muted" pos="24.5 -17" size="33 4" text="Balance Teams" textsize="0.5" action="balance_teams" />
+
+        <frame pos="0 -13">
+            <quad class="bg-light" pos="-1 -8" size="100 0.1" opacity="0.5" />
+            <label class="text-light" pos="44.75 -10.25" text="" textsize="1.6" z-index="5" />
+            <label id="horns" class="btn-muted horns" pos="16 -12" size="16 4" text=" Disable Horns" ScriptEvents="1" textsize="0.5" />
+        </frame>
+        <frame pos="0 -21">
+            <quad class="bg-light" pos="-1 -8" size="100 0.1" opacity="0.5" />
+            <label class="text-light" pos="44.75 -10.25" text="🏁" textsize="1.6" z-index="5" />
+            <label class="btn-success" pos="16 -12" size="16 4" text=" Start Match" ScriptEvents="1" textsize="0.25" />
+            <label class="btn-danger" pos="33 -12" size="16 4" text=" Stop Match" ScriptEvents="1" textsize="0.25" />
+            <label class="btn-warning" pos="16 -17" size="16 4" text=" Reset Map" ScriptEvents="1" textsize="0.25" action="map.reset" />
+            <label class="btn-warning" pos="33 -17" size="16 4" text=" Skip Map" ScriptEvents="1" textsize="0.25" action="map.skip" />
+        </frame>
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    Void updateTeamNames(){
+        declare content <=> (Page.MainFrame.GetFirstChild("content") as CMlFrame);
+
+        for(teamId, 1, 2){
+            Page.GetClassChildren("team" ^ teamId, content, True);
+            foreach(Control in Page.GetClassChildren_Result){
+                declare bar = (Control as CMlQuad);
+                bar.BgColor = Teams[teamId - 1].ColorPrimary;
+            }
+        }
+    }
+
+    Void updateHornsButton(CMlLabel control){
+        if(control.DataAttributeGet("enabled") == ""){
+            control.Value = "Horns ";
+            control.DataAttributeSet("enabled", "true");
+        }else{
+            control.Value = "Horns ";
+            control.DataAttributeSet("enabled", "");
+        }
+    }
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        updateTeamNames();
+
+        declare teamBalanceButton <=> (Page.MainFrame.GetFirstChild("balance") as CMlLabel);
+        declare hornsButton <=> (Page.MainFrame.GetFirstChild("horns") as CMlLabel);
+        hornsButton.DataAttributeSet("enabled", "{$hornsEnabled}");
+        updateHornsButton(hornsButton);
+
+        left__ = {config('match-maker.ui.position') == 'left'|ms_bool};
+        slot__ = {config('match-maker.ui.slot')};
+    {/block}
+
+    {block loop}
+    if(!UseClans){
+        widgetSetHeight__(0.0);
+    }
+    {/block}
+
+    {block pendingEvents}
+        if(event.Control.HasClass("horns") && event.Type == CMlScriptEvent::Type::MouseClick){
+            updateHornsButton(event.Control as CMlLabel);
+            TriggerPageAction("toggle_horns");
+        }
+    {/block}
+--></script>
+</manialink>

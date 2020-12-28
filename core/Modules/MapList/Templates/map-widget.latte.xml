@@ -36,7 +36,6 @@
     {/block}
 
     {block script}
-    {include 'Scripts.drag'}
     {/block}
 
     <script><!--
@@ -70,7 +69,7 @@
         declare favIconLabel <=> (Page.MainFrame.GetFirstChild("fav-icon") as CMlLabel);
         declare favLabelLabel <=> (Page.MainFrame.GetFirstChild("fav-label") as CMlLabel);
 
-        left__ = {config('map-list.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('map-list.ui.position') == 'left'|ms_bool};
         slot__ = {config('map-list.ui.slot')};
     {/block}
 

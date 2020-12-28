@@ -23,7 +23,7 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('pay2play.addtime.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('pay2play.addtime.ui.position') == 'left'|ms_bool};
         slot__ = {config('pay2play.addtime.ui.slot')};
     {/block}
 

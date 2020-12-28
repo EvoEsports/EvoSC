@@ -127,7 +127,7 @@ Void updateWindow(Text[Text][] MapQueue){
         (frame.Controls[3] as CMlLabel).Value = getLocal(map["id"]);
         (frame.Controls[4] as CMlLabel).Value = getDedi(map["id"]);
         (frame.Controls[6] as CMlLabel).Value = map["nick"];
-        ((frame.Controls[7] as CMlFrame).Controls[0] as CMlLabel).Visible = (LocalUser.Login == map["login"] || {$localPlayer->hasAccess('map_queue_drop') ? 'True' : 'False'});
+        ((frame.Controls[7] as CMlFrame).Controls[0] as CMlLabel).Visible = (LocalUser.Login == map["login"] || {$localPlayer->hasAccess('map_queue_drop')|ms_bool});
         frame.Show();
 
         i += 1;

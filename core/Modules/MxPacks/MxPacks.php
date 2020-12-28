@@ -15,6 +15,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxPacks\Classes\MxPackJob;
 use Exception;
+use EvoSC\Classes\Log;
 
 class MxPacks extends Module implements ModuleInterface
 {
@@ -50,15 +51,19 @@ class MxPacks extends Module implements ModuleInterface
         ManiaLinkEvent::add('mappack.aprove', [self::class, 'downloadMapPack'], 'map_add');
     }
 
-    public static function showAddMapPack(Player $player, string $packId, string $secret = null)
+    public static function showAddMapPack(Player $player, $cmd, $packId, $secret = '')
     {
-        $cacheIdInfo = 'map-packs/'.$packId.'_info';
-        $cacheIdTracks = 'map-packs/'.$packId.'_trackslist';
+        $cacheIdInfo = 'map-packs/' . $packId . '_info';
+        $cacheIdTracks = 'map-packs/' . $packId . '_trackslist';
 
         if (Cache::has($cacheIdInfo)) {
             $info = Cache::get($cacheIdInfo);
         } else {
-            $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+            if (isManiaPlanet()) {
+                $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+            } else {
+                $url = sprintf(self::$apiUrl . '/api/mappack/get_info/%d/?=%s', $packId, $secret);
+            }
 
             $response = RestClient::get($url);
             $info = json_decode($response->getBody()->getContents());
@@ -69,34 +74,34 @@ class MxPacks extends Module implements ModuleInterface
                 return;
             }
 
-            $info = $info[0];
+            $info = isManiaPlanet() ? $info[0] : $info;
 
-            Cache::put($cacheIdInfo, $info, now()->addDay());
+            Cache::put($cacheIdInfo, $info, now()->addMinute());
         }
 
-        if (Cache::has($cacheIdTracks)) {
-            $trackList = Cache::get($cacheIdTracks);
-        } else {
-            $url = sprintf(self::$apiUrl .'/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+        if (isManiaPlanet()){
+            $url = sprintf(self::$apiUrl . '/tm/mappack/%d/tracks/?=%s', $packId, $secret);
+        }else{
+            $url = sprintf(self::$exchangeUrl . '/api/mappack/get_mappack_tracks/%d/?=%s', $packId, $secret);
+        }
 
-            try {
-                $response = RestClient::get($url);
+        try {
+            $response = RestClient::get($url);
 
-                if ($response->getStatusCode() != 200) {
-                    throw new Exception('Failed to get map-list.');
-                }
-
-                $trackList = json_decode($response->getBody()->getContents());
-
-                Cache::put($cacheIdTracks, $trackList, now()->addDays(1));
-            } catch (Exception $e) {
-                warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
-
-                return;
+            if ($response->getStatusCode() != 200) {
+                throw new Exception('Failed to get map-list.');
             }
+
+            $trackList = json_decode($response->getBody()->getContents());
+
+            Cache::put($cacheIdTracks, $trackList, now()->addMinute());
+        } catch (Exception $e) {
+            warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
+
+            return;
         }
 
-        Template::show($player, 'mx-packs.confirm', compact('trackList', 'info'));
+        Template::show($player, 'MxPacks.confirm', compact('trackList', 'info'));
     }
 
     public static function downloadMapPack(Player $player, $mapPackId)

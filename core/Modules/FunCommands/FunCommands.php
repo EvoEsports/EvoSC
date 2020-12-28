@@ -7,6 +7,7 @@ use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Controllers\ChatController;
+use EvoSC\Controllers\PlayerController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
@@ -44,13 +45,26 @@ class FunCommands extends Module implements ModuleInterface
                 return;
             }
 
+            $parts = explode(' ', $message);
+            foreach ($parts as $part) {
+                if (preg_match('/@(.+)/', $part, $matches)) {
+                    $target = PlayerController::findPlayerByName($player, $matches[1]);
+                    if ($target) {
+                        $message = str_replace($part, '$<' . secondary($target->NickName) . '$>', $message);
+                    } else {
+                        warningMessage('Player ', secondary($matches[1]), ' not found.')->send($player);
+                        return;
+                    }
+                }
+            }
+
             if (preg_match_all('/{(.+?)}/', $message, $matches)) {
                 for ($i = 0; $i < count($matches[0]); $i++) {
-                    $message = str_replace($matches[0][$i], secondary($matches[1][$i]) . '$z$s$' . config('colors.info'), $message);
+                    $message = str_replace($matches[0][$i], '$<' . secondary($matches[1][$i]) . '$>', $message);
                 }
             }
 
             infoMessage($player, ' ', $message)->sendAll();
-        }, 'Mimic info output, put text into curly braces to make it secondary-color.');
+        }, 'Print a info-message beginning with your name.');
     }
 }

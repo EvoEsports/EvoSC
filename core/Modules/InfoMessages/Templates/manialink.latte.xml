@@ -1,6 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
-{php $window_height = 12.5 + count($messages) * 4;}
+{php $window_width = 104;}
+{php $window_height = 12.5 + $count * 4;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}info-msg-window{/block}
@@ -8,29 +9,58 @@
     {block title}Info-Messages{/block}
 
     {block content}
+    <framemodel id="info_message">
+        <label class="delete btn-danger" text="" textsize="0.5" scale="0.7" pos="3 -1" size="4 4" ScriptEvents="1"/>
+        <label class="edit btn-default" text="" textsize="0.5" scale="0.7" pos="6.5 -1" size="4 4" ScriptEvents="1"/>
+        <label class="text-light" text="text" textprefix="${config('colors.info')}" size="94 4" textsize="0.5" pos="9 0"/>
+        <label class="text-light" text="minutes" halign="right" textsize="0.5" pos="100 0"/>
+    </framemodel>
+
     <frame id="settings" pos="-1 6">
         <label class="create btn-default" textfont="{config('colors.ui.font')|noescape}" pos="8 -8.5" size="15 4" text=" CREATE" textsize="0.5" scale="0.9" valign="center" halign="center" ScriptEvents="1" focusareacolor1="{config('colors.ui.window.btn.primary')}9" focusareacolor2="{config('colors.ui.window.btn.primary')}c" />
 
         <label class="text-light" text="Messages" textsize="0.5" textprefix="$s" pos="9 -12" />
-        <label class="text-light" text="Show every" textsize="0.5" textprefix="$s" halign="right" pos="116 -12" />
+        <label class="text-light" text="Print Every" textsize="0.5" textprefix="$s" halign="right" pos="100 -12" />
 
-        {foreach $messages as $message}
-        <label class="delete btn-danger" data-id="{$message->id}" text="" textsize="0.5" scale="0.7" pos="3 {$iterator->counter * -4 - 13}" size="4 4" ScriptEvents="1"/>
-        <label class="edit btn-default" data-id="{$message->id}" data-message="{$message->text}" data-pause="{$message->delay}" text="" textsize="0.5" scale="0.7" pos="6.5 {$iterator->counter * -4 - 13}" size="4 4" ScriptEvents="1"/>
-        <label class="text-light" text="{$message->text}" textprefix="${config('colors.info')}" size="94 4" textsize="0.5" pos="9 {$iterator->counter * -4 - 12}"/>
-        <label class="text-lirght" text="{$message->delay} minutes" halign="right" textsize="0.5" pos="116 {$iterator->counter * -4 - 12}"/>
-        {/foreach}
+        <frame id="messages_box">
+            {for $i=1; $i<=$count; $i++}
+            <frameinstance modelid="info_message" pos="0 {$i * -4 - 12}"></frameinstance>
+            {/for}
+        </frame>
     </frame>
     {/block}
 
     <script><!--
     {block globals}
+    #Struct EvoSC_InfoMessage {
+        Integer id;
+        Integer delay;
+        Text text;
+    }
     {/block}
 
     {block functions}
     {/block}
 
     {block bootScript}
+        declare EvoSC_InfoMessage[] messages;
+        messages.fromjson("""{$messages}""");
+
+        declare messagesBox <=> (Page.MainFrame.GetFirstChild("messages_box") as CMlFrame);
+        for(i, 0, messages.count - 1){
+            if(i >= messagesBox.Controls.count) break;
+
+            declare messageFrame = (messagesBox.Controls[i] as CMlFrame);
+            declare message = messages[i];
+            declare text = message.text;
+            if(TL::Length(text) > 70){
+                text = "$<" ^ TL::SubString(text, 0, 70) ^ "$>...";
+            }
+            messageFrame.Controls[0].DataAttributeSet("id", "" ^ message.id);
+            messageFrame.Controls[1].DataAttributeSet("id", "" ^ message.id);
+            (messageFrame.Controls[2] as CMlLabel).Value = text;
+            (messageFrame.Controls[3] as CMlLabel).Value = message.delay ^ " min.";
+        }
     {/block}
 
     {block pendingEvents}

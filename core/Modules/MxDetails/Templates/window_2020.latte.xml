@@ -1,0 +1,116 @@
+{contentType text}
+{extends 'Components.window'}
+{php $window_width = 100;}
+{php $window_height = 61;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}mx-details{/block}
+    {block icon}{/block}
+    {block title}Map Details{/block}
+
+    {block content}
+    <frame pos="-5 0">
+        <quad bgcolor="000" size="100 17" pos="3 1.8" opacity="0.2" />
+        <label class="text-light" pos="52 -3.75" size="94" textsize="4.5" text="{$map->name}" valign="center" halign="center" z-index="5" />
+        <label class="text-light" pos="52 -10" size="80" textsize="1.6" text="by {$map->author->NickName}" valign="center" halign="center" z-index="5" />
+
+        <frame pos="66 -21">
+            <label class="btn-muted" pos="0 -18" size="28 5" textsize="0.9" text=" View on TMX" valign="center" halign="center" url="https://trackmania.exchange/tracks/{$map->mx_details->TrackID}" />
+            <label class="btn-muted id" pos="23 -18" size="16 5" textsize="0.9" text=" TMX-ID" data-value="{$map->mx_details->TrackID}" valign="center" halign="center" ScriptEvents="1" />
+            <label class="btn-muted login" pos="0 -24" size="28 5" textsize="0.9" text=" Copy author login" data-value="{$map->author->Login}" valign="center" halign="center" ScriptEvents="1" />
+            <label class="btn-accent juke" pos="0 -30" size="28 5" textsize="0.9" text=" Add to queue" data-value="{$map->uid}" valign="center" halign="center" ScriptEvents="1" />
+            {if $localPlayer->hasAccess('map_disable')}
+            <label class="btn-danger disable" pos="23 -24" size="16 5" textsize="0.9" text=" Disable" data-value="{$map->uid}" valign="center" halign="center" ScriptEvents="1" z-index="10" />
+            {/if}
+            {if $localPlayer->hasAccess('map_delete')}
+            <label class="btn-danger delete" pos="23 -30" size="16 5" textsize="0.9" text=" Delete" data-value="{$map->uid}" valign="center" halign="center" ScriptEvents="1" z-index="10" />
+            {/if}
+        </frame>
+
+        <frame pos="10 -34" scale="1.2">
+            <label class="text-light" z-index="1" valign="center" halign="left" pos="0 0" size="25 2" textsize="1" text="Top Local Records"/>
+            {if count($locals) == 0}
+            <label class="text-light" z-index="1" valign="center" halign="left" pos="0 -3.5" size="25 2" textsize="0.75" opacity="0.5" text="No local records"/>
+            {/if}
+            {foreach $locals as $i => $local}
+            <frame pos="-3.5 {$i * -3 - 4}">
+                <label class="text-light" z-index="1" valign="center" halign="left" pos="3.5 0" size="4 2" textprefix="$s" textsize="0.4" text="{$local->rank}."/>
+                <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text="{formatScore($local->score)}" opacity="0.25"/>
+                <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="12 2" textsize="0.6" text="{formatScore($local->score)}"/>
+                <label class="text-light" z-index="1" valign="center" halign="left" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="{$local->name}"/>
+            </frame>
+            {/foreach}
+        </frame>
+
+        <frame pos="-13 -1">
+            <label class="text-light" pos="62 -19.75" size="80" textsize="3.3" text="{formatScore($map->gbx->AuthorTime)}" valign="center" halign="center" />
+            <label class="text-light" pos="62 -25" size="40 5" textsize="0.75" text="Author Time" valign="center" halign="center" textcolor="fffc" />
+            <label class="text-light" pos="78 -20" size="40 5" textsize="0.75" text="First upload: {preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" halign="left" textcolor="fff" opacity="0.75" />
+            <label class="text-light" pos="78 -24" size="40 5" textsize="0.75" text="Latest version: {preg_replace('/T.+/', '', $map->mx_details->UploadedAt)}" valign="center" halign="left" textcolor="fff" opacity="0.75" />
+
+            <frame pos="34 5">
+                <frame id="stars" size="0 10" pos="-11 -20">
+                    <quad size="100 100" bgcolor="0000" />
+                    <label class="text-light" pos="11 -5" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fd0" z-index="1" />
+                </frame>
+                <label class="text-light" pos="0 -25" size="30 5" textsize="3" text="" valign="center" halign="center" textcolor="fff3" />
+                <label class="text-light" pos="0 -30" size="30 5" textsize="0.75" text="Total votes: {$totalVotes}" valign="center" halign="center" textcolor="fffc" />
+            </frame>
+        </frame>
+    </frame>
+    {/block}
+
+    {include 'Scripts.mle'}
+    {include 'Dialogues.confirm'}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block functions}
+    {/block}
+
+    {block bootScript}
+    declare CMlFrame starsFrame = (Page.MainFrame.GetFirstChild("stars") as CMlFrame);
+    declare Real rating = {sprintf('%.2f', $rating)};
+
+    if(rating != -1){
+        starsFrame.Size[0] = 22.0 * rating / 100.0;
+    }
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("login")){
+            System.ClipboardSet(event.Control.DataAttributeGet("value"));
+            continue;
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("id")){
+            System.ClipboardSet(event.Control.DataAttributeGet("value"));
+            continue;
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("juke")){
+            TriggerPageAction("map.queue," ^ event.Control.DataAttributeGet("value"));
+            continue;
+        }
+            {if $localPlayer->hasAccess('map_disable')}
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("disable")){
+            if(confirm("Disable map?")){
+                TriggerPageAction("{$map_list_class|classpath}::mleDisableMap," ^ event.Control.DataAttributeGet("value"));
+            }
+            continue;
+        }
+            {/if}
+            {if $localPlayer->hasAccess('map_delete')}
+        if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("delete")){
+            if(confirm("Delete map and all associated data?")){
+                TriggerPageAction("{$map_list_class|classpath}::mleDeleteMap," ^ event.Control.DataAttributeGet("value"));
+            }
+            continue;
+        }
+            {/if}
+    {/block}
+    --></script>
+</manialink>

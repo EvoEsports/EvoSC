@@ -50,9 +50,9 @@ class LiveRankings extends Module implements ModuleInterface
         $showTop = config('live-rankings.show', 14);
 
         if(ModeController::isTimeAttackType()){
-            $top = $top->sortBy('score')->take($showTop)->values()->toJson();
+            $top = $top->sortBy('score')->take($showTop)->values();
         }else{
-            $top = $top->sortByDesc('points')->take($showTop)->values()->toJson();
+            $top = $top->sortByDesc('points')->take($showTop)->values();
         }
 
         Template::showAll('LiveRankings.update', compact('top'));

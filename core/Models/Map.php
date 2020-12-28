@@ -43,21 +43,7 @@ class Map extends Model
     /**
      * @var array
      */
-    protected $fillable = [
-        'uid',
-        'filename',
-        'plays',
-        'author',
-        'last_played',
-        'enabled',
-        'mx_id',
-        'mx_details',
-        'mx_world_record',
-        'cooldown',
-        'name',
-        'environment',
-        'title_id',
-    ];
+    protected $guarded = ['id'];
 
     /**
      * @var array

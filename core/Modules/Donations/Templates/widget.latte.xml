@@ -41,7 +41,7 @@
         declare Boolean barVisible = False;
         declare Integer amount = 0;
 
-        left__ = {config('donations.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('donations.ui.position') == 'left'|ms_bool};
         slot__ = {config('donations.ui.slot')};
     {/block}
 

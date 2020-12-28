@@ -1,0 +1,64 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}add-time-buttons{/block}
+    {block size}44 5{/block}
+
+    {block content}
+    <quad class="bg-dark" size="50 50" opacity="0.8" />
+    <label class="text-light" pos="1.75 -2.35" text="ADD TIME" valign="center" z-index="1" opacity="0.9" />
+    <frame pos="38.5 -2.5" z-index="1">
+        {foreach $buttons as $i => $button}
+        <label class="btn-muted" pos="{$i * -9.5}" size="8 3" text="+{$button}" textsize="0.25" action="add_time,{$button}" />
+        {/foreach}
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
+        declare hidden = False;
+
+        widget.Hide();
+        wait(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack");
+        widget.Show();
+
+        left__ = {config('add-time.ui.position') == 'left'|ms_bool};
+        slot__ = {config('add-time.ui.slot')};
+    {/block}
+
+    {block loop}
+        declare timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        declare shouldBeHidden = timeRemaining <= 0;
+
+        if(shouldBeHidden && !hidden){
+            hidden = True;
+            widgetSetHeight__(0.0);
+        }else if(!shouldBeHidden && hidden){
+            hidden = False;
+            widgetSetHeight__(5.0);
+        }
+
+        if(CurrentServerModeName != "TM_TimeAttack_Online"){
+            widgetSetHeight__(0.0);
+            sleep(300);
+            widget.Hide();
+            return;
+        }
+
+        sleep(50);
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+--></script>
+</manialink>

@@ -1,0 +1,140 @@
+{
+  "enabled": true,
+  "settings": [
+    {
+      "id": "Race_Chrono",
+      "position": [
+        0,
+        -80
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_RespawnHelper",
+      "position": [
+        157,
+        -80
+      ],
+      "scale": 0.9,
+      "visible": false,
+      "visible_update": true,
+      "position_update": true,
+      "scale_update": true
+    },
+    {
+      "id": "Race_Checkpoint",
+      "position": [
+        -10,
+        45
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_LapsCounter",
+      "position": [
+        155.7,
+        86
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_TimeGap",
+      "position": [
+        44,
+        -52
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_ScoresTable",
+      "position": [
+        -50,
+        0
+      ],
+      "scale": 1,
+      "visible": false,
+      "visible_update": true
+    },
+    {
+      "id": "Race_DisplayMessage",
+      "position": [
+        -158,
+        81
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_Countdown",
+      "position": [
+        157,
+        4
+      ],
+      "scale": 1,
+      "visible": false,
+      "visible_update": true
+    },
+    {
+      "id": "Race_SpectatorBase_Name",
+      "position": [
+        0,
+        -60
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_SpectatorBase_Commands",
+      "position": [
+        151,
+        -87
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_Record",
+      "position": [
+        -160,
+        0
+      ],
+      "scale": 0.9,
+      "scale_update": true,
+      "visible": true,
+      "visible_update": true,
+      "position_update": true
+    },
+    {
+      "id": "Race_BigMessage",
+      "position": [
+        0,
+        80
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_BlockHelper",
+      "position": [
+        0,
+        50
+      ],
+      "scale": 1,
+      "visible": true
+    },
+    {
+      "id": "Race_BestRaceViewer",
+      "position": [
+        139,
+        -50
+      ],
+      "scale": 1,
+      "visible": false,
+      "visible_update": true
+    }
+  ]
+}

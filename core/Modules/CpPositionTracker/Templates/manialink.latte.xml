@@ -168,7 +168,7 @@
 
         positions = Position[Text];
 
-        left__ = {config('cp-pos-tracker.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('cp-pos-tracker.ui.position') == 'left'|ms_bool};
         slot__ = {config('cp-pos-tracker.ui.slot')};
     {/block}
 

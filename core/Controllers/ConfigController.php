@@ -155,12 +155,6 @@ class ConfigController implements ControllerInterface
                     }
                 }
             }
-
-            foreach ($targetJson as $key => $value) {
-                if (!isset($sourceJson->{$key})) {
-                    unset($targetJson->{$key});
-                }
-            }
         }
 
         return $targetJson;
@@ -171,13 +165,17 @@ class ConfigController implements ControllerInterface
         $map = collect();
 
         self::$rawConfigs->each(function ($value, $base) use ($map) {
-            self::createPathsRecursively($base, $value)->each(function ($value, $path) use ($map) {
-                if ($value === null) {
-                    $value = false;
-                }
+            $paths = self::createPathsRecursively($base, $value);
 
-                $map->put($path, $value);
-            });
+            if($paths != null){
+                $paths->each(function ($value, $path) use ($map) {
+                    if ($value === null) {
+                        $value = false;
+                    }
+
+                    $map->put($path, $value);
+                });
+            }
         });
 
         if (isVeryVerbose()) {
@@ -203,6 +201,10 @@ class ConfigController implements ControllerInterface
 
     private static function createPathsRecursively(string $base, $values)
     {
+        if (is_null($values)) {
+            return null;
+        }
+
         $base = strtolower($base);
         $paths = collect();
 

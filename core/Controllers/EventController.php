@@ -114,6 +114,13 @@ class EventController implements ControllerInterface
 
             $player->spectator_status = $playerInfo['SpectatorStatus'];
             $player->player_id = $playerInfo['PlayerId'];
+            $player->ubisoft_name = $playerInfo['NickName'];
+            $player->team = $playerInfo['TeamId'];
+            if ($player->isDirty()) {
+                $player->save();
+                Hook::fire('PlayerInfoChanged', $player);
+            }
+
             PlayerController::putPlayer($player);
         }
     }
@@ -180,15 +187,29 @@ class EventController implements ControllerInterface
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
             $details = Server::getDetailedPlayerInfo($playerInfo[0]);
 
-            $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
-                'NickName' => $details->nickName,
-                'path' => $details->path,
-                'player_id' => $details->playerId,
-            ]);
+            if (isManiaPlanet()) {
+                $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
+                    'NickName' => $details->nickName,
+                    'path' => $details->path,
+                    'player_id' => $details->playerId,
+                    'team' => $details->teamId
+                ]);
+            } else {
+                if ($name_ = Cache::get('nicknames/' . $playerInfo[0])) {
+                    $name = $name_;
+                } else {
+                    $name = $details->nickName;
+                }
 
-            if (isTrackmania() && Cache::has('nicknames/' . $playerInfo[0])) {
-                $name = Cache::get('nicknames/' . $playerInfo[0]);
-                PlayerController::setName($player, 'silent', $name);
+                $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
+                    'NickName' => $name,
+                    'ubisoft_name' => $details->nickName,
+                    'path' => $details->path,
+                    'player_id' => $details->playerId,
+                    'team' => $details->teamId
+                ]);
+
+                $player->NickName = $name;
             }
 
             Hook::fire('PlayerConnect', $player);
@@ -205,7 +226,11 @@ class EventController implements ControllerInterface
     private static function mpPlayerDisconnect($arguments)
     {
         if (count($arguments) == 2 && is_string($arguments[0])) {
-            Hook::fire('PlayerDisconnect', player($arguments[0]), 0);
+            $player = Player::updateOrCreate(['Login' => $arguments[0]], [
+                'player_id' => 0
+            ]);
+
+            Hook::fire('PlayerDisconnect', $player, 0);
         } else {
             throw new Exception('Malformed callback');
         }

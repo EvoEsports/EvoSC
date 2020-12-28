@@ -1,0 +1,72 @@
+{contentType text}
+{extends 'Components.window'}
+{php $window_width = 98;}
+{php $window_height = 36;}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}team-setup{/block}
+    {block icon}{/block}
+    {block title}Teams Setup{/block}
+
+    {block content}
+    <framemodel id="team">
+    </framemodel>
+
+    <frame pos="0 0">
+        <frame id="columns">
+            {for $i=0; $i<2; $i++}
+            <frame pos="{$i * 48} 0">
+                <label class="text-light" pos="1 -1" text="Team 1" halign="left" textsize="2" />
+                <label class="text-light" pos="1 -9" text="Name" halign="left" textsize="1" valign="center" />
+                <entry name="name[{$i}]" class="form" pos="19 -9" size="26 4" valign="center" />
+                <label class="text-light" pos="1 -14" text="Primary Color" size="16" halign="left" textsize="1" valign="center" />
+                <entry name="primary[{$i}]" class="form" pos="19 -14" size="26 4" valign="center" />
+                <label class="text-light" pos="1 -19" text="Secondary Color" size="16" halign="left" textsize="1" valign="center" />
+                <entry name="secondary[{$i}]" class="form" pos="19 -19" size="26 4" valign="center" />
+            </frame>
+            {/for}
+        </frame>
+
+        <label class="btn-success apply" pos="40.5 -28" size="16 5" text="Apply" ScriptEvents="1" />
+        <label class="btn-danger cancel" pos="57.5 -28" size="16 5" text="Cancel" ScriptEvents="1" />
+    </frame>
+    {/block}
+
+    <script><!--
+    {block globals}
+    #Include "ColorLib" as CL
+    {/block}
+
+    {block functions}
+        Void setup(){
+            declare columns <=> (Page.MainFrame.GetFirstChild("columns") as CMlFrame);
+            for(i, 1, 2){
+                declare frame = (columns.Controls[i - 1] as CMlFrame);
+                (frame.Controls[0] as CMlLabel).Value = "Team " ^ i;
+                (frame.Controls[2] as CMlEntry).Value = Teams[i - 1].Name;
+                (frame.Controls[4] as CMlEntry).Value = CL::RgbToHex(Teams[i - 1].ColorPrimary);
+                (frame.Controls[6] as CMlEntry).Value = CL::RgbToHex(Teams[i - 1].ColorSecondary);
+            }
+        }
+    {/block}
+
+    {block bootScript}
+        setup();
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("apply")){
+        TriggerPageAction("setup_teams");
+        window.Hide();
+        return;
+    }
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
+        window.Hide();
+        return;
+    }
+    {/block}
+    --></script>
+</manialink>

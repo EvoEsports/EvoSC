@@ -184,7 +184,7 @@
         primaryColor = TL::ToColor("{config('theme.hud.text-light')}");
         headerColor = TL::ToColor("{config('theme.hud.accent')}");
 
-        left__ = {config('locals.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('locals.ui.position') == 'left'|ms_bool};
         slot__ = {config('locals.ui.slot')};
     {/block}
 

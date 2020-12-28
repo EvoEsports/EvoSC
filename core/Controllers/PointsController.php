@@ -4,7 +4,9 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Controller;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
@@ -12,7 +14,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
 
-class PointsController implements ControllerInterface
+class PointsController extends Controller implements ControllerInterface
 {
     /**
      * @var int
@@ -41,12 +43,17 @@ class PointsController implements ControllerInterface
             return;
         }
 
-        self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
-        if (self::$originalPointsLimit == -1) {
-            self::$originalPointsLimit = Server::getRoundPointsLimit()['CurrentValue'];
-        }
-        if (self::$currentPointsLimit == -1) {
-            self::$currentPointsLimit = Server::getRoundPointsLimit()['NextValue'];
+        if (Cache::has('points_controller')) {
+            list(self::$originalPointsLimit, self::$currentPointsLimit) = Cache::get('points_controller');
+            Cache::forget('points_controller');
+        } else {
+            self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
+            if (self::$originalPointsLimit == -1) {
+                self::$originalPointsLimit = Server::getRoundPointsLimit()['CurrentValue'];
+            }
+            if (self::$currentPointsLimit == -1) {
+                self::$currentPointsLimit = Server::getRoundPointsLimit()['NextValue'];
+            }
         }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -54,7 +61,12 @@ class PointsController implements ControllerInterface
 
         ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'manipulate_points');
 
-        Template::showAll('Helpers.update-points-limit', ['points' => self::$currentPointsLimit]);
+        self::sendUpdatedPointsLimit(self::$currentPointsLimit);
+    }
+
+    public static function stop()
+    {
+        Cache::put('points_controller', [self::$originalPointsLimit, self::$currentPointsLimit], now()->addMinute());
     }
 
     /**
@@ -101,6 +113,7 @@ class PointsController implements ControllerInterface
         Server::setModeScriptSettings($modeScriptSettings);
         self::sendUpdatedPointsLimit(self::$originalPointsLimit);
         self::$currentPointsLimit = self::$originalPointsLimit;
+        Cache::forget('points_controller');
     }
 
     /**

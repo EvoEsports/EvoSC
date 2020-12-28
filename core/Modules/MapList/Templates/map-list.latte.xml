@@ -624,6 +624,7 @@ Void checkMapSearchQuery(){
         declare input <=> (Page.MainFrame.GetFirstChild("search-input") as CMlEntry);
         input.SetText(TL::Trim(MapSearchQuery), True);
         window.Show();
+        __dragSetFocus(EVO_SCRIPT_ID);
         MapSearchQuery = "";
     }
 }

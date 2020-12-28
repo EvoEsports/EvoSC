@@ -20,6 +20,7 @@ class UISettings extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'sendUiSettings']);
+        Hook::add('Trackmania.Event.StartLine', [self::class, 'rearrangeUi']);
 
         ManiaLinkEvent::add('ui.settings', [self::class, 'mleShowSettingsWindow']);
         ManiaLinkEvent::add('ui.save', [self::class, 'mleSaveSettings']);
@@ -44,5 +45,10 @@ class UISettings extends Module implements ModuleInterface
     {
         $settings = $player->setting('ui');
         Template::show($player, 'UISettings.update', compact('settings'), false, 20);
+    }
+
+    public static function rearrangeUi(Player $player)
+    {
+        Template::show($player, 'UISettings.rearrange');
     }
 }

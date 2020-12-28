@@ -208,7 +208,7 @@
         primaryColor = TL::ToColor("{config('theme.hud.text-light')|noescape}");
         headerColor = TL::ToColor("{config('theme.hud.accent')|noescape}");
 
-        left__ = {config('dedimania.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('dedimania.ui.position') == 'left'|ms_bool};
         slot__ = {config('dedimania.ui.slot')};
 
         mapUid = Map.Id;

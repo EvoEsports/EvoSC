@@ -25,7 +25,7 @@ class ControllerUpdater extends Module implements ModuleInterface
     {
         return;
 
-        self::$latestVersion = getEscVersion();
+        self::$latestVersion = getEvoSCVersion();
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
@@ -92,7 +92,7 @@ class ControllerUpdater extends Module implements ModuleInterface
                     if ($response->getStatusCode() == 200) {
                         $latestVersion = $response->getBody()->getContents();
 
-                        if ($latestVersion != '-1' && version_compare($latestVersion, getEscVersion(), 'gt')) {
+                        if ($latestVersion != '-1' && version_compare($latestVersion, getEvoSCVersion(), 'gt')) {
                             self::$latestVersion = $latestVersion;
                             self::$updateAvailable = true;
                             Log::cyan('EvoSC update available.');

@@ -141,7 +141,7 @@ class RestClient
         }
 
         $options[RequestOptions::VERIFY] = CaBundle::getSystemCaRootBundlePath();
-        $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.4', getEscVersion());
+        $options['headers']['User-Agent'] = sprintf('EvoSC/%s PHP/7.4', getEvoSCVersion());
 
         return $options;
     }

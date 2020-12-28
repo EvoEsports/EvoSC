@@ -4,13 +4,8 @@
     </frame>
 
     <script><!--
-CSmPlayer GetOwner() {
-	if (GUIPlayer != Null) return GUIPlayer;
-	return InputPlayer;
-}
-
 main() {
-    declare Owner <=> GetOwner();
+    log(ClientUI.UISequence);
 }
     --></script>
 </manialink>

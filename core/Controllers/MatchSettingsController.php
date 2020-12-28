@@ -6,6 +6,7 @@ namespace EvoSC\Controllers;
 
 use DOMDocument;
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\DB;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
@@ -20,6 +21,7 @@ use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
+use Maniaplanet\DedicatedServer\Structures\Map;
 use SimpleXMLElement;
 
 class MatchSettingsController implements ControllerInterface
@@ -55,7 +57,7 @@ class MatchSettingsController implements ControllerInterface
 
         self::$lastMatchSettingsModification = filemtime(self::getPath(self::getCurrentMatchSettingsFile()));
 
-        Timer::create('detect_match_settings_changes', [self::class, 'detectMatchSettingsChanges'], '5s', true);
+//        Timer::create('detect_match_settings_changes', [self::class, 'detectMatchSettingsChanges'], '5s', true);
     }
 
     /**
@@ -72,7 +74,7 @@ class MatchSettingsController implements ControllerInterface
             Log::info('Automatically loading matchsettings ' . $matchSettingsFile);
         }
 
-        if (!$matchSettingsFile) {
+        if (is_null($matchSettingsFile)) {
             $matchSettingsFile = self::getCurrentMatchSettingsFile();
         }
 
@@ -81,20 +83,7 @@ class MatchSettingsController implements ControllerInterface
         self::$lastMatchSettingsModification = filemtime(self::getPath($matchSettingsFile));
 
         if ($rebootClasses) {
-            $mode = Server::getScriptName()['NextValue'];
-
-            HookController::init();
-            ChatCommand::removeAll();
-            Timer::destroyAll();
-            ManiaLinkEvent::removeAll();
-            InputSetup::clearAll();
-            if (config('quick-buttons.enabled')) {
-                QuickButtons::removeAll();
-            }
-
-            ControllerController::loadControllers($mode);
-            ModuleController::startModules($mode, false);
-            EscRun::addBootCommands();
+            ModeController::rebootModules();
         }
 
         MapController::loadMaps();
@@ -178,46 +167,25 @@ class MatchSettingsController implements ControllerInterface
      */
     public static function shuffleCurrentMapListCommand(Player $player)
     {
-        if (CountdownController::getAddedSeconds() > 0) {
-            Hook::add('EndMatch', function () use ($player) {
-                self::shuffleCurrentMapList();
-                MatchSettingsController::shuffleCurrentMapList();
-                infoMessage($player, ' shuffled the map list.')->sendAll();
-            }, true);
-            
-            successMessage('Map list gets shuffled on map end.')->sendAdmin();
-        } else {
-            MatchSettingsController::shuffleCurrentMapList();
-            infoMessage($player, ' shuffled the map list.')->sendAll();
-        }
-    }
-
-    /**
-     *
-     */
-    public static function shuffleCurrentMapList()
-    {
-        $maps = collect();
         $file = self::getPath(self::$currentMatchSettingsFile);
         $settings = new SimpleXMLElement(File::get($file));
-
-        foreach ($settings->map as $mapInfo) {
-            $maps->push([
-                'file' => (string)$mapInfo->file,
-                'ident' => (string)$mapInfo->ident,
-            ]);
-        }
-
         unset($settings->map);
 
-        foreach ($maps->shuffle() as $map) {
+        $maps = DB::table('maps')
+            ->select(['filename', 'uid'])
+            ->where('enabled', '=', 1)
+            ->inRandomOrder()
+            ->get();
+
+        foreach ($maps as $map) {
             $entry = $settings->addChild('map');
-            $entry->addChild('file', $map['file']);
-            $entry->addChild('ident', $map['ident']);
+            $entry->addChild('file', $map->filename);
+            $entry->addChild('ident', $map->uid);
         }
 
         File::put($file, Utility::simpleXmlPrettyPrint($settings));
-        MatchSettingsController::loadMatchSettings();
+        Server::loadMatchSettings('MatchSettings/' . self::$currentMatchSettingsFile);
+        infoMessage($player, ' shuffled the map list.')->sendAll();
     }
 
     /**

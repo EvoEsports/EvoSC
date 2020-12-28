@@ -59,6 +59,16 @@ class ChatController implements ControllerInterface
 
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
+        ChatCommand::add('/version', [self::class, 'cmdVersion'], 'Print server, client and EvoSC version.');
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdVersion(Player $player, $cmd)
+    {
+        infoMessage('$fffEvoSC-Version: ' . getEvoSCVersion())->send($player);
     }
 
     /**

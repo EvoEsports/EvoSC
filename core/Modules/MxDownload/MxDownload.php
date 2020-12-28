@@ -18,6 +18,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Controllers\QueueController;
+use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
@@ -52,31 +53,36 @@ class MxDownload extends Module implements ModuleInterface
 
     /**
      * @param Player $player
-     * @param string ...$arguments
+     * @param string $cmd
+     * @param string $tmxId
+     * @throws Throwable
      */
-    public static function showAddMapInfo(Player $player, string ...$arguments)
+    public static function showAddMapInfo(Player $player, string $cmd, string $tmxId)
     {
-        foreach ($arguments as $mxId) {
-            if (intval($mxId) == 0) {
-                continue;
+        if (($tmxId = intval($tmxId)) <= 0) {
+            return;
+        }
+
+        try {
+            $details = self::loadMxDetails($tmxId);
+
+            if (isset($details->Downloadable) && $details->Downloadable == false) {
+                warningMessage('Downloading this map has been disabled, sorry.')->send($player);
+                return;
             }
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            dangerMessage('The map with the id ', secondary($tmxId), ' is unknown.')->send($player);
+            return;
+        }
 
-            try {
-                $details = self::loadMxDetails($mxId);
-
-                if (isset($details->Downloadable) && $details->Downloadable == false) {
-                    warningMessage('Downloading this map has been disabled, sorry.')->send($player);
-                    return;
-                }
-
-                $comment = self::parseBB($details->Comments);
-
-                Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
-            } catch (Exception $e) {
-                Log::error($e->getMessage());
-                warningMessage('Failed to load map details, adding.')->send($player);
-                //self::addMap($player, $mxId);
-            }
+        try {
+            $comment = self::parseBB($details->Comments);
+            Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            warningMessage('Failed to parse map info, adding...')->send($player);
+            self::addMap($player, $tmxId);
         }
     }
 
@@ -145,7 +151,9 @@ class MxDownload extends Module implements ModuleInterface
         }
 
         $mxDetails = self::loadMxDetails($mxId);
+        Log::write(json_encode($mxDetails));
         $gbx = json_decode(MapController::getGbxInformation($filename, true));
+        Log::write(json_encode($gbx));
 
         if (!isset($gbx->MapUid)) {
             warningMessage('Could not load UID for map.')->send($player);
@@ -170,7 +178,8 @@ class MxDownload extends Module implements ModuleInterface
             'title_id' => $gbx->TitleId,
             'enabled' => 1,
             'cooldown' => config('server.map-cooldown', 10),
-            'mx_id' => $mxId
+            'mx_id' => $mxId,
+            'exchange_version' => $mxDetails->UpdatedAt
         ]);
 
         if (!Server::isFilenameInSelection($filename)) {
@@ -246,20 +255,24 @@ class MxDownload extends Module implements ModuleInterface
     /**
      * Get mx-details by id
      *
-     * @param $mxId
-     * @return string
+     * @param int|string $tmxIdOrMapUid
+     * @return \stdClass
      * @throws Exception
      */
-    public static function loadMxDetails($mxId)
+    public static function loadMxDetails($tmxIdOrMapUid): \stdClass
     {
-        if (Cache::has("mx-details/{$mxId}")) {
-            return Cache::get("mx-details/{$mxId}");
+        if ($tmxIdOrMapUid instanceof Map) {
+            throw new InvalidArgumentException('Pass the tmx-id or map-uid.');
+        }
+
+        if (Cache::has("mx-details/{$tmxIdOrMapUid}")) {
+            return Cache::get("mx-details/{$tmxIdOrMapUid}");
         }
 
         if (isManiaPlanet()) {
-            $infoResponse = RestClient::get(self::$apiUrl . '/tm/maps/' . $mxId, ['timeout' => 3]); //deprecated, remove once new TMX API is available, only keep else-branch
+            $infoResponse = RestClient::get(self::$exchangeUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
         } else {
-            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $mxId, ['timeout' => 3]);
+            $infoResponse = RestClient::get(self::$apiUrl . '/api/maps/get_map_info/multi/' . $tmxIdOrMapUid, ['timeout' => 3]);
         }
 
         if ($infoResponse->getStatusCode() != 200) {
@@ -270,11 +283,13 @@ class MxDownload extends Module implements ModuleInterface
         $info = json_decode($detailsBody);
 
         if (!$info || isset($info->StatusCode)) {
-            throw new Exception('Failed to parse mx-details: ' . $detailsBody);
+            throw new Exception("Unknown map '$tmxIdOrMapUid'.");
         }
 
-        Cache::put("mx-details/{$mxId}", $info[0], now()->addMinutes(30));
+        $info = $info[0];
 
-        return $info[0];
+        Cache::put("mx-details/{$tmxIdOrMapUid}", $info, now()->addMinutes(30));
+
+        return $info;
     }
 }

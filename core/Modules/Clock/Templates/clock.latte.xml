@@ -108,7 +108,7 @@
         declare Integer minutes = 0;
         declare Real originalOpacity = bg.Opacity;
 
-        left__ = {config('clock.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('clock.ui.position') == 'left'|ms_bool};
         slot__ = {config('clock.ui.slot')};
     {/block}
 

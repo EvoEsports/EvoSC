@@ -24,7 +24,7 @@
     {/block}
 
     {block bootScript}
-        left__ = {config('next-map.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('next-map.ui.position') == 'left'|ms_bool};
         slot__ = {config('next-map.ui.slot')};
 
         declare uid = Map.MapInfo.MapUid;

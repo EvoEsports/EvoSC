@@ -119,7 +119,13 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        file_put_contents(baseDir(config('server.login') . '_evosc.pid'), getmypid());
+      $pidPath = config('server.pidfile');
+
+      // if no config given, use original
+      if (empty($pidPath))
+        $pidPath = baseDir(config('server.login') . '_evosc.pid');
+
+      file_put_contents($pidPath, getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -128,11 +134,11 @@ class EscRun extends Command
         global $_onlinePlayers;
         global $serverName;
 
-        $version = getEscVersion();
+        $version = getEvoSCVersion();
         $motd = "      ______           _____ ______
      / ____/  _______ / ___// ____/
-    / __/| | / / __ \\__ \/ /     
-   / /___| |/ / /_/ /__/ / /___   
+    / __/| | / / __ \\__ \/ /
+   / /___| |/ / /_/ /__/ / /___
   /_____/|___/\____/____/\____/  $version
 ";
 
@@ -195,9 +201,9 @@ class EscRun extends Command
 
         $failedConnectionRequests = 0;
 
-        successMessage(secondary('EvoSC v' . getEscVersion()), ' started.')->setIcon('')->sendAll();
+        successMessage(secondary('EvoSC v' . getEvoSCVersion()), ' started.')->setIcon('')->sendAll();
 
-        $__bootedVersion = getEscVersion();
+        $__bootedVersion = getEvoSCVersion();
 
         //cycle-loop
         while (true) {
@@ -247,9 +253,8 @@ class EscRun extends Command
 
         Timer::create('watch_for_restart_file', function () {
             if (Cache::has('restart_evosc')) {
-                Cache::forget('restart_evosc');
                 restart_evosc();
             }
-        }, '2m', true);
+        }, '30s', true);
     }
 }

@@ -163,9 +163,10 @@ class Votes extends Module implements ModuleInterface
         $voteRatioReached = ($voteState['yes'] / self::$onlinePlayersCount) > self::$vote->success_ratio;
 
         if ($timerRanOut || $everyoneVoted || $voteRatioReached) {
+            $success = false;
             if ($voteRatioReached) {
                 $success = true;
-            } else {
+            } else if ($voteCount > 0) {
                 $success = ($voteState['yes'] / $voteCount) > self::$vote->success_ratio;
             }
 
@@ -217,12 +218,12 @@ class Votes extends Module implements ModuleInterface
 
             $totalSeconds = CountdownController::getOriginalTimeLimitInSeconds() + CountdownController::getAddedSeconds();
             $timeLimitInMinutes = config('votes.time.limit-minutes');
-            if($timeLimitInMinutes != -1){
+            if ($timeLimitInMinutes != -1) {
                 if ($totalSeconds / 60 >= $timeLimitInMinutes) {
                     warningMessage('The limit of ' . secondary($timeLimitInMinutes . " min"), ' is reached.')->send($player);
                     return;
                 } else if (($totalSeconds + $secondsToAdd) / 60 > $timeLimitInMinutes) {
-                    warningMessage('Asking for ', secondary(($secondsToAdd/60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
+                    warningMessage('Asking for ', secondary(($secondsToAdd / 60) . " min"), ' would exceed the limit of ' . secondary($timeLimitInMinutes . " min"))->send($player);
                     return;
                 }
             }
@@ -336,6 +337,11 @@ class Votes extends Module implements ModuleInterface
         $secondsPassed = time() - self::$lastSkipVote;
 
         if (!$player->hasAccess('no_vote_limits')) {
+            if (!config('votes.skip.enabled')) {
+                warningMessage('Skipping is disabled.')->send($player);
+                return;
+            }
+
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {
                 warningMessage('Please wait ',
                     secondary((config('votes.skip.cooldown-in-seconds') - $secondsPassed) . ' seconds'),

@@ -1,9 +1,8 @@
 {contentType text}
 {extends 'Components.window'}
+{php $window_height = 78;}
 
-{block id}
-add-mx-map-pack
-{/block}
+{block id}add-mx-map-pack{/block}
 
 {block icon}
 
@@ -15,7 +14,7 @@ Add {$info->Name} map-pack
 
 {block content}
 <label class="text-light" pos="0 0" size="58 20" text="{$info->Name}" textsize="3"/>
-<label class="text-light" pos="0 -6" size="58 20" text="{$info->Description}" textsize="0.5" autonewline="1"/>
+<label class="text-light" pos="0 -6" size="58 20" text="{$is_maniaplanet ? $info->Description : $info->StyleName}" textsize="0.5" autonewline="1"/>
 
 <label class="btn-success confirm" pos="10 -70.5" size="20 5" text=" Install" textsize="0.75" ScriptEvents="1"/>
 

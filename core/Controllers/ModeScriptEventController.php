@@ -46,10 +46,8 @@ class ModeScriptEventController implements ControllerInterface
         }
     }
 
-    //Maniaplanet.StartMap_Start
-    //Maniaplanet.EndMap_Start
-
     //Decide if the callback should be transformed and fire the hooks.
+
     /**
      * @param $callback
      * @param $arguments
@@ -138,6 +136,8 @@ class ModeScriptEventController implements ControllerInterface
                     Hook::fire('AnnounceWinner', player($scores->winnerplayer));
                 }
                 Hook::fire('ShowScores', collect($scores->players));
+            } else {
+                Hook::fire('Scores', $scores);
             }
         }
     }

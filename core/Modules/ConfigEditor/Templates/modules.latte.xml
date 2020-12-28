@@ -3,9 +3,7 @@
 {php $window_width = 80;}
 {php $window_height = 70;}
 
-{block id}
-config-editor-window
-{/block}
+{block id}config-editor-window{/block}
 
 {block icon}
 

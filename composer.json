@@ -4,6 +4,7 @@
     "ext-json": "*",
     "ext-simplexml": "*",
     "ext-mbstring": "*",
+    "ext-zip": "*",
     "maniaplanet/dedicated-server-api": "^5.0",
     "illuminate/database": "^5.5",
     "symfony/console": "^4.0",
@@ -24,7 +25,7 @@
   "autoload": {
     "psr-4": {
       "EvoSC\\": "core/",
-      "EvoSC\\Modules\\": ["core/modules/", "modules/"]
+      "EvoSC\\Modules\\": ["core/Modules/", "modules/"]
     }
   },
   "require-dev": {

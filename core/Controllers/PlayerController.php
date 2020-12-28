@@ -10,6 +10,7 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
+use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
@@ -17,6 +18,7 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
@@ -34,8 +36,9 @@ class PlayerController implements ControllerInterface
 
     /** @var int */
     private static int $stringEditDistanceThreshold = 8;
-
+    private static bool $loadNicknamesFromEvoService = false;
     private static Collection $customNames;
+    private static Collection $customNamesByUbiname;
 
     /**
      * Initialize PlayerController
@@ -43,6 +46,8 @@ class PlayerController implements ControllerInterface
     public static function init()
     {
         self::$customNames = collect();
+        self::$customNamesByUbiname = collect();
+        self::$loadNicknamesFromEvoService = (bool)config('server.load-nicknames-from-evo-service', false);
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
 
@@ -68,6 +73,7 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
+        ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'player_warn');
 
         InputSetup::add('leave_spec', 'Leave spectator mode.', [self::class, 'leaveSpec'], 'Delete');
 
@@ -78,24 +84,40 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
 
         if (isTrackmania()) {
-            ChatCommand::add('/setname', [self::class, 'setName'], 'Change NickName.');
+            ChatCommand::add('/setname', [self::class, 'cmdSetName'], 'Change NickName.');
         }
     }
 
     /**
      * @param Player $player
      */
-    public static function leaveSpec(Player $player){
-        if($player->isSpectator()){
+    public static function leaveSpec(Player $player)
+    {
+        if ($player->isSpectator()) {
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
         }
     }
 
-    public static function setName(Player $player, $cmd, ...$name)
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param mixed ...$name
+     */
+    public static function cmdSetName(Player $player, $cmd, ...$name)
     {
-        $oldName = $player->NickName;
         $name = str_replace("\n", '', trim(implode(' ', $name)));
+        self::setName($player, $name);
+    }
+
+    /**
+     * @param Player $player
+     * @param $name
+     * @param false $silent
+     * @param false $fromCache
+     */
+    public static function setName(Player $player, $name, $silent = false, $fromCache = false)
+    {
         if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;
@@ -104,23 +126,32 @@ class PlayerController implements ControllerInterface
             warningMessage('Your name can not exceed 29 characters.')->send($player);
             return;
         }
+        $oldName = $player->NickName;
         $player->NickName = $name;
-        $player->update([
-            'NickName' => $name
-        ]);
+        $player->save();
         self::$customNames->put($player->Login, $name);
+        self::$customNamesByUbiname->put($player->ubisoft_name, $name);
         self::$players->put($player->Login, $player);
-        if ($cmd != 'silent') {
+        if (!$silent) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
-            Cache::put('nicknames/' . $player->Login, $name);
         }
+        Cache::put('nicknames/' . $player->Login, $name);
         self::sendUpdatesCustomNames();
-        Hook::fire('PlayerChangedName', $player);
+
+        if (!$fromCache) {
+            Hook::fire('PlayerChangedName', $player);
+        }
     }
 
-    private static function sendUpdatesCustomNames()
+    /**
+     * Sends custom nicknames to the players
+     */
+    public static function sendUpdatesCustomNames()
     {
-        Template::showAll('Helpers.update-custom-names', ['names' => self::$customNames]);
+        Template::showAll('Helpers.update-custom-names', [
+            'keyedByLogin' => self::$customNames,
+            'keyedByUbiname' => self::$customNamesByUbiname
+        ]);
     }
 
     public static function cacheConnectedPlayers()
@@ -133,11 +164,14 @@ class PlayerController implements ControllerInterface
                 self::$customNames->put($playerInfo->login, $name);
             }
 
-            return Player::updateOrCreate(['Login' => $playerInfo->login], [
+            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
                 'NickName' => $name,
                 'spectator_status' => $playerInfo->spectatorStatus,
-                'player_id' => $playerInfo->playerId
+                'player_id' => $playerInfo->playerId,
+                'team' => $playerInfo->teamId
             ]);
+
+            return $player;
         })->keyBy('Login');
 
         self::sendUpdatesCustomNames();
@@ -172,13 +206,51 @@ class PlayerController implements ControllerInterface
      */
     public static function playerConnect(Player $player)
     {
+        if (isManiaPlanet() || !self::$loadNicknamesFromEvoService) {
+            self::announceConnect($player, $player->NickName);
+            return;
+        }
+
+        RestClient::postAsync(sprintf('https://service.evotm.com/api/nicknames/%s/get', $player->Login), [
+            'connect_timeout' => 1.5
+        ])->then(function (Response $response) use ($player) {
+            if ($response->getStatusCode() == 200) {
+                $data = json_decode($response->getBody()->getContents());
+                $name = 'error_loading_name';
+
+                if ($data == new \stdClass()) {
+                    $name = $player->NickName;
+                } else if ($player->NickName != $data->name) {
+                    $name = $data->name;
+                    self::setName($player, $data->name, true, true);
+                }
+
+                self::announceConnect($player, $name);
+            }
+        }, function () use ($player) {
+            //connection to service failed
+            $name = $player->NickName;
+            if (Cache::has('nicknames/' . $player->Login)) {
+                $name = Cache::get('nicknames/' . $player->Login);
+            }
+            self::announceConnect($player, $name);
+        });
+    }
+
+    /**
+     * @param Player $player
+     * @param $name
+     * @throws Exception
+     */
+    private static function announceConnect(Player $player, $name)
+    {
         $diffString = $player->last_visit->diffForHumans();
         $stats = $player->stats;
 
         if ($stats) {
             $serverRank = $stats->Rank;
 
-            if($serverRank == -1){
+            if ($serverRank == -1) {
                 $serverRank = 'unranked';
             }
 
@@ -473,6 +545,15 @@ class PlayerController implements ControllerInterface
             ChatController::unmute($player, $target);
         } else {
             ChatController::mute($player, $target);
+        }
+    }
+
+    public static function warnPlayer(Player $player, string $targetLogin, string $message)
+    {
+        $target = Player::whereLogin($targetLogin)->first();
+
+        if ($target) {
+            warningMessage("You have been warned by $player ", secondary($message))->send($target);
         }
     }
 }

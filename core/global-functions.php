@@ -16,7 +16,7 @@ require 'vendor/larapack/dd/src/helper.php';
 /**
  * @return string
  */
-function getEscVersion(): string
+function getEvoSCVersion(): string
 {
     return str_replace("\n", '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }
@@ -410,8 +410,8 @@ function restart_evosc()
         Log::warning('Missing required php-extension pcntl, EvoSC will restart with a new PID and detached!');
 
         $cmd = PHP_BINARY . ' ' . implode(' ', $_SERVER['argv']);
-        if (isWindows()){
-            pclose(popen("start /B ". $cmd, "r"));
+        if (isWindows()) {
+            pclose(popen("start /B " . $cmd, "r"));
         } else {
             exec($cmd . " > /dev/null &");
         }
@@ -456,4 +456,17 @@ function isTrackmania(): bool
 {
     global $__ManiaPlanet;
     return !$__ManiaPlanet;
+}
+
+/**
+ * @param mixed ...$configs
+ * @throws \EvoSC\Exceptions\MissingConfigValueException
+ */
+function require_config(...$configs)
+{
+    foreach ($configs as $config) {
+        if (empty(config($config))) {
+            throw new \EvoSC\Exceptions\MissingConfigValueException("Config value '$config' is not set!");
+        }
+    }
 }

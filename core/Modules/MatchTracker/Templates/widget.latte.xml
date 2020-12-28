@@ -161,7 +161,7 @@
 
         Points = [{implode(',', $points)}];
 
-        left__ = {config('match-tracker.ui.position') == 'left' ? 'True' : 'False'};
+        left__ = {config('match-tracker.ui.position') == 'left'|ms_bool};
         slot__ = {config('match-tracker.ui.slot')};
     {/block}
 

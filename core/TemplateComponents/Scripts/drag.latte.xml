@@ -4,6 +4,16 @@ declare CMlFrame handle;
 declare Text handleId;
 declare Text D_Centered;
 
+Void __dragSetFocus(Text id){
+    declare Boolean[Text] EvoSC_Window_Focus for This;
+    declare Boolean[Text] focus;
+    foreach(ScriptId => Focused in EvoSC_Window_Focus){
+        focus[ScriptId] = False;
+    }
+    focus[EVO_SCRIPT_ID] = True;
+    EvoSC_Window_Focus = focus;
+}
+
 Void maniaLinkDrag(){
     declare Vec2[Text] lastFramePosition for This;
     declare Boolean G_Drag_Active for This = False;
@@ -62,12 +72,9 @@ Void maniaLinkDrag(){
 
                     G_Drag_Active = True;
 
-                    if(handle.Parent.ZIndex > ZIndex){
-                        ZIndex = handle.Parent.ZIndex;
-                    }
-
-                    ZIndex = ZIndex + 1.0;
-                    handle.Parent.ZIndex = ZIndex;
+                    __dragSetFocus(EVO_SCRIPT_ID);
+                    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+                    window.ZIndex = 300.0;
 
                     while(MouseLeftButton){
                         yield;

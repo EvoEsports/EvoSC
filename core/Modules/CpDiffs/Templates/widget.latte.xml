@@ -43,7 +43,7 @@
         declare Vec3 colorBlue;
         declare Target_V2 target;
 
-        {if $is_maniaplanet}CTmPlayer{else}CSmPlayer{/if} GetOwner() {
+        {if $is_maniaplanet}CTmMlPlayer{else}CSmPlayer{/if} GetOwner() {
             if (GUIPlayer != Null) return GUIPlayer;
             return InputPlayer;
         }

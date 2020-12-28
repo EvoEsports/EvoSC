@@ -22,12 +22,14 @@ use Illuminate\Support\Collection;
  * @property int $id
  * @property string $Login
  * @property string $NickName
+ * @property string $ubisoft_name
  * @property mixed $Score
  * @property integer $player_id
  * @property boolean $Afk
  * @property string $path
  * @property string $spectator_status
  * @property integer $MaxRank
+ * @property integer $team
  * @property boolean $banned
  * @property carbon $last_visit
  * @property Group $group

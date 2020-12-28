@@ -10,8 +10,13 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\HackMe\HackMe;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
+use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
+use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\SocialMedia\SocialMedia;
+use EvoSC\Modules\TeamInfo\TeamInfo;
 use Illuminate\Support\Collection;
 
 class TestModule extends Module implements ModuleInterface
@@ -29,8 +34,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-
-        LiveRankings::playerConnect($player);
+        TeamInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
