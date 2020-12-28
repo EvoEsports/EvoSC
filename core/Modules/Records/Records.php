@@ -8,6 +8,7 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
@@ -20,12 +21,16 @@ class Records extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (isManiaPlanet()) {
+        if (isManiaPlanet() || ModeController::isRoundsType()) {
             return;
         }
 
         Hook::add('PlayerConnect', [self::class, 'sendWidget']);
         ManiaLinkEvent::add('mle_ghost_notice', [self::class, 'mleGhostNotice']);
+
+        if (!$isBoot) {
+            Template::showAll('Records.manialink');
+        }
     }
 
     /**
@@ -35,7 +40,6 @@ class Records extends Module implements ModuleInterface
     public static function sendWidget(Player $player)
     {
         Template::show($player, 'Records.manialink');
-//        Template::show($player, 'Records.nadeo-records-mover');
     }
 
     /**
