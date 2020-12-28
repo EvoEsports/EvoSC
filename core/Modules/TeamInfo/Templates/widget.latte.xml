@@ -3,7 +3,7 @@
 <manialink name="ESC:team-info" id="team-info" version="3">
     {include 'Components.stylesheet'}
 
-    <frame pos="0 90">
+    <frame id="widget" pos="0 90">
         <quad size="150 18" pos="0 7.5" halign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />
 
         <quad id="team1quad" size="18 15" pos="16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
@@ -70,8 +70,23 @@
     }
 
     main(){
-        setup();
-        updateValues();
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare lastUpdate = 0;
+
+        while(True){
+            yield;
+
+            if(GameTime - lastUpdate > 1500){
+                setup();
+                updateValues();
+                lastUpdate = GameTime;
+            }
+
+            if(CurrentServerModeName != "TM_Teams_Online"){
+                widget.Hide();
+                return;
+            }
+        }
     }
     --></script>
 </manialink>

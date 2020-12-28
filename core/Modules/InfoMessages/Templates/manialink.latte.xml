@@ -54,7 +54,7 @@
             declare message = messages[i];
             declare text = message.text;
             if(TL::Length(text) > 70){
-                text = TL::SubString(text, 0, 70) ^ "...";
+                text = "$<" ^ TL::SubString(text, 0, 70) ^ "$>...";
             }
             messageFrame.Controls[0].DataAttributeSet("id", "" ^ message.id);
             messageFrame.Controls[1].DataAttributeSet("id", "" ^ message.id);
