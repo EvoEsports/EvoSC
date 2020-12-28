@@ -10,6 +10,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ConfigController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\Votes\Votes;
@@ -21,7 +22,7 @@ class AddTime extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (isManiaPlanet()) {
+        if (isManiaPlanet() || !ModeController::isTimeAttackType()) {
             return;
         }
 
@@ -37,20 +38,28 @@ class AddTime extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
         ManiaLinkEvent::add('add_time', [self::class, 'mleAddTime']);
+
+        if (!$isBoot) {
+            self::showWidget();
+        }
     }
 
     /**
      * @param Player $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function showWidget(Player $player)
+    public static function showWidget(Player $player = null)
     {
         $buttons = collect(config('add-time.buttons'))
             ->sort()
             ->reverse()
             ->values();
 
-        Template::show($player, 'AddTime.widget', compact('buttons'));
+        if (is_null($player)) {
+            Template::showAll('AddTime.widget', compact('buttons'));
+        } else {
+            Template::show($player, 'AddTime.widget', compact('buttons'));
+        }
     }
 
     /**

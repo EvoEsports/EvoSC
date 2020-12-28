@@ -161,6 +161,8 @@
         points.fromjson("{$points}");
         sleep(10);
 
+        wait(CurrentServerModeName != "TM_TimeAttack_Online" && CurrentServerModeName != "TimeAttack");
+
         left__ = {config('race-ranking.ui.position') == 'left'|ms_bool};
         slot__ = {config('race-ranking.ui.slot')};
         {/block}
@@ -170,7 +172,9 @@
             lastCurrentServerModeName = CurrentServerModeName;
             if(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack"){
                 widgetSetHeight__(0.0);
+                sleep(300);
                 widget.Hide();
+                return;
             }else{
                 widgetSetHeight__({config('race-ranking.ui.show', 10)*3+7} * 1.0);
                 widget.Show();

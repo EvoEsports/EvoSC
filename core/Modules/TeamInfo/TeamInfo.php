@@ -17,6 +17,10 @@ class TeamInfo extends Module implements ModuleInterface
     {
         if (ModeController::teams()) {
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
+
+            if (!$isBoot) {
+                Template::showAll('TeamInfo.widget');
+            }
         }
     }
 
