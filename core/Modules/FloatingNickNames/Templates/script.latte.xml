@@ -16,7 +16,7 @@
     }
 
     Boolean isTeams(){
-        return CurrentServerModeName == "Teams" || CurrentServerModeName == "TM_Teams_Online";
+        return UseClans;
     }
 
     Void setMarkersInit(EvoSC_Marker2[] markers){
@@ -50,11 +50,18 @@
         declare Integer EvoSC_MarkerNames_Update2 for This;
         declare lastUpdate = 0;
         declare initialized = False;
+        declare currentMapUid = "";
 
         wait(InputPlayer != Null);
 
         while(True){
             yield;
+
+            if(Map.Id^"" != currentMapUid){
+                currentMapUid = Map.Id^"";
+                initialized = False;
+                EvoSC_MarkerNames_Update2 += 1;
+            }
 
             if(lastUpdate != EvoSC_MarkerNames_Update2){
                 lastUpdate = EvoSC_MarkerNames_Update2;
