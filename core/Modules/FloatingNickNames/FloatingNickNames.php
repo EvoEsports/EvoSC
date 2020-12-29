@@ -24,6 +24,7 @@ class FloatingNickNames extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'sendScript']);
         Hook::add('PlayerDisconnect', [self::class, 'playerPoolChanged']);
         Hook::add('PlayerChangedName', [self::class, 'playerPoolChanged']);
+        Hook::add('BeginMatch', [self::class, 'playerPoolChanged']);
     }
 
     /**
@@ -37,9 +38,9 @@ class FloatingNickNames extends Module implements ModuleInterface
     }
 
     /**
-     * @param Player|null $player
+     * @param null $value
      */
-    public static function playerPoolChanged(Player $player = null)
+    public static function playerPoolChanged($value = null)
     {
         $data = onlinePlayers()->transform(function (Player $player) {
             return [
