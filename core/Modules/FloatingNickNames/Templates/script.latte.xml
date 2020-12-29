@@ -34,15 +34,13 @@
 
         foreach(marker in markers){
             if(LocalUser.Login != marker.login){
-                if(isTeams){
-                    //todo: implement teams colors
-                    markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' icon='"^ marker.prefix ^"' />";
-                }else{
-                    markersXml = markersXml ^ "<marker label='$"^ marker.color ^ marker.prefix ^"[$fff"^ marker.name ^"$z$"^ marker.color ^"]' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' />";
-                }
+                markersXml = markersXml ^ "<marker label='" ^  marker.name ^ "' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='100' color='{config('theme.hud.bg-dark')}' />";
             }
         }
 
+        ClientUI.AlliesLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
+        ClientUI.TeamLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
+        ClientUI.OpposingTeamLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
         ClientUI.OverrideMarkers = True;
         ClientUI.MarkersXML = markersXml;
     }

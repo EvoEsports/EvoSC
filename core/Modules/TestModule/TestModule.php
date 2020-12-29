@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\FloatingNickNames\FloatingNickNames;
 use EvoSC\Modules\HackMe\HackMe;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
@@ -34,7 +35,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        TeamInfo::showWidget($player);
+        FloatingNickNames::sendScript($player);
     }
 
     public static function sendTestManialink(Player $player)
