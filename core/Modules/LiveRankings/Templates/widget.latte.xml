@@ -1,6 +1,5 @@
 {contentType text}
 {extends 'Components.widget-base'}
-{php $doNotPause = true;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}liverankings{/block}
