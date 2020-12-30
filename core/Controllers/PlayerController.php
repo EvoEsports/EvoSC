@@ -136,7 +136,7 @@ class PlayerController implements ControllerInterface
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
         }
         Cache::put('nicknames/' . $player->Login, $name);
-        self::sendUpdatesCustomNames();
+        self::sendUpdatedCustomNames();
 
         if (!$fromCache) {
             Hook::fire('PlayerChangedName', $player);
@@ -146,7 +146,7 @@ class PlayerController implements ControllerInterface
     /**
      * Sends custom nicknames to the players
      */
-    public static function sendUpdatesCustomNames()
+    public static function sendUpdatedCustomNames()
     {
         Template::showAll('Helpers.update-custom-names', [
             'keyedByLogin' => self::$customNames,
@@ -156,7 +156,7 @@ class PlayerController implements ControllerInterface
 
     public static function cacheConnectedPlayers()
     {
-        self::$players = collect(Server::getPlayerList(999, 0))->map(function (PlayerInfo $playerInfo) {
+        self::$players = collect(Server::getPlayerList())->map(function (PlayerInfo $playerInfo) {
             $name = $playerInfo->nickName;
 
             if (isTrackmania() && Cache::has('nicknames/' . $playerInfo->login)) {
@@ -171,10 +171,13 @@ class PlayerController implements ControllerInterface
                 'team' => $playerInfo->teamId
             ]);
 
+            self::$customNames->put($player->Login, $name);
+            self::$customNamesByUbiname->put($player->ubisoft_name, $name);
+
             return $player;
         })->keyBy('Login');
 
-        self::sendUpdatesCustomNames();
+        self::sendUpdatedCustomNames();
     }
 
     /**
@@ -302,11 +305,6 @@ class PlayerController implements ControllerInterface
             $message->sendAdmin();
         }
 
-        $player->update([
-            'last_visit' => now(),
-            'player_id' => 0,
-        ]);
-
         self::$players = self::$players->forget($player->Login);
 
         if (self::$customNames->has($player->Login)) {
@@ -320,14 +318,6 @@ class PlayerController implements ControllerInterface
      */
     public static function beginMap()
     {
-        DB::table('players')
-            ->where('player_id', '>', 0)
-            ->orWhere('spectator_status', '>', 0)
-            ->update([
-                'player_id' => 0,
-                'spectator_status' => 0,
-            ]);
-
         DB::table('players')
             ->where('Score', '>', 0)
             ->update([

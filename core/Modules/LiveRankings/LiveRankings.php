@@ -14,6 +14,8 @@ use EvoSC\Models\Player;
 
 class LiveRankings extends Module implements ModuleInterface
 {
+    private static $shownLogins;
+
     /**
      * Called when the module is loaded
      *
@@ -22,6 +24,8 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        Hook::add('PlayerInfoChanged', [self::class, 'checkIfViewIsAffected']);
+        Hook::add('PlayerDisconnect', [self::class, 'checkIfViewIsAffected']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('Scores', [self::class, 'updateWidget']);
         Hook::add('PlayerFinish', function ($player, $score) {
@@ -40,7 +44,6 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function updateWidget($scores)
     {
-        dump($scores);
         $playerScores = collect($scores->players);
 
         if (ModeController::isTimeAttackType()) {
@@ -54,6 +57,7 @@ class LiveRankings extends Module implements ModuleInterface
         }
 
         $playerScores = $playerScores->take(config('live-rankings.show', 14));
+        self::$shownLogins = $playerScores->pluck('login')->toArray();
 
         $playerInfo = DB::table('players')
             ->select(['Login', 'NickName', 'player_id', 'spectator_status'])
@@ -78,6 +82,16 @@ class LiveRankings extends Module implements ModuleInterface
         })->values();
 
         Template::showAll('LiveRankings.update', compact('top'));
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function checkIfViewIsAffected(Player $player)
+    {
+        if (in_array($player->Login, self::$shownLogins)) {
+            Server::callGetScores();
+        }
     }
 
     /**

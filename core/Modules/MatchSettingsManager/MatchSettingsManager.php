@@ -261,8 +261,6 @@ class MatchSettingsManager extends Module implements ModuleInterface
             $scriptName = self::$gameModesTrackmania[$modeName];
         }
 
-        dump($modeName, $scriptName);
-
         $content = File::get($sourceMatchsettings);
         $content = str_replace('%script_name%', $scriptName, $content);
 
