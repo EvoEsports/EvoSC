@@ -331,7 +331,7 @@
 
             declare Integer EvoSC_PointsLimit for This = 0;
             declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
-            finalistLabel.Visible = (CurrentServerModeName == "TM_Cup_Online" && Score.Points >= EvoSC_PointsLimit);
+            finalistLabel.Visible = (CurrentServerModeName == "TM_Cup_Online" && Score.Points >= EvoSC_PointsLimit && EvoSC_PointsLimit > 0);
         }else{
             if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
                 scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
