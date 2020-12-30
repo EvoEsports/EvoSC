@@ -47,16 +47,16 @@ class PointsController extends Controller implements ControllerInterface
             list(self::$originalPointsLimit, self::$currentPointsLimit) = Cache::get('points_controller');
             Cache::forget('points_controller');
         } else {
-            self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
+            self::$originalPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
+            self::$currentPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
         }
-
-        dump(self::$originalPointsLimit, self::$currentPointsLimit);
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'resetPointsLimit']);
 
         ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'manipulate_points');
 
+        Server::triggerModeScriptEventArray('Trackmania.GetPointsRepartition');
         self::sendUpdatedPointsLimit(self::$currentPointsLimit);
     }
 
@@ -140,22 +140,5 @@ class PointsController extends Controller implements ControllerInterface
     private static function sendUpdatedPointsLimit(int $points)
     {
         Template::showAll('Helpers.update-points-limit', compact('points'));
-    }
-
-    /**
-     * @return array
-     */
-    public static function getPointsRepartition(): array
-    {
-        $points = Server::getModeScriptSettings();
-
-        if (array_key_exists('S_PointsRepartition', $points)) {
-            $parts = explode(',', $points['S_PointsRepartition']);
-            return array_map(function ($point) {
-                return intval($point);
-            }, $parts);
-        }
-
-        return [10, 6, 4, 3, 2, 1];
     }
 }

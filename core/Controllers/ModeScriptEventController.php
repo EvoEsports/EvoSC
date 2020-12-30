@@ -93,6 +93,10 @@ class ModeScriptEventController implements ControllerInterface
                 Hook::fire('WarmUpStart');
                 break;
 
+            case 'Trackmania.PointsRepartition':
+                Hook::fire('PointsRepartition', json_decode($arguments[0])->pointsrepartition);
+                break;
+
             case 'Maniaplanet.EndRound_Start':
             case 'Maniaplanet.StartMap_Start':
             case 'Maniaplanet.EndMap_Start':

@@ -194,7 +194,7 @@
         if(EvoSC_PointsLimit > 0){
             declare pointsLimitText = "Points-Limit: " ^ EvoSC_PointsLimit;
             if(EvoSC_PointsLimit > originalPointsLimit){
-                pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+                pointsLimitText = pointsLimitText ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
             }
             pointsLimitLabel.Value = pointsLimitText;
         }else{

@@ -36,7 +36,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        Server::triggerModeScriptEventArray('Trackmania.GetScores');
+        ScoreTable::sendScoreTable($player);
     }
 
     public static function sendTestManialink(Player $player)

@@ -8,6 +8,7 @@ use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
+use Maniaplanet\DedicatedServer\Structures\ScriptInfo;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 use Maniaplanet\DedicatedServer\Structures\Version;
 
@@ -177,7 +178,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool getWarmUp()
  * @method static string getModeScriptText()
  * @method static bool setModeScriptText(string $string)
- * @method static object getModeScriptInfo()
+ * @method static ScriptInfo getModeScriptInfo()
  * @method static array getModeScriptSettings()
  * @method static bool setModeScriptSettings(array $modeScriptSettingsArray)
  * @method static bool sendModeScriptCommands(object $struct)
@@ -330,6 +331,17 @@ class Server
     public static function callGetScores(): bool
     {
         return Server::triggerModeScriptEventArray('Trackmania.GetScores');
+    }
+
+    public static function getModeScriptVariable(string $name)
+    {
+        $data = Server::getModeScriptSettings();
+
+        if (array_key_exists($name, $data)) {
+            return $data[$name];
+        }
+
+        return null;
     }
 
     /**
