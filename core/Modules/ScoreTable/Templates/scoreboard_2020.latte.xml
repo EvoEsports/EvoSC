@@ -151,6 +151,10 @@
     {include 'Scripts.mle'}
 
     <script><!--
+    Boolean isRoundsTypeMode(){
+        return (CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
+    }
+
     Integer ceil(Real value){
         declare Integer ceiled = ML::CeilingInteger(value);
 
@@ -315,7 +319,7 @@
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans){
+        if(isRoundsTypeMode()){
             if(Score.Points > 0 || addedPoints > 0){
                 scoreLabel.Opacity = 1.0;
             }else{
@@ -552,7 +556,7 @@
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        if(CurrentServerModeName == "Rounds" || UseClans){
+        if(isRoundsTypeMode() && EvoSC_PointsLimit > 0){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
         }
 

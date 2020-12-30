@@ -8,8 +8,8 @@
     {block content}
     <quad id="header" class="bg-accent" size="44 5" z-index="-1"/>
     <quad id="bg" class="bg-dark" pos="0 -5" size="44 200" opacity="0.8" z-index="-1"/>
-    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" size="44 5" textsize="0.3" text=" Live ranking"/>
-    <label id="points-limit" class="text-light" z-index="1" valign="center" halign="right" pos="42.5 -2.5" size="44 5" textsize="0.3" textprefix="Points-Limit: " text=""/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" size="44 5" textsize="0.3" text=" Live Ranking"/>
+    <label id="points-limit" class="text-light" z-index="1" valign="center" halign="right" pos="42.5 -2.5" size="44 5" textsize="0.3" text=""/>
 
     <framemodel id="record">
         <label class="text-light" z-index="2" valign="center" halign="right" pos="3 0" size="3 2" textsize="0.4" text="0."/>
@@ -190,11 +190,16 @@
         lastPointLimitUpdate = EvoSC_LastPointsLimitUpdate;
         declare Integer originalPointsLimit = {$originalPointsLimit ?? 30};
         declare Integer EvoSC_PointsLimit for This = -1;
-        declare pointsLimitText = "" ^ EvoSC_PointsLimit;
-        if(EvoSC_PointsLimit > originalPointsLimit){
-            pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+
+        if(EvoSC_PointsLimit > 0){
+            declare pointsLimitText = "Points-Limit: " ^ EvoSC_PointsLimit;
+            if(EvoSC_PointsLimit > originalPointsLimit){
+                pointsLimitText = EvoSC_PointsLimit ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+            }
+            pointsLimitLabel.Value = pointsLimitText;
+        }else{
+            pointsLimitLabel.Value = "";
         }
-        pointsLimitLabel.Value = pointsLimitText;
     }
     {/block}
 
