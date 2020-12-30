@@ -16,6 +16,7 @@ use EvoSC\Modules\HackMe\HackMe;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
+use EvoSC\Modules\MatchRounds\MatchRounds;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\SocialMedia\SocialMedia;
 use EvoSC\Modules\TeamInfo\TeamInfo;
@@ -37,6 +38,7 @@ class TestModule extends Module implements ModuleInterface
     {
         TemplateController::loadTemplates();
         ScoreTable::sendScoreTable($player);
+        MatchRounds::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
