@@ -20,6 +20,7 @@ class ModeController implements ControllerInterface
     private static bool $laps;
     private static bool $teams;
     private static bool $cup;
+    private static string $mode;
 
     /**
      *
@@ -42,6 +43,7 @@ class ModeController implements ControllerInterface
      */
     public static function setMode(string $mode)
     {
+        self::$mode = $mode;
         self::$teams = false;
         self::$laps = false;
         self::$cup = false;
@@ -76,7 +78,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Cup.Script.txt':
-            case 'Trackmania/TM_Cup_Online.Script.Script.txt':
+            case 'Trackmania/TM_Cup_Online.Script.txt':
                 self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
                 self::$cup = true;
@@ -141,5 +143,13 @@ class ModeController implements ControllerInterface
     public static function cup(): bool
     {
         return self::$cup;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getMode():string
+    {
+        return self::$mode;
     }
 }

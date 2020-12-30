@@ -151,12 +151,10 @@ class PointsController extends Controller implements ControllerInterface
      */
     public static function getPointsRepartition(): array
     {
-        $points = Server::getModeScriptSettings()['S_PointsRepartition'];
+        $points = Server::getModeScriptSettings();
 
-        //modescript: Trackmania.GetPointsRepartition
-
-        if ($points) {
-            $parts = explode(',', $points);
+        if (array_key_exists('S_PointsRepartition', $points)) {
+            $parts = explode(',', $points['S_PointsRepartition']);
             return array_map(function ($point) {
                 return intval($point);
             }, $parts);
