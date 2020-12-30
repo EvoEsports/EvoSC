@@ -48,13 +48,9 @@ class PointsController extends Controller implements ControllerInterface
             Cache::forget('points_controller');
         } else {
             self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
-            if (self::$originalPointsLimit == -1) {
-                self::$originalPointsLimit = Server::getRoundPointsLimit()['CurrentValue'];
-            }
-            if (self::$currentPointsLimit == -1) {
-                self::$currentPointsLimit = Server::getRoundPointsLimit()['NextValue'];
-            }
         }
+
+        dump(self::$originalPointsLimit, self::$currentPointsLimit);
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'resetPointsLimit']);

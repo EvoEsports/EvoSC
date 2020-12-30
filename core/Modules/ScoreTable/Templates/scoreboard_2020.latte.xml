@@ -58,6 +58,8 @@
             </frame>
         </frame>
 
+        <label id="finalist-label" class="text-light" pos="86 -8" halign="right" valign="center" text="$fc2 $fffFinalist" opacity="0.85" textsize="0.8" hidden="1" />
+
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.45" />
     </framemodel>
@@ -326,6 +328,10 @@
                 scoreLabel.Opacity = 0.1;
             }
             scoreLabel.Value = Score.Points ^ " Pts";
+
+            declare Integer EvoSC_PointsLimit for This = 0;
+            declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
+            finalistLabel.Visible = (CurrentServerModeName == "TM_Cup_Online" && Score.Points >= EvoSC_PointsLimit);
         }else{
             if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
                 scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
