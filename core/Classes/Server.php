@@ -327,11 +327,16 @@ class Server
         return collect(Server::getMapList())->contains('fileName', $filename);
     }
 
+    public static function callGetScores(): bool
+    {
+        return Server::triggerModeScriptEventArray('Trackmania.GetScores');
+    }
+
     /**
      * Call an rpc-method.
      *
-     * @param  string  $rpc_func
-     * @param  null|mixed[]  $args
+     * @param string $rpc_func
+     * @param null|mixed[] $args
      */
     public static function call(string $rpc_func, $args = null)
     {

@@ -94,7 +94,6 @@ class WarmUpWidget extends Module implements ModuleInterface
     {
         Server::triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', []);
         infoMessage($player, ' skips warm-up.')->setColor('f90')->sendAll();
-        self::warmUpEnd();
     }
 
     public static function setWarmUpLimit(int $seconds)

@@ -54,6 +54,8 @@ class ModeScriptEventController implements ControllerInterface
      */
     private static function call($callback, $arguments)
     {
+        dump($callback);
+
         switch ($callback) {
             case 'Trackmania.Scores':
                 self::tmScores($arguments);

@@ -2,15 +2,15 @@
 
 namespace EvoSC\Modules\LiveRankings;
 
+use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
-use EvoSC\Controllers\MatchController;
 use EvoSC\Controllers\ModeController;
 use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use Illuminate\Support\Collection;
 
 class LiveRankings extends Module implements ModuleInterface
 {
@@ -23,11 +23,61 @@ class LiveRankings extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('MatchTrackerUpdated', [self::class, 'sendUpdatedValues']);
+        Hook::add('Scores', [self::class, 'updateWidget']);
+        Hook::add('PlayerFinish', function ($player, $score) {
+            if ($score > 0) {
+                Server::callGetScores();
+            }
+        });
 
-        if(!$isBoot) {
+        if (!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
         }
+    }
+
+    /**
+     * @param $scores
+     */
+    public static function updateWidget($scores)
+    {
+        dump($scores);
+        $playerScores = collect($scores->players);
+
+        if (ModeController::isTimeAttackType()) {
+            $playerScores = $playerScores->sortBy('bestracetime')->filter(function ($playerScore) {
+                return $playerScore->bestracetime > 0;
+            });
+        } else {
+            $playerScores = $playerScores->sortByDesc('matchpoints')->filter(function ($playerScore) {
+                return $playerScore->matchpoints > 0;
+            });
+        }
+
+        $playerScores = $playerScores->take(config('live-rankings.show', 14));
+
+        $playerInfo = DB::table('players')
+            ->select(['Login', 'NickName', 'player_id', 'spectator_status'])
+            ->whereIn('Login', $playerScores->pluck('login'))
+            ->get()
+            ->keyBy('Login');
+
+        $top = $playerScores->map(function ($playerScore) use ($playerInfo) {
+            $info = $playerInfo->get($playerScore->login);
+
+            return [
+                'name' => $info->NickName,
+                'login' => $playerScore->login,
+                'points' => $playerScore->matchpoints,
+                'gained' => 0,
+                'score' => $playerScore->bestracetime,
+                'team' => $playerScore->team,
+                'checkpoints' => '',
+                'online' => $info->player_id > 0,
+                'spectator' => $info->spectator_status > 0,
+            ];
+        })->values();
+
+        Template::showAll('LiveRankings.update', compact('top'));
     }
 
     /**
@@ -36,25 +86,8 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function playerConnect(Player $player)
     {
-        self::sendUpdatedValues(MatchController::getTracker());
-
+        Server::callGetScores();
         $originalPointsLimit = PointsController::getOriginalPointsLimit();
         Template::show($player, 'LiveRankings.widget', compact('originalPointsLimit'));
-    }
-
-    /**
-     * @param Collection $top
-     */
-    public static function sendUpdatedValues(Collection $top)
-    {
-        $showTop = config('live-rankings.show', 14);
-
-        if(ModeController::isTimeAttackType()){
-            $top = $top->sortBy('score')->take($showTop)->values();
-        }else{
-            $top = $top->sortByDesc('points')->take($showTop)->values();
-        }
-
-        Template::showAll('LiveRankings.update', compact('top'));
     }
 }
