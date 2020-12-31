@@ -4,6 +4,7 @@
 namespace EvoSC\Modules\TestModule;
 
 
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;

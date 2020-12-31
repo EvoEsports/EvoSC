@@ -14,7 +14,7 @@ use EvoSC\Models\Player;
 
 class LiveRankings extends Module implements ModuleInterface
 {
-    private static $shownLogins;
+    private static $shownLogins = [];
 
     /**
      * Called when the module is loaded
@@ -28,11 +28,14 @@ class LiveRankings extends Module implements ModuleInterface
         Hook::add('PlayerDisconnect', [self::class, 'checkIfViewIsAffected']);
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('Scores', [self::class, 'updateWidget']);
-        Hook::add('PlayerFinish', function ($player, $score) {
-            if ($score > 0) {
-                Server::callGetScores();
-            }
-        });
+
+        if (ModeController::isTimeAttackType()) {
+            Hook::add('PlayerFinish', function ($player, $score) {
+                if ($score > 0) {
+                    Server::callGetScores();
+                }
+            });
+        }
 
         if (!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
@@ -72,7 +75,7 @@ class LiveRankings extends Module implements ModuleInterface
                 'name' => $info->NickName,
                 'login' => $playerScore->login,
                 'points' => $playerScore->matchpoints,
-                'gained' => 0,
+                'gained' => $playerScore->roundpoints,
                 'score' => $playerScore->bestracetime,
                 'team' => $playerScore->team,
                 'checkpoints' => '',

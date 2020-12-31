@@ -97,7 +97,7 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('force_end_round', [self::class, 'mleForceEndOfRound'], 'force_end_round');
 
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-        QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+        QuickButtons::addButton('', 'Reset Match', 'map.reset', 'map_reset');
 
         if (ModeController::isRoundsType() || ModeController::teams() || ModeController::cup()) {
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');

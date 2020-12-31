@@ -140,9 +140,9 @@ class ModeScriptEventController implements ControllerInterface
                     Hook::fire('AnnounceWinner', player($scores->winnerplayer));
                 }
                 Hook::fire('ShowScores', collect($scores->players));
-            } else {
-                Hook::fire('Scores', $scores);
             }
+
+            Hook::fire('Scores', $scores);
         }
     }
 

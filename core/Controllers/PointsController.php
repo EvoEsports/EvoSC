@@ -115,15 +115,9 @@ class PointsController extends Controller implements ControllerInterface
     /**
      * @return int
      */
-    public static function getCurrentPoints(): int
+    public static function getCurrentPointsLimit(): int
     {
-        $modeScriptSettings = Server::getModeScriptSettings();
-
-        if (array_key_exists('S_PointsLimit', $modeScriptSettings)) {
-            return Server::getModeScriptSettings()['S_PointsLimit'];
-        }
-
-        return Server::getRoundPointsLimit()['CurrentValue'];
+        return self::$currentPointsLimit;
     }
 
     /**
