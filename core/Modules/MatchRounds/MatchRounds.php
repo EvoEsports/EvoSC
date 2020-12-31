@@ -14,6 +14,8 @@ use EvoSC\Models\Player;
 
 class MatchRounds extends Module implements ModuleInterface
 {
+    private static int $roundsPerMap = -1;
+
     public static function start(string $mode, bool $isBoot = false)
     {
         if (ModeController::isTimeAttackType()) {
@@ -23,22 +25,19 @@ class MatchRounds extends Module implements ModuleInterface
             return;
         }
 
-        Hook::add('PlayerConnect', [self::class, 'showWidget']);
+        self::$roundsPerMap = (int)Server::getModeScriptVariable('S_RoundsPerMap');
+
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
-        if (!$isBoot) {
-            self::showWidget();
-        }
+        self::showWidget();
     }
 
     public static function showWidget(Player $player = null)
     {
-        $roundsPerMap = Server::getModeScriptVariable('S_RoundsPerMap');
-
         if (is_null($player)) {
-            Template::showAll('MatchRounds.widget', compact('roundsPerMap'));
+            Template::showAll('MatchRounds.widget', ['roundsPerMap' => self::$roundsPerMap]);
         } else {
-            Template::show($player, 'MatchRounds.widget', compact('roundsPerMap'));
+            Template::show($player, 'MatchRounds.widget', ['roundsPerMap' => self::$roundsPerMap]);
         }
     }
 }

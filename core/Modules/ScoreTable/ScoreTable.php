@@ -14,7 +14,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\GroupManager\GroupManager;
 use Illuminate\Support\Collection;
-use function MongoDB\BSON\toJSON;
 
 class ScoreTable extends Module implements ModuleInterface
 {
@@ -73,7 +72,6 @@ class ScoreTable extends Module implements ModuleInterface
             self::$winners->put($player->Login, $place);
             self::$finalists->forget($player->Login);
             infoMessage($player, ' takes the ', secondary("$place. place"))->sendAll();
-            dump(self::$winners->toJson());
             Template::showAll('ScoreTable.update-winners', ['winners' => self::$winners]);
         }
     }

@@ -28,8 +28,15 @@
     {/block}
 
     {block loop}
+        wait(CurrentServerModeName == "TM_Cup_Online");
         roundsLabel.Value = "ROUND " ^ EvoSC_Round ^ "/{$roundsPerMap}";
         sleep(100);
+
+        if(CurrentServerModeName != "TM_Cup_Online"){
+            widgetSetHeight__(0.0);
+            widget.Hide();
+            return;
+        }
     {/block}
 
     {block pendingEvents}
