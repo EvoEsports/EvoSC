@@ -52,13 +52,13 @@ class ScoreTable extends Module implements ModuleInterface
 
     public static function playerFinish(Player $player, int $score)
     {
-        if ($score == 0) {
+        if ($score == 0 || self::$winners->count() >= Server::getModeScriptVariable('S_NbOfWinners')) {
             return;
         }
 
         if (self::$finalists->has($player->Login)) {
             $place = self::$winners->count() + 1;
-            self::$winners->put($player->Login, 1);
+            self::$winners->put($player->Login, $place);
             self::$finalists->forget($player->Login);
             infoMessage($player, ' takes the ', secondary("$place. place"))->sendAll();
             Template::showAll('ScoreTable.update-winners', ['winners' => self::$winners]);
