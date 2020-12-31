@@ -574,7 +574,8 @@
         playerInfoLabel.Value = Players.count ^ "/{$maxPlayers}";
 
         {if $roundsPerMap > 0}
-        playerInfoLabel.Value = playerInfoLabel.Value ^ "\t 3/{$roundsPerMap}";
+        declare Integer EvoSC_Round for This = 1;
+        playerInfoLabel.Value = playerInfoLabel.Value ^ "\t " ^ EvoSC_Round ^ "/{$roundsPerMap}";
         {/if}
 
         declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);

@@ -10,6 +10,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\MPS_Map;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
@@ -37,6 +38,7 @@ class MapController implements ControllerInterface
     private static ?Map $nextMap;
     private static string $mapsPath;
     private static Collection $mapToDisable;
+    private static int $round = -1;
 
     /**
      * Initialize MapController
@@ -99,9 +101,40 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
         QuickButtons::addButton('', 'Reset Match', 'map.reset', 'map_reset');
 
-        if (ModeController::isRoundsType() || ModeController::teams() || ModeController::cup()) {
+        if (ModeController::isRoundsType()) {
+            self::$round = 1;
+            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'incrementRoundCounter']);
+            Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
+            Hook::add('BeginMap', [self::class, 'resetRoundCounter']);
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
+            self::resetRoundCounter();
         }
+    }
+
+    /**
+     *
+     */
+    public static function incrementRoundCounter()
+    {
+        self::$round++;
+        self::sendUpdatedRound();
+    }
+
+    /**
+     *
+     */
+    public static function resetRoundCounter()
+    {
+        self::$round = 0;
+        self::sendUpdatedRound();
+    }
+
+    /**
+     *
+     */
+    public static function sendUpdatedRound()
+    {
+        Template::showAll('Helpers.update-round', ['round' => self::$round]);
     }
 
     /**
@@ -485,6 +518,7 @@ class MapController implements ControllerInterface
 
         Server::restartMap();
         Statistics::beginMap();
+        self::resetRoundCounter();
     }
 
     /**

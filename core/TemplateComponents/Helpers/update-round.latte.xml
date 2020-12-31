@@ -1,0 +1,11 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-round" name="EvoSC:update-round">
+    <script><!--
+    main(){
+        declare Integer EvoSC_Round for This = 1;
+
+        EvoSC_Round = {$round};
+    }
+    --></script>
+</manialink>
