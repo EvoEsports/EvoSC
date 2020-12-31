@@ -39,6 +39,7 @@ class MapController implements ControllerInterface
     private static string $mapsPath;
     private static Collection $mapToDisable;
     private static int $round = -1;
+    private static int $playersFinished = 0;
 
     /**
      * Initialize MapController
@@ -103,7 +104,8 @@ class MapController implements ControllerInterface
 
         if (ModeController::isRoundsType()) {
             self::$round = 1;
-            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'incrementRoundCounter']);
+            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);
             Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
             Hook::add('BeginMap', [self::class, 'resetRoundCounter']);
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
@@ -112,12 +114,28 @@ class MapController implements ControllerInterface
     }
 
     /**
+     * @param Player $player
+     * @param int $score
+     */
+    public static function playerFinish(Player $player, int $score)
+    {
+        if ($score > 0) {
+            self::$playersFinished++;
+        }
+    }
+
+    /**
      *
      */
-    public static function incrementRoundCounter()
+    public static function startPlayLoop()
     {
+        if (ModeController::cup() && self::$playersFinished == 0) {
+            return;
+        }
+
         self::$round++;
         self::sendUpdatedRound();
+        self::$playersFinished = 0;
     }
 
     /**
