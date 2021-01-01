@@ -43,6 +43,7 @@ class ScoreTable extends Module implements ModuleInterface
             Hook::add('Scores', [self::class, 'scores']);
             Hook::add('PlayerFinish', [self::class, 'decideWinner']);
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'resetFirstFinished']);
+            Hook::add('BeginMap', [self::class, 'resetWinners']);
             self::$nbOfWinners = (int)Server::getModeScriptVariable('S_NbOfWinners');
         }
     }
@@ -53,6 +54,17 @@ class ScoreTable extends Module implements ModuleInterface
     public static function resetFirstFinished()
     {
         self::$firstFinishedLogin = '';
+    }
+
+    /**
+     *
+     */
+    public static function resetWinners()
+    {
+        if (self::$winners->count() >= self::$nbOfWinners) {
+            self::$winners = collect();
+            self::$finalists = collect();
+        }
     }
 
     /**
