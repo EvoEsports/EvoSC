@@ -13,6 +13,11 @@
     {/block}
 
     {block script}
+    <script><!--
+    Boolean isRoundsType(){
+        return CurrentServerModeName == "TM_Cup_Online" || CurrentServerModeName == "TM_Rounds_Online" || UseClans;
+    }
+    --></script>
     {/block}
 
     <script><!--
@@ -28,11 +33,11 @@
     {/block}
 
     {block loop}
-        wait(CurrentServerModeName == "TM_Cup_Online" || CurrentServerModeName == "TM_Rounds_Online" || UseClans);
+        wait(isRoundsType());
         roundsLabel.Value = "ROUND " ^ EvoSC_Round ^ "/{$roundsPerMap}";
         sleep(100);
 
-        if(CurrentServerModeName != "TM_Cup_Online"){
+        if(!isRoundsType()){
             widgetSetHeight__(0.0);
             widget.Hide();
             return;

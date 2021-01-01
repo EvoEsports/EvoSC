@@ -38,7 +38,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        FloatingNickNames::sendScript($player);
+        MatchRounds::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
