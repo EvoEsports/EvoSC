@@ -43,7 +43,18 @@ class PlanetsController implements ControllerInterface
     public static function init()
     {
         self::$openBills = collect();
-        //   self::$billStates = explode(', ', 'CreatingTransaction, Issued, ValidatingPayement, Payed, Refused, Error');
+    }
+
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        if (isTrackmania()) {
+            return;
+        }
 
         Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
     }
@@ -90,10 +101,10 @@ class PlanetsController implements ControllerInterface
     /**
      * Create payment request.
      *
-     * @param Player     $player
-     * @param int        $amount
-     * @param string     $label
-     * @param array      $successFunction
+     * @param Player $player
+     * @param int $amount
+     * @param string $label
+     * @param array $successFunction
      * @param array|null $failFunction
      */
     public static function createBill(
@@ -102,7 +113,8 @@ class PlanetsController implements ControllerInterface
         string $label,
         array $successFunction,
         array $failFunction = null
-    ) {
+    )
+    {
         $billId = Server::sendBill($player->Login, $amount, $label);
 
         if (!$billId || !is_int($billId)) {
@@ -113,14 +125,5 @@ class PlanetsController implements ControllerInterface
 
         $bill = new Bill($player, $billId, $amount, Carbon::now(), $label, $successFunction, $failFunction);
         self::$openBills->push($bill);
-    }
-
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
     }
 }
