@@ -22,18 +22,23 @@ class FloatingNickNames extends Module implements ModuleInterface
         }
 
         Hook::add('PlayerConnect', [self::class, 'sendScript']);
+        Hook::add('BeginMatch', [self::class, 'sendScript']);
         Hook::add('PlayerDisconnect', [self::class, 'playerPoolChanged']);
         Hook::add('PlayerChangedName', [self::class, 'playerPoolChanged']);
-        Hook::add('BeginMatch', [self::class, 'playerPoolChanged']);
     }
 
     /**
-     * @param Player $player
+     * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendScript(Player $player)
+    public static function sendScript(Player $player = null)
     {
-        Template::show($player, 'FloatingNickNames.script');
+        if(is_null($player)){
+            Template::showAll('FloatingNickNames.script');
+        }else{
+            Template::show($player, 'FloatingNickNames.script');
+        }
+
         self::playerPoolChanged();
     }
 

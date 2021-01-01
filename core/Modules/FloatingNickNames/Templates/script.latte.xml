@@ -33,9 +33,10 @@
         declare isTeams = isTeams();
 
         foreach(marker in markers){
-            if(LocalUser.Login != marker.login){
-                markersXml = markersXml ^ "<marker label='" ^  marker.name ^ "' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='100' color='{config('theme.hud.bg-dark')}' />";
+            if(LocalUser.Login == marker.login){
+                continue;
             }
+            markersXml = markersXml ^ "<marker label='" ^  marker.name ^ "' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='100' color='{config('theme.hud.bg-dark')}' />";
         }
 
         ClientUI.AlliesLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
@@ -56,12 +57,6 @@
 
         while(True){
             yield;
-
-            if(Map.Id^"" != currentMapUid){
-                currentMapUid = Map.Id^"";
-                initialized = False;
-                EvoSC_MarkerNames_Update2 += 1;
-            }
 
             if(lastUpdate != EvoSC_MarkerNames_Update2){
                 lastUpdate = EvoSC_MarkerNames_Update2;
