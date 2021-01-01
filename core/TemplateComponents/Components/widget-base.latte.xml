@@ -36,7 +36,7 @@ declare Boolean left__;
 declare Integer slot__;
 --></script>
 
-    <frame pos="0 0" id="widget" size="{include size}" z-index="50">
+    <frame pos="0 0" id="widget" size="{include size}" z-index="50" hidden="1">
         {include content}
     </frame>
 

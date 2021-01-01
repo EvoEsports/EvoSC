@@ -28,7 +28,7 @@
     {/block}
 
     {block loop}
-        wait(CurrentServerModeName == "TM_Cup_Online");
+        wait(CurrentServerModeName == "TM_Cup_Online" || CurrentServerModeName == "TM_Rounds_Online" || UseClans);
         roundsLabel.Value = "ROUND " ^ EvoSC_Round ^ "/{$roundsPerMap}";
         sleep(100);
 
