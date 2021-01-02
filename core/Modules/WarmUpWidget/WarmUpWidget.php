@@ -5,101 +5,66 @@ namespace EvoSC\Modules\WarmUpWidget;
 
 
 use EvoSC\Classes\Hook;
-use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 
 class WarmUpWidget extends Module implements ModuleInterface
 {
-    private static int $round = 0;
-    private static int $warmUpNb = 0;
-    private static bool $warmUpInProgress = false;
-
     /**
-     * Called when the module is loaded
+     * Called when the module is loaded.
      *
      * @param string $mode
      * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        AccessRight::add('warm_up_skip', 'Lets you skip the warm-up phase.');
+        if (ModeController::isTimeAttackType()) {
+            return;
+        }
 
         Hook::add('PlayerConnect', [self::class, 'sendWarmUpWidget']);
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
-        Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpStartRound']);
-
-        self::$warmUpNb = Server::getModeScriptSettings()['S_WarmUpNb'];
-
-        ManiaLinkEvent::add('warmup.skip', [self::class, 'skipWarmUp'], 'warm_up_skip');
+        Hook::add('WarmUpRoundStarted', [self::class, 'warmUpRoundStarted']);
     }
 
+    /**
+     * Display the warm up widget for newly connected players, while warm up is in progress.
+     *
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function sendWarmUpWidget(Player $player)
     {
-        if(self::$warmUpInProgress){
+        if (ModeController::isWarmUpInProgress()) {
             Template::show($player, 'WarmUpWidget.widget', [
-                'warmupNb' => self::$warmUpNb,
-                'round' => ++self::$round
+                'warmupNb' => ModeController::getWarmUpRoundCount(),
+                'round' => ModeController::getWarmUpRound()
             ]);
         }
     }
 
-    public static function warmUpStartRound()
+    /**
+     * Update the widget.
+     *
+     * @param int $round
+     * @param int $warmUpCount
+     */
+    public static function warmUpRoundStarted(int $round, int $warmUpCount)
     {
-        self::$warmUpInProgress = true;
-
         Template::showAll('WarmUpWidget.widget', [
-            'warmupNb' => self::$warmUpNb,
-            'round' => ++self::$round
+            'warmupNb' => $warmUpCount,
+            'round' => $round
         ]);
-
-        if (self::$warmUpNb == 1) {
-            $message = [
-                'Warm-up ',
-                secondary(self::$round . '/' . self::$warmUpNb),
-                ' started.'
-            ];
-        } else {
-            if (self::$warmUpNb == self::$round) {
-                $message = [
-                    secondary('Last warm-up'),
-                    ' started.'
-                ];
-            } else {
-                $message = [
-                    'Warm-up ',
-                    secondary(self::$round . '/' . self::$warmUpNb),
-                    ' started.'
-                ];
-            }
-        }
-
-        infoMessage(...$message)->setColor('f90')->setIcon(' ')->sendAll();
     }
 
+    /**
+     * Tell the ManiaLink that the warm up ended, so it can hide.
+     */
     public static function warmUpEnd()
     {
-        self::$warmUpInProgress = false;
-        self::$round = 0;
-
-        infoMessage('Warm-up ended, ', secondary('starting play-loop.'))->setColor('f90')->setIcon(' ')->sendAll();
         Template::showAll('WarmUpWidget.widget', ['warmUpEnded' => true, 'warmupNb' => 0, 'round' => 0]);
-    }
-
-    public static function skipWarmUp(Player $player)
-    {
-        Server::triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', []);
-        infoMessage($player, ' skips warm-up.')->setColor('f90')->sendAll();
-    }
-
-    public static function setWarmUpLimit(int $seconds)
-    {
-        $settings = Server::getModeScriptSettings();
-        $settings['S_WarmUpDuration'] = $seconds;
-        Server::setModeScriptSettings($settings);
     }
 }
