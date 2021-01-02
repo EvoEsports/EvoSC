@@ -10,6 +10,7 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
@@ -20,6 +21,10 @@ class LocalRecords extends Module implements ModuleInterface
 {
     const TABLE = 'local-records';
 
+    private static bool $ignoreWarmUpTimes = false;
+    private static bool $ignoreRoundsTimes = false;
+    private static bool $ignoreTimeAttackTimes = false;
+
     /**
      * Called when the module is loaded
      *
@@ -28,14 +33,23 @@ class LocalRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('PlayerPb', [self::class, 'playerFinish']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
+        self::$ignoreWarmUpTimes = (bool)config('locals.ignore-warmup-times', false);
+        self::$ignoreRoundsTimes = (bool)config('locals.ignore-round-times', false);
+        self::$ignoreTimeAttackTimes = (bool)config('locals.ignore-time-attack-times', false);
 
         AccessRight::add('local_delete', 'Delete local-records.');
 
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
         ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
         ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
+
+        if ((self::$ignoreRoundsTimes && ModeController::isRoundsType()) ||
+            (self::$ignoreTimeAttackTimes && ModeController::isTimeAttackType())) {
+            return;
+        }
+        Hook::add('PlayerPb', [self::class, 'playerFinish']);
     }
 
     /**
@@ -72,6 +86,11 @@ class LocalRecords extends Module implements ModuleInterface
         if ($score < 3000) {
             //ignore times under 3 seconds
             return;
+        }
+        if (self::$ignoreWarmUpTimes) {
+            if (ModeController::isWarmUpInProgress()) {
+                return;
+            }
         }
 
         $map = MapController::getCurrentMap();
