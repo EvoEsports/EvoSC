@@ -122,8 +122,8 @@ class PlayerController implements ControllerInterface
             warningMessage('Your name can not be empty.')->send($player);
             return;
         }
-        if (strlen(stripAll($name)) > 28) {
-            warningMessage('Your name can not exceed 29 characters.')->send($player);
+        if (strlen(stripAll($name)) > 38) {
+            warningMessage('Your name can not exceed 39 characters.')->send($player);
             return;
         }
         $oldName = $player->NickName;
