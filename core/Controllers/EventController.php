@@ -140,7 +140,7 @@ class EventController implements ControllerInterface
                 return;
             }
 
-            $parts = explode(' ', $text);
+            $parts = explode(' ', trim($text));
 
             if (ChatCommand::has($parts[0])) {
                 ChatCommand::get($parts[0])->execute(player($login), $text);
