@@ -1,0 +1,39 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:spectator-info" id="spectator-info" version="3">
+    {include 'Components.stylesheet'}
+
+    <frame id="widget" pos="0 -56">
+        <label id="targetName" class="text-lighter" textcolor="fff" textfont="GameFontBlack" text="" textprefix="$s$i" halign="center" textsize="5.6" />
+    </frame>
+
+    <script><!--
+    main(){
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare targetName <=> (Page.MainFrame.GetFirstChild("targetName") as CMlLabel);
+        declare Text FocusedPlayerLogin;
+
+        while(True){
+            yield;
+
+            widget.Visible = IsSpectatorClient;
+
+            if(!widget.Visible){
+                sleep(100);
+                continue;
+            }
+
+			if (GUIPlayer != Null && FocusedPlayerLogin != GUIPlayer.User.Login) {
+				FocusedPlayerLogin = GUIPlayer.User.Login;
+				targetName.Value = GUIPlayer.User.Name;
+			} else if (GUIPlayer == Null && FocusedPlayerLogin != "") {
+				FocusedPlayerLogin = "";
+				targetName.Value = "";
+			}
+
+            //targetName.Value = "$<$fff$i$sebs$e52 $n$z$fff$i$s$fff Braker$> #"^GameTime;
+            sleep(25);
+        }
+    }
+    --></script>
+</manialink>
