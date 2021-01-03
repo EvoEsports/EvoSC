@@ -82,10 +82,6 @@ class PlayerController implements ControllerInterface
         ChatCommand::add('//kick', [self::class, 'kickPlayer'], 'Kick player by nickname', 'player_kick');
         ChatCommand::add('//fakeplayer', [self::class, 'addFakePlayer'], 'Adds N fakeplayers.', 'ma');
         ChatCommand::add('/reset-ui', [self::class, 'resetUserSettings'], 'Resets all user-settings to default.');
-
-        if (isTrackmania()) {
-            ChatCommand::add('/setname', [self::class, 'cmdSetName'], 'Change NickName.');
-        }
     }
 
     /**
@@ -97,17 +93,6 @@ class PlayerController implements ControllerInterface
             Server::forceSpectator($player->Login, 2);
             Server::forceSpectator($player->Login, 0);
         }
-    }
-
-    /**
-     * @param Player $player
-     * @param $cmd
-     * @param mixed ...$name
-     */
-    public static function cmdSetName(Player $player, $cmd, ...$name)
-    {
-        $name = str_replace("\n", '', trim(implode(' ', $name)));
-        self::setName($player, $name);
     }
 
     /**

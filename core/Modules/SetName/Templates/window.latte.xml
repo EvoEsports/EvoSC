@@ -1,0 +1,56 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '50';}
+{php $window_height = '20';}
+
+{block id}set-name{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Set Name
+{/block}
+
+{block content}
+<frame>
+    <entry id="entry" class="form entry" pos="23 -1.5" size="47 4" textsize="0.6" default="{$name}" halign="center" valign="center" />
+    <label id="preview" name="name" class="text-light" pos="23 -7" size="47 4" textprefix="Preview: " halign="center" valign="center" />
+
+    <label class="btn-success save" pos="23 -14" size="14 5" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+Void updatePreview(CMlLabel preview, CMlEntry entry){
+    preview.Value = entry.Value;
+}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+declare preview <=> (Page.MainFrame.GetFirstChild("preview") as CMlLabel);
+declare entry <=> (Page.MainFrame.GetFirstChild("entry") as CMlEntry);
+
+updatePreview(preview, entry);
+{/block}
+
+{block pendingEvents}
+if(event.Control.HasClass("entry") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+    updatePreview(preview, entry);
+}
+if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
+    TriggerPageAction("save_nickname," ^ entry.Value);
+    window.Hide();
+    return;
+}
+{/block}
+--></script>

@@ -19,6 +19,7 @@ use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\MatchRounds\MatchRounds;
 use EvoSC\Modules\ScoreTable\ScoreTable;
+use EvoSC\Modules\SetName\SetName;
 use EvoSC\Modules\SocialMedia\SocialMedia;
 use EvoSC\Modules\TeamInfo\TeamInfo;
 use Illuminate\Support\Collection;
@@ -38,7 +39,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        FloatingNickNames::sendScript($player);
+        SetName::showSetNickname($player, 'Bremser');
     }
 
     public static function sendTestManialink(Player $player)
