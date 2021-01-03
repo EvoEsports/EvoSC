@@ -27,9 +27,11 @@ class SpectatorInfo extends Module implements ModuleInterface
         Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
             'uimodules' => [
                 [
-                    'id' => 'Race_BestRaceViewer',
-                    'visible' => false,
-                    'visible_update' => true
+                    'id' => 'Race_SpectatorBase_Name',
+                    'visible' => true,
+                    'visible_update' => true,
+                    'position' => [0, -200],
+                    'position_update' => true,
                 ]
             ]
         ])]);

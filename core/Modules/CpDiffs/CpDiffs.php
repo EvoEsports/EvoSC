@@ -48,7 +48,7 @@ class CpDiffs extends Module implements ModuleInterface
             Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
                 'uimodules' => [
                     [
-                        'id' => 'Race_SpectatorBase_Name',
+                        'id' => 'Race_BestRaceViewer',
                         'visible' => false,
                         'visible_update' => true
                     ]
