@@ -92,6 +92,7 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+        ChatCommand::add('//endround', [self::class, 'cmdEndRound'], 'Force the round to end (rounds, cup, ...)', 'force_end_round');
         ChatCommand::add('/next', [self::class, 'cmdNextMap'], 'Print the upcoming map to chat.');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
@@ -153,6 +154,15 @@ class MapController implements ControllerInterface
     public static function sendUpdatedRound()
     {
         Template::showAll('Helpers.update-round', ['round' => self::$round]);
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdEndRound(Player $player, $cmd)
+    {
+        self::mleForceEndOfRound($player);
     }
 
     /**
