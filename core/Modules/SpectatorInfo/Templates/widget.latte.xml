@@ -4,13 +4,14 @@
     {include 'Components.stylesheet'}
 
     <frame id="widget" pos="0 -56">
-        <label id="targetName" class="text-lighter" textcolor="fff" textfont="GameFontBlack" text="" textprefix="$s$i" halign="center" textsize="5.6" />
+        <label id="targetName" class="text-lighter" textcolor="fff" textfont="GameFontBlack" text="" textprefix="$s$i" halign="center" textsize="5.6" textemboss="1" />
     </frame>
 
     <script><!--
     main(){
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare targetName <=> (Page.MainFrame.GetFirstChild("targetName") as CMlLabel);
+        declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
         declare Text FocusedPlayerLogin;
 
         while(True){
@@ -25,7 +26,12 @@
 
 			if (GUIPlayer != Null && FocusedPlayerLogin != GUIPlayer.User.Login) {
 				FocusedPlayerLogin = GUIPlayer.User.Login;
-				targetName.Value = GUIPlayer.User.Name;
+
+				if(EvoSC_CustomNamesByUbiname.existskey(GUIPlayer.User.Name)){
+                    targetName.Value = EvoSC_CustomNamesByUbiname[GUIPlayer.User.Name];
+				}else{
+                    targetName.Value = GUIPlayer.User.Name;
+				}
 			} else if (GUIPlayer == Null && FocusedPlayerLogin != "") {
 				FocusedPlayerLogin = "";
 				targetName.Value = "";
