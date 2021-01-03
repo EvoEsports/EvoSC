@@ -20,10 +20,14 @@ class SpectatorInfo extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (isManiaPlanet()) {
+            return;
+        }
+
         Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
             'uimodules' => [
                 [
-                    'id' => 'Race_SpectatorBase_Name',
+                    'id' => 'Race_BestRaceViewer',
                     'visible' => false,
                     'visible_update' => true
                 ]

@@ -46,6 +46,18 @@ class ScoreTable extends Module implements ModuleInterface
             Hook::add('BeginMap', [self::class, 'resetWinners']);
             self::$nbOfWinners = (int)Server::getModeScriptVariable('S_NbOfWinners');
         }
+
+        if (isTrackmania()) {
+            Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
+                'uimodules' => [
+                    [
+                        'id' => 'Race_ScoresTable',
+                        'visible' => false,
+                        'visible_update' => true
+                    ]
+                ]
+            ])]);
+        }
     }
 
     /**
