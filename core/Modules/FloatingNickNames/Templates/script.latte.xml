@@ -36,7 +36,7 @@
             if(LocalUser.Login == marker.login){
                 continue;
             }
-            markersXml = markersXml ^ "<marker label='" ^  marker.name ^ "' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='100' color='{config('theme.hud.bg-dark')}' />";
+            markersXml = markersXml ^ "<marker label='$<" ^  marker.name ^ "$>' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='95' color='{config('theme.hud.bg-light')}' />";
         }
 
         ClientUI.AlliesLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
