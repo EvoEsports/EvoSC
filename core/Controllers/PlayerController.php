@@ -103,6 +103,9 @@ class PlayerController implements ControllerInterface
      */
     public static function setName(Player $player, $name, $silent = false, $fromCache = false)
     {
+        if ($name == $player->NickName) {
+            return;
+        }
         if (strlen(trim(stripAll($name))) == 0) {
             warningMessage('Your name can not be empty.')->send($player);
             return;

@@ -16,10 +16,11 @@ Set Name
 
 {block content}
 <frame>
-    <entry id="entry" class="form entry" pos="23 -1.5" size="47 4" textsize="0.6" default="{$name}" halign="center" valign="center" />
+    <entry id="entry" class="form entry" pos="23 -1.5" size="47 4" textsize="0.6" default="{$name ?: $localPlayer->NickName}" halign="center" valign="center" />
     <label id="preview" name="name" class="text-light" pos="23 -7" size="47 4" textprefix="Preview: " halign="center" valign="center" />
 
-    <label class="btn-success save" pos="23 -14" size="14 5" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
+    <label class="btn-muted load" pos="15 -14" size="20 5" textsize="0.6" text=" Load current" ScriptEvents="1" scale="0.9"/>
+    <label class="btn-success save" pos="32 -14" size="14 5" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
 </frame>
 {/block}
 
@@ -46,6 +47,12 @@ updatePreview(preview, entry);
 {block pendingEvents}
 if(event.Control.HasClass("entry") && event.Type == CMlScriptEvent::Type::EntrySubmit){
     updatePreview(preview, entry);
+    continue;
+}
+if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseClick){
+    entry.Value = """{$localPlayer->NickName}""";
+    preview.Value = """{$localPlayer->NickName}""";
+    continue;
 }
 if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
     TriggerPageAction("save_nickname," ^ entry.Value);
