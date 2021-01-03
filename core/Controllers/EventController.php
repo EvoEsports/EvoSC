@@ -227,8 +227,7 @@ class EventController implements ControllerInterface
     {
         if (count($arguments) == 2 && is_string($arguments[0])) {
             $player = Player::updateOrCreate(['Login' => $arguments[0]], [
-                'player_id' => 0,
-                'last_visit' => now(),
+                'player_id' => 0
             ]);
 
             Hook::fire('PlayerDisconnect', $player, 0);
