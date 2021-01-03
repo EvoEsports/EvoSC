@@ -223,6 +223,8 @@ class PlayerController implements ControllerInterface
             }
             self::announceConnect($player, $name);
         });
+
+        self::sendUpdatedCustomNames();
     }
 
     /**

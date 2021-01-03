@@ -20,7 +20,7 @@
             widget.Visible = IsSpectatorClient;
 
             if(!widget.Visible){
-                sleep(100);
+                sleep(250);
                 continue;
             }
 
@@ -37,8 +37,7 @@
 				targetName.Value = "";
 			}
 
-            //targetName.Value = "$<$fff$i$sebs$e52 $n$z$fff$i$s$fff Braker$> #"^GameTime;
-            sleep(25);
+            sleep(50);
         }
     }
     --></script>
