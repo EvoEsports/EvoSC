@@ -52,7 +52,7 @@ class SetName extends Module implements ModuleInterface
      */
     public static function mleSaveNickname(Player $player, ...$nickname)
     {
-        $name = implode(' ', $nickname);
+        $name = str_replace("\n", '', trim(implode(' ', $nickname)));
         PlayerController::setName($player, $name);
     }
 }
