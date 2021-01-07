@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:floating-nicks" id="floating-nicks" version="3">
+<manialink name="ESC:player-markers" id="player-markers" version="3">
     <script><!--
     #Include "TextLib" as TL
 
@@ -27,6 +27,10 @@
         ClientUI.MarkersXML = markersXml;
     }
 
+    Text escapeQuotes(Text text){
+        return TL::Replace(text, "\"", "''");
+    }
+
     Void setMarkers(EvoSC_Marker2[] markers){
         declare Text markersXml = "";
         declare isTimeAttack = isTimeAttack();
@@ -36,8 +40,10 @@
             if(LocalUser.Login == marker.login){
                 continue;
             }
-            markersXml = markersXml ^ "<marker label='$<" ^  marker.name ^ "$>' playerlogin='" ^ marker.login ^ "' box='0 0.6 0' distmax='95' color='{config('theme.hud.bg-light')}' />";
+            markersXml = markersXml ^ """<marker label="$<""" ^  escapeQuotes(marker.name) ^ """$>" playerlogin='""" ^ marker.login ^ """' box='0 0.6 0' distmax='95' color='{config('theme.hud.bg-light')}' />""";
         }
+
+        log(markersXml);
 
         ClientUI.AlliesLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
         ClientUI.TeamLabelsVisibility = CUIConfig::ELabelsVisibility::Never;

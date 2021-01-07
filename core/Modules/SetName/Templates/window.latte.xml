@@ -16,7 +16,7 @@ Set Name
 
 {block content}
 <frame>
-    <entry id="entry" class="form entry" pos="23 -1.5" size="47 4" textsize="0.6" default="{$name ?: $localPlayer->NickName}" halign="center" valign="center" />
+    <entry id="entry" class="form entry" pos="23 -1.5" size="47 4" textsize="0.6" default="{$name ?: ml_escape($localPlayer->NickName)}" halign="center" valign="center" />
     <label id="preview" name="name" class="text-light" pos="23 -7" size="47 4" textprefix="Preview: " halign="center" valign="center" />
 
     <label class="btn-muted load" pos="15 -14" size="20 5" textsize="0.6" text=" Load current" ScriptEvents="1" scale="0.9"/>
