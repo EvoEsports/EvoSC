@@ -37,16 +37,12 @@ class PlayerController implements ControllerInterface
     /** @var int */
     private static int $stringEditDistanceThreshold = 8;
     private static bool $loadNicknamesFromEvoService = false;
-    private static Collection $customNames;
-    private static Collection $customNamesByUbiname;
 
     /**
      * Initialize PlayerController
      */
     public static function init()
     {
-        self::$customNames = collect();
-        self::$customNamesByUbiname = collect();
         self::$loadNicknamesFromEvoService = (bool)config('server.load-nicknames-from-evo-service', false);
         //Add already connected players to the player-list
         self::cacheConnectedPlayers();
@@ -117,14 +113,12 @@ class PlayerController implements ControllerInterface
         $oldName = $player->NickName;
         $player->NickName = $name;
         $player->save();
-        self::$customNames->put($player->Login, $name);
-        self::$customNamesByUbiname->put($player->ubisoft_name, $name);
         self::$players->put($player->Login, $player);
         if (!$silent) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
         }
         Cache::put('nicknames/' . $player->Login, $name);
-        self::sendUpdatedCustomNames();
+        self::playerPoolChanged();
 
         if (!$fromCache) {
             Hook::fire('PlayerChangedName', $player);
@@ -132,13 +126,25 @@ class PlayerController implements ControllerInterface
     }
 
     /**
-     * Sends custom nicknames to the players
+     * @param null $value
      */
-    public static function sendUpdatedCustomNames()
+    public static function playerPoolChanged($value = null)
     {
+        if (isManiaPlanet()) {
+            return;
+        }
+
+        $data = self::$players->map(function (Player $player) {
+            return [
+                'login' => $player->Login,
+                'name' => $player->NickName,
+                'ubiname' => $player->ubisoft_name,
+            ];
+        });
+
         Template::showAll('Helpers.update-custom-names', [
-            'keyedByLogin' => self::$customNames,
-            'keyedByUbiname' => self::$customNamesByUbiname
+            'keyedByLogin' => $data->pluck('name', 'login'),
+            'keyedByUbiname' => $data->pluck('ubiname', 'login')
         ]);
     }
 
@@ -149,7 +155,6 @@ class PlayerController implements ControllerInterface
 
             if (isTrackmania() && Cache::has('nicknames/' . $playerInfo->login)) {
                 $name = Cache::get('nicknames/' . $playerInfo->login);
-                self::$customNames->put($playerInfo->login, $name);
             }
 
             $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
@@ -159,13 +164,10 @@ class PlayerController implements ControllerInterface
                 'team' => $playerInfo->teamId
             ]);
 
-            self::$customNames->put($player->Login, $name);
-            self::$customNamesByUbiname->put($player->ubisoft_name, $name);
-
             return $player;
         })->keyBy('Login');
 
-        self::sendUpdatedCustomNames();
+        self::playerPoolChanged();
     }
 
     /**
@@ -226,8 +228,6 @@ class PlayerController implements ControllerInterface
             }
             self::announceConnect($player, $name);
         });
-
-        self::sendUpdatedCustomNames();
     }
 
     /**
@@ -273,6 +273,7 @@ class PlayerController implements ControllerInterface
         $player->save();
 
         self::$players->put($player->Login, $player);
+        self::playerPoolChanged();
     }
 
     /**
@@ -296,10 +297,7 @@ class PlayerController implements ControllerInterface
         }
 
         self::$players = self::$players->forget($player->Login);
-
-        if (self::$customNames->has($player->Login)) {
-            self::$customNames->forget($player->Login);
-        }
+        self::playerPoolChanged();
     }
 
     /**

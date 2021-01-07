@@ -312,10 +312,14 @@
         }else{
             rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
         }
-        if(EvoSC_CustomNames.existskey(user.Login)){
-            nameLabel.Value = EvoSC_CustomNames[user.Login];
-        }else{
-            nameLabel.Value = user.Name;
+        declare Text userlogin for nameLabel = "";
+        if(userlogin != user.Login){
+            userlogin = user.Login;
+            if(EvoSC_CustomNames.existskey(user.Login)){
+                nameLabel.Value = EvoSC_CustomNames[user.Login];
+            }else{
+                nameLabel.Value = user.Name;
+            }
         }
         groupLabel.Value = group.name;
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;

@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
 
-{php $window_width = '50';}
+{php $window_width = '100';}
 {php $window_height = '20';}
 
 {block id}set-name{/block}

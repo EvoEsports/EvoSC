@@ -29,6 +29,7 @@ class SetName extends Module implements ModuleInterface
      * @param Player $player
      * @param $cmd
      * @param mixed ...$name
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function cmdSetName(Player $player, $cmd, ...$name)
     {
