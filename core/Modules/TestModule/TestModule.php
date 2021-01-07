@@ -12,6 +12,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\PlayerMarkers\PlayerMarkers;
+use EvoSC\Modules\Records\Records;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\SetName\SetName;
 use Illuminate\Support\Collection;
@@ -31,7 +32,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ScoreTable::sendScoreTable($player);
+        Records::sendWidget($player);
     }
 
     public static function sendTestManialink(Player $player)

@@ -144,7 +144,7 @@ class PlayerController implements ControllerInterface
 
         Template::showAll('Helpers.update-custom-names', [
             'keyedByLogin' => $data->pluck('name', 'login'),
-            'keyedByUbiname' => $data->pluck('ubiname', 'login')
+            'keyedByUbiname' => $data->pluck('name', 'ubiname')
         ]);
     }
 

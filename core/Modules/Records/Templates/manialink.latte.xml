@@ -105,6 +105,8 @@ Void stopLoading(){
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
         (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
 
+        log(EvoSC_CustomNamesByUbiname);
+
         declare name = record.DisplayName;
         if(EvoSC_CustomNamesByUbiname.existskey(name)){
             name = EvoSC_CustomNamesByUbiname[name];
@@ -163,7 +165,10 @@ Void stopLoading(){
     Void update(Record::K_TMxSM_Record_Records[] zoneRecords){
         stopLoading();
         records = zoneRecords;
-        if(zoneRecords.count == 0) return;
+        if(zoneRecords.count == 0){
+            startLoading();
+            return;
+        }
 
         declare Text[] zones;
         foreach(records in zoneRecords){
@@ -405,6 +410,9 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
         left__ = {config('records.ui.position') == 'left'|ms_bool};
         slot__ = {config('records.ui.slot')};
 
+        declare Integer EvoSC_CustomNamesUpdate for LocalUser;
+        declare lastNamesUpdate = 0;
+
         declare K_State Race_Record_State for UI;
         declare Record::K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
         declare Boolean Race_Record_LoadingRecords for ClientUI;
@@ -420,6 +428,11 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
     {/block}
 
     {block loop}
+        if(lastNamesUpdate != EvoSC_CustomNamesUpdate && availableZones.count > 0){
+            lastNamesUpdate = EvoSC_CustomNamesUpdate;
+            changeZone(availableZones[selectedZone]);
+        }
+
         if(CurrentServerModeName != lastCurrentServerModeName){
             lastCurrentServerModeName = CurrentServerModeName;
             modeChanged(CurrentServerModeName);
