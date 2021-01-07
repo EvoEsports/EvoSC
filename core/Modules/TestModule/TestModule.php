@@ -12,12 +12,12 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\FloatingNickNames\FloatingNickNames;
 use EvoSC\Modules\HackMe\HackMe;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\LiveRankings\LiveRankings;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\MatchRounds\MatchRounds;
+use EvoSC\Modules\PlayerMarkers\PlayerMarkers;
 use EvoSC\Modules\ScoreTable\ScoreTable;
 use EvoSC\Modules\SetName\SetName;
 use EvoSC\Modules\SocialMedia\SocialMedia;
@@ -40,7 +40,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        SetName::showSetNickname($player, 'test');
+        PlayerMarkers::sendScript($player);
     }
 
     public static function sendTestManialink(Player $player)

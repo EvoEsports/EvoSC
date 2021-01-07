@@ -1,7 +1,7 @@
 <?php
 
 
-namespace EvoSC\Modules\FloatingNickNames;
+namespace EvoSC\Modules\PlayerMarkers;
 
 
 use EvoSC\Classes\Hook;
@@ -10,7 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
-class FloatingNickNames extends Module implements ModuleInterface
+class PlayerMarkers extends Module implements ModuleInterface
 {
     /**
      * @inheritDoc
@@ -34,9 +34,9 @@ class FloatingNickNames extends Module implements ModuleInterface
     public static function sendScript(Player $player = null)
     {
         if(is_null($player)){
-            Template::showAll('FloatingNickNames.script');
+            Template::showAll('PlayerMarkers.script');
         }else{
-            Template::show($player, 'FloatingNickNames.script');
+            Template::show($player, 'PlayerMarkers.script');
         }
 
         self::playerPoolChanged();
@@ -56,6 +56,6 @@ class FloatingNickNames extends Module implements ModuleInterface
             ];
         })->values()->toJson();
 
-        Template::showAll('FloatingNickNames.update', compact('data'));
+        Template::showAll('PlayerMarkers.update', compact('data'));
     }
 }
