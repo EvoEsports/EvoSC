@@ -20,7 +20,12 @@ class TeamInfo extends Module implements ModuleInterface
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
             if (!$isBoot) {
-                Template::showAll('TeamInfo.widget');
+                $emblems = [
+                    Server::getTeamInfo(1)->emblemUrl,
+                    Server::getTeamInfo(2)->emblemUrl,
+                ];
+
+                Template::showAll('TeamInfo.widget', compact('emblems'));
             }
         }
     }
