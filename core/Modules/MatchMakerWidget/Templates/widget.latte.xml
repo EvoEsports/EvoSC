@@ -38,6 +38,8 @@
     </frame>
     {/block}
 
+    {include 'Dialogues.confirm'}
+
     {block script}
     <script><!--
     Void updateTeamNames(){

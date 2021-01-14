@@ -419,15 +419,21 @@ class MapController implements ControllerInterface
      * @param bool $asString
      * @return string|MPS_Map
      */
-    public static function getGbxInformation($filename, bool $asString = true)
+    public static function getGbxInformation($filename, bool $asString = false): ?MPS_Map
     {
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
 
         if (File::exists($mapFile)) {
-            return MPS_Map::fromFilename($filename);
+            $mapsMap = MPS_Map::fromFilename($filename);
         } else {
-            return MPS_Map::fromObject(Server::getMapInfo($filename));
+            $mapsMap = MPS_Map::fromObject(Server::getMapInfo($filename));
         }
+
+        if ($asString) {
+            return json_encode($mapsMap);
+        }
+
+        return $mapsMap;
     }
 
     /**

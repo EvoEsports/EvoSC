@@ -152,7 +152,7 @@ class MxDownload extends Module implements ModuleInterface
 
         $mxDetails = self::loadMxDetails($mxId);
         Log::write(json_encode($mxDetails));
-        $gbx = json_decode(MapController::getGbxInformation($filename, true));
+        $gbx = MapController::getGbxInformation($filename);
         Log::write(json_encode($gbx));
 
         if (!isset($gbx->MapUid)) {

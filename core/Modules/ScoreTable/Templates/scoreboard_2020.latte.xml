@@ -74,8 +74,7 @@
         </frame>
         <frame id="header-frame" pos="5.5 17" z-index="1">
             {if !empty($logoUrl)}
-            <quad pos="175 8" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
-                  image="{$logoUrl|noescape}" scale="0.8"/>
+            <quad pos="177 13.5" bgcolor="000" valign="top" halign="right" size="12 12" image="{$logoUrl|noescape}" keepratio="Fit"/>
             {/if}
             <label id="server-name" class="text-light" pos="1 14" size="60 6" scale="1.8"/>
             <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>

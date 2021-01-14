@@ -133,7 +133,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static string gameDataDirectory()
  * @method static string getMapsDirectory()
  * @method static string getSkinsDirectory()
- * @method static object getTeamInfo(int $int)
+ * @method static \Maniaplanet\DedicatedServer\Structures\Team getTeamInfo(int $int)
  * @method static bool setForcedClubLinks(string $string, string $string)
  * @method static object getForcedClubLinks()
  * @method static string connectFakePlayer()
