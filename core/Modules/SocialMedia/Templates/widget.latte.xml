@@ -102,7 +102,6 @@
         }
 
         widgetSetHeight__(heights - GUTTER);
-        log("social height: " ^ (heights - GUTTER));
     }
     --></script>
     {/block}

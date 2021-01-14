@@ -16,8 +16,6 @@ class TeamInfo extends Module implements ModuleInterface
 {
     public static function start(string $mode, bool $isBoot = false)
     {
-        dump(Server::getTeamInfo(1));
-
         if (ModeController::teams()) {
             Hook::add('PlayerConnect', [self::class, 'showWidget']);
 

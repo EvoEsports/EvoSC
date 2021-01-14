@@ -30,8 +30,8 @@
             <quad id="team1bar" class="bg-lighter" size="5 0.5" pos="-15.5 -12"  halign="center"/>
             <quad id="team2bar" class="bg-lighter" size="5 0.5" pos="15.5 -12"  halign="center"/>
 
-            <quad id="team1logo" keepratio="Fit" size="7 7" pos="-66 -7" valign="center" halign="center" />
-            <quad id="team2logo" keepratio="Fit" size="7 7" pos="66 -7" valign="center" halign="center" />
+            <quad id="team1logo" keepratio="Fit" size="7 7" pos="-66 -7" valign="center" halign="center" image="{$emblems[0]}" />
+            <quad id="team2logo" keepratio="Fit" size="7 7" pos="66 -7" valign="center" halign="center" image="{$emblems[1]}" />
         </frame>
     </frame>
 
@@ -173,9 +173,6 @@ Void hidescript(){
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare lastUpdate = 0;
         HS_POS = widget.RelativePosition_V3;
-        
-        declare Text[] emblems;
-        emblems.fromjson("""{json_encode($emblems)}""");
 
         while(True){
             yield;
