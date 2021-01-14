@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6ec9e09aafae405d9c369003c90310fe",
+    "content-hash": "390b23cca81831685b53d145cd08e2c0",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -702,12 +702,12 @@
             "version": "4.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/manialib/gbx.git",
+                "url": "https://github.com/EvoTM/gbx.git",
                 "reference": "25d838374dd4d01b5488cfa2ec636e4befa03f3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/manialib/gbx/zipball/25d838374dd4d01b5488cfa2ec636e4befa03f3f",
+                "url": "https://api.github.com/repos/EvoTM/gbx/zipball/25d838374dd4d01b5488cfa2ec636e4befa03f3f",
                 "reference": "25d838374dd4d01b5488cfa2ec636e4befa03f3f",
                 "shasum": ""
             },

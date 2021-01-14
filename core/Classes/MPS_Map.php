@@ -39,7 +39,7 @@ class MPS_Map extends \stdClass
      * @param $object
      * @return MPS_Map
      */
-    public static function fromObject($object): MPS_Map
+    public static function fromObject($object): self
     {
         $map = new self();
 
@@ -64,6 +64,32 @@ class MPS_Map extends \stdClass
                 $map->{$key} = $value;
             }
         }
+
+        return $map;
+    }
+
+    /**
+     * @param string $filename
+     * @return static
+     */
+    public static function fromFilename(string $filename): self
+    {
+        $map = new self();
+        $gbx = \Manialib\Gbx\Map::loadFile(mapsDir($filename));
+
+        $map->MapUid = $gbx->getUid();
+        $map->Name = $gbx->getName();
+        $map->FileName = $filename;
+        $map->AuthorLogin = $gbx->getAuthor();
+        $map->Environment = $gbx->getEnvironment();
+        $map->BronzeTime = $gbx->getBronzeMedal();
+        $map->SilverTime = $gbx->getSilverMedal();
+        $map->GoldTime = $gbx->getGoldMedal();
+        $map->AuthorTime = $gbx->getAuthorTime();
+        $map->NbLaps = $gbx->getNbLaps();
+        $map->CheckpointsPerLaps = -1;
+        $map->MapType = $gbx->getMapType();
+        $map->MapStyle = $gbx->getMapStyle();
 
         return $map;
     }
