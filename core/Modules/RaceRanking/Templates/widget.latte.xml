@@ -171,9 +171,9 @@
         if(CurrentServerModeName != lastCurrentServerModeName){
             lastCurrentServerModeName = CurrentServerModeName;
             if(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack"){
+                declare Integer LastUiUpdate for This = 0;
                 widgetSetHeight__(0.0);
-                sleep(300);
-                widget.Hide();
+                LastUiUpdate = GameTime;
                 return;
             }else{
                 widgetSetHeight__({config('race-ranking.ui.show', 10)*3+7} * 1.0);

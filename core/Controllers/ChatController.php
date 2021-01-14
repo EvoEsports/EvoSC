@@ -4,6 +4,7 @@ namespace EvoSC\Controllers;
 
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
@@ -166,6 +167,8 @@ class ChatController implements ControllerInterface
         if (strlen(trim(stripAll($text))) == 0) {
             return;
         }
+
+        $text = trim($text);
 
         if ($player->isSpectator()) {
             $name = '$<$eee$> $fff' . $name;

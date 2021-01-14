@@ -9,6 +9,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Controllers\TeamController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
@@ -21,6 +22,10 @@ class MatchMakerWidget extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (!ModeController::isRoundsType()) {
+            return;
+        }
+
         AccessRight::add('match_maker', 'Control matches and view the admin panel for it.');
 
         ManiaLinkEvent::add('toggle_horns', [self::class, 'mleToggleHorns'], 'match_maker');
@@ -32,9 +37,8 @@ class MatchMakerWidget extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 
         if (!$isBoot) {
+            $hornsEnabled = !Server::areHornsDisabled();
             foreach (accessPlayers('match_maker') as $player) {
-                $hornsEnabled = !Server::areHornsDisabled();
-
                 Template::show($player, 'MatchMakerWidget.widget', compact('hornsEnabled'));
             }
         }

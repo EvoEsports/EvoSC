@@ -296,4 +296,10 @@ class QueueController implements ControllerInterface
             }
         }
     }
+
+    public static function dropAllMaps()
+    {
+        MapQueue::truncate();
+        Hook::fire('MapQueueUpdated', collect([]));
+    }
 }

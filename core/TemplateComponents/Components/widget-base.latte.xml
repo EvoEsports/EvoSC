@@ -141,8 +141,9 @@ declare Integer slot__;
             if(!grid_.right.existskey(slot__)) return;
             grid_.right[slot__].height = height;
         }
-        AnimMgr.Add(widget, "<frame size='" ^ widget.Size[0] ^ " " ^ newHeight ^ "' />", 250, CAnimManager::EAnimManagerEasing::ExpOut);
-        sleep(250);
+        //AnimMgr.Add(widget, "<frame size='" ^ widget.Size[0] ^ " " ^ newHeight ^ "' />", 250, CAnimManager::EAnimManagerEasing::ExpOut);
+        //sleep(250);
+        widget.Size[1] = newHeight;
         LastUiUpdate = GameTime;
     }
 
@@ -218,7 +219,7 @@ declare Integer slot__;
         setup__();
         LastUiUpdate = GameTime;
         rearrange__();
-        sleep(50);
+        sleep(300);
         widget.Show();
 
         while(True){

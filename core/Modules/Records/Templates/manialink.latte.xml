@@ -105,8 +105,6 @@ Void stopLoading(){
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
         (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
 
-        log(EvoSC_CustomNamesByUbiname);
-
         declare name = record.DisplayName;
         if(EvoSC_CustomNamesByUbiname.existskey(name)){
             name = EvoSC_CustomNamesByUbiname[name];

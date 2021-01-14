@@ -33,6 +33,11 @@ class RaceRanking extends Module implements ModuleInterface
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'clearWidget']);
             Hook::add('EndMatch', [self::class, 'clearWidget']);
             Hook::add('PointsRepartition', [self::class, 'updatePointsRepartition']);
+
+            if(!$isBoot){
+                $points = collect(self::$pointsRepartition)->toJson();
+                Template::showAll( 'RaceRanking.widget', compact('points'));
+            }
         }
     }
 
