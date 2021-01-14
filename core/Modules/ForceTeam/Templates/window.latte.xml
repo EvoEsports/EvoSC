@@ -1,0 +1,40 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '50';}
+{php $window_height = '28';}
+
+{block id}force-team{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+UI-Settings
+{/block}
+
+{block content}
+<frame pos="-0.5 -1" scale="1.075">
+    <label  class="text-light" pos="27 -0.5" size="27 3" textsize="0.6" text="Hide HUD while driving" halign="right" valign="center" />
+
+    <label class="btn-success save" pos="24 -19.5" size="12 4" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+{/block}
+
+{block functions}
+{/block}
+
+{block loop}
+{/block}
+
+{block bootScript}
+{/block}
+
+{block pendingEvents}
+{/block}
+--></script>

@@ -10,6 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\ForceTeam\ForceTeam;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
 use EvoSC\Modules\TeamInfo\TeamInfo;
@@ -30,7 +31,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        TeamInfo::showWidget($player);
+        ForceTeam::showWindow($player);
     }
 
     public static function sendTestManialink(Player $player)
