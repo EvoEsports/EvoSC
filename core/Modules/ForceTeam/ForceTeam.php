@@ -9,6 +9,7 @@ use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
@@ -24,6 +25,10 @@ class ForceTeam extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         AccessRight::add('switch_team', 'Switch players to another team.');
+
+        if (!ModeController::teams()) {
+            return;
+        }
 
         QuickButtons::addButton('', 'Switch player team', 'show_switch_player_team', 'switch_team');
 
