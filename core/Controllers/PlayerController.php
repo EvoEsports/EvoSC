@@ -498,6 +498,10 @@ class PlayerController implements ControllerInterface
     {
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
 
+        if (empty($count)) {
+            $count = '1';
+        }
+
         for ($i = 0; $i < intval($count); $i++) {
             Server::connectFakePlayer();
         }
