@@ -9,6 +9,7 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
@@ -42,6 +43,18 @@ class CpDiffs extends Module implements ModuleInterface
             'Use /target local|dedi|wr|me #id to load CPs of record to bottom widget');
 
         ChatCommand::add('/pb', [self::class, 'printPersonalBestToChat']);
+
+        if (isTrackmania()) {
+            Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
+                'uimodules' => [
+                    [
+                        'id' => 'Race_BestRaceViewer',
+                        'visible' => false,
+                        'visible_update' => true
+                    ]
+                ]
+            ])]);
+        }
     }
 
     public static function requestCpDiffs(Player $player)

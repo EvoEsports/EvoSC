@@ -34,6 +34,22 @@ class AfkController implements ControllerInterface
     }
 
     /**
+     * @param  string  $mode
+     * @param  bool  $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        Hook::add('PlayerConnect', [self::class, 'sendPinger']);
+        Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
+        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
+
+        ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
+
+//        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
+    }
+
+    /**
      * Add player to the tracker and send pinger
      *
      * @param Player $player
@@ -128,21 +144,5 @@ class AfkController implements ControllerInterface
         Server::forceSpectator($player->Login, 3);
 
         infoMessage($player, ' was forced to spectators by ', $admin)->sendAll();
-    }
-
-    /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        Hook::add('PlayerConnect', [self::class, 'sendPinger']);
-        Hook::add('PlayerDisconnect', [self::class, 'removePlayerFromTracker']);
-        Hook::add('PlayerCheckpoint', [self::class, 'interaction']);
-
-        ManiaLinkEvent::add('ping', [self::class, 'pingReceived']);
-
-//        Timer::create('checkPing', [self::class, 'checkPing'], '30s', true);
     }
 }

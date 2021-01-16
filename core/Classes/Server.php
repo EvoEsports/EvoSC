@@ -8,6 +8,7 @@ use Maniaplanet\DedicatedServer\InvalidArgumentException;
 use Maniaplanet\DedicatedServer\Structures\PlayerDetailedInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
+use Maniaplanet\DedicatedServer\Structures\ScriptInfo;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 use Maniaplanet\DedicatedServer\Structures\Version;
 
@@ -132,7 +133,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static string gameDataDirectory()
  * @method static string getMapsDirectory()
  * @method static string getSkinsDirectory()
- * @method static object getTeamInfo(int $int)
+ * @method static \Maniaplanet\DedicatedServer\Structures\Team getTeamInfo(int $int)
  * @method static bool setForcedClubLinks(string $string, string $string)
  * @method static object getForcedClubLinks()
  * @method static string connectFakePlayer()
@@ -177,7 +178,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool getWarmUp()
  * @method static string getModeScriptText()
  * @method static bool setModeScriptText(string $string)
- * @method static object getModeScriptInfo()
+ * @method static ScriptInfo getModeScriptInfo()
  * @method static array getModeScriptSettings()
  * @method static bool setModeScriptSettings(array $modeScriptSettingsArray)
  * @method static bool sendModeScriptCommands(object $struct)
@@ -327,11 +328,27 @@ class Server
         return collect(Server::getMapList())->contains('fileName', $filename);
     }
 
+    public static function callGetScores(): bool
+    {
+        return Server::triggerModeScriptEventArray('Trackmania.GetScores');
+    }
+
+    public static function getModeScriptVariable(string $name)
+    {
+        $data = Server::getModeScriptSettings();
+
+        if (array_key_exists($name, $data)) {
+            return $data[$name];
+        }
+
+        return null;
+    }
+
     /**
      * Call an rpc-method.
      *
-     * @param  string  $rpc_func
-     * @param  null|mixed[]  $args
+     * @param string $rpc_func
+     * @param null|mixed[] $args
      */
     public static function call(string $rpc_func, $args = null)
     {

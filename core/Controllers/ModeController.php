@@ -5,11 +5,14 @@ namespace EvoSC\Controllers;
 
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Timer;
 use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\AccessRight;
+use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 
@@ -20,12 +23,18 @@ class ModeController implements ControllerInterface
     private static bool $laps;
     private static bool $teams;
     private static bool $cup;
+    private static string $mode;
+
+    private static int $warmUpNb = 0;
+    private static int $warmUpRound = 0;
+    private static bool $warmUpInProgress = false;
 
     /**
      *
      */
     public static function init()
     {
+        AccessRight::add('warm_up_skip', 'Lets you skip the warm-up phase.');
     }
 
     /**
@@ -35,6 +44,41 @@ class ModeController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         self::setMode($mode);
+        self::$warmUpNb = Server::getModeScriptSettings()['S_WarmUpNb'];
+
+        Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
+        Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpRoundStarted']);
+
+        ManiaLinkEvent::add('warmup.skip', [self::class, 'skipWarmUp'], 'warm_up_skip');
+    }
+
+    public static function warmUpRoundStarted()
+    {
+        self::$warmUpInProgress = true;
+
+        infoMessage('Warm-up ', secondary(++self::$warmUpRound . "/" . self::$warmUpNb), ' started.')
+            ->setColor('f90')
+            ->setIcon(' ')
+            ->sendAll();
+
+        Hook::fire('WarmUpRoundStarted', self::$warmUpRound, self::$warmUpNb);
+    }
+
+    public static function warmUpEnd()
+    {
+        self::$warmUpInProgress = false;
+        self::$warmUpRound = 0;
+
+        infoMessage('Warm-up ended, ', secondary('starting play-loop.'))
+            ->setColor('f90')
+            ->setIcon(' ')
+            ->sendAll();
+    }
+
+    public static function skipWarmUp(Player $player)
+    {
+        Server::triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', []);
+        infoMessage($player, ' skips warm-up.')->setColor('f90')->sendAll();
     }
 
     /**
@@ -42,6 +86,7 @@ class ModeController implements ControllerInterface
      */
     public static function setMode(string $mode)
     {
+        self::$mode = $mode;
         self::$teams = false;
         self::$laps = false;
         self::$cup = false;
@@ -76,7 +121,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Cup.Script.txt':
-            case 'Trackmania/TM_Cup_Online.Script.Script.txt':
+            case 'Trackmania/TM_Cup_Online.Script.txt':
                 self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
                 self::$cup = true;
@@ -141,5 +186,37 @@ class ModeController implements ControllerInterface
     public static function cup(): bool
     {
         return self::$cup;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getMode(): string
+    {
+        return self::$mode;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isWarmUpInProgress(): bool
+    {
+        return self::$warmUpInProgress;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getWarmUpRound(): int
+    {
+        return self::$warmUpRound;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getWarmUpRoundCount(): int
+    {
+        return self::$warmUpNb;
     }
 }

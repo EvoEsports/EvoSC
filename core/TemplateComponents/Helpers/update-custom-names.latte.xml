@@ -3,13 +3,13 @@
 <manialink version="3" id="update-custom-names" name="EvoSC:update-custom-names">
     <script><!--
     main(){
+        declare Integer EvoSC_CustomNamesUpdate for LocalUser;
         declare Text[Text] EvoSC_CustomNames for LocalUser;
         declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
 
-        declare trans = """{$keyedByLogin->toJson()}""";
-        EvoSC_CustomNames.fromjson(trans);
-        trans = """{$keyedByUbiname->toJson()}""";
-        EvoSC_CustomNamesByUbiname.fromjson(trans);
+        EvoSC_CustomNames.fromjson("""{$keyedByLogin->toJson()}""");
+        EvoSC_CustomNamesByUbiname.fromjson("""{$keyedByUbiname->toJson()}""");
+        EvoSC_CustomNamesUpdate = GameTime;
     }
     --></script>
 </manialink>

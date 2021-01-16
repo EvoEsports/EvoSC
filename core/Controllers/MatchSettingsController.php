@@ -86,6 +86,7 @@ class MatchSettingsController implements ControllerInterface
             ModeController::rebootModules();
         }
 
+        QueueController::dropAllMaps();
         MapController::loadMaps();
         Hook::fire('MapPoolUpdated');
         Hook::fire('MatchSettingsLoaded', $matchSettingsFile);

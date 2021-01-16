@@ -1,7 +1,7 @@
 <?php
 
 
-namespace EvoSC\Modules\FloatingNickNames;
+namespace EvoSC\Modules\PlayerMarkers;
 
 
 use EvoSC\Classes\Hook;
@@ -10,7 +10,7 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 
-class FloatingNickNames extends Module implements ModuleInterface
+class PlayerMarkers extends Module implements ModuleInterface
 {
     /**
      * @inheritDoc
@@ -22,24 +22,30 @@ class FloatingNickNames extends Module implements ModuleInterface
         }
 
         Hook::add('PlayerConnect', [self::class, 'sendScript']);
+        Hook::add('BeginMatch', [self::class, 'sendScript']);
         Hook::add('PlayerDisconnect', [self::class, 'playerPoolChanged']);
         Hook::add('PlayerChangedName', [self::class, 'playerPoolChanged']);
     }
 
     /**
-     * @param Player $player
+     * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendScript(Player $player)
+    public static function sendScript(Player $player = null)
     {
-        Template::show($player, 'FloatingNickNames.script');
+        if(is_null($player)){
+            Template::showAll('PlayerMarkers.script');
+        }else{
+            Template::show($player, 'PlayerMarkers.script');
+        }
+
         self::playerPoolChanged();
     }
 
     /**
-     * @param Player|null $player
+     * @param null $value
      */
-    public static function playerPoolChanged(Player $player = null)
+    public static function playerPoolChanged($value = null)
     {
         $data = onlinePlayers()->transform(function (Player $player) {
             return [
@@ -50,6 +56,6 @@ class FloatingNickNames extends Module implements ModuleInterface
             ];
         })->values()->toJson();
 
-        Template::showAll('FloatingNickNames.update', compact('data'));
+        Template::showAll('PlayerMarkers.update', compact('data'));
     }
 }

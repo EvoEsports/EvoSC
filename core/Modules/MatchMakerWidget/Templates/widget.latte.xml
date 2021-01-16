@@ -32,11 +32,13 @@
             <label class="text-light" pos="44.75 -10.25" text="🏁" textsize="1.6" z-index="5" />
             <label class="btn-success" pos="16 -12" size="16 4" text=" Start Match" ScriptEvents="1" textsize="0.25" />
             <label class="btn-danger" pos="33 -12" size="16 4" text=" Stop Match" ScriptEvents="1" textsize="0.25" />
-            <label class="btn-warning" pos="16 -17" size="16 4" text=" Reset Map" ScriptEvents="1" textsize="0.25" action="map.reset" />
+            <label class="btn-warning" pos="16 -17" size="16 4" text=" Reset Match" ScriptEvents="1" textsize="0.25" action="map.reset" />
             <label class="btn-warning" pos="33 -17" size="16 4" text=" Skip Map" ScriptEvents="1" textsize="0.25" action="map.skip" />
         </frame>
     </frame>
     {/block}
+
+    {include 'Dialogues.confirm'}
 
     {block script}
     <script><!--
@@ -82,7 +84,10 @@
 
     {block loop}
     if(!UseClans){
+        declare Integer LastUiUpdate for This = 0;
         widgetSetHeight__(0.0);
+        LastUiUpdate = GameTime;
+        return;
     }
     {/block}
 

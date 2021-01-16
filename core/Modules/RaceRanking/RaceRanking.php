@@ -15,6 +15,7 @@ use EvoSC\Models\Player;
 class RaceRanking extends Module implements ModuleInterface
 {
     private static array $tracker;
+    private static array $pointsRepartition = [];
 
     /**
      * @param string $mode
@@ -31,26 +32,33 @@ class RaceRanking extends Module implements ModuleInterface
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'clearWidget']);
             Hook::add('EndMatch', [self::class, 'clearWidget']);
+            Hook::add('PointsRepartition', [self::class, 'updatePointsRepartition']);
 
-            if (!$isBoot) {
-                self::showWidget();
+            if(!$isBoot){
+                $points = collect(self::$pointsRepartition)->toJson();
+                Template::showAll( 'RaceRanking.widget', compact('points'));
             }
         }
+    }
+
+    /**
+     * @param $pointsRepartition
+     */
+    public static function updatePointsRepartition($pointsRepartition)
+    {
+        self::$pointsRepartition = $pointsRepartition;
+        $points = collect($pointsRepartition)->toJson();
+        Template::showAll('RaceRanking.widget', compact('points'));
     }
 
     /**
      * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function showWidget(Player $player = null)
+    public static function showWidget(Player $player)
     {
-        $points = collect(PointsController::getPointsRepartition())->toJson();
-
-        if (is_null($player)) {
-            Template::showAll('RaceRanking.widget', compact('points'));
-        } else {
-            Template::show($player, 'RaceRanking.widget', compact('points'));
-        }
+        $points = collect(self::$pointsRepartition)->toJson();
+        Template::show($player, 'RaceRanking.widget', compact('points'));
     }
 
     /**

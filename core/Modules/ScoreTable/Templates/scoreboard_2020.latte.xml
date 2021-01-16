@@ -58,6 +58,8 @@
             </frame>
         </frame>
 
+        <label id="finalist-label" class="text-light" pos="86 -8" halign="right" valign="center" text="" opacity="0.85" textsize="0.8" />
+
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.45" />
     </framemodel>
@@ -72,8 +74,7 @@
         </frame>
         <frame id="header-frame" pos="5.5 17" z-index="1">
             {if !empty($logoUrl)}
-            <quad pos="175 8" bgcolor="000" valign="center" halign="right" size="{config('scoretable.logo-dimensions')}"
-                  image="{$logoUrl|noescape}" scale="0.8"/>
+            <quad pos="177 13.5" bgcolor="000" valign="top" halign="right" size="12 12" image="{$logoUrl|noescape}" keepratio="Fit"/>
             {/if}
             <label id="server-name" class="text-light" pos="1 14" size="60 6" scale="1.8"/>
             <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>
@@ -151,6 +152,10 @@
     {include 'Scripts.mle'}
 
     <script><!--
+    Boolean isRoundsTypeMode(){
+        return (CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
+    }
+
     Integer ceil(Real value){
         declare Integer ceiled = ML::CeilingInteger(value);
 
@@ -306,22 +311,44 @@
         }else{
             rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
         }
-        if(EvoSC_CustomNames.existskey(user.Login)){
-            nameLabel.Value = EvoSC_CustomNames[user.Login];
-        }else{
-            nameLabel.Value = user.Name;
+        declare Text userlogin for nameLabel = "";
+        if(userlogin != user.Login){
+            userlogin = user.Login;
+            if(EvoSC_CustomNames.existskey(user.Login)){
+                nameLabel.Value = EvoSC_CustomNames[user.Login];
+            }else{
+                nameLabel.Value = user.Name;
+            }
         }
         groupLabel.Value = group.name;
         groupIconLabel.Value = "$" ^ group.color ^ group.icon;
 
         scoreBgLabel.Value = "";
-        if(CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans){
+        if(isRoundsTypeMode()){
             if(Score.Points > 0 || addedPoints > 0){
                 scoreLabel.Opacity = 1.0;
             }else{
                 scoreLabel.Opacity = 0.1;
             }
             scoreLabel.Value = Score.Points ^ " Pts";
+
+            declare Integer EvoSC_PointsLimit for This = 0;
+            declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
+            if(CurrentServerModeName == "TM_Cup_Online" && EvoSC_PointsLimit > 0){
+                declare Integer[Text] EvoSC_Winners for This;
+                if(EvoSC_Winners.existskey(Score.User.Login)){
+                    declare Integer winnerRank = EvoSC_Winners[Score.User.Login];
+                    finalistLabel.Show();
+                    finalistLabel.Value = "$fc2 $fff"^winnerRank^". Winner";
+                }else if(Score.Points >= EvoSC_PointsLimit){
+                    finalistLabel.Show();
+                    finalistLabel.Value = " Finalist";
+                }else{
+                    finalistLabel.Value = "";
+                }
+            }else{
+                finalistLabel.Value = "";
+            }
         }else{
             if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
                 scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
@@ -546,13 +573,19 @@
         }
 
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
-        (Page.MainFrame.GetFirstChild("player-info") as CMlLabel).Value = Players.count ^ "/{$maxPlayers}";
+        declare playerInfoLabel <=> (Page.MainFrame.GetFirstChild("player-info") as CMlLabel);
+        playerInfoLabel.Value = Players.count ^ "/{$maxPlayers}";
+
+        {if $roundsPerMap > 0}
+        declare Integer EvoSC_Round for This = 1;
+        playerInfoLabel.Value = playerInfoLabel.Value ^ "\t " ^ EvoSC_Round ^ "/{$roundsPerMap}";
+        {/if}
 
         declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        if(CurrentServerModeName == "Rounds" || UseClans){
+        if(isRoundsTypeMode() && EvoSC_PointsLimit > 0){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
         }
 

@@ -10,6 +10,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\MPS_Map;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
@@ -37,6 +38,8 @@ class MapController implements ControllerInterface
     private static ?Map $nextMap;
     private static string $mapsPath;
     private static Collection $mapToDisable;
+    private static int $round = -1;
+    private static int $playersFinished = 0;
 
     /**
      * Initialize MapController
@@ -89,6 +92,7 @@ class MapController implements ControllerInterface
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
         ChatCommand::add('//res', [self::class, 'forceReplay'], 'Queue map for replay', 'map_replay');
+        ChatCommand::add('//endround', [self::class, 'cmdEndRound'], 'Force the round to end (rounds, cup, ...)', 'force_end_round');
         ChatCommand::add('/next', [self::class, 'cmdNextMap'], 'Print the upcoming map to chat.');
 
         ManiaLinkEvent::add('map.skip', [self::class, 'skip'], 'map_skip');
@@ -97,11 +101,68 @@ class MapController implements ControllerInterface
         ManiaLinkEvent::add('force_end_round', [self::class, 'mleForceEndOfRound'], 'force_end_round');
 
         QuickButtons::addButton('', 'Skip Map', 'map.skip', 'map_skip');
-        QuickButtons::addButton('', 'Reset Map', 'map.reset', 'map_reset');
+        QuickButtons::addButton('', 'Reset Match', 'map.reset', 'map_reset');
 
-        if (ModeController::isRoundsType() || ModeController::teams()) {
+        if (ModeController::isRoundsType()) {
+            self::$round = 1;
+            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+            Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);
+            Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
+            Hook::add('BeginMap', [self::class, 'resetRoundCounter']);
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
+            self::resetRoundCounter();
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param int $score
+     */
+    public static function playerFinish(Player $player, int $score)
+    {
+        if ($score > 0) {
+            self::$playersFinished++;
+        }
+    }
+
+    /**
+     *
+     */
+    public static function startPlayLoop()
+    {
+        if (ModeController::cup() && self::$playersFinished == 0) {
+            return;
+        }
+
+        self::$round++;
+        self::sendUpdatedRound();
+        self::$playersFinished = 0;
+    }
+
+    /**
+     *
+     */
+    public static function resetRoundCounter()
+    {
+        self::$round = 0;
+        self::sendUpdatedRound();
+    }
+
+    /**
+     *
+     */
+    public static function sendUpdatedRound()
+    {
+        Template::showAll('Helpers.update-round', ['round' => self::$round]);
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdEndRound(Player $player, $cmd)
+    {
+        self::mleForceEndOfRound($player);
     }
 
     /**
@@ -358,39 +419,21 @@ class MapController implements ControllerInterface
      * @param bool $asString
      * @return string|MPS_Map
      */
-    public static function getGbxInformation($filename, bool $asString = true)
+    public static function getGbxInformation($filename, bool $asString = false): ?MPS_Map
     {
-        $executable = config('server.executeable');
-
-        if ($executable == 'TrackmaniaServer' && isManiaPlanet()) {
-            $executable = 'ManiaPlanetServer';
-        }
-        if ($executable == 'ManiaPlanetServer' && isTrackmania()) {
-            $executable = 'TrackmaniaServer';
-        }
-
-        if (isWindows()) {
-            $executable .= '.exe';
-        }
-
-        $mps = Server::GameDataDirectory() . (isWindows() ? DIRECTORY_SEPARATOR : '') . '..' . DIRECTORY_SEPARATOR . $executable;
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
 
         if (File::exists($mapFile)) {
-            $cmd = $mps . sprintf(' /parsegbx=\'%s\'', $mapFile);
-            $jsonString = shell_exec($cmd);
-
-            if ($asString) {
-                return $jsonString;
-            }
-
-            $data = json_decode($jsonString);
-            $data->fileName = $filename;
-
-            return MPS_Map::fromObject($data);
+            $mapsMap = MPS_Map::fromFilename($filename);
         } else {
-            return MPS_Map::fromObject(Server::getMapInfo($filename));
+            $mapsMap = MPS_Map::fromObject(Server::getMapInfo($filename));
         }
+
+        if ($asString) {
+            return json_encode($mapsMap);
+        }
+
+        return $mapsMap;
     }
 
     /**
@@ -485,6 +528,7 @@ class MapController implements ControllerInterface
 
         Server::restartMap();
         Statistics::beginMap();
+        self::resetRoundCounter();
     }
 
     /**

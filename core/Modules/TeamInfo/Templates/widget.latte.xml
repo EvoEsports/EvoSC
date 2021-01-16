@@ -19,7 +19,7 @@
 
         <frame pos="0 2" z-index="20">
             <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.5" />
-            <label class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.5" />
+            <label id="round" class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.5" />
 
             <label id="team1label" class="text-lighter" pos="-45 -4.5" halign="center" text="Team 1" textsize="4" />
             <label id="team2label" class="text-lighter" pos="45 -4.5" halign="center" text="Team 2" textsize="4" />
@@ -30,22 +30,118 @@
             <quad id="team1bar" class="bg-lighter" size="5 0.5" pos="-15.5 -12"  halign="center"/>
             <quad id="team2bar" class="bg-lighter" size="5 0.5" pos="15.5 -12"  halign="center"/>
 
-            <quad hidden="1" size="7 7" pos="-66 -7" bgcolor="f00" valign="center" halign="center" image="https://liquipedia.net/commons/images/thumb/2/26/Numelopslogo.png/600px-Numelopslogo.png" />
-            <quad hidden="1" size="7 7" pos="66 -7" bgcolor="f00" valign="center" halign="center" image="https://liquipedia.net/commons/images/thumb/1/11/MTKTM.png/600px-MTKTM.png" />
+            <quad id="team1logo" keepratio="Fit" size="7 7" pos="-66 -7" valign="center" halign="center" image="{$emblems[0]}" />
+            <quad id="team2logo" keepratio="Fit" size="7 7" pos="66 -7" valign="center" halign="center" image="{$emblems[1]}" />
         </frame>
     </frame>
 
     <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Integer showDelay;
+    Real scale;
+    Boolean sb_blur;
+    Boolean viewer_count;
+}
+
+declare Vec2 HS_POS;
+declare CMlFrame HS_Target;
+declare Boolean HS_Hidden;
+
+Void hs_hide(Integer duration){
+    HS_Hidden = True;
+    declare Real y = HS_POS[1] + (HS_Target.Size[0] * HS_Target.RelativeScale);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ y ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+}
+
+Void hs_show(Integer duration){
+    HS_Hidden = False;
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
+}
+
+Void hidescript(){
+    if(HS_Target == Null){
+        HS_Target <=> (Page.MainFrame.GetFirstChild("{isset($target) ? $target : 'widget'}") as CMlFrame);
+    }
+
+    declare UISettings settings for This;
+    declare Boolean ESC_Tab_Pressed for This;
+    declare Boolean Net_TMxSM_ScoresTable_IsDisplayed for UI;
+    declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
+
+    if(!settings.hide || InputPlayer == Null){
+        return;
+    }
+
+    if(UI.UISequence == CUIConfig::EUISequence::Podium){
+        if(!HS_Hidden){
+            hs_hide(800);
+        }
+    }else{
+        if({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
+            hs_show(1);
+            while({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
+                yield;
+                sleep(50);
+            }
+            hs_hide(1);
+        }
+
+        if(InputPlayer == Null){
+            return;
+        }
+
+        {if $is_maniaplanet}
+        declare Boolean playerIsRacing = InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+        {/if}
+        declare Boolean overHidespeed = ML::Abs(InputPlayer.Speed * 3.6) > hideSpeed;
+
+        if(overHidespeed && !HS_Hidden {if $is_maniaplanet}&& playerIsRacing{/if}){
+            hs_hide(1000);
+
+            {if !isset($doNotPause)}
+            while(InputPlayer.Speed * 3.6 > hideSpeed {if $is_maniaplanet}&& InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running{/if}){
+                yield;
+                hidescript();
+            }
+            {/if}
+        }
+        if((!overHidespeed {if $is_maniaplanet}|| !playerIsRacing{/if}) && HS_Hidden){
+            sleep(settings.showDelay);
+            hs_show(600);
+        }
+    }
+}
+
     Void setup(){
         declare team1Label <=> (Page.MainFrame.GetFirstChild("team1label") as CMlLabel);
         declare team2Label <=> (Page.MainFrame.GetFirstChild("team2label") as CMlLabel);
         declare team1Quad <=> (Page.MainFrame.GetFirstChild("team1quad") as CMlQuad);
         declare team2Quad <=> (Page.MainFrame.GetFirstChild("team2quad") as CMlQuad);
+        declare team1logo <=> (Page.MainFrame.GetFirstChild("team1logo") as CMlQuad);
+        declare team2logo <=> (Page.MainFrame.GetFirstChild("team2logo") as CMlQuad);
 
         team1Label.Value = Teams[0].Name;
         team2Label.Value = Teams[1].Name;
         team1Quad.Colorize = Teams[1].ColorPrimary;
         team2Quad.Colorize = Teams[0].ColorPrimary;
+
+        if(Teams[0].EmblemUrl != ""){
+            team1logo.ImageUrl = Teams[0].EmblemUrl;
+            team1logo.Show();
+        }else{
+            team1logo.Hide();
+        }
+        if(Teams[1].EmblemUrl != ""){
+            team2logo.ImageUrl = Teams[1].EmblemUrl;
+            team2logo.Show();
+        }else{
+            team2logo.Hide();
+        }
     }
 
     Void updateValues(){
@@ -53,6 +149,10 @@
         declare team2Points <=> (Page.MainFrame.GetFirstChild("team2points") as CMlLabel);
         declare team1Bar <=> (Page.MainFrame.GetFirstChild("team1bar") as CMlQuad);
         declare team2Bar <=> (Page.MainFrame.GetFirstChild("team2bar") as CMlQuad);
+        declare round <=> (Page.MainFrame.GetFirstChild("round") as CMlLabel);
+        declare Integer EvoSC_Round for This = 1;
+
+        round.Value = "" ^ EvoSC_Round;
 
         team1Points.Value = ClanScores[1] ^ "";
         team2Points.Value = ClanScores[2] ^ "";
@@ -72,15 +172,18 @@
     main(){
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare lastUpdate = 0;
+        HS_POS = widget.RelativePosition_V3;
 
         while(True){
             yield;
 
-            if(GameTime - lastUpdate > 1500){
+            if(GameTime - lastUpdate > 500){
                 setup();
                 updateValues();
                 lastUpdate = GameTime;
             }
+
+            hidescript();
 
             if(CurrentServerModeName != "TM_Teams_Online"){
                 widget.Hide();

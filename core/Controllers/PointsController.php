@@ -47,13 +47,8 @@ class PointsController extends Controller implements ControllerInterface
             list(self::$originalPointsLimit, self::$currentPointsLimit) = Cache::get('points_controller');
             Cache::forget('points_controller');
         } else {
-            self::$originalPointsLimit = MatchSettingsController::getValueFromCurrentMatchSettings('S_PointsLimit');
-            if (self::$originalPointsLimit == -1) {
-                self::$originalPointsLimit = Server::getRoundPointsLimit()['CurrentValue'];
-            }
-            if (self::$currentPointsLimit == -1) {
-                self::$currentPointsLimit = Server::getRoundPointsLimit()['NextValue'];
-            }
+            self::$originalPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
+            self::$currentPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
         }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -61,6 +56,7 @@ class PointsController extends Controller implements ControllerInterface
 
         ChatCommand::add('//addpoints', [self::class, 'cmdAddPoints'], 'Add points to the points-limit.', 'manipulate_points');
 
+        Server::triggerModeScriptEventArray('Trackmania.GetPointsRepartition');
         self::sendUpdatedPointsLimit(self::$currentPointsLimit);
     }
 
@@ -119,15 +115,9 @@ class PointsController extends Controller implements ControllerInterface
     /**
      * @return int
      */
-    public static function getCurrentPoints(): int
+    public static function getCurrentPointsLimit(): int
     {
-        $modeScriptSettings = Server::getModeScriptSettings();
-
-        if (array_key_exists('S_PointsLimit', $modeScriptSettings)) {
-            return Server::getModeScriptSettings()['S_PointsLimit'];
-        }
-
-        return Server::getRoundPointsLimit()['CurrentValue'];
+        return self::$currentPointsLimit;
     }
 
     /**
@@ -144,24 +134,5 @@ class PointsController extends Controller implements ControllerInterface
     private static function sendUpdatedPointsLimit(int $points)
     {
         Template::showAll('Helpers.update-points-limit', compact('points'));
-    }
-
-    /**
-     * @return array
-     */
-    public static function getPointsRepartition(): array
-    {
-        $points = Server::getModeScriptSettings()['S_PointsRepartition'];
-
-        //modescript: Trackmania.GetPointsRepartition
-
-        if ($points) {
-            $parts = explode(',', $points);
-            return array_map(function ($point) {
-                return intval($point);
-            }, $parts);
-        }
-
-        return [10, 6, 4, 3, 2, 1];
     }
 }

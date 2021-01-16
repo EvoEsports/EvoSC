@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
 {php $window_width = 98;}
-{php $window_height = 36;}
+{php $window_height = 40;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}team-setup{/block}
@@ -23,12 +23,14 @@
                 <entry name="primary[{$i}]" class="form" pos="19 -14" size="26 4" valign="center" />
                 <label class="text-light" pos="1 -19" text="Secondary Color" size="16" halign="left" textsize="1" valign="center" />
                 <entry name="secondary[{$i}]" class="form" pos="19 -19" size="26 4" valign="center" />
+                <label class="text-light" pos="1 -24" text="Emblem URL" size="16" halign="left" textsize="1" valign="center" />
+                <entry name="emblem[{$i}]" class="form" pos="19 -24" size="26 4" valign="center" />
             </frame>
             {/for}
         </frame>
 
-        <label class="btn-success apply" pos="40.5 -28" size="16 5" text="Apply" ScriptEvents="1" />
-        <label class="btn-danger cancel" pos="57.5 -28" size="16 5" text="Cancel" ScriptEvents="1" />
+        <label class="btn-success apply" pos="40.5 -33" size="16 5" text="Apply" ScriptEvents="1" />
+        <label class="btn-danger cancel" pos="57.5 -33" size="16 5" text="Cancel" ScriptEvents="1" />
     </frame>
     {/block}
 
@@ -46,6 +48,7 @@
                 (frame.Controls[2] as CMlEntry).Value = Teams[i - 1].Name;
                 (frame.Controls[4] as CMlEntry).Value = CL::RgbToHex(Teams[i - 1].ColorPrimary);
                 (frame.Controls[6] as CMlEntry).Value = CL::RgbToHex(Teams[i - 1].ColorSecondary);
+                (frame.Controls[8] as CMlEntry).Value = Teams[i - 1].EmblemUrl;
             }
         }
     {/block}

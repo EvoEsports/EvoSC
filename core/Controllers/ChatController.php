@@ -4,6 +4,7 @@ namespace EvoSC\Controllers;
 
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
@@ -158,15 +159,6 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        $questions = Question::getQuestions();
-        if ($questions->has($player->id)) {
-            $question = $questions->get($player->id);
-            $callable = $question->callback;
-            $callable($player, $text);
-            Question::forget($player->id);
-            return;
-        }
-
         Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
 
         $name = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $player->NickName);
@@ -175,6 +167,8 @@ class ChatController implements ControllerInterface
         if (strlen(trim(stripAll($text))) == 0) {
             return;
         }
+
+        $text = trim($text);
 
         if ($player->isSpectator()) {
             $name = '$<$eee$> $fff' . $name;

@@ -285,7 +285,7 @@ class Votes extends Module implements ModuleInterface
             if ($points > $opoints) {
                 $points = $opoints;
             }
-            if (PointsController::getCurrentPoints() >= config('votes.points.max-points')) {
+            if (PointsController::getCurrentPointsLimit() >= config('votes.points.max-points')) {
                 dangerMessage('Point limit reached.')->send($player);
                 return;
             }
@@ -295,7 +295,7 @@ class Votes extends Module implements ModuleInterface
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($points, $question) {
             if ($success) {
-                successMessage('Vote ', secondary($question), ' successful, ', secondary('point-limit is now ' . (PointsController::getCurrentPoints() + $points)), '.')->sendAll();
+                successMessage('Vote ', secondary($question), ' successful, ', secondary('point-limit is now ' . (PointsController::getCurrentPointsLimit() + $points)), '.')->sendAll();
                 PointsController::increasePointsLimit($points);
             } else {
                 dangerMessage('Vote ', secondary($question), ' did not pass.')->sendAll();

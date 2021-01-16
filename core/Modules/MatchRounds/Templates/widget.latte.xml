@@ -1,0 +1,50 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}match-rounds{/block}
+    {block size}44 8{/block}
+
+    {block content}
+    <quad class="bg-dark" size="36 8" opacity="0.8" z-index="-1"/>
+    <quad class="bg-accent" pos="36 0" size="8 8" z-index="-1"/>
+    <label id="rounds" class="text-light" pos="34.5 -4" z-index="1" size="33 3" text="ROUND -1/{$roundsPerMap}" halign="right" valign="center" textsize="1.3"/>
+    <label class="text-light" pos="40 -4" valign="center" halign="center" textsize="2" size="6 6" scale="0.8" text=""/>
+    {/block}
+
+    {block script}
+    <script><!--
+    Boolean isRoundsType(){
+        return CurrentServerModeName == "TM_Cup_Online" || CurrentServerModeName == "TM_Rounds_Online" || UseClans;
+    }
+    --></script>
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare roundsLabel <=> (Page.MainFrame.GetFirstChild("rounds") as CMlLabel);
+        declare Integer EvoSC_Round for This = 1;
+
+        left__ = {config('match-rounds.ui.position') == 'left'|ms_bool};
+        slot__ = {config('match-rounds.ui.slot')};
+    {/block}
+
+    {block loop}
+        wait(isRoundsType());
+        roundsLabel.Value = "ROUND " ^ EvoSC_Round ^ "/{$roundsPerMap}";
+        sleep(100);
+
+        if(!isRoundsType()){
+            widgetSetHeight__(0.0);
+            widget.Hide();
+            return;
+        }
+    {/block}
+
+    {block pendingEvents}
+    {/block}
+    --></script>
+</manialink>

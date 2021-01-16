@@ -38,7 +38,8 @@
         86
       ],
       "scale": 1,
-      "visible": true
+      "visible": false,
+      "visible_update": true
     },
     {
       "id": "Race_TimeGap",

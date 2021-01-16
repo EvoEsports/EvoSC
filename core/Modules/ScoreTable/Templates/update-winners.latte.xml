@@ -1,0 +1,11 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-winners" name="ESC:update-winners">
+    <script><!--
+    main(){
+        declare Integer[Text] EvoSC_Winners for This;
+
+        EvoSC_Winners.fromjson("""{$winners->toJson()}""");
+    }
+    --></script>
+</manialink>

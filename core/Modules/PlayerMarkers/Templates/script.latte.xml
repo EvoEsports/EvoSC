@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:floating-nicks" id="floating-nicks" version="3">
+<manialink name="ESC:player-markers" id="player-markers" version="3">
     <script><!--
     #Include "TextLib" as TL
 
@@ -16,7 +16,7 @@
     }
 
     Boolean isTeams(){
-        return CurrentServerModeName == "Teams" || CurrentServerModeName == "TM_Teams_Online";
+        return UseClans;
     }
 
     Void setMarkersInit(EvoSC_Marker2[] markers){
@@ -27,22 +27,25 @@
         ClientUI.MarkersXML = markersXml;
     }
 
+    Text escapeQuotes(Text text){
+        return TL::Replace(text, "\"", "''");
+    }
+
     Void setMarkers(EvoSC_Marker2[] markers){
         declare Text markersXml = "";
         declare isTimeAttack = isTimeAttack();
         declare isTeams = isTeams();
 
         foreach(marker in markers){
-            if(LocalUser.Login != marker.login){
-                if(isTeams){
-                    //todo: implement teams colors
-                    markersXml = markersXml ^ "<marker label='"^marker.name^"' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' icon='"^ marker.prefix ^"' />";
-                }else{
-                    markersXml = markersXml ^ "<marker label='$"^ marker.color ^ marker.prefix ^"[$fff"^ marker.name ^"$z$"^ marker.color ^"]' playerlogin='" ^ marker.login ^ "' box='0 0.1 0' distmax='100' />";
-                }
+            if(LocalUser.Login == marker.login){
+                continue;
             }
+            markersXml = markersXml ^ """<marker label="$<""" ^  escapeQuotes(marker.name) ^ """$>" playerlogin='""" ^ marker.login ^ """' box='0 0.6 0' distmax='95' color='{config('theme.hud.bg-light')}' />""";
         }
 
+        ClientUI.AlliesLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
+        ClientUI.TeamLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
+        ClientUI.OpposingTeamLabelsVisibility = CUIConfig::ELabelsVisibility::Never;
         ClientUI.OverrideMarkers = True;
         ClientUI.MarkersXML = markersXml;
     }
@@ -52,6 +55,7 @@
         declare Integer EvoSC_MarkerNames_Update2 for This;
         declare lastUpdate = 0;
         declare initialized = False;
+        declare currentMapUid = "";
 
         wait(InputPlayer != Null);
 

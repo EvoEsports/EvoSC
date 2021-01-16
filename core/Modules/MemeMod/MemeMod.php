@@ -4,9 +4,11 @@
 namespace EvoSC\Modules\MemeMod;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ChatController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -25,9 +27,37 @@ class MemeMod extends Module implements ModuleInterface
     {
         self::$tracker = collect();
 
-        Hook::add('PlayerChat', [self::class, 'chat']);
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         InputSetup::add('pay_respects', 'Pay your respects', [self::class, 'payRespects'], 'F');
+        ChatCommand::add('/mock', [self::class, 'mockingSpongebobText'], 'Write mocking spongebob text to chat.');
+
+        if (isManiaPlanet()) {
+            Hook::add('PlayerChat', [self::class, 'chat']);
+        }
+    }
+
+    private static function mock(string $in)
+    {
+        $out = '';
+        $split = str_split($in);
+        foreach ($split as $i => $c) {
+            if ($i % 2 == 0) {
+                $out .= strtolower($c);
+            } else {
+                $out .= strtoupper($c);
+            }
+        }
+        return $out;
+    }
+
+    public static function mockingSpongebobText(Player $player, $cmd, ...$text)
+    {
+        $out = '';
+        foreach ($text as $part) {
+            $out .= self::mock($part) . ' ';
+        }
+
+        ChatController::playerChat($player, trim($out));
     }
 
     /**

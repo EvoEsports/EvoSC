@@ -4,9 +4,12 @@
 namespace EvoSC\Controllers;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Log;
+use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use stdClass;
 
@@ -31,6 +34,28 @@ class ConfigController implements ControllerInterface
     public static function init()
     {
         self::loadConfigurationFiles();
+    }
+
+    /**
+     * @param string $mode
+     * @param bool $isBoot
+     * @return mixed|void
+     */
+    public static function start(string $mode, bool $isBoot)
+    {
+        ChatCommand::add('//servername', [self::class, 'cmdSetServerName'], 'Set a new server name.', 'ma');
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param mixed ...$newName
+     */
+    public static function cmdSetServerName(Player $player, $cmd, ...$newName)
+    {
+        $name = implode(' ', $newName);
+        Server::setServerName($name);
+        infoMessage($player, ' changed the server name to ', secondary($name))->sendAdmin();
     }
 
     /**
@@ -167,7 +192,7 @@ class ConfigController implements ControllerInterface
         self::$rawConfigs->each(function ($value, $base) use ($map) {
             $paths = self::createPathsRecursively($base, $value);
 
-            if($paths != null){
+            if ($paths != null) {
                 $paths->each(function ($value, $path) use ($map) {
                     if ($value === null) {
                         $value = false;
@@ -219,15 +244,5 @@ class ConfigController implements ControllerInterface
         }
 
         return $paths;
-    }
-
-    /**
-     * @param string $mode
-     * @param bool $isBoot
-     * @return mixed|void
-     */
-    public static function start(string $mode, bool $isBoot)
-    {
-        // TODO: Implement start() method.
     }
 }

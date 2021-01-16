@@ -1,4 +1,20 @@
 {
+  "name": "evotm/evosc",
+  "type": "project",
+  "description": "EvoSC is a modern server controller for the game Trackmania² and TM2020.",
+  "keywords": [
+    "Evo",
+    "Maniaplanet",
+    "Trackmania"
+  ],
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/EvoTM/EvoSC",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/EvoTM/gbx.git"
+    }
+  ],
   "require": {
     "php": "^7.4",
     "ext-json": "*",
@@ -25,7 +41,10 @@
   "autoload": {
     "psr-4": {
       "EvoSC\\": "core/",
-      "EvoSC\\Modules\\": ["core/Modules/", "modules/"]
+      "EvoSC\\Modules\\": [
+        "core/Modules/",
+        "modules/"
+      ]
     }
   },
   "require-dev": {
