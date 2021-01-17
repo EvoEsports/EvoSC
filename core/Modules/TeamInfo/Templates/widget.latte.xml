@@ -21,8 +21,8 @@
             <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.7" />
             <label id="round" class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.7" />
 
-            <label id="team1label" class="text-lighter" pos="-45 -4.5" halign="center" text="Team 1" textsize="4" />
-            <label id="team2label" class="text-lighter" pos="45 -4.5" halign="center" text="Team 2" textsize="4" />
+            <label id="team1label" class="text-lighter" pos="-43 -4.5" size="32 5" halign="center" text="Team 1" textsize="4" />
+            <label id="team2label" class="text-lighter" pos="43 -4.5" size="32 5" halign="center" text="Team 2" textsize="4" />
 
             <label id="team1points" class="text-lighter" pos="-15.5 -7.25" halign="center" text="1" textsize="6" valign="center" />
             <label id="team2points" class="text-lighter" pos="15.5 -7.25" halign="center" text="2" textsize="6" valign="center" />

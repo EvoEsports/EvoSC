@@ -43,9 +43,13 @@ class AddAdmin extends Command
         $player = Player::find($login);
 
         if ($player === null) {
-            $output->writeln("No player found with login '{$login}'. Please make sure the player/you joined the server at least once.");
-            exit(1);
+            $player = Player::create([
+                'Login' => $login,
+                'NickName' => $login,
+                'ubisoft_name' => $login,
+            ]);
         }
+
         if (!$groupId) {
             $table = new Table($output);
             $table->setHeaders(["Id", "Title"]);

@@ -83,12 +83,6 @@
     {/block}
 
     {block loop}
-    if(!UseClans){
-        declare Integer LastUiUpdate for This = 0;
-        widgetSetHeight__(0.0);
-        LastUiUpdate = GameTime;
-        return;
-    }
     {/block}
 
     {block pendingEvents}

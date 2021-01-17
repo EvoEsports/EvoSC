@@ -9,7 +9,6 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
-use Illuminate\Support\Collection;
 
 class FixDisableRespawn extends Module implements ModuleInterface
 {
@@ -51,7 +50,7 @@ class FixDisableRespawn extends Module implements ModuleInterface
 
         $login = json_decode($data[0])->login;
         Server::forceSpectator($login, 3);
-        usleep(10000);
+        usleep(100000);
         Server::forceSpectator($login, 2);
     }
 }
