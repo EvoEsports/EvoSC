@@ -3,6 +3,7 @@
 namespace EvoSC\Modules\SpeedoMeter;
 
 
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
@@ -17,16 +18,19 @@ class SpeedoMeter extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        global $__ManiaPlanet;
-
-        if(!$__ManiaPlanet){
-            return;
+        if (isManiaPlanet()) {
+            Hook::add('PlayerConnect', [self::class, 'show']);
+        } else {
+            ChatCommand::add('/speedo', [self::class, 'cmdShowSpeedo'], 'Show speed on HUD.');
         }
-
-        Hook::add('PlayerConnect', [self::class, 'show']);
 
         ManiaLinkEvent::add('speedo.save', [self::class, 'saveSettings']);
         ManiaLinkEvent::add('speedo.reset', [self::class, 'resetSettings']);
+    }
+
+    public static function cmdShowSpeedo(Player $player, $cmd)
+    {
+        self::show($player);
     }
 
     public static function show(Player $player)
