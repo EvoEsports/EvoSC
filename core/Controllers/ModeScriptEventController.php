@@ -80,11 +80,6 @@ class ModeScriptEventController implements ControllerInterface
 
                 return;
 
-            case 'Trackmania.Event.Stunt':
-                self::tmStunt($arguments);
-
-                return;
-
             case 'Trackmania.WarmUp.End':
                 Hook::fire('WarmUpEnd');
                 break;
@@ -102,16 +97,6 @@ class ModeScriptEventController implements ControllerInterface
             case 'Maniaplanet.EndMap_Start':
                 Hook::fire($callback);
 
-                return;
-
-            case 'Trackmania.Event.OnPlayerAdded':
-                // self::tmPlayerConnect($arguments);
-                // Handled by {@see EventController}
-                return;
-
-            case 'Trackmania.Event.OnPlayerRemoved':
-                // self::tmPlayerLeave($arguments);
-                // Handled by {@see EventController}
                 return;
 
             default:
@@ -207,47 +192,5 @@ class ModeScriptEventController implements ControllerInterface
     {
         $playerLogin = json_decode($arguments[0])->login;
         Hook::fire('PlayerStartLine', player($playerLogin));
-    }
-
-    /**
-     * Disabled: Called when a player does a stunt.
-     *
-     * @param $arguments
-     */
-    static function tmStunt($arguments)
-    {
-        //ignore stunts for now
-    }
-
-    /**
-     * Called on player connect.
-     *
-     * @param $arguments
-     */
-    static function tmPlayerConnect($arguments)
-    {
-        $playerData = json_decode($arguments[0]);
-
-        //string Login, bool IsSpectator
-        if (Player::whereLogin($playerData->login)->get()->isEmpty()) {
-            $player = Player::create(['Login' => $playerData->login, 'NickName' => $playerData->login]);
-        } else {
-            $player = Player::find($playerData->login);
-        }
-
-        Hook::fire('PlayerConnect', $player);
-    }
-
-    /**
-     * Called on player leave.
-     *
-     * @param $arguments
-     */
-    static function tmPlayerLeave($arguments)
-    {
-        $playerData = json_decode($arguments[0]);
-        $player = player($playerData->login);
-
-        Hook::fire('PlayerDisconnect', $player);
     }
 }

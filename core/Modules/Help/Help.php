@@ -3,10 +3,12 @@
 namespace EvoSC\Modules\Help;
 
 use EvoSC\Classes\ChatCommand;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 
@@ -15,8 +17,8 @@ class Help extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -43,13 +45,13 @@ class Help extends Module implements ModuleInterface
         })->map(function (ChatCommand $command) {
 
             return [
-                'command'     => $command->command,
+                'command' => $command->command,
                 'description' => $command->description,
-                'access'      => $command->access ?: '',
+                'access' => $command->access ?: '',
             ];
         })->sortBy('access')->values()->toJson();
 
-        Template::show($player, 'Help.cmds', compact('commands'));
+        Template::show($player, 'Help.cmds', ['commands' => $commands]);
     }
 
     public static function showAbout(Player $player)

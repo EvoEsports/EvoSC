@@ -21,7 +21,7 @@ class SpeedoMeter extends Module implements ModuleInterface
         if (isManiaPlanet()) {
             Hook::add('PlayerConnect', [self::class, 'show']);
         } else {
-            ChatCommand::add('/speedo', [self::class, 'cmdShowSpeedo'], 'Show speed on HUD.');
+            ChatCommand::add('/speed', [self::class, 'cmdShowSpeedo'], 'Show speed on HUD.');
         }
 
         ManiaLinkEvent::add('speedo.save', [self::class, 'saveSettings']);
@@ -37,7 +37,7 @@ class SpeedoMeter extends Module implements ModuleInterface
     {
         $settings = $player->setting('speedo');
 
-        Template::show($player, 'SpeedoMeter.meter', compact('settings'));
+        Template::show($player, 'SpeedoMeter.meter' . (isTrackmania() ? '_2020' : ''), compact('settings'));
     }
 
     public static function saveSettings(Player $player, ...$settingsJson)

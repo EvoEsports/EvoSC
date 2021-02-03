@@ -155,7 +155,7 @@
         Text nick;
     }
 
-    declare Vec2 HS_POS;
+    declare Vec2 widgetBasePosition;
     declare CMlFrame HS_Target;
     declare Boolean HS_Hidden;
     declare Position[Text] positions;
