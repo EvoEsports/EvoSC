@@ -1,6 +1,7 @@
 {contentType text}
 {extends 'Components.widget-base'}
-{php $customHidescript = true;}
+{php $customHideMethod = 'hide';}
+{php $customShowMethod = 'show';}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}countdown{/block}
@@ -18,59 +19,30 @@
 
     {block script}
     <script><!--
-    Void hide(){
-        HS_Hidden = True;
+    Void hide(Integer duration){
         declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
         declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
-        AnimMgr.Add(label, "<label opacity='0.0' />", 600, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(addedTimeLabel, "<label opacity='0.0' />", 600, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(label, "<label opacity='0.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(addedTimeLabel, "<label opacity='0.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
 
-    Void show(){
-        HS_Hidden = False;
+    Void show(Integer duration){
         declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
         declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
-        AnimMgr.Add(label, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-        AnimMgr.Add(addedTimeLabel, "<label opacity='1.0' />", 800, CAnimManager::EAnimManagerEasing::ExpInOut);
-    }
-
-    Void hidescript(){
-        declare UISettings settings for This;
-        declare hideSpeed = settings.speed;
-
-        if(hideSpeed == -1 || InputPlayer == Null){
-            return;
-        }
-
-        if(UI.UISequence == CUIConfig::EUISequence::Podium){
-            if(!HS_Hidden){
-                hide();
-            }
-        }else{
-            declare Boolean overHidespeed = InputPlayer.Speed * 3.6 > 10;
-            if(overHidespeed && !HS_Hidden){
-                hide();
-            }
-            if((!overHidespeed) && HS_Hidden){
-                show();
-            }
-        }
+        AnimMgr.Add(label, "<label opacity='1.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+        AnimMgr.Add(addedTimeLabel, "<label opacity='1.0' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
     }
     --></script>
     {/block}
 
     <script><!--
     {block globals}
-        declare Vec2 widgetBasePosition;
-        declare CMlFrame HS_Target;
-        declare Boolean HS_Hidden;
     {/block}
 
     {block bootScript}
-        HS_Target <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare Real AddedTimeR for This = 0.0;
-        declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
-        declare timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        declare netread Integer Net_Race_Helpers_CutOffTimeLimit for Teams[0];
+        declare timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
         declare cd <=> (Page.MainFrame.GetFirstChild("cd") as CMlLabel);
         declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
         declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
@@ -88,7 +60,7 @@
             AddedTimeR = 0.0;
         }
 
-        timeRemaining = Net_Race_Countdown_CutOffTimeLimit - GameTime + 1000;
+        timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
         if(timeRemaining > 0){
             cd.Value = TL::TimeToText(timeRemaining);
 
@@ -124,8 +96,6 @@
         }else{
             cd.TextColor = <1., 1., 1.>;
         }
-
-        hidescript();
     {/block}
 
     {block pendingEvents}
