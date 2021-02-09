@@ -28,10 +28,6 @@
         declare netread Integer Net_Race_Countdown_CutOffTimeLimit for Teams[0];
         declare hidden = False;
 
-        widget.Hide();
-        wait(CurrentServerModeName == "TM_TimeAttack_Online" || CurrentServerModeName == "TimeAttack");
-        widget.Show();
-
         left__ = {config('add-time.ui.position') == 'left'|ms_bool};
         slot__ = {config('add-time.ui.slot')};
     {/block}
