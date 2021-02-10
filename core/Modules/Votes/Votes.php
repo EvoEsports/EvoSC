@@ -242,8 +242,9 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
         }
-
-        $question = 'Add $<' . secondary(round($secondsToAdd / 60, 1)) . '$> minutes?';
+        
+        $verb = $secondsToAdd>0 ? 'Add' : 'Subtract';
+        $question = $verb . ' $<' . secondary(abs(round($secondsToAdd / 60, 1))) . '$> minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {
             if ($success) {
