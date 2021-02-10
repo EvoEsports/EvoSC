@@ -10,9 +10,12 @@ use EvoSC\Classes\Template;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
+use EvoSC\Modules\CountDown\CountDown;
 use EvoSC\Modules\ForceTeam\ForceTeam;
+use EvoSC\Modules\HideScript\HideScript;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\MatchMakerWidget\MatchMakerWidget;
+use EvoSC\Modules\SpeedoMeter\SpeedoMeter;
 use EvoSC\Modules\TeamInfo\TeamInfo;
 use Illuminate\Support\Collection;
 
@@ -31,7 +34,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        ForceTeam::showWindow($player);
+        CountDown::showCountdown($player);
     }
 
     public static function sendTestManialink(Player $player)

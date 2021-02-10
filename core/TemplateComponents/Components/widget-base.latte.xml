@@ -30,6 +30,7 @@
 
 {include globals}
 
+declare Vec2 widgetBasePosition;
 declare CMlFrame widget;
 declare CMlQuad bg;
 declare Boolean left__;
@@ -39,10 +40,6 @@ declare Integer slot__;
     <frame pos="0 0" id="widget" size="{include size}" z-index="50" hidden="1">
         {include content}
     </frame>
-
-    {if !isset($customHidescript)}
-    {include 'Scripts.hide'}
-    {/if}
 
     <script><!--
     Void rearrange__(){
@@ -120,7 +117,7 @@ declare Integer slot__;
         {/if}
 
         declare newY = 90.0 - heights - (gutter * count) - 2.5;
-        HS_POS = <newX, newY>;
+        widgetBasePosition = <newX, newY>;
         if(widget.RelativePosition_V3[1] != newY || widget.RelativePosition_V3[0] != newX){
             declare posString = newX ^ " " ^ newY;
             AnimMgr.Add(widget, """<frame pos='""" ^ posString ^ """' />""", 500, CAnimManager::EAnimManagerEasing::ExpOut);
@@ -195,12 +192,29 @@ declare Integer slot__;
             {/if}
         }
     }
+
+    Void hs_hide(Integer duration){
+        declare Real x;
+        if(widgetBasePosition[0] < 0.0){
+            x = (widget.Size[0] * -widget.RelativeScale) - 322.0;
+        }else{
+            x = 322.0;
+        }
+        AnimMgr.Add(widget, "<frame pos='" ^ x ^ " " ^ widgetBasePosition[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+    }
+
+    Void hs_show(Integer duration){
+        AnimMgr.Add(widget, "<frame pos='" ^ widgetBasePosition[0] ^ " " ^ widgetBasePosition[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
+    }
     --></script>
 
     {include script}
 
     <script><!--
     main() {
+        declare Boolean EvoSC_UI_Hidden for This = False;
+        declare Integer EvoSC_UI_HiddenUpdate for This;
+        declare lastHiddenUpdate = 0;
         declare WidgetGrid grid_ for This;
         declare Integer LastUiUpdate for This = 0;
         declare Integer lastUiUpdate;
@@ -233,8 +247,15 @@ declare Integer slot__;
 
             {include loop}
 
-            {if !isset($customHidescript) && !isset($dontHide)}
-            hidescript();
+            {if !isset($dontHide)}
+            if(lastHiddenUpdate != EvoSC_UI_HiddenUpdate){
+                lastHiddenUpdate = EvoSC_UI_HiddenUpdate;
+                if(EvoSC_UI_Hidden){
+                    {$customHideMethod ?? 'hs_hide'}(800);
+                }else{
+                    {$customShowMethod ?? 'hs_show'}(600);
+                }
+            }
             {/if}
 
             if(lastUiUpdate != LastUiUpdate){

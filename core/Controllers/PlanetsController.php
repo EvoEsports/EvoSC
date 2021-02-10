@@ -56,7 +56,7 @@ class PlanetsController implements ControllerInterface
             return;
         }
 
-        Timer::create('bills.check', [PlanetsController::class, 'checkBills'], '1s');
+        Timer::create('bills.check', [self::class, 'checkBills'], '1s');
     }
 
     /**

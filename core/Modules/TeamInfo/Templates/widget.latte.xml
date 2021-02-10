@@ -3,7 +3,7 @@
 <manialink name="ESC:team-info" id="team-info" version="3">
     {include 'Components.stylesheet'}
 
-    <frame id="widget" pos="0 90">
+    <frame id="widget" pos="0 90" scale="0.95">
         <quad size="150 18" pos="0 7.5" halign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />
 
         <quad id="team1quad" size="18 15" pos="16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
@@ -18,11 +18,11 @@
         <quad size="18 15" pos="0 2" halign="center" z-index="19" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-dark')}" />
 
         <frame pos="0 2" z-index="20">
-            <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.5" />
-            <label id="round" class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.5" />
+            <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.7" />
+            <label id="round" class="text-light" pos="0 -4.75" halign="center" text="#" textsize="4" opacity="0.7" />
 
-            <label id="team1label" class="text-lighter" pos="-45 -4.5" halign="center" text="Team 1" textsize="4" />
-            <label id="team2label" class="text-lighter" pos="45 -4.5" halign="center" text="Team 2" textsize="4" />
+            <label id="team1label" class="text-lighter" pos="-43 -4.5" size="32 5" halign="center" text="Team 1" textsize="4" />
+            <label id="team2label" class="text-lighter" pos="43 -4.5" size="32 5" halign="center" text="Team 2" textsize="4" />
 
             <label id="team1points" class="text-lighter" pos="-15.5 -7.25" halign="center" text="1" textsize="6" valign="center" />
             <label id="team2points" class="text-lighter" pos="15.5 -7.25" halign="center" text="2" textsize="6" valign="center" />
@@ -48,19 +48,19 @@
     Boolean viewer_count;
 }
 
-declare Vec2 HS_POS;
+declare Vec2 widgetBasePosition;
 declare CMlFrame HS_Target;
 declare Boolean HS_Hidden;
 
 Void hs_hide(Integer duration){
     HS_Hidden = True;
-    declare Real y = HS_POS[1] + (HS_Target.Size[0] * HS_Target.RelativeScale);
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ y ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+    declare Real y = widgetBasePosition[1] + (HS_Target.Size[0] * HS_Target.RelativeScale);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ widgetBasePosition[0] ^ " " ^ y ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
 Void hs_show(Integer duration){
     HS_Hidden = False;
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ widgetBasePosition[0] ^ " " ^ widgetBasePosition[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
 }
 
 Void hidescript(){
@@ -172,7 +172,7 @@ Void hidescript(){
     main(){
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare lastUpdate = 0;
-        HS_POS = widget.RelativePosition_V3;
+        widgetBasePosition = widget.RelativePosition_V3;
 
         while(True){
             yield;

@@ -29,7 +29,7 @@ A server controller for Trackmania²
 * MySql/MariaDB Server
 
 ### Installation
-[Wiki: Installation](https://github.com/EvoTM/EvoSC/wiki/Installation)
+[Wiki: Installation](https://wiki.evotm.com/books/evosc-users-guide/page/download-installation)
 
 ___
 

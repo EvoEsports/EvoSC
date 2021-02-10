@@ -1,0 +1,90 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:hide-script" id="hide-script" version="3">
+    <script><!--
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+
+#Struct UISettings {
+    Boolean hide;
+    Integer speed;
+    Integer showDelay;
+    Real scale;
+    Boolean sb_blur;
+    Boolean viewer_count;
+}
+
+Boolean tabPressed(){
+    {if $is_maniaplanet}
+    declare Boolean ESC_Tab_Pressed for This;
+    return ESC_Tab_Pressed;
+    {else}
+    declare Boolean Net_TMxSM_ScoresTable_IsDisplayed for UI;
+    return Net_TMxSM_ScoresTable_IsDisplayed;
+    {/if}
+}
+
+Boolean playerIsRacing(){
+    if(InputPlayer == Null) return False;
+    {if $is_maniaplanet}
+    return InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running;
+    {else}
+    return True;
+    {/if}
+}
+
+Boolean shouldHide(Integer hideSpeed, Integer showDelay){
+    if(tabPressed()){
+        return False;
+    }
+
+    declare Boolean playerIsRacing = playerIsRacing();
+    declare playerSpeed = InputPlayer.Speed;
+    if(playerSpeed < 0) playerSpeed *= -1;
+    declare Boolean overHidespeed = (playerSpeed * 3.6) > hideSpeed;
+
+    if(overHidespeed && playerIsRacing){
+        return True;
+    }
+    if(!overHidespeed || !playerIsRacing){
+        sleep(showDelay);
+    }
+
+    return False;
+}
+
+main() {
+    declare Boolean EvoSC_UI_Hidden for This = False;
+    declare Integer EvoSC_UI_HiddenUpdate for This;
+    declare UISettings settings for This;
+    declare Boolean previouslyHidden = False;
+
+    while(True){
+        if(!settings.hide){
+            sleep(5000);
+            EvoSC_UI_Hidden = False;
+            continue;
+        }
+        if(InputPlayer == Null){
+            sleep(200);
+            EvoSC_UI_Hidden = False;
+            continue;
+        }
+
+        declare newState = False;
+        if(UI.UISequence == CUIConfig::EUISequence::Podium){
+            newState = False;
+        }else{
+            newState = shouldHide(settings.speed, settings.showDelay);
+        }
+
+        if(newState != EvoSC_UI_Hidden){
+            EvoSC_UI_Hidden = newState;
+            EvoSC_UI_HiddenUpdate = GameTime;
+        }
+
+        sleep(100);
+    }
+}
+    --></script>
+</manialink>

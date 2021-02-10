@@ -3,17 +3,22 @@
 <manialink name="ESC:speedometer" id="speedometer" version="3">
     {include 'Components.stylesheet'}
     <frame id="speedometer" z-index="100">
-        {if isManiaPlanet()}
-        <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textemboss="1"/>
-        <label id="label" class="text-light" pos="0.5 -1.5" text="Km/H" valign="center" textsize="1.8" textemboss="1"/>
-        <label class="action btn-accent" pos="-12.5 2.5" size="22.5 6.5"  valign="top" halign="left" focusareacolor1="0000" ScriptEvents="1"/>
-        <label class="text-light" z-index="5" id="wrench" pos="-9 0.5" text="" valign="center" textsize="0.5" textemboss="1" hidden="1"/>
-        {else}
         <label id="speed" class="text-lighter" text="..." halign="left" valign="center" textsize="8" textemboss="0"/>
-        <quad id="label" image="https://i.imgur.com/fbn6wcc.png" pos="-9 -0.75" size="7.5 6.5" valign="center" scale="1"/>
         <label class="action btn-accent" pos="-12.5 2.5" size="22.5 6.75"  valign="top" halign="left" focusareacolor1="0000" ScriptEvents="1" z-index="1"/>
         <label class="text-light" id="wrench" pos="-1.5 -0.5" text=" SETTINGS" halign="center" valign="center" textsize="1.5" textemboss="1" hidden="1" z-index="2"/>
-        {/if}
+
+        <frame id="label" pos="-5.5 -1" scale="0.7">
+            <quad size="10 10" image="https://i.imgur.com/GlEaewr.png" colorize="fff" valign="center" halign="center" />
+            <frame id="rotation" z-index="1" valign="center" halign="center">
+                <frame rot="-30">
+                    <quad size="10 10" image="https://i.imgur.com/UlSsKHT.png" colorize="{config('theme.hud.accent')}" valign="center" halign="center" />
+                </frame>
+            </frame>
+            <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" />
+            <label class="text-light" text="GEAR" halign="center" pos="0 -3" textsize="0.15" />
+            <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" scale="0.95" />
+            <label id="gear" class="text-light" text="3" halign="center" pos="0 1.5" textsize="2" />
+        </frame>
     </frame>
 
     <frame id="settings" pos="-20 7" hidden="1">
@@ -82,12 +87,14 @@
 
         declare labelEnabled <=> (Page.MainFrame.GetFirstChild("label-enabled") as CMlLabel);
         declare labelDisabled <=> (Page.MainFrame.GetFirstChild("label-disabled") as CMlLabel);
+        declare gear <=> (Page.MainFrame.GetFirstChild("gear") as CMlLabel);
         declare speedLabel <=> (Page.MainFrame.GetFirstChild("speed") as CMlLabel);
-        declare labelLabel <=> (Page.MainFrame.GetFirstChild("label") as {isManiaPlanet() ? 'CMlLabel' : 'CMlQuad'});
+        declare labelLabel <=> (Page.MainFrame.GetFirstChild("label") as CMlFrame);
         declare wrench <=> (Page.MainFrame.GetFirstChild("wrench") as CMlLabel);
         declare scaleEntry <=> (Page.MainFrame.GetFirstChild("entry-scale") as CMlEntry);
         declare speedometer <=> (Page.MainFrame.GetFirstChild("speedometer") as CMlFrame);
         declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings") as CMlFrame);
+        declare rotationFrame <=> (Page.MainFrame.GetFirstChild("rotation") as CMlFrame);
         declare speed = 0;
         declare Boolean hidden = False;
         declare Boolean settingsVisible = False;
@@ -108,6 +115,8 @@
 
             if(speedometer.Visible){
                 speedLabel.Value = ML::NearestInteger(Owner.Speed * 3.6) ^ "";
+                rotationFrame.RelativeRotation = Owner.Speed * 0.8;
+                //gear.Value = "" ^ Owner.EngineCurGear;
             }else{
                 sleep(500);
                 continue;

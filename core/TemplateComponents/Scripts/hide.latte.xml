@@ -1,23 +1,23 @@
 {contentType text}
 <script><!--
-declare Vec2 HS_POS;
+declare Vec2 widgetBasePosition;
 declare CMlFrame HS_Target;
 declare Boolean HS_Hidden;
 
 Void hs_hide(Integer duration){
     HS_Hidden = True;
     declare Real x;
-    if(HS_POS[0] < 0.0){
+    if(widgetBasePosition[0] < 0.0){
         x = (HS_Target.Size[0] * -HS_Target.RelativeScale) - 322.0;
     }else{
         x = 322.0;
     }
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ x ^ " " ^ widgetBasePosition[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::ExpInOut);
 }
 
 Void hs_show(Integer duration){
     HS_Hidden = False;
-    AnimMgr.Add(HS_Target, "<frame pos='" ^ HS_POS[0] ^ " " ^ HS_POS[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
+    AnimMgr.Add(HS_Target, "<frame pos='" ^ widgetBasePosition[0] ^ " " ^ widgetBasePosition[1] ^ "' />", duration, CAnimManager::EAnimManagerEasing::CircOut);
 }
 
 Void hidescript(){

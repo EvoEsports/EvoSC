@@ -1,24 +1,33 @@
 {contentType text}
 {extends 'Components.window'}
 
-{php $window_width = '50';}
-{php $window_height = '28';}
+{php $window_width = '60';}
+{php $window_height = max($teams->get(0)->count(), $teams->get(1)->count()) * 4 + 9}
 
 {block id}force-team{/block}
 
 {block icon}
-
+
 {/block}
 
 {block title}
-UI-Settings
+Switch players to another team
 {/block}
 
 {block content}
-<frame pos="-0.5 -1" scale="1.075">
-    <label  class="text-light" pos="27 -0.5" size="27 3" textsize="0.6" text="Hide HUD while driving" halign="right" valign="center" />
+<frame pos="-2 -7">
+    <label  class="text-light" pos="25 6" size="27 3" text="${$teamInfo[0]->rGB}{$teamInfo[0]->name}" halign="right" valign="center" textemboss="1" />
+    <label  class="text-light" pos="32 6" size="27 3" text="${$teamInfo[1]->rGB}{$teamInfo[1]->name}" halign="left" valign="center" textemboss="1" />
+    <quad pos="30 3" bgcolor="fff" size="54 0.2" halign="center" />
 
-    <label class="btn-success save" pos="24 -19.5" size="12 4" textsize="0.6" text=" Save" ScriptEvents="1" scale="0.9"/>
+    {foreach $teams->get(0)->values() as $i => $player}
+    <label  class="text-light" pos="25 {$i * -4}" size="25 3" text="{$player->NickName}" halign="right" valign="center" />
+    <label  class="btn-muted" pos="28 {$i * -4}" size="3 3" text="" action="switch_player_team,{$player->Login},1" focusareacolor1="0000" />
+    {/foreach}
+    {foreach $teams->get(1)->values() as $i => $player}
+    <label  class="text-light" pos="35 {$i * -4}" size="25 3" text="{$player->NickName}" halign="left" valign="center" />
+    <label  class="btn-muted" pos="32 {$i * -4}" size="3 3" text="" action="switch_player_team,{$player->Login},0" focusareacolor1="0000" />
+    {/foreach}
 </frame>
 {/block}
 
