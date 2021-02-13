@@ -6,6 +6,7 @@
 #Include "MathLib" as ML
 #Include "TextLib" as TL
 #Include "TimeLib" as TimeLib
+#Include "ColorLib" as CL
 
 #Struct WidgetRow {
     Real height;

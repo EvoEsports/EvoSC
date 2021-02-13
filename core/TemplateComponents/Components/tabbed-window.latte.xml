@@ -23,6 +23,7 @@
 <script><!--
 #Include "MathLib" as ML
 #Include "TextLib" as TL
+#Include "ColorLib" as CL
 #Const EVO_SCRIPT_ID "{include id}"
 
 #Struct UISettings {
