@@ -1,15 +1,12 @@
 | ⚠ Bug-Reports are only accepted for the master-branch ⚠ |
 | --- |
 | If you encounter a bug, create an [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
-| If you fail to set up EvoSC on your own, then it is probably too early for you to run EvoSC and you should wait for the official release packages, which will contain all required files. EvoSC is still in development stage and we do not have the resources to help you through the setup process. Version 1.0 is planned to release in 2020. |
-
 
 # EvoSC
 
 [![GitHub](https://img.shields.io/badge/LICENSE-Creative_Commons_Attribution_NonCommercial_NoDerivatives_4_International_Public_License-lightgrey.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
 
-A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack
@@ -17,9 +14,6 @@ A server controller for Trackmania²
 * Teams
 * Cup
 * ~~Chase~~
-
-
-
 
 
 ### Requirements
@@ -32,7 +26,7 @@ A server controller for Trackmania²
 
 ___
 
-## EvoSC CLI
+## EvoSC Command Line Interface
 
 Get all available commands with `php esc list`
 
@@ -47,7 +41,7 @@ Get all available commands with `php esc list`
 
 ---
 
-## Ingame Fonts
+## Available ingame fonts
 * RajdhaniMono (default)
 * Oswald
 * OswaldMono
