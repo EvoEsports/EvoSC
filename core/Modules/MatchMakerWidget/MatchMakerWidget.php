@@ -71,7 +71,6 @@ class MatchMakerWidget extends Module implements ModuleInterface
             $matchPoints += $points;
             $points = abs($points);
 
-//            dump("$team -> $roundPoints $mapPoints $matchPoints");
             Server::triggerModeScriptEventArray('Trackmania.SetTeamPoints', ["$team", "$roundPoints", "$mapPoints", "$matchPoints"]);
 
             warningMessage($player, $action, secondary("$points points"), $direction, secondary("Team $teamName"))->sendAll();
