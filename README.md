@@ -6,17 +6,16 @@
 
 # EvoSC
 
-[![Status](https://img.shields.io/badge/STATUS-almost_stable-orange.svg?style=for-the-badge&link=http://google.com/)](https://github.com/EvoTM/EvoSC/)
-[![GitHub](https://img.shields.io/github/license/EvoTM/EvoSC.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
+[![GitHub](https://img.shields.io/badge/LICENSE-Creative_Commons_Attribution_NonCommercial_NoDerivatives_4_International_Public_License-lightgrey.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
 [![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
-[![Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fevotm&style=for-the-badge)](https://www.patreon.com/evotm)
 
 A server controller for Trackmania²
 
 **Supported-Modes:**
 * TimeAttack
 * Rounds
-* ~~Teams~~
+* Teams
+* Cup
 * ~~Chase~~
 
 
