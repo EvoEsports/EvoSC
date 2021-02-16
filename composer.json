@@ -13,6 +13,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/EvoTM/gbx.git"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/EvoTM/dedicated-server-api.git"
     }
   ],
   "require": {
@@ -21,7 +25,7 @@
     "ext-simplexml": "*",
     "ext-mbstring": "*",
     "ext-zip": "*",
-    "maniaplanet/dedicated-server-api": "^5.0",
+    "evotm/dedicated-server-api": "v5.0.3",
     "symfony/console": "^5.2",
     "guzzlehttp/guzzle": "^6.3",
     "latte/latte": "^2.4",
