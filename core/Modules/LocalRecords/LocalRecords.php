@@ -21,6 +21,7 @@ class LocalRecords extends Module implements ModuleInterface
 {
     const TABLE = 'local-records';
 
+    private static bool $showWidget = true;
     private static bool $ignoreWarmUpTimes = false;
     private static bool $ignoreRoundsTimes = false;
     private static bool $ignoreTimeAttackTimes = false;
@@ -33,22 +34,27 @@ class LocalRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$ignoreWarmUpTimes = (bool)config('locals.show-widget', true);
         self::$ignoreWarmUpTimes = (bool)config('locals.ignore-warmup-times', false);
         self::$ignoreRoundsTimes = (bool)config('locals.ignore-round-times', false);
         self::$ignoreTimeAttackTimes = (bool)config('locals.ignore-time-attack-times', false);
-
-        AccessRight::add('local_delete', 'Delete local-records.');
-
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-        Hook::add('BeginMap', [self::class, 'beginMap']);
-
-        ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
-        ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
 
         if ((self::$ignoreRoundsTimes && ModeController::isRoundsType()) ||
             (self::$ignoreTimeAttackTimes && ModeController::isTimeAttackType())) {
             return;
         }
+
+        AccessRight::add('local_delete', 'Delete local-records.');
+
+        Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        if (self::$showWidget) {
+            Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+
+            ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
+            ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
+        }
+
         Hook::add('PlayerPb', [self::class, 'playerFinish']);
     }
 
@@ -68,6 +74,10 @@ class LocalRecords extends Module implements ModuleInterface
      */
     public static function sendLocalsChunk(Player $playerIn = null)
     {
+        if (!self::$showWidget) {
+            return;
+        }
+
         Utility::sendRecordsChunk(self::TABLE, 'locals', 'LocalRecords.update', $playerIn);
     }
 
@@ -102,7 +112,6 @@ class LocalRecords extends Module implements ModuleInterface
 
         if ($localsLimit == 0) {
             throw new \RuntimeException("Locals limit is zero!");
-            return;
         }
 
         $chatMessage = chatMessage()
