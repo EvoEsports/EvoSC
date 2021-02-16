@@ -96,6 +96,10 @@ class MatchMakerWidget extends Module implements ModuleInterface
         Server::setForcedClubLinks(TeamController::getClubLinkUrl($data->name[0], $data->primary[0], $data->secondary[0], $data->emblem[0]),
             TeamController::getClubLinkUrl($data->name[1], $data->primary[1], $data->secondary[1], $data->emblem[1]));
 
+        $settings = Server::getModeScriptSettings();
+        $settings['S_UseClublinks'] = true;
+        Server::setModeScriptSettings($settings);
+
         infoMessage($player, ' updated the team information.')->sendAll();
     }
 
