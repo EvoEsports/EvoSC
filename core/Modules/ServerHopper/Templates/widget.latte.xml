@@ -145,14 +145,17 @@
             page -= 1;
             if(page < 0) page = totalPages - 1;
             updateWidget(ServersWidgetInfo);
+            continue;
         }
         if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("next")){
             page += 1;
             if(page >= totalPages) page = 0;
             updateWidget(ServersWidgetInfo);
+            continue;
         }
         if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("join")){
             ManiaLinkEvent("server_hopper_join", event.Control.DataAttributeGet("login"));
+            continue;
         }
     {/block}
 --></script>

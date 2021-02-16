@@ -69,7 +69,54 @@ class TemplateController implements ControllerInterface
             return str_replace('\\', '\\\\', $str);
         })->addFilter('ms_bool', function (bool $bool) {
             return $bool ? 'True' : 'False';
+        })->addFilter('contrast', function ($str) {
+            return self::getContrastColor($str);
         });
+    }
+
+    /**
+     * Get the color for readable text, based on the given background color.
+     * https://stackoverflow.com/questions/1331591/given-a-background-color-black-or-white-text/42921358#42921358
+     *
+     * @param $hexColor
+     * @return string
+     */
+    private static function getContrastColor($hexColor)
+    {
+        // hexColor RGB
+        $R1 = hexdec(substr($hexColor, 1, 2));
+        $G1 = hexdec(substr($hexColor, 3, 2));
+        $B1 = hexdec(substr($hexColor, 5, 2));
+
+        // Black RGB
+        $blackColor = "#000000";
+        $R2BlackColor = hexdec(substr($blackColor, 1, 2));
+        $G2BlackColor = hexdec(substr($blackColor, 3, 2));
+        $B2BlackColor = hexdec(substr($blackColor, 5, 2));
+
+        // Calc contrast ratio
+        $L1 = 0.2126 * pow($R1 / 255, 2.2) +
+            0.7152 * pow($G1 / 255, 2.2) +
+            0.0722 * pow($B1 / 255, 2.2);
+
+        $L2 = 0.2126 * pow($R2BlackColor / 255, 2.2) +
+            0.7152 * pow($G2BlackColor / 255, 2.2) +
+            0.0722 * pow($B2BlackColor / 255, 2.2);
+
+        $contrastRatio = 0;
+        if ($L1 > $L2) {
+            $contrastRatio = (int)(($L1 + 0.05) / ($L2 + 0.05));
+        } else {
+            $contrastRatio = (int)(($L2 + 0.05) / ($L1 + 0.05));
+        }
+
+        // If contrast is more than 5, return black color
+        if ($contrastRatio > 5) {
+            return config('theme.hud.text-dark');
+        } else {
+            // if not, return white color.
+            return config('theme.hud.text-light');
+        }
     }
 
     /**

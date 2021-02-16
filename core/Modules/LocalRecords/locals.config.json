@@ -11,5 +11,6 @@
   },
   "ignore-warmup-times": false,
   "ignore-round-times": false,
-  "ignore-time-attack-times": false
+  "ignore-time-attack-times": false,
+  "show-widget": true
 }

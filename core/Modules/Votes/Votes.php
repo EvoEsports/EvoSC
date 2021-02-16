@@ -211,6 +211,11 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
 
+            if ($secondsToAdd < 0) {
+                warningMessage('Sorry, you\'re not allowed to reduce time.')->send($player);
+                return;
+            }
+
             $oSecondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
             if ($secondsToAdd > $oSecondsToAdd) {
                 $secondsToAdd = $oSecondsToAdd;
@@ -242,8 +247,8 @@ class Votes extends Module implements ModuleInterface
                 return;
             }
         }
-        
-        $verb = $secondsToAdd>0 ? 'Add' : 'Subtract';
+
+        $verb = $secondsToAdd > 0 ? 'Add' : 'Subtract';
         $question = $verb . ' $<' . secondary(abs(round($secondsToAdd / 60, 1))) . '$> minutes?';
 
         $voteStarted = self::startVote($player, $question, function ($success) use ($secondsToAdd, $question) {

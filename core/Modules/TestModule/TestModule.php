@@ -11,6 +11,7 @@ use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\CountDown\CountDown;
+use EvoSC\Modules\EvoCupInfo\EvoCupInfo;
 use EvoSC\Modules\ForceTeam\ForceTeam;
 use EvoSC\Modules\HideScript\HideScript;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -34,7 +35,7 @@ class TestModule extends Module implements ModuleInterface
     public static function testStuff(Player $player = null)
     {
         TemplateController::loadTemplates();
-        CountDown::showCountdown($player);
+        EvoCupInfo::showWidget($player);
     }
 
     public static function sendTestManialink(Player $player)
