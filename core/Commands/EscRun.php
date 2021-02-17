@@ -118,13 +118,13 @@ class EscRun extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-      $pidPath = config('server.pidfile');
+        $pidPath = config('server.pidfile');
 
-      // if no config given, use original
-      if (empty($pidPath))
-        $pidPath = baseDir(config('server.login') . '_evosc.pid');
+        // if no config given, use original
+        if (empty($pidPath))
+            $pidPath = baseDir(config('server.login') . '_evosc.pid');
 
-      file_put_contents($pidPath, getmypid());
+        file_put_contents($pidPath, getmypid());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

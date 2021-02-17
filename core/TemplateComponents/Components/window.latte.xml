@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:{include id}" id="{include id}" version="3">
-{include 'Components.stylesheet'}
+{include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
 <frame id="window" pos="0 0" scale="1.0" hidden="{isset($startHidden) ? 1 : 0}">
     <quad class="bg-accent" size="{$window_width ?? 120} 6" opacity="0.9" z-index="-3"/>

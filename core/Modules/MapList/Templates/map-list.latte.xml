@@ -69,19 +69,19 @@
                            text="No Dedi" scale="0.8" ScriptEvents="1"/>
 
                     <frame pos="25.6 0">
-                        <label class="btn-accent" pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="btn-accent" pos="43" size="11 4" textsize="0.7" text=" Locals" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="best" pos="49.2" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="worst" pos="52.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
-                        <label class="btn-accent" pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="btn-accent" pos="59.4" size="11 4" textsize="0.7" text=" Dedis" scale="0.8" ScriptEvents="1"/>
                         <label class="btn-accent filter-btn" data-sort="best_dedi" pos="65.6" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                         <label class="btn-accent filter-btn" data-sort="worst_dedi" pos="69" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
-                        <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="btn-accent" pos="75.8" size="11 4" textsize="0.7" text=" Karma" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="worst_karma" pos="82" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="best_karma" pos="85.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
 
-                        <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1" focusareacolor2="{config('theme.hud.accent')}5"/>
+                        <label class="btn-accent" pos="94.5" size="17 4" textsize="0.7" text=" Author Time" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="author_time_asc" pos="103" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                         <label class="filter-btn btn-accent" data-sort="author_time_desc" pos="106.4" size="4 4" textsize="0.7" text="" scale="0.8" ScriptEvents="1"/>
                     </frame>

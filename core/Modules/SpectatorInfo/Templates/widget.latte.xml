@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:spectator-info" id="spectator-info" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="widget" pos="0 -56">
         <label id="targetName" class="text-lighter" textcolor="fff" textfont="GameFontBlack" text="" textprefix="$s$i" halign="center" textsize="5.6" textemboss="1" />

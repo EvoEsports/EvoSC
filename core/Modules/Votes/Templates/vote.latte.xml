@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="Vote" name="ESC:Vote" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="widget" size="50 50" pos="{config('votes.pos')}" scale="{config('votes.scale') * 0.5}" z-index="50000">
         <label id="question" class="text-light" pos="25 -2.25" z-index="1" size="48 5" textprefix="$s" autonewline="1" text="{$vote->question}" halign="center" textsize="1.25"/>

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:team-info" id="team-info" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="widget" pos="0 90" scale="0.95">
         <quad size="150 18" pos="0 7.5" halign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />

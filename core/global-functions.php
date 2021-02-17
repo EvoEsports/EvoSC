@@ -251,12 +251,12 @@ function player(string $login, bool $addToOnlineIfOffline = false): Player
 
         if ($data) {
             $player = Player::create([
-                'Login' => $data->login,
+                'Login'    => $data->login,
                 'NickName' => $data->nickName,
             ]);
         } else {
             $player = Player::create([
-                'Login' => $login,
+                'Login'    => $login,
                 'NickName' => $login,
             ]);
         }
@@ -469,4 +469,16 @@ function require_config(...$configs)
             throw new \EvoSC\Exceptions\MissingConfigValueException("Config value '$config' is not set!");
         }
     }
+}
+
+function serverPlayer(): Player
+{
+    $player = new Player();
+    $player->id = -1;
+    $player->Group = 1;
+    $player->Login = Server::getServerName();
+    $player->NickName = Server::getServerName();
+    $player->ubisoft_name = Server::getServerName();
+
+    return $player;
 }

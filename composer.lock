@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4fa9005c5940a7f4ef4ea0c2d407cbb9",
+    "content-hash": "79304ffac8a43c60d030163c593474bb",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -947,6 +947,59 @@
                 "source": "https://github.com/EvoTM/dedicated-server-api/tree/master"
             },
             "time": "2021-02-16T19:31:17+00:00"
+        },
+        {
+            "name": "mexitek/phpcolors",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mexitek/phpColors.git",
+                "reference": "4b1ccc920b5fc3749a575c171d2f12fca0ecfded"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mexitek/phpColors/zipball/4b1ccc920b5fc3749a575c171d2f12fca0ecfded",
+                "reference": "4b1ccc920b5fc3749a575c171d2f12fca0ecfded",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "nette/tester": "^2.3",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arlo Carreon",
+                    "homepage": "http://arlocarreon.com",
+                    "role": "creator"
+                }
+            ],
+            "description": "A series of methods that let you manipulate colors. Just incase you ever need different shades of one color on the fly.",
+            "homepage": "http://mexitek.github.com/phpColors/",
+            "keywords": [
+                "color",
+                "css",
+                "design",
+                "frontend",
+                "ui"
+            ],
+            "support": {
+                "issues": "https://github.com/mexitek/phpColors/issues",
+                "source": "https://github.com/mexitek/phpColors"
+            },
+            "time": "2020-11-05T06:04:47+00:00"
         },
         {
             "name": "nesbot/carbon",

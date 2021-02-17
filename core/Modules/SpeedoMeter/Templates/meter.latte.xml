@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="speedometer" z-index="100">
         {if isManiaPlanet()}
         <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textemboss="1"/>

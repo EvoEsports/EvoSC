@@ -16,6 +16,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Models\Schedule;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use SimpleXMLElement;
 
@@ -26,38 +27,38 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
     private static array $modeTemplatesManiaplanet = [
         'TimeAttack' => 'timeattack.xml',
-        'Team' => 'team.xml',
-        'Rounds' => 'rounds.xml',
-        'Laps' => 'laps.xml',
-        'Cup' => 'cup.xml',
-        'Chase' => 'chase.xml',
+        'Team'       => 'team.xml',
+        'Rounds'     => 'rounds.xml',
+        'Laps'       => 'laps.xml',
+        'Cup'        => 'cup.xml',
+        'Chase'      => 'chase.xml',
     ];
 
     private static array $modeTemplatesTrackmania = [
         'TimeAttack' => 'timeattack.xml',
-        'Team' => 'team.xml',
-        'Rounds' => 'rounds.xml',
-        'Laps' => 'laps.xml',
-        'Cup' => 'cup.xml',
+        'Team'       => 'team.xml',
+        'Rounds'     => 'rounds.xml',
+        'Laps'       => 'laps.xml',
+        'Cup'        => 'cup.xml',
     ];
 
     private static array $gameModesManiaplanet = [
         'TimeAttack' => 'TimeAttack.Script.txt',
-        'Rounds' => 'Rounds.Script.txt',
-        'Team' => 'Team.Script.txt',
-        'Cup' => 'Cup.Script.txt',
-        'Laps' => 'Laps.Script.txt',
-        'Chase' => 'Chase.Script.txt',
+        'Rounds'     => 'Rounds.Script.txt',
+        'Team'       => 'Team.Script.txt',
+        'Cup'        => 'Cup.Script.txt',
+        'Laps'       => 'Laps.Script.txt',
+        'Chase'      => 'Chase.Script.txt',
     ];
 
     private static array $gameModesTrackmania = [
         'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
-        'Rounds' => 'Trackmania/TM_Rounds_Online.Script.txt',
-        'Teams' => 'Trackmania/TM_Teams_Online.Script.txt',
-        'Cup' => 'Trackmania/TM_Cup_Online.Script.txt',
-        'Laps' => 'Trackmania/TM_Laps_Online.Script.txt',
-        'Champion' => 'Trackmania/TM_Champion_Online.Script.txt',
-        'Knockout' => 'Trackmania/TM_Knockout_Online.Script.txt',
+        'Rounds'     => 'Trackmania/TM_Rounds_Online.Script.txt',
+        'Teams'      => 'Trackmania/TM_Teams_Online.Script.txt',
+        'Cup'        => 'Trackmania/TM_Cup_Online.Script.txt',
+        'Laps'       => 'Trackmania/TM_Laps_Online.Script.txt',
+        'Champion'   => 'Trackmania/TM_Champion_Online.Script.txt',
+        'Knockout'   => 'Trackmania/TM_Knockout_Online.Script.txt',
     ];
 
     /**
@@ -77,6 +78,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'matchsettings_edit');
 
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'matchsettings_load');
+        ManiaLinkEvent::add('msm.load_and_skip', [self::class, 'loadMatchsettingsAndSkip'], 'matchsettings_load');
         ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'matchsettings_load');
         ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'matchsettings_edit');
@@ -86,10 +88,17 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.schedule', [self::class, 'scheduleMatchSettings'], 'matchsettings_load');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'matchsettings_load');
         }
+    }
+
+    public static function scheduleMatchSettings(Player $player, $timeStamp, $matchsettingsFile)
+    {
+        dump($timeStamp, $matchsettingsFile);
+        Schedule::maniaLinkEvent($player, 'Start Event XYZ', $timeStamp, 'msm.load_and_skip', serverPlayer(), $matchsettingsFile);
     }
 
     /**
@@ -313,6 +322,16 @@ class MatchSettingsManager extends Module implements ModuleInterface
     public static function loadMatchsettings(Player $player, string $matchsettingsFile)
     {
         MatchSettingsController::loadMatchSettings(true, $player, $matchsettingsFile . '.txt');
+    }
+
+    /**
+     * @param Player $player
+     * @param string $matchSettingsFile
+     */
+    public static function loadMatchsettingsAndSkip(Player $player, string $matchSettingsFile)
+    {
+        self::loadMatchsettings($player, $matchSettingsFile);
+        Server::nextMap();
     }
 
     /**
