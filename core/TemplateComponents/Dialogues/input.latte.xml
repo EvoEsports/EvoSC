@@ -1,6 +1,6 @@
 {contentType text}
 <frame id="input-dialog" z-index="9999" hidden="1">
-    <quad class="bg-darker" opacity="0.5" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
+    <quad class="bg-darker" opacity="0.9" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
 
     <label text="Enter something" class="text-light" pos="0 11" scale="2.4" valign="center" halign="center" z-index="1" />
     <entry id="input__Entry" class="form" pos="0 1" scale="1.6" valign="center" halign="center" z-index="1" textsize="2" size="100 6" />

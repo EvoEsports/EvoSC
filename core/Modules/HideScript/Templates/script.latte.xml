@@ -35,6 +35,7 @@ Boolean playerIsRacing(){
 
 Boolean shouldHide(Integer hideSpeed, Integer showDelay){
     if(tabPressed()){
+        log("tab pressed " ^ GameTime);
         return False;
     }
 
@@ -61,13 +62,13 @@ main() {
 
     while(True){
         if(!settings.hide){
-            sleep(5000);
             EvoSC_UI_Hidden = False;
+            sleep(5000);
             continue;
         }
         if(InputPlayer == Null){
-            sleep(200);
             EvoSC_UI_Hidden = False;
+            sleep(200);
             continue;
         }
 
@@ -83,7 +84,7 @@ main() {
             EvoSC_UI_HiddenUpdate = GameTime;
         }
 
-        sleep(100);
+        sleep(50);
     }
 }
     --></script>

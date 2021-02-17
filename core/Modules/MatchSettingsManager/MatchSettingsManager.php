@@ -95,15 +95,20 @@ class MatchSettingsManager extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @param $timeStamp
+     * @param $matchsettingsFile
+     */
     public static function scheduleMatchSettings(Player $player, $timeStamp, $matchsettingsFile)
     {
-        dump($timeStamp, $matchsettingsFile);
-        Schedule::maniaLinkEvent($player, 'Start Event XYZ', $timeStamp, 'msm.load_and_skip', serverPlayer(), $matchsettingsFile);
+        Schedule::maniaLinkEvent($player, 'Load ' . $matchsettingsFile, $timeStamp, 'msm.load_and_skip', serverPlayer(), $matchsettingsFile);
     }
 
     /**
      * @param Player $player
      * @param $data
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function saveMaps(Player $player, $data)
     {

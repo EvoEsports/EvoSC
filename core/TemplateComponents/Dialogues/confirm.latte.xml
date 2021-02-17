@@ -1,6 +1,6 @@
 {contentType text}
 <frame id="confirm-dialog" z-index="9999" hidden="1">
-    <quad class="bg-blur" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
+    <quad class="bg-darker" opacity="0.9" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
 
     <label text="Please confirm" class="text-light" pos="0 4" scale="2.4" valign="center" halign="center" z-index="1" />
     <label text="Confirm" class="btn-success confirm" pos="-10.5 -8" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />

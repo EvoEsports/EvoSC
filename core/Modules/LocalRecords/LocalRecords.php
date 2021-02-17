@@ -34,7 +34,7 @@ class LocalRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        self::$ignoreWarmUpTimes = (bool)config('locals.show-widget', true);
+        self::$showWidget = (bool)config('locals.show-widget', true);
         self::$ignoreWarmUpTimes = (bool)config('locals.ignore-warmup-times', false);
         self::$ignoreRoundsTimes = (bool)config('locals.ignore-round-times', false);
         self::$ignoreTimeAttackTimes = (bool)config('locals.ignore-time-attack-times', false);

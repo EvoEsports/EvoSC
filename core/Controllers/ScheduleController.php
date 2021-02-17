@@ -19,7 +19,7 @@ class ScheduleController extends Controller implements ControllerInterface
 
     public static function start(string $mode, bool $isBoot)
     {
-        Timer::create('check_schedule', [self::class, 'checkSchedule'], '1s', true);
+        Timer::create('check_schedule', [self::class, 'checkSchedule'], '30s', true);
     }
 
     public static function checkSchedule()
