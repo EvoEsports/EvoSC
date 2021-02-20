@@ -59,11 +59,9 @@ class HookController implements ControllerInterface
      */
     static function removeHook(Hook $hook)
     {
-        if (self::$hooks->has($hook->getEvent())) {
-            self::$hooks = self::$hooks->get($hook->getEvent())->reject(function (Hook $hookCompare) use ($hook) {
-                return $hookCompare === $hook;
-            });
-        }
+        self::$hooks->put($hook->getEvent(), self::$hooks->get($hook->getEvent())->reject(function (Hook $hookCompare) use ($hook) {
+            return $hookCompare === $hook;
+        }));
     }
 
     /**
