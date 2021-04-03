@@ -63,7 +63,7 @@ class RecordsTable extends Module implements ModuleInterface
         }
 
         if (!$myRecord) {
-            infoMessage('You do not have an record to compare to.')->send($player);
+            infoMessage('You do not have a record to compare to.')->send($player);
 
             return;
         }
