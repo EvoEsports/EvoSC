@@ -27,7 +27,6 @@ class ModeController implements ControllerInterface
 
     private static int $warmUpNb = 0;
     private static int $warmUpRound = 0;
-    private static bool $warmUpInProgress = false;
 
     /**
      *
@@ -54,8 +53,6 @@ class ModeController implements ControllerInterface
 
     public static function warmUpRoundStarted()
     {
-        self::$warmUpInProgress = true;
-
         infoMessage('Warm-up ', secondary(++self::$warmUpRound . "/" . self::$warmUpNb), ' started.')
             ->setColor('f90')
             ->setIcon(' ')
@@ -66,7 +63,6 @@ class ModeController implements ControllerInterface
 
     public static function warmUpEnd()
     {
-        self::$warmUpInProgress = false;
         self::$warmUpRound = 0;
 
         infoMessage('Warm-up ended, ', secondary('starting play-loop.'))
@@ -194,14 +190,6 @@ class ModeController implements ControllerInterface
     public static function getMode(): string
     {
         return self::$mode;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isWarmUpInProgress(): bool
-    {
-        return self::$warmUpInProgress;
     }
 
     /**

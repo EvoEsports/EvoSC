@@ -7,6 +7,7 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
@@ -98,7 +99,7 @@ class LocalRecords extends Module implements ModuleInterface
             return;
         }
         if (self::$ignoreWarmUpTimes) {
-            if (ModeController::isWarmUpInProgress()) {
+            if (Server::getWarmUp()) {
                 return;
             }
         }

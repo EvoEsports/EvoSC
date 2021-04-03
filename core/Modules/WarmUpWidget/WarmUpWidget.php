@@ -6,6 +6,7 @@ namespace EvoSC\Modules\WarmUpWidget;
 
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
@@ -38,7 +39,7 @@ class WarmUpWidget extends Module implements ModuleInterface
      */
     public static function sendWarmUpWidget(Player $player)
     {
-        if (ModeController::isWarmUpInProgress()) {
+        if (Server::getWarmUp()) {
             Template::show($player, 'WarmUpWidget.widget', [
                 'warmupNb' => ModeController::getWarmUpRoundCount(),
                 'round' => ModeController::getWarmUpRound()
