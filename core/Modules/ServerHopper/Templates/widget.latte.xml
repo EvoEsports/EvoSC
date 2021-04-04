@@ -69,7 +69,6 @@
         declare Text[Text][] servers;
         declare filled = 0;
         declare skipped = 0;
-        declare perPage = {config('server-hopper.ui.servers-per-page')};
         declare Text pw = "";
         servers.fromjson(data);
 
@@ -108,8 +107,6 @@
         for(x, filled, dataFrame.Controls.count - 1){
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
-
-        widgetSetHeight__(perPage * 3.5 + 5.5);
     }
     --></script>
 
@@ -119,15 +116,18 @@
     <script><!--
     {block globals}
     declare Integer page;
+    declare Integer perPage;
     declare Integer totalPages;
     {/block}
 
     {block bootScript}
+        perPage = {config('server-hopper.ui.servers-per-page')};
         declare Integer LastServersWidgetUpdate for This;
         declare Text ServersWidgetInfo for This;
         declare Integer lastUpdate = 0;
 
         page = 0;
+        widgetSetHeight__(perPage * 3.5 + 5.5);
 
         left__ = {config('server-hopper.ui.position') == 'left'|ms_bool};
         slot__ = {config('server-hopper.ui.slot')};
