@@ -158,13 +158,19 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerCheckpoint',
             $player,
             $wayPoint->laptime,
-            count($wayPoint->curlapcheckpoints) - 1,
+            $wayPoint->checkpointinlap + 1,
             $wayPoint->isendlap
         );
 
         //player finished
-        if ($wayPoint->isendlap || $wayPoint->isendrace) {
+        if ($wayPoint->isendrace || (!ModeController::laps() && $wayPoint->isendlap)) {
             Hook::fire('PlayerFinish',
+                $player,
+                $wayPoint->laptime,
+                implode(',', $wayPoint->curlapcheckpoints)
+            );
+        } else if ($wayPoint->isendlap) {
+            Hook::fire('PlayerLap',
                 $player,
                 $wayPoint->laptime,
                 implode(',', $wayPoint->curlapcheckpoints)

@@ -2,23 +2,24 @@
 <manialink name="ESC:push-live-rankings" id="push-live-rankings" version="3">
     <script>
         <!--
-        #Struct EvoSC_MatchTrackerEntry_V3 {
+        #Struct EvoSC_MatchTrackerEntry {
             Text name;
             Text login;
             Integer points;
             Integer gained;
             Integer score;
             Integer team;
+            Integer laps;
             Text checkpoints;
             Boolean online;
             Boolean spectator;
         }
 
         main(){
-            declare EvoSC_MatchTrackerEntry_V3[] EvoSC_LiveRankings_V3 for This;
+            declare EvoSC_MatchTrackerEntry[] EvoSC_LiveRankings for This;
             declare Integer EvoSC_LiveRankings_LastUpdate for This;
 
-            EvoSC_LiveRankings_V3.fromjson("""{$top->toJson()|noescape}""");
+            EvoSC_LiveRankings.fromjson("""{$top->toJson()|noescape}""");
             EvoSC_LiveRankings_LastUpdate = GameTime;
         }
         -->

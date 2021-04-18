@@ -103,7 +103,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Laps.Script.txt':
-            case 'Trackmania/TM_Laps_Online.Script.Script.txt':
+            case 'Trackmania/TM_Laps_Online.Script.txt':
                 self::$isTimeAttackType = false;
                 self::$isRoundsType = true;
                 self::$laps = true;

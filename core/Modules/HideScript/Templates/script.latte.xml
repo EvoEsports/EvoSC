@@ -35,7 +35,6 @@ Boolean playerIsRacing(){
 
 Boolean shouldHide(Integer hideSpeed, Integer showDelay){
     if(tabPressed()){
-        log("tab pressed " ^ GameTime);
         return False;
     }
 

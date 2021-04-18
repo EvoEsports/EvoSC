@@ -1,0 +1,11 @@
+{contentType text}
+<frame size="8 3">
+    <frame pos="5 0" id="toggle">
+        <entry class="form" pos="1000 0"/>
+        <label class="text-dark" pos="1.5 -1.5" valign="center" halign="center" text="{$enabled ? '' : ''}" size="3 3" z-index="2" opacity="0.75" scale="0.5" />
+        <label class="toggle" focusareacolor1="fff0" focusareacolor2="fff3" pos="-5" size="13 3" opacity="0.75" z-index="3" ScriptEvents="1" />
+        <quad class="bg-accent" pos="-5" size="5 3" opacity="0.75" />
+        <quad class="bg-light" size="3 3" />
+        <quad class="bg-light" pos="3" size="5 3" opacity="0.25" />
+    </frame>
+</frame>

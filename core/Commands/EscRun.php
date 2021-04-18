@@ -190,7 +190,7 @@ class EscRun extends Command
         $map = Map::where('filename', Server::getCurrentMapInfo()->fileName)->first();
         Hook::fire('BeginMap', $map);
 
-        //Enable mode script rpc-callbacks else you wont get stuf flike checkpoints and finish
+        //Enable mode script rpc-callbacks else you wont get stuff like checkpoints and finish
         Server::triggerModeScriptEventArray('XmlRpc.EnableCallbacks', ['true']);
         Server::disableServiceAnnounces(true);
 
