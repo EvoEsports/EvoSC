@@ -19,7 +19,7 @@ class Ranks extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        ChatCommand::add('/ranks', [self::class, 'showRanks']);
+        ChatCommand::add('/ranks', [self::class, 'showRanks'], 'Show an overview of the players server ranking.');
 
         ManiaLinkEvent::add('ranks.list', [self::class, 'showRanks']);
     }
