@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="ESC:update-pack-progress" id="update-pack-progress" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_ExchangePackDownload {
+            Integer packId;
+            Integer total;
+            Integer current;
+            Text message;
+            Boolean finished;
+        }
+
+        main(){
+            declare EvoSC_ExchangePackDownload ExchangePackDownload for This;
+            declare Integer LastExchangePackDownload for This;
+            declare Text localsJson = """{$info|noescape}""";
+
+            ExchangePackDownload.fromjson(localsJson);
+            LastExchangePackDownload = GameTime;
+        }
+        -->
+    </script>
+</manialink>
