@@ -1,13 +1,13 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="window" pos="-25 10">
         <quad class="bg-accent" size="50 5" z-index="-1"/>
         <quad id="handle" data-id="help" size="35 5" z-index="5"/>
-        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($matchsettings) * 5 + 8}" opacity="0.8" z-index="-1"/>
+        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($matchsettings) * 5 + 8}" opacity="0.9" z-index="-1"/>
         <label class="text-light" pos="2 -2.5" textsize="0.8" text=" Matchsettings Manager" textprefix="$s" valign="center"/>
-        <label class="close" pos="47.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
+        <label class="btn-accent close" pos="47.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1"/>
 
         <label pos="25 -9"
                class="btn-accent"
@@ -20,9 +20,9 @@
 
         <frame pos="2 -14" n:if="count($matchsettings) > 0">
             {foreach $matchsettings as $i => $name}
-            <label pos="15.5 {$i * -5}"
+            <label pos="13   {$i * -5}"
                    text="{$name}  "
-                   size="31 4"
+                   size="26 4"
                    textsize="0.5"
                    textprefix="$s"
                    ScriptEvents="1"
@@ -30,12 +30,22 @@
                    data-name="{$name}"
             />
 
-            <label pos="33.5 {$i * -5}"
+            <label pos="28.5 {$i * -5}"
                    text=""
                    size="5 4"
                    textsize="0.5"
                    textprefix="$s"
                    class="load btn-default"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+            />
+
+            <label pos="33.5 {$i * -5}"
+                   text=""
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="schedule btn-default"
                    data-name="{$name}"
                    ScriptEvents="1"
             />
@@ -65,9 +75,11 @@
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
+    #Include "TimeLib" as TimeLib
     --></script>
 
     {include 'Dialogues.confirm'}
+    {include 'Dialogues.input'}
 
     <script><!--
     {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
@@ -100,6 +112,18 @@
                         if(confirm("Delete " ^ name ^ "?")){
                             TriggerPageAction("msm.delete," ^ name);
                         }
+                        continue;
+                    }
+
+                    if(event.Control.HasClass("schedule") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+                        declare Text input = input("Schedule load at (Format: YYYY-MM-DD HH:MM:SS)", "{date('Y-m-d H:i:s', time())}");
+
+                        if(input != ""){
+                            TriggerPageAction("msm.schedule," ^ input ^ "," ^ name);
+                        }
+
+                        continue;
                     }
 
                     if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseClick){
@@ -108,6 +132,7 @@
                         if(confirm("Do you really want to load " ^ name ^ " now?")){
                             TriggerPageAction("msm.load," ^ name);
                         }
+                        continue;
                     }
                 }
 

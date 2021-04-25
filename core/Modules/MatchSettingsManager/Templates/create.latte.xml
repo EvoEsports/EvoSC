@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="window" pos="-25 10">
         <quad class="bg-accent" size="50 5" z-index="-1"/>
         <quad id="handle" data-id="help" pos="0 0" size="35 5" z-index="5"/>

@@ -54,10 +54,10 @@
         return joinLink ^ server["name"] ^ pw ^ youAreHere;
     }
 
-    Integer getTotalPages(Integer itemCount, Integer itemsPerPage){
+    Integer getTotalPages(Integer itemCount){
         declare pageCount = -1;
-        pageCount = ML::CeilingInteger(itemCount / itemsPerPage * 1.0);
-        if(itemCount % itemsPerPage == 0){
+        pageCount = ML::CeilingInteger(itemCount / perPage * 1.0);
+        if(itemCount % perPage == 0){
             pageCount -= 1;
         }
         return pageCount;
@@ -69,11 +69,10 @@
         declare Text[Text][] servers;
         declare filled = 0;
         declare skipped = 0;
-        declare perPage = {config('server-hopper.ui.servers-per-page')};
         declare Text pw = "";
         servers.fromjson(data);
 
-        totalPages = getTotalPages(servers.count, perPage);
+        totalPages = getTotalPages(servers.count);
         (Page.MainFrame.GetFirstChild("page-label") as CMlLabel).Value = (page + 1) ^ "/" ^ totalPages;
         (Page.MainFrame.GetFirstChild("pagination") as CMlFrame).Visible = totalPages > 1;
 
@@ -108,8 +107,6 @@
         for(x, filled, dataFrame.Controls.count - 1){
             (dataFrame.Controls[x] as CMlFrame).Hide();
         }
-
-        widgetSetHeight__(perPage * 3.5 + 5.5);
     }
     --></script>
 
@@ -119,13 +116,16 @@
     <script><!--
     {block globals}
     declare Integer page;
+    declare Integer perPage;
     declare Integer totalPages;
     {/block}
 
     {block bootScript}
+        perPage = {config('server-hopper.ui.servers-per-page')};
         declare Integer LastServersWidgetUpdate for This;
         declare Text ServersWidgetInfo for This;
         declare Integer lastUpdate = 0;
+        declare heightSet = False;
 
         page = 0;
 
@@ -137,6 +137,11 @@
         if(lastUpdate != LastServersWidgetUpdate){
             lastUpdate = LastServersWidgetUpdate;
             updateWidget(ServersWidgetInfo);
+        }
+
+        if(!heightSet){
+            heightSet = True;
+            widgetSetHeight__(perPage * 3.5 + 5.5);
         }
     {/block}
 

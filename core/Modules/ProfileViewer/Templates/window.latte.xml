@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:Profile" id="Profile" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="info">
         <label pos="0 0" textsize="0.1" text="Label" textcolor="{config('colors.ui.window.header.color')}" textfont="{config('colors.ui.font')|noescape}" />
         <label pos="0 -2" textsize="0.75" size="24 4" text="Value" textfont="{config('colors.ui.font')|noescape}" />

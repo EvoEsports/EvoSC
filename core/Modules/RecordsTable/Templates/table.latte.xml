@@ -31,7 +31,7 @@
             <label class="btn-muted" z-index="1" pos="30 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" action="local.delete,{$record->Rank}"/>
             {/if}
             <label class="btn-muted" z-index="1" pos="33.5 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" action="records.graph,{$map->id},{$window_title ?? 'Records'},{$record->Rank}"/>
-            <label class="btn-muted" z-index="1" pos="37 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" action="profile,{$record->Login}"/>
+            <label class="btn-muted profile" z-index="1" pos="37 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" ScriptEvents="1" data-login="{$record->Login}"/>
             {if $onlineLogins->contains($record->Login)}
             {if $record->Player == $localPlayer->id}
             <quad class="bg-accent" pos="-1 1.35" size="41 3" opacity="0.8" z-index="-1" />
@@ -69,6 +69,11 @@
     {/block}
 
     {block pendingEvents}
+    if(event.Control.HasClass("profile") && event.Type == CMlScriptEvent::Type::MouseClick){
+        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
+        LibTMxSMRaceScoresTable_OpenProfileLogin = event.Control.DataAttributeGet("login");
+        continue;
+    }
     {/block}
 --></script>
 </manialink>

@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="QuickButtons" name="ESC:QuickButtons">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="buttons" pos="{$is_maniaplanet ? '89 -50.5' : '83 -54'}" halign="center" valign="center" scale="{$is_maniaplanet ? '1.1' : '1.2'}" z-index="8000">
         {foreach $buttons as $button}
         <frame pos="{$iterator->counter * -6} 0" data-action="{$button->action}">

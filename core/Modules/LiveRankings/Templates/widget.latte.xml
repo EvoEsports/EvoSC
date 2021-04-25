@@ -73,7 +73,7 @@
         return CurrentServerModeName == "TimeAttack" || CurrentServerModeName == "TM_TimeAttack_Online";
     }
 
-    Void updateSlot(CMlFrame box, Integer rank, EvoSC_MatchTrackerEntry_V3 entry){
+    Void updateSlot(CMlFrame box, Integer rank, EvoSC_MatchTrackerEntry entry){
         declare prefix = "";
 
         if(entry.spectator){
@@ -91,8 +91,6 @@
                 prefix = prefix ^ "  ";
             }
         }else{
-            (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.points, 3) ^ " PTS";
-            (box.Controls[2] as CMlLabel).Value = entry.points ^ " PTS";
             if(entry.gained > 0){
                 (box.Controls[4] as CMlLabel).Value = "+" ^ entry.gained;
                 (box.Controls[4] as CMlLabel).Show();
@@ -100,20 +98,33 @@
                 (box.Controls[4] as CMlLabel).Hide();
             }
 
-            if(UseClans){
-                (box.Controls[5] as CMlLabel).Show();
-                if(entry.team == -1){
-                    (box.Controls[5] as CMlLabel).TextColor = <0.5,0.5,0.5>;
+            if(isInLapsMode){
+                if(entry.laps == maxLaps){
+                    (box.Controls[1] as CMlLabel).Value = "🏁 🏁 🏁";
+                    (box.Controls[2] as CMlLabel).Value = "🏁";
                 }else{
-                    (box.Controls[5] as CMlLabel).TextColor = Teams[entry.team].ColorPrimary;
+                    (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.laps, 3) ^ " Lap";
+                    (box.Controls[2] as CMlLabel).Value = entry.laps ^ " Lap";
                 }
-                if(prefix == ""){
-                    prefix = "      " ^ prefix;
-                }else{
-                    prefix = prefix ^ "  ";
-                }
-            }else{
                 box.Controls[5].Hide();
+            }else{
+                (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.points, 3) ^ " PTS";
+                (box.Controls[2] as CMlLabel).Value = entry.points ^ " PTS";
+                if(UseClans){
+                    (box.Controls[5] as CMlLabel).Show();
+                    if(entry.team == -1){
+                        (box.Controls[5] as CMlLabel).TextColor = <0.5,0.5,0.5>;
+                    }else{
+                        (box.Controls[5] as CMlLabel).TextColor = Teams[entry.team].ColorPrimary;
+                    }
+                    if(prefix == ""){
+                        prefix = "      " ^ prefix;
+                    }else{
+                        prefix = prefix ^ "  ";
+                    }
+                }else{
+                    box.Controls[5].Hide();
+                }
             }
         }
 
@@ -122,14 +133,16 @@
         box.Show();
     }
 
-    Void updateWidget(EvoSC_MatchTrackerEntry_V3[] ranking){
+    Void updateWidget(EvoSC_MatchTrackerEntry[] ranking){
         declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
         declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
         declare rankingFrame <=> (Page.MainFrame.GetFirstChild("ranking") as CMlFrame);
         declare filled = 0;
-        declare isInRoundsMode = !isTimeAttack();
 
-        pointsLimitLabel.Visible = isInRoundsMode;
+        pointsLimitLabel.Visible = (!isTimeAttack() || isInLapsMode);
+        if(isInLapsMode){
+            pointsLimitLabel.Value = Map.MapInfo.TMObjective_NbLaps ^ " Laps";
+        }
 
         foreach(entry in ranking){
             if(filled >= rankingFrame.Controls.count) break;
@@ -148,34 +161,45 @@
     {block globals}
     #Include "ColorLib" as CL
 
-    #Struct EvoSC_MatchTrackerEntry_V3 {
+    #Struct EvoSC_MatchTrackerEntry {
         Text name;
         Text login;
         Integer points;
         Integer gained;
         Integer score;
         Integer team;
+        Integer laps;
         Text checkpoints;
         Boolean online;
         Boolean spectator;
     }
 
     declare Integer max;
+    declare Integer maxLaps;
+    declare Boolean isInLapsMode;
     {/block}
 
     {block bootScript}
         declare pointsLimitLabel = (Page.MainFrame.GetFirstChild("points-limit") as CMlLabel);
         declare Integer EvoSC_PointsLimit for This;
         declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
-        declare EvoSC_MatchTrackerEntry_V3[] EvoSC_LiveRankings_V3 for This;
+        declare EvoSC_MatchTrackerEntry[] EvoSC_LiveRankings for This;
         declare Integer EvoSC_LiveRankings_LastUpdate for This;
         declare lastUpdate = 0;
         declare lastPointLimitUpdate = 0;
+        declare CMap lastMap <=> Map;
 
+        isInLapsMode = {if isManiaplanet()}CurrentServerModeName == "Laps"{else}CurrentServerModeName == "TM_Laps_Online"{/if};
         max = {config('live-rankings.show', 14)};
 
         left__ = {config('live-rankings.ui.position') == 'left'|ms_bool};
         slot__ = {config('live-rankings.ui.slot')};
+
+        if(isInLapsMode){
+            maxLaps = Map.MapInfo.TMObjective_NbLaps;
+        }else{
+            maxLaps = -1;
+        }
 
         widgetSetHeight__(5.0 + (max * 3));
     {/block}
@@ -183,7 +207,12 @@
     {block loop}
     if(lastUpdate != EvoSC_LiveRankings_LastUpdate){
         lastUpdate = EvoSC_LiveRankings_LastUpdate;
-        updateWidget(EvoSC_LiveRankings_V3);
+        updateWidget(EvoSC_LiveRankings);
+    }
+
+    if(lastMap != Map){
+        isInLapsMode = {if isManiaplanet()}CurrentServerModeName == "Laps"{else}CurrentServerModeName == "TM_Laps_Online"{/if};
+        maxLaps = Map.MapInfo.TMObjective_NbLaps;
     }
 
     if(lastPointLimitUpdate != EvoSC_LastPointsLimitUpdate){
@@ -198,7 +227,9 @@
             }
             pointsLimitLabel.Value = pointsLimitText;
         }else{
-            pointsLimitLabel.Value = "";
+            if(!isInLapsMode){
+                pointsLimitLabel.Value = "";
+            }
         }
     }
     {/block}

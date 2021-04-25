@@ -13,6 +13,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/EvoTM/gbx.git"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/EvoTM/dedicated-server-api.git"
     }
   ],
   "require": {
@@ -21,7 +25,7 @@
     "ext-simplexml": "*",
     "ext-mbstring": "*",
     "ext-zip": "*",
-    "maniaplanet/dedicated-server-api": "^5.0",
+    "maniaplanet/dedicated-server-api": "dev-master",
     "symfony/console": "^5.2",
     "guzzlehttp/guzzle": "^6.3",
     "latte/latte": "^2.4",
@@ -31,7 +35,8 @@
     "manialib/gbx": "^4.1",
     "larapack/dd": "^1.1",
     "illuminate/container": "^8.27",
-    "illuminate/database": "^8.27"
+    "illuminate/database": "^8.27",
+    "mexitek/phpcolors": "^1.0"
   },
   "scripts": {
     "pre-install-cmd": [

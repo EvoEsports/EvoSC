@@ -1,0 +1,37 @@
+{contentType text}
+<stylesheet>
+    <!-- Text -->
+    <style class="text" textfont="{config('theme.font')}" textcolor="{config('theme.chat.default')}" textsize="1"/>
+    <style class="text-accent" textfont="{config('theme.font')}" textcolor="{config('theme.hud.accent')}" textsize="1"/>
+    <style class="text-success" textfont="{config('theme.font')}" textcolor="{config('theme.form.success.bg')}" textsize="1"/>
+    <style class="text-warning" textfont="{config('theme.font')}" textcolor="{config('theme.form.warning.bg')}" textsize="1"/>
+    <style class="text-danger" textfont="{config('theme.font')}" textcolor="{config('theme.form.danger.bg')}" textsize="1"/>
+    <style class="text-light" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
+    <style class="text-lighter" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-lighter')}" textsize="1"/>
+    <style class="text-dark" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-dark')}" textsize="1"/>
+    <style class="text-darker" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-darker')}" textsize="1"/>
+
+    <!-- Backgrounds -->
+<!--    <style class="bg-blur" bluramount="1.0" style="Bgs1" substyle="BgDialogBlur"/>-->
+    <style class="bg-accent" bgcolor="{config('theme.hud.accent')}"/>
+    <style class="bg-dark" bgcolor="{config('theme.hud.bg-dark')}"/>
+    <style class="bg-blur" bgcolor="{config('theme.hud.bg-dark')}"/>
+    <style class="bg-darker" bgcolor="{config('theme.hud.bg-darker')}"/>
+    <style class="bg-light" bgcolor="{config('theme.hud.bg-light')}"/>
+    <style class="bg-lighter" bgcolor="{config('theme.hud.bg-lighter')}"/>
+    <style class="bg-success" bgcolor="{config('theme.form.success.bg')}"/>
+    <style class="bg-warning" bgcolor="{config('theme.form.warning.bg')}"/>
+    <style class="bg-danger" bgcolor="{config('theme.form.danger.bg')}"/>
+
+    <!-- Buttons -->
+    <style class="btn-default" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.default.bg')))->lighten(10)}" textcolor="{config('theme.form.default.text')}" textsize="0.8"/>
+    <style class="btn-light" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.text-light')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.hud.text-light')))->lighten(10)}" textcolor="{config('theme.hud.text-dark')}9" textsize="0.8"/>
+    <style class="btn-accent" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.accent')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.hud.accent')))->lighten(10)}" textcolor="{config('theme.hud.text-light')}" textsize="0.8"/>
+    <style class="btn-muted" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.hud.accent')))->lighten(10)}" textcolor="{config('theme.hud.text-light')}" textsize="0.8"/>
+    <style class="btn-success" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.success.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.success.bg')))->lighten(10)}" textcolor="{config('theme.form.success.text')}" textsize="0.8"/>
+    <style class="btn-warning" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.warning.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.warning.bg')))->lighten(10)}" textcolor="{config('theme.form.warning.text')}" textsize="0.8"/>
+    <style class="btn-danger" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.danger.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.danger.bg')))->lighten(10)}" textcolor="{config('theme.form.danger.text')}" textsize="0.8"/>
+
+    <!-- Form-Elements -->
+    <style class="form" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.default.bg')))->lighten(10)}" textcolor="{config('theme.form.default.text')}" textsize="1"/>
+</stylesheet>

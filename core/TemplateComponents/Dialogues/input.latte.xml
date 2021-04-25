@@ -1,18 +1,20 @@
 {contentType text}
 <frame id="input-dialog" z-index="9999" hidden="1">
-    <quad class="bg-blur" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
+    <quad class="bg-darker" opacity="0.9" size="320 180" halign="center" valign="center" ScriptEvents="1" z.index="-1" />
 
     <label text="Enter something" class="text-light" pos="0 11" scale="2.4" valign="center" halign="center" z-index="1" />
-    <entry class="form" pos="0 1" scale="1.6" valign="center" halign="center" z-index="1" textsize="2" size="100 6" />
+    <entry id="input__Entry" class="form" pos="0 1" scale="1.6" valign="center" halign="center" z-index="1" textsize="2" size="100 6" />
     <label text="Confirm" class="btn-success confirm" pos="-10.5 -12" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />
     <label text="Cancel" class="btn-danger cancel" pos="10.5 -12" size="20 8" textsize="2" z-index="1" ScriptEvents="1" />
 </frame>
 
 <script><!--
-    Text input(Text question){
+    Text input(Text question, Text placeholder){
         declare inputDialogFrame <=> (Page.MainFrame.GetFirstChild("input-dialog") as CMlFrame);
+        declare entry <=> (Page.MainFrame.GetFirstChild("input__Entry") as CMlEntry);
         declare Text answer = "";
         declare Boolean decided = False;
+        entry.Value = placeholder;
 
         //Set question text
         (inputDialogFrame.Controls[1] as CMlLabel).Value = question;
@@ -25,7 +27,7 @@
 
             foreach(event in PendingEvents){
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("confirm")){
-                    answer = (inputDialogFrame.Controls[2] as CMlEntry).Value;
+                    answer = entry.Value;
                     decided = True;
                 }
                 if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("cancel")){
@@ -38,5 +40,9 @@
         inputDialogFrame.Hide();
 
         return TL::Trim(answer);
+    }
+
+    Text input(Text question){
+        return input(question, "");
     }
 --></script>

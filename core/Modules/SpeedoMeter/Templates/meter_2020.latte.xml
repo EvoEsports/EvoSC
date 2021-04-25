@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="ESC:speedometer" id="speedometer" version="3">
-    {include 'Components.stylesheet'}
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="speedometer" z-index="100">
         <label id="speed" class="text-lighter" text="..." halign="left" valign="center" textsize="8" textemboss="0"/>
         <label class="action btn-accent" pos="-12.5 2.5" size="22.5 6.75"  valign="top" halign="left" focusareacolor1="0000" ScriptEvents="1" z-index="1"/>
@@ -15,9 +15,9 @@
                 </frame>
             </frame>
             <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" />
-            <label class="text-light" text="GEAR" halign="center" pos="0 -3" textsize="0.15" />
+            <label class="text-light" text="KPH" halign="center" pos="0 -3" textsize="0.15" />
             <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" scale="0.95" />
-            <label id="gear" class="text-light" text="3" halign="center" pos="0 1.5" textsize="2" />
+            <label id="gear" class="text-light" text="" halign="center" pos="0 1.5" textsize="2" />
         </frame>
     </frame>
 
