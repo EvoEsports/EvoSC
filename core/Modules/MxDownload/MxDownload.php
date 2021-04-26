@@ -113,7 +113,7 @@ class MxDownload extends Module implements ModuleInterface
         $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
         $filename = preg_replace('/[^a-z0-9\-_# .]/i', '', $filename);
         $filename = preg_replace('/\s/i', '_', $filename);
-        $filename = "MX/$mxId" . "_$filename";
+        $filename = "MX" . DIRECTORY_SEPARATOR . "$mxId" . "_$filename";
 
         Log::write('Saving map as ' . MapController::getMapsPath($filename), true);
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
@@ -176,6 +176,7 @@ class MxDownload extends Module implements ModuleInterface
             'name' => $gbx->Name,
             'environment' => $gbx->Environment,
             'title_id' => $gbx->TitleId,
+            'folder' => substr($filename, 0, strrpos($filename, DIRECTORY_SEPARATOR)),
             'enabled' => 1,
             'cooldown' => config('server.map-cooldown', 10),
             'mx_id' => $mxId,
