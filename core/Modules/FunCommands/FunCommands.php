@@ -35,6 +35,13 @@ class FunCommands extends Module implements ModuleInterface
             infoMessage($player, ' boots back to the real world!')->sendAll();
             Server::kick($player->Login, 'cya');
         }, 'Boot yourself back to the real world.');
+        
+        ChatCommand::add('/sd', function (Player $player) {
+            infoMessage('A speeddrift (SD) is a drift during which all 4 tires produce drift marks,' . 
+                        'with the front and rear marks overlapping on each side.'. '
+                        A SD can be initiated at over 400km/h by either oversteering, driving over a bump/jump or tapping the break.')->send($player);
+            Server::kick($player->Login, 'cya');
+        }, 'Learn what a SpeedDrift (SD) is.');
 
         ChatCommand::add('/me', function (Player $player, ...$message) {
             array_shift($message);
