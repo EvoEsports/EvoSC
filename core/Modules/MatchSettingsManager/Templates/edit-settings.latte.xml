@@ -9,7 +9,8 @@
     {include 'Components.tabs', tabs =>
         [
             'Settings'=>'',
-            'Maps'=>'msm.edit_maps,'.$name
+            'Maps'=>'msm.edit_maps,'.$name,
+            'Folders'=>'msm.edit_folders,'.$name
         ]
     }
     {/block}
