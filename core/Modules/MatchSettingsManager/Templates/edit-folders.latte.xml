@@ -10,8 +10,8 @@
         {include 'Components.tabs', tabs =>
             [
                 'Settings'=>'msm.edit,'.$name,
-                'Maps'=>'',
-                'Folders'=>'msm.edit_folders,'.$name
+                'Maps'=>'msm.edit_maps,'.$name,
+                'Folders'=>''
             ]
         }
     {/block}
@@ -19,8 +19,6 @@
     {block content}
     <frame pos="0 -7.5">
         <label class="text-accent" size="35 4" textsize="0.3" text="Name" valign="center" />
-        <label class="text-accent" pos="37" size="30 4" textsize="0.3" text="Author" valign="center" />
-        <label class="text-accent" pos="72" size="22 4" textsize="0.3" text="Environment(Title)" valign="center" />
         <label class="text-accent" pos="116" size="30 4" textsize="0.3" text="Enabled" valign="center" halign="right" />
     </frame>
 
@@ -28,19 +26,17 @@
 
     <entry name="matchsettings" default="{$name}" hidden="1" />
 
-    <frame id="map-pages" pos="0 -8">
-        {foreach $mapChunks as $chunk}
+    <frame id="folder-pages" pos="0 -8">
+        {foreach $folderChunks as $chunk}
         <frame hidden="1">
-            {foreach $chunk as $map}
-            {php $enabled = $enabledMapUids->contains($map->uid);}
-            <frame class="map" pos="0 {($iterator->counter * -3.5)}" data-id="id">
+            {foreach $chunk as $folder}
+            {php $enabled = $enabledFolders->contains($folder->folder);}
+            <frame class="folder" pos="0 {($iterator->counter * -3.5)}" data-id="id">
                 <label pos="113" size="3 3" textsize="0.5" text="{$enabled ? '$fff' : '$333'}" valign="center" />
-                <label size="34 3" textsize="0.6" text="{$map->name}" valign="center" />
-                <label pos="37" size="30 3" textsize="0.6" text="{$map->author->NickName}({$map->author->Login})" valign="center" />
-                <label pos="72" size="30 3" textsize="0.6" text="{$map->environment}({$map->title_id ?? '?'})" valign="center" />
+                <label size="34 3" textsize="0.6" text="{$folder->folder}" valign="center" />
                 <label class="toggle" pos="-2" size="120 3.5" valign="center" ScriptEvents="1" z-index="-2" focusareacolor1="0000" focusareacolor2="fff3" />
                 <quad class="bg-accent highlight" pos="-2" size="120 3.5" valign="center" z-index="-1" hidden="1" />
-                <entry name="map_{$map->id}" default="{$enabled}" hidden="1" />
+                <entry name="folder_{$folder->folder}" default="{$enabled}" hidden="1" />
             </frame>
             {/foreach}
         </frame>
@@ -72,7 +68,7 @@
     {block functions}
     <script><!--
     Void goToPage(Integer page){
-        declare mapPages <=> (Page.MainFrame.GetFirstChild("map-pages") as CMlFrame);
+        declare folderPages <=> (Page.MainFrame.GetFirstChild("folder-pages") as CMlFrame);
         declare pageInfo <=> (Page.MainFrame.GetFirstChild("page-info") as CMlLabel);
 
         declare targetPage = page;
@@ -86,11 +82,11 @@
 
         pageInfo.Value = (targetPage + 1) ^ "/" ^ totalPages;
 
-        foreach(pageFrame in mapPages.Controls){
+        foreach(pageFrame in folderPages.Controls){
             pageFrame.Hide();
         }
-        if(targetPage >= 0 && targetPage < mapPages.Controls.count){
-            mapPages.Controls[targetPage].Show();
+        if(targetPage >= 0 && targetPage < folderPages.Controls.count){
+            folderPages.Controls[targetPage].Show();
         }
 
         currentPage = targetPage;
@@ -99,7 +95,7 @@
     Void toggleEnabled(CMlControl parentFrame){
         declare parent <=> (parentFrame as CMlFrame);
         declare checkbox <=> (parent.Controls[0] as CMlLabel);
-        declare entryEnabled <=> (parent.Controls[6] as CMlEntry);
+        declare entryEnabled <=> (parent.Controls[4] as CMlEntry);
         declare enabled = entryEnabled.Value == "1";
 
         if(enabled){
@@ -115,7 +111,7 @@
     }
 
     Integer search(Text search){
-        declare mapPages <=> (Page.MainFrame.GetFirstChild("map-pages") as CMlFrame);
+        declare folderPages <=> (Page.MainFrame.GetFirstChild("folder-pages") as CMlFrame);
         declare Integer pageN = 0;
         declare Integer firstMatch = -1;
         declare hideAll = False;
@@ -124,7 +120,7 @@
             hideAll = True;
         }
 
-        foreach(page in mapPages.Controls){
+        foreach(page in folderPages.Controls){
             foreach(rowControl in (page as CMlFrame).Controls){
                 declare row = (rowControl as CMlFrame);
                 (row.Controls[5] as CMlQuad).Hide();
@@ -151,7 +147,7 @@
     {block bootScript}
         perPage = 19;
         currentPage = 0;
-        totalPages = {count($mapChunks)};
+        totalPages = {count($folderChunks)};
         alertUnsavedChanges = False;
 
         goToPage(0);
@@ -167,7 +163,7 @@
         }
 
         if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
-            TriggerPageAction("msm.save_maps");
+            TriggerPageAction("msm.save_folders");
             continue;
         }
 

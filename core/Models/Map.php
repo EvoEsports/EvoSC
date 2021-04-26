@@ -20,6 +20,7 @@ use stdClass;
  * @property string $id
  * @property string $uid
  * @property string $filename
+ * @property string $folder
  * @property Player $author
  * @property boolean $enabled
  * @property string $last_played
