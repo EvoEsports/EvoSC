@@ -18,7 +18,7 @@ require 'vendor/larapack/dd/src/helper.php';
  */
 function getEvoSCVersion(): string
 {
-    return str_replace("\n", '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
+    return str_replace(["\r\n","\r" ,"\n"], '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }
 
 /**
