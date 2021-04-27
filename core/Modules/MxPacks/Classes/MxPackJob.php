@@ -117,7 +117,7 @@ class MxPackJob
         ]);
 
         $zip = new ZipArchive();
-        $dir = $this->packsDir . '/' . $this->name;
+        $dir = $this->packsDir . DIRECTORY_SEPARATOR . $this->name;
 
         if (is_dir($dir)) {
             File::delete($dir);
@@ -153,7 +153,7 @@ class MxPackJob
 
             preg_match($pattern, $name, $matches);
             $mx_id = $matches[1];
-            $filename = 'MXPacks/' . $this->name . '/' . $name;
+            $filename = 'MXPacks'. DIRECTORY_SEPARATOR . $this->name . DIRECTORY_SEPARATOR . $name;
 
             $gbx = MapController::getGbxInformation($filename, false);
             $uid = $gbx->MapUid;
@@ -183,6 +183,7 @@ class MxPackJob
                 Map::create([
                     'uid'         => $uid,
                     'filename'    => $filename,
+                    'folder'      => 'MXPacks'.DIRECTORY_SEPARATOR. $this->name,
                     'author'      => $authorId,
                     'mx_id'       => $mx_id,
                     'enabled'     => 1,
