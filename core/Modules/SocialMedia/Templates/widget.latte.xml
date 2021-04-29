@@ -11,7 +11,7 @@
         <quad pos="-100 0" size="8 10" bgcolor="000" opacity="0.9" z-index="5" />
         <quad pos="4 -4" size="4 4" halign="center" valign="center" image="ICON" z-index="15"/>
         <label class="text-light" pos="4 -7.5" valign="center" halign="center" textsize="0.002" text="TITLE" z-index="15"/>
-        <quad z-index="10" halign="center" valign="center" />
+        <quad z-index="10" halign="center" valign="center" keepratio="Fit" />
     </framemodel>
 
     <frame id="links" pos="36">

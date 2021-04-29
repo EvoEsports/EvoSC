@@ -135,7 +135,7 @@ class MxDownload extends Module implements ModuleInterface
     public static function addMap(Player $player, int $mxId)
     {
         if ($mxId <= 0) {
-            warningMessage('MX-ID invalid.')->send($player);
+            warningMessage('Exchange-ID invalid.')->send($player);
             return;
         }
 
