@@ -289,7 +289,8 @@ class EscRun extends Command implements SignalableCommandInterface
     {
         if ($signal == SIGTERM) {
             $this->keepRunning = false;
-            warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. Exiting.')->sendAdmin();
+            warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. EvoSC Exiting.')->sendAdmin();
+            shutdown_evosc();
         }
     }
 }

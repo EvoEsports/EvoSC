@@ -18,7 +18,7 @@ require 'vendor/larapack/dd/src/helper.php';
  */
 function getEvoSCVersion(): string
 {
-    return str_replace(["\r\n","\r" ,"\n"], '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
+    return str_replace(["\r\n", "\r", "\n"], '', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'VERSION'));
 }
 
 /**
@@ -395,13 +395,8 @@ function evo_str_slug($title)
  */
 function restart_evosc()
 {
-    global $__bootedVersion;
-
     if (function_exists('pcntl_exec')) {
-        warningMessage(secondary('EvoSC v' . $__bootedVersion), ' is restarting.')->sendAll();
-        Server::chatEnableManualRouting(false);
-        \EvoSC\Controllers\ModuleController::stopModules();
-        \EvoSC\Controllers\ControllerController::stopControllers();
+        shutdown_evosc(true);
         Log::warning('Old process is terminating.');
         pcntl_exec(PHP_BINARY, $_SERVER['argv']);
         warningMessage('$f00[CRITICAL]', ' Failed to restart EvoSC. Please restart it manually.')->sendAdmin();
@@ -418,6 +413,20 @@ function restart_evosc()
     }
 
     exit(56);
+}
+
+/**
+ * Stops modules & controllers, disconnects chat router
+ */
+function shutdown_evosc(bool $restart = false)
+{
+    global $__bootedVersion;
+
+    $action = $restart ? 'is restarting' : 'is shutting down';
+    warningMessage(secondary('EvoSC v' . $__bootedVersion), $action)->sendAll();
+    Server::chatEnableManualRouting(false);
+    \EvoSC\Controllers\ModuleController::stopModules();
+    \EvoSC\Controllers\ControllerController::stopControllers();
 }
 
 /**
