@@ -101,6 +101,13 @@ class EscRun extends Command implements SignalableCommandInterface
                 config('server.rpc.password')
             );
 
+            $pidPath = config('server.pidfile');
+
+            // if no config given, use original
+            if (empty($pidPath)) {
+                $pidPath = baseDir(Server::getSystemInfo()->serverLogin . '_evosc.pid');
+            }
+
             $serverName = Server::getServerName();
 
             if (!Server::isAutoSaveValidationReplaysEnabled()) {
@@ -125,12 +132,6 @@ class EscRun extends Command implements SignalableCommandInterface
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $pidPath = config('server.pidfile');
-
-        // if no config given, use original
-        if (empty($pidPath))
-            $pidPath = baseDir(config('server.login') . '_evosc.pid');
-
         file_put_contents($pidPath, getmypid());
     }
 

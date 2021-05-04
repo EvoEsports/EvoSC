@@ -136,7 +136,7 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text = $data[2];
 
-            if ($login === config('server.login')) {
+            if ($login === Server::getSystemInfo()->serverLogin) {
                 return;
             }
 
