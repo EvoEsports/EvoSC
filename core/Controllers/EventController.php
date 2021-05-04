@@ -22,6 +22,8 @@ use Exception;
  */
 class EventController implements ControllerInterface
 {
+    private static string $serverLogin;
+
     /**
      * Method called on controller-boot.
      */
@@ -136,7 +138,7 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text = $data[2];
 
-            if ($login === Server::getSystemInfo()->serverLogin) {
+            if ($login === $serverLogin) {
                 return;
             }
 
@@ -309,5 +311,10 @@ class EventController implements ControllerInterface
     {
         $file = cacheDir('round_start_time.txt');
         File::put($file, time());
+    }
+
+    public static function setServerLogin(string $serverLogin)
+    {
+        self::$serverLogin = $serverLogin;
     }
 }

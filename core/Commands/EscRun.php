@@ -62,6 +62,8 @@ class EscRun extends Command implements SignalableCommandInterface
     {
         global $serverName;
         global $__ManiaPlanet;
+        global $pidPath;
+        global $serverLogin;
 
         ConfigController::init();
         Log::setOutput($output);
@@ -101,11 +103,12 @@ class EscRun extends Command implements SignalableCommandInterface
                 config('server.rpc.password')
             );
 
+            $serverLogin = Server::getSystemInfo()->serverLogin;
             $pidPath = config('server.pidfile');
 
             // if no config given, use original
             if (empty($pidPath)) {
-                $pidPath = baseDir(Server::getSystemInfo()->serverLogin . '_evosc.pid');
+                $pidPath = baseDir($serverLogin.'_evosc.pid');
             }
 
             $serverName = Server::getServerName();
@@ -132,6 +135,8 @@ class EscRun extends Command implements SignalableCommandInterface
 
     protected function interact(InputInterface $input, OutputInterface $output)
     {
+        global $pidPath;
+
         file_put_contents($pidPath, getmypid());
     }
 
@@ -140,6 +145,7 @@ class EscRun extends Command implements SignalableCommandInterface
         global $__bootedVersion;
         global $_onlinePlayers;
         global $serverName;
+        global $serverLogin;
 
         $version = getEvoSCVersion();
         $motd = "      ______           _____ ______
@@ -177,6 +183,10 @@ class EscRun extends Command implements SignalableCommandInterface
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
+
+        EventController::init();
+        EventController::setServerLogin($serverLogin);
+
         ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
 
         self::addBootCommands();
