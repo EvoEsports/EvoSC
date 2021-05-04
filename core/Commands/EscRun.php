@@ -37,15 +37,20 @@ use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EscRun extends Command
+class EscRun extends Command implements SignalableCommandInterface
 {
+    private static bool $docker = false;
+    private bool $keepRunning = true;
+
     protected function configure()
     {
         $this->setName('run')
+            ->addOption('docker', null, InputOption::VALUE_OPTIONAL, 'Set this flag if EvoSC runs inside docker.', false)
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
             ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.',
                 false)
@@ -82,6 +87,8 @@ class EscRun extends Command
             global $_skipMapCheck;
             $_skipMapCheck = true;
         }
+
+        self::$docker = $input->getOption('docker') !== false;
 
         try {
             $output->writeln("Connecting to server...");
@@ -204,7 +211,7 @@ class EscRun extends Command
         $__bootedVersion = getEvoSCVersion();
 
         //cycle-loop
-        while (true) {
+        while ($this->keepRunning) {
             try {
                 Timer::startCycle();
                 RestClient::curlTick();
@@ -239,20 +246,50 @@ class EscRun extends Command
         }
     }
 
+    /**
+     * Add EvoSC base commands
+     */
     public static function addBootCommands()
     {
         AwaitAction::createQueueAndStartCheckCycle();
 
-        AccessRight::add('restart_evosc', 'Allows you to restart EvoSC.');
+        if (!self::$docker) {
+            AccessRight::add('restart_evosc', 'Allows you to restart EvoSC.');
 
-        ChatCommand::add('//restart-evosc', function () {
-            restart_evosc();
-        }, 'Restart EvoSC', 'restart_evosc');
-
-        Timer::create('watch_for_restart_file', function () {
-            if (Cache::has('restart_evosc')) {
+            ChatCommand::add('//restart-evosc', function () {
                 restart_evosc();
-            }
-        }, '30s', true);
+            }, 'Restart EvoSC', 'restart_evosc');
+
+            Timer::create('watch_for_restart_file', function () {
+                if (Cache::has('restart_evosc')) {
+                    restart_evosc();
+                }
+            }, '30s', true);
+        }
+    }
+
+    /**
+     * Returns the signals which EvoSC subscribes to
+     *
+     * @return array
+     */
+    public function getSubscribedSignals(): array
+    {
+        // return here any of the constants defined by PCNTL extension
+        // https://www.php.net/manual/en/pcntl.constants.php
+        return [SIGTERM];
+    }
+
+    /**
+     * Signal handler
+     *
+     * @param int $signal
+     */
+    public function handleSignal(int $signal): void
+    {
+        if ($signal == SIGTERM) {
+            $this->keepRunning = false;
+            warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. Exiting.')->sendAdmin();
+        }
     }
 }
