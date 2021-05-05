@@ -81,11 +81,6 @@ class SetupController implements ControllerInterface
     {
         $questions = [
             [
-                'id'       => 'login',
-                'question' => 'Enter your server login',
-                'default'  => '',
-            ],
-            [
                 'id'       => 'ip',
                 'question' => 'Enter your server ip',
                 'default'  => 'localhost',
