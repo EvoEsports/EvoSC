@@ -10,6 +10,7 @@ use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 use Maniaplanet\DedicatedServer\Structures\PlayerRanking;
 use Maniaplanet\DedicatedServer\Structures\ScriptInfo;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
+use Maniaplanet\DedicatedServer\Structures\SystemInfos;
 use Maniaplanet\DedicatedServer\Structures\Version;
 
 /**
@@ -98,7 +99,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static int sendBill(string $string, int $int, string $string, string $string = null)
  * @method static object getBillState(int $int)
  * @method static int getServerPlanets()
- * @method static object getSystemInfo()
+ * @method static SystemInfos getSystemInfo()
  * @method static bool setConnectionRates(int $int, int $int)
  * @method static array getServerTags()
  * @method static bool setServerTag(string $string, string $string)

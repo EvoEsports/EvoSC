@@ -3,14 +3,15 @@
 
 namespace EvoSC\Modules\MxPacks\Classes;
 
+use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
+use EvoSC\Modules\MxPacks\MxPacks;
 use Exception;
 use Illuminate\Support\Collection;
 use ZipArchive;
-use EvoSC\Classes\Cache;
 use EvoSC\Classes\File;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Exchange;
@@ -20,20 +21,19 @@ use EvoSC\Classes\Log;
 
 class MxPackJob
 {
-    private $id;
-    private $files;
+    private int $id;
     private string $name;
     private string $path;
     private string $packsDir;
     private $info;
-    private int $i = 0;
+    private string $secret;
 
     /**
      * @var Player
      */
     private Player $issuer;
 
-    public function __construct(Player $player, $packId)
+    public function __construct(Player $player, int $packId, string $secret)
     {
         infoMessage('Downloading map pack ', secondary($packId), ' from Exchange.')->sendAdmin();
 
@@ -43,11 +43,12 @@ class MxPackJob
             mkdir($this->packsDir);
         }
 
-        $this->info = Cache::get("map-packs/".$packId."_info");
-        $this->name = $this->info->ID.'_'. $this->info->ShortName;
-        $this->path = $this->packsDir.'/'.$this->name.'.zip';
+        $this->info = MxPacks::getPackInfo($packId, $secret);
+        $this->name = $this->info->ID . '_' . $this->info->ShortName;
+        $this->path = $this->packsDir . '/' . $this->name . '.zip';
         $this->issuer = $player;
         $this->id = $packId;
+        $this->secret = $secret;
 
         try {
             $this->loadFiles();
@@ -56,24 +57,38 @@ class MxPackJob
         }
     }
 
+    private function updateStatus(array $info)
+    {
+        Template::show($this->issuer, 'MxPacks.update', [
+            'info' => json_encode((object)$info)
+        ]);
+    }
+
     /**
      * @throws Exception
      */
     private function loadFiles()
     {
+        $this->updateStatus([
+            'packId'   => $this->id,
+            'total'    => $this->info->TrackCount,
+            'current'  => 0,
+            'message'  => 'Downloading map pack...',
+            'finished' => false
+        ]);
+
         if (File::exists($this->path)) {
             $this->unpackFiles($this->path);
             return;
         }
 
-        if (isManiaPlanet()){
+        if (isManiaPlanet()) {
             $url = Exchange::MANIAPLANET_MX_URL;
-        }else{
+        } else {
             $url = Exchange::TRACKMANIA_MX_API_URL;
         }
 
-        $secret = (isset($this->info->Secret) ? $this->info->Secret : '');
-        $url = sprintf($url . '/mappack/download/%s?%s', $this->info->ID, $secret);
+        $url = sprintf($url . '/mappack/download/%s?secret=%s', $this->info->ID, $this->secret);
         $response = RestClient::get($url);
 
         if ($response->getStatusCode() != 200) {
@@ -88,17 +103,24 @@ class MxPackJob
     }
 
     /**
-     * @param  string  $path
+     * @param string $path
      * @throws Exception
      */
     private function unpackFiles(string $path)
     {
+        $this->updateStatus([
+            'packId'   => $this->id,
+            'total'    => $this->info->TrackCount,
+            'current'  => 0,
+            'message'  => 'Extracting maps from archive...',
+            'finished' => false
+        ]);
+
         $zip = new ZipArchive();
-        $dir = $this->packsDir.'/'.$this->name;
+        $dir = $this->packsDir . DIRECTORY_SEPARATOR . $this->name;
 
         if (is_dir($dir)) {
-            $this->addFiles(File::getFiles($dir));
-            return;
+            File::delete($dir);
         }
 
         mkdir($dir);
@@ -113,43 +135,62 @@ class MxPackJob
         $this->addFiles(File::getFiles($dir));
     }
 
+    /**
+     * @param Collection $files
+     * @throws Exception
+     */
     private function addFiles(Collection $files)
     {
-        $files->each(function ($value) {
-            $name = basename($value);
+        $mapInfos = collect(MxPacks::getPackMapInfos($this->id, $this->secret))
+            ->keyBy('GbxMapName');
 
+        foreach ($files->values() as $i => $value) {
+            $name = basename($value);
             $pattern = '/\((\d+)\)\.Map.Gbx$/';
-            if (isManiaPlanet())
-              $pattern = '/\((\d+)\)\.Gbx$/';
+            if (isManiaPlanet()) {
+                $pattern = '/\((\d+)\)\.Gbx$/';
+            }
 
             preg_match($pattern, $name, $matches);
             $mx_id = $matches[1];
-            $filename = 'MXPacks/'.$this->name.'/'.$name;
+            $filename = 'MXPacks'. DIRECTORY_SEPARATOR . $this->name . DIRECTORY_SEPARATOR . $name;
 
             $gbx = MapController::getGbxInformation($filename, false);
             $uid = $gbx->MapUid;
             $authorLogin = $gbx->AuthorLogin;
 
+            $this->updateStatus([
+                'packId'   => $this->id,
+                'total'    => $this->info->TrackCount,
+                'current'  => $i + 1,
+                'message'  => 'Adding ' . stripAll($gbx->Name),
+                'finished' => false
+            ]);
+
             if (!Map::whereUid($uid)->exists()) {
+                $exchangeMapInfo = $mapInfos->get($gbx->Name);
+                $authorName = $exchangeMapInfo->Username ?? $gbx->AuthorLogin;
+
                 if (Player::whereLogin($authorLogin)->exists()) {
                     $authorId = Player::find($authorLogin)->id;
                 } else {
                     $authorId = Player::insertGetId([
-                        'NickName' => $authorLogin,
-                        'Login' => $authorLogin
+                        'NickName' => $authorName,
+                        'Login'    => $authorLogin
                     ]);
                 }
 
                 Map::create([
-                    'uid' => $uid,
-                    'filename' => $filename,
-                    'author' => $authorId,
-                    'mx_id' => $mx_id,
-                    'enabled' => 1,
-                    'cooldown' => 999,
-                    'name' => $gbx->Name,
+                    'uid'         => $uid,
+                    'filename'    => $filename,
+                    'folder'      => 'MXPacks'.DIRECTORY_SEPARATOR. $this->name,
+                    'author'      => $authorId,
+                    'mx_id'       => $mx_id,
+                    'enabled'     => 1,
+                    'cooldown'    => 999,
+                    'name'        => $gbx->Name,
                     'environment' => $gbx->Environment,
-                    'title_id' => $gbx->TitleId
+                    'title_id'    => $gbx->TitleId
                 ]);
             }
 
@@ -166,19 +207,21 @@ class MxPackJob
             } catch (Exception $e) {
                 Log::write($e->getMessage());
             }
-        });
-
-        Hook::fire('MapPoolUpdated');
-
-        if (isManiaPlanet()){
-            $url = Exchange::MANIAPLANET_MX_URL;
-        }else{
-
-            $url = Exchange::TRACKMANIA_MX_URL;
         }
 
+        Hook::fire('MapPoolUpdated');
+        $url = isManiaPlanet() ? Exchange::MANIAPLANET_MX_URL : Exchange::TRACKMANIA_MX_URL;
+
+        $this->updateStatus([
+            'packId'   => $this->id,
+            'total'    => $this->info->TrackCount,
+            'current'  => $this->info->TrackCount,
+            'message'  => 'Map pack added',
+            'finished' => true
+        ]);
+
         infoMessage($this->issuer, ' added map-pack ',
-            '$l[' . $url . '/mappack/view/'.$this->id.']'.secondary($this->info->Name),
+            '$l[' . $url . '/mappack/view/' . $this->id . ']' . secondary($this->info->Name),
             '$l from Exchange.')->sendAll();
     }
 }

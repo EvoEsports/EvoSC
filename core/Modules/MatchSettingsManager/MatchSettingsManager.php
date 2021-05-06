@@ -83,11 +83,13 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.edit_maps', [self::class, 'showEditMatchsettingsMaps'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.edit_folders', [self::class, 'showEditMatchsettingsFolders'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.delete', [self::class, 'deleteMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.new', [self::class, 'createNewMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.save_folders', [self::class, 'saveFolders'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.schedule', [self::class, 'scheduleMatchSettings'], 'matchsettings_load');
 
         if (config('quick-buttons.enabled')) {
@@ -137,6 +139,41 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
         successMessage('MatchSettings ', secondary($matchsettings), ' saved.')->send($player);
         self::showEditMatchsettingsMaps($player, $matchsettings);
+    }
+
+    /**
+     * @param Player $player
+     * @param $data
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function saveFolders(Player $player, $data)
+    {
+        $matchsettings = $data->matchsettings;
+
+        $enabledFolders = collect($data)->map(function ($value, $key) {
+            if (preg_match('/^folder_.+/', $key) && $value == '1') {
+                return preg_replace('/^folder_/', '', $key);
+            }
+            return null;
+        })->filter()->values();
+
+        $file = mapsDir("MatchSettings/$matchsettings.txt");
+
+        $settings = new SimpleXMLElement(File::get($file));
+        unset($settings->map);
+
+        $test = Map::whereIn('folder', $enabledFolders)->get();
+
+        foreach ($test as $map) {
+            $entry = $settings->addChild('map');
+            $entry->addChild('file', $map->filename);
+            $entry->addChild('ident', $map->uid);
+        }
+
+        File::put($file, Utility::simpleXmlPrettyPrint($settings));
+
+        successMessage('MatchSettings ', secondary($matchsettings), ' saved.')->send($player);
+        self::showEditMatchsettingsFolders($player, $matchsettings);
     }
 
     /**
@@ -223,6 +260,41 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $mapChunks = Map::all()->sortByDesc('enabled')->chunk(19);
 
         Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'mapChunks', 'enabledMapUids'));
+    }
+
+    /**
+     * @param Player $player
+     * @param string $name
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function showEditMatchsettingsFolders(Player $player, string $name)
+    {
+        $file = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
+        $data = File::get($file);
+        $enabledFolders = collect();
+        $maps = collect();
+        $xml = new SimpleXMLElement($data);
+
+        foreach ($xml as $node) {
+            if ($node->getName() == 'map') {
+                $value = (string)$node->ident;
+                $maps->push($value);
+            }
+        }
+
+        $folders = Map::distinct()->get(['folder']);
+
+        foreach ($folders as $folder) {
+            $uid_mapper = function ($item) {return $item->uid;};
+            $count = Map::whereFolder($folder->folder)->get()->toBase()->map($uid_mapper)->diff($maps->toBase())->count();
+            if($count == 0) {
+                $enabledFolders->push($folder->folder);
+            }
+        }
+
+        $folderChunks = $folders->chunk(19);
+
+        Template::show($player, 'MatchSettingsManager.edit-folders', compact('name', 'folderChunks', 'enabledFolders'));
     }
 
     /**

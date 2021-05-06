@@ -53,66 +53,96 @@ class MxPacks extends Module implements ModuleInterface
 
     public static function showAddMapPack(Player $player, $cmd, $packId, $secret = '')
     {
-        $cacheIdInfo = 'map-packs/' . $packId . '_info';
-        $cacheIdTracks = 'map-packs/' . $packId . '_trackslist';
+        $info = self::getPackInfo($packId, $secret);
 
-        if (Cache::has($cacheIdInfo)) {
-            $info = Cache::get($cacheIdInfo);
-        } else {
-            if (isManiaPlanet()) {
-                $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
-            } else {
-                $url = sprintf(self::$apiUrl . '/api/mappack/get_info/%d/?=%s', $packId, $secret);
-            }
-
-            $response = RestClient::get($url);
-            $info = json_decode($response->getBody()->getContents());
-
-            if ($response->getStatusCode() != 200 || !$info) {
-                warningMessage('Failed to get information for map-pack ', secondary($packId))->send($player);
-
-                return;
-            }
-
-            $info = isManiaPlanet() ? $info[0] : $info;
-
-            Cache::put($cacheIdInfo, $info, now()->addMinute());
+        if (isset($info->Message)) {
+            warningMessage($info->Message)->send($player);
+            return;
         }
 
-        if (isManiaPlanet()){
+        $trackList = self::getPackMapInfos($packId, $secret);
+
+        Template::show($player, 'MxPacks.confirm', compact('trackList', 'info', 'secret'));
+    }
+
+    public static function getPackMapInfos($packId, $secret)
+    {
+        $cacheKey = 'map-packs/' . $packId . '_trackslist';
+
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        if (isManiaPlanet()) {
             $url = sprintf(self::$apiUrl . '/tm/mappack/%d/tracks/?=%s', $packId, $secret);
-        }else{
-            $url = sprintf(self::$exchangeUrl . '/api/mappack/get_mappack_tracks/%d/?=%s', $packId, $secret);
+        } else {
+            $url = sprintf(self::$exchangeUrl . '/api/mappack/get_mappack_tracks/%d/?secret=%s', $packId, $secret);
         }
+
+        //addpack 524 G5Gpl77r4B
+        dump($url);
 
         try {
             $response = RestClient::get($url);
 
             if ($response->getStatusCode() != 200) {
-                throw new Exception('Failed to get map-list.');
+                Log::error('Failed to get map list for map-pack', $response->getReasonPhrase());
+                return null;
             }
 
             $trackList = json_decode($response->getBody()->getContents());
+            Cache::put($cacheKey, $trackList, now()->addMinute());
 
-            Cache::put($cacheIdTracks, $trackList, now()->addMinute());
+            return $trackList;
         } catch (Exception $e) {
-            warningMessage('Failed to get map-list from pack ', secondary($packId))->send($player);
-
-            return;
+            Log::error('Failed to get map list for map-pack', $e->getMessage());
         }
 
-        Template::show($player, 'MxPacks.confirm', compact('trackList', 'info'));
+        return null;
     }
 
-    public static function downloadMapPack(Player $player, $mapPackId)
+    public static function getPackInfo($packId, $secret)
+    {
+        $cacheIdInfo = 'map-packs/' . $packId . '_info';
+        if (Cache::has($cacheIdInfo)) {
+            return Cache::get($cacheIdInfo);
+        }
+
+        if (isManiaPlanet()) {
+            $url = sprintf(self::$apiUrl . '/tm/mappacks/%d/?=%s', $packId, $secret);
+        } else {
+            $url = sprintf(self::$apiUrl . '/api/mappack/get_info/%d/?secret=%s', $packId, $secret);
+        }
+
+        $response = RestClient::get($url);
+        $info = json_decode($response->getBody()->getContents());
+
+        if ($response->getStatusCode() != 200 || !$info) {
+            Log::error('Failed to get information for map-pack', $response->getReasonPhrase());
+
+            return null;
+        }
+
+        $info = isManiaPlanet() ? $info[0] : $info;
+        Cache::put($cacheIdInfo, $info, now()->addMinute());
+
+        return $info;
+    }
+
+    public static function downloadMapPack(Player $player, $mapPackId, $secret)
     {
         if (isset(self::$activeJob)) {
             warningMessage('Can not download two map-packs at once, please wait.')->send($player);
-
             return;
         }
 
-        self::$activeJob = new MxPackJob($player, $mapPackId);
+        $info = self::getPackInfo($mapPackId, $secret);
+        if ($info->TrackCount == 0) {
+            warningMessage('Can not add empty map pack.')->send($player);
+            return;
+        }
+
+        self::$activeJob = new MxPackJob($player, $mapPackId, $secret);
         self::$activeJob = null;
     }
 }

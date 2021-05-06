@@ -158,7 +158,7 @@ class ModeScriptEventController implements ControllerInterface
         Hook::fire('PlayerCheckpoint',
             $player,
             $wayPoint->laptime,
-            $wayPoint->checkpointinlap + 1,
+            $wayPoint->checkpointinlap,
             $wayPoint->isendlap
         );
 

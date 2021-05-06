@@ -27,7 +27,8 @@ class PM extends Module implements ModuleInterface
         ManiaLinkEvent::add('pm.dialog', [self::class, 'mlePmDialog']);
         ManiaLinkEvent::add('pm', [self::class, 'mlePm']);
 
-        ChatCommand::add('/pm', [self::class, 'cmdWritePM']);
+        ChatCommand::add('/pm', [self::class, 'cmdWritePM'], 'Send a private message to another player. Usage: /pm <partial_nickname> <message...> or click PM in the scoreboard, to message a player.')
+        ->addAlias('dm');
     }
 
     /**

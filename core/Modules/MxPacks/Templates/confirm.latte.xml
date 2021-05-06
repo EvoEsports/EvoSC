@@ -9,21 +9,33 @@
 {/block}
 
 {block title}
-Add {$info->Name} map-pack
+Add {$info->Name}
 {/block}
 
 {block content}
-<label class="text-light" pos="0 0" size="58 20" text="{$info->Name}" textsize="3"/>
-<label class="text-light" pos="0 -6" size="58 20" text="{$is_maniaplanet ? $info->Description : $info->StyleName}" textsize="0.5" autonewline="1"/>
+<label class="text-light" pos="0 0" size="58 6" text="{$info->Name}" textsize="3"/>
+<label class="text-light" pos="0 -6" size="58 4" text="Owner: {$info->Username}" textsize="0.5" autonewline="1"/>
+<label class="text-light" pos="0 -9" size="58 4" text=" {$info->Downloads} Downloads" textsize="0.5" autonewline="1"/>
+<label class="text-light" pos="0 -12" size="58 4" text=" {$info->MappackValue} map pack value" textsize="0.5" autonewline="1"/>
+<label class="text-light" pos="0 -17" size="58 40" text="Style: {$is_maniaplanet ? $info->Description : $info->StyleName}" textsize="0.5" autonewline="1"/>
 
-<label class="btn-success confirm" pos="10 -70.5" size="20 5" text=" Install" textsize="0.75" ScriptEvents="1"/>
+<label id="install" class="btn-success confirm" pos="10 -71.5" size="20 5" text=" Install" textsize="0.75" ScriptEvents="1"/>
 
 <label class="text-light" pos="60 0" size="116 3" text="Map" textsize="0.75"/>
 <label class="text-light" pos="80 0" size="116 3" text="Author" textsize="0.75"/>
-<label class="text-light" pos="100 0" size="116 3" text="TitlePack" textsize="0.75"/>
+<label class="text-light" pos="100 0" size="116 3" text="{$is_maniaplanet ? 'TitlePack' : 'Length'}" textsize="0.75"/>
 <quad pos="60 -3.5" size="56 0.2" bgcolor="fff9" />
 
-<frame pos="102 -71">
+<frame id="spinners" pos="3.5 -71" hidden="1">
+    <label id="message" class="text-light" pos="4.5 3.5" size="49 4" text="Starting..." textsize="0.75" />
+    <label id="progress" class="text-light" pos="4.5 -0.75" size="58 4" text="" textsize="0.5" />
+    <quad class="bg-light" pos="4.5 0.5" size="49 0.5" opacity="0.25" />
+    <quad id="progress-bar" class="bg-accent" pos="4.5 0.5" size="0 0.5" z-index="1" />
+    <quad id="spinner1" size="6 6" image="https://i.imgur.com/raBEPlW.png" valign="center" halign="center" colorize="{config('theme.hud.bg-light')}" scale="1.1" />
+    <quad id="spinner2" size="6 6" image="https://i.imgur.com/WuJWnZq.png" valign="center" halign="center" colorize="{config('theme.hud.accent')}" scale="1.2" />
+</frame>
+
+<frame pos="102 -72">
 {include 'Components.pagination'}
 </frame>
 
@@ -33,25 +45,35 @@ Add {$info->Name} map-pack
         {foreach $chunk as  $i => $map}
         <label class="text-light" pos="60 {$i * -3.5 - 5}" size="19 3" text="{$map->GbxMapName}" textsize="0.5"/>
         <label class="text-light" pos="80 {$i * -3.5 - 5}" size="19 3" text="{$map->Username}" textsize="0.5"/>
-        <label class="text-light" pos="100 {$i * -3.5 - 5}" size="19 3" text="{$map->TitlePack}" textsize="0.5"/>
+        <label class="text-light" pos="100 {$i * -3.5 - 5}" size="19 3" text="{$is_maniaplanet ? $map->TitlePack : $map->LengthName}" textsize="0.5"/>
         {/foreach}
     </frame>
     {/foreach}
 </frame>
 {/block}
 
+{include 'Dialogues.confirm'}
 <script><!--
 {block globals}
+#Struct EvoSC_ExchangePackDownload {
+    Integer packId;
+    Integer total;
+    Integer current;
+    Text message;
+    Boolean finished;
+}
+
 declare Integer maxPage;
 declare Integer currentPage;
+declare Integer packId;
 {/block}
 
 {block pendingEvents}
 if(event.Control.HasClass("confirm") && event.Type == CMlScriptEvent::Type::MouseClick){
-    window.Hide();
-    TriggerPageAction("mappack.aprove,{$info->ID}");
-
-    return;
+    if(confirm("EvoSC won't respond to gamemode events until all maps have been added, do you want to continue?")){
+        startLoad();
+        TriggerPageAction("mappack.aprove,{$info->ID},{$secret}");
+    }
 }
 if(event.Control.HasClass("previous-page") && event.Type == CMlScriptEvent::Type::MouseClick){
     currentPage -= 1;
@@ -80,14 +102,46 @@ if(event.Control.HasClass("next-page") && event.Type == CMlScriptEvent::Type::Mo
 {/block}
 
 {block functions}
+Void updateStatus(EvoSC_ExchangePackDownload info){
+    (Page.MainFrame.GetFirstChild("message") as CMlLabel).Value = info.message;
+    (Page.MainFrame.GetFirstChild("progress") as CMlLabel).Value = info.current ^ "/" ^ info.total;
+    (Page.MainFrame.GetFirstChild("progress-bar") as CMlQuad).Size[0] = 49.0 * (info.current / (info.total * 1.0));
+
+    if(info.finished){
+        declare spinner1 <=> (Page.MainFrame.GetFirstChild("spinner1") as CMlQuad);
+        declare spinner2 <=> (Page.MainFrame.GetFirstChild("spinner2") as CMlQuad);
+        AnimMgr.Flush(spinner1);
+        AnimMgr.Flush(spinner2);
+    }
+}
+
+Void startLoad(){
+    Page.MainFrame.GetFirstChild("install").Hide();
+    Page.MainFrame.GetFirstChild("spinners").Show();
+    declare spinner1 <=> (Page.MainFrame.GetFirstChild("spinner1") as CMlQuad);
+    declare spinner2 <=> (Page.MainFrame.GetFirstChild("spinner2") as CMlQuad);
+    AnimMgr.Add(spinner1, "<quad rot='9999999' />", 40000000, CAnimManager::EAnimManagerEasing::Linear);
+    AnimMgr.Add(spinner2, "<quad rot='-9999999' />", 100000000, CAnimManager::EAnimManagerEasing::Linear);
+}
 {/block}
 
 {block bootScript}
+declare EvoSC_ExchangePackDownload ExchangePackDownload for This;
+declare Integer LastExchangePackDownload for This;
+declare lastStatusUpdate = 0;
+
 currentPage = 0;
+packId = {$info->ID};
 maxPage = {ceil(count($trackList)/18)};
 (Page.MainFrame.GetFirstChild("page-info") as CMlLabel).Value = (currentPage + 1) ^ "/" ^ maxPage;
 {/block}
 
 {block loop}
+if(LastExchangePackDownload != lastStatusUpdate){
+    lastStatusUpdate = LastExchangePackDownload;
+    if(ExchangePackDownload.packId == packId){
+        updateStatus(ExchangePackDownload);
+    }
+}
 {/block}
 --></script>

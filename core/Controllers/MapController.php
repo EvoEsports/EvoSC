@@ -456,6 +456,7 @@ class MapController implements ControllerInterface
             ], [
                 'author' => self::createOrGetAuthor($map->author),
                 'filename' => $map->fileName,
+                'folder' => substr($map->fileName, 0, strrpos($map->fileName, DIRECTORY_SEPARATOR)),
                 'name' => $map->name,
                 'environment' => $map->environnement,
                 'enabled' => 1
