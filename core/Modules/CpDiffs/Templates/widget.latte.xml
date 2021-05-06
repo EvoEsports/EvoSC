@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:pb-cp-records" id="pb-cp-records" version="3">
+<manialink name="ESC:cp-diffs" id="cp-diffs" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="box" valign="center" halign="center">
         <quad class="bg-dark" pos="-7.5" halign="center" valign="center" size="5 4" opacity="0.5" z-index="-1" />
@@ -75,13 +75,17 @@
         }
 
         Void fillBox(Integer cpId, Integer score, Boolean finish){
-            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
-            declare boxFrame = (boxesFrame.Controls[cpId] as CMlFrame);
-
             if(!target.cps.existskey(cpId)){
                 return;
             }
 
+            declare boxesFrame <=> (Page.MainFrame.GetFirstChild("boxes") as CMlFrame);
+
+            if(!boxesFrame.Controls.existskey(cpId)){
+                return;
+            }
+
+            declare boxFrame = (boxesFrame.Controls[cpId] as CMlFrame);
             declare diff = score - target.cps[cpId];
 
             if(finish){
