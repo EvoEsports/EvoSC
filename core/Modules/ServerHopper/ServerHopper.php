@@ -27,7 +27,7 @@ class ServerHopper extends Module implements ModuleInterface
             try {
                 self::sendUpdatedServerInformations();
             } catch (Exception $e) {
-                Log::error($e->getMessage());
+                Log::errorWithCause('Failed to send updated server information', $e);
                 Log::error('Stopping module ' . self::class);
                 return;
             }
@@ -93,6 +93,7 @@ class ServerHopper extends Module implements ModuleInterface
                     'port' => $systemInfo->port
                 ];
             } catch (Exception $e) {
+                Log::errorWithCause('Failed to get server data', $e);
                 return null;
             }
         })

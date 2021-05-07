@@ -114,12 +114,12 @@ class ModuleController implements ControllerInterface
                 try {
                     $instance = new $moduleClass();
                 } catch (\Error $e) {
-                    Log::error('[MODULE ERROR] ' . $e->getMessage() . ' (not started).', true);
+                    Log::errorWithCause("Failed to create module $moduleClass (not started)", $e);
                     return null;
                 }
 
                 if (!($instance instanceof Module)) {
-                    Log::error("$moduleClass is not a module, but should be (not started).", true);
+                    Log::error("$moduleClass is not a module, but should be (not started).");
                     return null;
                 }
 
@@ -160,7 +160,7 @@ class ModuleController implements ControllerInterface
             try {
                 $module->stop();
             } catch (\Exception $e) {
-                Log::error('Failed to stop module: ' . $e->getMessage());
+                Log::errorWithCause("Failed to stop module", $e);
             }
         });
     }

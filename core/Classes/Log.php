@@ -116,10 +116,27 @@ class Log
      * @param      $message
      * @param bool $echo
      */
-    public static function error($message, bool $echo = true)
+    public static function error($message, bool $echo = true, int $limit = 2)
     {
-        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
         self::write('<error>' . $message . '</>', $echo, $caller);
+    }
+
+    /**
+     * Log an error message and cause stacktrace.
+     *
+     * @param      $message
+     * @param      $throwable
+     * @param bool $echo
+     */
+    public static function errorWithCause($message, \Throwable $throwable, bool $echo = true)
+    {
+        self::error($message . ': ' . $throwable->getMessage(), $echo, 3);
+
+        if (isVerbose())
+        {
+            self::write($throwable->getTraceAsString(), $echo);
+        }
     }
 
     /**

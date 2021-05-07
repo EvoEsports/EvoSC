@@ -64,7 +64,7 @@ class Migrate extends Command
                 });
             }
         }catch(\Exception $e){
-            Log::error('Check that your database config is correct and that it is running.');
+            Log::errorWithCause('Failed to create migrations table', $e);
             exit(1);
         }
 

@@ -341,7 +341,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
                 Log::error('Failed to save ghost for ' . $dedi->player->Login . " [" . $dedi->map->uid . "]");
             }
         } catch (Exception $e) {
-            Log::error('Could not save ghost: ' . $e->getMessage());
+            Log::errorWithCause('Could not save ghost', $e);
         }
     }
 

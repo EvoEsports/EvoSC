@@ -233,8 +233,8 @@ class EscRun extends Command implements SignalableCommandInterface
 
                 usleep($pause);
             } catch (Exception $e) {
-                Log::write('Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/3');
-                Log::write($e->getMessage());
+                $message = 'Failed to fetch callbacks from dedicated-server. Failed attempts: ' . $failedConnectionRequests . '/3';
+                Log::errorWithCause($message, $e);
 
                 $failedConnectionRequests++;
                 if ($failedConnectionRequests > 3) {
@@ -251,8 +251,7 @@ class EscRun extends Command implements SignalableCommandInterface
                 $output->writeln("<error>===============================================================================</error>");
                 $output->writeln("<error>" . $e->getTraceAsString() . "</error>");
 
-                Log::write('EvoSC encountered an error: ' . $e->getMessage(), false);
-                Log::write($e->getTraceAsString(), false);
+                Log::errorWithCause("EvoSC encountered an error", $e, false);
             }
         }
     }

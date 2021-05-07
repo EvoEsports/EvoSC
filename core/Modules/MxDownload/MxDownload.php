@@ -71,7 +71,7 @@ class MxDownload extends Module implements ModuleInterface
                 return;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            Log::errorWithCause("The map $tmxId is unknown", $e);
             dangerMessage('The map with the id ', secondary($tmxId), ' is unknown.')->send($player);
             return;
         }
@@ -80,7 +80,7 @@ class MxDownload extends Module implements ModuleInterface
             $comment = self::parseBB($details->Comments);
             Template::show($player, 'MxDownload.add-map-info', compact('details', 'comment'));
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            Log::errorWithCause('Failed to parse map info', $e);
             warningMessage('Failed to parse map info, adding...')->send($player);
             self::addMap($player, $tmxId);
         }
@@ -188,8 +188,8 @@ class MxDownload extends Module implements ModuleInterface
                 Server::addMap($filename);
                 Log::info("Added $filename to the selection.");
             } catch (Exception $e) {
+                Log::errorWithCause('Adding map to selection failed', $e);
                 warningMessage('Failed to add map ', secondary($gbx->Name), ' to the map-pool: ' . $e->getMessage())->send($player);
-                Log::write('Adding map to selection failed: ' . $e->getMessage());
                 return;
             }
         }

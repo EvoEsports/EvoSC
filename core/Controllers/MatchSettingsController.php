@@ -159,7 +159,7 @@ class MatchSettingsController implements ControllerInterface
         try {
             self::saveMatchSettings($file, $settings);
         } catch (Exception $e) {
-            Log::error("Failed to add map \"$filename\" to \"$matchSettings\"");
+            Log::errorWithCause("Failed to add map \"$filename\" to \"$matchSettings\"", $e);
         }
     }
 

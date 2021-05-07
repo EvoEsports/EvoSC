@@ -57,7 +57,7 @@ class MapQueue extends Model
                         return self::getFirst();
                     }
                 } catch (\Exception $e) {
-                    Log::error($e->getMessage());
+                    Log::errorWithCause('Failed to retrieve map from queue', $e);
                 }
             }
         }

@@ -444,7 +444,7 @@ class DedimaniaApi extends Module
                 Log::info('New Dedis saved.');
             });
         } catch (Exception $e) {
-            Log::error('Error saving dedis: ' . $e->getMessage(), true);
+            Log::errorWithCause('Failed to save dedis', $e);
         }
 
         $map->dedis()->where('New', 1)->update(['New' => 0]);
@@ -624,9 +624,7 @@ class DedimaniaApi extends Module
                 'body' => $xml->asXML()
             ]);
         } catch (RequestException $e) {
-            Log::write('DedimaniaAp::post failed: ' . $e->getMessage());
-            Log::write($e->getTraceAsString(), isVerbose());
-
+            Log::errorWithCause('DedimaniaAp::post failed', $e);
             return null;
         }
 
