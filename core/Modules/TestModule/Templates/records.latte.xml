@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Records" id="Records" version="3">
-    <script>
-        <!--
-        #Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/Record_Client.Script.txt"
-        -->
-    </script>
-</manialink>
