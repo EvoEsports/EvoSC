@@ -74,7 +74,7 @@ class LocalRecords extends Module implements ModuleInterface
      */
     public static function warmupEnd()
     {
-        self::$isWarmUpOngoing = true;
+        self::$isWarmUpOngoing = false;
     }
 
     /**
