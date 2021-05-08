@@ -26,6 +26,7 @@ class LocalRecords extends Module implements ModuleInterface
     private static bool $ignoreWarmUpTimes = false;
     private static bool $ignoreRoundsTimes = false;
     private static bool $ignoreTimeAttackTimes = false;
+    private static bool $isWarmUpOngoing = false;
 
     /**
      * Called when the module is loaded
@@ -48,6 +49,9 @@ class LocalRecords extends Module implements ModuleInterface
         AccessRight::add('local_delete', 'Delete local-records.');
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
+        Hook::add('PlayerPb', [self::class, 'playerFinish']);
+        Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmupStart']);
+        Hook::add('Trackmania.WarmUp.EndRound', [self::class, 'warmupEnd']);
 
         if (self::$showWidget) {
             Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -55,8 +59,22 @@ class LocalRecords extends Module implements ModuleInterface
             ManiaLinkEvent::add('local.delete', [self::class, 'delete'], 'local_delete');
             ManiaLinkEvent::add('locals.show', [self::class, 'showLocalsTable']);
         }
+    }
 
-        Hook::add('PlayerPb', [self::class, 'playerFinish']);
+    /**
+     *
+     */
+    public static function warmupStart()
+    {
+        self::$isWarmUpOngoing = true;
+    }
+
+    /**
+     *
+     */
+    public static function warmupEnd()
+    {
+        self::$isWarmUpOngoing = true;
     }
 
     /**
@@ -92,16 +110,21 @@ class LocalRecords extends Module implements ModuleInterface
         self::sendLocalsChunk($player);
     }
 
+    /**
+     * @param Player $player
+     * @param int $score
+     * @param string $checkpoints
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function playerFinish(Player $player, int $score, string $checkpoints)
     {
         if ($score < 3000) {
             //ignore times under 3 seconds
             return;
         }
-        if (self::$ignoreWarmUpTimes) {
-            if (Server::getWarmUp()) {
-                return;
-            }
+
+        if (self::$ignoreWarmUpTimes && self::$isWarmUpOngoing) {
+            return;
         }
 
         $map = MapController::getCurrentMap();
@@ -152,10 +175,10 @@ class LocalRecords extends Module implements ModuleInterface
             if ($oldRank == $newRank) {
                 DB::table(self::TABLE)
                     ->updateOrInsert([
-                        'Map' => $map->id,
+                        'Map'    => $map->id,
                         'Player' => $player->id
                     ], [
-                        'Score' => $score,
+                        'Score'       => $score,
                         'Checkpoints' => $checkpoints,
                     ]);
 
@@ -174,12 +197,12 @@ class LocalRecords extends Module implements ModuleInterface
 
                 DB::table(self::TABLE)
                     ->updateOrInsert([
-                        'Map' => $map->id,
+                        'Map'    => $map->id,
                         'Player' => $player->id
                     ], [
-                        'Score' => $score,
+                        'Score'       => $score,
                         'Checkpoints' => $checkpoints,
-                        'Rank' => $newRank,
+                        'Rank'        => $newRank,
                     ]);
 
                 $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score) . ' (' . $oldRank . '. -' . formatScore($diff) . ')'));
@@ -201,12 +224,12 @@ class LocalRecords extends Module implements ModuleInterface
 
             DB::table(self::TABLE)
                 ->updateOrInsert([
-                    'Map' => $map->id,
+                    'Map'    => $map->id,
                     'Player' => $player->id
                 ], [
-                    'Score' => $score,
+                    'Score'       => $score,
                     'Checkpoints' => $checkpoints,
-                    'Rank' => $newRank,
+                    'Rank'        => $newRank,
                 ]);
 
             $chatMessage = $chatMessage->setParts($player, ' gained the ', secondary($newRank . '.'), ' local record ', secondary(formatScore($score)));

@@ -136,14 +136,14 @@ class PlayerController implements ControllerInterface
 
         $data = self::$players->map(function (Player $player) {
             return [
-                'login' => $player->Login,
-                'name' => $player->NickName,
+                'login'   => $player->Login,
+                'name'    => $player->NickName,
                 'ubiname' => $player->ubisoft_name,
             ];
         });
 
         Template::showAll('Helpers.update-custom-names', [
-            'keyedByLogin' => $data->pluck('name', 'login'),
+            'keyedByLogin'   => $data->pluck('name', 'login'),
             'keyedByUbiname' => $data->pluck('name', 'ubiname')
         ]);
     }
@@ -158,10 +158,10 @@ class PlayerController implements ControllerInterface
             }
 
             $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
-                'NickName' => $name,
+                'NickName'         => $name,
                 'spectator_status' => $playerInfo->spectatorStatus,
-                'player_id' => $playerInfo->playerId,
-                'team' => $playerInfo->teamId
+                'player_id'        => $playerInfo->playerId,
+                'team'             => $playerInfo->teamId
             ]);
 
             return $player;
@@ -204,7 +204,7 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        RestClient::postAsync(sprintf('https://service.evotm.com/api/nicknames/%s/get', $player->Login), [
+        RestClient::getAsync(sprintf(EVO_API_URL . '/nicknames/%s', $player->Login), [
             'connect_timeout' => 1.5
         ])->then(function (Response $response) use ($player) {
             if ($response->getStatusCode() == 200) {
@@ -445,10 +445,10 @@ class PlayerController implements ControllerInterface
 
             if (!$hasBetterTime) {
                 DB::table('pbs')->updateOrInsert([
-                    'map_id' => $map->id,
+                    'map_id'    => $map->id,
                     'player_id' => $player->id
                 ], [
-                    'score' => $score,
+                    'score'       => $score,
                     'checkpoints' => $checkpoints
                 ]);
 
