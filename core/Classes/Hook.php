@@ -85,11 +85,11 @@ class Hook
         } catch (Exception $e) {
             $message = $e->getMessage();
             if ($message != "Login unknown.") {
-                Log::write("Exception: " . $message . "\n" . $e->getTraceAsString(), isVerbose());
+                Log::errorWithCause('Failed to execute hook', $e);
                 Log::write(json_encode($this->function), isDebug());
             }
         } catch (TypeError $e) {
-            Log::write("TypeError: " . $e->getMessage() . "\n" . $e->getTraceAsString(), isVerbose());
+            Log::errorWithCause('Failed to execute hook', $e);
         }
 
         if ($this->runOnce) {
@@ -131,7 +131,8 @@ class Hook
         try {
             HookController::add($event, $callback, $runOnce, $priority);
         } catch (Exception $e) {
-            Log::error(sprintf('Failed to add hook %s: %s', $event, serialize($callback)));
+            $message = sprintf('Failed to add hook %s: %s', $event, serialize($callback));
+            Log::errorWithCause($message, $e);
         }
     }
 
@@ -163,7 +164,7 @@ class Hook
             try {
                 $hook->execute(...$arguments);
             } catch (Exception $e) {
-                Log::write($e->getMessage() . "\n" . $e->getTraceAsString());
+                Log::errorWithCause("Hook execution failed", $e);
             }
         }
     }

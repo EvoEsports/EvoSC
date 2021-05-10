@@ -36,6 +36,7 @@ class Cache
 
             return (new Carbon($cacheObject->expires))->isFuture();
         } catch (Exception $e) {
+            Log::errorWithCause("Failed to check if object $id exists in cache", $e);
             return false;
         }
     }
@@ -66,6 +67,7 @@ class Cache
         try {
             return (new Carbon($cacheObject->expires));
         } catch (Exception $e) {
+            Log::errorWithCause("Failed to retrieve object $id from cache", $e);
         }
 
         return null;
@@ -88,9 +90,7 @@ class Cache
 
             File::put(cacheDir($id), $cacheObject, true);
         } catch (Exception $e) {
-            Log::error("Failed to save $id.", true);
-            Log::write($e->getMessage());
-            Log::write($e->getTraceAsString());
+            Log::errorWithCause("Failed to save object $id in cache", $e);
         }
     }
 

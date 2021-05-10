@@ -159,8 +159,8 @@ class ManiaLinkEvent
             warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
             Log::warning($e->getMessage());
         } catch (Exception $e) {
-            Log::error("An error occured calling " . $callback[0] . '::' . $callback[1] . ": " . $e->getMessage());
-            Log::write($e->getTraceAsString(), isVerbose());
+            $message = "An error occured calling " . $callback[0] . '::' . $callback[1];
+            Log::errorWithCause($message, $e);
         }
     }
 

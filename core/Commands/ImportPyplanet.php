@@ -156,6 +156,7 @@ class ImportPyplanet extends Command
                         'Rating' => ($rating->score == 1 ? 100 : 0)
                     ]);
                 } catch (Exception $e) {
+                    Log::errorWithCause("Failed to insert in mx-karma table", $e);
                 }
             }
 

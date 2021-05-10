@@ -335,6 +335,7 @@ class MapList extends Module implements ModuleInterface
         try {
             $map = Map::whereUid($mapUid)->firstOrFail();
         } catch (Exception $e) {
+            Log::errorWithCause('Failed to enable map', $e);
             dangerMessage('Failed to enable map ', secondary($mapUid))->send($player);
             return;
         }

@@ -498,7 +498,7 @@ class Votes extends Module implements ModuleInterface
         try {
             $action(true);
         } catch (Error $e) {
-            Log::write($e->getMessage());
+            Log::errorWithCause('Failed to approve vote', $e);
         }
 
         self::$vote = null;
@@ -519,7 +519,7 @@ class Votes extends Module implements ModuleInterface
         try {
             $action(false);
         } catch (Error $e) {
-            Log::write($e->getMessage());
+            Log::errorWithCause('Failed to decline vote', $e);
         }
 
         self::$vote = null;
@@ -538,7 +538,7 @@ class Votes extends Module implements ModuleInterface
             try {
                 $action(false);
             } catch (Error $e) {
-                Log::write($e->getMessage());
+                Log::errorWithCause('Failed to end match', $e);
             }
 
             $voteStateJson = '{"yes":-1,"no":-1}';

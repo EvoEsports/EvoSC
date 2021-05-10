@@ -91,7 +91,7 @@ class AddAdmin extends Command
                 "You have been added to group {$groupName}, please rejoin to this server.", $login);
 
         } catch (Exception $e) {
-            // silent exception
+            Log::errorWithCause("Failed to send message to chat", $e);
         }
     }
 }

@@ -95,7 +95,7 @@ class MxPacks extends Module implements ModuleInterface
 
             return $trackList;
         } catch (Exception $e) {
-            Log::error('Failed to get map list for map-pack', $e->getMessage());
+            Log::errorWithCause('Failed to get map list for map-pack', $e);
         }
 
         return null;

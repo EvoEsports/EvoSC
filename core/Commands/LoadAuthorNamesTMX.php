@@ -58,7 +58,7 @@ class LoadAuthorNamesTMX extends Command
                             ]);
                     }
                 } catch (Exception $e) {
-                    echo $e->getMessage() . "\n";
+                    Log::errorWithCause("Failed to load author names", $e);
                 }
             }
         }
