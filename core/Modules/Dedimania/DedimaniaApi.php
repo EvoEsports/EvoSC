@@ -659,7 +659,7 @@ class DedimaniaApi extends Module
                 $success(new SimpleXMLElement($response->getBody()));
             }
         }, function (RequestException $e) use ($fail) {
-            Log::warning('Request failed: ' . $e->getMessage());
+            Log::warningWithCause('Request failed', $e);
             if (!is_null($fail)) {
                 $fail();
             }
