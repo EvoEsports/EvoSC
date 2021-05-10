@@ -206,7 +206,7 @@ class ChatMessage
                 Log::info($this->getMessage(), isVerbose());
             }
         } catch (\Exception $e) {
-            Log::warning('Failed to deliver message: ' . $e->getMessage());
+            Log::warningWithCause('Failed to deliver message', $e);
         }
     }
 }

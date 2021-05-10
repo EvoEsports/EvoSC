@@ -146,8 +146,7 @@ class TemplateController implements ControllerInterface
 
             return self::$latte->renderToString($index, $values);
         } catch (Exception $e) {
-            Log::warning('Failed to render template: ' . $index . ' (' . $e->getMessage() . ')');
-            Log::write($e->getTraceAsString(), isVeryVerbose());
+            Log::warningWithCause("Failed to render template $index", $e);
         }
 
         return '';

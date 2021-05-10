@@ -128,10 +128,27 @@ class Log
      * @param      $message
      * @param bool $echo
      */
-    public static function warning($message, bool $echo = true)
+    public static function warning($message, bool $echo = true, $limit = 2)
     {
-        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        self::write('<fg=red>' . $message . '</>', $echo, $caller);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+        self::write('<warning>' . $message . '</>', $echo, $caller);
+    }
+
+    /**
+     * Log a warning message and cause stacktrace.
+     *
+     * @param      $message
+     * @param      $throwable
+     * @param bool $echo
+     */
+    public static function warningWithCause($message, \Throwable $throwable, bool $echo = true)
+    {
+        self::warning($message . ': ' . $throwable->getMessage(), $echo, 3);
+
+        if (isVeryVerbose())
+        {
+            self::write($throwable->getTraceAsString(), $echo);
+        }
     }
 
     /**

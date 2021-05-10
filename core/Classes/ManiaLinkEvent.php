@@ -156,8 +156,8 @@ class ManiaLinkEvent
         try {
             call_user_func_array($callback, $arguments);
         } catch (UnauthorizedException $e) {
+            Log::warningWithCause("Player $ply is not allowed to execute action $action", $e);
             warningMessage('Sorry, you\'re not allowed to do that.')->send($ply);
-            Log::warning($e->getMessage());
         } catch (Exception $e) {
             Log::error("An error occured calling " . $callback[0] . '::' . $callback[1] . ": " . $e->getMessage());
             Log::write($e->getTraceAsString(), isVerbose());
@@ -183,7 +183,7 @@ class ManiaLinkEvent
 
             if ($event->access != null && !$player->hasAccess($event->access)) {
                 warningMessage('Sorry, you\'re not allowed to do that.')->send($player);
-                Log::write('Player ' . $player . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::',
+                Log::warning('Player ' . $player . ' tried to access forbidden ManiaLinkEvent: ' . $event->id . ' -> ' . implode('::',
                         $event->callback));
 
                 return null;

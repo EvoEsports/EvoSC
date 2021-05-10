@@ -42,7 +42,7 @@ class ChatController implements ControllerInterface
                 Server::chatEnableManualRouting();
                 Log::info('Chat router started.');
             } catch (FaultException $e) {
-                Log::warning($e->getMessage(), isVerbose());
+                Log::warningWithCause('Failed to enable manual chat routing', $e, isVerbose());
             }
         } else {
             Server::chatEnableManualRouting(false);
