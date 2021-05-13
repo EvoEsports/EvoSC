@@ -334,7 +334,7 @@ class Server
         return Server::triggerModeScriptEventArray('Trackmania.GetScores');
     }
 
-    public static function getModeScriptVariable(string $name)
+    public static function getModeScriptSetting(string $name)
     {
         $data = Server::getModeScriptSettings();
 
