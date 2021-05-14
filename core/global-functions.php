@@ -209,6 +209,15 @@ function baseDir(string $filename = ''): string
 }
 
 /**
+ * @param string $filename
+ * @return string
+ */
+function getOsSafePath(string $filename): string
+{
+    return str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
+}
+
+/**
  * @return Collection
  * @todo implement $withSpectators
  */

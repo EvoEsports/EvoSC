@@ -1,4 +1,5 @@
 {
   "enabled": true,
-  "log-chat": true
+  "log-chat": true,
+  "log-chat-per-map": false
 }
