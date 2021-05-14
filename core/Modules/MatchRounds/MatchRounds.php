@@ -21,11 +21,11 @@ class MatchRounds extends Module implements ModuleInterface
         if (ModeController::isTimeAttackType()) {
             return;
         }
-        if (Server::getModeScriptVariable('S_RoundsPerMap') <= 0) {
+        if (Server::getModeScriptSetting('S_RoundsPerMap') <= 0) {
             return;
         }
 
-        self::$roundsPerMap = (int)Server::getModeScriptVariable('S_RoundsPerMap');
+        self::$roundsPerMap = (int)Server::getModeScriptSetting('S_RoundsPerMap');
 
         Hook::add('PlayerConnect', [self::class, 'showWidget']);
 

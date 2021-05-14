@@ -186,6 +186,7 @@ class ChatController implements ControllerInterface
         $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
         Server::ChatSendServerMessage($chatText);
+        Hook::fire('ChatLine', $chatText);
     }
 
     /**

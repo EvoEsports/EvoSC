@@ -44,7 +44,7 @@ class ScoreTable extends Module implements ModuleInterface
             Hook::add('PlayerFinish', [self::class, 'decideWinner']);
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'resetFirstFinished']);
             Hook::add('BeginMap', [self::class, 'resetWinners']);
-            self::$nbOfWinners = (int)Server::getModeScriptVariable('S_NbOfWinners');
+            self::$nbOfWinners = (int)Server::getModeScriptSetting('S_NbOfWinners');
         }
 
         if (isTrackmania()) {
@@ -120,7 +120,7 @@ class ScoreTable extends Module implements ModuleInterface
     {
         $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-        $roundsPerMap = Server::getModeScriptVariable('S_RoundsPerMap');
+        $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
 
         $joinedPlayerInfo = collect([$player])->map(function (Player $player) {
             return [
