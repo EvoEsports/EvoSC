@@ -17,13 +17,13 @@ use Illuminate\Support\Collection;
 class MatchStats extends Module implements ModuleInterface
 {
     private static string $matchDir;
+    private static string $mapFileName;
     private static Collection $roundStats;
 
     /**
      * @param string $mode
      * @param bool $isBoot
      * @return mixed|void
-     * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -32,8 +32,11 @@ class MatchStats extends Module implements ModuleInterface
         Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
         Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        Hook::add('ChatLine', [self::class, 'newChatLine']);
 
-        self::createMatchDir();
+        $matchDate = date('Y-m-d_H-i', time());
+        $matchSettings = basename(MatchSettingsController::getCurrentMatchSettingsFile());
+        self::$matchDir = cacheDir("match-stats/$matchSettings/$matchDate");
     }
 
     /**
@@ -50,11 +53,13 @@ class MatchStats extends Module implements ModuleInterface
         ]);
     }
 
-    private static function createMatchDir()
+    /**
+     * @param string $line
+     */
+    public static function newChatLine(string $line)
     {
-        $matchDate = date('Y-m-d_H-i', time());
-        $matchSettings = basename(MatchSettingsController::getCurrentMatchSettingsFile());
-        self::$matchDir = cacheDir("match-stats/$matchSettings/$matchDate");
+        $targetFile = self::$matchDir . '/' . self::$mapFileName . "/chatlog.txt";
+        File::appendLine($targetFile, date('[Y-m-d H:i:s] ', time()) . stripAll($line));
     }
 
     /**
@@ -63,6 +68,7 @@ class MatchStats extends Module implements ModuleInterface
     public static function roundStart(...$data)
     {
         self::$roundStats = collect();
+        self::$mapFileName = str_replace(DIRECTORY_SEPARATOR, '_', MapController::getCurrentMap()->filename);
     }
 
     /**
@@ -77,8 +83,7 @@ class MatchStats extends Module implements ModuleInterface
         $teamInfo = [Server::getTeamInfo(0), Server::getTeamInfo(1)];
         $roundNumber = json_decode($data[0][0])->count;
 
-        $mapFilename = str_replace(DIRECTORY_SEPARATOR, '_', MapController::getCurrentMap()->filename);
-        $targetFile = self::$matchDir . "/$mapFilename/rounds/$roundNumber.csv";
+        $targetFile = self::$matchDir . '/' . self::$mapFileName . "/rounds/$roundNumber.csv";
         File::put($targetFile, 'position;name_plain;team;score;login;name;checkpoints');
 
         $dnfs = self::$roundStats->where('score', '=', 'DNF');
