@@ -13,6 +13,7 @@ use EvoSC\Controllers\MatchSettingsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
+use League\Csv\Writer;
 
 class MatchStats extends Module implements ModuleInterface
 {
@@ -32,7 +33,10 @@ class MatchStats extends Module implements ModuleInterface
         Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
         Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-        Hook::add('ChatLine', [self::class, 'newChatLine']);
+
+        if (config('match-stats.log-chat', true)) {
+            Hook::add('ChatLine', [self::class, 'newChatLine']);
+        }
 
         $matchDate = date('Y-m-d_H-i', time());
         $matchSettings = basename(MatchSettingsController::getCurrentMatchSettingsFile());
@@ -54,57 +58,71 @@ class MatchStats extends Module implements ModuleInterface
     }
 
     /**
-     * @param string $line
+     * @param $data
      */
-    public static function newChatLine(string $line)
-    {
-        $targetFile = self::$matchDir . '/' . self::$mapFileName . "/chatlog.txt";
-        File::appendLine($targetFile, date('[Y-m-d H:i:s] ', time()) . stripAll($line));
-    }
-
-    /**
-     * @param ...$data
-     */
-    public static function roundStart(...$data)
+    public static function roundStart($data)
     {
         self::$roundStats = collect();
         self::$mapFileName = str_replace(DIRECTORY_SEPARATOR, '_', MapController::getCurrentMap()->filename);
     }
 
     /**
-     * @param ...$data
+     * @param $data
+     * @throws \League\Csv\CannotInsertRecord
+     * @throws \League\Csv\InvalidArgument
      */
-    public static function roundEnd(...$data)
+    public static function roundEnd($data)
     {
         if (self::$roundStats->isEmpty()) {
             return;
         }
 
         $teamInfo = [Server::getTeamInfo(0), Server::getTeamInfo(1)];
-        $roundNumber = json_decode($data[0][0])->count;
-
+        $roundNumber = json_decode($data[0])->count;
         $targetFile = self::$matchDir . '/' . self::$mapFileName . "/rounds/$roundNumber.csv";
-        File::put($targetFile, 'position;name_plain;team;score;login;name;checkpoints');
 
-        $dnfs = self::$roundStats->where('score', '=', 'DNF');
-        $scores = self::$roundStats->where('score', '!=', 'DNF')->merge($dnfs)->values();
+        $writer = Writer::createFromPath($targetFile, 'w+');
+        $writer->setDelimiter(';');
+        $writer->setEnclosure('"');
+        $writer->insertOne([
+            'position',
+            'name_plain',
+            'score',
+            'team',
+            'login',
+            'name',
+            'checkpoints'
+        ]);
 
-        foreach ($scores as $i => $score) {
+        $scores = self::$roundStats->where('score', '!=', 'DNF')
+            ->merge(self::$roundStats->where('score', '=', 'DNF'))
+            ->values()
+            ->map(function ($score, $pos) use ($teamInfo) {
             /**
              * @var Player $player
              */
             $player = $score->player;
 
-            $line = sprintf('%d;%s;%s;%s;%s;%s;%s;',
-                $i + 1,
+            return [
+                $pos + 1,
                 stripAll($player->NickName),
-                $teamInfo[$player->team]->name ?: ['Blue', 'Red'][$player->team],
                 $score->score,
+                $teamInfo[$player->team]->name ?: ['Blue', 'Red'][$player->team],
                 $player->Login,
                 $player->NickName,
-                $score->checkpoints);
+                $score->checkpoints
+            ];
+        })->toArray();
 
-            File::appendLine($targetFile, "$line");
-        }
+        $writer->insertAll($scores);
+    }
+
+    /**
+     * @param string $line
+     */
+    public static function newChatLine(string $line)
+    {
+        $targetFile = self::$matchDir . '/' . self::$mapFileName . "/chatlog.txt";
+        File::appendLine($targetFile, date('[Y-m-d H:i:s] ', time()) . stripAll($line));
     }
 }

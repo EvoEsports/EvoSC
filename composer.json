@@ -36,7 +36,8 @@
     "larapack/dd": "^1.1",
     "illuminate/container": "^8.27",
     "illuminate/database": "^8.27",
-    "mexitek/phpcolors": "^1.0"
+    "mexitek/phpcolors": "^1.0",
+    "league/csv": "^9.7"
   },
   "scripts": {
     "pre-install-cmd": [
