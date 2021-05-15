@@ -1,7 +1,7 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 {php $id = uniqid()}
-<manialink version="3" id="update-sb-players-{$id}" name="ESC:update-sb-players-{$id}">
+<manialink version="3" id="update-sb-players-{$id}" name="EvoSC:update-sb-players-{$id}">
     <script><!--
     #Struct EvoSC_User {
         Text login;

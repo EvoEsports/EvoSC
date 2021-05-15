@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:Statistics" id="Statistics" version="3">
+<manialink name="EvoSC:Statistics" id="Statistics" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="main" z-index="9999" scale="0.98" pos="-1.5 0.25">
         {foreach $statCollection as $statisticWidget}

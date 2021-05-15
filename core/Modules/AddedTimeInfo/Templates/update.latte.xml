@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:update-add-time" id="update-add-time" version="3">
+<manialink name="EvoSC:update-add-time" id="update-add-time" version="3">
     <script><!--
         main() {
             declare Real AddedTimeR for This;

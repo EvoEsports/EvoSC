@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:gear-info" id="gear-info" version="3">
+<manialink name="EvoSC:gear-info" id="gear-info" version="3">
     <frame id="main" pos="0 0" z-index="100">
         <label id="up" halign="center" valign="center" textsize="5.5" textcolor="fff" text="" opacity="0" />
         <label id="down" halign="center" valign="center" textsize="5.5" textcolor="f33" text="" opacity="0" />

@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:cp-diffs" id="cp-diffs" version="3">
+<manialink name="EvoSC:cp-diffs" id="cp-diffs" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="box" valign="center" halign="center">
         <quad class="bg-dark" pos="-7.5" halign="center" valign="center" size="5 4" opacity="0.5" z-index="-1" />

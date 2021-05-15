@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MxKarma:update-my-rating" id="update-my-rating" version="3">
+<manialink name="EvoSC:MxKarma:update-my-rating" id="update-my-rating" version="3">
     <script><!--
 main(){
     declare Integer EvoSC_MxKarma_MyRating for This;

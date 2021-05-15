@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:best-cps" id="best-cps" version="3">
+<manialink name="EvoSC:best-cps" id="best-cps" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="record">
         <quad class="bg-dark" opacity="0.5" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>

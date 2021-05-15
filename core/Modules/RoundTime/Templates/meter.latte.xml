@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:roundtime" id="roundtime" version="3">
+<manialink name="EvoSC:roundtime" id="roundtime" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="roundtime" z-index="10000">
         <label id="speed" class="text-lighter" text="..." halign="right" valign="center" textsize="5.5" textprefix="$s"/>

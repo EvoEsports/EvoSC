@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:push-new-local" id="push-new-local" version="3">
+<manialink name="EvoSC:push-new-local" id="push-new-local" version="3">
     <script>
         <!--
         #Struct Record {

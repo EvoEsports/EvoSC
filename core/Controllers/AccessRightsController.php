@@ -50,7 +50,7 @@ class AccessRightsController implements ControllerInterface
             }
 
             $manialink = '
-<manialink name="ESC:access-rights" id="access-rights" version="3">
+<manialink name="EvoSC:access-rights" id="access-rights" version="3">
     <script><!--
         main() {
             declare Text[] ESC_Access_rights for This;

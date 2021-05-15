@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+<manialink name="EvoSC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <stylesheet>
         <style class="floating" textsize="2.5" size="5 5" focusareacolor2="0000" focusareacolor1="0000" textprefix="$s" halign="center" valign="center" textfont="{config('colors.ui.font')}" textcolor="{config('theme.hud.text-light')}"/>

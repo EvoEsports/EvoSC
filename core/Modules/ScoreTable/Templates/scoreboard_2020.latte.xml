@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+<manialink name="EvoSC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="button">
         <quad class="btn" size="260 142" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_button_260x142.png" colorize="{config('theme.hud.bg-light')}" opacity="0.05" ScriptEvents="1" />

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:update-current-map" id="update-current-map" version="3">
+<manialink name="EvoSC:update-current-map" id="update-current-map" version="3">
     <script>
         <!--
         #Struct EvoSC_Map_Info {
