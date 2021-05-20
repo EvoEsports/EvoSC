@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Name;
  * @property string $chat_prefix;
  * @property string $color;
+ * @property bool $unrestricted;
+ * @property int $security_level;
  */
 class Group extends Model
 {
@@ -27,8 +29,7 @@ class Group extends Model
 
     public function hasAccess(string $accessRightName)
     {
-        if ($this->id == 1) {
-            //Master admin always has access
+        if ($this->unrestricted) {
             return true;
         }
 

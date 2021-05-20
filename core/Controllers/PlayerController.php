@@ -362,19 +362,7 @@ class PlayerController implements ControllerInterface
             return;
         }
 
-        if ($playerToBeKicked->Group < $player->Group) {
-            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
-            infoMessage($player, ' tried to kick you but was blocked.')->send($playerToBeKicked);
-            return;
-        }
-
-        $reason = implode(' ', $reason);
-
-        AwaitAction::add($player, "Kick \$<$playerToBeKicked->NickName\$>?", function () use ($playerToBeKicked, $reason, $player) {
-            Server::kick($playerToBeKicked->Login, $reason);
-            warningMessage($player, ' kicked ', $playerToBeKicked->NickName, '. Reason: ',
-                secondary($reason))->setIcon('')->sendAll();
-        });
+        self::kickPlayerEvent($player, $playerToBeKicked->Login, implode(' ', $reason));
     }
 
     /**
@@ -386,14 +374,17 @@ class PlayerController implements ControllerInterface
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
+        /**
+         * @var Player $toBeKicked
+         */
         try {
             $toBeKicked = Player::find($login);
         } catch (\Exception $e) {
             $toBeKicked = $login;
         }
 
-        if ($toBeKicked->Group < $player->Group) {
-            warningMessage('You can not kick players with a higher group-rank than yours.')->send($player);
+        if ($toBeKicked->group->security_level > $player->group->security_level) {
+            warningMessage('You can not kick players with a higher security-level than yours.')->send($player);
             infoMessage($player, ' tried to kick you but was blocked.')->send($toBeKicked);
             return;
         }

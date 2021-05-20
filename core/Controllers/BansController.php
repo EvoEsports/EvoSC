@@ -47,8 +47,8 @@ class BansController implements ControllerInterface
      */
     public static function ban(Player $toBan, Player $admin, string $reason = '')
     {
-        if ($toBan->Group < $admin->Group) {
-            warningMessage('You can not kick players with a higher group-rank than yours.')->send($admin);
+        if ($toBan->group->security_level > $admin->group->security_level) {
+            warningMessage('You can not ban players with a higher security-level than yours.')->send($admin);
             infoMessage($admin, ' tried to kick you but was blocked.')->send($toBan);
             return;
         }
