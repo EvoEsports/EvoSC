@@ -47,6 +47,9 @@ class EscRun extends Command implements SignalableCommandInterface
     private static bool $docker = false;
     private bool $keepRunning = true;
 
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('run')
@@ -58,6 +61,10 @@ class EscRun extends Command implements SignalableCommandInterface
             ->setDescription('Run Evo Server Controller');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         global $serverName;
@@ -133,6 +140,10 @@ class EscRun extends Command implements SignalableCommandInterface
         }
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         global $pidPath;
@@ -140,6 +151,11 @@ class EscRun extends Command implements SignalableCommandInterface
         file_put_contents($pidPath, getmypid());
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         global $__bootedVersion;
@@ -241,7 +257,7 @@ class EscRun extends Command implements SignalableCommandInterface
                     Log::write('MPS',
                         sprintf('Connection terminated after %d connection-failures.', $failedConnectionRequests));
 
-                    return;
+                    return 1;
                 }
                 sleep(1);
             } catch (Error $e) {
@@ -254,6 +270,8 @@ class EscRun extends Command implements SignalableCommandInterface
                 Log::errorWithCause("EvoSC encountered an error", $e, false);
             }
         }
+
+        return 0;
     }
 
     /**
