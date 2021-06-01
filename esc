@@ -3,6 +3,7 @@
 require 'vendor/autoload.php';
 require 'core/global-functions.php';
 
+use EvoSC\Commands\EscRunSignal;
 use EvoSC\Commands\LoadAuthorNamesTMX;
 use EvoSC\Commands\GetVersion;
 use EvoSC\Commands\EscRun;
@@ -50,7 +51,7 @@ $application->add(new MakeMigration());
 $application->add(new ImportUaseco());
 $application->add(new ImportPyplanet());
 $application->add(new GetVersion());
-$application->add(new EscRun());
+$application->add(extension_loaded('pcntl') ? new EscRunSignal(): new EscRun());
 $application->add(new FakeLocals());
 $application->add(new AddAdmin());
 $application->add(new SetupAccessRights());
