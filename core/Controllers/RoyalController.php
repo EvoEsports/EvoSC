@@ -33,45 +33,43 @@ class RoyalController implements ControllerInterface
 
     /**
      * @param Player $player
-     * @param stdClass $data
+     * @param stdClass $wayPointData
      */
-    public static function playerFinish(Player $player, stdClass $data)
+    public static function playerWayPoint(Player $player, stdClass $wayPointData)
     {
-        $blockId = $data->blockid;
+        $blockId = $wayPointData->blockid;
         $tracker = self::$trackers->get($player->id);
 
-        if (is_null($tracker)) {
-            $tracker = collect();
-            $tracker->push((object)[
-                'blockId' => $blockId,
-                'time'    => $data->racetime
-            ]);
-            self::$trackers->put($player->id, $tracker);
-            Hook::fire('PlayerFinishSection', $player, $data->racetime, $data->curlapcheckpoints, 1);
-            return;
+        if (in_array($blockId, $tracker->blockIds)) {
+            throw new RuntimeException("Player finished same section twice in a row.");
         }
 
-        /**
-         * @var Collection $tracker
-         */
-        if ($tracker->contains('blockId', '=', $blockId)) {
-            throw new RuntimeException("Player finished section twice in a row.");
-        }
+        array_push($tracker->blockIds, $blockId);
+        $sectionsFinished = count($tracker->blockIds);
 
-        $tracker->push((object)[
-            'blockId' => $blockId,
-            'time'    => $data->racetime
-        ]);
+        Hook::fire('PlayerFinishSection', $player, $wayPointData->racetime, $wayPointData->curlapcheckpoints, $sectionsFinished);
 
-        Hook::fire('PlayerFinishSection', $player, $data->racetime, $data->curlapcheckpoints, $tracker->count());
-
-        if ($tracker->count() == 5) {
-            $totalTime = $tracker->sum('time');
-            Hook::fire('PlayerFinish', $player, $totalTime, implode(',', $data->curlapcheckpoints));
+        if ($sectionsFinished == 5) {
+            $score = $wayPointData->time - $tracker->startServerTime;
+            Hook::fire('PlayerFinish', $player, $score, implode(',', $wayPointData->curlapcheckpoints));
 
             self::$trackers->forget($player->id);
         } else {
             self::$trackers->put($player->id, $tracker);
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @param stdClass $data
+     */
+    public static function playerStartLine(Player $player, stdClass $data)
+    {
+        if (!self::$trackers->has($player->id)) {
+            self::$trackers->put($player->id, (object)[
+                'startServerTime' => $data->time,
+                'blockIds'        => []
+            ]);
         }
     }
 }
