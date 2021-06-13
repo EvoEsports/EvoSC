@@ -8,6 +8,7 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
@@ -35,6 +36,10 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        if (ModeController::isRoyal()) {
+            return;
+        }
+
         if (Cache::has('cp_records_current')) {
             self::$tracker = collect(Cache::get('cp_records_current'));
             Cache::forget('cp_records_current');

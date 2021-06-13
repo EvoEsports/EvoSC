@@ -20,7 +20,7 @@
             <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
         </frame> <!-- Badge -->
         <label class="text-light" pos="7 -5.5" size="10 10" textsize="1.1" scale="2" z-index="5" halign="center" valign="center"/> <!-- Pos/Rank -->
-        <label class="text-light" pos="87 -2.5" size="15 3" scale="1.3" z-index="5" halign="right"/> <!-- Score -->
+        <label class="text-light" pos="87 -2.5" size="20 3" scale="1.3" z-index="5" halign="right"/> <!-- Score -->
         <quad pos="14.75 -6" valign="center" size="9.75 8" z-index="5" /> <!-- Avatar -->
         <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" hidden="1" z-index="5" /> <!-- Flag -->
         <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" hidden="1" z-index="5"/> <!-- Region -->
@@ -350,12 +350,25 @@
                 finalistLabel.Value = "";
             }
         }else{
-            if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
-                scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
-                scoreLabel.Opacity = 1.0;
+            if(CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
+                declare netread Int2 Net_TMxSM_ScoresTable_RaceProgression for Score;
+                if (Net_TMxSM_ScoresTable_RaceProgression.Y > 0) {
+                    declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
+                    finalistLabel.Value = "" ^ formatScoreCorrect(Net_TMxSM_ScoresTable_RaceProgression.Y, True);
+                    scoreLabel.Value = Net_TMxSM_ScoresTable_RaceProgression.X ^ " ";
+                    scoreLabel.Opacity = 1.0;
+                } else {
+                    scoreLabel.Value = "0 ";
+                    scoreLabel.Opacity = 0.1;
+                }
             }else{
-                scoreLabel.Value = "--:--.---";
-                scoreLabel.Opacity = 0.1;
+                if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
+                    scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
+                    scoreLabel.Opacity = 1.0;
+                }else{
+                    scoreLabel.Value = "--:--.---";
+                    scoreLabel.Opacity = 0.1;
+                }
             }
         }
 
@@ -722,6 +735,7 @@
     Void showControls(CMlFrame _box){
         declare CMlFrame box = _box;
         setupButtons(box);
+        declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
         AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='27 -1.5' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //Name label
         AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='50 -2.5' scale='0.8' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //group icon
         AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='7 -2.4' scale='0.85' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //Position label
@@ -731,6 +745,7 @@
         AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -2.5' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -2.5' scale='0.8' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
         AnimMgr.Add(box.Controls[5], "<label opacity='0.0' />", 190, CAnimManager::EAnimManagerEasing::ExpOut);
+        finalistLabel.Hide();
         box.Controls[2].Hide();
         box.Controls[9].Hide();
         box.Controls[11].Hide();
@@ -818,6 +833,7 @@
         AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='25 -7' scale='1' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
         box.Controls[14].Show();
         box.Controls[16].Hide();
+        finalistLabel.Show();
     }
 
     main() {
