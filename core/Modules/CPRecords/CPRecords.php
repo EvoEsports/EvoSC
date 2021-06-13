@@ -194,6 +194,10 @@ class CPRecords extends Module implements ModuleInterface
     {
         self::$tracker = collect();
         self::sendUpdatedCpRecords();
-        Template::showAll('CPRecords.widget');
+        if (ModeController::isRoyal()) {
+            Template::showAll('CPRecords.widget_royal');
+        }else{
+            Template::showAll('CPRecords.widget');
+        }
     }
 }
