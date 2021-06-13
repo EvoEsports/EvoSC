@@ -25,36 +25,23 @@ class AccessRightsController implements ControllerInterface
      */
     public static function start(string $mode, bool $isBoot)
     {
-        //TODO: Remove after July 2020
-        DB::table('access_right_group')->whereNull('access_right_name')->get()->each(function ($accessRightGroup) {
-            DB::table('access_right_group')
-                ->where('group_id', '=', $accessRightGroup->group_id)
-                ->where('access_right_id', '=', $accessRightGroup->access_right_id)
-                ->update([
-                    'access_right_name' => DB::table('access-rights')
-                        ->where('id', '=', $accessRightGroup->access_right_id)
-                        ->first()
-                        ->name
-                ]);
-        });
-
         $groupAccess = collect();
 
         onlinePlayers()->each(function (Player $player) use ($groupAccess) {
-            if (!$groupAccess->has($player->Group)) {
-                if ($player->Group == 1) {
-                    $groupAccess->put(1, AccessRight::all()->pluck('name'));
+            if (!$groupAccess->has($player->group->id)) {
+                if ($player->group->unrestricted) {
+                    $groupAccess->put($player->group->id, AccessRight::all()->pluck('name'));
                 } else {
-                    $groupAccess->put($player->Group, $player->group->accessRights()->pluck('name'));
+                    $groupAccess->put($player->group->id, $player->group->accessRights()->pluck('name'));
                 }
             }
 
             $manialink = '
-<manialink name="ESC:access-rights" id="access-rights" version="3">
+<manialink name="EvoSC:access-rights" id="access-rights" version="3">
     <script><!--
         main() {
             declare Text[] ESC_Access_rights for This;
-            ESC_Access_rights.fromjson("""' . $groupAccess->get($player->Group)->toJson() . '""");
+            ESC_Access_rights.fromjson("""' . $groupAccess->get($player->group->id)->toJson() . '""");
         }
         --></script>
 </manialink>

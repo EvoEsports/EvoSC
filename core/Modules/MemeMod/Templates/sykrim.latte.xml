@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:sykrim" id="sykrim" version="3">
+<manialink name="EvoSC:sykrim" id="sykrim" version="3">
     <frame>
         <quad id="quad" pos="-160 90" size="320 180" bgcolor="000" opacity="0.5" />
     </frame>

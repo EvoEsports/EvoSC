@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:asay" id="asay" version="3">
+<manialink name="EvoSC:asay" id="asay" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <label class="text-light" id="text" opacity="1.0" textprefix="$s" halign="center" valign="center" size="80 120" textsize="2.5" autonewline="1" text="{$text|noescape}" pos="{config('asay.pos')|noescape}" />
 

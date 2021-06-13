@@ -11,6 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportUaseco extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('import:uaseco')
@@ -37,6 +40,11 @@ class ImportUaseco extends Command
         return $bar;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $migrate = $this->getApplication()->find('migrate');
@@ -47,7 +55,7 @@ class ImportUaseco extends Command
         if (!file_exists('config/database.config.json')) {
             $output->writeln('config/database.config.json not found');
 
-            return;
+            return 1;
         }
 
         $targetConfig = json_decode(file_get_contents('config/database.config.json'));
@@ -268,5 +276,8 @@ class ImportUaseco extends Command
         }
         $bar->finish();
         $output->writeln("\n");
+
+
+        return 0;
     }
 }

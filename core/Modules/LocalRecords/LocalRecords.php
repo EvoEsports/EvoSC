@@ -7,7 +7,6 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MapController;
@@ -49,7 +48,7 @@ class LocalRecords extends Module implements ModuleInterface
         AccessRight::add('local_delete', 'Delete local-records.');
 
         Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('PlayerPb', [self::class, 'playerFinish']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmupStart']);
         Hook::add('Trackmania.WarmUp.EndRound', [self::class, 'warmupEnd']);
 

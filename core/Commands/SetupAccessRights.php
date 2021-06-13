@@ -14,6 +14,9 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class SetupAccessRights extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('setup:access-rights')
@@ -34,6 +37,7 @@ class SetupAccessRights extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -43,10 +47,12 @@ class SetupAccessRights extends Command
 
         if ($this->getHelper('question')->ask($input, $output, $question)) {
             $this->loadDefaultConfiguration($input, $output);
-            return;
+            return 0;
         }
 
         $this->menuLoop($input, $output);
+
+        return 0;
     }
 
     /**

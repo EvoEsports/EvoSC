@@ -30,7 +30,9 @@
             {if $localPlayer->hasAccess('local_delete') && $window_title=='Local Records'}
             <label class="btn-muted" z-index="1" pos="30 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" action="local.delete,{$record->Rank}"/>
             {/if}
+            {if !$isRoyal}
             <label class="btn-muted" z-index="1" pos="33.5 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" action="records.graph,{$map->id},{$window_title ?? 'Records'},{$record->Rank}"/>
+            {/if}
             <label class="btn-muted profile" z-index="1" pos="37 -0.15" size="3.5 2.75" textsize="0.1" textprefix="" text="" ScriptEvents="1" data-login="{$record->Login}"/>
             {if $onlineLogins->contains($record->Login)}
             {if $record->Player == $localPlayer->id}

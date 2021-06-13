@@ -16,12 +16,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FakeLocals extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('fake:locals')
             ->setDescription('Adds fake local records for testing.');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         ConfigController::init();
@@ -29,6 +36,11 @@ class FakeLocals extends Command
         Database::init();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $maps = Map::all();
@@ -56,5 +68,7 @@ class FakeLocals extends Command
         }
 
         $bar->finish();
+
+        return 0;
     }
 }

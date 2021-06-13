@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:team-info" id="team-info" version="3">
+<manialink name="EvoSC:team-info" id="team-info" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="widget" pos="0 90" scale="0.95">

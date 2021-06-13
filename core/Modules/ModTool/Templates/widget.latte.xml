@@ -1,0 +1,205 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:ModTool" id="ModTool" version="3">
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
+
+    <frame id="main" size="50 30">
+        <label id="mini-toggle" class="btn-muted mini-toggle" pos="3 -3" size="6 6" text="" textsize="2" valign="center" halign="center" z-index="1" ScriptEvents="1" />
+
+        <frame>
+            <quad class="bg-dark" size="100 100" z-index="-1" />
+            <quad id="menu-separator" class="bg-accent" pos="6 0" size="0.5 100" />
+
+            <frame id="menu-buttons" pos="0 0">
+                <label class="btn-muted players" pos="3 -9" size="6 6" text="" textsize="0.75" valign="center" halign="center" z-index="1" ScriptEvents="1" focusareacolor1="0000" />
+                <label class="btn-muted players" pos="3 -15" size="6 6" text="" textsize="0.75" valign="center" halign="center" z-index="1" ScriptEvents="1" focusareacolor1="0000"/>
+                <label class="btn-muted players" pos="3 -21" size="6 6" text="" textsize="0.75" valign="center" halign="center" z-index="1" ScriptEvents="1" focusareacolor1="0000" />
+                <quad class="bg-accent" pos="3 -9" size="6 6" valign="center" halign="center" />
+            </frame>
+
+            <frame id="content" pos="6.5 0">
+                <frame pos="1.5 -2">
+                    <entry id="player-search" class="form player-search" opacity="0.2" size="40.5 4" ScriptEvents="1" />
+                    <frame id="player-select" z-index="5">
+                        {for $i=1; $i<=6; $i++}
+                        <label class="btn-muted player" pos="20.25 {$i * -4 - 2}" size="40.5 4" ScriptEvents="1" hidden="1" />
+                        {/for}
+                    </frame>
+
+                    <frame id="player-window">
+                        <label id="selected-player" class="text-light" pos="20.25 -7" textsize="1.6" halign="center" text="Select player" z-index="1" />
+                        <frame id="player-actions" hidden="1">
+                            <label class="btn-muted" pos="20.25 -15" size="40.5 4" halign="center" text="Kick" z-index="1" ScriptEvents="1" />
+                            <label class="btn-muted" pos="20.25 -20" size="40.5 4" halign="center" text="Ban" z-index="1" ScriptEvents="1" />
+                        </frame>
+                    </frame>
+                </frame>
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    declare Text selectedLogin;
+
+    //From: https://github.com/PRGfx/mQscripts/blob/master/lib/TextExt.Script.txt#L257
+    Real TextExt_Levenshtein(Text word1, Text word2)
+    {
+        declare n = TextLib::Length(word1);
+        declare m = TextLib::Length(word2);
+        declare Real[Integer][Integer] matrix;
+        for (i, 0, n) {
+            matrix[i] = Real[Integer];
+            matrix[i][0] = MathLib::ToReal(i);
+            for (j, 1, m) {
+                if (i == 0)
+                    matrix[i][j] = MathLib::ToReal(j);
+                else
+                    matrix[i][j] = 0.;
+            }
+        }
+        declare Real min;
+        declare Integer isEqual;
+        declare Int3 cost = <1, 1, 1>; /* del, ins, rep */
+        for (i, 1, n) {
+            for (j, 1, m) {
+                if (TextExt_Lowercase(TextLib::SubString(word1, j-1, 1)) == TextExt_Lowercase(TextLib::SubString(word2, i-1, 1)))
+                    isEqual = 0;
+                else
+                    isEqual = 1;
+                min = matrix[i-1][j] + cost[0];
+                if (matrix[i][j-1] + cost[1] < min)
+                    min = matrix[i][j-1] + cost[1];
+                if (matrix[i-1][j-1] + cost[2] < min)
+                    min = matrix[i-1][j-1] + cost[2];
+                if (matrix[i-1][j-1] + isEqual < min)
+                    min = matrix[i-1][j-1] + isEqual;
+                matrix[i][j] = min;
+            }
+        }
+        return matrix[n][m];
+    }
+
+    Boolean mouseOverMini(Vec2 pos){
+        declare halfHeight = 3.0;
+        declare halfWidth = 3.0;
+        if(MouseY > pos[1] - halfHeight && MouseY < pos[1] + halfHeight){
+            if(MouseX > pos[0] - halfWidth && MouseX < pos[0] + halfWidth){
+                return True;
+            }
+        }
+
+        return False;
+    }
+
+    Void shrink(){
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
+        AnimMgr.Add(mainFrame, " <frame size='5.9 5.9' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+    }
+
+    Void expand(){
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
+        AnimMgr.Add(mainFrame, " <frame size='50 30' /> ", 150, CAnimManager::EAnimManagerEasing::QuadOut);
+    }
+
+    Void hidePlayerSelect(Integer startHide){
+        declare playerSelectFrame <=> (Page.MainFrame.GetFirstChild("player-select") as CMlFrame);
+        for(i, startHide, 5){
+            playerSelectFrame.Controls[i].Hide();
+        }
+    }
+
+    Void search(Text query_){
+        declare query = TL::Trim(query_);
+        declare playerSelectFrame <=> (Page.MainFrame.GetFirstChild("player-select") as CMlFrame);
+        declare {if $is_maniaplanet}CTmMlPlayer{else}CSmPlayer{/if}[] found;
+
+        if(TL::Length(query) > 0){
+            foreach(player in Players){
+                if(found.count == 6) break;
+
+                declare searchIn = player.Name;
+                if(TL::Find(query, searchIn, False, False)){
+                    declare selectLabel = (playerSelectFrame.Controls[found.count] as CMlLabel);
+                    selectLabel.Value = player.Name;
+                    selectLabel.Show();
+                    selectLabel.DataAttributeSet("name", player.Name);
+                    selectLabel.DataAttributeSet("login", player.Login);
+                    found.add(player);
+                }
+            }
+        }
+
+        hidePlayerSelect(found.count);
+    }
+
+    main(){
+        declare persistent Vec2 EvoSC_ModTool_Position;
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
+        declare miniButton <=> (Page.MainFrame.GetFirstChild("mini-toggle") as CMlLabel);
+        declare selectedPlayerLabel <=> (Page.MainFrame.GetFirstChild("selected-player") as CMlLabel);
+        declare playerWindow <=> (Page.MainFrame.GetFirstChild("player-window") as CMlFrame);
+        declare playerSelectFrame <=> (Page.MainFrame.GetFirstChild("player-select") as CMlFrame);
+        declare playerSearchEntry <=> (Page.MainFrame.GetFirstChild("player-search") as CMlEntry);
+        declare expanded = True;
+        declare typeAheadFocused = False;
+
+        mainFrame.RelativePosition_V3 = EvoSC_ModTool_Position;
+
+        while(True){
+            yield;
+
+            if(miniButton.Visible){
+                if(mouseOverMini(miniButton.AbsolutePosition_V3) && MouseLeftButton){
+                    declare oldPos = mainFrame.RelativePosition_V3;
+                    declare startMouse = <MouseX, MouseY>;
+
+                    while(MouseLeftButton){
+                        declare diff = startMouse - <MouseX, MouseY>;
+                        mainFrame.RelativePosition_V3 = oldPos - diff;
+
+                        yield;
+                    }
+
+                    EvoSC_ModTool_Position = mainFrame.RelativePosition_V3;
+
+                    if(ML::Distance(oldPos, mainFrame.RelativePosition_V3) < 0.01){
+                        //click
+                        log("click");
+                        if(expanded){
+                            shrink();
+                            expanded = False;
+                        }else{
+                            expand();
+                            expanded = True;
+                        }
+                    }
+                }
+            }
+
+            if(expanded){
+                playerSelectFrame.Visible = playerSearchEntry.IsFocused;
+                playerWindow.Visible = !playerSearchEntry.IsFocused;
+
+                foreach(Event in PendingEvents){
+                    if(Event.Control == Null) continue;
+                    if(Event.Control.HasClass("player-search") && Event.Type == CMlScriptEvent::Type::EntrySubmit){
+                        search((Event.Control as CMlEntry).Value);
+                        (Event.Control as CMlEntry).Value = "";
+                        Event.Control.Focus();
+                    }
+                    if(Event.Control.HasClass("player") && Event.Type == CMlScriptEvent::Type::MouseClick){
+                        selectedLogin = Event.Control.DataAttributeGet("login");
+                        selectedPlayerLabel.Value = Event.Control.DataAttributeGet("name");
+                        hidePlayerSelect(0);
+                        Page.MainFrame.GetFirstChild("player-actions").Show();
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+    --></script>
+</manialink>

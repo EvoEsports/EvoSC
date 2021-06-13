@@ -23,10 +23,11 @@ class AccessRights extends Module implements ModuleInterface
 
     /**
      * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function sendAccessRights(Player $player)
     {
-        if ($player->Group == 1) {
+        if ($player->group->unrestricted) {
             $accessRights = AccessRight::all()->pluck('name')->values();
         } else {
             $accessRights = $player->group->accessRights()->pluck('name')->values();

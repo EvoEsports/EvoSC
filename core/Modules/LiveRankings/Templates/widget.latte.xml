@@ -90,6 +90,11 @@
             if(prefix != ""){
                 prefix = prefix ^ "  ";
             }
+        }else if(CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
+            (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.section, 3) ^ " ";
+            (box.Controls[2] as CMlLabel).Value = entry.section ^ " ";
+            (box.Controls[4] as CMlLabel).Hide();
+            (box.Controls[5] as CMlLabel).Hide();
         }else{
             if(entry.gained > 0){
                 (box.Controls[4] as CMlLabel).Value = "+" ^ entry.gained;
@@ -169,6 +174,7 @@
         Integer score;
         Integer team;
         Integer laps;
+        Integer section;
         Text checkpoints;
         Boolean online;
         Boolean spectator;

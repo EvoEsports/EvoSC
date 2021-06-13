@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+<manialink name="EvoSC:GroupsManager" id="GroupsManager" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="overview" pos="-60 {ceil($playerCount / 2) * 3 + 3}">
         <quad class="bg-dark" size="120 {ceil($playerCount / 2) * 3 + 5.5}" pos="0 -6" opacity="0.8" z-index="-1" />

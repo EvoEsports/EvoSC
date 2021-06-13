@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:player-markers" id="player-markers" version="3">
+<manialink name="EvoSC:player-markers" id="player-markers" version="3">
     <script><!--
     #Include "TextLib" as TL
 

@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink version="3" id="access-rights" name="ESC:access-rights">
+<manialink version="3" id="access-rights" name="EvoSC:access-rights">
     <script><!--
     main(){
         declare Text[] EvoSC_Access_Rights for This;

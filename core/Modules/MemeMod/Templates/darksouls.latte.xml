@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:dark-souls" id="dark-souls" version="3">
+<manialink name="EvoSC:dark-souls" id="dark-souls" version="3">
     <frame>
         <quad id="quad" pos="-160 90" size="320 180" bgcolor="000" opacity="0.75" />
         <label id="label" text="YOU DIED" textsize="10" opacity="0" textcolor="f00" valign="center" halign="center" textfont="{config('theme.font')}" z-index="1" />

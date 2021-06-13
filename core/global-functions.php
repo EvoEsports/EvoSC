@@ -494,9 +494,9 @@ function require_config(...$configs)
 function serverPlayer(): Player
 {
     $player = new Player();
-    $player->id = -1;
+    $player->id = 0;
     $player->Group = 1;
-    $player->Login = Server::getServerName();
+    $player->Login = Server::getSystemInfo()->serverLogin;
     $player->NickName = Server::getServerName();
     $player->ubisoft_name = Server::getServerName();
 

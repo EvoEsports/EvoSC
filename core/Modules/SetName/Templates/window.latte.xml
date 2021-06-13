@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
 
-{php $window_width = '100';}
+{php $window_width = '50';}
 {php $window_height = '20';}
 
 {block id}set-name{/block}
@@ -55,7 +55,7 @@ if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseCl
     continue;
 }
 if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
-    TriggerPageAction("save_nickname," ^ entry.Value);
+    TriggerPageAction("save_nickname," ^ TL::CloseStyleTags(entry.Value));
     window.Hide();
     return;
 }

@@ -8,6 +8,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
@@ -33,9 +34,10 @@ class RecordsTable extends Module implements ModuleInterface
         $pages = floor($records->count() / 100);
         $records = $records->chunk(100);
         $onlineLogins = onlinePlayers()->pluck('Login');
+        $isRoyal = ModeController::isRoyal();
 
         Template::show($player, 'RecordsTable.table',
-            compact('records', 'pages', 'onlineLogins', 'window_title', 'map'));
+            compact('records', 'pages', 'onlineLogins', 'window_title', 'map', 'isRoyal'));
     }
 
     public static function showGraph(Player $player, $mapId, $window_title, $targetRecordRank)

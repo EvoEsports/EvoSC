@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MxKarma:update-map-karma" id="update-map-karma" version="3">
+<manialink name="EvoSC:MxKarma:update-map-karma" id="update-map-karma" version="3">
     <script><!--
 main(){
     declare Real EvoSC_MxKarma_VotesAverage for This;
