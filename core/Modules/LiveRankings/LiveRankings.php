@@ -37,6 +37,8 @@ class LiveRankings extends Module implements ModuleInterface
             if (ModeController::isRoyal()) {
                 Hook::add('Scores', [self::class, 'updateWidget']);
                 Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
+                Hook::add('BeginMatch', [self::class, 'resetLapsTracker']);
+                Hook::add('EndMap', [self::class, 'resetLapsTracker']);
             } else {
                 Hook::add('Scores', [self::class, 'updateWidget']);
                 Hook::add('PlayerFinish', function ($player, $score) {
@@ -74,7 +76,8 @@ class LiveRankings extends Module implements ModuleInterface
     public static function resetLapsTracker()
     {
         self::$lapTracker = [];
-        self::updateWidget(collect(self::$lapTracker));
+        self::$sectionTracker = [];
+        self::updateWidget(collect());
     }
 
     public static function playerFinishSection(Player $player, int $score, array $checkpoints, int $section)
