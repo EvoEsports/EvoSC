@@ -137,7 +137,7 @@ class Template
             try {
                 Server::sendDisplayManialinkPage($login, $xml, 0, false, true);
             } catch (Exception $e) {
-                Log::warning('Failed to render template for ' . $login);
+                Log::warningWithCause("Failed to render template for $login", $e);
             }
         });
 
@@ -149,7 +149,7 @@ class Template
                 try {
                     Server::sendDisplayManialinkPage($login, $xml, 0, false);
                 } catch (Exception $e) {
-                    Log::warning($e->getMessage());
+                    Log::warningWithCause("Failed to render template for $login", $e);
                 }
             });
         }
