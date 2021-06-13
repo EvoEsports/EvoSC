@@ -131,7 +131,13 @@ class ModeController implements ControllerInterface
         }
 
         if (self::$isRoundsType) {
-            self::$warmUpNb = Server::getModeScriptSettings()['S_WarmUpNb'];
+            $wus = Server::getModeScriptSettings()['S_WarmUpNb'];
+
+            if (is_null($wus)) {
+                $wus = 0;
+            }
+
+            self::$warmUpNb = $wus;
         }
     }
 
