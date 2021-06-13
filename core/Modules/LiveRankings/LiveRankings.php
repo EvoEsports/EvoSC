@@ -131,7 +131,7 @@ class LiveRankings extends Module implements ModuleInterface
             if (ModeController::isRoyal()) {
                 $playerScores = $playerScores->filter(function ($playerScore) {
                     return $playerScore->section > 0;
-                })->sortBy('section');
+                })->sortByDesc('section');
             } else {
                 $playerScores = $playerScores->filter(function ($playerScore) {
                     return $playerScore->bestracetime > 0;
