@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\LiveRankings;
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
@@ -17,6 +18,7 @@ class LiveRankings extends Module implements ModuleInterface
 {
     private static $shownLogins = [];
     private static $lapTracker = [];
+    private static $sectionTracker = [];
     private static $numberOfLaps = -1;
 
     /**
@@ -32,12 +34,17 @@ class LiveRankings extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
 
         if (ModeController::isTimeAttackType()) {
-            Hook::add('Scores', [self::class, 'updateWidget']);
-            Hook::add('PlayerFinish', function ($player, $score) {
-                if ($score > 0) {
-                    Server::callGetScores();
-                }
-            });
+            if (ModeController::isRoyal()) {
+                Hook::add('Scores', [self::class, 'updateWidget']);
+                Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
+            } else {
+                Hook::add('Scores', [self::class, 'updateWidget']);
+                Hook::add('PlayerFinish', function ($player, $score) {
+                    if ($score > 0) {
+                        Server::callGetScores();
+                    }
+                });
+            }
         } else if (ModeController::laps()) {
             Hook::add('PlayerFinish', [self::class, 'playerLap']);
             Hook::add('PlayerLap', [self::class, 'playerLap']);
@@ -45,8 +52,12 @@ class LiveRankings extends Module implements ModuleInterface
             Hook::add('EndMap', [self::class, 'resetLapsTracker']);
 
             self::$numberOfLaps = Server::getCurrentMapInfo()->nbLaps;
-        }else{
+        } else {
             Hook::add('Scores', [self::class, 'updateWidget']);
+        }
+
+        if (ModeController::isRoyal()) {
+            self::$sectionTracker = Cache::get('live_ranking_sections');
         }
 
         if (!$isBoot) {
@@ -54,10 +65,40 @@ class LiveRankings extends Module implements ModuleInterface
         }
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function stop()
+    {
+        if (ModeController::isRoyal()) {
+            Cache::put('live_ranking_sections', self::$sectionTracker, now()->addMinute());
+        }
+    }
+
     public static function resetLapsTracker()
     {
         self::$lapTracker = [];
         self::updateWidget(collect(self::$lapTracker));
+    }
+
+    public static function playerFinishSection(Player $player, int $score, array $checkpoints, int $section)
+    {
+        $id = $player->id;
+        if (!array_key_exists($id, self::$sectionTracker)) {
+            self::$sectionTracker[$id] = (object)[
+                'laps'         => 0,
+                'login'        => $player->Login,
+                'matchpoints'  => 0,
+                'roundpoints'  => 0,
+                'bestracetime' => 0,
+                'team'         => 0,
+                'section'      => 0,
+            ];
+        }
+
+        self::$sectionTracker[$id]->section++;
+        self::$sectionTracker[$id]->bestracetime += $score;
+        self::updateWidget(collect(self::$sectionTracker));
     }
 
     public static function playerLap(Player $player, $score, $checkpointsString)
@@ -71,6 +112,7 @@ class LiveRankings extends Module implements ModuleInterface
                 'roundpoints'  => 0,
                 'bestracetime' => 0,
                 'team'         => 0,
+                'section'      => 0,
             ];
         }
 
@@ -105,7 +147,7 @@ class LiveRankings extends Module implements ModuleInterface
             }
         }
 
-        $playerScores = $playerScores->take(config('live-rankings.show', 14));
+        $playerScores = $playerScores->take(config('live - rankings . show', 14));
         self::$shownLogins = $playerScores->pluck('login')->toArray();
 
         $playerInfo = DB::table('players')
@@ -125,6 +167,7 @@ class LiveRankings extends Module implements ModuleInterface
                 'score'       => $playerScore->bestracetime,
                 'team'        => $playerScore->team,
                 'laps'        => $playerScore->laps,
+                'section'     => $playerScore->section,
                 'checkpoints' => '',
                 'online'      => $info->player_id > 0,
                 'spectator'   => $info->spectator_status > 0,

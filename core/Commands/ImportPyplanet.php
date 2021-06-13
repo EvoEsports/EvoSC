@@ -21,6 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportPyplanet extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('import:pyplanet')
@@ -32,6 +35,11 @@ class ImportPyplanet extends Command
             ->addArgument('table_prefix', InputArgument::OPTIONAL, 'Prefix');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $migrate = $this->getApplication()->find('migrate');
@@ -42,7 +50,7 @@ class ImportPyplanet extends Command
         if (!file_exists('config/database.config.json')) {
             $output->writeln('config/database.config.json not found');
 
-            return;
+            return 1;
         }
 
         ConfigController::init();
@@ -156,6 +164,7 @@ class ImportPyplanet extends Command
                         'Rating' => ($rating->score == 1 ? 100 : 0)
                     ]);
                 } catch (Exception $e) {
+                    Log::errorWithCause("Failed to insert in mx-karma table", $e);
                 }
             }
 
@@ -212,5 +221,7 @@ class ImportPyplanet extends Command
         echo "\n";
 
         $output->writeln('<info>Import finished.</>');
+
+        return 0;
     }
 }

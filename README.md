@@ -13,7 +13,8 @@
 * Rounds
 * Teams
 * Cup
-* ~~Chase~~
+* Royal TimeAttack (TM2020 only)
+* ~~Chase~~ (not planned)
 
 
 ### Requirements

@@ -6,6 +6,7 @@
     <style class="text-success" textfont="{config('theme.font')}" textcolor="{config('theme.form.success.bg')}" textsize="1"/>
     <style class="text-warning" textfont="{config('theme.font')}" textcolor="{config('theme.form.warning.bg')}" textsize="1"/>
     <style class="text-danger" textfont="{config('theme.font')}" textcolor="{config('theme.form.danger.bg')}" textsize="1"/>
+    <style class="text-meta" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-light')}" textsize="0.75"/>
     <style class="text-light" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-light')}" textsize="1"/>
     <style class="text-lighter" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-lighter')}" textsize="1"/>
     <style class="text-dark" textfont="{config('theme.font')}" textcolor="{config('theme.hud.text-dark')}" textsize="1"/>

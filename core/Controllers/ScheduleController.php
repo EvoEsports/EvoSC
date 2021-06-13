@@ -38,8 +38,8 @@ class ScheduleController extends Controller implements ControllerInterface
                     $task->delete();
                 }
             } catch (Exception $e) {
-                Log::error('Failed to execute scheduled task: ' . $e->getMessage());
-                Log::error($e->getTraceAsString(), isVerbose());
+                Log::errorWithCause('Failed to execute scheduled task', $e);
+
                 $task->update(['failed' => 1, 'stack_trace' => $e->getMessage() . "\n" . $e->getTraceAsString()]);
             }
         }

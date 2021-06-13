@@ -208,7 +208,7 @@ WHERE 1=1;');
         try {
             $player->stats()->increment('Wins');
         } catch (Exception $e) {
-            Log::write('Failed to increment win count of ' . $player);
+            Log::errorWithCause('Failed to increment win count of ' . $player, $e);
         }
 
         infoMessage($player, ' wins this round. Total wins: ', ($player->stats->Wins + 1))

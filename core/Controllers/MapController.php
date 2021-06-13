@@ -244,7 +244,7 @@ class MapController implements ControllerInterface
                 try {
                     Server::addMap($request->map->filename);
                 } catch (Exception $e) {
-                    Log::write('Adding map to selection failed: ' . $e->getMessage());
+                    Log::errorWithCause('Adding map to selection failed', $e);
                 }
             }
 
@@ -293,7 +293,8 @@ class MapController implements ControllerInterface
             try {
                 Server::removeMap($map->filename);
             } catch (Exception $e) {
-                Log::error($e);
+                $message = 'Failed to delete map ' . $map->filename;
+                Log::errorWithCause($message, $e);
             }
         }
 
@@ -309,7 +310,7 @@ class MapController implements ControllerInterface
                 $map->delete();
                 Log::write($player . '(' . $player->Login . ') deleted map ' . $map . ' [' . $map->uid . ']');
             } catch (Exception $e) {
-                Log::write('Failed to remove map "' . $map->uid . '" from database: ' . $e->getMessage(), isVerbose());
+                Log::errorWithCause('Failed to remove map "' . $map->uid . '" from database: ', $e);
             }
 
             MatchSettingsController::removeByFilenameFromCurrentMatchSettings($map->filename);
@@ -332,7 +333,7 @@ class MapController implements ControllerInterface
             try {
                 Server::removeMap($map->filename);
             } catch (Exception $e) {
-                Log::error($e);
+                Log::errorWithCause('Failed to disable map', $e);
             }
         }
 
@@ -356,7 +357,7 @@ class MapController implements ControllerInterface
             try {
                 Server::addMap($map->filename);
             } catch (Exception $e) {
-                Log::error($e);
+                Log::errorWithCause('Failed to enable map', $e);
             }
         }
     }

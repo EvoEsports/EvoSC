@@ -19,6 +19,9 @@ use Symfony\Component\Console\Question\Question;
 
 class AddAdmin extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('add:admin')
@@ -27,6 +30,10 @@ class AddAdmin extends Command
             ->addArgument('groupId', InputArgument::OPTIONAL, 'Group id to add, 1 = Masteradmin');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         Log::setOutput($output);
@@ -34,6 +41,11 @@ class AddAdmin extends Command
         Database::init();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $login = $input->getArgument('login');
@@ -44,8 +56,8 @@ class AddAdmin extends Command
 
         if ($player === null) {
             $player = Player::create([
-                'Login' => $login,
-                'NickName' => $login,
+                'Login'        => $login,
+                'NickName'     => $login,
                 'ubisoft_name' => $login,
             ]);
         }
@@ -70,7 +82,7 @@ class AddAdmin extends Command
             $groupId = intval($groupId);
         } else {
             $output->writeln("Group id must be numeric and integer.");
-            exit(1);
+            return 1;
         }
 
         $groupName = Group::findOrFail($groupId)->Name;
@@ -91,7 +103,9 @@ class AddAdmin extends Command
                 "You have been added to group {$groupName}, please rejoin to this server.", $login);
 
         } catch (Exception $e) {
-            // silent exception
+            Log::errorWithCause("Failed to send message to chat", $e);
         }
+
+        return 0;
     }
 }

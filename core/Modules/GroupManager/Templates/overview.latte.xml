@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:GroupsManager" id="GroupsManager" version="3">
+<manialink name="EvoSC:GroupsManager" id="GroupsManager" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="overview" pos="-65 {$groups->count() * 3 + 5}" scale="1.1">

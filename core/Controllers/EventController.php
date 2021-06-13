@@ -138,7 +138,7 @@ class EventController implements ControllerInterface
             $login = $data[1];
             $text = $data[2];
 
-            if ($login === $serverLogin) {
+            if ($login === self::$serverLogin) {
                 return;
             }
 
@@ -166,13 +166,13 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('PlayerChat', player($login), $text);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::errorWithCause("Failed to fire PlayerChat hook", $e);
             }
 
             try {
                 ChatController::playerChat(player($login), $text);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::errorWithCause("Failed to send player text to chat", $e);
             }
         } else {
             throw new Exception('Malformed callback');
@@ -259,7 +259,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('BeginMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::errorWithCause("Failed to fire BeginMap hook", $e);
             }
         } else {
             throw new Exception('Malformed callback');
@@ -279,7 +279,7 @@ class EventController implements ControllerInterface
             try {
                 Hook::fire('EndMap', $map);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::errorWithCause("Failed to fire EndMap hook", $e);
             }
         } else {
             throw new Exception('Malformed callback');
@@ -297,7 +297,7 @@ class EventController implements ControllerInterface
             try {
                 ManiaLinkEvent::call(player($arguments[1]), $arguments[2], $arguments[3]);
             } catch (Exception $e) {
-                Log::write("Error: " . $e->getMessage());
+                Log::errorWithCause("Failed to call mania link", $e);
             }
         } else {
             throw new Exception('Malformed callback');

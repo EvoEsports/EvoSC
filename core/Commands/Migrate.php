@@ -13,12 +13,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Migrate extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('migrate')->setDescription('Run all database migrations. Run after pulling updates');
-
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         global $_isVerbose;
@@ -64,7 +71,7 @@ class Migrate extends Command
                 });
             }
         }catch(\Exception $e){
-            Log::error('Check that your database config is correct and that it is running.');
+            Log::errorWithCause('Failed to create migrations table', $e);
             exit(1);
         }
 
@@ -90,7 +97,7 @@ class Migrate extends Command
             $schemaBuilder,
             $migrationsTable,
             $output,
-            $anyMigrationRan
+            &$anyMigrationRan
         ) {
             if ($executedMigrations->where('file', $migration->file)->isNotEmpty()) {
                 //Skip already executed migrations
@@ -119,6 +126,8 @@ class Migrate extends Command
         if (!file_exists(cacheDir('.setupfinished'))) {
             File::put(cacheDir('.setupfinished'), 1);
         }
+
+        return 0;
     }
 
     private function getMigrations(): Collection

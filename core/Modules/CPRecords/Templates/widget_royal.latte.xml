@@ -1,0 +1,206 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:best-cps" id="best-cps" version="3">
+    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
+    <framemodel id="record">
+        <quad class="bg-dark" opacity="0.65" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
+        <label class="text-light" pos="3" size="5" valign="center" halign="center" textsize="0.8" z-index="5" />
+        <label class="text-light" pos="17.5" valign="center" halign="right" textsize="0.75" opacity="0.35" z-index="4" />
+        <label class="text-light" pos="17.5" valign="center" halign="right" textsize="0.75" z-index="5" />
+        <label class="text-light" pos="30.5" size="21" valign="center" halign="center" textsize="0.8" z-index="5" />
+        <quad class="bg-dark" opacity="0.95" pos="0 -0.25" size="19 4" valign="center" z-index="-2"/>
+        <quad class="bg-dark" opacity="0.65" pos="0 -0.25" size="6 4" valign="center" z-index="-1"/>
+        <quad class="bg-accent" pos="6 -0.25" size="0.3 4" valign="center" z-index="1" hidden="1"/>
+        <quad class="bg-accent" pos="0 -0.25" size="42 4" valign="center" opacity="0" z-index="2"/>
+    </framemodel>
+
+    <frame id="mf" pos="{config('cp-records.pos')}" {if !$is_maniaplanet}size="1000 1000"{/if} scale="{config('cp-records.scale')}">
+        <frame id="widget">
+            <frame id="records">
+                {for $i=1; $i<=6; $i++}
+                <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct EvoSC_Royal_Section_Tracker {
+        Integer section;
+        Integer time;
+        Text name;
+    }
+
+    declare Real padding;
+    declare Integer columns;
+    declare CMlFrame records;
+    declare Vec3[] sectionColors;
+
+    Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
+        declare Text secondString;
+        declare Text msString;
+        declare Integer score;
+
+        score = scoreIn;
+
+        if(score < 0){
+            score = -score;
+        }
+
+        declare Integer seconds = score / 1000;
+        declare Integer minutes = seconds / 60;
+        declare Integer ms = score - (seconds * 1000);
+
+        seconds = seconds - (minutes * 60);
+
+        secondString = "" ^ seconds;
+
+        if(seconds < 10 && minutes > 0){
+            secondString = "0" ^ seconds;
+        }
+
+        if(ms == 0){
+            msString = "000";
+        }else if(ms > 0 && ms < 10){
+            msString = "00" ^ ms;
+        }else if(ms >= 10 && ms < 100){
+            msString = "0" ^ ms;
+        }else{
+            msString = "" ^ ms;
+        }
+
+        if(cutZeroes && minutes == 0){
+            return secondString ^ "." ^ msString;
+        }
+
+        return minutes ^ ":" ^ secondString ^ "." ^ msString;
+    }
+
+    Vec2 getRecordPosition(Integer index){
+        declare position = Vec2;
+        position[0] = (index % columns) * (42.0 + padding);
+        position[1] = ML::FloorInteger(index / columns * 1.0) * - (4.0 + padding);
+        return position;
+    }
+
+    Void updateWidget(EvoSC_Royal_Section_Tracker record, Boolean flash){
+        if(!records.Controls.existskey(record.section)) return;
+
+        declare frame = (records.Controls[record.section] as CMlFrame);
+        declare indexLabel = (frame.Controls[1] as CMlLabel);
+        declare timeLabel = (frame.Controls[2] as CMlLabel);
+        declare timeLabel2 = (frame.Controls[3] as CMlLabel);
+        declare nameLabel = (frame.Controls[4] as CMlLabel);
+        declare sectionQuad = (frame.Controls[5] as CMlQuad);
+        declare sectionQuadSmall = (frame.Controls[6] as CMlQuad);
+
+        sectionQuad.BgColor = sectionColors[record.section - 1];
+        sectionQuadSmall.BgColor = sectionColors[record.section - 1];
+
+        indexLabel.SetText(TL::ToText(record.section));
+        indexLabel.TextSizeReal = 0.8;
+
+        timeLabel.SetText(formatScoreCorrect(record.time, False));
+        timeLabel2.SetText(formatScoreCorrect(record.time, True));
+        nameLabel.SetText(record.name);
+
+        if(flash){
+            declare flashQuad = (frame.Controls[8] as CMlQuad);
+            flashQuad.Opacity = 1.0;
+            AnimMgr.Add(flashQuad, """ <quad opacity="0" /> """, 1200, CAnimManager::EAnimManagerEasing::QuartOut);
+        }
+
+        frame.RelativePosition_V3 = getRecordPosition(record.section);
+        frame.Show();
+    }
+
+    Void updateWidgets(EvoSC_Royal_Section_Tracker[] records, Integer newSection){
+        foreach(record in records){
+            updateWidget(record, record.section == newSection);
+        }
+    }
+
+    Void reset(){
+        foreach(control in records.Controls){
+            control.Hide();
+        }
+    }
+
+    {if $is_maniaplanet}CTmMlPlayer{else}CSmPlayer{/if} GetOwner() {
+        if (GUIPlayer != Null) return GUIPlayer;
+        return InputPlayer;
+    }
+
+    main() {
+        declare EvoSC_Royal_Section_Tracker[] EvoSC_RoyalSectionTracker for This;
+        declare Integer EvoSC_RoyalSectionUpdated for This = -1;
+        declare Integer EvoSC_RoyalSectionTracker_Update for This = 0;
+        declare lastUpdate = 0;
+        declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
+        declare mf <=> (Page.MainFrame.GetFirstChild("mf") as CMlFrame);
+        declare currentMapId = "";
+        declare player <=> GetOwner();
+        declare oldRow = -1;
+        declare driving = False;
+        declare waitForTime = GameTime;
+
+        sectionColors.add(<1.0, 1.0, 1.0>);
+        sectionColors.add(<57.0 / 255, 174.0 / 255, 88.0 / 255>);
+        sectionColors.add(<50.0 / 225, 130.0 / 255, 206.0 / 255>);
+        sectionColors.add(<235.0 / 255, 64.0 / 255, 52.0 / 255>);
+        sectionColors.add(<44.0 / 255, 41.0 / 255, 40.0 / 255>);
+
+        columns = 6;
+        padding = 0.5;
+        records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
+        currentMapId = Map.MapInfo.MapUid;
+        mf.RelativePosition_V3[0] -= 16.0;
+
+        while(True){
+            yield;
+
+            if(lastUpdate != EvoSC_RoyalSectionTracker_Update){
+                lastUpdate = EvoSC_RoyalSectionTracker_Update;
+                updateWidgets(EvoSC_RoyalSectionTracker, EvoSC_RoyalSectionUpdated);
+            }
+
+            if(Map.MapInfo.MapUid != currentMapId){
+                currentMapId = Map.MapInfo.MapUid;
+                reset();
+            }
+
+            if(player != Null){
+                if(InputPlayer.Speed > 2 && !driving){
+                    driving = True;
+                    AnimMgr.Add(mf, """<frame size="1000 8.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
+                    waitForTime = GameTime + 1500; //wait 1.5s before showing again
+                }
+                if(InputPlayer.Speed <= 2 && driving && waitForTime < GameTime){
+                    driving = False;
+                    AnimMgr.Add(mf, """<frame size="1000 70.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
+                }
+
+                {if !$is_maniaplanet}
+                declare row = player.RaceWaypointTimes.count / columns;
+                if(row > 0) row -= 1;
+
+                if(oldRow != row){
+                    oldRow = row;
+                    declare newY = row * (4.0 + padding) - 1.5;
+                    AnimMgr.Add(widget, """<frame pos="0 """ ^ newY ^ """" />""", 170, CAnimManager::EAnimManagerEasing::QuartOut);
+                    sleep(10);
+                }
+                {/if}
+            }
+
+            if(UI.UISequence == CUIConfig::EUISequence::Podium){
+                reset();
+                sleep(2000);
+            }
+        }
+    }
+--></script>
+</manialink>

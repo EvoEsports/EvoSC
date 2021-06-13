@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:update-maps" id="update-maps" version="3">
+<manialink name="EvoSC:update-maps" id="update-maps" version="3">
     <script>
         <!--
         main(){

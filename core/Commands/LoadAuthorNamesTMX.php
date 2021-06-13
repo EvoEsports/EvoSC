@@ -19,12 +19,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LoadAuthorNamesTMX extends Command
 {
+    /**
+     * Command settings
+     */
     protected function configure()
     {
         $this->setName('tmx:load-authors')
             ->setDescription('Loads and sets missing author names for maps.');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         Log::setOutput($output);
@@ -32,6 +39,11 @@ class LoadAuthorNamesTMX extends Command
         Database::init();
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         global $__ManiaPlanet;
@@ -58,9 +70,11 @@ class LoadAuthorNamesTMX extends Command
                             ]);
                     }
                 } catch (Exception $e) {
-                    echo $e->getMessage() . "\n";
+                    Log::errorWithCause("Failed to load author names", $e);
                 }
             }
         }
+
+        return 0;
     }
 }

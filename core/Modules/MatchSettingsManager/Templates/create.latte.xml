@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3">
+<manialink name="EvoSC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="window" pos="-25 10">
         <quad class="bg-accent" size="50 5" z-index="-1"/>

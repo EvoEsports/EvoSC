@@ -23,6 +23,7 @@ class ModeController implements ControllerInterface
     private static bool $laps;
     private static bool $teams;
     private static bool $cup;
+    private static bool $royal;
     private static string $mode;
 
     private static int $warmUpNb = 0;
@@ -43,7 +44,6 @@ class ModeController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         self::setMode($mode);
-        self::$warmUpNb = Server::getModeScriptSettings()['S_WarmUpNb'];
 
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
         Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpRoundStarted']);
@@ -86,6 +86,7 @@ class ModeController implements ControllerInterface
         self::$teams = false;
         self::$laps = false;
         self::$cup = false;
+        self::$royal = false;
         self::$isTimeAttackType = false;
         self::$isRoundsType = false;
 
@@ -122,6 +123,15 @@ class ModeController implements ControllerInterface
                 self::$isRoundsType = true;
                 self::$cup = true;
                 break;
+
+            case 'Trackmania/TM_RoyalTimeAttack_Online.Script.txt':
+                self::$isTimeAttackType = true;
+                self::$royal = true;
+                break;
+        }
+
+        if (self::$isRoundsType) {
+            self::$warmUpNb = Server::getModeScriptSettings()['S_WarmUpNb'];
         }
     }
 
@@ -206,5 +216,13 @@ class ModeController implements ControllerInterface
     public static function getWarmUpRoundCount(): int
     {
         return self::$warmUpNb;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isRoyal(): bool
+    {
+        return self::$royal;
     }
 }

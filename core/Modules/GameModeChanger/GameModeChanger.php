@@ -78,6 +78,7 @@ class GameModeChanger extends Module implements ModuleInterface
             Server::restartMap();
             ModeController::rebootModules();
         } catch (\Exception $e) {
+            Log::errorWithCause('Failed to change mode', $e);
             dangerMessage($e->getMessage())->send($player);
         }
     }

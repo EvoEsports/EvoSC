@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:best-cps" id="best-cps" version="3">
+<manialink name="EvoSC:best-cps" id="best-cps" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="record">
         <quad class="bg-dark" opacity="0.5" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
@@ -29,7 +29,7 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct EvoSC_CP_Tracker_V2 {
+    #Struct EvoSC_CP_Tracker {
         Integer cpId;
         Text name;
         Integer time;
@@ -87,7 +87,7 @@
         return position;
     }
 
-    Void updateWidget(EvoSC_CP_Tracker_V2 record, Boolean flash){
+    Void updateWidget(EvoSC_CP_Tracker record, Boolean flash){
         if(!records.Controls.existskey(record.cpId)) return;
 
         declare frame = (records.Controls[record.cpId] as CMlFrame);
@@ -117,7 +117,7 @@
         frame.Show();
     }
 
-    Void updateWidgets(EvoSC_CP_Tracker_V2[] records, Integer newCpId){
+    Void updateWidgets(EvoSC_CP_Tracker[] records, Integer newCpId){
         foreach(record in records){
             updateWidget(record, record.cpId == newCpId);
         }
@@ -135,7 +135,7 @@
     }
 
     main() {
-        declare EvoSC_CP_Tracker_V2[] EvoSC_CP_Records_V2 for This;
+        declare EvoSC_CP_Tracker[] EvoSC_CP_Records_V2 for This;
         declare Ident EvoSC_CP_MapId for This;
         declare Integer EvoSC_CP_New for This;
         declare Integer EvoSC_CP_Update for This;

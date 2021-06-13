@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:{include id}" id="{include id}" version="3">
+<manialink name="EvoSC:{include id}" id="{include id}" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <script><!--
 #Include "MathLib" as ML

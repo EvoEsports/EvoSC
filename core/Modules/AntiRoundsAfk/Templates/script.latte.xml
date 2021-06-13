@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:anti-rounds-afk" id="anti-rounds-afk" version="3">
+<manialink name="EvoSC:anti-rounds-afk" id="anti-rounds-afk" version="3">
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL

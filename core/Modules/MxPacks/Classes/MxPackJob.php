@@ -53,6 +53,7 @@ class MxPackJob
         try {
             $this->loadFiles();
         } catch (Exception $e) {
+            Log::errorWithCause('Failed to download map pack', $e);
             warningMessage('Failed to download map pack: ', secondary($e->getMessage()))->send($player);
         }
     }
@@ -205,7 +206,7 @@ class MxPackJob
             try {
                 Server::addMap($filename);
             } catch (Exception $e) {
-                Log::write($e->getMessage());
+                Log::errorWithCause("Failed to add map $filename", $e);
             }
         }
 

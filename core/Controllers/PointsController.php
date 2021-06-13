@@ -47,8 +47,8 @@ class PointsController extends Controller implements ControllerInterface
             list(self::$originalPointsLimit, self::$currentPointsLimit) = Cache::get('points_controller');
             Cache::forget('points_controller');
         } else {
-            self::$originalPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
-            self::$currentPointsLimit = (int)Server::getModeScriptVariable('S_PointsLimit');
+            self::$originalPointsLimit = (int)Server::getModeScriptSetting('S_PointsLimit');
+            self::$currentPointsLimit = (int)Server::getModeScriptSetting('S_PointsLimit');
         }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -134,5 +134,21 @@ class PointsController extends Controller implements ControllerInterface
     private static function sendUpdatedPointsLimit(int $points)
     {
         Template::showAll('Helpers.update-points-limit', compact('points'));
+    }
+
+    /**
+     * @return int[]
+     */
+    public static function getPointsRepartition(): array
+    {
+        $repartition = Server::getModeScriptSetting('S_PointsRepartition');
+
+        if (empty($repartition)) {
+            return [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+        }
+
+        return array_map(function ($i) {
+            return intval($i);
+        }, explode(',', $repartition));
     }
 }

@@ -75,7 +75,7 @@ class ControllerUpdater extends Module implements ModuleInterface
                 }
             });
         } catch (\Exception $e) {
-            Log::error($e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::errorWithCause('Failed to update EvoSC', $e);
         }
     }
 
@@ -104,7 +104,7 @@ class ControllerUpdater extends Module implements ModuleInterface
                     }
                 });
             } catch (\Exception $e) {
-                Log::error($e->getMessage() . "\n" . $e->getTraceAsString());
+                Log::errorWithCause('Failed to check for EvoSC update', $e);
             }
         }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:update-cp-records" id="update-cp-records" version="3">
+    <script>
+        <!--
+        #Struct EvoSC_Royal_Section_Tracker {
+            Integer section;
+            Integer time;
+            Text name;
+        }
+
+        main(){
+            declare EvoSC_Royal_Section_Tracker[] EvoSC_RoyalSectionTracker for This;
+            declare Integer EvoSC_RoyalSectionUpdated for This = -1;
+            declare Integer EvoSC_RoyalSectionTracker_Update for This = 0;
+
+            EvoSC_RoyalSectionTracker.fromjson("""{$data|noescape}""");
+            EvoSC_RoyalSectionUpdated = {$section};
+            EvoSC_RoyalSectionTracker_Update = GameTime;
+
+            log(EvoSC_RoyalSectionTracker);
+        }
+        -->
+    </script>
+</manialink>

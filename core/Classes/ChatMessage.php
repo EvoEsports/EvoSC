@@ -160,10 +160,12 @@ class ChatMessage
      */
     public function sendAll()
     {
-        Server::chatSendServerMessage($this->getMessage());
+        $message = $this->getMessage();
+        Server::chatSendServerMessage($message);
+        Hook::fire('ChatLine', $message);
 
         if (isVerbose()) {
-            Log::info($this->getMessage());
+            Log::info($message);
         }
     }
 
@@ -180,7 +182,11 @@ class ChatMessage
         });
 
         Server::executeMulticall();
-        Log::info($this->getMessage());
+        Hook::fire('ChatLine', $message);
+
+        if (isVerbose()) {
+            Log::info($message);
+        }
     }
 
     /**

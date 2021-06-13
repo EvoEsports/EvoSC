@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="ESC:{include id}" id="{include id}" version="3">
+<manialink name="EvoSC:{include id}" id="{include id}" version="3">
 {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 <frame id="window" pos="{($window_width ?? 120)/-2.0} 0">
     <quad class="bg-accent" size="{$window_width ?? 120} 11" opacity="0.9" z-index="-3"/>
