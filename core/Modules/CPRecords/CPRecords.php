@@ -190,13 +190,15 @@ class CPRecords extends Module implements ModuleInterface
     /**
      *
      */
-    public static function beginMatch()
-    {
+    public static function beginMatch(){
         self::$tracker = collect();
-        self::sendUpdatedCpRecords();
         if (ModeController::isRoyal()) {
+            $data = self::$tracker->values()->toJson();
+            $section = -1;
+            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
             Template::showAll('CPRecords.widget_royal');
         }else{
+            self::sendUpdatedCpRecords();
             Template::showAll('CPRecords.widget');
         }
     }
