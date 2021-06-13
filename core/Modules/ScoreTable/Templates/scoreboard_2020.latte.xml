@@ -358,7 +358,7 @@
                     scoreLabel.Value = Net_TMxSM_ScoresTable_RaceProgression.X ^ " ";
                     scoreLabel.Opacity = 1.0;
                 } else {
-                    scoreLabel.Value = "0 ";
+                    scoreLabel.Value = "0 ";
                     scoreLabel.Opacity = 0.1;
                 }
             }else{

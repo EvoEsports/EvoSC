@@ -10,6 +10,7 @@
             Integer score;
             Integer team;
             Integer laps;
+            Integer section;
             Text checkpoints;
             Boolean online;
             Boolean spectator;
