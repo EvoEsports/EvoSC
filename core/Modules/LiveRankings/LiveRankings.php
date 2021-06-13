@@ -56,10 +56,6 @@ class LiveRankings extends Module implements ModuleInterface
             Hook::add('Scores', [self::class, 'updateWidget']);
         }
 
-        if (ModeController::isRoyal()) {
-            self::$sectionTracker = Cache::get('live_ranking_sections');
-        }
-
         if (!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
         }
