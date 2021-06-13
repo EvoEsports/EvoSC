@@ -46,17 +46,22 @@ class RoyalController implements ControllerInterface
 
         array_push($tracker->blockIds, $blockId);
         $sectionsFinished = count($tracker->blockIds);
+        $time = $wayPointData->time - $tracker->serverStartTime;
+        $tracker->totalTime += $time;
+        $tracker->totalTimeSection += $time;
 
-        Hook::fire('PlayerFinishSection', $player, $wayPointData->racetime, $wayPointData->curlapcheckpoints, $sectionsFinished);
+        Hook::fire('PlayerFinishSection', $player, $tracker->totalTimeSection, $wayPointData->curlapcheckpoints, $sectionsFinished);
 
         if ($sectionsFinished == 5) {
-            $score = $wayPointData->time - $tracker->startServerTime;
-            Hook::fire('PlayerFinish', $player, $score, implode(',', $wayPointData->curlapcheckpoints));
+            Hook::fire('PlayerFinish', $player, $tracker->totalTime, implode(',', $wayPointData->curlapcheckpoints));
 
-            self::$trackers->forget($player->id);
-        } else {
-            self::$trackers->put($player->id, $tracker);
+            $tracker->serverStartTime = $wayPointData->time;
+            $tracker->totalTime = 0;
+            $tracker->blockIds = [];
         }
+
+        $tracker->totalTimeSection = 0;
+        self::$trackers->put($player->id, $tracker);
     }
 
     /**
@@ -65,11 +70,33 @@ class RoyalController implements ControllerInterface
      */
     public static function playerStartLine(Player $player, stdClass $data)
     {
-        if (!self::$trackers->has($player->id)) {
+        $tracker = self::$trackers->get($player->id);
+
+        if (is_null($tracker)) {
             self::$trackers->put($player->id, (object)[
-                'startServerTime' => $data->time,
-                'blockIds'        => []
+                'serverStartTime'  => $data->time,
+                'totalTime'        => 0,
+                'totalTimeSection' => 0,
+                'blockIds'         => []
             ]);
+        } else {
+            $tracker->serverStartTime = $data->time;
+            self::$trackers->put($player->id, $tracker);
         }
+    }
+
+    /**
+     * @param Player $player
+     * @param $data
+     */
+    public static function playerGiveUp(Player $player, $data)
+    {
+        $penalty = 1500;
+        $tracker = self::$trackers->get($player->id);
+        $time = $data->time - $tracker->serverStartTime + $penalty;
+        $tracker->totalTime += $time;
+        $tracker->totalTimeSection += $time;
+
+        self::$trackers->put($player->id, $tracker);
     }
 }

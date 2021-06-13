@@ -138,10 +138,15 @@ class ModeScriptEventController implements ControllerInterface
      */
     static function tmGiveUp($arguments)
     {
-        $playerLogin = json_decode($arguments[0])->login;
+        $data = json_decode($arguments[0]);
+        $player = player($data->login);
 
-        Hook::fire('PlayerFinish', player($playerLogin), 0, "");
-        Hook::fire('PlayerGiveUp', player($playerLogin));
+        Hook::fire('PlayerFinish', $player, 0, "");
+        Hook::fire('PlayerGiveUp', $player);
+
+        if(ModeController::isRoyal()){
+            RoyalController::playerGiveUp($player, $data);
+        }
     }
 
     /**
