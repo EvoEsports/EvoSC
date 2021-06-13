@@ -128,9 +128,15 @@ class LiveRankings extends Module implements ModuleInterface
         }
 
         if (ModeController::isTimeAttackType()) {
-            $playerScores = $playerScores->sortBy('bestracetime')->filter(function ($playerScore) {
-                return $playerScore->bestracetime > 0;
-            });
+            if (ModeController::isRoyal()) {
+                $playerScores = $playerScores->filter(function ($playerScore) {
+                    return $playerScore->section > 0;
+                })->sortBy('section');
+            } else {
+                $playerScores = $playerScores->filter(function ($playerScore) {
+                    return $playerScore->bestracetime > 0;
+                })->sortBy('bestracetime');
+            }
         } else {
             if (ModeController::laps()) {
                 $playerScores = $playerScores->sortByDesc('laps')->filter(function ($playerScore) {
