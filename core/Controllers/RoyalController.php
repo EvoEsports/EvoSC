@@ -91,8 +91,9 @@ class RoyalController implements ControllerInterface
      */
     public static function playerGiveUp(Player $player, $data)
     {
+        $penalty = 1500;
         $tracker = self::$trackers->get($player->id);
-        $time = $data->time - $tracker->serverStartTime;
+        $time = $data->time - $tracker->serverStartTime + $penalty;
         $tracker->totalTime += $time;
         $tracker->totalTimeSection += $time;
 
