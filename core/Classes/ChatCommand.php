@@ -180,7 +180,7 @@ class ChatCommand
                 call_user_func_array($this->callback, $arguments);
             }
         } catch (\ArgumentCountError $e) {
-            Log::warning($e->getMessage());
+            Log::warningWithCause('Wrong number of arguments', $e);
             warningMessage('Wrong number of arguments, see ', secondary('/help'), ' for a list of all commands.')->send($player);
         }
     }

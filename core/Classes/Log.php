@@ -2,6 +2,7 @@
 
 namespace EvoSC\Classes;
 
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -145,10 +146,27 @@ class Log
      * @param      $message
      * @param bool $echo
      */
-    public static function warning($message, bool $echo = true)
+    public static function warning($message, bool $echo = true, $limit = 2)
     {
-        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        self::write('<fg=red>' . $message . '</>', $echo, $caller);
+        list($childClass, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+        self::write('<warning>' . $message . '</>', $echo, $caller);
+    }
+
+    /**
+     * Log a warning message and cause stacktrace.
+     *
+     * @param      $message
+     * @param      $throwable
+     * @param bool $echo
+     */
+    public static function warningWithCause($message, \Throwable $throwable, bool $echo = true)
+    {
+        self::warning($message . ': ' . $throwable->getMessage(), $echo, 3);
+
+        if (isVeryVerbose())
+        {
+            self::write($throwable->getTraceAsString(), $echo);
+        }
     }
 
     /**
@@ -170,6 +188,9 @@ class Log
     {
         self::$singleFileMode = (bool)config('server.logs.single-file', false);
         self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
+
+        $warningOutputFormatterStyle = new OutputFormatterStyle('red');
+        $output->getFormatter()->setStyle('warning', $warningOutputFormatterStyle);
 
         self::$output = $output;
     }
