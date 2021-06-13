@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\LiveRankings;
 
+use EvoSC\Classes\Cache;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
@@ -34,6 +35,7 @@ class LiveRankings extends Module implements ModuleInterface
 
         if (ModeController::isTimeAttackType()) {
             if (ModeController::isRoyal()) {
+                Hook::add('Scores', [self::class, 'updateWidget']);
                 Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
             } else {
                 Hook::add('Scores', [self::class, 'updateWidget']);
@@ -54,8 +56,22 @@ class LiveRankings extends Module implements ModuleInterface
             Hook::add('Scores', [self::class, 'updateWidget']);
         }
 
+        if (ModeController::isRoyal()) {
+            self::$sectionTracker = Cache::get('live_ranking_sections');
+        }
+
         if (!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function stop()
+    {
+        if (ModeController::isRoyal()) {
+            Cache::put('live_ranking_sections', self::$sectionTracker, now()->addMinute());
         }
     }
 

@@ -3,22 +3,21 @@
 <manialink name="EvoSC:best-cps" id="best-cps" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <framemodel id="record">
-        <quad class="bg-dark" opacity="0.5" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
+        <quad class="bg-dark" opacity="0.65" pos="0 -0.25" size="42 4" valign="center" z-index="-2"/>
         <label class="text-light" pos="3" size="5" valign="center" halign="center" textsize="0.8" z-index="5" />
-        <label class="text-light" pos="18" valign="center" halign="right" textsize="0.75" opacity="0.5" z-index="4" />
-        <label class="text-light" pos="18" valign="center" halign="right" textsize="0.75" z-index="5" />
+        <label class="text-light" pos="17.5" valign="center" halign="right" textsize="0.75" opacity="0.35" z-index="4" />
+        <label class="text-light" pos="17.5" valign="center" halign="right" textsize="0.75" z-index="5" />
         <label class="text-light" pos="30.5" size="21" valign="center" halign="center" textsize="0.8" z-index="5" />
-        <quad class="bg-dark" opacity="0.25" pos="0 -0.25" size="19 4" valign="center" z-index="-1"/>
-        <quad class="bg-dark" opacity="0.25" pos="0 -0.25" size="6 4" valign="center" z-index="-1"/>
-        <quad class="bg-accent" pos="6 -0.25" size="0.3 4" valign="center" z-index="1"/>
+        <quad class="bg-dark" opacity="0.95" pos="0 -0.25" size="19 4" valign="center" z-index="-2"/>
+        <quad class="bg-dark" opacity="0.65" pos="0 -0.25" size="6 4" valign="center" z-index="-1"/>
+        <quad class="bg-accent" pos="6 -0.25" size="0.3 4" valign="center" z-index="1" hidden="1"/>
         <quad class="bg-accent" pos="0 -0.25" size="42 4" valign="center" opacity="0" z-index="2"/>
     </framemodel>
 
     <frame id="mf" pos="{config('cp-records.pos')}" {if !$is_maniaplanet}size="1000 1000"{/if} scale="{config('cp-records.scale')}">
         <frame id="widget">
-            <!--suppress CheckTagEmptyBody -->
             <frame id="records">
-                {for $i=0; $i<1000; $i++}
+                {for $i=1; $i<=6; $i++}
                 <frameinstance modelid="record" pos="0 0" hidden="1"></frameinstance>
                 {/for}
             </frame>
@@ -29,16 +28,16 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct EvoSC_CP_Tracker {
-        Integer cpId;
-        Text name;
+    #Struct EvoSC_Royal_Section_Tracker {
+        Integer section;
         Integer time;
-        Boolean isFinish;
+        Text name;
     }
 
     declare Real padding;
     declare Integer columns;
     declare CMlFrame records;
+    declare Vec3[] sectionColors;
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
         declare Text secondString;
@@ -87,22 +86,23 @@
         return position;
     }
 
-    Void updateWidget(EvoSC_CP_Tracker record, Boolean flash){
-        if(!records.Controls.existskey(record.cpId)) return;
+    Void updateWidget(EvoSC_Royal_Section_Tracker record, Boolean flash){
+        if(!records.Controls.existskey(record.section)) return;
 
-        declare frame = (records.Controls[record.cpId] as CMlFrame);
+        declare frame = (records.Controls[record.section] as CMlFrame);
         declare indexLabel = (frame.Controls[1] as CMlLabel);
         declare timeLabel = (frame.Controls[2] as CMlLabel);
         declare timeLabel2 = (frame.Controls[3] as CMlLabel);
         declare nameLabel = (frame.Controls[4] as CMlLabel);
+        declare sectionQuad = (frame.Controls[5] as CMlQuad);
+        declare sectionQuadSmall = (frame.Controls[6] as CMlQuad);
 
-        if(record.isFinish){
-            indexLabel.SetText("");
-            indexLabel.TextSizeReal = 0.5;
-        }else{
-            indexLabel.SetText(TL::ToText(record.cpId + 1));
-            indexLabel.TextSizeReal = 0.8;
-        }
+        sectionQuad.BgColor = sectionColors[record.section - 1];
+        sectionQuadSmall.BgColor = sectionColors[record.section - 1];
+
+        indexLabel.SetText(TL::ToText(record.section));
+        indexLabel.TextSizeReal = 0.8;
+
         timeLabel.SetText(formatScoreCorrect(record.time, False));
         timeLabel2.SetText(formatScoreCorrect(record.time, True));
         nameLabel.SetText(record.name);
@@ -113,13 +113,13 @@
             AnimMgr.Add(flashQuad, """ <quad opacity="0" /> """, 1200, CAnimManager::EAnimManagerEasing::QuartOut);
         }
 
-        frame.RelativePosition_V3 = getRecordPosition(record.cpId);
+        frame.RelativePosition_V3 = getRecordPosition(record.section);
         frame.Show();
     }
 
-    Void updateWidgets(EvoSC_CP_Tracker[] records, Integer newCpId){
+    Void updateWidgets(EvoSC_Royal_Section_Tracker[] records, Integer newSection){
         foreach(record in records){
-            updateWidget(record, record.cpId == newCpId);
+            updateWidget(record, record.section == newSection);
         }
     }
 
@@ -135,10 +135,9 @@
     }
 
     main() {
-        declare EvoSC_CP_Tracker[] EvoSC_CP_Records_V2 for This;
-        declare Ident EvoSC_CP_MapId for This;
-        declare Integer EvoSC_CP_New for This;
-        declare Integer EvoSC_CP_Update for This;
+        declare EvoSC_Royal_Section_Tracker[] EvoSC_RoyalSectionTracker for This;
+        declare Integer EvoSC_RoyalSectionUpdated for This = -1;
+        declare Integer EvoSC_RoyalSectionTracker_Update for This = 0;
         declare lastUpdate = 0;
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare mf <=> (Page.MainFrame.GetFirstChild("mf") as CMlFrame);
@@ -148,17 +147,24 @@
         declare driving = False;
         declare waitForTime = GameTime;
 
-        columns = {config('cp-records.columns')};
+        sectionColors.add(<1.0, 1.0, 1.0>);
+        sectionColors.add(<57.0 / 255, 174.0 / 255, 88.0 / 255>);
+        sectionColors.add(<50.0 / 225, 130.0 / 255, 206.0 / 255>);
+        sectionColors.add(<235.0 / 255, 64.0 / 255, 52.0 / 255>);
+        sectionColors.add(<44.0 / 255, 41.0 / 255, 40.0 / 255>);
+
+        columns = 6;
         padding = 0.5;
         records <=> (Page.MainFrame.GetFirstChild("records") as CMlFrame);
         currentMapId = Map.MapInfo.MapUid;
+        mf.RelativePosition_V3[0] -= 16.0;
 
         while(True){
             yield;
 
-            if(lastUpdate != EvoSC_CP_Update && Map.Id == EvoSC_CP_MapId){
-                lastUpdate = EvoSC_CP_Update;
-                updateWidgets(EvoSC_CP_Records_V2, EvoSC_CP_New);
+            if(lastUpdate != EvoSC_RoyalSectionTracker_Update){
+                lastUpdate = EvoSC_RoyalSectionTracker_Update;
+                updateWidgets(EvoSC_RoyalSectionTracker, EvoSC_RoyalSectionUpdated);
             }
 
             if(Map.MapInfo.MapUid != currentMapId){

@@ -36,10 +36,6 @@ class CPRecords extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (ModeController::isRoyal()) {
-            return;
-        }
-
         if (Cache::has('cp_records_current')) {
             self::$tracker = collect(Cache::get('cp_records_current'));
             Cache::forget('cp_records_current');
@@ -47,12 +43,14 @@ class CPRecords extends Module implements ModuleInterface
             self::$tracker = collect();
         }
 
-        $cpMode = config('cp-records.mode', 'best-cp');
-
-        if ($cpMode == 'best-round') {
-            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        if (ModeController::isRoyal()) {
+            Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
         } else {
-            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+            if (config('cp-records.mode', 'best-cp') == 'best-round') {
+                Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+            } else {
+                Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+            }
         }
 
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
@@ -61,12 +59,35 @@ class CPRecords extends Module implements ModuleInterface
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
     }
 
-    /**
-     *
-     */
     public function stop()
     {
         Cache::put('cp_records_current', self::$tracker->toArray(), now()->addMinute());
+    }
+
+    public static function playerFinishSection(Player $player, int $timeInMs, array $checkpoints, int $section)
+    {
+        if (!self::$tracker->has($section)) {
+            self::$tracker->put($section, (object)[
+                'section' => $section,
+                'time'    => $timeInMs,
+                'name'    => $player->NickName
+            ]);
+        } else {
+            $tracker = self::$tracker->get($section);
+
+            if ($timeInMs >= $tracker->time) {
+                return;
+            }
+
+            self::$tracker->put($section, (object)[
+                'section' => $section,
+                'time'    => $timeInMs,
+                'name'    => $player->NickName
+            ]);
+        }
+
+        $data = self::$tracker->values()->toJson();
+        Template::showAll('CPRecords.update_royal', compact('data', 'section'));
     }
 
     /**
@@ -142,11 +163,19 @@ class CPRecords extends Module implements ModuleInterface
 
     /**
      * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function playerConnect(Player $player)
     {
-        self::sendUpdatedCpRecords();
-        Template::show($player, 'CPRecords.widget');
+        if (ModeController::isRoyal()) {
+            $data = self::$tracker->values()->toJson();
+            $section = -1;
+            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
+            Template::show($player, 'CPRecords.widget_royal');
+        } else {
+            self::sendUpdatedCpRecords();
+            Template::show($player, 'CPRecords.widget');
+        }
     }
 
     /**
