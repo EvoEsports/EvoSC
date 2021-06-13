@@ -71,7 +71,7 @@ class Log
         }
 
         if (isDebug()) {
-            $callingClass .= "\nData: " . json_encode($caller['args']);
+            $callingClass .= "\nData: " . json_encode($caller);
         }
 
         $time = date("H:i:s", time());
