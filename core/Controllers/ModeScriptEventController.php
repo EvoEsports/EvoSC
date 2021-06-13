@@ -165,7 +165,7 @@ class ModeScriptEventController implements ControllerInterface
         //player finished
         if ($wayPoint->isendrace || (!ModeController::laps() && $wayPoint->isendlap)) {
             if(ModeController::isRoyal()){
-                RoyalController::playerFinish($player, $wayPoint);
+                RoyalController::playerWayPoint($player, $wayPoint);
             }else{
                 Hook::fire('PlayerFinish',
                     $player,
@@ -200,7 +200,10 @@ class ModeScriptEventController implements ControllerInterface
      */
     static function tmStartLine($arguments)
     {
-        $playerLogin = json_decode($arguments[0])->login;
-        Hook::fire('PlayerStartLine', player($playerLogin));
+        $player = player(json_decode($arguments[0])->login);
+        Hook::fire('PlayerStartLine', $player);
+        if(ModeController::isRoyal()){
+            RoyalController::playerStartLine($player, json_decode($arguments[0]));
+        }
     }
 }
