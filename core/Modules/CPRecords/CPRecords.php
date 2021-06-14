@@ -86,8 +86,7 @@ class CPRecords extends Module implements ModuleInterface
             ]);
         }
 
-        $data = self::$tracker->values()->toJson();
-        Template::showAll('CPRecords.update_royal', compact('data', 'segment'));
+        self::sendUpdatedRoyalRecord($segment);
     }
 
     /**
@@ -162,16 +161,23 @@ class CPRecords extends Module implements ModuleInterface
     }
 
     /**
+     * @param int $segment
+     */
+    private static function sendUpdatedRoyalRecord(int $segment = -1)
+    {
+        $data = self::$tracker->values()->toJson();
+        Template::showAll('CPRecords.update_royal', compact('data', 'segment'));
+    }
+
+    /**
      * @param Player $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function playerConnect(Player $player)
     {
         if (ModeController::isRoyal()) {
+            self::sendUpdatedRoyalRecord();
             Template::show($player, 'CPRecords.widget_royal');
-            $data = self::$tracker->values()->toJson();
-            $section = -1;
-            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
         } else {
             self::sendUpdatedCpRecords();
             Template::show($player, 'CPRecords.widget');
