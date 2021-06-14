@@ -14,10 +14,8 @@
             declare Integer EvoSC_RoyalSectionTracker_Update for This = 0;
 
             EvoSC_RoyalSectionTracker.fromjson("""{$data|noescape}""");
-            EvoSC_RoyalSectionUpdated = {$section};
+            EvoSC_RoyalSectionUpdated = {$segment};
             EvoSC_RoyalSectionTracker_Update = GameTime;
-
-            log(EvoSC_RoyalSectionTracker);
         }
         -->
     </script>

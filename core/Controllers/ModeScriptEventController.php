@@ -6,7 +6,6 @@ namespace EvoSC\Controllers;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Interfaces\ControllerInterface;
-use EvoSC\Models\Player;
 
 /**
  * Class ModeScriptEventController
@@ -92,6 +91,16 @@ class ModeScriptEventController implements ControllerInterface
                 Hook::fire('PointsRepartition', json_decode($arguments[0])->pointsrepartition);
                 break;
 
+            case 'Royal.PlayerFinish':
+                $data = json_decode($arguments[0]);
+                Hook::fire('PlayerFinish', player($data->login), $data->racetime, '');
+                break;
+
+            case 'Royal.PlayerFinishSegment':
+                $data = json_decode($arguments[0]);
+                Hook::fire('PlayerFinishSegment', player($data->login), $data->racetime, $data->segment, $data->totalsegments);
+                break;
+
             case 'Maniaplanet.EndRound_Start':
             case 'Maniaplanet.StartMap_Start':
             case 'Maniaplanet.EndMap_Start':
@@ -143,10 +152,6 @@ class ModeScriptEventController implements ControllerInterface
 
         Hook::fire('PlayerFinish', $player, 0, "");
         Hook::fire('PlayerGiveUp', $player);
-
-        if(ModeController::isRoyal()){
-            RoyalController::playerGiveUp($player, $data);
-        }
     }
 
     /**
@@ -169,9 +174,7 @@ class ModeScriptEventController implements ControllerInterface
 
         //player finished
         if ($wayPoint->isendrace || (!ModeController::laps() && $wayPoint->isendlap)) {
-            if(ModeController::isRoyal()){
-                RoyalController::playerWayPoint($player, $wayPoint);
-            }else{
+            if (!ModeController::isRoyal()) {
                 Hook::fire('PlayerFinish',
                     $player,
                     $wayPoint->laptime,
@@ -207,8 +210,5 @@ class ModeScriptEventController implements ControllerInterface
     {
         $player = player(json_decode($arguments[0])->login);
         Hook::fire('PlayerStartLine', $player);
-        if(ModeController::isRoyal()){
-            RoyalController::playerStartLine($player, json_decode($arguments[0]));
-        }
     }
 }

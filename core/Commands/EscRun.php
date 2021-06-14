@@ -29,7 +29,6 @@ use EvoSC\Controllers\ModuleController;
 use EvoSC\Controllers\PlanetsController;
 use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
-use EvoSC\Controllers\RoyalController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Models\AccessRight;
@@ -200,7 +199,6 @@ class EscRun extends Command implements SignalableCommandInterface
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
-        RoyalController::init();
 
         EventController::init();
         EventController::setServerLogin($serverLogin);
