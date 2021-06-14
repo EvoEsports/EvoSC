@@ -350,7 +350,7 @@
                 finalistLabel.Value = "";
             }
         }else{
-            if(CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
+            if(CurrentServerModeName == "Evo_Royal_TA" || CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
                 declare netread Int2 Net_TMxSM_ScoresTable_RaceProgression for Score;
                 if (Net_TMxSM_ScoresTable_RaceProgression.Y > 0) {
                     declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);

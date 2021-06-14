@@ -125,6 +125,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Trackmania/TM_RoyalTimeAttack_Online.Script.txt':
+            case 'Trackmania/Evo_Royal_TA.Script.txt':
                 self::$isTimeAttackType = true;
                 self::$royal = true;
                 break;
