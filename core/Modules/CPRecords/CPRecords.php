@@ -168,10 +168,10 @@ class CPRecords extends Module implements ModuleInterface
     public static function playerConnect(Player $player)
     {
         if (ModeController::isRoyal()) {
+            Template::show($player, 'CPRecords.widget_royal');
             $data = self::$tracker->values()->toJson();
             $section = -1;
             Template::showAll('CPRecords.update_royal', compact('data', 'section'));
-            Template::show($player, 'CPRecords.widget_royal');
         } else {
             self::sendUpdatedCpRecords();
             Template::show($player, 'CPRecords.widget');
@@ -190,14 +190,15 @@ class CPRecords extends Module implements ModuleInterface
     /**
      *
      */
-    public static function beginMatch(){
+    public static function beginMatch()
+    {
         self::$tracker = collect();
         if (ModeController::isRoyal()) {
             $data = self::$tracker->values()->toJson();
-            $section = -1;
-            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
+            $segment = 0;
+            Template::showAll('CPRecords.update_royal', compact('data', 'segment'));
             Template::showAll('CPRecords.widget_royal');
-        }else{
+        } else {
             self::sendUpdatedCpRecords();
             Template::showAll('CPRecords.widget');
         }

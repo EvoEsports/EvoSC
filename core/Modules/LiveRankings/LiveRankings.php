@@ -195,8 +195,12 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function checkIfViewIsAffected(Player $player)
     {
-        if (in_array($player->Login, self::$shownLogins)) {
-            Server::callGetScores(); //Force server to send scores callback
+        if (ModeController::isRoyal()) {
+            self::updateWidget(collect(self::$sectionTracker));
+        } else {
+            if (in_array($player->Login, self::$shownLogins)) {
+                Server::callGetScores(); //Force server to send scores callback
+            }
         }
     }
 
