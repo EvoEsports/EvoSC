@@ -40,10 +40,10 @@ class Hook
     /**
      * Hook constructor.
      *
-     * @param string   $event
+     * @param string $event
      * @param callable $function
-     * @param bool     $runOnce
-     * @param int      $priority
+     * @param bool $runOnce
+     * @param int $priority
      */
     public function __construct(string $event, callable $function, bool $runOnce = false, int $priority = 0)
     {
@@ -121,10 +121,10 @@ class Hook
      * Use Hook::add.
      * Register a hook.
      *
-     * @param string   $event
+     * @param string $event
      * @param callable $callback
-     * @param bool     $runOnce
-     * @param int      $priority
+     * @param bool $runOnce
+     * @param int $priority
      */
     public static function add(string $event, callable $callback, bool $runOnce = false, int $priority = 0)
     {
@@ -139,8 +139,8 @@ class Hook
     /**
      * TODO: Remove a hook
      *
-     * @param  string  $event
-     * @param  callable  $callback
+     * @param string $event
+     * @param callable $callback
      */
     public static function remove(string $event, callable $callback)
     {
@@ -150,7 +150,7 @@ class Hook
      * Fire all hooks for the given name and arguments.
      *
      * @param string $hookName
-     * @param mixed  ...$arguments
+     * @param mixed ...$arguments
      */
     public static function fire(string $hookName, ...$arguments)
     {
@@ -167,5 +167,13 @@ class Hook
                 Log::errorWithCause("Hook execution failed", $e);
             }
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority(): int
+    {
+        return $this->priority;
     }
 }
