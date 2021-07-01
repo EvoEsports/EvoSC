@@ -214,7 +214,7 @@ function baseDir(string $filename = ''): string
  */
 function getOsSafePath(string $filename): string
 {
-    return str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
+    return str_replace('/', DIRECTORY_SEPARATOR, $filename);
 }
 
 /**

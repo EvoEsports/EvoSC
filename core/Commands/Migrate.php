@@ -43,14 +43,14 @@ class Migrate extends Command
         $capsule = new Capsule();
 
         $capsule->addConnection([
-            'driver' => 'mysql',
-            'host' => $config->host,
-            'database' => $config->db,
-            'username' => $config->user,
-            'password' => $config->password,
-            'charset' => 'utf8mb4',
+            'driver'    => 'mysql',
+            'host'      => $config->host,
+            'database'  => $config->db,
+            'username'  => $config->user,
+            'password'  => $config->password,
+            'charset'   => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => $config->prefix,
+            'prefix'    => $config->prefix,
         ]);
 
         $capsule->setAsGlobal();
@@ -61,7 +61,7 @@ class Migrate extends Command
         $schemaBuilder = $connection->getSchemaBuilder();
         $schemaBuilder::defaultStringLength(191);
 
-        try{
+        try {
             if (!$schemaBuilder->hasTable('migrations')) {
                 $output->writeln('Creating migrations table');
                 $schemaBuilder->create('migrations', function (Blueprint $table) {
@@ -70,7 +70,7 @@ class Migrate extends Command
                     $table->integer('batch');
                 });
             }
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             Log::errorWithCause('Failed to create migrations table', $e);
             exit(1);
         }
@@ -119,7 +119,7 @@ class Migrate extends Command
             }
         });
 
-        if(!$anyMigrationRan){
+        if (!$anyMigrationRan) {
             $output->writeln('<fg=green>Nothing to migrate.</>');
         }
 
@@ -134,44 +134,42 @@ class Migrate extends Command
     {
         $migrations = collect();
 
-        $files = collect(scandir('Migrations'))->filter(function ($file) {
-            return preg_match('/\.php$/', $file);
-        })->filter(function ($file) {
-            $content = file_get_contents('Migrations/' . $file);
+        $migrationDirectories = collect(['Migrations']);
+        $moduleDirectories = ['core' . DIRECTORY_SEPARATOR . 'Modules', 'modules'];
 
-            return preg_match('/extends Migration/', $content);
-        })->map(function ($migration) {
-            $col = collect();
-            $col->path = "Migrations/$migration";
-            $col->file = $migration;
-
-            return $col;
-        });
-
-        $migrations = $migrations->merge($files);
-
-        collect(scandir('core/Modules'))->filter(function ($moduleDir) {
-            return is_dir("core/Modules/$moduleDir") && !in_array($moduleDir, ['.', '..']);
-        })->filter(function ($moduleDir) {
-            return is_dir("core/Modules/$moduleDir/Migrations");
-        })->each(function ($moduleDir) use (&$migrations) {
-            $moduleMigrations = collect(scandir("core/Modules/$moduleDir/Migrations"))->filter(function ($file) {
-                return preg_match('/\.php$/', $file);
-            })->filter(function ($file) use ($moduleDir) {
-                $content = file_get_contents("core/Modules/$moduleDir/Migrations/" . $file);
-
-                return preg_match('/extends Migration/', $content);
-            })->map(function ($migration) use ($moduleDir) {
-                $col = collect();
-                $col->path = "core/Modules/$moduleDir/Migrations/$migration";
-                $col->file = $migration;
-
-                return $col;
+        foreach ($moduleDirectories as $baseDir) {
+            $subDirs = collect(scandir($baseDir))->filter(function ($moduleDir) use ($baseDir) {
+                return !in_array($moduleDir, ['.', '..'])
+                    && is_dir($baseDir . DIRECTORY_SEPARATOR . $moduleDir)
+                    && is_dir($baseDir . DIRECTORY_SEPARATOR . $moduleDir . DIRECTORY_SEPARATOR . 'Migrations');
+            })->map(function ($moduleDirectory) use ($baseDir) {
+                return getOsSafePath("$baseDir/$moduleDirectory/Migrations");
             });
+
+            $migrationDirectories = $migrationDirectories->merge($subDirs);
+        }
+
+        $migrationDirectories->each(function ($moduleDir) use (&$migrations) {
+            $moduleMigrations = collect(scandir($moduleDir))
+                ->filter(function ($file) {
+                    return preg_match('/\.php$/', $file);
+                })->filter(function ($file) use ($moduleDir) {
+                    $content = File::get("$moduleDir/$file");
+
+                    return preg_match('/extends Migration/', $content);
+                })->map(function ($migration) use ($moduleDir) {
+                    $object = new \stdClass();
+                    $object->path = getOsSafePath("$moduleDir/$migration");
+                    $object->file = $migration;
+
+                    return $object;
+                });
 
             $migrations = $migrations->merge($moduleMigrations);
         });
 
-        return $migrations;
+        return $migrations->sortBy(function ($migrationObject) {
+            return intval(preg_replace('/^(\d+)_.+/', '$1', $migrationObject->file));
+        })->values();
     }
 }

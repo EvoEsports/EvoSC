@@ -243,6 +243,7 @@ class LocalRecords extends Module implements ModuleInterface
             self::sendLocalsChunk();
             DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', '>', $localsLimit)->delete();
         }
+
         Hook::fire('PlayerLocalRecord', $player, $score, $checkpoints, $newRank);
     }
 
