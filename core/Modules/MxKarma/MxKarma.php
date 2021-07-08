@@ -336,6 +336,9 @@ class MxKarma extends Module implements ModuleInterface
 
         self::$newVotes->put($player->Login, $rating);
         self::sendVoteData($map);
+
+        // $player, $map, $rating, $isNew
+        Hook::fire('PlayerRateMap', $player, $map, $rating, $karma == null);
     }
 
     /**
