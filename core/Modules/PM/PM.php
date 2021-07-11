@@ -63,6 +63,6 @@ class PM extends Module implements ModuleInterface
      */
     public static function mlePm(Player $player, string $recipientLogin, string ...$text)
     {
-        ChatController::pmTo($player, $recipientLogin, implode(' ', $text));
+        ChatController::pmTo($player, $recipientLogin, '$z'.implode(' ', $text));
     }
 }
