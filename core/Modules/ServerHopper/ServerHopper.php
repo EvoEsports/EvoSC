@@ -74,8 +74,8 @@ class ServerHopper extends Module implements ModuleInterface
         $systemInfo = $connection->getSystemInfo();
         $id = $systemInfo->publishedIp . ':' . $systemInfo->port;
 
-        if (self::$connections->has($id)) {
-            $data = self::$connections->get($id);
+        if (self::$serverData->has($id)) {
+            $data = self::$serverData->get($id);
         } else {
             $data = (object)[
                 'login'         => $connection->getMainServerPlayerInfo()->login,
