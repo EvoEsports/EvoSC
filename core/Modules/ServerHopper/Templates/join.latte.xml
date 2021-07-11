@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.window'}
-{php $window_width = 80;}
-{php $window_height = 40;}
+{php $window_width = 88;}
+{php $window_height = 24;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}join-server{/block}
@@ -10,12 +10,36 @@
 
     {block content}
     <frame pos="0 0">
-        <label class="text-light" pos="38 -2" size="76 8" text="{$server->name}" halign="center" textsize="3" />
-        <label id="description" class="text-light" pos="38 -8" size="76 20" text="{$server->description ?: '$iNo description available'}" halign="center" autonewline="1" />
+        <frame pos="4.75 0">
+            <quad class="bg-light" size="30 20" opacity="0.1" />
+            <graph size="30 20" min="0 -1" max="60 {$server->max}" z-index="5">
+                <curve color="{config('theme.hud.bg-lighter')}" width="0.33">
+                    <point coords="0 {$server->players}" />
+                    <point coords="61 {$server->players}" />
+                </curve>
+                <curve color="{config('theme.hud.accent')}" width="0.5">
+                    {foreach $server->player_counts as $i => $count}
+                    <point coords="{$i} {$count}" />
+                    {/foreach}
+                </curve>
+            </graph>
+            <label class="text-accent" text="{$server->max}" pos="-1 0" halign="right" opacity="0.9" />
+            <label class="text-accent" text="MAX" pos="-1 -2.7" textsize="0.05" halign="right" opacity="0.9" />
+            <label class="text-lighter" text="{$server->players}" pos="-1 {-19.05 + ($server->players / $server->max) * 20.0}" textsize="1" z-index="11" halign="right" valign="center" textemboss="0" />
+            <quad class="bg-light" size="0.2 20" pos="0 0" opacity="0.45" />
+            <quad class="bg-light" size="0.2 20" pos="15 0" opacity="0.45" />
+            <quad class="bg-light" size="0.2 20" pos="30 0" opacity="0.45" />
+            <label class="text-light" text="-60min" pos="0.85 -0.5" halign="left" textsize="0.25" opacity="0.75" />
+            <label class="text-light" text="-30min" pos="15.85 -0.5" halign="left" textsize="0.25" opacity="0.75" />
+        </frame>
 
-        <frame id="buttons">
-            <label class="btn-accent join" pos="27 -13" size="20 6" text="JOIN" ScriptEvents="1" />
-            <label class="btn-danger cancel" pos="49 -13" size="20 6" text="CANCEL" ScriptEvents="1" />
+        <label class="text-light" pos="37 0" size="76 8" text="{$server->name}" textsize="3" />
+        <label class="text-meta" pos="37 -6" size="76 20" text="Playing:" opacity="0.75" />
+        <label class="text-light" pos="37 -9" size="76 20" textsize="1.5" text="{$server->map}" />
+
+        <frame id="buttons" pos="20 -17.5">
+            <label class="btn-accent join" pos="27 0" size="20 5" text="JOIN" ScriptEvents="1" textemboss="1" />
+            <label class="btn-danger cancel" pos="49 0" size="20 5" text="CANCEL" ScriptEvents="1" textemboss="1" />
         </frame>
     </frame>
     {/block}
@@ -30,11 +54,6 @@
     {/block}
 
     {block bootScript}
-    declare buttonsFrame <=> (Page.MainFrame.GetFirstChild("buttons") as CMlFrame);
-    declare descriptionLabel <=> (Page.MainFrame.GetFirstChild("description") as CMlLabel);
-
-    buttonsFrame.RelativePosition_V3[1] -= descriptionLabel.ComputeHeight(descriptionLabel.Value);
-    window.Size[1] = 27.0 + (buttonsFrame.RelativePosition_V3[1] * -1);
     {/block}
 
     {block loop}
@@ -46,7 +65,7 @@
         return;
     }
     if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("join")){
-        OpenLink("maniaplanet://#qjoin={$server->login}@Trackmania", CMlScript::LinkType::ManialinkBrowser);
+        OpenLink("maniaplanet://#join={$server->login}@Trackmania", CMlScript::LinkType::ExternalBrowser);
     }
     {/block}
     --></script>
