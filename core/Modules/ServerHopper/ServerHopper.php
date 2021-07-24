@@ -92,7 +92,7 @@ class ServerHopper extends Module implements ModuleInterface
         $data->map = $connection->getCurrentMapInfo()->name;
         $data->player_counts = array_slice($data->player_counts, 1);
 
-        if(isManiaPlanet()){
+        if (isManiaPlanet()) {
             $data->title = $connection->getSystemInfo()->titleId;
         }
 
