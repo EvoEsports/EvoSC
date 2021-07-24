@@ -1,0 +1,220 @@
+{contentType text}
+{extends 'Components.tabbed-window'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="{block id}edit-settings{/block}" version="3">
+{block icon}{/block}
+{block title}Edit {$name}{/block}
+
+{block navbar}
+{include 'Components.tabs', tabs =>
+[
+'Settings'=>'',
+'Maps'=>'msm.edit_maps,'.$name
+]
+}
+{/block}
+
+{block content}
+    <framemodel id="setting">
+        <quad id="background" class="bg-accent" pos="0 2" size="200 100" z-index="-2" opacity="0" />
+        <quad id="descriptionBg" class="bg-dark" pos="0 -5" size="200 10" z-index="-1" opacity="0.2" />
+        <label id="setting" class="text-light" pos="1.5 -2.5" text="Setting Name" valign="center" />
+        <label id="description" class="text-light" pos="1.5 -7.25" text="Description" size="112 100" autonewline="1" textsize="0.6" />
+        <frame id="type-integer" pos="112 -2.5" z-index="1">
+            <entry id="entry" class="form setting-entry" pos="0 0" size="30 3.5" valign="center" halign="right" focusareacolor1="fff1" focusareacolor2="fff3" ScriptEvents="1" />
+        </frame>
+        <frame id="type-real" pos="112 -2.5" z-index="1">
+            <entry id="entry" class="form setting-entry" pos="0 0" size="20 3.5" valign="center" halign="right" focusareacolor1="fff1" focusareacolor2="fff3" ScriptEvents="1" />
+        </frame>
+        <frame id="type-text" pos="112 -2.5" z-index="1">
+            <entry id="entry" class="form setting-entry" pos="0 0" size="40 3.5" valign="center" halign="right" focusareacolor1="fff1" focusareacolor2="fff3" ScriptEvents="1" />
+        </frame>
+    </framemodel>
+
+    <frame id="main" pos="0 -9">
+        <quad class="bg-accent" z-index="-1" size="120 8" pos="-2 4" />
+        <label class="text-light" z-index="1" pos="111 2" text="" />
+        <quad class="bg-light" z-index="1" pos="92 -1.9" size="22 0.2" />
+        <quad class="bg-light" z-index="1" pos="29 -1.9" size="19.5 0.2" />
+        <quad class="bg-light" z-index="1" pos="115 -6" size="1 65" opacity="0.2" />
+        <quad id="scrollbar" class="bg-accent" z-index="2" pos="115 -6" size="1 15" opacity="1" />
+        <frame id="tabs">
+            {for $i=0;$i<3;$i++}
+            <label class="btn-accent tab" size="4 4" text="{$i}" ScriptEvents="1" data-tab="{$i}" />
+            {/for}
+        </frame>
+        <frame pos="-1 -7">
+            <frame pos="1 0" size="113 64" id="settings-frame">
+                {for $i=0;$i<50;$i++}
+                <frameinstance modelid="setting" pos="0 {$i * -5}" data-expanded="false" z-index="{100 - $i}" />
+                {/for}
+            </frame>
+        </frame>
+    </frame>
+{/block}
+
+{block scriptDeclarations}
+    <script><!--
+    #Struct EvoSC_ModeScriptSetting {
+        Text setting;
+        Text description;
+        Text def;
+        Text value;
+        Text type;
+    }
+
+    declare EvoSC_ModeScriptSetting[] matchSettings;
+    declare Real maxScroll;
+    declare CMlControl activeFrame;
+    declare CMlFrame[] windows;
+    --></script>
+{/block}
+
+{block functions}
+<script><!--
+EvoSC_ModeScriptSetting[] getSortedSettings(){
+    declare EvoSC_ModeScriptSetting[] notDefault;
+    declare EvoSC_ModeScriptSetting[] isDefault;
+    foreach(setting in matchSettings){
+        if(setting.value == setting.def){
+            isDefault.add(setting);
+        }else{
+            notDefault.add(setting);
+        }
+    }
+    foreach(setting in isDefault){
+        notDefault.add(setting);
+    }
+    return notDefault;
+}
+
+Void expand(CMlFrame settingFrame){
+    declare descriptionBackground <=> (settingFrame.GetFirstChild("descriptionBg") as CMlQuad);
+    declare background <=> (settingFrame.GetFirstChild("background") as CMlQuad);
+
+    settingFrame.DataAttributeSet("expanded", "true");
+    if(settingFrame.DataAttributeGet("expanded") == "true"){
+        background.Opacity = 1.0;
+        settingFrame.Size = <200.0, descriptionBackground.Size[1] + ML::Abs(descriptionBackground.RelativePosition_V3[1]) - 0.05>;
+    }else{
+        settingFrame.Size = <200.0, ML::Abs(descriptionBackground.RelativePosition_V3[1]) - 0.05>;
+    }
+}
+
+Void update(){
+    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
+    declare filled = 0;
+
+    foreach(setting in getSortedSettings()){
+        declare settingFrame = (settingsFrame.Controls[filled] as CMlFrame);
+        declare settingLabel <=> (settingFrame.GetFirstChild("setting") as CMlLabel);
+        declare descriptionLabel <=> (settingFrame.GetFirstChild("description") as CMlLabel);
+        declare descriptionBackground <=> (settingFrame.GetFirstChild("descriptionBg") as CMlQuad);
+        declare integerFrame <=> (settingFrame.GetFirstChild("type-integer") as CMlFrame);
+        declare realFrame <=> (settingFrame.GetFirstChild("type-real") as CMlFrame);
+        declare textFrame <=> (settingFrame.GetFirstChild("type-text") as CMlFrame);
+
+        settingLabel.Value = setting.setting;
+        descriptionLabel.Value = setting.description ^ "\nDefault: " ^ setting.def;
+        descriptionBackground.Size[1] = descriptionLabel.ComputeHeight(descriptionLabel.Value) + 4.0;
+        if(settingFrame.DataAttributeGet("expanded") == "true"){
+            settingFrame.Size = <200.0, descriptionBackground.Size[1] + ML::Abs(descriptionBackground.RelativePosition_V3[1]) - 0.05>;
+        }else{
+            settingFrame.Size = <200.0, ML::Abs(descriptionBackground.RelativePosition_V3[1]) - 0.05>;
+        }
+
+        if(setting.type == "integer"){
+            declare entry <=> (integerFrame.GetFirstChild("entry") as CMlEntry);
+            entry.Value = setting.value;
+            textFrame.Hide();
+            realFrame.Hide();
+        }else if(setting.type == "real"){
+            declare entry <=> (realFrame.GetFirstChild("entry") as CMlEntry);
+            entry.Value = setting.value;
+            textFrame.Hide();
+            integerFrame.Hide();
+        }else{
+            declare entry <=> (textFrame.GetFirstChild("entry") as CMlEntry);
+            entry.Value = setting.value;
+            integerFrame.Hide();
+            realFrame.Hide();
+        }
+
+        filled += 1;
+    }
+
+    for(i, filled, 20){
+        settingsFrame.Controls[i].Hide();
+    }
+}
+    --></script>
+{/block}
+
+<script><!--
+    {block bootScript}
+        declare mainFrame <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
+        declare tabsFrame <=> (Page.MainFrame.GetFirstChild("tabs") as CMlFrame);
+        declare scrollBar <=> (Page.MainFrame.GetFirstChild("scrollbar") as CMlQuad);
+
+        Page.GetClassChildren("tab", tabsFrame, True);
+        declare tabOffset = 0.0;
+        foreach(frame_ in Page.GetClassChildren_Result){
+            declare button = (frame_ as CMlLabel);
+            declare width = button.ComputeWidth(button.Value) + 4.0;
+            button.Size[0] = width;
+            button.RelativePosition_V3[0] = tabOffset + (width / 2);
+            tabOffset += width + 1.0;
+        }
+
+        matchSettings.fromjson("""{$data}""");
+        update();
+
+        declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
+        expand(settingsFrame.Controls[6] as CMlFrame);
+    {/block}
+
+    {block loop}
+    {/block}
+
+    {block pendingEvents}
+        if(event.Type == CMlScriptEvent::Type::MouseOver){
+            if(event.Control.HasClass("setting-entry")){
+                log("hey");
+                continue;
+                declare settingFrame = (event.Control.Parent as CMlFrame);
+                log(settingFrame);
+                continue;
+                declare background <=> (settingFrame.GetFirstChild("background") as CMlQuad);
+                background.Opacity = 0.25;
+                continue;
+            }
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            if(event.Control.HasClass("tab")){
+                declare target = event.Control.DataAttributeGet("tab");
+                foreach(frame in windows){
+                    frame.Hide();
+                }
+                Page.MainFrame.GetFirstChild(target).Show();
+                continue;
+            }
+            if(event.Control.HasClass("toggle")){
+                declare toggleFrame = (event.Control.Parent as CMlFrame);
+                declare value = toggleFrame.DataAttributeGet("value");
+                declare accentQuad = (toggleFrame.Controls[1] as CMlQuad);
+                declare handleFrame = (toggleFrame.Controls[3] as CMlFrame);
+                if(value == "1"){
+                    AnimMgr.Add(handleFrame, "<frame pos='-12 0' />", 220, CAnimManager::EAnimManagerEasing::QuartOut);
+                    AnimMgr.Add(accentQuad, "<quad opacity='0' />", 330, CAnimManager::EAnimManagerEasing::QuartOut);
+                    toggleFrame.DataAttributeSet("value", "0");
+                }else{
+                    AnimMgr.Add(handleFrame, "<frame pos='-4 0' />", 220, CAnimManager::EAnimManagerEasing::QuartOut);
+                    AnimMgr.Add(accentQuad, "<quad opacity='1' />", 330, CAnimManager::EAnimManagerEasing::QuartOut);
+                    toggleFrame.DataAttributeSet("value", "1");
+                }
+                continue;
+            }
+        }
+    {/block}
+    --></script>
+</manialink>

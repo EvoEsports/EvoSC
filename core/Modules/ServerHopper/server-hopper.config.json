@@ -7,21 +7,19 @@
   },
   "servers": [
     {
-      "login": "",
       "rpc": {
         "host": "localhost",
-        "port": 5000,
-        "login": "",
-        "pw": ""
+        "port": 5100,
+        "login": "User",
+        "pw": "User"
       }
     },
     {
-      "login": "",
       "rpc": {
         "host": "localhost",
-        "port": 5001,
-        "login": "",
-        "pw": ""
+        "port": 5101,
+        "login": "User",
+        "pw": "User"
       }
     }
   ]
