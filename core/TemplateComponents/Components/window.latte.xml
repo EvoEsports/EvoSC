@@ -10,7 +10,7 @@
     <quad class="bg-dark" size="{$window_width ?? 120} 6" opacity="0.6" z-index="-1"/>
     <quad id="bg" class="bg-dark" pos="0 -6" size="{$window_width ?? 120} {$window_height ?? 77}" opacity="0.9" z-index="-1"/>
     <quad class="bg-blur" size="{$window_width ?? 120} {$window_height + 6 ?? 83}" opacity="0.9" z-index="-2" />
-    <quad id="focus-trigger" class="bg-accent focus-trigger" size="{$window_width ?? 120} {$window_height + 6 ?? 83}" opacity="0.15" hidden="1" z-index="10000" ScriptEvents="1" />
+    <quad id="focus-trigger" class="bg-accent focus-trigger" size="{$window_width ?? 120} {($window_height ?? 83) + 6}" opacity="0.15" hidden="1" z-index="10000" ScriptEvents="1" />
     <label class="icon text-light" pos="2 -3" textsize="0.8" size="3 3" text="{include icon}" textprefix="$s" valign="center" ScriptEvents="1" focusareacolor2="0000" focusareacolor1="0000"/>
     <label class="text-light" pos="5.5 -3" textsize="0.8" text="{include title}" textcolor="{config('theme.hud.text-light')|contrast}" textprefix="$s" valign="center"/>
     <label class="close text-light" pos="{($window_width ?? 120) - 3} -3" size="6 6" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
