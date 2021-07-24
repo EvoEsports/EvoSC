@@ -91,6 +91,11 @@ class ServerHopper extends Module implements ModuleInterface
         $data->pw = $connection->getServerPassword() != (isManiaPlanet() ? false : 'No password');
         $data->map = $connection->getCurrentMapInfo()->name;
         $data->player_counts = array_slice($data->player_counts, 1);
+
+        if(isManiaPlanet()){
+            $data->title = $connection->getSystemInfo()->titleId;
+        }
+
         array_push($data->player_counts, $data->players);
 
         self::$serverData->put($id, $data);

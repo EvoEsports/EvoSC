@@ -46,7 +46,7 @@
         }
 
         {if $is_maniaplanet}
-            joinLink = "$p[#join=" ^ server["login"] ^ "@" ^ server["title"] ^ "]";
+            joinLink = "$p[#join=" ^ server["login"] ^ "@" ^ LoadedTitle.Name ^ "]";
         {else}
             joinLink = "";
         {/if}
