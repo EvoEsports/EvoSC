@@ -294,6 +294,7 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 #Include "Libs/Nadeo/MenuLibs/Common/Menu/Components/LoadingSpinner.Script.txt" as LoadingSpinner
 #Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/Record_Common.Script.txt" as Record
 #Include "Libs/Nadeo/CommonLibs/Common/Http.Script.txt" as Http
+#Include "Libs/Nadeo/CommonLibs/Common/Task.Script.txt" as Task
 #Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Const
 #Include "Libs/Nadeo/TMNext/TrackMania/API/LeaderboardAPI.Script.txt" as LeaderboardAPI
 #Include "Libs/Nadeo/TMNext/TrackMania/Stores/ClubStore.Script.txt" as ClubStore
@@ -348,6 +349,8 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 	K_Celebration Celebration;
 	Integer CurrentMedal;
 	Boolean RecordsEnabled;
+	Integer MapAvailaibleOnNadeoServices;
+	Task::LibCommonTask_K_Task TaskGetMapFromUid;
 	Boolean PlayerIsDisplayingRecords;
 	Integer RecordsSelectedZone;
 	Integer RecordsPlayerTime;
@@ -379,6 +382,7 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 	Record::K_TMxSM_Record_Records[] ZonesRecords;
 	K_RecordGhost[Text] LoadingRecordGhosts;
 	K_RecordGhost[Text] LoadedRecordGhosts;
+	Boolean ManialinkIsInitialized;
 }
 
         #Struct Player {

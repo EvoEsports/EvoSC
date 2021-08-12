@@ -1,12 +1,18 @@
-| ⚠ Bug-Reports are only accepted for the master-branch ⚠ |
-| --- |
-| If you encounter a bug, create an [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
+<center>
 
 # EvoSC
 
-[![GitHub](https://img.shields.io/badge/LICENSE-Creative_Commons_Attribution_NonCommercial_NoDerivatives_4_International_Public_License-lightgrey.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
-[![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
+A modern server controller for the game Trackmania (TM² & 2020).
+ 
+![EvoSC Screenshot](https://i.imgur.com/cXMIv8Q.png "EvoSC Screenshot")
 
+[![GitHub](https://img.shields.io/badge/LICENSE-CC_BY--NC--ND_4.0-lightgrey.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE.md)
+[![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
+</center>
+
+| ⚠ Bug-Reports are only accepted for the master-branch ⚠ |
+| --- |
+| If you encounter a bug, create an [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
 
 **Supported-Modes:**
 * TimeAttack
@@ -20,7 +26,7 @@
 ### Requirements
 * PHP 7.4 and simplexml, mbstring, gd, dom, mysql extension.
 * Composer
-* MySql/MariaDB Server
+* MySQL/MariaDB Server
 
 ### Installation
 [Wiki: Installation](https://wiki.evotm.com/books/evosc-users-guide/page/download-installation)

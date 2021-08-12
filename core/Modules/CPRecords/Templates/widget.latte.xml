@@ -166,7 +166,7 @@
                 reset();
             }
 
-            if(player != Null){
+            if(player != Null && InputPlayer != Null){
                 if(InputPlayer.Speed > 2 && !driving){
                     driving = True;
                     AnimMgr.Add(mf, """<frame size="1000 8.5" />""", 333, CAnimManager::EAnimManagerEasing::QuartOut);
