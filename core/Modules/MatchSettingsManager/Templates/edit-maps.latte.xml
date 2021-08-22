@@ -9,7 +9,7 @@
     {block navbar}
         {include 'Components.tabs', tabs =>
             [
-                'Settings'=>'msm.edit,'.$name,
+                'Script-Settings'=>'msm.edit,'.$name,
                 'Maps'=>'',
                 'Folders'=>'msm.edit_folders,'.$name
             ]

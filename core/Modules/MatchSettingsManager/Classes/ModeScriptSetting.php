@@ -79,20 +79,11 @@ class ModeScriptSetting implements Jsonable, Arrayable
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isDefaultValue(): bool
+    public function getType(): string
     {
-        return $this->value == $this->default;
-    }
-
-    /**
-     * @param int $options
-     * @return string|void
-     */
-    public function toJson($options = 0): string
-    {
-        return json_encode($this->toArray());
+        return $this->type;
     }
 
     /**
@@ -103,9 +94,18 @@ class ModeScriptSetting implements Jsonable, Arrayable
         return [
             'setting'     => $this->setting,
             'description' => $this->description,
-            'def'         => $this->default,
+            'default'     => $this->default,
             'value'       => $this->value,
             'type'        => $this->type,
         ];
+    }
+
+    /**
+     * @param int $options
+     * @return string|void
+     */
+    public function toJson($options = 0): string
+    {
+        return json_encode($this->toArray(), $options);
     }
 }

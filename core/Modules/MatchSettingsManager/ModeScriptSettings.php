@@ -30,7 +30,12 @@ class ModeScriptSettings
             new ModeScriptSetting('S_ScriptEnvironment', 'text', 'Environment in which the script runs, used mainly for debugging purpose', 'production'),
             new ModeScriptSetting('S_IsChannelServer', 'boolean', 'Set the server as a channel server', false),
             new ModeScriptSetting('S_AllowRespawn', 'boolean', 'Allow the players to respawn or not', true),
-            new ModeScriptSetting('S_RespawnBehaviour', 'integer', 'This setting control the behavior of the respawn button. It overrides the respawn behavior set by the game mode script and the S_AllowRespawn setting. It can takes one of the following values: 0 -> use the game mode value , 1 -> normal (respawn when pressing the button), 2 -> do nothing, 3 -> give up before first checkpoint, respawn after, 4 -> always give up', 0),
+            new ModeScriptSetting('S_RespawnBehaviour', 'integer', "This setting controls the behavior of the respawn button. It overrides the respawn behavior set by the game mode script and the S_AllowRespawn setting. It can takes one of the following values:\n
+\$o\$n0\$z -> use the game mode value
+\$o\$n1\$z -> normal (respawn when pressing the button)
+\$o\$n2\$z -> do nothing
+\$o\$n3\$z -> give up before first checkpoint, respawn after
+\$o\$n4\$z -> always give up", 0),
             new ModeScriptSetting('S_HideOpponents', 'boolean', 'Do not display the opponents cars', false),
             new ModeScriptSetting('S_UseLegacyXmlRpcCallbacks', 'boolean', 'Turn on/off the legacy xmlrpc callbacks', true)
         ]);
