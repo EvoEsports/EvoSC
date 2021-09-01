@@ -68,8 +68,8 @@ class RestClient
      *
      * @param string $url
      * @param array|null $options
-     *
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
     {

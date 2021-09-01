@@ -2,14 +2,12 @@
 <frame id="navbar" pos="0 -5.5" z-index="5">
     {php $i=0;}
     {foreach $tabs as $tab => $action}
-    {if $action != ''}
-    <quad id="nav-active" class="bg-dark" pos="{$i * 18 + 10} -3" size="17 4" z-index="10" halign="center" valign="center" opacity="0.33"/>
-    {/if}
-
     {if trim($action) == ''}
-    <label class="nav-btn btn-accent" pos="{$i++ * 18 + 10} -3" textsize="0.3" text="{$tab}" size="17 4" ScriptEvents="1"/>
+    <label class="nav-btn btn-accent" pos="0 -3" textsize="0.3" text="{$tab}" size="4 4" ScriptEvents="1"
+           focusareacolor2="{config('theme.hud.accent')}"/>
     {else}
-    <label class="nav-btn btn-accent switch-tab" pos="{$i++ * 18 + 10} -3" textsize="0.3" textcolor="{config('theme.hud.text-light')}" text="{$tab}" size="17 4" data-action="{$action}" ScriptEvents="1"/>
+    <label class="nav-btn btn-accent switch-tab" pos="0 -3" textsize="0.3" textcolor="{config('theme.hud.text-light')}" text="{$tab}" size="4 4" data-action="{$action}" ScriptEvents="1"
+           focusareacolor1="{(new \Mexitek\PHPColors\Color('#' . config('theme.hud.accent')))->darken(12)}"/>
     {/if}
     {/foreach}
 </frame>

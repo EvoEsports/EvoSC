@@ -27,7 +27,7 @@
         <label class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75" z-index="5"/> <!-- Group -->
         <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="6" rot="90"/> <!-- Fame Stars -->
         <label class="text-light" pos="25 -7" size="11 3" z-index="5"/> <!-- Score BG-Layer -->
-        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
+        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="cenert" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0" hidden="1"/> <!-- Primary BG -->
         <quad class="bg-accent" opacity="0" pos="1 0" size="86 12" z-index="-15" ScriptEvents="1" hidden="1"/> <!-- Primary BG -->

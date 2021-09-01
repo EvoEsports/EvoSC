@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 require 'vendor/larapack/dd/src/helper.php';
 
-const EVO_API_URL = "https://api.evotm.com";
+const EVO_API_URL = "https://ayylmao";
 
 /**
  * @return string

@@ -110,11 +110,11 @@ class TemplateController implements ControllerInterface
             $contrastRatio = (int)(($L2 + 0.05) / ($L1 + 0.05));
         }
 
-        // If contrast is more than 5, return black color
+        // If contrast is more than 5, return dark color
         if ($contrastRatio > 5) {
             return config('theme.hud.text-dark');
         } else {
-            // if not, return white color.
+            // if not, return light color.
             return config('theme.hud.text-light');
         }
     }

@@ -17,6 +17,7 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Models\Schedule;
+use EvoSC\Modules\MatchSettingsManager\Classes\ModeScriptSetting;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use SimpleXMLElement;
 
@@ -81,7 +82,8 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.load_and_skip', [self::class, 'loadMatchsettingsAndSkip'], 'matchsettings_load');
         ManiaLinkEvent::add('msm.overview', [self::class, 'showOverview'], 'matchsettings_load');
         ManiaLinkEvent::add('msm.create', [self::class, 'showCreateMatchsettings'], 'matchsettings_edit');
-        ManiaLinkEvent::add('msm.edit', [self::class, 'showEditMatchsettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.edit', [self::class, 'showEditModeScriptSettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.edit_server_settings', [self::class, 'showEditServerSettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.edit_maps', [self::class, 'showEditMatchsettingsMaps'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.edit_folders', [self::class, 'showEditMatchsettingsFolders'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.duplicate', [self::class, 'duplicateMatchsettings'], 'matchsettings_edit');
@@ -90,6 +92,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.update', [self::class, 'updateMatchsettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_folders', [self::class, 'saveFolders'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.save_mode_script', [self::class, 'mleSaveModeScriptSettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.schedule', [self::class, 'scheduleMatchSettings'], 'matchsettings_load');
 
         if (config('quick-buttons.enabled')) {
@@ -205,38 +208,89 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
     /**
      * @param Player $player
-     * @param string $name
+     * @param string $matchSettingsName
+     * @throws \Exception
+     */
+    public static function showEditServerSettings(Player $player, string $matchSettingsName)
+    {
+        $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
+        $xml = new SimpleXMLElement(File::get($file));
+        unset($xml->map);
+        unset($xml->script_settings);
+        dump($xml);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $matchSettingsName
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function showEditMatchsettings(Player $player, string $name)
+    public static function showEditModeScriptSettings(Player $player, string $matchSettingsName)
     {
-        $file = Server::getMapsDirectory() . 'MatchSettings/' . $name . '.txt';
-        $data = File::get($file);
-        $nodes = collect();
-        $xml = new SimpleXMLElement($data);
+        $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
+        $xml = new SimpleXMLElement(File::get($file));
 
-        foreach ($xml as $node) {
-            if ($node->getName() != 'map') {
-                if (count($node) > 0) {
-                    $nodeName = $node->getName();
-                    $items = collect();
+        $modeScriptName = $xml->gameinfos->script_name;
+        $availableSettings = ModeScriptSettings::getSettingsByMode($modeScriptName);
 
-                    foreach ($node as $item) {
-                        if ($nodeName == 'mode_script_settings' || $nodeName == 'script_settings') {
-                            $items->put('' . $item['name'], '' . $item['value']);
-                        } else {
-                            $items->put($item->getName(), '' . $item[0]);
-                        }
-                    }
+        foreach ($xml->script_settings->setting as $setting) {
+            $settingsName = (string)$setting['name'];
+            /**
+             * @var ModeScriptSetting $availableSetting
+             */
+            if ($availableSetting = $availableSettings->get($settingsName)) {
+                $availableSetting->setValue((string)$setting['value']);
+            }
+        }
 
-                    $nodes->put($nodeName, $items);
-                } else {
-                    $nodes->put($node->getName(), '' . $node[0]);
+        Template::show($player, 'MatchSettingsManager.edit-modescript-settings', [
+            'name'         => $matchSettingsName,
+            'data'         => $availableSettings->values()->toArray(),
+            'returnAction' => 'msm.overview'
+        ]);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $matchSettingsName
+     * @param $data
+     * @throws \Exception
+     */
+    public static function mleSaveModeScriptSettings(Player $player, string $matchSettingsName, $data)
+    {
+        $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
+        $xml = new SimpleXMLElement(File::get($file));
+        $toSave = collect();
+
+        $modeScriptName = $xml->gameinfos->script_name;
+        $availableSettings = ModeScriptSettings::getSettingsByMode($modeScriptName);
+
+        foreach ((array)$data as $setting => $value) {
+            /**
+             * @var ModeScriptSetting $availableSetting
+             */
+            if ($availableSetting = $availableSettings->get($setting)) {
+                if ($availableSetting->getDefault() != $value) {
+                    $toSave->push((object)[
+                        'name'  => $setting,
+                        'value' => $value,
+                        'type'  => $availableSetting->getType()
+                    ]);
                 }
             }
         }
 
-        @Template::show($player, 'MatchSettingsManager.edit-settings', compact('name', 'nodes'));
+        infoMessage($player, ' updated match-settings ', secondary($matchSettingsName))->sendAdmin();
+
+        unset($xml->script_settings->setting);
+        foreach ($toSave as $setting) {
+            $node = $xml->script_settings->addChild('setting');
+            $node->addAttribute('name', $setting->name);
+            $node->addAttribute('value', $setting->value);
+            $node->addAttribute('type', $setting->type);
+        }
+
+        File::put($file, Utility::simpleXmlPrettyPrint($xml));
     }
 
     /**
@@ -285,9 +339,11 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $folders = Map::distinct()->get(['folder']);
 
         foreach ($folders as $folder) {
-            $uid_mapper = function ($item) {return $item->uid;};
+            $uid_mapper = function ($item) {
+                return $item->uid;
+            };
             $count = Map::whereFolder($folder->folder)->get()->toBase()->map($uid_mapper)->diff($maps->toBase())->count();
-            if($count == 0) {
+            if ($count == 0) {
                 $enabledFolders->push($folder->folder);
             }
         }
