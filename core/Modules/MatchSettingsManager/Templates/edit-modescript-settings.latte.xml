@@ -311,6 +311,7 @@ Void mouseScroll(CMlFrame settingsFrame, CMlFrame settingsFrameChild){
             }
             if(event.Control.HasClass("save")){
                 TriggerPageAction("msm.save_mode_script,{$name}");
+                (Page.MainFrame.GetFirstChild("save_button") as CMlLabel).Hide();
                 alertUnsavedChanges = False;
                 continue;
             }

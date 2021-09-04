@@ -8,8 +8,8 @@
 {block navbar}
 {include 'Components.tabs', tabs =>
 [
-' Server'=>"msm.edit_server_settings,$name",
-' Mode-Script'=>'',
+' Server'=>"",
+' Mode-Script'=>"msm.edit,$name",
 ' Maps'=>"msm.edit_maps,$name",
 ' Folders'=>"msm.edit_folders,$name"
 ]
@@ -27,42 +27,23 @@
         </frame>
         <frame pos="-1 1">
             <frame pos="1 0" size="113 64" id="settings-frame">
-                <frame pos="0 0">
-                    {foreach $data as $i => $setting}
-                    <frame pos="0 {$i * -5}" size="120 4" data-index="{$i}" data-setting="{$setting['setting']}">
-                        <quad class="bg-accent" size="120 100" z-index="-1" opacity="0" />
-                        <label id="setting" class="text-light" pos="0 -2" size="112 4.1" text="{$setting['setting']}" data-text="{$setting['setting']}" valign="center" ScriptEvents="1" z-index="-1" focusareacolor1="0000" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.default.bg')))->darken(5)}" />
-                        <label id="description" textsize="0.7" class="text-lighter" pos="2 -7" textfont="GameFontRegular" size="108 100" text="{$setting['description']|ml_escape}
-
-$o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
-                        <quad class="bg-darker" size="112 100" pos="0 -5" />
-                        <label class="btn-muted help" pos="59.5 -2" size="4.1 4.1" text="" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" />
-                        <frame>
-                            {switch $setting['type']}
-                            {case 'boolean'}
-                            <entry class="form setting_entry" pos="1112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']|ml_escape}" selecttext="1" />
-                            <frame pos="112 -2" valign="center" halign="right" size="14 4.1">
-                                <frame pos="{($setting['value'] ?: $setting['default']) == '' ? -20 : 0} 0">
-                                    <quad class="bg-default" valign="center" size="20 5" />
-                                    <quad size="20 10" pos="-17.8" valign="center" colorize="{config('theme.hud.accent')}" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" z-index="1" />
-                                    <label class="text-light" valign="center" halign="center" pos="-6.75 0.25" text=" ON" textsize="0.5" z-index="2" />
-                                    <label class="text-light" valign="center" halign="center" pos="13.1 0.25" text=" OFF" textsize="0.5" z-index="2" />
-                                    <label class="toggle" size="50 5" valign="center" halign="center" ScriptEvents="1" z-index="3" focusareacolor1="0000" focusareacolor2="0000" />
-                                </frame>
+                <frame pos="0 -1" id="items">
+                    {foreach $xml as $node}
+                        {if count($node->children())}
+                            <label class="text-accent" text="{$node->getName()}" valign="center" textsize="1.4" size="50 4" />
+                            {foreach $node->children() as $n}
+                            <frame>
+                                <label class="text-light" textprefix="$<$999-$> " text="{$n->getName()}" valign="center" />
+                                <entry name="{$node->getName()}.{$n->getName()}" pos="112" size="60 4" class="form setting_entry" halign="right" valign="center" default="{$n}" selecttext="1" />
                             </frame>
-                            {case 'real'}
-                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
-                            <label class="btn-muted add-real" data-value="-1" pos="64 -2" size="4.1 4.1" valign="center" halign="center" text="-" ScriptEvents="1" />
-                            <label class="btn-muted add-real" data-value="1" pos="68.5 -2" size="4.1 4.1" valign="center" halign="center" text="+" ScriptEvents="1" />
-                            {case 'integer'}
-                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
-                            <label class="btn-muted add-int" data-value="-1" pos="64 -2" size="4.1 4.1" valign="center" halign="center" text="-" ScriptEvents="1" />
-                            <label class="btn-muted add-int" data-value="1" pos="68.5 -2" size="4.1 4.1" valign="center" halign="center" text="+" ScriptEvents="1" />
-                            {default}
-                            <entry class="form setting_entry" pos="112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
-                            {/switch}
+                            {/foreach}
+                        {else}
+                        <frame>
+                            <label class="text-accent" text="$o$n{$node->getName()}" valign="center" textsize="1.4" />
+                            <entry name="{$node->getName()}" pos="112" size="60 4" class="form setting_entry" halign="right" valign="center" default="{$node}" selecttext="1" />
                         </frame>
-                    </frame>
+                        {/if}
+                        <label /> <!-- spacer -->
                     {/foreach}
                 </frame>
                 <quad class="trigger" size="113 10000" ScriptEvents="1" />
@@ -73,12 +54,6 @@ $o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
             <label size="18 4" pos="9 0" class="btn-default" text=" SAVE" valign="center" halign="center" ScriptEvents="1" />
             <label id="save_button" size="18 4" pos="9 0" class="btn-accent save" text=" SAVE" valign="center" halign="center" ScriptEvents="1" hidden="1" z-index="1" />
         </frame>
-        <frame pos="116 -69" halign="right" z-index="5">
-            <quad size="16 4" class="bg-default" valign="center" halign="right" />
-            <label class="text-light" pos="-8" text=" FILTER" valign="center" halign="center" z-index="1" textsize="0.5" />
-            <entry id="filter_entry" class="filter form" pos="-16" size="30 4" valign="center" halign="right" selecttext="true" />
-            <label id="reset_filter" size="4 4" pos="-48" class="reset_filter btn-muted" text="" valign="center" halign="center" ScriptEvents="1" hidden="1" />
-        </frame>
     </frame>
 {/block}
 
@@ -87,129 +62,21 @@ $o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
     #Const GUTTER 1.0
     #Const BASE 4.0
     #Const EXPAND_DURATION 140
-
-    declare CMlFrame[] currentSelection;
     --></script>
 {/block}
 
 {block functions}
 <script><!--
-Void calculateDescriptionHeights(){
-    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
-    declare scrollFrame = (settingsFrame.Controls[0] as CMlFrame);
-    foreach(frame_ in scrollFrame.Controls){
-        declare frame =  (frame_ as CMlFrame);
-        currentSelection.add(frame);
-        declare descriptionLabel = (frame.GetFirstChild("description") as CMlLabel);
-        declare height = descriptionLabel.ComputeHeight(descriptionLabel.Value) + GUTTER * 5;
-        frame.DataAttributeSet("height", height ^ "");
-    }
-}
+Real alignItems(){
+    declare itemsFrame <=> (Page.MainFrame.GetFirstChild("items") as CMlFrame);
+    declare offset = 0.0;
 
-Void moveItems(Integer start, Real value){
-    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
-    for(i, start, currentSelection.count - 1){
-        declare frame = currentSelection[i];
-        declare newY = frame.RelativePosition_V3[1] - value;
-        AnimMgr.Add(frame, "<frame pos='" ^ frame.RelativePosition_V3[0] ^ " " ^ newY ^ "' />", EXPAND_DURATION, CAnimManager::EAnimManagerEasing::CubicOut);
-    }
-}
-
-Real getScrollHeight(){
-    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
-    declare scrollFrame = (settingsFrame.Controls[0] as CMlFrame);
-    declare height = 0.0;
-    foreach(frame in scrollFrame.Controls){
-        declare f = (frame as CMlFrame);
-        height += BASE;
-    }
-    return height;
-}
-
-Text highlightWithColor(Text source, Text toHighlight_){
-    declare toHighlight = TL::Trim(toHighlight_);
-    declare settingLower = TL::ToLowerCase(source);
-    declare highlightLength = TL::Length(toHighlight);
-
-    if(highlightLength == 0){
-        return source;
+    foreach(control in itemsFrame.Controls){
+        control.RelativePosition_V3[1] = offset;
+        offset -= BASE + GUTTER;
     }
 
-    declare Text[] parts = TL::Split("~", TL::Replace(settingLower, toHighlight, "~"));
-    declare out = "";
-    declare offset = 0;
-
-    for(i, 0, parts.count - 1){
-        declare isLast = i == parts.count - 1;
-        declare length = TL::Length(parts[i]);
-        declare part = TL::SubString(source, offset, length);
-        offset += length;
-        out = out ^ part ^ "$<$s${getShortColorCode(config('theme.hud.accent'))}" ^ TL::SubString(source, offset, highlightLength) ^ "$>";
-        offset += highlightLength;
-    }
-
-    return out;
-}
-
-Void filter(Text search_){
-    declare search = TL::Trim(search_);
-    declare resetFilterButton <=> (Page.MainFrame.GetFirstChild("reset_filter") as CMlLabel);
-    declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
-    declare scrollFrame = (settingsFrame.Controls[0] as CMlFrame);
-    declare Integer[CMlFrame] toShow;
-    declare Integer[CMlFrame] toHide;
-    currentSelection = CMlFrame[];
-
-    for(i, 0, scrollFrame.Controls.count - 1){
-        declare frame = (scrollFrame.Controls[i] as CMlFrame);
-        frame.Size[1] = BASE;
-
-        if(i == 0){
-            Page.ScrollToControl(frame);
-        }
-
-        declare settingLabel <=> (frame.GetFirstChild("setting") as CMlLabel);
-        declare original = settingLabel.DataAttributeGet("text");
-
-        if(search == ""){
-            frame.RelativePosition_V3[1] = i * -(GUTTER + BASE);
-            settingLabel.Value = original;
-            frame.Show();
-            frame.DataAttributeSet("index", "" ^ i);
-            frame.DataAttributeSet("expanded", "false");
-            currentSelection.add(frame);
-            continue;
-        }
-
-        if(TL::Find(search, original, False, False)){
-            settingLabel.Value = highlightWithColor(original, search);
-            declare modified = TL::Replace(TL::ToLowerCase(original), TL::ToLowerCase(search), "~");
-            declare parts = TL::Split("~", modified);
-            toShow[frame] = TL::Length(parts[0]);
-        }else{
-            toHide[frame] = i;
-        }
-    }
-
-    if(search == ""){
-        resetFilterButton.Hide();
-        return;
-    }else{
-        resetFilterButton.Show();
-    }
-
-    foreach(frame => i in toHide){
-        frame.Hide();
-    }
-
-    declare y = 0;
-    foreach(frame => i in toShow.sort()){
-        frame.Show();
-        frame.DataAttributeSet("index", "" ^ y);
-        currentSelection.add(frame);
-        frame.RelativePosition_V3[1] = y * -(GUTTER + BASE);
-        y += 1;
-    }
+    return offset * -1.0;
 }
 
 Void updateScrollBarPosition(CMlFrame settingsFrame, CMlFrame settingsFrameChild){
@@ -219,33 +86,16 @@ Void updateScrollBarPosition(CMlFrame settingsFrame, CMlFrame settingsFrameChild
     declare scrollRatio = scrollDistance / max;
     scrollBar.RelativePosition_V3[1] = scrollRatio * (80 - scrollBar.Size[1]) * -1.0;
 }
-
-Void mouseScroll(CMlFrame settingsFrame, CMlFrame settingsFrameChild){
-    declare scrollBar <=> (Page.MainFrame.GetFirstChild("scrollbar") as CMlLabel);
-    declare yStart = MouseY;
-    declare yFrameStart = settingsFrameChild.RelativePosition_V3[1];
-    declare y = 0.0;
-    while(MouseLeftButton){
-        yStart = MouseY;
-        sleep(1);
-        y = (yStart - MouseY) * 0.9;
-        settingsFrame.Scroll(<0.0, y>);
-        updateScrollBarPosition(settingsFrame, settingsFrameChild);
-    }
-}
     --></script>
 {/block}
 
 <script><!--
     {block bootScript}
-        declare baseHeight = 4.0;
-        calculateDescriptionHeights();
-
         declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
         declare scrollFrame = (settingsFrame.Controls[0] as CMlFrame);
         settingsFrame.ScrollActive = True;
         settingsFrame.ScrollMin = <0.0, 0.0>;
-        settingsFrame.ScrollMax = <0.0, getScrollHeight()>;
+        settingsFrame.ScrollMax = <0.0, alignItems() / 2.0>;
     {/block}
 
     {block loop}
@@ -253,85 +103,18 @@ Void mouseScroll(CMlFrame settingsFrame, CMlFrame settingsFrameChild){
     {/block}
 
     {block pendingEvents}
-        if(event.Type == CMlScriptEvent::Type::MouseClick){
-            if(event.Control.HasClass("scroll-handle")){
-                mouseScroll(settingsFrame, scrollFrame);
-                continue;
-            }
-            if(event.Control.HasClass("toggle")){
-                declare slideFrame = (event.Control.Parent as CMlFrame);
-                declare parentFrame = (slideFrame.Parent.Parent as CMlFrame);
-                declare entry = (parentFrame.Controls[0] as CMlEntry);
-                if(entry.Value == ""){
-                    entry.SetText("1", True);
-                    AnimMgr.Add(slideFrame, "<frame pos='0 0' />", 230, CAnimManager::EAnimManagerEasing::CubicOut);
-                }else{
-                    entry.SetText("", True);
-                    AnimMgr.Add(slideFrame, "<frame pos='-20 0' />", 230, CAnimManager::EAnimManagerEasing::CubicOut);
-                }
-                continue;
-            }
-            if(event.Control.HasClass("add-int")){
-                declare parentFrame = (event.Control.Parent as CMlFrame);
-                declare entry = (parentFrame.Controls[0] as CMlEntry);
-                declare currentValue = TL::ToInteger(entry.Value);
-                declare valueToAdd = TL::ToInteger(event.Control.DataAttributeGet("value"));
-                entry.SetText("" ^ (currentValue + valueToAdd), True);
-                continue;
-            }
-            if(event.Control.HasClass("add-real")){
-                declare parentFrame = (event.Control.Parent as CMlFrame);
-                declare entry = (parentFrame.Controls[0] as CMlEntry);
-                declare currentValue = TL::ToReal(entry.Value);
-                declare valueToAdd = TL::ToReal(event.Control.DataAttributeGet("value"));
-                entry.SetText("" ^ (currentValue + valueToAdd), True);
-                continue;
-            }
-            if(event.Control.HasClass("help")){
-                declare parentFrame = (event.Control.Parent as CMlFrame);
-                declare descriptionHeight = TL::ToReal(parentFrame.DataAttributeGet("height"));
-                declare index = TL::ToInteger(parentFrame.DataAttributeGet("index"));
-                declare isExpanded = parentFrame.DataAttributeGet("expanded") == "true";
-
-                if(isExpanded){
-                    moveItems(index, -descriptionHeight);
-                    parentFrame.DataAttributeSet("expanded", "false");
-                    AnimMgr.Add(parentFrame, "<frame size='" ^ parentFrame.Size[0] ^ " " ^ baseHeight ^ "' />", EXPAND_DURATION, CAnimManager::EAnimManagerEasing::CubicOut);
-                }else{
-                    moveItems(index, descriptionHeight);
-                    parentFrame.DataAttributeSet("expanded", "true");
-                    AnimMgr.Add(parentFrame, "<frame size='" ^ parentFrame.Size[0] ^ " " ^ (baseHeight + descriptionHeight) ^ "' />", EXPAND_DURATION, CAnimManager::EAnimManagerEasing::CubicOut);
-                }
-                continue;
-            }
-            if(event.Control.HasClass("reset_filter")){
-                (Page.MainFrame.GetFirstChild("filter_entry") as CMlEntry).Value = "";
-                filter("");
-                continue;
-            }
-            if(event.Control.HasClass("save")){
-                TriggerPageAction("msm.save_mode_script,{$name}");
-                alertUnsavedChanges = False;
-                continue;
-            }
-        }
         if(event.Type == CMlScriptEvent::Type::EntrySubmit){
-            if(event.Control.HasClass("filter")){
-                foreach(frame_ in scrollFrame.Controls){
-                    declare entry = (event.Control as CMlEntry);
-                    filter(entry.Value);
-                    continue;
-                    declare frame = (frame_ as CMlFrame);
-                    declare label <=> (frame.Controls[1] as CMlLabel);
-                    declare originalText = label.DataAttributeGet("text");
-                    label.Value = highlightWithColor(originalText, entry.Value);
-                    log(label.Value == originalText);
-                }
-                continue;
-            }
             if(event.Control.HasClass("setting_entry")){
                 (Page.MainFrame.GetFirstChild("save_button") as CMlLabel).Show();
                 alertUnsavedChanges = True;
+                continue;
+            }
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            if(event.Control.HasClass("save")){
+                TriggerPageAction("msm.save_server_settings,{$name}");
+                (Page.MainFrame.GetFirstChild("save_button") as CMlLabel).Hide();
+                alertUnsavedChanges = False;
                 continue;
             }
         }

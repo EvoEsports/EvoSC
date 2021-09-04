@@ -332,7 +332,6 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 	Boolean AlwaysDisplayRecords;
 	Boolean ReloadRecords;
 	Boolean PBGhostEnabled;
-	Boolean DisplayPBGhost;
 	Boolean MedalEnabled;
 	Boolean CelebratePB;
 	Boolean CelebrateMedal;

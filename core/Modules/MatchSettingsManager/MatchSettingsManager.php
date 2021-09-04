@@ -93,6 +93,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.save_maps', [self::class, 'saveMaps'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_folders', [self::class, 'saveFolders'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_mode_script', [self::class, 'mleSaveModeScriptSettings'], 'matchsettings_edit');
+        ManiaLinkEvent::add('msm.save_server_settings', [self::class, 'mleSaveServerSettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.schedule', [self::class, 'scheduleMatchSettings'], 'matchsettings_load');
 
         if (config('quick-buttons.enabled')) {
@@ -217,7 +218,12 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $xml = new SimpleXMLElement(File::get($file));
         unset($xml->map);
         unset($xml->script_settings);
-        dump($xml);
+
+        Template::show($player, 'MatchSettingsManager.edit-server-settings', [
+            'name'         => $matchSettingsName,
+            'xml'          => $xml,
+            'returnAction' => 'msm.overview'
+        ]);
     }
 
     /**
@@ -240,6 +246,10 @@ class MatchSettingsManager extends Module implements ModuleInterface
              */
             if ($availableSetting = $availableSettings->get($settingsName)) {
                 $availableSetting->setValue((string)$setting['value']);
+            } else {
+                $modeScriptSetting = new ModeScriptSetting($settingsName, (string)$setting['type'], 'No description available.', '');
+                $modeScriptSetting->setValue((string)$setting['value']);
+                $availableSettings->push($modeScriptSetting);
             }
         }
 
@@ -277,6 +287,12 @@ class MatchSettingsManager extends Module implements ModuleInterface
                         'type'  => $availableSetting->getType()
                     ]);
                 }
+            } else {
+                $toSave->push((object)[
+                    'name'  => $setting,
+                    'value' => $value,
+                    'type'  => intval($value) > 0 ? 'real' : 'text'
+                ]);
             }
         }
 
@@ -289,6 +305,47 @@ class MatchSettingsManager extends Module implements ModuleInterface
             $node->addAttribute('value', $setting->value);
             $node->addAttribute('type', $setting->type);
         }
+
+        File::put($file, Utility::simpleXmlPrettyPrint($xml));
+    }
+
+    public static function mleSaveServerSettings(Player $player, string $matchSettingsName, $data)
+    {
+        $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
+        $xml = new SimpleXMLElement(File::get($file));
+
+        $toUnset = collect($data)->map(function ($value, $key) {
+            $parts = explode('.', $key);
+
+            return $parts[0];
+        })->unique()->values();
+
+        foreach ($toUnset as $key) {
+            if (isset($xml->{$key})) {
+                unset($xml->{$key});
+            }
+        }
+
+        $nodes = collect();
+        foreach ($data as $key => $value) {
+            $keyParts = explode('.', $key);
+            $parent = array_shift($keyParts);
+
+            if (!$nodes->has($parent)) {
+                $node = $xml->addChild($parent);
+                $nodes->put($parent, $node);
+            } else {
+                $node = $nodes->get($parent);
+            }
+
+            if (count($keyParts) > 0) {
+                $node->addChild(implode('.', $keyParts), $value);
+            } else {
+                $node[0] = $value;
+            }
+        }
+
+        infoMessage($player, ' updated match-settings ', secondary($matchSettingsName))->sendAdmin();
 
         File::put($file, Utility::simpleXmlPrettyPrint($xml));
     }
@@ -312,8 +369,9 @@ class MatchSettingsManager extends Module implements ModuleInterface
         }
 
         $mapChunks = Map::all()->sortByDesc('enabled')->chunk(19);
+        $returnAction = 'msm.overview';
 
-        Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'mapChunks', 'enabledMapUids'));
+        Template::show($player, 'MatchSettingsManager.edit-maps', compact('name', 'mapChunks', 'enabledMapUids', 'returnAction'));
     }
 
     /**
@@ -349,8 +407,9 @@ class MatchSettingsManager extends Module implements ModuleInterface
         }
 
         $folderChunks = $folders->chunk(19);
+        $returnAction = 'msm.overview';
 
-        Template::show($player, 'MatchSettingsManager.edit-folders', compact('name', 'folderChunks', 'enabledFolders'));
+        Template::show($player, 'MatchSettingsManager.edit-folders', compact('name', 'folderChunks', 'enabledFolders', 'returnAction'));
     }
 
     /**
