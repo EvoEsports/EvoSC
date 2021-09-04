@@ -325,7 +325,6 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 	Ident GhostId;
 	Ident GhostInstanceId;
 }
-
 #Struct K_State {
 	Integer SetupUpdate;
 	Integer ForceMapUpdate;
