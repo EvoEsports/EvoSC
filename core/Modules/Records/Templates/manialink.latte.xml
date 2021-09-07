@@ -326,12 +326,14 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 	Ident GhostInstanceId;
 }
 
+
 #Struct K_State {
 	Integer SetupUpdate;
 	Integer ForceMapUpdate;
 	Boolean AlwaysDisplayRecords;
 	Boolean ReloadRecords;
 	Boolean PBGhostEnabled;
+	Boolean DisplayPBGhost;
 	Boolean MedalEnabled;
 	Boolean CelebratePB;
 	Boolean CelebrateMedal;
