@@ -94,8 +94,13 @@ class Cache
         }
     }
 
-    public static function forget(string $string)
+    /**
+     * @param string ...$string
+     */
+    public static function forget(string ...$string)
     {
-        File::delete(cacheDir($string));
+        foreach ($string as $item) {
+            File::delete(cacheDir($item));
+        }
     }
 }

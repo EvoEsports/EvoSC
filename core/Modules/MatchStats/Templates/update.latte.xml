@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:push-new-match-recording-state" id="push-new-match-recording-state" version="3">
+    <script>
+        <!--
+        main(){
+            declare Text EvoSC_MatchRecordingName for This;
+            EvoSC_MatchRecordingName = """{$currentMatch|noescape}""";
+        }
+        -->
+    </script>
+</manialink>
