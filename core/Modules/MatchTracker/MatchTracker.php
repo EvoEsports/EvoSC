@@ -3,9 +3,11 @@
 namespace EvoSC\Modules\MatchTracker;
 
 
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
@@ -21,27 +23,29 @@ class MatchTracker extends Module implements ModuleInterface
     /**
      * Called when the module is loaded
      *
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-//        if (ModeController::isRounds()) {
-//            if (!$isBoot) {
-//                Template::showAll('match-tracker.widget');
-//            }
-//
-//            self::$match = collect();
-//            Hook::add('PlayerConnect', [self::class, 'sendWidget']);
-//            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
-//            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
-//            Hook::add('Maniaplanet.StartRound_Start', [self::class, 'resetTracker']);
-//            Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'resetTracker']);
-//        } else {
-//            if (!$isBoot) {
-//                Template::hideAll('match-tracker-widget');
-//            }
-//        }
+        return;
+
+        if (ModeController::isRoundsType()) {
+            if (!$isBoot) {
+                Template::showAll('match-tracker.widget');
+            }
+
+            self::$match = collect();
+            Hook::add('PlayerConnect', [self::class, 'sendWidget']);
+            Hook::add('PlayerCheckpoint', [self::class, 'playerCheckpoint']);
+            Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+            Hook::add('Maniaplanet.StartRound_Start', [self::class, 'resetTracker']);
+            Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'resetTracker']);
+        } else {
+            if (!$isBoot) {
+                Template::hideAll('match-tracker-widget');
+            }
+        }
     }
 
     public static function sendWidget(Player $player)

@@ -149,9 +149,6 @@
 
     <script><!--
     {block globals}
-        declare Vec2 widgetBasePosition;
-        declare CMlFrame HS_Target;
-        declare Boolean HS_Hidden;
     {/block}
 
     {block bootScript}
