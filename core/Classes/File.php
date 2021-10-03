@@ -102,12 +102,12 @@ class File
         }
 
         if ($filterPattern) {
-            return collect(scandir($path))->filter(function ($file) use ($filterPattern) {
+            return collect(array_slice(scandir($path), 2))->filter(function ($file) use ($filterPattern) {
                 return preg_match($filterPattern, $file);
             });
         }
 
-        return collect(scandir($path));
+        return collect(array_slice(scandir($path), 2));
     }
 
     /**
@@ -178,11 +178,22 @@ class File
     {
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        if (file_exists($path) && is_file($path)) {
-            unlink($path);
-            Log::warning('Deleted file: ' . $path);
+        if (file_exists($path)) {
+            if (is_file($path)) {
+                unlink($path);
+                Log::warning('Deleted file: ' . $path);
 
-            return true;
+                return true;
+            } else if (is_dir($path)) {
+                foreach (array_slice(scandir($path), 2) as $item) {
+                    self::delete($item);
+                }
+
+                rmdir($path);
+                Log::warning('Deleted directory: ' . $path);
+
+                return true;
+            }
         }
 
         return false;

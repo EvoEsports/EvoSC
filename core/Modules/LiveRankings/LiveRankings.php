@@ -5,6 +5,7 @@ namespace EvoSC\Modules\LiveRankings;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
@@ -29,14 +30,17 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('PlayerInfoChanged', [self::class, 'checkIfViewIsAffected']);
-        Hook::add('PlayerDisconnect', [self::class, 'checkIfViewIsAffected']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
-
         if (ModeController::isTimeAttackType()) {
             if (ModeController::isRoyal()) {
-                Hook::add('Scores', [self::class, 'updateWidget']);
-                Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
+                if (ModeController::getMode() != 'Trackmania/Evo_Royal_TA.Script.txt') {
+                    Log::warning("For local records to work in RoyalTA, you need to download Evos modified RoyalTA script from https://raw.githubusercontent.com/EvoTM/Evo-Royal-TA/master/Evo_Royal_TA.Script.txt.\nSave it to UserData/Scripts/Modes/Trackmania and set 'Trackmania/Evo_Royal_TA.Script.txt' in your match-settings.");
+
+                    return;
+                }
+
+                Hook::add('PlayerFinishSegment', [self::class, 'playerFinishSection']);
+                Hook::add('BeginMatch', [self::class, 'resetLapsTracker']);
+                Hook::add('EndMap', [self::class, 'resetLapsTracker']);
             } else {
                 Hook::add('Scores', [self::class, 'updateWidget']);
                 Hook::add('PlayerFinish', function ($player, $score) {
@@ -56,6 +60,10 @@ class LiveRankings extends Module implements ModuleInterface
             Hook::add('Scores', [self::class, 'updateWidget']);
         }
 
+        Hook::add('PlayerInfoChanged', [self::class, 'checkIfViewIsAffected']);
+        Hook::add('PlayerDisconnect', [self::class, 'checkIfViewIsAffected']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+
         if (!$isBoot) {
             Template::showAll('LiveRankings.widget', ['originalPointsLimit' => PointsController::getOriginalPointsLimit()]);
         }
@@ -74,11 +82,14 @@ class LiveRankings extends Module implements ModuleInterface
     public static function resetLapsTracker()
     {
         self::$lapTracker = [];
-        self::updateWidget(collect(self::$lapTracker));
+        self::$sectionTracker = [];
+        self::updateWidget(collect());
     }
 
-    public static function playerFinishSection(Player $player, int $score, array $checkpoints, int $section)
+    public static function playerFinishSection(Player $player, int $score, int $segment, int $totalSegments)
     {
+        dump($totalSegments);
+
         $id = $player->id;
         if (!array_key_exists($id, self::$sectionTracker)) {
             self::$sectionTracker[$id] = (object)[
@@ -92,8 +103,8 @@ class LiveRankings extends Module implements ModuleInterface
             ];
         }
 
-        self::$sectionTracker[$id]->section++;
-        self::$sectionTracker[$id]->bestracetime += $score;
+        self::$sectionTracker[$id]->section = $totalSegments;
+        self::$sectionTracker[$id]->bestracetime = $score;
         self::updateWidget(collect(self::$sectionTracker));
     }
 
@@ -184,8 +195,12 @@ class LiveRankings extends Module implements ModuleInterface
      */
     public static function checkIfViewIsAffected(Player $player)
     {
-        if (in_array($player->Login, self::$shownLogins)) {
-            Server::callGetScores(); //Force server to send scores callback
+        if (ModeController::isRoyal()) {
+            self::updateWidget(collect(self::$sectionTracker));
+        } else {
+            if (in_array($player->Login, self::$shownLogins)) {
+                Server::callGetScores(); //Force server to send scores callback
+            }
         }
     }
 

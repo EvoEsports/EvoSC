@@ -3,7 +3,6 @@
 namespace EvoSC\Modules\ServerHopper;
 
 
-use EvoSC\Classes\Cache;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
@@ -19,35 +18,87 @@ use Maniaplanet\DedicatedServer\Connection;
 class ServerHopper extends Module implements ModuleInterface
 {
     /**
+     * @var Collection
+     */
+    private static Collection $connections;
+
+    /**
+     * @var Collection
+     */
+    private static Collection $serverData;
+
+    /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (count(config('server-hopper.servers'))) {
-            try {
-                self::sendUpdatedServerInformations();
-            } catch (Exception $e) {
-                Log::errorWithCause('Failed to send updated server information', $e);
-                Log::error('Stopping module ' . self::class);
-                return;
+        self::$connections = collect();
+        self::$serverData = collect();
+        self::connectToToServers();
+
+        Hook::add('PlayerConnect', [self::class, 'showWidget']);
+
+        ManiaLinkEvent::add('server_hopper_join', [self::class, 'mleShowJoinWindow']);
+
+        Timer::create('refresh_server_list', [self::class, 'sendUpdatedServerInformation'], '1m', true);
+    }
+
+    /**
+     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
+     */
+    public static function connectToToServers()
+    {
+        foreach (config('server-hopper.servers') as $server) {
+            $id = $server->rpc->host . ':' . $server->rpc->port;
+
+            if (self::$connections->has($id)) {
+                continue;
             }
 
-            Hook::add('PlayerConnect', [self::class, 'showWidget']);
-
-            ManiaLinkEvent::add('server_hopper_join', [self::class, 'mleShowJoinWindow']);
-
-            Timer::create('refresh_server_list', [self::class, 'sendUpdatedServerInformations'], '1m', true);
+            try {
+                $connection = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
+                self::$connections->put($id, $connection);
+                self::updateServerInfo($connection);
+            } catch (\Exception $e) {
+                Log::errorWithCause('Failed to connect to server ' . $server->rpc->host . ':' . $server->rpc->host, $e);
+            }
         }
     }
 
     /**
-     * @param Player $player
-     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     * @param Connection $connection
+     * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
      */
-    public static function showWidget(Player $player)
+    public static function updateServerInfo(Connection $connection)
     {
-        self::sendUpdatedServerInformations($player);
-        Template::show($player, 'ServerHopper.widget');
+        $systemInfo = $connection->getSystemInfo();
+        $id = $systemInfo->publishedIp . ':' . $systemInfo->port;
+
+        if (self::$serverData->has($id)) {
+            $data = self::$serverData->get($id);
+        } else {
+            $data = (object)[
+                'login'         => $connection->getMainServerPlayerInfo()->login,
+                'ip'            => $systemInfo->publishedIp,
+                'port'          => $systemInfo->port,
+                'player_counts' => array_fill(0, 61, 0)
+            ];
+        }
+
+        $data->name = $connection->getServerName();
+        $data->players = count($connection->getPlayerList());
+        $data->max = $connection->getMaxPlayers()['CurrentValue'];
+        $data->pw = $connection->getServerPassword() != (isManiaPlanet() ? false : 'No password');
+        $data->map = $connection->getCurrentMapInfo()->name;
+        $data->player_counts = array_slice($data->player_counts, 1);
+
+        if (isManiaPlanet()) {
+            $data->title = $connection->getSystemInfo()->titleId;
+        }
+
+        array_push($data->player_counts, $data->players);
+
+        self::$serverData->put($id, $data);
     }
 
     /**
@@ -55,9 +106,16 @@ class ServerHopper extends Module implements ModuleInterface
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      * @throws Exception
      */
-    public static function sendUpdatedServerInformations(Player $player = null)
+    public static function sendUpdatedServerInformation(Player $player = null)
     {
-        $serversJson = self::getServersData()->values()->toJson();
+        foreach (self::$connections as $connection) {
+            self::updateServerInfo($connection);
+        }
+
+        $serversJson = self::$serverData
+            ->sortByDesc('players')
+            ->values()
+            ->toJson();
 
         if ($player != null) {
             Template::show($player, 'ServerHopper.update', compact('serversJson'), false, 5);
@@ -67,54 +125,24 @@ class ServerHopper extends Module implements ModuleInterface
     }
 
     /**
-     * @return mixed|string
-     * @throws Exception
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    private static function getServersData(): Collection
+    public static function showWidget(Player $player)
     {
-        if (Cache::has('server_hopper')) {
-            return collect(Cache::get('server_hopper'));
-        }
-
-        $serversJson = collect(config('server-hopper.servers'))->map(function ($server) {
-            try {
-                $connection = Connection::factory($server->rpc->host, $server->rpc->port, 500, $server->rpc->login, $server->rpc->pw);
-                $systemInfo = $connection->getSystemInfo();
-
-                return [
-                    'login' => $server->login,
-                    'name' => $connection->getServerName(),
-                    'description' => $connection->getServerComment(),
-                    'players' => count($connection->getPlayerList()),
-                    'max' => $connection->getMaxPlayers()['CurrentValue'],
-                    'title' => $connection->getVersion()->titleId,
-                    'pw' => isManiaPlanet() ? $connection->getServerPassword() != false : false,
-                    'ip' => $systemInfo->publishedIp,
-                    'port' => $systemInfo->port
-                ];
-            } catch (Exception $e) {
-                Log::errorWithCause('Failed to get server data', $e);
-                return null;
-            }
-        })
-            ->filter()
-            ->sortByDesc('players');
-
-        Cache::put('server_hopper', $serversJson, now()->seconds(55));
-
-        return $serversJson;
+        self::sendUpdatedServerInformation($player);
+        Template::show($player, 'ServerHopper.widget');
     }
 
     /**
      * @param Player $player
      * @param string $serverLogin
      * @throws \EvoSC\Exceptions\InvalidArgumentException
-     * @throws Exception
      */
     public static function mleShowJoinWindow(Player $player, string $serverLogin)
     {
-        $server = self::getServersData()->where('login', $serverLogin)->first();
-
-        Template::show($player, 'ServerHopper.join', ['server' => $server]);
+        Template::show($player, 'ServerHopper.join', [
+            'server' => self::$serverData->where('login', $serverLogin)->first()
+        ]);
     }
 }

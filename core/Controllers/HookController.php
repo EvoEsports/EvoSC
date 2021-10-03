@@ -30,8 +30,8 @@ class HookController implements ControllerInterface
     }
 
     /**
-     * @param  string  $mode
-     * @param  bool  $isBoot
+     * @param string $mode
+     * @param bool $isBoot
      * @return mixed|void
      */
     public static function start(string $mode, bool $isBoot)
@@ -41,7 +41,7 @@ class HookController implements ControllerInterface
     /**
      * Get all hooks, or all by name
      *
-     * @param  string|null  $eventName
+     * @param string|null $eventName
      *
      * @return Collection|null
      */
@@ -67,10 +67,10 @@ class HookController implements ControllerInterface
     /**
      * Add a new hook
      *
-     * @param  string  $event
-     * @param  callable  $callback
-     * @param  bool  $runOnce
-     * @param  int  $priority
+     * @param string $event
+     * @param callable $callback
+     * @param bool $runOnce
+     * @param int $priority
      *
      * @throws Exception
      */
@@ -84,13 +84,18 @@ class HookController implements ControllerInterface
                 $hooks->put($event, collect());
             }
 
-            $hookGroup = $hooks->get($event)->push($hook)->sortByDesc('priority');
+            $hookGroup = $hooks->get($event)->push($hook)->sortByDesc(function (Hook $hook) {
+                return $hook->getPriority();
+            })->values();
+
             $hooks->put($event, $hookGroup);
 
-            if (gettype($callback) == "object") {
-                Log::write("Added $event (Closure)", isDebug());
-            } else {
-                Log::write("Added ".$callback[0]."::".$callback[1], isDebug());
+            if (isDebug()) {
+                if (gettype($callback) == "object") {
+                    Log::write("Added $event (Closure)");
+                } else {
+                    Log::write("Added " . $callback[0] . "::" . $callback[1]);
+                }
             }
         }
     }

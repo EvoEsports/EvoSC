@@ -1,0 +1,123 @@
+{contentType text}
+{extends 'Components.tabbed-window'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink id="{block id}edit-settings{/block}" version="3">
+{block icon}{/block}
+{block title}Edit {$name}{/block}
+
+{block navbar}
+{include 'Components.tabs', tabs =>
+[
+' Server'=>"",
+' Mode-Script'=>"msm.edit,$name",
+' Maps'=>"msm.edit_maps,$name",
+' Folders'=>"msm.edit_folders,$name"
+]
+}
+{/block}
+
+{block content}
+    <frame id="main" pos="0 -9">
+        <quad class="bg-darker" z-index="1" pos="-2 -65" size="120 8" opacity="0.85" />
+        <frame pos="0 8">
+            <quad class="bg-light" z-index="1" pos="114.5 -6" size="1.5 65" opacity="0.2" />
+            <frame pos="114.5 -6" size="1.5 65" z-index="2">
+                <label id="scrollbar" class="btn-accent scroll-handle" z-index="2" pos="0 -6" size="15 15" opacity="1" ScriptEvents="1" />
+            </frame>
+        </frame>
+        <frame pos="-1 1">
+            <frame pos="1 0" size="113 64" id="settings-frame">
+                <frame pos="0 -1" id="items">
+                    {foreach $xml as $node}
+                        {if count($node->children())}
+                            <label class="text-accent" text="{$node->getName()}" valign="center" textsize="1.4" size="50 4" />
+                            {foreach $node->children() as $n}
+                            <frame>
+                                <label class="text-light" textprefix="$<$999-$> " text="{$n->getName()}" valign="center" />
+                                <entry name="{$node->getName()}.{$n->getName()}" pos="112" size="60 4" class="form setting_entry" halign="right" valign="center" default="{$n}" selecttext="1" />
+                            </frame>
+                            {/foreach}
+                        {else}
+                        <frame>
+                            <label class="text-accent" text="$o$n{$node->getName()}" valign="center" textsize="1.4" />
+                            <entry name="{$node->getName()}" pos="112" size="60 4" class="form setting_entry" halign="right" valign="center" default="{$node}" selecttext="1" />
+                        </frame>
+                        {/if}
+                        <label /> <!-- spacer -->
+                    {/foreach}
+                </frame>
+                <quad class="trigger" size="113 10000" ScriptEvents="1" />
+            </frame>
+        </frame>
+        <quad class="bg-accent" pos="-2 -64.7" size="120 0.3" opacity="0.5" z-index="50" />
+        <frame pos="0 -69" z-index="5">
+            <label size="18 4" pos="9 0" class="btn-default" text=" SAVE" valign="center" halign="center" ScriptEvents="1" />
+            <label id="save_button" size="18 4" pos="9 0" class="btn-accent save" text=" SAVE" valign="center" halign="center" ScriptEvents="1" hidden="1" z-index="1" />
+        </frame>
+    </frame>
+{/block}
+
+{block scriptDeclarations}
+    <script><!--
+    #Const GUTTER 1.0
+    #Const BASE 4.0
+    #Const EXPAND_DURATION 140
+    --></script>
+{/block}
+
+{block functions}
+<script><!--
+Real alignItems(){
+    declare itemsFrame <=> (Page.MainFrame.GetFirstChild("items") as CMlFrame);
+    declare offset = 0.0;
+
+    foreach(control in itemsFrame.Controls){
+        control.RelativePosition_V3[1] = offset;
+        offset -= BASE + GUTTER;
+    }
+
+    return offset * -1.0;
+}
+
+Void updateScrollBarPosition(CMlFrame settingsFrame, CMlFrame settingsFrameChild){
+    declare scrollBar <=> (Page.MainFrame.GetFirstChild("scrollbar") as CMlLabel);
+    declare max = settingsFrame.ScrollMax[1];
+    declare scrollDistance = (settingsFrame.AbsolutePosition_V3[1] - settingsFrameChild.AbsolutePosition_V3[1]) * -1.0;
+    declare scrollRatio = scrollDistance / max;
+    scrollBar.RelativePosition_V3[1] = scrollRatio * (80 - scrollBar.Size[1]) * -1.0;
+}
+    --></script>
+{/block}
+
+<script><!--
+    {block bootScript}
+        declare settingsFrame <=> (Page.MainFrame.GetFirstChild("settings-frame") as CMlFrame);
+        declare scrollFrame = (settingsFrame.Controls[0] as CMlFrame);
+        settingsFrame.ScrollActive = True;
+        settingsFrame.ScrollMin = <0.0, 0.0>;
+        settingsFrame.ScrollMax = <0.0, alignItems() / 2.0>;
+    {/block}
+
+    {block loop}
+        updateScrollBarPosition(settingsFrame, scrollFrame);
+    {/block}
+
+    {block pendingEvents}
+        if(event.Type == CMlScriptEvent::Type::EntrySubmit){
+            if(event.Control.HasClass("setting_entry")){
+                (Page.MainFrame.GetFirstChild("save_button") as CMlLabel).Show();
+                alertUnsavedChanges = True;
+                continue;
+            }
+        }
+        if(event.Type == CMlScriptEvent::Type::MouseClick){
+            if(event.Control.HasClass("save")){
+                TriggerPageAction("msm.save_server_settings,{$name}");
+                (Page.MainFrame.GetFirstChild("save_button") as CMlLabel).Hide();
+                alertUnsavedChanges = False;
+                continue;
+            }
+        }
+    {/block}
+    --></script>
+</manialink>

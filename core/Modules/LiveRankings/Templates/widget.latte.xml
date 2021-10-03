@@ -90,7 +90,7 @@
             if(prefix != ""){
                 prefix = prefix ^ "  ";
             }
-        }else if(CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
+        }else if(CurrentServerModeName == "TM_RoyalTimeAttack_Online" || CurrentServerModeName == "Evo_Royal_TA"){
             (box.Controls[1] as CMlLabel).Value = TL::FormatInteger(entry.section, 3) ^ " ";
             (box.Controls[2] as CMlLabel).Value = entry.section ^ " ";
             (box.Controls[4] as CMlLabel).Hide();

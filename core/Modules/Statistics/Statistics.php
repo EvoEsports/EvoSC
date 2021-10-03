@@ -254,7 +254,7 @@ WHERE 1=1;');
      */
     public static function playerRateMap(Player $player)
     {
-        $player->Ratings = $player->ratings()->count();
+        $player->stats->Ratings = $player->ratings()->count();
         $player->save();
     }
 

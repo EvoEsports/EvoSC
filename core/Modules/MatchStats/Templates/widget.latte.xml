@@ -1,0 +1,72 @@
+{contentType text}
+{extends 'Components.widget-base'}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    {block id}match-stats{/block}
+    {block size}44 27{/block}
+
+    {block content}
+    <quad class="bg-dark widget" z-index="-1" size="45 27" opacity="0.8" ScriptEvents="1"/>
+    <quad class="bg-accent" size="45 5" opacity="0.8"/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Match Stats"/>
+
+    <frame id="records" pos="2 -10">
+        <label id="match_name" class="text-light" pos="20 0.5" size="40 5" halign="center" valign="center" textprefix=" " hidden="1" />
+        <entry id="match_name_entry" class="form" pos="20 0.5" size="40 5" default="{$currentMatch ?? 'Match #'.$matchNumber}" halign="center" valign="center" />
+        <label id="start_button" class="btn-success start" pos="20 -6.5" size="40 6" text=" Start recording" halign="center" valign="center" tetxsize="0.75" ScriptEvents="1" />
+        <label id="stop_button" class="btn-danger stop" pos="20 -6.5" size="40 6" text=" Stop recording" halign="center" valign="center" tetxsize="0.75" ScriptEvents="1" hidden="1" />
+        <label class="btn-muted" pos="20 -13" size="40 4" text=" Show recorded matches" halign="center" valign="center" tetxsize="0.01" ScriptEvents="1" />
+    </frame>
+    {/block}
+
+    {block script}
+    <script><!--
+    --></script>
+    {include 'Dialogues.confirm'}
+    {include 'Scripts.mle'}
+    {/block}
+
+    <script><!--
+    {block globals}
+    {/block}
+
+    {block bootScript}
+        declare Text EvoSC_MatchRecordingName for This;
+        declare startButton <=> (Page.MainFrame.GetFirstChild("start_button") as CMlLabel);
+        declare stopButton <=> (Page.MainFrame.GetFirstChild("stop_button") as CMlLabel);
+        declare matchName <=> (Page.MainFrame.GetFirstChild("match_name") as CMlLabel);
+        declare matchNameEntry <=> (Page.MainFrame.GetFirstChild("match_name_entry") as CMlEntry);
+
+        left__ = {config('match-stats.ui.position') == 'left'|ms_bool};
+        slot__ = {config('match-stats.ui.slot')};
+    {/block}
+
+    {block loop}
+        if(EvoSC_MatchRecordingName != matchName.Value){
+            matchName.Value = EvoSC_MatchRecordingName;
+            if(EvoSC_MatchRecordingName != ""){
+                matchName.Show();
+                matchNameEntry.Hide();
+                startButton.Hide();
+                stopButton.Show();
+            }else{
+                matchName.Hide();
+                matchNameEntry.Show();
+                startButton.Show();
+                stopButton.Hide();
+            }
+        }
+    {/block}
+
+    {block pendingEvents}
+        if(event.Control.HasClass("start") && event.Type == CMlScriptEvent::Type::MouseClick){
+            ManiaLinkEvent("ms.start_recording", matchNameEntry.Value);
+        }
+        if(event.Control.HasClass("stop") && event.Type == CMlScriptEvent::Type::MouseClick){
+            if(confirm("Stop recording?")){
+                ManiaLinkEvent("ms.stop_recording", matchNameEntry.Value);
+            }
+        }
+    {/block}
+--></script>
+</manialink>

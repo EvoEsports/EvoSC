@@ -110,7 +110,7 @@ function stripAll(?string $styled = '', bool $keepLinks = false): string
         return preg_replace('/(?<![$])\${1}(?:[iwngosz<>]{1}|[a-f0-9]{1,3})/i', '', $styled);
     }
 
-    return preg_replace('/(?<![$])\${1}(([lh])(?:\[.+?])|[iwngosz<>]{1}|[a-f0-9]{1,3})/i', '', $styled);
+    return preg_replace('/(?<![$])\${1}(([lh])(\[.+?])|[iwngosz<>]{1}|[a-f0-9]{1,3})/i', '', $styled);
 }
 
 /**
@@ -214,7 +214,7 @@ function baseDir(string $filename = ''): string
  */
 function getOsSafePath(string $filename): string
 {
-    return str_replace('/', DIRECTORY_SEPARATOR, '/' . $filename);
+    return str_replace('/', DIRECTORY_SEPARATOR, $filename);
 }
 
 /**

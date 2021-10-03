@@ -177,7 +177,7 @@ class MxKarma extends Module implements ModuleInterface
             })
             ->leftJoin('pbs', 'pbs.player_id', '=', 'players.id')
             ->whereIn('players.id', onlinePlayers()->pluck('id'))
-            ->groupBy(['players.id', 'Login', 'Rating', 'Map'])
+            ->groupBy(['players.id', 'Login', 'Rating', 'Map', 'pbs.Score'])
             ->get();
 
         foreach ($votes as $vote) {
@@ -336,6 +336,9 @@ class MxKarma extends Module implements ModuleInterface
 
         self::$newVotes->put($player->Login, $rating);
         self::sendVoteData($map);
+
+        // $player, $map, $rating, $isNew
+        Hook::fire('PlayerRateMap', $player, $map, $rating, $karma == null);
     }
 
     /**

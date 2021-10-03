@@ -9,9 +9,10 @@
     {block navbar}
         {include 'Components.tabs', tabs =>
             [
-                'Settings'=>'msm.edit,'.$name,
-                'Maps'=>'msm.edit_maps,'.$name,
-                'Folders'=>''
+                ' Server'=>"msm.edit_server_settings,$name",
+                ' Mode-Script'=>"msm.edit,$name",
+                ' Maps'=>"msm.edit_maps,$name",
+                ' Folders'=>''
             ]
         }
     {/block}

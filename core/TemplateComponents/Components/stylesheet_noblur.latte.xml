@@ -16,6 +16,7 @@
 <!--    <style class="bg-blur" bluramount="1.0" style="Bgs1" substyle="BgDialogBlur"/>-->
     <style class="bg-accent" bgcolor="{config('theme.hud.accent')}"/>
     <style class="bg-dark" bgcolor="{config('theme.hud.bg-dark')}"/>
+    <style class="bg-default" bgcolor="{config('theme.form.default.bg')}"/>
     <style class="bg-blur" bgcolor="{config('theme.hud.bg-dark')}"/>
     <style class="bg-darker" bgcolor="{config('theme.hud.bg-darker')}"/>
     <style class="bg-light" bgcolor="{config('theme.hud.bg-light')}"/>

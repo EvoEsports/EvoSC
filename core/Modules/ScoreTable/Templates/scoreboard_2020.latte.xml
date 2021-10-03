@@ -27,7 +27,7 @@
         <label class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75" z-index="5"/> <!-- Group -->
         <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="6" rot="90"/> <!-- Fame Stars -->
         <label class="text-light" pos="25 -7" size="11 3" z-index="5"/> <!-- Score BG-Layer -->
-        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="center" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
+        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="cenert" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
 
         <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0" hidden="1"/> <!-- Primary BG -->
         <quad class="bg-accent" opacity="0" pos="1 0" size="86 12" z-index="-15" ScriptEvents="1" hidden="1"/> <!-- Primary BG -->
@@ -66,7 +66,7 @@
 
     <!-- end components -->
 
-    <frame id="main-frame" pos="-87.5 14" scale="1">
+    <frame id="main-frame" pos="-87.5 14" z-index="10000" scale="1">
         <quad id="bg-dark" class="bg-dark" hidden="1" />
         <frame z-index="0" pos="90 -12.5" scale="0.85">
             <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
@@ -350,7 +350,7 @@
                 finalistLabel.Value = "";
             }
         }else{
-            if(CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
+            if(CurrentServerModeName == "Evo_Royal_TA" || CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
                 declare netread Int2 Net_TMxSM_ScoresTable_RaceProgression for Score;
                 if (Net_TMxSM_ScoresTable_RaceProgression.Y > 0) {
                     declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);

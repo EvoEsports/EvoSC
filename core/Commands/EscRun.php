@@ -29,7 +29,6 @@ use EvoSC\Controllers\ModuleController;
 use EvoSC\Controllers\PlanetsController;
 use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
-use EvoSC\Controllers\RoyalController;
 use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Models\AccessRight;
@@ -38,15 +37,14 @@ use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EscRun extends Command implements SignalableCommandInterface
+class EscRun extends Command
 {
-    private static bool $docker = false;
-    private bool $keepRunning = true;
+    protected static bool $docker = false;
+    protected bool $keepRunning = true;
 
     /**
      * Command settings
@@ -99,6 +97,8 @@ class EscRun extends Command implements SignalableCommandInterface
         }
 
         self::$docker = $input->getOption('docker') !== false;
+
+        if (windows_os()) self::setWindowsExitHandler();
 
         try {
             $output->writeln("Connecting to server...");
@@ -200,7 +200,6 @@ class EscRun extends Command implements SignalableCommandInterface
         ModuleController::init();
         PlanetsController::init();
         CountdownController::init();
-        RoyalController::init();
 
         EventController::init();
         EventController::setServerLogin($serverLogin);
@@ -298,29 +297,15 @@ class EscRun extends Command implements SignalableCommandInterface
         }
     }
 
-    /**
-     * Returns the signals which EvoSC subscribes to
-     *
-     * @return array
-     */
-    public function getSubscribedSignals(): array
-    {
-        // return here any of the constants defined by PCNTL extension
-        // https://www.php.net/manual/en/pcntl.constants.php
-        return [SIGTERM];
+    protected function shutdownEvoSC() {
+        $this->keepRunning = false;
+        warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. EvoSC Exiting.')->sendAdmin();
+        shutdown_evosc();
     }
 
-    /**
-     * Signal handler
-     *
-     * @param int $signal
-     */
-    public function handleSignal(int $signal): void
+    protected function setWindowsExitHandler()
     {
-        if ($signal == SIGTERM) {
-            $this->keepRunning = false;
-            warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. EvoSC Exiting.')->sendAdmin();
-            shutdown_evosc();
-        }
+        sapi_windows_set_ctrl_handler([$this, "shutdownEvoSC"]);
     }
+
 }

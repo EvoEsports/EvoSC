@@ -16,6 +16,7 @@ use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\RecordsTable\RecordsTable;
+use RuntimeException;
 
 class LocalRecords extends Module implements ModuleInterface
 {
@@ -134,7 +135,7 @@ class LocalRecords extends Module implements ModuleInterface
         }
 
         if ($localsLimit == 0) {
-            throw new \RuntimeException("Locals limit is zero!");
+            throw new RuntimeException("Locals limit is zero!");
         }
 
         $chatMessage = chatMessage()
@@ -242,6 +243,8 @@ class LocalRecords extends Module implements ModuleInterface
             self::sendLocalsChunk();
             DB::table(self::TABLE)->where('Map', '=', $map->id)->where('Rank', '>', $localsLimit)->delete();
         }
+
+        Hook::fire('PlayerLocalRecord', $player, $score, $checkpoints, $newRank);
     }
 
     /**

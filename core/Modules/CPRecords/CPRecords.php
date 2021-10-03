@@ -44,7 +44,7 @@ class CPRecords extends Module implements ModuleInterface
         }
 
         if (ModeController::isRoyal()) {
-            Hook::add('PlayerFinishSection', [self::class, 'playerFinishSection']);
+            Hook::add('PlayerFinishSegment', [self::class, 'playerFinishSegment']);
         } else {
             if (config('cp-records.mode', 'best-cp') == 'best-round') {
                 Hook::add('PlayerFinish', [self::class, 'playerFinish']);
@@ -64,30 +64,29 @@ class CPRecords extends Module implements ModuleInterface
         Cache::put('cp_records_current', self::$tracker->toArray(), now()->addMinute());
     }
 
-    public static function playerFinishSection(Player $player, int $timeInMs, array $checkpoints, int $section)
+    public static function playerFinishSegment(Player $player, int $timeInMs, int $segment)
     {
-        if (!self::$tracker->has($section)) {
-            self::$tracker->put($section, (object)[
-                'section' => $section,
+        if (!self::$tracker->has($segment)) {
+            self::$tracker->put($segment, (object)[
+                'section' => $segment,
                 'time'    => $timeInMs,
                 'name'    => $player->NickName
             ]);
         } else {
-            $tracker = self::$tracker->get($section);
+            $tracker = self::$tracker->get($segment);
 
             if ($timeInMs >= $tracker->time) {
                 return;
             }
 
-            self::$tracker->put($section, (object)[
-                'section' => $section,
+            self::$tracker->put($segment, (object)[
+                'section' => $segment,
                 'time'    => $timeInMs,
                 'name'    => $player->NickName
             ]);
         }
 
-        $data = self::$tracker->values()->toJson();
-        Template::showAll('CPRecords.update_royal', compact('data', 'section'));
+        self::sendUpdatedRoyalRecord($segment);
     }
 
     /**
@@ -162,15 +161,22 @@ class CPRecords extends Module implements ModuleInterface
     }
 
     /**
+     * @param int $segment
+     */
+    private static function sendUpdatedRoyalRecord(int $segment = -1)
+    {
+        $data = self::$tracker->values()->toJson();
+        Template::showAll('CPRecords.update_royal', compact('data', 'segment'));
+    }
+
+    /**
      * @param Player $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function playerConnect(Player $player)
     {
         if (ModeController::isRoyal()) {
-            $data = self::$tracker->values()->toJson();
-            $section = -1;
-            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
+            self::sendUpdatedRoyalRecord();
             Template::show($player, 'CPRecords.widget_royal');
         } else {
             self::sendUpdatedCpRecords();
@@ -190,14 +196,15 @@ class CPRecords extends Module implements ModuleInterface
     /**
      *
      */
-    public static function beginMatch(){
+    public static function beginMatch()
+    {
         self::$tracker = collect();
         if (ModeController::isRoyal()) {
             $data = self::$tracker->values()->toJson();
-            $section = -1;
-            Template::showAll('CPRecords.update_royal', compact('data', 'section'));
+            $segment = 0;
+            Template::showAll('CPRecords.update_royal', compact('data', 'segment'));
             Template::showAll('CPRecords.widget_royal');
-        }else{
+        } else {
             self::sendUpdatedCpRecords();
             Template::showAll('CPRecords.widget');
         }
