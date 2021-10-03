@@ -2,7 +2,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3" layer="ScoresTable" id="QuickButtons" name="EvoSC:QuickButtons">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
-    <frame id="buttons" pos="{$is_maniaplanet ? '89 -50.5' : '83 -54'}" halign="center" valign="center" scale="{$is_maniaplanet ? '1.1' : '1.2'}" z-index="8000">
+    <frame id="buttons" pos="{$is_maniaplanet ? '89 -50.5' : '83 -54'}" halign="center" valign="center" scale="{$is_maniaplanet ? '1.1' : '1.2'}" z-index="8010">
         {foreach $buttons as $button}
         <frame pos="{$iterator->counter * -6} 0" data-action="{$button->action}">
             <label class="btn-muted" size="5.5 5.5" textsize="1.25" text="$s{$button->icon}" z-index="1" ScriptEvents="1" focusareacolor1="0000" />
