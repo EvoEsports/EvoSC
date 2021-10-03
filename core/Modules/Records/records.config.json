@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "ui": {
     "position": "left",
     "slot": 11

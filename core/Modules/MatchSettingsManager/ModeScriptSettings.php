@@ -29,7 +29,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_NeutralEmblemUrl', 'text', 'Url of the neutral emblem url to use by default', ''),
             new ModeScriptSetting('S_ScriptEnvironment', 'text', 'Environment in which the script runs, used mainly for debugging purpose', 'production'),
             new ModeScriptSetting('S_IsChannelServer', 'boolean', 'Set the server as a channel server', false),
-            new ModeScriptSetting('S_AllowRespawn', 'boolean', 'Allow the players to respawn or not', true),
+//            new ModeScriptSetting('S_AllowRespawn', 'boolean', 'Allow the players to respawn or not', true), // broken, use S_RespawnBehaviour
             new ModeScriptSetting('S_RespawnBehaviour', 'integer', "This setting controls the behavior of the respawn button. It overrides the respawn behavior set by the game mode script and the S_AllowRespawn setting. It can takes one of the following values:\n
 \$o\$n0\$z -> use the game mode value
 \$o\$n1\$z -> normal (respawn when pressing the button)
