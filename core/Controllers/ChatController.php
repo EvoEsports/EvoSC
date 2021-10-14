@@ -27,6 +27,8 @@ class ChatController implements ControllerInterface
 
     private static string $primary;
 
+    private static array $jsonOutput;
+
     /**
      * Initialize ChatController.
      */
@@ -58,9 +60,12 @@ class ChatController implements ControllerInterface
     {
         self::$primary = (string)config('theme.chat.default');
 
+        self::$jsonOutput = array();
+
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/version', [self::class, 'cmdVersion'], 'Print server, client and EvoSC version.');
+        ChatCommand::add('/chatformat', [self::class, 'cmdChatFormat'], 'Outputs chat-text as JSON format.');
     }
 
     /**
@@ -70,6 +75,14 @@ class ChatController implements ControllerInterface
     public static function cmdVersion(Player $player, $cmd)
     {
         infoMessage('$fffEvoSC-Version: ' . getEvoSCVersion())->send($player);
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdChatFormat(Player $player, $cmd ){
+        array_push( self::$jsonOutput, $player->Login );
     }
 
     /**
@@ -185,8 +198,29 @@ class ChatController implements ControllerInterface
         $groupColor = $player->group->color;
         $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
 
-        Server::ChatSendServerMessage($chatText);
+
+        // Json output
+        if( count( self::$jsonOutput ) ){
+
+            // Loop all players on server
+            foreach( Server::getPlayerList() as $playerVal ){
+
+                if( in_array( $playerVal->login, self::$jsonOutput ) ){
+                    Server::ChatSendToLogin( json_encode( array( 'login' => $player->Login, 'nickname' => $name, 'text' => $text ) ), $playerVal->login );
+                }else{
+                    Server::ChatSendToLogin( $chatText, $playerVal->login );
+                }
+    
+            }
+
+        }else{
+
+            Server::ChatSendServerMessage($chatText);
+
+        }
+
         Hook::fire('ChatLine', $chatText);
+         
     }
 
     /**
