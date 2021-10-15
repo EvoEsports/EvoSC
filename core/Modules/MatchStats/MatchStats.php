@@ -27,8 +27,8 @@ class MatchStats extends Module implements ModuleInterface
 
     private static ?string $activeMatch = null;
     private static Collection $roundStats;
-    private static array $teamPoints;
-    private static bool $isWarmUpOngoing;
+    private static array $teamPoints = [];
+    private static bool $isWarmUpOngoing = false;
 
     /**
      * @param string $mode
@@ -37,13 +37,14 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$roundStats = collect();
+        self::$teamPoints = [];
+
         if (Cache::has(self::CACHE_KEY)) {
             self::$activeMatch = Cache::get(self::CACHE_KEY);
             self::$roundStats = Cache::get(self::CACHE_KEY . '-roundstats') ?: collect();
             self::$teamPoints = Cache::get(self::CACHE_KEY . '-teampoints') ?: [];
         } else {
-            self::$roundStats = collect();
-            self::$teamPoints = [];
             Cache::forget(self::CACHE_KEY . '-roundstats', self::CACHE_KEY . '-teampoints');
         }
 
