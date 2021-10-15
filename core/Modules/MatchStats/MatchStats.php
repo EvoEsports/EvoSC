@@ -4,7 +4,6 @@
 namespace EvoSC\Modules\MatchStats;
 
 
-use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
@@ -16,14 +15,12 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
-use EvoSC\Modules\AccessRights\AccessRights;
 use Illuminate\Support\Collection;
 use League\Csv\Writer;
 
 class MatchStats extends Module implements ModuleInterface
 {
     const CACHE_DIR = 'match-stats';
-    const CACHE_KEY = 'match-stats-current';
 
     private static ?string $activeMatch = null;
     private static Collection $roundStats;
@@ -39,14 +36,6 @@ class MatchStats extends Module implements ModuleInterface
     {
         self::$roundStats = collect();
         self::$teamPoints = [];
-
-        if (Cache::has(self::CACHE_KEY)) {
-            self::$activeMatch = Cache::get(self::CACHE_KEY);
-            self::$roundStats = Cache::get(self::CACHE_KEY . '-roundstats') ?: collect();
-            self::$teamPoints = Cache::get(self::CACHE_KEY . '-teampoints') ?: [];
-        } else {
-            Cache::forget(self::CACHE_KEY . '-roundstats', self::CACHE_KEY . '-teampoints');
-        }
 
         AccessRight::add('record_match_stats', 'Is allowed to control match stats recording.');
 
@@ -109,7 +98,6 @@ class MatchStats extends Module implements ModuleInterface
             File::makeDir($target);
         }
 
-        Cache::put(self::CACHE_KEY, $matchName);
         Template::show($player, 'MatchStats.update', ['currentMatch' => $matchName]);
 
         successMessage($player, ' started stats tracking for match ', secondary($matchName))
@@ -123,8 +111,6 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function stopRecording(Player $player)
     {
-        Cache::forget(self::CACHE_KEY);
-
         if (File::getDirectoryContents(self::getTargetDirectory())->isEmpty()) {
             File::delete(self::getTargetDirectory());
         }
@@ -172,7 +158,6 @@ class MatchStats extends Module implements ModuleInterface
             $scores->teams[0]->mappoints,
             $scores->teams[1]->mappoints
         ];
-        self::cacheData();
     }
 
     /**
@@ -191,7 +176,6 @@ class MatchStats extends Module implements ModuleInterface
             'score'       => $time == 0 ? 'DNF' : formatScore($time),
             'checkpoints' => $checkpoints
         ]);
-        self::cacheData();
     }
 
     /**
@@ -218,7 +202,6 @@ class MatchStats extends Module implements ModuleInterface
         $mapName = Server::getCurrentMapInfo()->name;
         self::$teamPoints[$mapName] = [0, 0];
         self::$roundStats = collect();
-        self::cacheData();
     }
 
     /**
@@ -289,11 +272,5 @@ class MatchStats extends Module implements ModuleInterface
 
         $slug = evo_str_slug(self::$activeMatch);
         return cacheDir(self::CACHE_DIR . '/' . $slug);
-    }
-
-    private static function cacheData()
-    {
-        Cache::put(self::CACHE_KEY . '-roundstats', self::$roundStats);
-        Cache::put(self::CACHE_KEY . '-teampoints', self::$teamPoints);
     }
 }
