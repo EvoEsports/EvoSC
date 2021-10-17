@@ -249,6 +249,7 @@ class ModeScriptSettings
                 return self::laps();
 
             case 'Teams.Script.txt':
+            case 'FSM_Teams.Script.txt':
             case 'Trackmania/TM_Teams_Online.Script.txt':
                 return self::team();
 
