@@ -14,6 +14,12 @@
             <label id="label" class="text-lighter" pos="0 -2" text="ADDED TIME" textprefix="$s" textsize="0.7" halign="right" z-index="5" />
             <label id="added-time" class="text-lighter" pos="0 -4.5" text="" textprefix="$s" halign="right" textsize="1.8" z-index="5" />
         </frame>
+        <frame id="skip-frame" pos="8 -0.25">
+            {if $skipAccess}
+            <label class="text-lighter" pos="0 -2" text="SKIP" textprefix="$s" textsize="0.7" halign="left" z-index="5" action="cd.skip_scores" />
+            <label class="text-lighter" pos="0 -4.5" text="PODIUM" textprefix="$s" halign="left" textsize="1.8" z-index="5" action="cd.skip_scores" />
+            {/if}
+        </frame>
     </frame>
     {/block}
 
@@ -37,9 +43,14 @@
 
     <script><!--
     {block globals}
+#Const C_State_Play "play"
+#Const C_State_Scores "scores"
     {/block}
 
     {block bootScript}
+        declare Integer EvoSC_RaceStateChange for This;
+        declare Integer EvoSC_ChatTime for This;
+        declare Text EvoSC_RaceState for This;
         declare Real AddedTimeR for This = 0.0;
         declare netread Integer Net_Race_Helpers_CutOffTimeLimit for Teams[0];
         declare timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
@@ -47,8 +58,10 @@
         declare label <=> (Page.MainFrame.GetFirstChild("label") as CMlLabel);
         declare addedTimeLabel <=> (Page.MainFrame.GetFirstChild("added-time") as CMlLabel);
         declare addedTimeFrame <=> (Page.MainFrame.GetFirstChild("added-time-frame") as CMlFrame);
+        declare skipFrame <=> (Page.MainFrame.GetFirstChild("skip-frame") as CMlFrame);
         declare sign = "";
         declare currentMapId = Map.Id;
+        declare lastState = C_State_Play;
 
         left__ = {config('countdown.ui.position') == 'left'|ms_bool};
         slot__ = {config('countdown.ui.slot')};
@@ -60,7 +73,26 @@
             AddedTimeR = 0.0;
         }
 
-        timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
+        if(EvoSC_RaceState != lastState){
+            lastState = EvoSC_RaceState;
+        }
+
+        if(lastState == C_State_Play){
+            timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
+
+            if(skipFrame.Visible){
+                skipFrame.Hide();
+            }
+        }else if(lastState == C_State_Scores){
+            timeRemaining = EvoSC_RaceStateChange + EvoSC_ChatTime * 1000 - GameTime;
+
+            if(!skipFrame.Visible){
+                skipFrame.Show();
+            }
+        }else{
+            timeRemaining = 0;
+        }
+
         if(timeRemaining > 0){
             cd.Value = TL::TimeToText(timeRemaining);
 
@@ -81,6 +113,10 @@
             }else{
                 addedTimeFrame.Visible = False;
             }
+
+            if(lastState == C_State_Scores){
+                cd.Value ^= " ";
+            }
         }else{
             cd.Value = "";
         }
@@ -91,11 +127,13 @@
             widgetSetHeight__(8.0);
         }
 
-        if(timeRemaining <= 31000){
+        if(timeRemaining <= 31000 && lastState == C_State_Play){
             cd.TextColor = <0.98, 0.149, 0.149>;
         }else{
             cd.TextColor = <1., 1., 1.>;
         }
+
+        sleep(50);
     {/block}
 
     {block pendingEvents}
