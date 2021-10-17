@@ -682,6 +682,23 @@
                     (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
                 }
             }
+            case "FSM_Teams": {
+                Page.MainFrame.GetFirstChild("teams-frame").Show();
+                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
+                boxesFrame.RelativePosition_V3 = <-2.0, 2.0>;
+                boxesFrame.Controls[5].Hide();
+                boxesFrame.Controls[11].Hide();
+                boxesFrame.Controls[17].Hide();
+                boxesFrame.Controls[23].Hide();
+                for(i, 12, 16){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[0].ColorPrimary;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
+                }
+                for(i, 17, 22){
+                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[1].ColorPrimary;
+                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
+                }
+            }
 
             default: {
                 Page.MainFrame.GetFirstChild("teams-frame").Hide();
