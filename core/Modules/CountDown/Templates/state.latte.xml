@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:race-state" id="race-state" version="3">
+    <script><!--
+        main() {
+            declare Text EvoSC_RaceState for This;
+            declare Integer EvoSC_ChatTime for This;
+            declare Integer EvoSC_RaceStateChange for This;
+
+            EvoSC_RaceState = {$state};
+            EvoSC_ChatTime = {$chatTime};
+            EvoSC_RaceStateChange = GameTime;
+        }
+    --></script>
+</manialink>

@@ -88,11 +88,19 @@ class MatchStats extends Module implements ModuleInterface
      * @param Player $player
      * @param string $matchName
      * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function startRecording(Player $player, string $matchName)
     {
         self::$activeMatch = $matchName;
         $target = self::getTargetDirectory();
+
+        if (is_null($target)) {
+            dangerMessage('Failed to start recording ', secondary(' INVALID DIRECTORY'))
+                ->send($player);
+
+            return;
+        }
 
         if (!File::dirExists($target)) {
             File::makeDir($target);
@@ -131,6 +139,11 @@ class MatchStats extends Module implements ModuleInterface
     public static function updateResult(Map $map = null)
     {
         $targetDir = self::getTargetDirectory();
+
+        if (is_null($targetDir)) {
+            return;
+        }
+
         $targetFile = "$targetDir/result.csv";
 
         File::put($targetFile, '');
