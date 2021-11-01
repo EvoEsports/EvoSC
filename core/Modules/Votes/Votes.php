@@ -45,7 +45,7 @@ class Votes extends Module implements ModuleInterface
         ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
-        ChatCommand::add('/res', [self::class, 'cmdAskMoreTime'], 'Start a vote to add time/points.')
+        ChatCommand::add('/res', [self::class, 'cmdAskMoreTime'], 'Start a vote to add or remove time/points.')
             ->addAlias('/replay')
             ->addAlias('/restart')
             ->addAlias('/points')
