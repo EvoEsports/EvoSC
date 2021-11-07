@@ -3,6 +3,7 @@
 namespace EvoSC\Classes;
 
 
+use EvoSC\Controllers\ChatController;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
@@ -161,7 +162,7 @@ class ChatMessage
     public function sendAll()
     {
         $message = $this->getMessage();
-        Server::chatSendServerMessage($message);
+        ChatController::sendServerMessage($message);
         Hook::fire('ChatLine', $message);
 
         if (isVerbose()) {
@@ -177,11 +178,7 @@ class ChatMessage
         $this->setIcon('$666');
         $message = $this->getMessage();
 
-        echoPlayers()->each(function (Player $player) use ($message) {
-            Server::chatSendServerMessage($message, $player->Login, true);
-        });
-
-        Server::executeMulticall();
+        ChatController::sendServerMessage($message, echoPlayers()->pluck('Login'));
         Hook::fire('ChatLine', $message);
 
         if (isVerbose()) {
@@ -203,12 +200,13 @@ class ChatMessage
         try {
             if ($player instanceof Player) {
                 Server::chatSendServerMessage($this->getMessage(), $player->Login);
+                ChatController::sendServerMessage($this->getMessage(), collect([$player->Login]));
                 Log::info("(@$player)" . $this->getMessage(), isVerbose());
             } else if (is_string($player)) {
-                Server::chatSendServerMessage($this->getMessage(), $player);
+                ChatController::sendServerMessage($this->getMessage(), collect([$player]));
                 Log::info("(@$player)" . $this->getMessage(), isVerbose());
             } else if ($player instanceof Collection) {
-                Server::chatSendServerMessage($this->getMessage(), $player->pluck('Login')->implode(','));
+                ChatController::sendServerMessage($this->getMessage(), $player->pluck('Login'));
                 Log::info($this->getMessage(), isVerbose());
             }
         } catch (\Exception $e) {
