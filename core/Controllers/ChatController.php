@@ -11,6 +11,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
@@ -234,17 +235,17 @@ class ChatController implements ControllerInterface
 
     /**
      * @param string $message
-     * @param array $recipientLogins
+     * @param Collection $recipientLogins
      */
-    public static function sendServerMessage(string $message, array $recipientLogins = [])
+    public static function sendServerMessage(string $message, Collection $recipientLogins = null)
     {
-        Server::chatSendServerMessage($message);
-        return;
         $betterChatLogins = collect(self::$betterChatEnabledLogins);
+        if (is_null($recipientLogins)) {
+            $recipientLogins = collect(Server::getPlayerList())->pluck('login');
+        }
 
         if ($betterChatLogins->isNotEmpty()) {
-            $allLogins = collect($recipientLogins);
-            $punyChatLogins = $allLogins->diff($betterChatLogins);
+            $punyChatLogins = $recipientLogins->diff($betterChatLogins);
 
             $jsonMessage = json_encode(['text' => $message], JSON_UNESCAPED_UNICODE);
             Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','), true);
