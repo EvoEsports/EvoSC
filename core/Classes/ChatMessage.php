@@ -162,7 +162,7 @@ class ChatMessage
     public function sendAll()
     {
         $message = $this->getMessage();
-        ChatController::sendServerMessage($message);
+        ChatController::sendServerMessage($message, collect(Server::getPlayerList())->pluck('login'));
         Hook::fire('ChatLine', $message);
 
         if (isVerbose()) {
@@ -197,17 +197,18 @@ class ChatMessage
             return;
         }
 
+        $message = $this->getMessage();
+
         try {
             if ($player instanceof Player) {
-                Server::chatSendServerMessage($this->getMessage(), $player->Login);
-                ChatController::sendServerMessage($this->getMessage(), collect([$player->Login]));
-                Log::info("(@$player)" . $this->getMessage(), isVerbose());
+                ChatController::sendServerMessage($message, collect([$player->Login]));
+                Log::info("(@$player)" . $message, isVerbose());
             } else if (is_string($player)) {
-                ChatController::sendServerMessage($this->getMessage(), collect([$player]));
-                Log::info("(@$player)" . $this->getMessage(), isVerbose());
+                ChatController::sendServerMessage($message, collect([$player]));
+                Log::info("(@$player)" . $message, isVerbose());
             } else if ($player instanceof Collection) {
-                ChatController::sendServerMessage($this->getMessage(), $player->pluck('Login'));
-                Log::info($this->getMessage(), isVerbose());
+                ChatController::sendServerMessage($message, $player->pluck('Login'));
+                Log::info($message, isVerbose());
             }
         } catch (\Exception $e) {
             Log::warningWithCause('Failed to deliver message', $e);
