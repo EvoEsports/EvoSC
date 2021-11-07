@@ -237,28 +237,21 @@ class ChatController implements ControllerInterface
      * @param string $message
      * @param Collection $recipientLogins
      */
-    public static function sendServerMessage(string $message, Collection $recipientLogins = null)
+    public static function sendServerMessage(string $message, Collection $recipientLogins)
     {
-        $betterChatLogins = collect(self::$betterChatEnabledLogins);
-        if (is_null($recipientLogins)) {
-            $recipientLogins = collect(Server::getPlayerList())->pluck('login');
-        }
+        $betterChatLogins = collect(self::$betterChatEnabledLogins)->intersect($recipientLogins);
+        $punyChatLogins = $recipientLogins->diff($betterChatLogins);
 
         if ($betterChatLogins->isNotEmpty()) {
-            $punyChatLogins = $recipientLogins->diff($betterChatLogins);
-
             $jsonMessage = json_encode(['text' => $message], JSON_UNESCAPED_UNICODE);
             Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','), true);
-
-            if ($punyChatLogins->isNotEmpty()) {
-                Server::chatSendServerMessage($message, $punyChatLogins->implode(','), true);
-            }
-
-            Server::executeMulticall();
-        } else {
-            Server::chatSendServerMessage($message);
         }
 
+        if ($punyChatLogins->isNotEmpty()) {
+            Server::chatSendServerMessage($message, $punyChatLogins->implode(','), true);
+        }
+
+        Server::executeMulticall();
         Hook::fire('ChatLine', $message);
     }
 
@@ -268,5 +261,13 @@ class ChatController implements ControllerInterface
     public static function getRoutingEnabled()
     {
         return self::$routingEnabled;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getBetterChatEnabledLogins(): array
+    {
+        return self::$betterChatEnabledLogins;
     }
 }
