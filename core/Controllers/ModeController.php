@@ -111,6 +111,7 @@ class ModeController implements ControllerInterface
                 break;
 
             case 'Teams.Script.txt':
+            case 'FSM_Teams.Script.txt':
             case 'Trackmania/TM_Teams_Online.Script.txt':
                 self::$isTimeAttackType = false;
                 self::$isRoundsType = true;

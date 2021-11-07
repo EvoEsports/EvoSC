@@ -4,8 +4,7 @@
 namespace EvoSC\Modules\MatchStats;
 
 
-use Carbon\Carbon;
-use EvoSC\Classes\Cache;
+use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
@@ -13,6 +12,7 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
@@ -21,11 +21,11 @@ use League\Csv\Writer;
 class MatchStats extends Module implements ModuleInterface
 {
     const CACHE_DIR = 'match-stats';
-    const CACHE_KEY = 'match-stats-current';
 
     private static ?string $activeMatch = null;
     private static Collection $roundStats;
-    private static array $teamPoints;
+    private static array $teamPoints = [];
+    private static bool $isWarmUpOngoing = false;
 
     /**
      * @param string $mode
@@ -34,25 +34,26 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        if (Cache::has(self::CACHE_KEY)) {
-            self::$activeMatch = Cache::get(self::CACHE_KEY);
-            self::$roundStats = Cache::get(self::CACHE_KEY . '-roundstats') ?: collect();
-            self::$teamPoints = Cache::get(self::CACHE_KEY . '-teampoints') ?: [];
-        } else {
-            self::$roundStats = collect();
-            self::$teamPoints = [];
-            Cache::forget(self::CACHE_KEY . '-roundstats', self::CACHE_KEY . '-teampoints');
-        }
+        return; //memleak
+
+        self::$roundStats = collect();
+        self::$teamPoints = [];
+
+        AccessRight::add('record_match_stats', 'Is allowed to control match stats recording.');
 
         Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
         Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('Scores', [self::class, 'scoresUpdated']);
         Hook::add('EndMap', [self::class, 'updateResult']);
+        Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmupStart']);
+        Hook::add('Trackmania.WarmUp.EndRound', [self::class, 'warmupEnd']);
 
-        ManiaLinkEvent::add('ms.start_recording', [self::class, 'startRecording']);
-        ManiaLinkEvent::add('ms.stop_recording', [self::class, 'stopRecording']);
-        ManiaLinkEvent::add('ms.download', [self::class, 'downloadStats']);
+        ManiaLinkEvent::add('ms.start_recording', [self::class, 'startRecording'], 'record_match_stats');
+        ManiaLinkEvent::add('ms.stop_recording', [self::class, 'stopRecording'], 'record_match_stats');
+        ManiaLinkEvent::add('ms.download', [self::class, 'downloadStats'], 'record_match_stats');
+
+        ChatCommand::add('//stats', [self::class, 'sendWidget'], 'Match stats recording.', 'record_match_stats');
     }
 
     /**
@@ -89,17 +90,24 @@ class MatchStats extends Module implements ModuleInterface
      * @param Player $player
      * @param string $matchName
      * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function startRecording(Player $player, string $matchName)
     {
         self::$activeMatch = $matchName;
         $target = self::getTargetDirectory();
 
+        if (is_null($target)) {
+            dangerMessage('Failed to start recording ', secondary(' INVALID DIRECTORY'))
+                ->send($player);
+
+            return;
+        }
+
         if (!File::dirExists($target)) {
             File::makeDir($target);
         }
 
-        Cache::put(self::CACHE_KEY, $matchName);
         Template::show($player, 'MatchStats.update', ['currentMatch' => $matchName]);
 
         successMessage($player, ' started stats tracking for match ', secondary($matchName))
@@ -113,8 +121,6 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function stopRecording(Player $player)
     {
-        Cache::forget(self::CACHE_KEY);
-
         if (File::getDirectoryContents(self::getTargetDirectory())->isEmpty()) {
             File::delete(self::getTargetDirectory());
         }
@@ -135,6 +141,11 @@ class MatchStats extends Module implements ModuleInterface
     public static function updateResult(Map $map = null)
     {
         $targetDir = self::getTargetDirectory();
+
+        if (is_null($targetDir)) {
+            return;
+        }
+
         $targetFile = "$targetDir/result.csv";
 
         File::put($targetFile, '');
@@ -162,7 +173,6 @@ class MatchStats extends Module implements ModuleInterface
             $scores->teams[0]->mappoints,
             $scores->teams[1]->mappoints
         ];
-        self::cacheData();
     }
 
     /**
@@ -172,12 +182,31 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function playerFinish(Player $player, int $time, string $checkpoints)
     {
+        if (self::$isWarmUpOngoing) {
+            return;
+        }
+
         self::$roundStats->push((object)[
             'player'      => $player,
             'score'       => $time == 0 ? 'DNF' : formatScore($time),
             'checkpoints' => $checkpoints
         ]);
-        self::cacheData();
+    }
+
+    /**
+     *
+     */
+    public static function warmupStart()
+    {
+        self::$isWarmUpOngoing = true;
+    }
+
+    /**
+     *
+     */
+    public static function warmupEnd()
+    {
+        self::$isWarmUpOngoing = false;
     }
 
     /**
@@ -188,7 +217,6 @@ class MatchStats extends Module implements ModuleInterface
         $mapName = Server::getCurrentMapInfo()->name;
         self::$teamPoints[$mapName] = [0, 0];
         self::$roundStats = collect();
-        self::cacheData();
     }
 
     /**
@@ -259,11 +287,5 @@ class MatchStats extends Module implements ModuleInterface
 
         $slug = evo_str_slug(self::$activeMatch);
         return cacheDir(self::CACHE_DIR . '/' . $slug);
-    }
-
-    private static function cacheData()
-    {
-        Cache::put(self::CACHE_KEY . '-roundstats', self::$roundStats);
-        Cache::put(self::CACHE_KEY . '-teampoints', self::$teamPoints);
     }
 }

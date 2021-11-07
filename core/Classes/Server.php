@@ -41,10 +41,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool setCallVoteRatiosEx(bool $boolean, array $array)
  * @method static array getCallVoteRatiosEx()
  * @method static bool chatSendServerMessage(string $message, string $login = null, bool $multicall = false)
- * @method static bool chatSend(string $string)
- * @method static bool chatSendToLanguage(array $array, string $string)
- * @method static bool chatSendToLogin(string $string, string $string)
- * @method static bool chatSendToId(string $string, int $int)
+ * @method static bool chatSend(string $message, string $recipient = null, bool $multicall = false)
  * @method static array getChatLines()
  * @method static bool chatEnableManualRouting(bool $routeMessages = true, bool $excludeServer = false) @throws FaultException
  * @method static bool chatForwardToLogin(string $string, string $string, string $string)

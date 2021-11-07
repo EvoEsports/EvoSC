@@ -185,7 +185,7 @@ Void hidescript(){
 
             hidescript();
 
-            if(CurrentServerModeName != "TM_Teams_Online"){
+            if(CurrentServerModeName != "TM_Teams_Online" && CurrentServerModeName != "FSM_Teams"){
                 widget.Hide();
                 return;
             }

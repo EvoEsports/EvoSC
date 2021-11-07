@@ -220,7 +220,7 @@ class ModeScriptSettings
     public static function timeAttack(): Collection
     {
         return collect([
-            new ModeScriptSetting('S_TimeLimit', 'integer', "Time limit", 300),
+            new ModeScriptSetting('S_TimeLimit', 'integer', "Time limit in seconds", 300),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_ForceLapsNb', 'integer', "Number of Laps (-1 to use the map default, 0 to disable laps limit)", 0),
@@ -249,6 +249,7 @@ class ModeScriptSettings
                 return self::laps();
 
             case 'Teams.Script.txt':
+            case 'FSM_Teams.Script.txt':
             case 'Trackmania/TM_Teams_Online.Script.txt':
                 return self::team();
 

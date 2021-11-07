@@ -24,7 +24,6 @@ use SimpleXMLElement;
 class MatchSettingsManager extends Module implements ModuleInterface
 {
     private static string $path;
-    private static $objects;
 
     private static array $modeTemplatesManiaplanet = [
         'TimeAttack' => 'timeattack.xml',
@@ -55,7 +54,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
     private static array $gameModesTrackmania = [
         'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
         'Rounds'     => 'Trackmania/TM_Rounds_Online.Script.txt',
-        'Teams'      => 'Trackmania/TM_Teams_Online.Script.txt',
+        'Team'      => 'Trackmania/TM_Teams_Online.Script.txt',
         'Cup'        => 'Trackmania/TM_Cup_Online.Script.txt',
         'Laps'       => 'Trackmania/TM_Laps_Online.Script.txt',
         'Champion'   => 'Trackmania/TM_Champion_Online.Script.txt',
@@ -71,7 +70,6 @@ class MatchSettingsManager extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         self::$path = Server::getMapsDirectory() . '/MatchSettings/';
-        self::$objects = collect();
 
         AccessRight::add('matchsettings_load', 'Load matchsettings.');
         AccessRight::add('matchsettings_edit', 'Edit matchsettings.');
@@ -466,7 +464,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $content = str_replace('%script_name%', $scriptName, $content);
 
         File::put($targetFile, $content);
-        Log::info($player . ' created new "' . $filename . '" with mode "' . $modeName . '"');
+        Log::info($player . ' created new "' . $filename . '" with mode "' . $scriptName . '"');
 
         self::showOverview($player);
     }

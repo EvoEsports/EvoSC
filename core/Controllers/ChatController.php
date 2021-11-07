@@ -11,6 +11,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
+use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Xmlrpc\FaultException;
 
 /**
@@ -26,6 +27,8 @@ class ChatController implements ControllerInterface
     private static bool $routingEnabled;
 
     private static string $primary;
+
+    private static array $betterChatEnabledLogins = [];
 
     /**
      * Initialize ChatController.
@@ -61,6 +64,7 @@ class ChatController implements ControllerInterface
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/version', [self::class, 'cmdVersion'], 'Print server, client and EvoSC version.');
+        ChatCommand::add('/chatformat', [self::class, 'cmdChatFormat'], 'Outputs chat-text as JSON format.');
     }
 
     /**
@@ -70,6 +74,31 @@ class ChatController implements ControllerInterface
     public static function cmdVersion(Player $player, $cmd)
     {
         infoMessage('$fffEvoSC-Version: ' . getEvoSCVersion())->send($player);
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param $format
+     */
+    public static function cmdChatFormat(Player $player, $cmd, $format = null)
+    {
+        switch ($format) {
+            case 'json':
+                if (!in_array($player->Login, self::$betterChatEnabledLogins)) {
+                    array_push(self::$betterChatEnabledLogins, $player->Login);
+                }
+                break;
+
+            case 'text':
+                if (in_array($player->Login, self::$betterChatEnabledLogins)) {
+                    self::$betterChatEnabledLogins = array_diff([$player->Login], self::$betterChatEnabledLogins);
+                }
+                break;
+
+            default:
+                dangerMessage('Invalid chat format entered. Available formats are: ', secondary('json, text'))->send($player);
+        }
     }
 
     /**
@@ -184,9 +213,53 @@ class ChatController implements ControllerInterface
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color;
         $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
+        $betterChatLogins = collect(self::$betterChatEnabledLogins);
 
-        Server::ChatSendServerMessage($chatText);
+        if ($betterChatLogins->isNotEmpty()) {
+            $betterChatName = sprintf('$<$%s%s $<%s$>$>', $groupColor, $groupIcon, secondary($name));
+            $allLogins = collect(Server::getPlayerList())->pluck('login');
+            $punyChatLogins = $allLogins->diff($betterChatLogins);
+
+            $jsonMessage = json_encode(['login' => $player->Login, 'nickname' => $betterChatName, 'text' => $text], JSON_UNESCAPED_UNICODE);
+            Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','));
+
+            if ($punyChatLogins->isNotEmpty()) {
+                Server::chatSendServerMessage($chatText, $punyChatLogins->implode(','));
+            }
+        } else {
+            Server::chatSendServerMessage($chatText);
+        }
+
         Hook::fire('ChatLine', $chatText);
+    }
+
+    /**
+     * @param string $message
+     * @param Collection $recipientLogins
+     */
+    public static function sendServerMessage(string $message, Collection $recipientLogins = null)
+    {
+        $betterChatLogins = collect(self::$betterChatEnabledLogins);
+        if (is_null($recipientLogins)) {
+            $recipientLogins = collect(Server::getPlayerList())->pluck('login');
+        }
+
+        if ($betterChatLogins->isNotEmpty()) {
+            $punyChatLogins = $recipientLogins->diff($betterChatLogins);
+
+            $jsonMessage = json_encode(['text' => $message], JSON_UNESCAPED_UNICODE);
+            Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','), true);
+
+            if ($punyChatLogins->isNotEmpty()) {
+                Server::chatSendServerMessage($message, $punyChatLogins->implode(','), true);
+            }
+
+            Server::executeMulticall();
+        } else {
+            Server::chatSendServerMessage($message);
+        }
+
+        Hook::fire('ChatLine', $message);
     }
 
     /**
