@@ -34,6 +34,8 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        return; //memleak
+
         self::$roundStats = collect();
         self::$teamPoints = [];
 

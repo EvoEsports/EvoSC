@@ -27,7 +27,7 @@ class ChatController implements ControllerInterface
 
     private static string $primary;
 
-    private static array $jsonOutput;
+    private static array $betterChatEnabledLogins = [];
 
     /**
      * Initialize ChatController.
@@ -60,8 +60,6 @@ class ChatController implements ControllerInterface
     {
         self::$primary = (string)config('theme.chat.default');
 
-        self::$jsonOutput = array();
-
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/version', [self::class, 'cmdVersion'], 'Print server, client and EvoSC version.');
@@ -80,9 +78,26 @@ class ChatController implements ControllerInterface
     /**
      * @param Player $player
      * @param $cmd
+     * @param $format
      */
-    public static function cmdChatFormat(Player $player, $cmd ){
-        array_push( self::$jsonOutput, $player->Login );
+    public static function cmdChatFormat(Player $player, $cmd, $format = null)
+    {
+        switch ($format) {
+            case 'json':
+                if (!in_array($player->Login, self::$betterChatEnabledLogins)) {
+                    array_push(self::$betterChatEnabledLogins, $player->Login);
+                }
+                break;
+
+            case 'text':
+                if (in_array($player->Login, self::$betterChatEnabledLogins)) {
+                    self::$betterChatEnabledLogins = array_diff([$player->Login], self::$betterChatEnabledLogins);
+                }
+                break;
+
+            default:
+                dangerMessage('Invalid chat format entered. Available formats are: ', secondary('json, text'))->send($player);
+        }
     }
 
     /**
@@ -197,30 +212,53 @@ class ChatController implements ControllerInterface
         $groupIcon = $player->group->chat_prefix ?? '';
         $groupColor = $player->group->color;
         $chatText = sprintf('$z$s$%s%s[$<%s$>]%s %s', $groupColor, $groupIcon, secondary($name), $chatColor, $text);
+        $betterChatLogins = collect(self::$betterChatEnabledLogins);
 
+        if ($betterChatLogins->isNotEmpty()) {
+            $betterChatName = sprintf('$<$%s%s $<%s$>$>', $groupColor, $groupIcon, secondary($name));
+            $allLogins = collect(Server::getPlayerList())->pluck('login');
+            $punyChatLogins = $allLogins->diff($betterChatLogins);
 
-        // Json output
-        if( count( self::$jsonOutput ) ){
+            $jsonMessage = json_encode(['login' => $player->Login, 'nickname' => $betterChatName, 'text' => $text], JSON_UNESCAPED_UNICODE);
+            Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','));
 
-            // Loop all players on server
-            foreach( Server::getPlayerList() as $playerVal ){
-
-                if( in_array( $playerVal->login, self::$jsonOutput ) ){
-                    Server::ChatSendToLogin( json_encode( array( 'login' => $player->Login, 'nickname' => $name, 'text' => $text ) ), $playerVal->login );
-                }else{
-                    Server::ChatSendToLogin( $chatText, $playerVal->login );
-                }
-    
+            if ($punyChatLogins->isNotEmpty()) {
+                Server::chatSendServerMessage($chatText, $punyChatLogins->implode(','));
             }
-
-        }else{
-
-            Server::ChatSendServerMessage($chatText);
-
+        } else {
+            Server::chatSendServerMessage($chatText);
         }
 
         Hook::fire('ChatLine', $chatText);
-         
+    }
+
+    /**
+     * @param string $message
+     * @param array $recipientLogins
+     */
+    public static function sendServerMessage(string $message, array $recipientLogins = [])
+    {
+        Server::chatSendServerMessage($message);
+        return;
+        $betterChatLogins = collect(self::$betterChatEnabledLogins);
+
+        if ($betterChatLogins->isNotEmpty()) {
+            $allLogins = collect($recipientLogins);
+            $punyChatLogins = $allLogins->diff($betterChatLogins);
+
+            $jsonMessage = json_encode(['text' => $message], JSON_UNESCAPED_UNICODE);
+            Server::chatSendServerMessage('CHAT_JSON:' . $jsonMessage, $betterChatLogins->implode(','), true);
+
+            if ($punyChatLogins->isNotEmpty()) {
+                Server::chatSendServerMessage($message, $punyChatLogins->implode(','), true);
+            }
+
+            Server::executeMulticall();
+        } else {
+            Server::chatSendServerMessage($message);
+        }
+
+        Hook::fire('ChatLine', $message);
     }
 
     /**
