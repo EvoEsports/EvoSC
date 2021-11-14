@@ -90,7 +90,7 @@ class ModeController implements ControllerInterface
         self::$isTimeAttackType = false;
         self::$isRoundsType = false;
 
-        $customMode = collect(config('msm.custom'))->firstWhere('name', '=', $mode);
+        $customMode = collect(config('msm.custom'))->firstWhere('name', '=', basename($mode));
         if ($customMode && !empty($customMode->base)) {
             $mode = $customMode->base;
         }
