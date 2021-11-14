@@ -118,7 +118,7 @@ class File
      *
      * @return Collection
      */
-    public static function getFilesRecursively(string $baseDirectory, string $filterPattern): Collection
+    public static function getFilesRecursively(string $baseDirectory, string $filterPattern = null): Collection
     {
         $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
@@ -136,7 +136,7 @@ class File
                     $files = collect([...$files, ...self::getFilesRecursively($path, $filterPattern)]);
                 } else {
                     //File is not directory
-                    if (preg_match($filterPattern, $file)) {
+                    if (is_null($filterPattern) || preg_match($filterPattern, $file)) {
                         //Add template
                         $files->push(realpath($path));
                     }

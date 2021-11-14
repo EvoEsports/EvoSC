@@ -12,7 +12,7 @@
 
         {foreach $modes as $i => $mode}
         <label pos="25 {$i*-5 - 9}"
-               text="{$mode}"
+               text="{preg_replace('/\.script\.txt$/i', '', basename($mode))}"
                halign="center"
                valign="center"
                size="46 4"

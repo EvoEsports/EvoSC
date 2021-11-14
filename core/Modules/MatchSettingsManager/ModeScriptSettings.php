@@ -29,7 +29,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_NeutralEmblemUrl', 'text', 'Url of the neutral emblem url to use by default', ''),
             new ModeScriptSetting('S_ScriptEnvironment', 'text', 'Environment in which the script runs, used mainly for debugging purpose', 'production'),
             new ModeScriptSetting('S_IsChannelServer', 'boolean', 'Set the server as a channel server', false),
-//            new ModeScriptSetting('S_AllowRespawn', 'boolean', 'Allow the players to respawn or not', true), // broken, use S_RespawnBehaviour
+            //            new ModeScriptSetting('S_AllowRespawn', 'boolean', 'Allow the players to respawn or not', true), // broken, use S_RespawnBehaviour
             new ModeScriptSetting('S_RespawnBehaviour', 'integer', "This setting controls the behavior of the respawn button. It overrides the respawn behavior set by the game mode script and the S_AllowRespawn setting. It can takes one of the following values:\n
 \$o\$n0\$z -> use the game mode value
 \$o\$n1\$z -> normal (respawn when pressing the button)
@@ -93,7 +93,7 @@ class ModeScriptSettings
      */
     public static function chase(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_TimeLimit', 'integer', 'Time limit (0 to disable, -1 automatic based on author time)', 900),
             new ModeScriptSetting('S_MapPointsLimit', 'integer', 'Map points limit', 3),
             new ModeScriptSetting('S_RoundPointsLimit', 'integer', 'Round points limit (0 to disable, negative values automatic based on number of checkpoints)', -5),
@@ -111,10 +111,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpDuration', 'integer', 'Duration of one warm up', 0),
             new ModeScriptSetting('S_NbPlayersPerTeamMax', 'integer', 'Maximum number of players per team in matchmaking', 3),
             new ModeScriptSetting('S_NbPlayersPerTeamMin', 'integer', 'Minimum number of players per team in matchmaking', 3),
-        ])
-            ->merge(self::all())
-            ->merge(self::matchMaking())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all(), self::matchMaking());
     }
 
     /**
@@ -122,7 +119,7 @@ class ModeScriptSettings
      */
     public static function chaseAttack(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_TimeLimit', 'integer', "Time limit (0 to disable, -1 automatic based on author time)", 300),
             new ModeScriptSetting('S_ForceLapsNb', 'integer', "Number of Laps (-1 to use the map default, 0 to disable laps limit)", -1),
             new ModeScriptSetting('S_FinishTimeout', 'integer', "Finish timeout (-1 automatic based on author time)", 5),
@@ -130,9 +127,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WaypointEventDelay', 'integer', "Waypoint event buffer delay", 300),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
-        ])
-            ->merge(self::all())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all());
     }
 
     /**
@@ -140,18 +135,14 @@ class ModeScriptSettings
      */
     public static function cup(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_RoundsPerMap', 'integer', "Rounds per map", 5),
             new ModeScriptSetting('S_NbOfWinners', 'integer', "Number of winners before ending the match", 3),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_NbOfPlayersMax', 'integer', "Maximum number of players in matchmaking", 4),
             new ModeScriptSetting('S_NbOfPlayersMin', 'integer', "Minimum number of players in matchmaking", 4),
-        ])
-            ->merge(self::all())
-            ->merge(self::roundsBase())
-            ->merge(self::matchMaking())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all(), self::roundsBase(), self::matchMaking());
     }
 
     /**
@@ -159,16 +150,14 @@ class ModeScriptSettings
      */
     public static function laps(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_TimeLimit', 'integer', "Time limit (0 to disable, -1 automatic based on author time)", 0),
             new ModeScriptSetting('S_ForceLapsNb', 'integer', "Number of Laps (-1 to use the map default)", 5),
             new ModeScriptSetting('S_FinishTimeout', 'integer', "Finish timeout (-1 automatic based on author time)", -1),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of warm up", 0),
             new ModeScriptSetting('S_DisableGiveUp', 'boolean', "Prevent players from giving up the race", false),
-        ])
-            ->merge(self::all())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all());
     }
 
     /**
@@ -176,17 +165,14 @@ class ModeScriptSettings
      */
     public static function rounds(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_PointsLimit', 'integer', "Points limit (negative value to disable)", 50),
             new ModeScriptSetting('S_RoundsPerMap', 'integer', "Number of round to play on one map before going to the next one (negative value to disable)", -1),
             new ModeScriptSetting('S_MapsPerMatch', 'integer', "Number of maps to play before finishing the match (negative value to disable)", -1),
             new ModeScriptSetting('S_UseTieBreak', 'boolean', "Continue to play the map until the tie is broken", true),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
-        ])
-            ->merge(self::all())
-            ->merge(self::roundsBase())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all(), self::roundsBase());
     }
 
     /**
@@ -194,7 +180,7 @@ class ModeScriptSettings
      */
     public static function team(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_PointsLimit', 'integer', "Points limit", 5),
             new ModeScriptSetting('S_MaxPointsPerRound', 'integer', "The maximum number of points attributed to the first player to cross the finish line", 6),
             new ModeScriptSetting('S_PointsGap', 'integer', "The number of points lead a team must have to win the map", 1),
@@ -207,11 +193,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_NbPlayersPerTeamMax	', 'integer', "Maximum number of players per team in matchmaking", 3),
             new ModeScriptSetting('S_NbPlayersPerTeamMin', 'integer', "Minimum number of players per team in matchmaking", 3),
-        ])
-            ->merge(self::all())
-            ->merge(self::roundsBase())
-            ->merge(self::matchMaking())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all(), self::roundsBase(), self::matchMaking());
     }
 
     /**
@@ -219,14 +201,30 @@ class ModeScriptSettings
      */
     public static function timeAttack(): Collection
     {
-        return collect([
+        return self::combine([
             new ModeScriptSetting('S_TimeLimit', 'integer', "Time limit in seconds", 300),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_ForceLapsNb', 'integer', "Number of Laps (-1 to use the map default, 0 to disable laps limit)", 0),
-        ])
-            ->merge(self::all())
-            ->keyBy([self::class, 'keyBy']);
+        ], self::all());
+    }
+
+    /**
+     * @param array $custom
+     * @param Collection ...$settings
+     * @return Collection
+     */
+    private static function combine(array $custom, Collection ...$settings)
+    {
+        $custom = collect($custom);
+
+        foreach ($settings as $otherSettings) {
+            $custom->merge($custom->diffUsing($otherSettings, function (ModeScriptSetting $a, ModeScriptSetting $b) {
+                return $a->getSetting() == $b->getSetting() ? 0 : -1;
+            }));
+        }
+
+        return $custom->keyBy([self::class, 'keyBy']);
     }
 
     /**
@@ -235,26 +233,43 @@ class ModeScriptSettings
      */
     public static function getSettingsByMode(string $mode)
     {
+        $mode = basename($mode);
+        $modeName = preg_replace('/\.script\.txt/i', '', $mode);
+        $customSettings = collect(config('msm.custom'))->firstWhere('name', '=', $modeName);
+
+        if ($customSettings) {
+            $settings = [];
+            foreach ($customSettings->settings as $setting) {
+                array_push($settings, new ModeScriptSetting($setting->setting, $setting->type, $setting->description, $setting->default));
+            }
+
+            if (empty($customSettings->base)) {
+                return collect($settings)->keyBy([self::class, 'keyBy']);
+            }
+
+            return self::combine($settings, self::getSettingsByMode($customSettings->base));
+        }
+
         switch ($mode) {
             case 'TimeAttack.Script.txt':
-            case 'Trackmania/TM_TimeAttack_Online.Script.txt':
+            case 'TM_TimeAttack_Online.Script.txt':
                 return self::timeAttack();
 
             case 'Rounds.Script.txt':
-            case 'Trackmania/TM_Rounds_Online.Script.txt':
+            case 'TM_Rounds_Online.Script.txt':
                 return self::rounds();
 
             case 'Laps.Script.txt':
-            case 'Trackmania/TM_Laps_Online.Script.txt':
+            case 'TM_Laps_Online.Script.txt':
                 return self::laps();
 
             case 'Teams.Script.txt':
             case 'FSM_Teams.Script.txt':
-            case 'Trackmania/TM_Teams_Online.Script.txt':
+            case 'TM_Teams_Online.Script.txt':
                 return self::team();
 
             case 'Cup.Script.txt':
-            case 'Trackmania/TM_Cup_Online.Script.txt':
+            case 'TM_Cup_Online.Script.txt':
                 return self::cup();
         }
 
