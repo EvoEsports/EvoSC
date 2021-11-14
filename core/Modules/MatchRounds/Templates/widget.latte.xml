@@ -15,7 +15,8 @@
     {block script}
     <script><!--
     Boolean isRoundsType(){
-        return CurrentServerModeName == "TM_Cup_Online" || CurrentServerModeName == "TM_Rounds_Online" || UseClans;
+        declare roundsType = {\EvoSC\Controllers\ModeController::isRoundsType() ? 'True' : 'False'}; //{\EvoSC\Controllers\ModeController::isRoundsType()}
+        return (roundsType || CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
     }
     --></script>
     {/block}
