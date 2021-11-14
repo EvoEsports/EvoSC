@@ -58,7 +58,7 @@
             </frame>
         </frame>
 
-        <label id="finalist-label" class="text-light" pos="86 -8" halign="right" valign="center" text="" opacity="0.85" textsize="0.8" />
+        <label id="finalist-label" class="text-light" pos="86 -8" halign="right" valign="center" text="asd" opacity="0.85" textsize="0.8" />
 
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
         <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.45" />
@@ -114,6 +114,7 @@
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
+    #Include "ColorLib" as CL
     #Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
     #Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
 
@@ -153,7 +154,8 @@
 
     <script><!--
     Boolean isRoundsTypeMode(){
-        return (CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
+        declare roundsType = {\EvoSC\Controllers\ModeController::isRoundsType() ? 'True' : 'False'}; //{\EvoSC\Controllers\ModeController::isRoundsType()}
+        return (roundsType || CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
     }
 
     Integer ceil(Real value){
@@ -305,6 +307,21 @@
             badgeLabel.Value = "";
 		}
 
+        declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
+        declare netread Text[][Text] Net_TMxSM_ScoresTable_CustomPoints for Teams[0];
+        declare _CustomPoints = Net_TMxSM_ScoresTable_CustomPoints;
+		declare Boolean CustomPointsEnabled = _CustomPoints.existskey(Score.User.WebServicesUserId);
+		if(CustomPointsEnabled){
+			if (_CustomPoints[Score.User.WebServicesUserId].existskey(0)) {
+				finalistLabel.Value = _CustomPoints[Score.User.WebServicesUserId][0];
+			}
+			if (_CustomPoints[Score.User.WebServicesUserId].existskey(1)) {
+				finalistLabel.TextColor = CL::HexToRgb(_CustomPoints[Score.User.WebServicesUserId][1]);
+			}
+		}else{
+            finalistLabel.Value = "";
+        }
+
         if(UseClans){
             declare Integer TRank for Score = 0;
             rankLabel.Value = "" ^ (TRank);
@@ -331,24 +348,6 @@
                 scoreLabel.Opacity = 0.1;
             }
             scoreLabel.Value = Score.Points ^ " Pts";
-
-            declare Integer EvoSC_PointsLimit for This = 0;
-            declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
-            if(CurrentServerModeName == "TM_Cup_Online" && EvoSC_PointsLimit > 0){
-                declare Integer[Text] EvoSC_Winners for This;
-                if(EvoSC_Winners.existskey(Score.User.Login)){
-                    declare Integer winnerRank = EvoSC_Winners[Score.User.Login];
-                    finalistLabel.Show();
-                    finalistLabel.Value = "$fc2 $fff"^winnerRank^". Winner";
-                }else if(Score.Points >= EvoSC_PointsLimit){
-                    finalistLabel.Show();
-                    finalistLabel.Value = " Finalist";
-                }else{
-                    finalistLabel.Value = "";
-                }
-            }else{
-                finalistLabel.Value = "";
-            }
         }else{
             if(CurrentServerModeName == "Evo_Royal_TA" || CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
                 declare netread Int2 Net_TMxSM_ScoresTable_RaceProgression for Score;

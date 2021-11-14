@@ -90,6 +90,11 @@ class ModeController implements ControllerInterface
         self::$isTimeAttackType = false;
         self::$isRoundsType = false;
 
+        $customMode = collect(config('msm.custom'))->firstWhere('name', '=', $mode);
+        if ($customMode && !empty($customMode->base)) {
+            $mode = $customMode->base;
+        }
+
         switch ($mode) {
             case 'TimeAttack.Script.txt':
             case 'Trackmania/TM_TimeAttack_Online.Script.txt':

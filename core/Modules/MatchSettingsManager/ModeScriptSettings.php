@@ -234,8 +234,7 @@ class ModeScriptSettings
     public static function getSettingsByMode(string $mode)
     {
         $mode = basename($mode);
-        $modeName = preg_replace('/\.script\.txt/i', '', $mode);
-        $customSettings = collect(config('msm.custom'))->firstWhere('name', '=', $modeName);
+        $customSettings = collect(config('msm.custom'))->firstWhere('name', '=', $mode);
 
         if ($customSettings) {
             $settings = [];
