@@ -210,6 +210,22 @@ class ModeScriptSettings
     }
 
     /**
+     * @return Collection
+     */
+    public static function knockout(): Collection
+    {
+        return self::combine([
+            new ModeScriptSetting('S_FinishTimeout', 'integer', "Finish timeout", 5),
+            new ModeScriptSetting('S_RoundsPerMap', 'integer', "Number of rounds per map", -1),
+            new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm ups", 0),
+            new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
+            new ModeScriptSetting('S_ChatTime', 'integer', "Time in seconds to chat at map end", 6),
+            new ModeScriptSetting('S_EliminatedPlayersNbRanks', 'text', "Rank at which one more player is eliminated per round", "3"),
+            new ModeScriptSetting('S_RoundsWithoutElimination', 'integer', "Numbers of rounds without elimination", 1),
+        ], self::all());
+    }
+
+    /**
      * @param array $custom
      * @param Collection ...$settings
      * @return Collection
@@ -250,6 +266,9 @@ class ModeScriptSettings
         }
 
         switch ($mode) {
+            case 'TM_Knockout_Online.Script.txt':
+                return self::knockout();
+
             case 'TimeAttack.Script.txt':
             case 'TM_TimeAttack_Online.Script.txt':
                 return self::timeAttack();
