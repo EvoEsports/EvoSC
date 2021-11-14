@@ -19,6 +19,7 @@ use EvoSC\Models\Player;
 use EvoSC\Models\Schedule;
 use EvoSC\Modules\MatchSettingsManager\Classes\ModeScriptSetting;
 use EvoSC\Modules\QuickButtons\QuickButtons;
+use Illuminate\Support\Collection;
 use SimpleXMLElement;
 
 class MatchSettingsManager extends Module implements ModuleInterface
@@ -54,7 +55,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
     private static array $gameModesTrackmania = [
         'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
         'Rounds'     => 'Trackmania/TM_Rounds_Online.Script.txt',
-        'Team'      => 'Trackmania/TM_Teams_Online.Script.txt',
+        'Team'       => 'Trackmania/TM_Teams_Online.Script.txt',
         'Cup'        => 'Trackmania/TM_Cup_Online.Script.txt',
         'Laps'       => 'Trackmania/TM_Laps_Online.Script.txt',
         'Champion'   => 'Trackmania/TM_Champion_Online.Script.txt',
@@ -75,6 +76,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         AccessRight::add('matchsettings_edit', 'Edit matchsettings.');
 
         ChatCommand::add('//msm', [self::class, 'showOverview'], 'Show MatchSettingsManager', 'matchsettings_edit');
+        ChatCommand::add('//modes', [self::class, 'cmdListAvailableModeScripts'], 'List available custom mode scripts', 'matchsettings_edit');
 
         ManiaLinkEvent::add('msm.load', [self::class, 'loadMatchsettings'], 'matchsettings_load');
         ManiaLinkEvent::add('msm.load_and_skip', [self::class, 'loadMatchsettingsAndSkip'], 'matchsettings_load');
@@ -145,6 +147,32 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
     /**
      * @param Player $player
+     * @param $cmd
+     */
+    public static function cmdListAvailableModeScripts(Player $player, $cmd)
+    {
+        $modeScripts = self::getAvailableModeScripts()->map(function ($file) {
+            $file = preg_replace('/\.Script.txt$/', '', $file);
+            return secondary('► ' . $file);
+        });
+
+        $available = $modeScripts->implode("\n");
+        infoMessage("The available modes are:\n$available")->send($player);
+    }
+
+    /**
+     * @return Collection
+     */
+    public static function getAvailableModeScripts(): Collection
+    {
+        $modeScriptsDir = realpath(modeScriptsDir());
+        return File::getFilesRecursively($modeScriptsDir, '/\.script.txt$/i')->map(function ($file) use ($modeScriptsDir) {
+            return substr(str_replace($modeScriptsDir, '', $file), 1);
+        });
+    }
+
+    /**
+     * @param Player $player
      * @param $data
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
@@ -195,11 +223,15 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function showCreateMatchsettings(Player $player)
     {
+        $customModes = MatchSettingsManager::getAvailableModeScripts();
+
         if (isManiaPlanet()) {
-            $modes = collect(self::$modeTemplatesManiaplanet)->keys();
+            $options = collect(self::$gameModesManiaplanet)->values();
         } else {
-            $modes = collect(self::$modeTemplatesTrackmania)->keys();
+            $options = collect(self::$gameModesTrackmania)->values();
         }
+
+        $modes = $options->merge($customModes);
 
         Template::show($player, 'MatchSettingsManager.create', compact('modes'));
 
@@ -307,6 +339,12 @@ class MatchSettingsManager extends Module implements ModuleInterface
         File::put($file, Utility::simpleXmlPrettyPrint($xml));
     }
 
+    /**
+     * @param Player $player
+     * @param string $matchSettingsName
+     * @param $data
+     * @throws \Exception
+     */
     public static function mleSaveServerSettings(Player $player, string $matchSettingsName, $data)
     {
         $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
@@ -361,7 +399,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $xml = new SimpleXMLElement($data);
 
         foreach ($xml as $node) {
-            if ($node->getName() == 'map') {
+            if ($node instanceof SimpleXMLElement && $node->getName() == 'map') {
                 $enabledMapUids->push($node->ident);
             }
         }
@@ -440,28 +478,28 @@ class MatchSettingsManager extends Module implements ModuleInterface
      * @param string $modeName
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function createNewMatchsettings(Player $player, string $modeName)
+    public static function createNewMatchsettings(Player $player, string $scriptName)
     {
-        $modeFile = self::$modeTemplatesManiaplanet[$modeName];
-        $modeBaseName = str_replace('.xml', '', $modeFile);
-        $sourceMatchsettings = __DIR__ . '/MatchSettingsRepo/' . $modeFile;
-        $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
-        $i = 0;
+        $baseMatchSettings = new SimpleXMLElement(File::get(__DIR__ . '/base.xml'));
+        $baseMatchSettings->gameinfos->addChild('script_name', $scriptName);
+        $scriptSettingsNode = $baseMatchSettings->addChild('script_settings');
 
+        ModeScriptSettings::getSettingsByMode($scriptName)->map(function (ModeScriptSetting $setting) use ($scriptSettingsNode) {
+            $node = $scriptSettingsNode->addChild('setting');
+            $node->addAttribute('name', $setting->getSetting());
+            $node->addAttribute('type', $setting->getType());
+            $node->addAttribute('value', $setting->getDefault());
+        });
+
+        $i = 0;
         do {
-            $filename = sprintf('%s_%d.txt', $modeBaseName, $i);
+            $matchsettingsDirectory = mapsDir('/MatchSettings/');
+            $filename = sprintf('%s_%d.txt', basename($scriptName), $i);
             $i++;
             $targetFile = $matchsettingsDirectory . $filename;
         } while (File::exists($matchsettingsDirectory . $filename));
 
-        if (isManiaPlanet()) {
-            $scriptName = self::$gameModesManiaplanet[$modeName];
-        } else {
-            $scriptName = self::$gameModesTrackmania[$modeName];
-        }
-
-        $content = File::get($sourceMatchsettings);
-        $content = str_replace('%script_name%', $scriptName, $content);
+        $content = Utility::simpleXmlPrettyPrint($baseMatchSettings);
 
         File::put($targetFile, $content);
         Log::info($player . ' created new "' . $filename . '" with mode "' . $scriptName . '"');

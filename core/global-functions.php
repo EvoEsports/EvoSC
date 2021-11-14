@@ -150,6 +150,15 @@ function mapsDir(string $filename = ''): string
 
 /**
  * @param string $filename
+ * @return string
+ */
+function modeScriptsDir(string $filename = ''): string
+{
+    return mapsDir('../Scripts/' . $filename);
+}
+
+/**
+ * @param string $filename
  *
  * @return string
  */
