@@ -1,0 +1,165 @@
+{contentType text}
+{extends 'Components.window'}
+
+{php $window_width = '100';}
+{php $window_height = count($groups) * 8 + 2;}
+
+{block id}group-manager{/block}
+
+{block icon}
+
+{/block}
+
+{block title}
+Group Manager
+{/block}
+
+{block content}
+<frame>
+    {foreach $groups as $i => $group}
+    <frame pos="0 {$i * -8 - 2}">
+        <label class="text-light" pos="2" halign="center" text="{$group->chat_prefix}" textcolor="{$group->color}" valign="center" />
+        <label class="text-light" pos="5" size="33" text="{$group->Name}" valign="center" />
+        {if $group->id == 3}
+        <label class="text-light" pos="44" text="DEFAULT" opacity="0.5" size="9" valign="center" halign="center" textsize="0.25" />
+        {else}
+        {if $group->Protected}
+        <label class="text-light" pos="44" text="PROTECTED" opacity="0.5" size="11" valign="center" halign="center" textsize="0.25" />
+        {else}
+        <label class="text-light" pos="44" text="" opacity="0.5" size="9" valign="center" halign="center" />
+        {/if}
+        {/if}-
+        <label class="text-light" pos="59" text="" textsize="0.5" opacity="0.5" valign="center" />
+        <label class="text-light" pos="58" text="{$count = $group->player()->count()}" opacity="{$count?1.0:0.5}" halign="right" valign="center" />
+        {if $group->unrestricted}
+        <label class="text-light" pos="70" text="" textsize="1" opacity="0.5" valign="center" />
+        {else}
+        <label class="text-light" pos="70" text="" textsize="1" opacity="0.5" valign="center" />
+        {/if}
+        <label class="text-light" pos="69" text="{$count = $group->security_level}" opacity="{$count?1.0:0.5}" halign="right" valign="center" />
+
+        <label class="btn-accent add" pos="78" size="4 4" text="" textsize="0.25" ScriptEvents="1" />
+        <label class="btn-accent" pos="83" size="4 4" text="" textsize="0.25" ScriptEvents="1" />
+        <label class="btn-warning" pos="88" size="4 4" text="" textsize="0.25" ScriptEvents="1" />
+        {if $group->Protected}
+        <label class="btn-default" pos="93" size="4 4" text="" textsize="0.25" ScriptEvents="1" />
+        {else}
+        <label class="btn-danger" pos="93" size="4 4" text="" textsize="0.25" ScriptEvents="1" />
+        {/if}
+
+        <quad class="bg-light" pos="0 -4" size="96 0.1" opacity="0.5" />
+    </frame>
+    {/foreach}
+</frame>
+
+<framemodel id="player_search_player">
+    <label class="text-light" text="player" pos="25" size="26 4" valign="center" />
+    <label class="text-light" text="player" size="18 4" valign="center" />
+    <label class="text-light" text="icon" pos="55" valign="center" />
+    <label class="text-light" text="group" pos="58" valign="center" />
+    <label class="btn-muted change" pos="88 0" size="16 4" text=" CHANGE" textsize="0.5" ScriptEvents="1" />
+    <quad class="bg-darker" size="96 0.1" pos="0 -3" opacity="1" />
+</framemodel>
+
+<frame id="player_search" pos="-2 2" z-index="10" hidden="1">
+    <quad class="bg-dark" size="100 {count($groups) * 8 + 20}" z-index="-1" />
+    <label class="text-light" pos="2 -3" textsize="1.6" text="Change player group" valign="center" />
+    <label class="btn-danger cancel_search" pos="91 -3.5" size="14 4" text=" CANCEL" textsize="0.5" ScriptEvents="1" />
+    <label class="text-meta" pos="2 -9.5" text="Search by name or login" valign="center" />
+    <entry id="search_player" class="form search_player" pos="31 -9.5" size="67 3" valign="center" />
+    <quad class="bg-darker" size="100 6" pos="0 -9.5" valign="center" />
+
+    <frame pos="2 -16">
+        <label class="text-lighter" text="Ubisoft-Name" size="18 4" valign="center" />
+        <label class="text-lighter" text="Name" pos="25" size="26 4" valign="center" />
+        <label class="text-lighter" text="Group" pos="55" valign="center" />
+    </frame>
+
+    <frame id="player_search_results" pos="2 -22">
+        {for $i=0;$i<8;$i++}
+        <frameinstance modelid="player_search_player" pos="0 {$i * -6}" />
+        {/for}
+    </frame>
+</frame>
+{/block}
+
+<script><!--
+{block globals}
+    #Struct EvoSC_PlayerSearchPlayer {
+        Text name;
+        Text login;
+        Text group;
+        Text group_icon;
+        Text group_color;
+    }
+
+    #Struct EvoSC_PlayerSearchResult {
+        Boolean exact_match;
+        EvoSC_PlayerSearchPlayer[] results;
+    }
+{/block}
+
+{block functions}
+    Void clearSearchResultList(){
+        declare rowsFrame <=> (Page.MainFrame.GetFirstChild("player_search_results") as CMlFrame);
+        foreach(row in rowsFrame.Controls){
+            row.Hide();
+        }
+    }
+
+    Void fillSearchResultList(EvoSC_PlayerSearchResult searchResult){
+        declare rowsFrame <=> (Page.MainFrame.GetFirstChild("player_search_results") as CMlFrame);
+        clearSearchResultList();
+        for(i, 0, rowsFrame.Controls.count - 1){
+            if(i >= searchResult.results.count){
+                break;
+            }
+
+            declare row = (rowsFrame.Controls[i] as CMlFrame);
+            declare player = searchResult.results[i];
+            (row.Controls[0] as CMlLabel).Value = player.name;
+            (row.Controls[1] as CMlLabel).Value = player.login;
+            (row.Controls[2] as CMlLabel).Value = "$" ^ player.group_color ^ player.group_icon;
+            (row.Controls[3] as CMlLabel).Value = player.group;
+            row.Show();
+
+log(i ^ " -> " ^ (searchResult.results.count - 1));
+            if(i == searchResult.results.count - 1){
+                row.Controls[5].Hide();
+            }
+        }
+        for(i, searchResult.results.count, 7){
+            rowsFrame.Controls[i].Hide();
+        }
+    }
+{/block}
+
+{block bootScript}
+    declare playerSearchEntry <=> (Page.MainFrame.GetFirstChild("search_player") as CMlEntry);
+
+    declare EvoSC_PlayerSearchResult groupManagerPlayerSearchResult for This;
+    declare Integer lastGroupManagerSearchResult for This = 0;
+    declare lastPlayerSearchResult = 0;
+{/block}
+
+{block loop}
+    if(lastPlayerSearchResult != lastGroupManagerSearchResult){
+        lastPlayerSearchResult = lastGroupManagerSearchResult;
+        fillSearchResultList(groupManagerPlayerSearchResult);
+    }
+{/block}
+
+{block pendingEvents}
+if(event.Control.HasClass("search_player") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+    TriggerPageAction("{$MODULE|classpath}::mleSearchPlayer," ^ playerSearchEntry.Value);
+}
+if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
+    clearSearchResultList();
+    playerSearchEntry.Value = "";
+    Page.MainFrame.GetFirstChild("player_search").Show();
+}
+if(event.Control.HasClass("cancel_search") && event.Type == CMlScriptEvent::Type::MouseClick){
+    Page.MainFrame.GetFirstChild("player_search").Hide();
+}
+{/block}
+--></script>
