@@ -85,6 +85,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_ForceLapsNb', 'integer', 'Force number of laps (-1 to use the map default)', -1),
             new ModeScriptSetting('S_DisplayTimeDiff', 'boolean', 'Display time difference at checkpoint', false),
             new ModeScriptSetting('S_PointsRepartition', 'text', 'Comma separated points distribution. eg: "10,6,4,3,2,1"', '10,6,4,3,2,1'),
+            new ModeScriptSetting('S_UseCustomPointsRepartition', 'boolean', "Use a custom points repartition defined with xmlrpc", false),
         ]);
     }
 
@@ -184,7 +185,6 @@ class ModeScriptSettings
             new ModeScriptSetting('S_PointsLimit', 'integer', "Points limit", 5),
             new ModeScriptSetting('S_MaxPointsPerRound', 'integer', "The maximum number of points attributed to the first player to cross the finish line", 6),
             new ModeScriptSetting('S_PointsGap', 'integer', "The number of points lead a team must have to win the map", 1),
-            new ModeScriptSetting('S_UseCustomPointsRepartition', 'boolean', "Use a custom points repartition defined with xmlrpc", false),
             new ModeScriptSetting('S_CumulatePoints', 'boolean', "At the end of the round both teams win their players points", false),
             new ModeScriptSetting('S_RoundsPerMap', 'integer', "Number of rounds to play on one map before going to the next one (0 or less to disable)", -1),
             new ModeScriptSetting('S_MapsPerMatch', 'integer', "Number of maps to play before finishing the match (0 or less to disable)", -1),
