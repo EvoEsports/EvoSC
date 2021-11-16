@@ -1,6 +1,6 @@
 {contentType text}
 {extends 'Components.window'}
-{php $window_width = 40;}
+{php $window_width = 50;}
 {php $window_height = 50;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
@@ -10,8 +10,8 @@
 
     {block content}
     <frame pos="-2 4.5">
-        {foreach $options as $mode => $id}
-        <label class="btn-muted select" pos="20 {$iterator->counter * -5}" size="40 5" textsize="1" text="{$mode}" data-name="{$mode}" data-id="{$id}" ScriptEvents="1"/>
+        {foreach $options as $mode}
+        <label class="btn-muted select" pos="25 {$iterator->counter * -5}" size="50 5" textsize="1" text="{preg_replace('/\.script\.txt$/i', '', basename($mode))}" data-name="{$mode}" data-id="{$mode}" ScriptEvents="1"/>
         {/foreach}
     </frame>
     {/block}

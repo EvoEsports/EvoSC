@@ -1,2 +1,30 @@
 {
+  "custom": [
+    {
+      "name": "Example_Script_Name.Script.txt",
+      "base": "Trackmania/TimeAttack.Script.txt",
+      "settings": [
+        {"setting": "S_VarName", "type": "text", "default": "The default value", "description": "..."},
+        {"setting": "S_VarName2", "type": "integer", "default": 1, "description": "..."},
+        {"setting": "S_VarName3", "type": "boolean", "default": false, "description": "..."},
+        {"setting": "S_VarName4", "type": "real", "default": 0.5, "description": "..."}
+      ]
+    },
+    {
+      "name": "LastManStandingRounds.Script.txt",
+      "base": "Trackmania/TM_Rounds_Online.Script.txt",
+      "settings": [
+        {"setting": "S_PointsStartup", "type": "integer", "description": "The points a player starts with", "default": 50},
+        {"setting": "S_FinishTimeout", "type": "integer", "description": "Finish timeout", "default": -1},
+        {"setting": "S_RoundsPerMap", "type": "integer", "description": "Number of round to play on one map before going to the next map", "default": 5},
+        {"setting": "S_NbOfWinners", "type": "integer", "description": "Number of winners", "default": 1},
+        {"setting": "S_WarmUpNb", "type": "integer", "description": "Number of warmups", "default": 0},
+        {"setting": "S_WarmUpDuration", "type": "integer", "description": "Warmup duration in seconds", "default": 20},
+        {"setting": "S_WarmUpTimeout", "type": "integer", "description": "Warmup timeout", "default": -1},
+        {"setting": "S_PointsRepartition", "type": "text", "description": "Points repartition", "default": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"},
+        {"setting": "S_DNF_LossPoints", "type": "integer", "description": "Number of points for player that give up a round", "default": 20},
+        {"setting": "S_ScriptEnvironment", "type": "text", "description": "Script environment", "default": "production"}
+      ]
+    }
+  ]
 }

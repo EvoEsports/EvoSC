@@ -40,6 +40,7 @@
             if(LocalUser.Login == marker.login){
                 continue;
             }
+
             markersXml = markersXml ^ """<marker label="$<""" ^  escapeQuotes(marker.name) ^ """$>" playerlogin='""" ^ marker.login ^ """' box='0 0.6 0' distmax='95' color='{config('theme.hud.bg-light')}' />""";
         }
 

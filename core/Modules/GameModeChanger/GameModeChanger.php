@@ -13,26 +13,27 @@ use EvoSC\Controllers\ModeController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
+use EvoSC\Modules\MatchSettingsManager\MatchSettingsManager;
 
 class GameModeChanger extends Module implements ModuleInterface
 {
     private static array $gameModesManiaplanet = [
         'TimeAttack' => 'TimeAttack.Script.txt',
-        'Rounds' => 'Rounds.Script.txt',
-        'Team' => 'Team.Script.txt',
-        'Cup' => 'Cup.Script.txt',
-        'Laps' => 'Laps.Script.txt',
-        'Chase' => 'Chase.Script.txt',
+        'Rounds'     => 'Rounds.Script.txt',
+        'Team'       => 'Team.Script.txt',
+        'Cup'        => 'Cup.Script.txt',
+        'Laps'       => 'Laps.Script.txt',
+        'Chase'      => 'Chase.Script.txt',
     ];
 
     private static array $gameModesTrackmania = [
         'TimeAttack' => 'Trackmania/TM_TimeAttack_Online.Script.txt',
-        'Rounds' => 'Trackmania/TM_Rounds_Online.Script.txt',
-        'Teams' => 'Trackmania/TM_Teams_Online.Script.txt',
-        'Cup' => 'Trackmania/TM_Cup_Online.Script.txt',
-        'Laps' => 'Trackmania/TM_Laps_Online.Script.txt',
-        'Champion' => 'Trackmania/TM_Champion_Online.Script.txt',
-        'Knockout' => 'Trackmania/TM_Knockout_Online.Script.txt',
+        'Rounds'     => 'Trackmania/TM_Rounds_Online.Script.txt',
+        'Teams'      => 'Trackmania/TM_Teams_Online.Script.txt',
+        'Cup'        => 'Trackmania/TM_Cup_Online.Script.txt',
+        'Laps'       => 'Trackmania/TM_Laps_Online.Script.txt',
+        'Champion'   => 'Trackmania/TM_Champion_Online.Script.txt',
+        'Knockout'   => 'Trackmania/TM_Knockout_Online.Script.txt',
     ];
 
     /**
@@ -56,11 +57,15 @@ class GameModeChanger extends Module implements ModuleInterface
      */
     public static function cmdChangeGameMode(Player $player, $cmd = null)
     {
+        $customModes = MatchSettingsManager::getAvailableModeScripts();
+
         if (isManiaPlanet()) {
-            $options = self::$gameModesManiaplanet;
+            $options = collect(self::$gameModesManiaplanet)->values();
         } else {
-            $options = self::$gameModesTrackmania;
+            $options = collect(self::$gameModesTrackmania)->values();
         }
+
+        $options = $options->merge($customModes);
 
         Template::show($player, 'GameModeChanger.select', ['options' => $options]);
     }
