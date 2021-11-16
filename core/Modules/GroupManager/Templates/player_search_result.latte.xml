@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:gm-player-search-result" id="gm-player-search-result" version="3">
+    <script><!--
+    #Include "MathLib" as ML
+    #Include "TextLib" as TL
+
+    #Struct EvoSC_PlayerSearchPlayer {
+        Text name;
+        Text login;
+        Text group;
+        Text group_icon;
+        Text group_color;
+    }
+
+    #Struct EvoSC_PlayerSearchResult {
+        Boolean exact_match;
+        EvoSC_PlayerSearchPlayer[] results;
+    }
+
+    main(){
+        declare EvoSC_PlayerSearchResult groupManagerPlayerSearchResult for This;
+        declare Integer lastGroupManagerSearchResult for This;
+        groupManagerPlayerSearchResult.fromjson("""{$data|noescape}""");
+        lastGroupManagerSearchResult = GameTime;
+    }
+
+    --></script>
+</manialink>
