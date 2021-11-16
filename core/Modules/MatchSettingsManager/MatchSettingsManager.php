@@ -302,7 +302,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         $xml = new SimpleXMLElement(File::get($file));
         $toSave = collect();
 
-        $modeScriptName = $xml->gameinfos->script_name;
+        $modeScriptName = (string)$xml->gameinfos->script_name;
         $availableSettings = ModeScriptSettings::getSettingsByMode($modeScriptName);
 
         foreach ((array)$data as $setting => $value) {
@@ -310,13 +310,11 @@ class MatchSettingsManager extends Module implements ModuleInterface
              * @var ModeScriptSetting $availableSetting
              */
             if ($availableSetting = $availableSettings->get($setting)) {
-                if ($availableSetting->getDefault() != $value) {
-                    $toSave->push((object)[
-                        'name'  => $setting,
-                        'value' => $value,
-                        'type'  => $availableSetting->getType()
-                    ]);
-                }
+                $toSave->push((object)[
+                    'name'  => $setting,
+                    'value' => $value,
+                    'type'  => $availableSetting->getType()
+                ]);
             } else {
                 $toSave->push((object)[
                     'name'  => $setting,

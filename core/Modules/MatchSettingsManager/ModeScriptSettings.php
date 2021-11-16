@@ -232,15 +232,21 @@ class ModeScriptSettings
      */
     private static function combine(array $custom, Collection ...$settings)
     {
-        $custom = collect($custom);
+        $custom = collect($custom)->keyBy([self::class, 'keyBy']);
+        $toAdd = collect();
 
         foreach ($settings as $otherSettings) {
-            $custom->merge($custom->diffUsing($otherSettings, function (ModeScriptSetting $a, ModeScriptSetting $b) {
-                return $a->getSetting() == $b->getSetting() ? 0 : -1;
-            }));
+            foreach($otherSettings as $setting){
+                /**
+                 * @var ModeScriptSetting $setting
+                 */
+                if(!$custom->has($setting->getSetting())){
+                    $toAdd->put($setting->getSetting(), $setting);
+                }
+            }
         }
 
-        return $custom->keyBy([self::class, 'keyBy']);
+        return $custom->merge($toAdd);
     }
 
     /**
