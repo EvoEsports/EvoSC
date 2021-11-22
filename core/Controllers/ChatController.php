@@ -65,6 +65,7 @@ class ChatController implements ControllerInterface
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
         ChatCommand::add('/version', [self::class, 'cmdVersion'], 'Print server, client and EvoSC version.');
         ChatCommand::add('/chatformat', [self::class, 'cmdChatFormat'], 'Outputs chat-text as JSON format.');
+        Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
     }
 
     /**
@@ -269,5 +270,15 @@ class ChatController implements ControllerInterface
     public static function getBetterChatEnabledLogins(): array
     {
         return self::$betterChatEnabledLogins;
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function playerDisconnect(Player $player)
+    {
+        if (in_array($player->Login, self::$betterChatEnabledLogins)) {
+            self::$betterChatEnabledLogins = array_diff([$player->Login], self::$betterChatEnabledLogins);
+        }
     }
 }
