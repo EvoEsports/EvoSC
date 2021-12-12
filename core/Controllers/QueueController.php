@@ -102,6 +102,7 @@ class QueueController implements ControllerInterface
         ]);
 
         Log::write($player . '(' . $player->Login . ') queued map ' . $mapQueueItem->map->name . ' [' . $mapUid . ']');
+        Hook::fire('MapQueueMapAdded', $mapQueueItem);
         Hook::fire('MapQueueUpdated', self::getMapQueue());
 
         if (self::$preCache) {
