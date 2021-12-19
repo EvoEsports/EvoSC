@@ -93,7 +93,7 @@ class ChatController implements ControllerInterface
 
             case 'text':
                 if (in_array($player->Login, self::$betterChatEnabledLogins)) {
-                    self::$betterChatEnabledLogins = array_diff([$player->Login], self::$betterChatEnabledLogins);
+                    self::$betterChatEnabledLogins = array_diff(self::$betterChatEnabledLogins, [$player->Login]);
                 }
                 break;
 
@@ -278,7 +278,7 @@ class ChatController implements ControllerInterface
     public static function playerDisconnect(Player $player)
     {
         if (in_array($player->Login, self::$betterChatEnabledLogins)) {
-            self::$betterChatEnabledLogins = array_diff([$player->Login], self::$betterChatEnabledLogins);
+            self::$betterChatEnabledLogins = array_diff(self::$betterChatEnabledLogins, [$player->Login]);
         }
     }
 }
