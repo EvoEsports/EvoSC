@@ -301,7 +301,6 @@ function echoPlayers(): Collection
 
 /**
  * @return Carbon
- * @throws Exception
  */
 function now(): Carbon
 {

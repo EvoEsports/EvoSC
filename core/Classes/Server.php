@@ -56,7 +56,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool sendHideManialinkPageToLogin(string $string)
  * @method static array getManialinkPageAnswers()
  * @method static bool sendOpenLinkToId(int $int, string $string, int $int)
- * @method static bool sendOpenLinkToLogin(string $string, string $string, int $int)
+ * @method static bool sendOpenLinkToLogin(string $recipient, string $link, int $linkType)
  * @method static bool kick(string $string, string $string)
  * @method static bool kickId(int $int, string $string)
  * @method static bool ban(string $string, string $string)
