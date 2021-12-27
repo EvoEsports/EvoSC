@@ -191,10 +191,10 @@ class EventController implements ControllerInterface
 
             if (isManiaPlanet()) {
                 $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
-                    'NickName' => $details->nickName,
-                    'path' => $details->path,
+                    'NickName'  => $details->nickName,
+                    'path'      => $details->path,
                     'player_id' => $details->playerId,
-                    'team' => $details->teamId
+                    'team'      => $details->teamId
                 ]);
             } else {
                 if ($name_ = Cache::get('nicknames/' . $playerInfo[0])) {
@@ -204,11 +204,11 @@ class EventController implements ControllerInterface
                 }
 
                 $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
-                    'NickName' => $name,
+                    'NickName'     => $name,
                     'ubisoft_name' => $details->nickName,
-                    'path' => $details->path,
-                    'player_id' => $details->playerId,
-                    'team' => $details->teamId
+                    'path'         => $details->path,
+                    'player_id'    => $details->playerId,
+                    'team'         => $details->teamId
                 ]);
 
                 $player->NickName = $name;
@@ -245,24 +245,46 @@ class EventController implements ControllerInterface
      */
     private static function mpBeginMap($arguments)
     {
-        if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
-            $mapUid = $arguments[0]['UId'];
+        if (config('server.use-filename-to-identify-maps-in-db', false)) {
+            if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+                $mapFile = $arguments[0]['FileName'];
 
-            $map = Map::whereUid($mapUid)->get()->first();
+                $map = Map::whereFilename($mapFile)->get()->first();
 
-            if ($map == null) {
-                Log::error("Map with UID $mapUid not found in database!");
-            }
+                if ($map == null) {
+                    Log::error("Map with UID $mapFile not found in database!");
+                }
 
-            MapController::setCurrentMap($map);
+                MapController::setCurrentMap($map);
 
-            try {
-                Hook::fire('BeginMap', $map);
-            } catch (Exception $e) {
-                Log::errorWithCause("Failed to fire BeginMap hook", $e);
+                try {
+                    Hook::fire('BeginMap', $map);
+                } catch (Exception $e) {
+                    Log::errorWithCause("Failed to fire BeginMap hook", $e);
+                }
+            } else {
+                throw new Exception('Malformed callback');
             }
         } else {
-            throw new Exception('Malformed callback');
+            if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+                $mapUid = $arguments[0]['UId'];
+
+                $map = Map::whereUid($mapUid)->get()->first();
+
+                if ($map == null) {
+                    Log::error("Map with UID $mapUid not found in database!");
+                }
+
+                MapController::setCurrentMap($map);
+
+                try {
+                    Hook::fire('BeginMap', $map);
+                } catch (Exception $e) {
+                    Log::errorWithCause("Failed to fire BeginMap hook", $e);
+                }
+            } else {
+                throw new Exception('Malformed callback');
+            }
         }
     }
 

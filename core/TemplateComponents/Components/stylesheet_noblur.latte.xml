@@ -25,6 +25,13 @@
     <style class="bg-warning" bgcolor="{config('theme.form.warning.bg')}"/>
     <style class="bg-danger" bgcolor="{config('theme.form.danger.bg')}"/>
 
+    <!-- Colorize -->
+    <style class="colorize-accent" colorize="{config('theme.hud.accent')}"/>
+    <style class="colorize-dark" colorize="{config('theme.hud.bg-dark')}"/>
+    <style class="colorize-darker" colorize="{config('theme.hud.bg-darker')}"/>
+    <style class="colorize-light" colorize="{config('theme.hud.bg-light')}"/>
+    <style class="colorize-lighter" colorize="{config('theme.hud.bg-lighter')}"/>
+
     <!-- Buttons -->
     <style class="btn-default" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.form.default.bg')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.form.default.bg')))->lighten(10)}" textcolor="{config('theme.form.default.text')}" textsize="0.8"/>
     <style class="btn-light" halign="center" valign="center" textfont="{config('theme.font')}" focusareacolor1="{config('theme.hud.text-light')}" focusareacolor2="{(new \Mexitek\PHPColors\Color('#' . config('theme.hud.text-light')))->lighten(10)}" textcolor="{config('theme.hud.text-dark')}9" textsize="0.8"/>
