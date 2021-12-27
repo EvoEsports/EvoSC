@@ -57,7 +57,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static array getManialinkPageAnswers()
  * @method static bool sendOpenLinkToId(int $int, string $string, int $int)
  * @method static bool sendOpenLinkToLogin(string $recipient, string $link, int $linkType)
- * @method static bool kick(string $string, string $string)
+ * @method static bool kick(string $login, string $reason)
  * @method static bool kickId(int $int, string $string)
  * @method static bool ban(string $string, string $string)
  * @method static bool banAndBlackList(string $string, string $string, bool $boolean)
@@ -340,6 +340,18 @@ class Server
         }
 
         return null;
+    }
+
+    /**
+     * @param string $filename
+     */
+    public static function addMapOrIgnore(string $filename)
+    {
+        try {
+            Server::addMap($filename);
+        } catch (\Exception $e) {
+            //map already in selection
+        }
     }
 
     /**

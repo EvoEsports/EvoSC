@@ -519,6 +519,12 @@ class MapController implements ControllerInterface
      */
     public static function getNextMap(): stdClass
     {
+        if(config('server.use-filename-to-identify-maps-in-db', false)){
+            return DB::table('maps')
+                ->where('filename', '=', Server::getNextMapInfo()->fileName)
+                ->first();
+        }
+
         return DB::table('maps')
             ->where('uid', '=', Server::getNextMapInfo()->uId)
             ->first();
