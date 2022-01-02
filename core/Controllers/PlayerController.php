@@ -374,13 +374,22 @@ class PlayerController implements ControllerInterface
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
+        $toBeKicked = null;
+
         /**
          * @var Player $toBeKicked
          */
         try {
             $toBeKicked = Player::find($login);
         } catch (\Exception $e) {
-            $toBeKicked = $login;
+        }
+
+        if(is_null($toBeKicked)){
+            $toBeKicked = (object)[
+                'group' => (object)[
+                    'security_level' => 0
+                ]
+            ];
         }
 
         if ($toBeKicked->group->security_level > $player->group->security_level) {
@@ -521,7 +530,7 @@ class PlayerController implements ControllerInterface
         }
     }
 
-    public static function warnPlayer(Player $player, string $targetLogin, string $message)
+    public static function warnPlayer(Player $player, string $targetLogin, string $message = '')
     {
         $target = Player::whereLogin($targetLogin)->first();
 

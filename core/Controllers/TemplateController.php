@@ -6,6 +6,7 @@ namespace EvoSC\Controllers;
 use Carbon\Carbon;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Exceptions\TemplateNameInvalidException;
 use EvoSC\Interfaces\ControllerInterface;
@@ -34,10 +35,16 @@ class TemplateController implements ControllerInterface
     private static Collection $templates;
 
     /**
+     * @var Collection
+     */
+    private static Collection $templateOverrides;
+
+    /**
      * Initialize TemplateController
      */
     public static function init()
     {
+        self::$templateOverrides = collect();
         self::loadTemplates();
     }
 
@@ -168,26 +175,50 @@ class TemplateController implements ControllerInterface
         $coreTemplates = File::getFilesRecursively(coreDir(), '/\.latte\.xml$/');
         $extModuleTemplates = File::getFilesRecursively(modulesDir(), '/\.latte\.xml$/');
 
-        self::$templates = collect([...$coreTemplates, ...$extModuleTemplates])->map(function ($template) {
-            $templateObject = collect();
-
+        self::$templates = collect([...$coreTemplates, ...$extModuleTemplates])->mapWithKeys(function ($template) {
             //Get path relative to core directory
             $relativePath = str_replace(coreDir('/'), '', $template);
 
-            //Get template id from filename & path
-            $templateObject->id = self::getTemplateId($relativePath);
+            //Return ID => TemplateContents
+            return [self::getTemplateId($relativePath) => File::get($template)];
+        })->merge(self::$templateOverrides->mapWithKeys(function ($file, $id) {
+            return [$id => File::get($file)];
+        }));
 
-            //Load template contents
-            $templateObject->template = File::get($template);
+        self::updateTemplateLoader();
+    }
 
-            //Assign as new value
-            return $templateObject;
-        });
-
+    /**
+     * Creates the template loader and sets it on the latte instance
+     */
+    private static function updateTemplateLoader()
+    {
         //Set id <=> template map as loader for latte
-        $templateMap = self::$templates->pluck('template', 'id')->toArray();
-        $stringLoader = new StringLoader($templateMap);
+        $stringLoader = new StringLoader(self::$templates->toArray());
         self::$latte->setLoader($stringLoader);
+    }
+
+    /**
+     * @param string $id
+     * @param string $file
+     */
+    public static function overrideTemplate(string $id, string $file)
+    {
+        self::$templateOverrides->put($id, $file);
+        self::$templates->put($id, File::get($file));
+        self::updateTemplateLoader();
+    }
+
+    /**
+     * @param array $templates
+     */
+    public static function overrideTemplateBulk(array $templates)
+    {
+        foreach ($templates as $id => $file) {
+            self::$templateOverrides->put($id, $file);
+            self::$templates->put($id, File::get($file));
+        }
+        self::updateTemplateLoader();
     }
 
     /**
