@@ -135,7 +135,7 @@ class Player extends Model
     {
         $parts = explode('|', $path);
 
-        while (in_array($parts[0], ['World', 'Europe', 'Asia', 'North America', 'South America'])) {
+        while (in_array($parts[0], ['World', 'Europe', 'Asia', 'North America', 'South America', 'Oceania', 'Africa'])) {
             array_shift($parts);
         }
 
