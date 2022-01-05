@@ -23,6 +23,14 @@
     #Const C_Status_NotSpawned		2
     #Const C_Status_Spectating		3
 
+    #Const UIModules_ScoresTable::C_Mode_BestTime as C_Mode_BestTime
+    #Const UIModules_ScoresTable::C_Mode_PrevTime as C_Mode_PrevTime
+    #Const UIModules_ScoresTable::C_Mode_LapTime as C_Mode_LapTime
+    #Const UIModules_ScoresTable::C_Mode_Points as C_Mode_Points
+    #Const UIModules_ScoresTable::C_Mode_Laps as C_Mode_Laps
+    #Const UIModules_ScoresTable::C_Mode_Trophy as C_Mode_Trophy
+    #Const UIModules_ScoresTable::C_Mode_RaceProgression as C_Mode_RaceProgression
+
     #Struct EvoSC_Group {
         Text name;
         Text icon;
@@ -40,6 +48,8 @@
         Integer Amount;
     }
 
+    declare Vec3 SB_Team1_Color;
+    declare Vec3 SB_Team2_Color;
     declare CMlFrame mainFrame;
     declare CMlFrame[] boxes;
     declare Integer page;
@@ -68,11 +78,6 @@ log("implement me");
 
     <frame>
         <script><!--
-    Boolean isRoundsTypeMode(){
-        declare roundsType = {\EvoSC\Controllers\ModeController::isRoundsType() ? 'True' : 'False'};
-        return (roundsType || CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
-    }
-
     Integer SB_GetMaxPage(){
         if(Scores.count % perPage == 0){
             return ML::NearestInteger(Scores.count / perPage * 1.0);
@@ -310,9 +315,10 @@ log("implement me");
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-//        if(isRoundsTypeMode() && EvoSC_PointsLimit > 0){
-//            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
-//        }
+        declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
+        if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Points && EvoSC_PointsLimit > 0){
+            modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
+        }
 
         +++ SB_SetScores +++
     }
@@ -356,6 +362,9 @@ log("implement me");
         forceUpdate = True;
         SB_Last_Update = 0;
         declare Boolean findMe for This = False;
+        declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
+        declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
+        declare TrophiesUpdate = -1;
 
         while(True){
             yield;
@@ -365,6 +374,25 @@ log("implement me");
                 updateScoreTable();
                 //log("update scoretable " ^ GameTime);
                 SB_Last_Update = GameTime;
+            }
+
+            if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {
+                TrophiesUpdate = Net_TMxSM_ScoresTable_TrophiesUpdate;
+                foreach (Score in Scores) {
+                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
+                    LibTMxSM_ScoresTable_Trophies = [];
+                    if (Net_TMxSM_ScoresTable_Trophies.existskey(Score.User.WebServicesUserId)) {
+                        declare Integer[Integer] NewTrophies = Net_TMxSM_ScoresTable_Trophies[Score.User.WebServicesUserId].sortkeyreverse();
+                        foreach (TrophyLevel => TrophyAmount in NewTrophies) {
+                            if (TrophyAmount > 0) {
+                                LibTMxSM_ScoresTable_Trophies.add(K_Trophy {
+                                    Level = TrophyLevel,
+                                    Amount = TrophyAmount
+                                });
+                            }
+                        }
+                    }
+                }
             }
 
             if(findMe){

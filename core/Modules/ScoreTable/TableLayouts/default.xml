@@ -2,8 +2,8 @@
 <frame>
     <framemodel id="flag">
         <quad id="avatar" pos="-0.6 0" valign="center" size="9 7" scale="0.84" z-index="3" />
-        <quad pos="3 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://i.imgur.com/3iuieZL.png" keepratio="fit" />
-        <label class="text-light" valign="center" halign="center" scale="0.7" pos="3 -0.7" opacity="0.1" text="SC" />
+        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://i.imgur.com/3iuieZL.png" keepratio="fit" />
+        <label class="text-light" valign="center" halign="center" scale="0.7" pos="3.25 -0.7" opacity="0.1" text="SC" />
     </framemodel>
 
     <framemodel id="row">
@@ -169,6 +169,35 @@
         nameLabel.Value = name;
     }
 
+    declare Frame_Trophies <=> (slot.GetFirstChild("frame-trophies") as CMlFrame);
+    declare Frame_TrophiesGroup <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-1") as CMlFrame);
+    declare Frame_TrophiesDetails <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-2") as CMlFrame);
+    declare _TrophyStyle = 2;
+    Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
+    Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
+    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for score = [];
+
+    if (Frame_TrophiesDetails.Visible) {
+        foreach (Key => Control in Frame_TrophiesDetails.Controls) {
+            // Show the best trophies
+            declare Integer TrophyKey = Key;
+            if (LibTMxSM_ScoresTable_Trophies.count < Frame_TrophiesDetails.Controls.count) {
+                TrophyKey = Key - (Frame_TrophiesDetails.Controls.count - LibTMxSM_ScoresTable_Trophies.count);
+            }
+            if (LibTMxSM_ScoresTable_Trophies.existskey(TrophyKey)) {
+                declare CMlFrame Frame_Trophy <=> (Control as CMlFrame);
+                declare CMlQuad Quad_Trophy <=> (Frame_Trophy.GetFirstChild("quad-trophy") as CMlQuad);
+                declare CMlLabel Label_Trophy <=> (Frame_Trophy.GetFirstChild("label-trophy") as CMlLabel);
+                Quad_Trophy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
+                ApplyTrophyImage(Quad_Trophy, LibTMxSM_ScoresTable_Trophies[TrophyKey].Level);
+                Label_Trophy.Value = LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount ^ "x";
+                Frame_Trophy.Visible = True;
+            } else {
+                Control.Visible = False;
+            }
+        }
+    }
+
     declare netread Text[][Text] Net_TMxSM_ScoresTable_CustomPoints for Teams[0];
     declare _CustomPoints = Net_TMxSM_ScoresTable_CustomPoints;
     declare Boolean CustomPointsEnabled = _CustomPoints.existskey(score.User.WebServicesUserId);
@@ -183,11 +212,49 @@
         customLabel.Value = "";
     }
 
-    if(score.BestLapTimes.count > 0 && score.BestLapTimes[score.BestLapTimes.count - 1] > 0){
-        scoreLabel.Value = formatScoreCorrect(score.BestLapTimes[score.BestLapTimes.count - 1], True);
+    declare scoreIsSet = False;
+    declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
+    if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Points){
+        if(score.Points > 0){
+            scoreIsSet = True;
+        }
+        scoreLabel.Value = score.Points ^ " Pts";
+
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        if(EvoSC_RoundsPointsDistribution.existskey(score.User.Login)){
+            declare addedPoints = EvoSC_RoundsPointsDistribution[score.User.Login];
+            if(addedPoints > 0){
+                customLabel.Value = "${getShortColorCode(config('theme.hud.accent'))}+" ^ addedPoints;
+            }
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_BestTime || Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Laps){
+        if(score.BestRaceTimes.count > 0 && score.BestRaceTimes[score.BestRaceTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.BestRaceTimes[score.BestRaceTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_PrevTime){
+        if(score.PrevRaceTimes.count > 0 && score.PrevRaceTimes[score.PrevRaceTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.PrevRaceTimes[score.PrevRaceTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_LapTime){
+        if(score.BestLapTimes.count > 0 && score.BestLapTimes[score.BestLapTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.BestLapTimes[score.BestLapTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else{
+        scoreLabel.Value = "not implemented";
+    }
+
+    if(scoreIsSet){
         scoreLabel.Opacity = 1.0;
     }else{
-        scoreLabel.Value = "--:--.---";
         scoreLabel.Opacity = 0.1;
     }
 ***
@@ -201,6 +268,7 @@ Void clearSlot(CMlFrame slot){
     groupIconLabel.Hide();
     groupNameLabel.Hide();
     avatarFrame.Hide();
+    slot.DataAttributeSet("login", "");
 }
 
 *** SB_SetScores ***

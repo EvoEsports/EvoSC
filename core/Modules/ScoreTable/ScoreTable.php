@@ -43,11 +43,6 @@ class ScoreTable extends Module implements ModuleInterface
                     'type' => 'TM_Teams_Online',
                     'file' => __DIR__ . '/TableLayouts/teams.xml',
                     'id'   => "ScoreTable.Layouts.TM_Teams_Online"
-                ],
-                (object)[
-                    'type' => 'TM_Rounds_Online',
-                    'file' => __DIR__ . '/TableLayouts/not_rounds.xml',
-                    'id'   => "ScoreTable.Layouts.TM_Rounds_Online"
                 ]
             ]);
 
