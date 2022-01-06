@@ -10,6 +10,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ModeController;
 use EvoSC\Controllers\PointsController;
+use EvoSC\Controllers\TemplateController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\GroupManager\GroupManager;
@@ -22,12 +23,32 @@ class ScoreTable extends Module implements ModuleInterface
     private static Collection $winners;
     private static string $firstFinishedLogin = '';
     private static int $nbOfWinners = 0;
+    private static string $mode;
+    private static Collection $layouts;
 
     /**
      * @inheritDoc
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$mode = $mode;
+        if (!isset(self::$layouts)) {
+            self::$layouts = collect([
+                (object)[
+                    'type' => 'default',
+                    'file' => __DIR__ . '/TableLayouts/default.xml',
+                    'id'   => "ScoreTable.Layouts.Default"
+                ],
+                (object)[
+                    'type' => 'TM_Teams_Online',
+                    'file' => __DIR__ . '/TableLayouts/teams.xml',
+                    'id'   => "ScoreTable.Layouts.TM_Teams_Online"
+                ]
+            ]);
+
+            TemplateController::overrideTemplateBulk(self::$layouts->pluck('file', 'id')->toArray());
+        }
+
         if (isManiaPlanet()) {
             self::$scoreboardTemplate = 'ScoreTable.scoreboard';
         } else {
@@ -51,12 +72,21 @@ class ScoreTable extends Module implements ModuleInterface
             Server::triggerModeScriptEvent('Common.UIModules.SetProperties', [json_encode([
                 'uimodules' => [
                     [
-                        'id' => 'Race_ScoresTable',
-                        'visible' => false,
+                        'id'             => 'Race_ScoresTable',
+                        'visible'        => false,
                         'visible_update' => true
                     ]
                 ]
             ])]);
+
+            $logoUrl = config('scoretable.logo-url');
+            $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
+            $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
+            $mode = preg_replace('/\.script.txt$/i', '', basename(self::$mode));
+            $layouts = self::$layouts->mapWithKeys(function ($layout) {
+                return [$layout->type => $layout->id];
+            });
+            Template::showAll(self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'layouts', 'mode'));
         }
     }
 
@@ -121,26 +151,66 @@ class ScoreTable extends Module implements ModuleInterface
         $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
+        $mode = preg_replace('/\.script.txt$/i', '', basename(self::$mode));
+        $layouts = self::$layouts->mapWithKeys(function ($layout) {
+            return [$layout->type => $layout->id];
+        });
 
         $joinedPlayerInfo = collect([$player])->map(function (Player $player) {
             return [
-                'login' => $player->Login,
-                'name' => ml_escape($player->NickName),
+                'login'   => $player->Login,
+                'name'    => ml_escape($player->NickName),
                 'groupId' => $player->group->id
             ];
         })->keyBy('login');
 
         $playerInfo = onlinePlayers()->map(function (Player $player) {
             return [
-                'login' => $player->Login,
-                'name' => ml_escape($player->NickName),
+                'login'   => $player->Login,
+                'name'    => ml_escape($player->NickName),
                 'groupId' => $player->group->id
             ];
         })->keyBy('login');
 
+
         GroupManager::sendGroupsInformation($player);
         Template::showAll('ScoreTable.update', ['players' => $joinedPlayerInfo], 20);
         Template::show($player, 'ScoreTable.update', ['players' => $playerInfo], false, 20);
-        Template::show($player, self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap'));
+        Template::show($player, self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'layouts', 'mode'));
+    }
+
+    /**
+     * @param string $forMode
+     * @param string $file
+     */
+    public static function addLayout(string $forMode, string $file)
+    {
+        $id = "ScoreTable.Layouts.$forMode";
+        self::$layouts->push((object)[
+            'type' => $forMode,
+            'file' => $file,
+            'id'   => $id
+        ]);
+
+        TemplateController::overrideTemplate($id, $file);
+    }
+
+    /**
+     * @param string $mode
+     * @return string
+     */
+    public static function getLayoutId(string $mode)
+    {
+        $layout = self::$layouts->firstWhere('type', '=', $mode);
+
+        return $layout->id ?? 'ScoreTable.Layouts.Default';
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getLayouts(): Collection
+    {
+        return self::$layouts;
     }
 }

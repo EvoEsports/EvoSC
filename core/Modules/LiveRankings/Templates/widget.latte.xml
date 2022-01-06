@@ -18,6 +18,7 @@
         <label class="text-light" z-index="2" valign="center" pos="14 0" size="23 2" textsize="0.4" text="name"/>
         <label class="text-accent" z-index="2" valign="center" pos="41 0" size="23 2" halign="right" textsize="0.4" text="+00"/>
         <label pos="13.9 0" text="" textsize="1.1" valign="center" />
+        <quad class="trigger" pos="-1" size="44 3" valign="center" ScriptEvents="1" />
     </framemodel>
 
     <frame id="ranking" pos="1 -7">
@@ -136,6 +137,7 @@
         (box.Controls[0] as CMlLabel).Value = rank ^ ".";
         (box.Controls[3] as CMlLabel).Value = prefix ^ entry.name;
         box.Show();
+        box.DataAttributeSet("login", entry.login);
     }
 
     Void updateWidget(EvoSC_MatchTrackerEntry[] ranking){
@@ -241,6 +243,13 @@
     {/block}
 
     {block pendingEvents}
+    if(event.Type == CMlScriptEvent::Type::MouseClick && event.Control.HasClass("trigger")){
+        declare targetLogin = event.Control.Parent.DataAttributeGet("login");
+        if(targetLogin != ""){
+            declare EvoSC_PlayerContextMenuTarget for This = "";
+            EvoSC_PlayerContextMenuTarget = targetLogin;
+        }
+    }
     {/block}
 --></script>
 </manialink>

@@ -62,8 +62,6 @@ class Timer
         $timer = self::$timers->where('id', $id)->first();
 
         if (!$timer) {
-            Log::warning("Can not get non-existent timer: $id");
-
             return null;
         }
 
@@ -282,8 +280,8 @@ class Timer
     /**
      * Pauses a timer
      */
-    public function pause(): void
+    public static function pause(string $id): void
     {
-        $this->isPaused = true;
+        self::$timers->where('id', '=', $id);
     }
 }

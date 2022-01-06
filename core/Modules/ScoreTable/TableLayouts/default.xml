@@ -1,0 +1,349 @@
+{contentType text}
+<frame>
+    <framemodel id="flag">
+        <quad id="avatar" pos="-0.6 0" valign="center" size="9 7" scale="0.84" z-index="3" />
+        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://cloud.evotm.com/s/8x6ArNnRQsK6AJH/preview?file=.png" keepratio="fit" />
+        <label class="text-light" valign="center" halign="center" scale="0.7" pos="3.25 -0.7" opacity="0.1" text="SC" />
+    </framemodel>
+
+    <framemodel id="row">
+        <frame pos="-10" valign="center" z-index="1">
+            <frame size="1000 8" valign="center">
+                <quad class="bg-dark trigger" pos="10" size="59 80" rot="10.42" valign="center" halign="left" opacity="0.4" z-index="1" ScriptEvents="1" bgcolorfocus="{config('theme.hud.accent')}9" />
+                <quad id="me" class="bg-accent" pos="10" size="59 80" rot="10.42" valign="center" halign="left" opacity="0" />
+            </frame>
+        </frame>
+    </framemodel>
+
+    <framemodel id="rank">
+        <label id="rank" class="text-light" pos="4.1 0.5" size="10 10" textsize="1.1" scale="1.4" z-index="4" halign="center" valign="center"/>
+        <frame pos="-10" valign="center" z-index="1">
+            <frame size="1000 8" valign="center">
+                <quad class="bg-darker" pos="10" size="8 80" rot="10.42" valign="center" halign="left" opacity="0.2" />
+            </frame>
+        </frame>
+    </framemodel>
+
+    <framemodel id="framemodel-trophy">
+        <label id="label-trophy" class="text-default text-light" pos="-3.5 -2.5" z-index="1" halign="center" size="5 5" textsize="2.2" textprefix="$i" opacity="0.9" />
+        <quad id="quad-trophy" class="quad-base" z-index="0" pos="-2 0.2" size="8 7" halign="left" />
+    </framemodel>
+
+    <framemodel id="box" data-size="100 12">
+        <label id="name" class="text-light" pos="26.25 -2.5" size="25 3" z-index="5" scale="1.3"/>
+        <label id="group_icon" class="text-light" pos="27 -8" scale="0.9" size="3 3" z-index="5" valign="center" halign="center" opacity="0.85"/>
+        <frame id="badge" size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="5" scale="1.1" hidden="1">
+            <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2" opacity="0"/>
+            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
+        </frame>
+        <label id="score" class="text-light" pos="87 -2.5" size="20 3" scale="1.3" z-index="5" halign="right"/>
+        <label id="group_name" class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75" z-index="5"/>
+        <label id="custom_label" class="text-light" pos="86 -8" halign="right" valign="center" text="ERROR" opacity="0.85" textsize="0.8" />
+
+        <frameinstance id="bg_rank" modelid="rank" pos="1 -6" z-index="5" scale="1.5" />
+        <frameinstance id="bg_slot" modelid="row" pos="1 -6" scale="1.5" />
+        <frameinstance id="avatar_frame" modelid="flag" pos="15.5 -6" z-index="6" scale="1.3" />
+
+        <frame id="actions" pos="7.25 -5.25" hidden="1" z-index="10">
+            <frameinstance modelid="button" data-action="spec" data-icon="" data-access="" data-text="Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="profile" data-icon="" data-access="" data-text="Profile" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="pm" data-icon="" data-access="" data-text="PM" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="mute" data-icon="" data-access="player_mute" data-text="Mute" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="ban" data-icon="" data-access="player_ban" data-text="Ban" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="kick" data-icon="" data-access="player_kick" data-text="Kick" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="warn" data-icon="" data-access="player_warn" data-text="Warn" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+            <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
+        </frame>
+
+        <frame id="frame-trophies" pos="86 -6.25" scale="0.7">
+            <frame id="frame-trophies-style-2">
+                <frameinstance modelid="framemodel-trophy" pos="-26 0" />
+                <frameinstance modelid="framemodel-trophy" pos="-15 0" />
+                <frameinstance modelid="framemodel-trophy" pos="-4 0" />
+            </frame>
+            <frame id="frame-trophies-style-1" pos="-7 0">
+                <quad id="quad-best-trophy" class="text-light" halign="center" valign="center" pos="1.5 0.2" z-index="1" size="9 9" autoscale="0" />
+                <label id="label-big-trophy" class="text-light" valign="center2" pos="-14.5 0" z-index="2" halign="right" size="7 10" textprefix="$i" />
+                <label id="label-small-trophy" class="text-light" valign="center2" pos="-15 -0.4" z-index="2" halign="left" size="7 10" textprefix="$i" textsize="2" />
+            </frame>
+        </frame>
+    </framemodel>
+
+    <frame z-index="0" pos="90 -12.5" scale="0.85">
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
+    </frame>
+
+    <frame id="header-frame" pos="5.5 17" z-index="1">
+        {if !empty($logoUrl)}
+        <quad pos="177 13.5" bgcolor="000" valign="top" halign="right" size="{config('scoretable.logo-dimensions', '12 12')}" image="{$logoUrl|noescape}" keepratio="Fit"/>
+        {/if}
+        <label id="server-name" class="text-light" pos="1 14" size="60 6" scale="1.8"/>
+        <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>
+        <label id="player-info" class="text-light" pos="-0.25 4.8" size="60 6" textprefix="$s "/>
+    </frame>
+
+    <frame id="fillable_slots" pos="0 15" z-index="100">
+        {for $i=0;$i<6;$i++}
+        <frameinstance modelid="box" pos="{$i*-2.3 + 1} {$i * -13}" z-index="100"></frameinstance>
+        {/for}
+        {for $i=0;$i<6;$i++}
+        <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}" z-index="100"></frameinstance>
+        {/for}
+    </frame>
+
+    <frame pos="-14 -66" scale="1" z-index="1" hidden="0">
+        <label id="prev-page" class="floating prev-page" text="" pos="4 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+        <label id="me" class="floating me" text="" pos="24.3 0" textsize="2.5" size="5 5"  ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
+    </frame>
+</frame>
+
+<script><!--
+*** SB_Slot_Declarations ***
+***
+    declare actionsFrame <=> (slot.GetFirstChild("actions") as CMlFrame);
+    declare nameLabel <=> (slot.GetFirstChild("name") as CMlLabel);
+    declare groupIconLabel <=> (slot.GetFirstChild("group_icon") as CMlLabel);
+    declare groupNameLabel <=> (slot.GetFirstChild("group_name") as CMlLabel);
+    declare rankLabel <=> (slot.GetFirstChild("rank") as CMlLabel);
+    declare scoreLabel <=> (slot.GetFirstChild("score") as CMlLabel);
+    declare customLabel <=> (slot.GetFirstChild("custom_label") as CMlLabel);
+    declare badgeFrame = (slot.GetFirstChild("badge") as CMlFrame);
+    declare bgRankQuad = (slot.GetFirstChild("bg_rank") as CMlQuad);
+    declare bgSlotQuad = (slot.GetFirstChild("bg_slot") as CMlQuad);
+    declare avatarFrame = (slot.GetFirstChild("avatar_frame") as CMlQuad);
+    declare avatarQuad = (slot.GetFirstChild("avatar") as CMlQuad);
+    declare badgeQuad <=> (badgeFrame.Controls[0] as CMlQuad);
+    declare badgeLabel <=> (badgeFrame.Controls[1] as CMlLabel);
+    declare trigger <=> (slot.GetFirstChild("trigger") as CMlLabel);
+***
+
+*** SB_Slot_Update ***
+***
+    declare CUser user <=> score.User;
+    declare login = user.Login;
+    declare custom = "";
+    bgRankQuad.Show();
+    groupIconLabel.Show();
+    groupNameLabel.Show();
+    nameLabel.Show();
+    avatarFrame.Show();
+
+    rankLabel.Value = ((perPage * (page - 1)) + rank) ^ "";
+    declare LibST_Status for user = C_Status_Disconnected;
+    if(LibST_Status == C_Status_Disconnected){
+        rankLabel.Value ^= "$aaa | ";
+        AnimMgr.Add(rankLabel, "<label scale='0.65' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
+    }else if(LibST_Status == C_Status_Spectating){
+        rankLabel.Value ^= "$aaa | ";
+        AnimMgr.Add(rankLabel, "<label scale='0.65' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
+    }else{
+        AnimMgr.Add(rankLabel, "<label scale='1.4' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
+    }
+
+    if(slot.DataAttributeGet("login") != login){
+        slot.DataAttributeSet("login", login);
+        declare name = user.Name;
+        declare groupIcon = "";
+        declare groupName = "";
+
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        if(EvoSC_Players.existskey(login)){
+            declare evoscPlayer = EvoSC_Players[login];
+            name = evoscPlayer.name;
+
+            declare EvoSC_Group[Integer] EvoSC_Groups for This;
+            if(EvoSC_Groups.existskey(evoscPlayer.groupId)){
+                declare group = EvoSC_Groups[evoscPlayer.groupId];
+                groupIcon = "$" ^ group.color ^ group.icon;
+                groupName = group.name;
+            }
+        }
+
+        groupIconLabel.Value = groupIcon;
+        groupNameLabel.Value = groupName;
+        avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ score.User.Login ^ "/country";
+        avatarQuad.AlphaMaskUrl = "https://cloud.evotm.com/s/ZXDNYDYp4CB7esx/preview?file=.png";
+        nameLabel.Value = name;
+    }
+
+    declare Frame_Trophies <=> (slot.GetFirstChild("frame-trophies") as CMlFrame);
+    declare Frame_TrophiesGroup <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-1") as CMlFrame);
+    declare Frame_TrophiesDetails <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-2") as CMlFrame);
+    declare _TrophyStyle = 2;
+    Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
+    Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
+    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for score = [];
+
+    if (Frame_TrophiesDetails.Visible) {
+        foreach (Key => Control in Frame_TrophiesDetails.Controls) {
+            // Show the best trophies
+            declare Integer TrophyKey = Key;
+            if (LibTMxSM_ScoresTable_Trophies.count < Frame_TrophiesDetails.Controls.count) {
+                TrophyKey = Key - (Frame_TrophiesDetails.Controls.count - LibTMxSM_ScoresTable_Trophies.count);
+            }
+            if (LibTMxSM_ScoresTable_Trophies.existskey(TrophyKey)) {
+                declare CMlFrame Frame_Trophy <=> (Control as CMlFrame);
+                declare CMlQuad Quad_Trophy <=> (Frame_Trophy.GetFirstChild("quad-trophy") as CMlQuad);
+                declare CMlLabel Label_Trophy <=> (Frame_Trophy.GetFirstChild("label-trophy") as CMlLabel);
+                Quad_Trophy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
+                ApplyTrophyImage(Quad_Trophy, LibTMxSM_ScoresTable_Trophies[TrophyKey].Level);
+                Label_Trophy.Value = LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount ^ "x";
+                Frame_Trophy.Visible = True;
+            } else {
+                Control.Visible = False;
+            }
+        }
+    }
+
+    declare netread Text[][Text] Net_TMxSM_ScoresTable_CustomPoints for Teams[0];
+    declare _CustomPoints = Net_TMxSM_ScoresTable_CustomPoints;
+    declare Boolean CustomPointsEnabled = _CustomPoints.existskey(score.User.WebServicesUserId);
+    if(CustomPointsEnabled){
+        if (_CustomPoints[score.User.WebServicesUserId].existskey(0)) {
+            customLabel.Value = _CustomPoints[score.User.WebServicesUserId][0];
+        }
+        if (_CustomPoints[score.User.WebServicesUserId].existskey(1)) {
+            customLabel.TextColor = CL::HexToRgb(_CustomPoints[score.User.WebServicesUserId][1]);
+        }
+    }else{
+        customLabel.Value = "";
+    }
+
+    declare scoreIsSet = False;
+    declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
+    if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Points){
+        if(score.Points > 0){
+            scoreIsSet = True;
+        }
+        scoreLabel.Value = score.Points ^ " Pts";
+
+        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+        if(EvoSC_RoundsPointsDistribution.existskey(score.User.Login)){
+            declare addedPoints = EvoSC_RoundsPointsDistribution[score.User.Login];
+            if(addedPoints > 0){
+                customLabel.Value = "${getShortColorCode(config('theme.hud.accent'))}+" ^ addedPoints;
+            }
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_BestTime || Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Laps){
+        if(score.BestRaceTimes.count > 0 && score.BestRaceTimes[score.BestRaceTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.BestRaceTimes[score.BestRaceTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_PrevTime){
+        if(score.PrevRaceTimes.count > 0 && score.PrevRaceTimes[score.PrevRaceTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.PrevRaceTimes[score.PrevRaceTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_LapTime){
+        if(score.BestLapTimes.count > 0 && score.BestLapTimes[score.BestLapTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.BestLapTimes[score.BestLapTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
+    }else{
+        scoreLabel.Value = "not implemented";
+    }
+
+    if(scoreIsSet){
+        scoreLabel.Opacity = 1.0;
+    }else{
+        scoreLabel.Opacity = 0.1;
+    }
+***
+
+Void clearSlot(CMlFrame slot){
+    +++ SB_Slot_Declarations +++
+    rankLabel.Value = "";
+    customLabel.Value = "";
+    nameLabel.Hide();
+    bgRankQuad.Hide();
+    groupIconLabel.Hide();
+    groupNameLabel.Hide();
+    avatarFrame.Hide();
+    slot.DataAttributeSet("login", "");
+}
+
+*** SB_SetScores ***
+***
+    declare fillableSlotsFrame <=> (Page.MainFrame.GetFirstChild("fillable_slots") as CMlFrame);
+    declare slotsCount = fillableSlotsFrame.Controls.count;
+
+    declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
+    declare rank = 1;
+    declare filled = 0;
+    declare skipped = 0;
+    declare toSkip = (page - 1) * slotsCount;
+
+    foreach(Score => Weight in GetSortedScores()){
+        if(skipped < toSkip){
+            skipped += 1;
+            continue;
+        }
+
+        if(filled >= slotsCount){ // divided by two because of background boxes
+            return;
+        }
+
+        declare SlotNeedUpdate = False;
+        declare LibST_LastTick for Score.User = -1;
+        declare LibST_Status for Score.User = C_Status_Disconnected;
+        if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
+            LibST_Status = C_Status_Disconnected;
+            SlotNeedUpdate = True;
+        }
+
+        declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
+        if (LibST_PrevStatus != LibST_Status) {
+            LibST_PrevStatus = LibST_Status;
+            SlotNeedUpdate = True;
+        }
+
+        declare addedPoints = 0;
+        if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
+            addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
+        }
+
+        declare LibST_PrevUpdate for Score = -1;
+        declare netread Integer Net_LibST_Update for Score;
+        if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
+            LibST_PrevUpdate = Net_LibST_Update;
+            updateSlot(fillableSlotsFrame.Controls[filled] as CMlFrame, Score, rank);
+        }
+        rank += 1;
+        filled += 1;
+    }
+
+    forceUpdate = False;
+
+    if(filled < slotsCount){
+        for(i, filled, slotsCount - 1){
+            clearSlot(fillableSlotsFrame.Controls[i] as CMlFrame);
+        }
+    }
+***
+
+*** SB_PendingEvents ***
+***
+    if(Event.Type == CMlScriptEvent::Type::MouseClick){
+        if(Event.Control.HasClass("trigger")){
+            declare Text targetLogin = Event.Control.Parent.Parent.Parent.Parent.DataAttributeGet("login");
+            if(targetLogin != ""){
+                declare EvoSC_PlayerContextMenuTarget for This = "";
+                EvoSC_PlayerContextMenuTarget = targetLogin;
+            }
+        }else if(Event.Control.HasClass("me")){
+            log("me");
+            declare Boolean findMe for This = False;
+            findMe = True;
+        }
+    }
+***
+--></script>

@@ -1,0 +1,154 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:PlayerContextMenu" id="PlayerContextMenu" version="3">
+    {include 'Components.stylesheet_noblur'}
+
+    <framemodel id="action">
+        <label id="action" class="btn-muted action" size="40 5" halign="left" textprefix="             " text="Action" ScriptEvents="1" />
+        <label id="icon" class="text-light" pos="4" text="" z-index="1" halign="center" valign="center" />
+    </framemodel>
+
+    <quad id="bg_trigger" class="bg_trigger" size="1000 1000" valign="center" halign="center" z-index="9000" hidden="1" ScriptEvents="1" />
+    <frame pos="0 80" id="menu" z-index="9001" hidden="1">
+        <frame id="info" size="40 9" z-index="1">
+            <quad class="bg-darker" size="100 100" opacity="0.9" />
+            <label id="player_login" class="text-light" pos="2 -2" z-index="2" scale="0.8" opacity="0.75" />
+            <label id="player_name" class="text-light" pos="2 -4.5" z-index="2" scale="1" />
+        </frame>
+        <frame id="actions" pos="0 -6.5">
+            {for $i=0; $i<20; $i++}
+            <frameinstance modelid="action" />
+            {/for}
+        </frame>
+    </frame>
+
+    <script><!--
+    #Struct EvoSC_Group {
+        Text name;
+        Text icon;
+        Text color;
+    }
+
+    #Struct EvoSC_User {
+        Text login;
+        Text name;
+        Integer groupId;
+    }
+
+    #Struct EvoSC_ContextMenuAction {
+        Text icon;
+        Text text;
+        Text action;
+        Text access;
+        Boolean confirm;
+    }
+
+    declare Boolean visible;
+    declare EvoSC_ContextMenuAction[] defaultActions;
+    --></script>
+
+    {include 'Dialogues.confirm'}
+
+    <script><!--
+    EvoSC_ContextMenuAction[] getActions(){
+        return defaultActions;
+    }
+
+    Void setAction(CMlFrame actionFrame, EvoSC_ContextMenuAction action){
+        declare iconLabel = (actionFrame.GetFirstChild("icon") as CMlLabel);
+        declare actionLabel = (actionFrame.GetFirstChild("action") as CMlLabel);
+
+        iconLabel.Value = action.icon;
+        actionLabel.Value = action.text;
+        actionLabel.DataAttributeSet("action", action.action);
+        actionLabel.DataAttributeSet("confirm", action.confirm ^ "");
+    }
+
+    Void showContextMenu(Text login){
+        declare bgTrigger <=> (Page.MainFrame.GetFirstChild("bg_trigger") as CMlQuad);
+        declare menuFrame <=> (Page.MainFrame.GetFirstChild("menu") as CMlFrame);
+        declare infoFrame <=> (menuFrame.GetFirstChild("info") as CMlFrame);
+        declare actionsFrame <=> (menuFrame.GetFirstChild("actions") as CMlFrame);
+        declare playerLoginLabel = (menuFrame.GetFirstChild("player_login") as CMlLabel);
+        declare playerNameLabel = (menuFrame.GetFirstChild("player_name") as CMlLabel);
+        playerLoginLabel.Value = login;
+        playerNameLabel.Value = login;
+
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        if(EvoSC_Players.existskey(login)){
+            declare evoscPlayer = EvoSC_Players[login];
+            playerNameLabel.Value = evoscPlayer.name;
+        }
+
+        foreach(control in actionsFrame.Controls){
+            control.RelativePosition_V3.Y = 3.0;
+            control.Hide();
+        }
+
+        declare posX = MouseX;
+        if(posX > 100){
+            posX -= 40;
+        }
+        menuFrame.RelativePosition_V3 = <posX, MouseY>;
+        menuFrame.DataAttributeSet("login", login);
+        menuFrame.DataAttributeSet("name", playerNameLabel.Value);
+        menuFrame.Show();
+        bgTrigger.Show();
+        visible = True;
+
+        declare actions = getActions();
+        for(i, 0, actions.count - 1){
+            declare actionsFrame = (actionsFrame.Controls[i] as CMlFrame);
+            actionsFrame.Show();
+            AnimMgr.Add(actionsFrame, "<frame pos='"^actionsFrame.RelativePosition_V3.X^" "^((i+1) * -5)^"' />", Now+i*11, 100, CAnimManager::EAnimManagerEasing::ExpOut);
+            setAction(actionsFrame, actions[i]);
+        }
+    }
+
+    Void hideMenu(){
+        declare menuFrame <=> (Page.MainFrame.GetFirstChild("menu") as CMlFrame);
+        menuFrame.Hide();
+    }
+
+    main(){
+        declare EvoSC_PlayerContextMenuTarget for This = "";
+        visible = False;
+
+        defaultActions.fromjson("""{$defaultActions->toJson()}""");
+        log(defaultActions);
+
+        while(True){
+            yield;
+
+            if(EvoSC_PlayerContextMenuTarget != ""){
+                showContextMenu(EvoSC_PlayerContextMenuTarget);
+                EvoSC_PlayerContextMenuTarget = "";
+            }
+
+            if(visible){
+                foreach(Event in PendingEvents){
+                    if(Event.Control == Null) continue;
+                    if(Event.Type == CMlScriptEvent::Type::MouseClick){
+                        if(Event.Control.HasClass("bg_trigger")){
+                            hideMenu();
+                            Event.Control.Hide();
+                        }else if(Event.Control.HasClass("action")){
+                            declare actionLabel = (Event.Control as CMlLabel);
+                            declare menuFrame = (Event.Control.Parent.Parent.Parent as CMlFrame);
+                            declare confirmAction = actionLabel.DataAttributeGet("confirm") == "True";
+                            if(confirmAction && !confirm(actionLabel.Value^" "^menuFrame.DataAttributeGet("name")^"?")){
+                                continue;
+                            }
+                            TriggerPageAction(actionLabel.DataAttributeGet("action")^","^menuFrame.DataAttributeGet("login"));
+                            hideMenu();
+                            Page.MainFrame.GetFirstChild("bg_trigger").Hide();
+                        }
+                    }
+                }
+            }else{
+                sleep(50);
+            }
+        }
+    }
+    --></script>
+</manialink>
