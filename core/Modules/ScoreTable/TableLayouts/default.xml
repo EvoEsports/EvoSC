@@ -249,7 +249,7 @@
             scoreLabel.Value = "--:--.---";
         }
     }else{
-        scoreLabel.Value = "not implemented";
+        scoreLabel.Value = "--:--.---";
     }
 
     if(scoreIsSet){
