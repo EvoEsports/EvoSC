@@ -755,22 +755,22 @@
         },
         {
             "name": "latte/latte",
-            "version": "v2.10.2",
+            "version": "v2.10.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/latte.git",
-                "reference": "2f8dd896472b8a2f2069934f128a02566631d876"
+                "reference": "596b28bf098ebb852732d60b00538139a009c4db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/latte/zipball/2f8dd896472b8a2f2069934f128a02566631d876",
-                "reference": "2f8dd896472b8a2f2069934f128a02566631d876",
+                "url": "https://api.github.com/repos/nette/latte/zipball/596b28bf098ebb852732d60b00538139a009c4db",
+                "reference": "596b28bf098ebb852732d60b00538139a009c4db",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-tokenizer": "*",
-                "php": ">=7.1 <8.1"
+                "php": ">=7.1 <8.2"
             },
             "conflict": {
                 "nette/application": "<2.4.1"
@@ -789,6 +789,9 @@
                 "nette/php-generator": "to use tag {templatePrint}",
                 "nette/utils": "to use filter |webalize"
             },
+            "bin": [
+                "bin/latte-lint"
+            ],
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -830,9 +833,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/latte/issues",
-                "source": "https://github.com/nette/latte/tree/v2.10.2"
+                "source": "https://github.com/nette/latte/tree/v2.10.8"
             },
-            "time": "2021-02-08T08:16:26+00:00"
+            "time": "2022-01-04T14:13:28+00:00"
         },
         {
             "name": "league/csv",
@@ -932,11 +935,6 @@
                 "reference": "25d838374dd4d01b5488cfa2ec636e4befa03f3f",
                 "shasum": ""
             },
-            "archive": {
-                "exclude": [
-                    "/tests"
-                ]
-            },
             "require": {
                 "ext-gd": "*",
                 "php": "^7.1"
@@ -954,6 +952,11 @@
                 "psr-4": {
                     "": "tests/"
                 }
+            },
+            "archive": {
+                "exclude": [
+                    "/tests"
+                ]
             },
             "license": [
                 "MIT"
@@ -4863,5 +4866,5 @@
         "ext-zip": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
