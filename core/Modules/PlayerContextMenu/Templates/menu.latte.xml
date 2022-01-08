@@ -20,6 +20,9 @@
             <frameinstance modelid="action" />
             {/for}
         </frame>
+        <frame pos="0 -9">
+            <quad id="separator" class="bg-dark" size="40 0.25" />
+        </frame>
     </frame>
 
     <script><!--
@@ -45,13 +48,22 @@
 
     declare Boolean visible;
     declare EvoSC_ContextMenuAction[] defaultActions;
+    declare Integer customActionsCount;
     --></script>
 
     {include 'Dialogues.confirm'}
 
     <script><!--
     EvoSC_ContextMenuAction[] getActions(){
-        return defaultActions;
+        declare actions = defaultActions;
+        declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
+        customActionsCount = EvoSC_CustomContextMenuActions.count;
+
+        foreach(action in EvoSC_CustomContextMenuActions){
+            actions.add(action);
+        }
+
+        return actions;
     }
 
     Void setAction(CMlFrame actionFrame, EvoSC_ContextMenuAction action){
@@ -71,8 +83,10 @@
         declare actionsFrame <=> (menuFrame.GetFirstChild("actions") as CMlFrame);
         declare playerLoginLabel = (menuFrame.GetFirstChild("player_login") as CMlLabel);
         declare playerNameLabel = (menuFrame.GetFirstChild("player_name") as CMlLabel);
+        declare separator <=> (Page.MainFrame.GetFirstChild("separator") as CMlQuad);
         playerLoginLabel.Value = login;
         playerNameLabel.Value = login;
+        separator.Hide();
 
         declare EvoSC_User[Text] EvoSC_Players for This;
         if(EvoSC_Players.existskey(login)){
@@ -98,10 +112,23 @@
 
         declare actions = getActions();
         for(i, 0, actions.count - 1){
+            declare offset = 0.0;
+            declare isCustomAction = (i >= actions.count - customActionsCount);
+            if(isCustomAction){
+                offset = 0.25;
+            }
+
             declare actionsFrame = (actionsFrame.Controls[i] as CMlFrame);
             actionsFrame.Show();
-            AnimMgr.Add(actionsFrame, "<frame pos='"^actionsFrame.RelativePosition_V3.X^" "^((i+1) * -5)^"' />", Now+i*11, 100, CAnimManager::EAnimManagerEasing::ExpOut);
+            AnimMgr.Add(actionsFrame, "<frame pos='"^actionsFrame.RelativePosition_V3.X^" "^((i+1) * -5 - offset)^"' />", Now+i*11, 100, CAnimManager::EAnimManagerEasing::ExpOut);
             setAction(actionsFrame, actions[i]);
+        }
+
+        if(customActionsCount > 0){
+            separator.Size.Y = 0.0;
+            separator.Opacity = 0.0;
+            separator.Show();
+            AnimMgr.Add(separator, "<quad size='"^(separator.Size.X)^" "^(actions.count * 5)^"' opacity='1' />", 60, CAnimManager::EAnimManagerEasing::ExpOut);
         }
     }
 
@@ -113,9 +140,9 @@
     main(){
         declare EvoSC_PlayerContextMenuTarget for This = "";
         visible = False;
+                customActionsCount = 0;
 
         defaultActions.fromjson("""{$defaultActions->toJson()}""");
-        log(defaultActions);
 
         while(True){
             yield;
@@ -123,6 +150,9 @@
             if(EvoSC_PlayerContextMenuTarget != ""){
                 showContextMenu(EvoSC_PlayerContextMenuTarget);
                 EvoSC_PlayerContextMenuTarget = "";
+                declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
+                EvoSC_CustomContextMenuActions = [];
+                customActionsCount = 0;
             }
 
             if(visible){
