@@ -332,9 +332,10 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
         infoMessage($player, ' updated match-settings ', secondary($matchSettingsName))->sendAdmin();
 
-        unset($xml->script_settings->setting);
+        $scriptSettingsNodeName = is_object($xml->script_settings) ? 'script_settings' : 'mode_script_settings';
+        unset($xml->{$scriptSettingsNodeName}->setting);
         foreach ($toSave as $setting) {
-            $node = $xml->script_settings->addChild('setting');
+            $node = $xml->{$scriptSettingsNodeName}->addChild('setting');
             $node->addAttribute('name', $setting->name);
             $node->addAttribute('value', $setting->value);
             $node->addAttribute('type', $setting->type);
