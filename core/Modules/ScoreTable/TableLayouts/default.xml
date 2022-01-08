@@ -55,7 +55,7 @@
             <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
         </frame>
 
-        <frame id="frame-trophies" pos="86 -6.25" scale="0.7">
+        <frame id="frame-trophies" pos="86 -6.25" scale="0.7" z-index="20">
             <frame id="frame-trophies-style-2">
                 <frameinstance modelid="framemodel-trophy" pos="-26 0" />
                 <frameinstance modelid="framemodel-trophy" pos="-15 0" />
@@ -176,8 +176,9 @@
     Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
     Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
     declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for score = [];
+    declare trophiesVisible = LibTMxSM_ScoresTable_Trophies.count > 0;
 
-    if (Frame_TrophiesDetails.Visible) {
+    if (trophiesVisible && Frame_TrophiesDetails.Visible) {
         foreach (Key => Control in Frame_TrophiesDetails.Controls) {
             // Show the best trophies
             declare Integer TrophyKey = Key;
@@ -227,13 +228,6 @@
                 customLabel.Value = "${getShortColorCode(config('theme.hud.accent'))}+" ^ addedPoints;
             }
         }
-    }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_BestTime || Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Laps){
-        if(score.BestRaceTimes.count > 0 && score.BestRaceTimes[score.BestRaceTimes.count - 1] > 0){
-            scoreLabel.Value = formatScoreCorrect(score.BestRaceTimes[score.BestRaceTimes.count - 1], True);
-            scoreIsSet = True;
-        }else{
-            scoreLabel.Value = "--:--.---";
-        }
     }else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_PrevTime){
         if(score.PrevRaceTimes.count > 0 && score.PrevRaceTimes[score.PrevRaceTimes.count - 1] > 0){
             scoreLabel.Value = formatScoreCorrect(score.PrevRaceTimes[score.PrevRaceTimes.count - 1], True);
@@ -248,11 +242,17 @@
         }else{
             scoreLabel.Value = "--:--.---";
         }
+    //}else if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_BestTime || Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Laps){ //default
     }else{
-        scoreLabel.Value = "--:--.---";
+        if(score.BestRaceTimes.count > 0 && score.BestRaceTimes[score.BestRaceTimes.count - 1] > 0){
+            scoreLabel.Value = formatScoreCorrect(score.BestRaceTimes[score.BestRaceTimes.count - 1], True);
+            scoreIsSet = True;
+        }else{
+            scoreLabel.Value = "--:--.---";
+        }
     }
 
-    if(scoreIsSet){
+    if(scoreIsSet || trophiesVisible){
         scoreLabel.Opacity = 1.0;
     }else{
         scoreLabel.Opacity = 0.1;
@@ -268,6 +268,7 @@ Void clearSlot(CMlFrame slot){
     groupIconLabel.Hide();
     groupNameLabel.Hide();
     avatarFrame.Hide();
+    scoreLabel.Value = "";
     slot.DataAttributeSet("login", "");
 }
 
