@@ -29,7 +29,7 @@ class Group extends Model
 
     public function hasAccess(string $accessRightName)
     {
-        if ($this->unrestricted) {
+        if ($this->unrestricted || empty($accessRightName)) {
             return true;
         }
 

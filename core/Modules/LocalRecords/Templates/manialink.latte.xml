@@ -222,7 +222,6 @@
                 declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
                 declare showAllLocals = EvoSC_ContextMenuAction{ icon="", text="Show all local records", action="locals.show", access="",confirm=False };
                 EvoSC_CustomContextMenuActions.add(showAllLocals);
-
                 declare EvoSC_PlayerContextMenuTarget for This = "";
                 EvoSC_PlayerContextMenuTarget = targetLogin;
             }
