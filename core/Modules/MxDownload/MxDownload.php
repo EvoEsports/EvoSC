@@ -284,7 +284,7 @@ class MxDownload extends Module implements ModuleInterface
         $info = json_decode($detailsBody);
 
         if (!$info || isset($info->StatusCode)) {
-            throw new Exception("Unknown map '$tmxIdOrMapUid'.");
+            throw new Exception("Unknown exchange map '$tmxIdOrMapUid'.");
         }
 
         $info = $info[0];

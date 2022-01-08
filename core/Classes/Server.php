@@ -273,7 +273,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool forceScores(array $array, bool $boolean)
  * @method static bool forcePlayerTeam(string $string, int $int)
  * @method static bool forcePlayerTeamId(int $int, int $int)
- * @method static bool forceSpectator(string $string, int $int)
+ * @method static bool forceSpectator(string $string, int $int) 0: user selectable, 1: spectator, 2: player, 3: spectator but keep selectable
  * @method static bool forceSpectatorId(int $int, int $int)
  * @method static bool forceSpectatorTarget(string $string, string $string, int $int)
  * @method static bool forceSpectatorTargetId(int $int, int $int, int $int)

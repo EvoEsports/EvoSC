@@ -268,8 +268,14 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
         $modeScriptName = $xml->gameinfos->script_name;
         $availableSettings = ModeScriptSettings::getSettingsByMode($modeScriptName);
+        $scriptSettingsNode = is_object($xml->script_settings) ? $xml->script_settings : $xml->mode_script_settings;
 
-        foreach ($xml->script_settings->setting as $setting) {
+        if (!is_object($scriptSettingsNode)) {
+            warningMessage('Script settings could not be found, defaults are shown if available. Add your script settings to a ', secondary('<script_settings>'), ' node.')
+                ->send($player);
+        }
+
+        foreach ($scriptSettingsNode->setting as $setting) {
             $settingsName = (string)$setting['name'];
             /**
              * @var ModeScriptSetting $availableSetting
@@ -326,9 +332,10 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
         infoMessage($player, ' updated match-settings ', secondary($matchSettingsName))->sendAdmin();
 
-        unset($xml->script_settings->setting);
+        $scriptSettingsNodeName = is_object($xml->script_settings) ? 'script_settings' : 'mode_script_settings';
+        unset($xml->{$scriptSettingsNodeName}->setting);
         foreach ($toSave as $setting) {
-            $node = $xml->script_settings->addChild('setting');
+            $node = $xml->{$scriptSettingsNodeName}->addChild('setting');
             $node->addAttribute('name', $setting->name);
             $node->addAttribute('value', $setting->value);
             $node->addAttribute('type', $setting->type);
