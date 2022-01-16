@@ -7,6 +7,7 @@ namespace EvoSC\Modules\MatchStats;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
@@ -34,7 +35,7 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        return; //memleak
+        Log::warning("Match Statistics module has a known memory leak, use with caution.");
 
         self::$roundStats = collect();
         self::$teamPoints = [];
