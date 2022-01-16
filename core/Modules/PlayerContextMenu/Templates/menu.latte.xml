@@ -87,6 +87,7 @@
         playerLoginLabel.Value = login;
         playerNameLabel.Value = login;
         separator.Hide();
+        declare actions = getActions();
 
         declare EvoSC_User[Text] EvoSC_Players for This;
         if(EvoSC_Players.existskey(login)){
@@ -99,18 +100,24 @@
             control.Hide();
         }
 
-        declare posX = MouseX;
+        declare Real posX = MouseX;
         if(posX > 100){
             posX -= 40;
         }
-        menuFrame.RelativePosition_V3 = <posX, MouseY>;
+
+        declare Real posY = MouseY;
+        declare y = posY - actions.count * 9.0;
+        if(y < -90.0){
+            posY += actions.count * 5.0 + 9.0;
+        }
+
+        menuFrame.RelativePosition_V3 = <posX, posY>;
         menuFrame.DataAttributeSet("login", login);
         menuFrame.DataAttributeSet("name", playerNameLabel.Value);
         menuFrame.Show();
         bgTrigger.Show();
         visible = True;
 
-        declare actions = getActions();
         for(i, 0, actions.count - 1){
             declare offset = 0.0;
             declare isCustomAction = (i >= actions.count - customActionsCount);
