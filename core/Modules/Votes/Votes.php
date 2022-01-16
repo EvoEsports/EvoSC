@@ -42,14 +42,20 @@ class Votes extends Module implements ModuleInterface
     public static function start(string $mode, bool $isBoot = false)
     {
         ChatCommand::add('//vote', [self::class, 'startVoteQuestion'], 'Start a custom vote.', 'vote_custom');
-        ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
         ChatCommand::add('/y', [self::class, 'voteYes'], 'Vote yes.');
         ChatCommand::add('/n', [self::class, 'voteNo'], 'Vote no.');
-        ChatCommand::add('/res', [self::class, 'cmdAskMoreTime'], 'Start a vote to add or remove time/points.')
-            ->addAlias('/replay')
-            ->addAlias('/restart')
-            ->addAlias('/points')
-            ->addAlias('/time');
+
+        if (config('votes.time.enabled')) {
+            ChatCommand::add('/res', [self::class, 'cmdAskMoreTime'], 'Start a vote to add or remove time/points.')
+                ->addAlias('/replay')
+                ->addAlias('/restart')
+                ->addAlias('/points')
+                ->addAlias('/time');
+        }
+
+        if (config('votes.skip.enabled')) {
+            ChatCommand::add('/skip', [self::class, 'askSkip'], 'Start a vote to skip map.');
+        }
 
         Hook::add('EndMatch', [self::class, 'endMatch']);
         Hook::add('BeginMatch', [self::class, 'beginMatch']);
@@ -73,14 +79,14 @@ class Votes extends Module implements ModuleInterface
     public function stop()
     {
         $data = (object)[
-            'vote' => self::$vote,
-            'voters' => self::$voters,
-            'lastTimeVote' => self::$lastTimeVote,
-            'lastSkipVote' => self::$lastSkipVote,
+            'vote'               => self::$vote,
+            'voters'             => self::$voters,
+            'lastTimeVote'       => self::$lastTimeVote,
+            'lastSkipVote'       => self::$lastSkipVote,
             'timeVotesThisRound' => self::$timeVotesThisRound,
             'skipVotesThisRound' => self::$skipVotesThisRound,
             'onlinePlayersCount' => self::$onlinePlayersCount,
-            'addTimeSuccess' => self::$addTimeSuccess
+            'addTimeSuccess'     => self::$addTimeSuccess
         ];
 
         Cache::put('vote-cache', $data, now()->addMinutes(2));
@@ -131,11 +137,11 @@ class Votes extends Module implements ModuleInterface
         self::$voters = collect();
         self::$lastTimeVote = time();
         $vote = (object)[
-            'question' => $question,
+            'question'      => $question,
             'success_ratio' => $successRatio,
-            'start_time' => time(),
-            'duration' => $duration,
-            'action' => $action,
+            'start_time'    => time(),
+            'duration'      => $duration,
+            'action'        => $action,
         ];
         self::$vote = $vote;
 
@@ -197,7 +203,7 @@ class Votes extends Module implements ModuleInterface
         }
 
         if (config('votes.time.enabled') === false) {
-            warningMessage('Point-limit votes are disabled.')->send($player);
+            warningMessage('Time votes are disabled.')->send($player);
             return;
         }
 
@@ -345,13 +351,14 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
+        if (!config('votes.skip.enabled')) {
+            warningMessage('Skipping is disabled.')->send($player);
+            return;
+        }
+
         $secondsPassed = time() - self::$lastSkipVote;
 
         if (!$player->hasAccess('no_vote_limits')) {
-            if (!config('votes.skip.enabled')) {
-                warningMessage('Skipping is disabled.')->send($player);
-                return;
-            }
 
             if ($secondsPassed < config('votes.skip.cooldown-in-seconds')) {
                 warningMessage('Please wait ',
@@ -418,7 +425,7 @@ class Votes extends Module implements ModuleInterface
 
         return collect([
             'yes' => $yesVotes,
-            'no' => $noVotes,
+            'no'  => $noVotes,
         ]);
     }
 
