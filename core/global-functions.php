@@ -442,7 +442,7 @@ function shutdown_evosc(bool $restart = false)
     global $__bootedVersion;
 
     $action = $restart ? 'is restarting' : 'is shutting down';
-    warningMessage(secondary('EvoSC v' . $__bootedVersion), $action)->sendAll();
+    warningMessage(secondary('EvoSC v' . $__bootedVersion), ' '.$action)->sendAll();
     Server::chatEnableManualRouting(false);
     \EvoSC\Controllers\ModuleController::stopModules();
     \EvoSC\Controllers\ControllerController::stopControllers();

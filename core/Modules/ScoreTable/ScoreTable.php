@@ -83,10 +83,7 @@ class ScoreTable extends Module implements ModuleInterface
             $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
             $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
             $mode = preg_replace('/\.script.txt$/i', '', basename(self::$mode));
-            $layouts = self::$layouts->mapWithKeys(function ($layout) {
-                return [$layout->type => $layout->id];
-            });
-            Template::showAll(self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'layouts', 'mode'));
+            Template::showAll(self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'mode'));
         }
     }
 
@@ -152,9 +149,6 @@ class ScoreTable extends Module implements ModuleInterface
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
         $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
         $mode = preg_replace('/\.script.txt$/i', '', basename(self::$mode));
-        $layouts = self::$layouts->mapWithKeys(function ($layout) {
-            return [$layout->type => $layout->id];
-        });
 
         $joinedPlayerInfo = collect([$player])->map(function (Player $player) {
             return [
@@ -172,11 +166,10 @@ class ScoreTable extends Module implements ModuleInterface
             ];
         })->keyBy('login');
 
-
         GroupManager::sendGroupsInformation($player);
         Template::showAll('ScoreTable.update', ['players' => $joinedPlayerInfo], 20);
         Template::show($player, 'ScoreTable.update', ['players' => $playerInfo], false, 20);
-        Template::show($player, self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'layouts', 'mode'));
+        Template::show($player, self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'mode'));
     }
 
     /**
