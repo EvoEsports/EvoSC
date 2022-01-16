@@ -196,6 +196,11 @@ class Votes extends Module implements ModuleInterface
             return;
         }
 
+        if (config('votes.time.enabled') === false) {
+            warningMessage('Point-limit votes are disabled.')->send($player);
+            return;
+        }
+
         if (floatval($time) == 0) {
             $secondsToAdd = CountdownController::getOriginalTimeLimitInSeconds() * config('votes.time-multiplier');
         } else {
