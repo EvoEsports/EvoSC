@@ -1,6 +1,6 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="EvoSC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+<manialink name="EvoSC:scoretable" layer="ScoresTable" id="scoretable" version="3">
     {include 'Components.stylesheet_noblur'}
 
     <frame id="main-frame" pos="-87.5 14" z-index="500" scale="1">

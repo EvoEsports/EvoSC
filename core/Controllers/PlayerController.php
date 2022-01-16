@@ -515,8 +515,9 @@ class PlayerController implements ControllerInterface
 
     public static function specPlayer(Player $player, $targetLogin)
     {
-        Server::forceSpectator($player->Login, 3);
-        Server::forceSpectatorTarget($player->Login, $targetLogin, 1);
+        Server::forceSpectator($player->Login, Server::FORCE_TO_SPECTATORS_SELECTABLE);
+        usleep(100000);
+        Server::forceSpectatorTarget($player->Login, $targetLogin, Server::FORCE_TO_SPECTATORS);
     }
 
     public static function muteLoginToggle(Player $player, $targetLogin)
