@@ -39,6 +39,7 @@ class MapController implements ControllerInterface
     private static string $mapsPath;
     private static Collection $mapToDisable;
     private static int $round = 0;
+    private static int $matchRound = 0;
     private static int $playersFinished = 0;
 
     /**
@@ -89,6 +90,7 @@ class MapController implements ControllerInterface
         Hook::add('EndMatch', [self::class, 'processMapsToDisable']);
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'endMatch']);
         Hook::add('Maniaplanet.StartRound_Start', [self::class, 'setRound']);
+        Hook::add('Maniaplanet.EndMatch_End', [self::class, 'resetMatchRounds']);
 
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
@@ -105,7 +107,6 @@ class MapController implements ControllerInterface
         QuickButtons::addButton('', 'Reset Match', 'map.reset', 'map_reset');
 
         if (ModeController::isRoundsType()) {
-            self::$round = 1;
             Hook::add('PlayerFinish', [self::class, 'playerFinish']);
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);
             Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
@@ -139,6 +140,7 @@ class MapController implements ControllerInterface
 
     public static function setRound($data){
         self::$round = json_decode($data[0])->count;
+        self::$matchRound++;
         self::sendUpdatedRound();
     }
 
@@ -540,6 +542,14 @@ class MapController implements ControllerInterface
         Server::restartMap();
         Statistics::beginMap();
         self::resetRoundCounter();
+        self::resetMatchRounds();
+    }
+
+    /**
+     * @return void
+     */
+    public static function resetMatchRounds(){
+        self::$matchRound = 0;
     }
 
     /**
@@ -556,5 +566,13 @@ class MapController implements ControllerInterface
     public static function getRound(): int
     {
         return self::$round;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getMatchRound(): int
+    {
+        return self::$matchRound;
     }
 }
