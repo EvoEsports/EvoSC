@@ -18,6 +18,16 @@ class DB
     }
 
     /**
+     * @param callable $transaction
+     * @return mixed
+     * @throws \Throwable
+     */
+    public static function transaction(callable $transaction)
+    {
+        return Database::getConnection()->transaction($transaction);
+    }
+
+    /**
      * @param  string  $query
      * @return bool
      */

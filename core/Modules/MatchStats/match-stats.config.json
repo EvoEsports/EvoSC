@@ -1,9 +1,3 @@
 {
-  "enabled": false,
-  "ui": {
-    "position": "left",
-    "slot": 3
-  },
-  "log-chat": true,
-  "log-chat-per-map": false
+  "enabled": false
 }
