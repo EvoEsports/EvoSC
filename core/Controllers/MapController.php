@@ -38,7 +38,7 @@ class MapController implements ControllerInterface
     private static ?Map $nextMap;
     private static string $mapsPath;
     private static Collection $mapToDisable;
-    private static int $round = -1;
+    private static int $round = 0;
     private static int $playersFinished = 0;
 
     /**
@@ -88,6 +88,7 @@ class MapController implements ControllerInterface
         Hook::add('BeginMap', [self::class, 'beginMap']);
         Hook::add('EndMatch', [self::class, 'processMapsToDisable']);
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'endMatch']);
+        Hook::add('Maniaplanet.StartRound_Start', [self::class, 'setRound']);
 
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
@@ -110,7 +111,6 @@ class MapController implements ControllerInterface
             Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
             Hook::add('BeginMap', [self::class, 'resetRoundCounter']);
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
-            self::resetRoundCounter();
         }
     }
 
@@ -134,9 +134,12 @@ class MapController implements ControllerInterface
             return;
         }
 
-        self::$round++;
-        self::sendUpdatedRound();
         self::$playersFinished = 0;
+    }
+
+    public static function setRound($data){
+        self::$round = json_decode($data[0])->count;
+        self::sendUpdatedRound();
     }
 
     /**
@@ -207,8 +210,8 @@ class MapController implements ControllerInterface
 
         $map->update([
             'last_played' => now(),
-            'cooldown' => 0,
-            'plays' => $map->plays + 1,
+            'cooldown'    => 0,
+            'plays'       => $map->plays + 1,
         ]);
 
         if (!$map->mx_details) {
@@ -455,12 +458,12 @@ class MapController implements ControllerInterface
             DB::table('maps')->updateOrInsert([
                 'uid' => $map->uId
             ], [
-                'author' => self::createOrGetAuthor($map->author),
-                'filename' => $map->fileName,
-                'folder' => substr($map->fileName, 0, strrpos($map->fileName, DIRECTORY_SEPARATOR)),
-                'name' => $map->name,
+                'author'      => self::createOrGetAuthor($map->author),
+                'filename'    => $map->fileName,
+                'folder'      => substr($map->fileName, 0, strrpos($map->fileName, DIRECTORY_SEPARATOR)),
+                'name'        => $map->name,
                 'environment' => $map->environnement,
-                'enabled' => 1
+                'enabled'     => 1
             ]);
 
             echo '.';
@@ -482,7 +485,7 @@ class MapController implements ControllerInterface
             $authorId = $author->id;
         } else {
             $authorId = DB::table('players')->insertGetId([
-                'Login' => $login,
+                'Login'    => $login,
                 'NickName' => $name ?: $login
             ]);
         }
@@ -519,7 +522,7 @@ class MapController implements ControllerInterface
      */
     public static function getNextMap(): stdClass
     {
-        if(config('server.use-filename-to-identify-maps-in-db', false)){
+        if (config('server.use-filename-to-identify-maps-in-db', false)) {
             return DB::table('maps')
                 ->where('filename', '=', Server::getNextMapInfo()->fileName)
                 ->first();
@@ -532,7 +535,7 @@ class MapController implements ControllerInterface
 
     public static function resetRound(Player $player)
     {
-        infoMessage($player, ' resets the round.')->sendAll();
+        infoMessage($player, ' resets the match.')->sendAll();
 
         Server::restartMap();
         Statistics::beginMap();
@@ -545,5 +548,13 @@ class MapController implements ControllerInterface
     public static function getMapToDisable(): Collection
     {
         return self::$mapToDisable;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getRound(): int
+    {
+        return self::$round;
     }
 }
