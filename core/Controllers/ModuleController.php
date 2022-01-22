@@ -86,10 +86,9 @@ class ModuleController implements ControllerInterface
             })
             ->filter()
             ->unique()
-            ->map(function ($moduleDir, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
+            ->mapWithKeys(function ($moduleDir, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
                 $files = scandir($moduleDir);
                 $configId = null;
-                $config = null;
 
                 foreach ($files as $file) {
                     if (preg_match('/^(.+)\.config\.json$/', $file, $matches)) {
@@ -99,48 +98,77 @@ class ModuleController implements ControllerInterface
 
                 if ($configId == null) {
                     Log::warning('No config for module: ' . $moduleClass, true);
-                    return null;
+                    return [$moduleClass => null];
                 } else {
                     $config = ConfigController::getConfig($configId, true);
                     $enabled = isset($config->enabled) ? $config->enabled : true;
                     if (!is_null($enabled) && $enabled == false) {
-                        Log::warning("Module: $moduleClass [Disabled]", isVerbose());
-                        return null;
+                        $className = str_pad(class_basename($moduleClass), 30, '.', STR_PAD_RIGHT);
+                        Log::warning("Module: $className <fg=red;options=bold>[Disabled]</>", isVerbose());
+                        return [$moduleClass => null];
                     }
                 }
-
-                Log::info("Starting $moduleClass.", isVerbose());
 
                 try {
                     $instance = new $moduleClass();
                 } catch (\Error $e) {
                     Log::errorWithCause("Failed to create module $moduleClass (not started)", $e);
-                    return null;
+                    return [$moduleClass => null];
                 }
 
                 if (!($instance instanceof Module)) {
                     Log::error("$moduleClass is not a module, but should be (not started).");
-                    return null;
+                    return [$moduleClass => null];
                 }
 
                 /** @var $moduleClass Module */
-                $instance::start($mode, $isBoot);
                 $instance->setConfigId($configId);
                 $instance->setDirectory($moduleDir);
                 $instance->setNamespace($moduleClass);
                 $instance->setName(preg_replace('#^.+[\\\]#', '', $moduleClass));
 
-                if (isVerbose()) {
-                    Log::info("Module: $moduleClass [Started]");
-                } else {
-                    Log::getOutput()->write('<fg=cyan;options=bold>.</>');
+                return [$moduleClass => $instance];
+            })
+            ->filter()
+            ->sortByDesc(function ($instance) {
+                /**
+                 * @var Module $instance
+                 */
+                return $instance->getBootPriority();
+            })
+            ->each(function (Module $instance, $moduleClass) use ($mode, $isBoot, &$totalStarted) {
+                $priority = $instance->getBootPriority();
+                switch ($priority) {
+                    case Module::PRIORITY_HIGHEST:
+                        $color = 'red';
+                        break;
+
+                    case Module::PRIORITY_HIGH:
+                        $color = 'yellow';
+                        break;
+
+                    case Module::PRIORITY_LOW:
+                        $color = 'cyan';
+                        break;
+
+                    case Module::PRIORITY_LOWEST:
+                        $color = 'blue';
+                        break;
+
+                    default:
+                        $color = 'white';
                 }
 
-                $totalStarted++;
+                if (isVerbose()) {
+                    $className = str_pad(class_basename($moduleClass), 30, '.', STR_PAD_RIGHT);
+                    Log::info("Module: <fg=green;options=bold>$className</> [<fg=yellow;options=bold>Started</>] [Priority: <fg=$color>$priority</>]");
+                } else {
+                    Log::getOutput()->write("<fg=$color;options=bold>.</>");
+                }
 
-                return $instance;
-            })
-            ->filter();
+                $instance::start($mode, $isBoot);
+                $totalStarted++;
+            });
 
         //Boot modules
         echo "\n";
@@ -156,7 +184,7 @@ class ModuleController implements ControllerInterface
      */
     public static function stopModules()
     {
-        self::$loadedModules->each(function (Module $module){
+        self::$loadedModules->each(function (Module $module) {
             try {
                 $module->stop();
             } catch (\Exception $e) {

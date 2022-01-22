@@ -8,10 +8,17 @@ use stdClass;
 
 class Module
 {
+    const PRIORITY_HIGHEST = 4;
+    const PRIORITY_HIGH = 3;
+    const PRIORITY_NORMAL = 2;
+    const PRIORITY_LOW = 1;
+    const PRIORITY_LOWEST = 0;
+
     protected string $name;
     protected string $namespace;
     protected string $directory;
     protected string $configId;
+    protected int $bootPriority = self::PRIORITY_NORMAL;
 
     /**
      * @return string
@@ -83,5 +90,21 @@ class Module
     public function stop()
     {
 
+    }
+
+    /**
+     * @return int
+     */
+    public function getBootPriority(): int
+    {
+        return $this->bootPriority;
+    }
+
+    /**
+     * @param int $bootPriority
+     */
+    public function setBootPriority(int $bootPriority): void
+    {
+        $this->bootPriority = $bootPriority;
     }
 }

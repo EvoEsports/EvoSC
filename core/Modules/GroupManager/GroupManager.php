@@ -43,14 +43,18 @@ class GroupManager extends Module implements ModuleInterface
         }
     }
 
-    public static function sendGroupsInformation(Player $player)
+    public static function sendGroupsInformation(Player $player = null)
     {
         $groups = DB::table('groups')
             ->select(['id', 'Name as name', 'chat_prefix as icon', 'color'])
             ->get()
             ->keyBy('id');
 
-        Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
+        if($player){
+            Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
+        }else{
+            Template::showAll( 'GroupManager.update', compact('groups'), false, 20);
+        }
     }
 
     /**
