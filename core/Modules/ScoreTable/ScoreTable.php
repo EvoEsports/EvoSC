@@ -154,7 +154,7 @@ class ScoreTable extends Module implements ModuleInterface
     {
         $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
-        $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap');
+        $roundsPerMap = Server::getModeScriptSetting('S_RoundsPerMap', 0);
 
         if (empty($mode)) {
             $layoutId = self::getLayoutIdByModeName(ModeController::getMode());
