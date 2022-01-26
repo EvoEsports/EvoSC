@@ -204,7 +204,7 @@ class EscRun extends Command
         EventController::init();
         EventController::setServerLogin($serverLogin);
 
-        ControllerController::loadControllers(Server::getScriptName()['CurrentValue'], true);
+        ControllerController::loadControllers(Server::getCurrentGameInfo()->scriptName, true);
 
         self::addBootCommands();
 

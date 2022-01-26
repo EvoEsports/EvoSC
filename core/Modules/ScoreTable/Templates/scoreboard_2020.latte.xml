@@ -4,7 +4,6 @@
     {include 'Components.stylesheet_noblur'}
 
     <frame id="main-frame" pos="-87.5 14" z-index="500" scale="1">
-        {php $layoutId = \EvoSC\Modules\ScoreTable\ScoreTable::getLayoutId($mode)}
         {include $layoutId}
     </frame>
 

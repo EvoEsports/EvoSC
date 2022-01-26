@@ -25,7 +25,6 @@ class WarmUpWidget extends Module implements ModuleInterface
         if (ModeController::isTimeAttackType()) {
             return;
         }
-
         Hook::add('PlayerConnect', [self::class, 'sendWarmUpWidget']);
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
         Hook::add('WarmUpRoundStarted', [self::class, 'warmUpRoundStarted']);
@@ -39,10 +38,10 @@ class WarmUpWidget extends Module implements ModuleInterface
      */
     public static function sendWarmUpWidget(Player $player)
     {
-        if (Server::getWarmUp()) {
+        if (ModeController::isWarmup()) {
             Template::show($player, 'WarmUpWidget.widget', [
                 'warmupNb' => ModeController::getWarmUpRoundCount(),
-                'round' => ModeController::getWarmUpRound()
+                'round'    => ModeController::getWarmUpRound()
             ]);
         }
     }
@@ -57,7 +56,7 @@ class WarmUpWidget extends Module implements ModuleInterface
     {
         Template::showAll('WarmUpWidget.widget', [
             'warmupNb' => $warmUpCount,
-            'round' => $round
+            'round'    => $round
         ]);
     }
 
