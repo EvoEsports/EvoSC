@@ -9,6 +9,7 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\PlayerController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Group;
@@ -53,7 +54,7 @@ class GroupManager extends Module implements ModuleInterface
         if($player){
             Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
         }else{
-            Template::showAll( 'GroupManager.update', compact('groups'), false, 20);
+            Template::showAll( 'GroupManager.update', compact('groups'));
         }
     }
 
@@ -82,8 +83,8 @@ class GroupManager extends Module implements ModuleInterface
         collect($formData)->forget('group_id')->each(function ($value, $key) use ($groupId) {
             if ($value != "0") {
                 DB::table('access_right_group')->insert([
-                    'group_id' => $groupId,
-                    'access_right_id' => DB::table('access-rights')->where('name', '=', $key)->first()->id, //TOD: Remove after July 2020
+                    'group_id'          => $groupId,
+                    'access_right_id'   => DB::table('access-rights')->where('name', '=', $key)->first()->id, //TOD: Remove after July 2020
                     'access_right_name' => $key
                 ]);
             }
@@ -92,9 +93,13 @@ class GroupManager extends Module implements ModuleInterface
         self::showOverview($player);
     }
 
+    /**
+     * @param Player $player
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
     public static function showOverview(Player $player)
     {
-
+//        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
         $groups = Group::all();
 
         Template::show($player, 'GroupManager.overview', compact('groups'));
@@ -127,7 +132,7 @@ class GroupManager extends Module implements ModuleInterface
         if ($group) {
             $group->update([
                 'chat_prefix' => $prefix,
-                'color' => $color,
+                'color'       => $color,
             ]);
 
             self::showOverview($player);
@@ -194,13 +199,57 @@ class GroupManager extends Module implements ModuleInterface
         if (!$newMember) {
             $newMember = Player::create([
                 'NickName' => $playerLogin,
-                'Login' => $playerLogin,
+                'Login'    => $playerLogin,
             ]);
         }
 
         $group = Group::find(intval($groupId));
         Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
+        $newMember = Player::whereLogin($playerLogin)->with(['group', 'settings'])->first();
         Hook::fire('GroupChanged', $newMember);
-        infoMessage($player->group, ' ', $player, ' changed ', secondary($newMember.'s'), ' group to ', secondary($group))->sendAll();
+        infoMessage($player->group, ' ', $player, ' changed ', secondary($newMember . 's'), ' group to ', secondary($group))->sendAll();
+    }
+
+    /**
+     * @param Player $player
+     * @param string $nameOrLogin
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function mleSearchPlayer(Player $player, string $nameOrLogin)
+    {
+        if ($found = Player::find($nameOrLogin)) {
+            $data = [
+                'exact_match' => true,
+                'results'     => [
+                    [
+                        'name'        => $found->NickName,
+                        'login'       => $found->ubisoft_name,
+                        'group'       => $found->group->Name,
+                        'group_icon'  => $found->group->chat_prefix,
+                        'group_color' => $found->group->color
+                    ]
+                ]
+            ];
+        } else {
+            $found = Player::where('ubisoft_name', 'LIKE', '%' . $nameOrLogin . '%')
+                ->orWhere('NickName', 'LIKE', '%' . $nameOrLogin . '%')
+                ->limit(8)
+                ->get();
+
+            $data = [
+                'exact_match' => false,
+                'results'     => $found->map(function (Player $ply) {
+                    return [
+                        'name'        => $ply->NickName,
+                        'login'       => $ply->ubisoft_name,
+                        'group'       => $ply->group->Name,
+                        'group_icon'  => $ply->group->chat_prefix,
+                        'group_color' => $ply->group->color
+                    ];
+                })
+            ];
+        }
+
+        Template::show($player, 'GroupManager.player_search_result', ['data' => json_encode($data)]);
     }
 }

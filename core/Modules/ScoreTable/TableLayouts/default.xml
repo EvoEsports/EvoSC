@@ -132,7 +132,7 @@
         AnimMgr.Add(rankLabel, "<label scale='1.4' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
-    if(slot.DataAttributeGet("login") != login){
+    //if(slot.DataAttributeGet("login") != login){
         slot.DataAttributeSet("login", login);
         declare name = user.Name;
         declare groupIcon = "";
@@ -156,15 +156,15 @@
         avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ score.User.Login ^ "/country";
         avatarQuad.AlphaMaskUrl = "https://cloud.evotm.com/s/ZXDNYDYp4CB7esx/preview?file=.png";
         nameLabel.Value = name;
-    }
+    //}
 
+    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for score = [];
     declare Frame_Trophies <=> (slot.GetFirstChild("frame-trophies") as CMlFrame);
     declare Frame_TrophiesGroup <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-1") as CMlFrame);
     declare Frame_TrophiesDetails <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-2") as CMlFrame);
     declare _TrophyStyle = 2;
     Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
     Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
-    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for score = [];
     declare trophiesVisible = LibTMxSM_ScoresTable_Trophies.count > 0;
 
     if (trophiesVisible && Frame_TrophiesDetails.Visible) {

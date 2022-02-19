@@ -149,10 +149,6 @@ class ChatMessage
 
         $message = ($this->icon ? '$fff' . $this->icon . ' ' : '') . sprintf('$%s%s', $this->color, $parts);
 
-        if (!in_array(substr($message, -1), ['.', '!', '?'])) {
-            $message .= '.';
-        }
-
         return '$z$s' . preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $message) . '$z';
     }
 

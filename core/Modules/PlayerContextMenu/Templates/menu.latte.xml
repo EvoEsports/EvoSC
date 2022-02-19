@@ -144,6 +144,24 @@
         menuFrame.Hide();
     }
 
+    Void __specPlayer(Text targetLogin){
+        if(!IsSpectatorClient) RequestSpectatorClient(True);
+        SetSpectateTarget(targetLogin);
+    }
+
+    Void __showProfile(Text targetLogin){
+        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
+        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+    }
+
+    Void call(Text action, Text login){
+        switch(action){
+            case "__showProfile": __showProfile(login);
+            case "__specPlayer": __specPlayer(login);
+            default: TriggerPageAction(action^","^login);
+        }
+    }
+
     main(){
         declare EvoSC_PlayerContextMenuTarget for This = "";
         visible = False;
@@ -176,7 +194,9 @@
                             if(confirmAction && !confirm(actionLabel.Value^" "^menuFrame.DataAttributeGet("name")^"?")){
                                 continue;
                             }
-                            TriggerPageAction(actionLabel.DataAttributeGet("action")^","^menuFrame.DataAttributeGet("login"));
+                            declare action = actionLabel.DataAttributeGet("action");
+                            declare login = menuFrame.DataAttributeGet("login");
+                            call(action, login);
                             hideMenu();
                             Page.MainFrame.GetFirstChild("bg_trigger").Hide();
                         }

@@ -28,9 +28,9 @@ class PlayerContextMenu extends Module implements ModuleInterface
     public static function sendContextMenu(Player $player)
     {
         $defaultActions = collect([
-            (object)['icon' => '', 'text' => 'Spectate player', 'action' => 'spec', 'access' => '', 'confirm' => false],
-            (object)['icon' => '', 'text' => 'Show profile', 'action' => 'profile', 'access' => '', 'confirm' => false],
-            (object)['icon' => '', 'text' => 'DM the player', 'action' => 'pm', 'access' => '', 'confirm' => false],
+            (object)['icon' => '', 'text' => 'Spectate player', 'action' => '__specPlayer', 'access' => '', 'confirm' => false],
+            (object)['icon' => '', 'text' => 'Show profile', 'action' => '__showProfile', 'access' => '', 'confirm' => false],
+            (object)['icon' => '', 'text' => 'DM the player', 'action' => 'pm.dialog', 'access' => '', 'confirm' => false],
             (object)['icon' => '', 'text' => 'Toggle mute player', 'action' => 'mute', 'access' => 'player_mute', 'confirm' => false],
             (object)['icon' => '', 'text' => 'Ban player', 'action' => 'ban', 'access' => 'player_ban', 'confirm' => true],
             (object)['icon' => '', 'text' => 'Kick player', 'action' => 'kick', 'access' => 'player_kick', 'confirm' => true],
