@@ -166,6 +166,10 @@ class ChatController implements ControllerInterface
 
     public static function pmTo(Player $player, $login, $message)
     {
+        if (empty($message)) {
+            return;
+        }
+
         $target = player($login);
 
         if ($target->id == $player->id) {
@@ -174,11 +178,11 @@ class ChatController implements ControllerInterface
             return;
         }
 
-        $from = sprintf(secondary('[from:') . $player . secondary('] '));
-        $to = sprintf(secondary('[to:') . $target . secondary('] '));
+        $from = secondary("[from:\$<$player\$>]");
+        $to = secondary("[to:\$<$target\$>]");
 
-        chatMessage($from . $message)->setIcon('')->send($target);
-        chatMessage($to . $message)->setIcon('')->send($player);
+        chatMessage($from . " \$<\$fff$message\$>")->setIcon('')->send($target);
+        chatMessage($to . " \$<\$fff$message\$>")->setIcon('')->send($player);
     }
 
     /**
