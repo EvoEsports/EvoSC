@@ -85,6 +85,8 @@ class ScoreTable extends Module implements ModuleInterface
             }
 
             ScoreTable::sendScoreTable(null, $mode);
+            Hook::add('PlayerChangedName', [self::class, 'playerChangedName']);
+            Hook::add('GroupChanged', [self::class, 'playerChangedName']);
         }
     }
 
@@ -188,6 +190,25 @@ class ScoreTable extends Module implements ModuleInterface
             Template::showAll('ScoreTable.update', ['players' => $playerInfo], 20);
             Template::showAll(self::$scoreboardTemplate, compact('logoUrl', 'maxPlayers', 'roundsPerMap', 'layoutId'));
         }
+    }
+
+    /**
+     * @param Player|null $player
+     * @return void
+     */
+    public static function playerChangedName(Player $player)
+    {
+        $playerInfo = collect([$player])->map(function (Player $player) {
+            return [
+                'login'   => $player->Login,
+                'name'    => ml_escape($player->NickName),
+                'groupId' => $player->group->id
+            ];
+        })->keyBy('login');
+
+        dump($playerInfo);
+
+        Template::showAll('ScoreTable.update', ['players' => $playerInfo], 60);
     }
 
     /**
