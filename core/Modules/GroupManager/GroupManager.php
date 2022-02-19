@@ -99,7 +99,8 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function showOverview(Player $player)
     {
-        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
+//        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
+        $groups = Group::all();
 
         Template::show($player, 'GroupManager.overview', compact('groups'));
     }
