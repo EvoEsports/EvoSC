@@ -206,8 +206,6 @@ class ScoreTable extends Module implements ModuleInterface
             ];
         })->keyBy('login');
 
-        dump($playerInfo);
-
         Template::showAll('ScoreTable.update', ['players' => $playerInfo], 60);
     }
 

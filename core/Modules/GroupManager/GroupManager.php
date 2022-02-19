@@ -99,7 +99,7 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function showOverview(Player $player)
     {
-
+//        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
         $groups = Group::all();
 
         Template::show($player, 'GroupManager.overview', compact('groups'));
@@ -195,16 +195,16 @@ class GroupManager extends Module implements ModuleInterface
     public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)
     {
         $newMember = Player::find($playerLogin);
+        $group = Group::find(intval($groupId));
 
         if (!$newMember) {
-            $newMember = Player::create([
+            Player::create([
                 'NickName' => $playerLogin,
                 'Login'    => $playerLogin,
+                'Group'    => $group->id
             ]);
         }
 
-        $group = Group::find(intval($groupId));
-        Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
         $newMember = Player::whereLogin($playerLogin)->with(['group', 'settings'])->first();
         Hook::fire('GroupChanged', $newMember);
         infoMessage($player->group, ' ', $player, ' changed ', secondary($newMember . 's'), ' group to ', secondary($group))->sendAll();
