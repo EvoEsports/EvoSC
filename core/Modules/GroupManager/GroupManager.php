@@ -51,10 +51,10 @@ class GroupManager extends Module implements ModuleInterface
             ->get()
             ->keyBy('id');
 
-        if ($player) {
+        if($player){
             Template::show($player, 'GroupManager.update', compact('groups'), false, 20);
-        } else {
-            Template::showAll('GroupManager.update', compact('groups'));
+        }else{
+            Template::showAll( 'GroupManager.update', compact('groups'));
         }
     }
 
@@ -99,8 +99,7 @@ class GroupManager extends Module implements ModuleInterface
      */
     public static function showOverview(Player $player)
     {
-//        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
-        $groups = Group::all();
+        $groups = Group::orderByDesc('security_level')->orderBy('id')->get();
 
         Template::show($player, 'GroupManager.overview', compact('groups'));
     }
@@ -195,16 +194,16 @@ class GroupManager extends Module implements ModuleInterface
     public static function groupMemberAdd(Player $player, string $groupId, string $playerLogin)
     {
         $newMember = Player::find($playerLogin);
-        $group = Group::find(intval($groupId));
 
         if (!$newMember) {
-            Player::create([
+            $newMember = Player::create([
                 'NickName' => $playerLogin,
                 'Login'    => $playerLogin,
-                'Group'    => $group->id
             ]);
         }
 
+        $group = Group::find(intval($groupId));
+        Player::whereLogin($playerLogin)->update(['Group' => $group->id]);
         $newMember = Player::whereLogin($playerLogin)->with(['group', 'settings'])->first();
         Hook::fire('GroupChanged', $newMember);
         infoMessage($player->group, ' ', $player, ' changed ', secondary($newMember . 's'), ' group to ', secondary($group))->sendAll();
