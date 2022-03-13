@@ -6,6 +6,8 @@ namespace EvoSC\Modules\MatchStats;
 
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
@@ -19,6 +21,14 @@ class MatchStats extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$roundStats = collect();
+        self::$teamPoints = [];
+
+        AccessRight::add('record_match_stats', 'Is allowed to control match stats recording.');
+
+        Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
+        Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
+        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('Scores', [self::class, 'scoresUpdated']);
     }
 
