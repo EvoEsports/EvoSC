@@ -25,5 +25,6 @@
   },
   "pre-cache-maps": false,
   "pidfile": "",
-  "load-nicknames-from-evo-service": false
+  "load-nicknames-from-evo-service": false,
+  "use-filename-to-identify-maps-in-db": false
 }

@@ -11,15 +11,16 @@
         <label class="text-light" z-index="0" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000" opacity="0.25"/>
         <label class="text-light" z-index="1" valign="center" halign="right" pos="16 0" size="10 2" textsize="0.6" text="0:00.000"/>
         <label class="text-light" z-index="1" valign="center" pos="17 0" size="25 2" textsize="0.4" textprefix="$s" text="name"/>
-        <quad class="bg-accent" pos="-1 -0.2" size="45 3" opacity="0.3" z-index="-1" hidden="1" valign="center" />
+        <quad bgcolor="{config('theme.hud.accent')}3" bgcolorfocus="{config('theme.hud.accent')}9" pos="-1 -0.2" size="45 3" z-index="-1" hidden="1" valign="center" />
+        <quad class="trigger" pos="-1 -0.2" size="45 3" z-index="-2" valign="center" ScriptEvents="1" />
     </framemodel>
 
     <quad class="bg-dark widget" z-index="-1" size="45 {config('locals.rows') * 3 + 6.5}" opacity="0.8" ScriptEvents="1"/>
     <quad class="bg-darker" z-index="-2" pos="0 -5" size="45 {config('locals.showtop') * 3 + 0.7}" opacity="0.4" />
     <quad class="bg-accent" size="45 5" opacity="0.8"/>
-    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text="🏆 Local Records"/>
+    <label class="text-light" z-index="1" valign="center" pos="1.5 -2.5" textsize="0.4" text=" Local Records"/>
 
-    <frame id="records" pos="1 -7">
+    <frame id="records" pos="1 -7" z-index="10">
         {for $i=0; $i<config('locals.rows'); $i++}
         <frameinstance modelid="record" pos="0 {$i * -3}" hidden="0"/>
         {/for}
@@ -105,6 +106,7 @@
             (recordsFrame.Controls[0] as CMlLabel).TextColor = primaryColor;
             (recordsFrame.Controls[4] as CMlLabel).Hide();
         }
+        recordsFrame.DataAttributeSet("login", record.login);
         recordsFrame.Show();
     }
 
@@ -142,7 +144,6 @@
             }
 
             fillRecord(filled, record, onlinePlayers);
-
             filled = filled + 1;
         }
 
@@ -155,6 +156,7 @@
                 continue;
             }
 
+            frame.DataAttributeSet("login", "");
             frame.Hide();
         }
     }
@@ -169,6 +171,14 @@
         Integer score;
         Text name;
         Text login;
+    }
+
+    #Struct EvoSC_ContextMenuAction {
+        Text icon;
+        Text text;
+        Text action;
+        Text access;
+        Boolean confirm;
     }
 
     declare Vec3 headerColor;
@@ -202,9 +212,20 @@
     {/block}
 
     {block pendingEvents}
-                if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    TriggerPageAction("locals.show");
-                }
+        if(event.Control.HasClass("widget") && event.Type == CMlScriptEvent::Type::MouseClick){
+            TriggerPageAction("locals.show");
+            continue;
+        }
+        if(event.Control.HasClass("trigger") && event.Type == CMlScriptEvent::Type::MouseClick){
+            declare targetLogin = event.Control.Parent.DataAttributeGet("login");
+            if(targetLogin != ""){
+                declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
+                declare showAllLocals = EvoSC_ContextMenuAction{ icon="", text="Show all local records", action="locals.show", access="",confirm=False };
+                EvoSC_CustomContextMenuActions.add(showAllLocals);
+                declare EvoSC_PlayerContextMenuTarget for This = "";
+                EvoSC_PlayerContextMenuTarget = targetLogin;
+            }
+        }
     {/block}
 --></script>
 </manialink>

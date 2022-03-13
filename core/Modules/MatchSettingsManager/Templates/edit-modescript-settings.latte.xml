@@ -37,10 +37,11 @@
 $o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
                         <quad class="bg-darker" size="112 100" pos="0 -5" />
                         <label class="btn-muted help" pos="59.5 -2" size="4.1 4.1" text="" halign="center" valign="center" ScriptEvents="1" focusareacolor1="0000" />
+                        <entry name="{$setting['setting']}[type]" default="{$setting['type']}" hidden="1" />
                         <frame>
                             {switch $setting['type']}
                             {case 'boolean'}
-                            <entry class="form setting_entry" pos="1112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']|ml_escape}" selecttext="1" />
+                            <entry class="form setting_entry" pos="1112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}[value]" default="{$setting['value'] ?: $setting['default']|ml_escape}" selecttext="1" />
                             <frame pos="112 -2" valign="center" halign="right" size="14 4.1">
                                 <frame pos="{($setting['value'] ?: $setting['default']) == '' ? -20 : 0} 0">
                                     <quad class="bg-default" valign="center" size="20 5" />
@@ -51,15 +52,15 @@ $o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
                                 </frame>
                             </frame>
                             {case 'real'}
-                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
+                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}[value]" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
                             <label class="btn-muted add-real" data-value="-1" pos="64 -2" size="4.1 4.1" valign="center" halign="center" text="-" ScriptEvents="1" />
                             <label class="btn-muted add-real" data-value="1" pos="68.5 -2" size="4.1 4.1" valign="center" halign="center" text="+" ScriptEvents="1" />
                             {case 'integer'}
-                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
+                            <entry class="form setting_entry" pos="112 -2" size="41 4.1" valign="center" halign="right" name="{$setting['setting']}[value]" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
                             <label class="btn-muted add-int" data-value="-1" pos="64 -2" size="4.1 4.1" valign="center" halign="center" text="-" ScriptEvents="1" />
                             <label class="btn-muted add-int" data-value="1" pos="68.5 -2" size="4.1 4.1" valign="center" halign="center" text="+" ScriptEvents="1" />
                             {default}
-                            <entry class="form setting_entry" pos="112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
+                            <entry class="form setting_entry" pos="112 -2" size="50 4.1" valign="center" halign="right" name="{$setting['setting']}[value]" default="{$setting['value'] ?: $setting['default']}" selecttext="1" />
                             {/switch}
                         </frame>
                     </frame>

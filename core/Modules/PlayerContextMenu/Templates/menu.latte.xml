@@ -1,0 +1,211 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink name="EvoSC:PlayerContextMenu" id="PlayerContextMenu" version="3">
+    {include 'Components.stylesheet_noblur'}
+
+    <framemodel id="action">
+        <label id="action" class="btn-muted action" size="40 5" halign="left" textprefix="             " text="Action" ScriptEvents="1" />
+        <label id="icon" class="text-light" pos="4" text="" z-index="1" halign="center" valign="center" />
+    </framemodel>
+
+    <quad id="bg_trigger" class="bg_trigger" size="1000 1000" valign="center" halign="center" z-index="9000" hidden="1" ScriptEvents="1" />
+    <frame pos="0 80" id="menu" z-index="9001" hidden="1">
+        <frame id="info" size="40 9" z-index="1">
+            <quad class="bg-darker" size="100 100" opacity="0.9" />
+            <label id="player_login" class="text-light" pos="2 -2" z-index="2" scale="0.8" opacity="0.75" />
+            <label id="player_name" class="text-light" pos="2 -4.5" z-index="2" scale="1" />
+        </frame>
+        <frame id="actions" pos="0 -6.5">
+            {for $i=0; $i<20; $i++}
+            <frameinstance modelid="action" />
+            {/for}
+        </frame>
+        <frame pos="0 -9">
+            <quad id="separator" class="bg-dark" size="40 0.25" />
+        </frame>
+    </frame>
+
+    <script><!--
+    #Struct EvoSC_Group {
+        Text name;
+        Text icon;
+        Text color;
+    }
+
+    #Struct EvoSC_User {
+        Text login;
+        Text name;
+        Integer groupId;
+    }
+
+    #Struct EvoSC_ContextMenuAction {
+        Text icon;
+        Text text;
+        Text action;
+        Text access;
+        Boolean confirm;
+    }
+
+    declare Boolean visible;
+    declare EvoSC_ContextMenuAction[] defaultActions;
+    declare Integer customActionsCount;
+    --></script>
+
+    {include 'Dialogues.confirm'}
+
+    <script><!--
+    EvoSC_ContextMenuAction[] getActions(){
+        declare actions = defaultActions;
+        declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
+        customActionsCount = EvoSC_CustomContextMenuActions.count;
+
+        foreach(action in EvoSC_CustomContextMenuActions){
+            actions.add(action);
+        }
+
+        return actions;
+    }
+
+    Void setAction(CMlFrame actionFrame, EvoSC_ContextMenuAction action){
+        declare iconLabel = (actionFrame.GetFirstChild("icon") as CMlLabel);
+        declare actionLabel = (actionFrame.GetFirstChild("action") as CMlLabel);
+
+        iconLabel.Value = action.icon;
+        actionLabel.Value = action.text;
+        actionLabel.DataAttributeSet("action", action.action);
+        actionLabel.DataAttributeSet("confirm", action.confirm ^ "");
+    }
+
+    Void showContextMenu(Text login){
+        declare bgTrigger <=> (Page.MainFrame.GetFirstChild("bg_trigger") as CMlQuad);
+        declare menuFrame <=> (Page.MainFrame.GetFirstChild("menu") as CMlFrame);
+        declare infoFrame <=> (menuFrame.GetFirstChild("info") as CMlFrame);
+        declare actionsFrame <=> (menuFrame.GetFirstChild("actions") as CMlFrame);
+        declare playerLoginLabel = (menuFrame.GetFirstChild("player_login") as CMlLabel);
+        declare playerNameLabel = (menuFrame.GetFirstChild("player_name") as CMlLabel);
+        declare separator <=> (Page.MainFrame.GetFirstChild("separator") as CMlQuad);
+        playerLoginLabel.Value = login;
+        playerNameLabel.Value = login;
+        separator.Hide();
+        declare actions = getActions();
+
+        declare EvoSC_User[Text] EvoSC_Players for This;
+        if(EvoSC_Players.existskey(login)){
+            declare evoscPlayer = EvoSC_Players[login];
+            playerNameLabel.Value = evoscPlayer.name;
+        }
+
+        foreach(control in actionsFrame.Controls){
+            control.RelativePosition_V3.Y = 3.0;
+            control.Hide();
+        }
+
+        declare Real posX = MouseX;
+        if(posX > 100){
+            posX -= 40;
+        }
+
+        declare Real posY = MouseY;
+        declare y = posY - actions.count * 9.0;
+        if(y < -90.0){
+            posY += actions.count * 5.0 + 9.0;
+        }
+
+        menuFrame.RelativePosition_V3 = <posX, posY>;
+        menuFrame.DataAttributeSet("login", login);
+        menuFrame.DataAttributeSet("name", playerNameLabel.Value);
+        menuFrame.Show();
+        bgTrigger.Show();
+        visible = True;
+
+        for(i, 0, actions.count - 1){
+            declare offset = 0.0;
+            declare isCustomAction = (i >= actions.count - customActionsCount);
+            if(isCustomAction){
+                offset = 0.25;
+            }
+
+            declare actionsFrame = (actionsFrame.Controls[i] as CMlFrame);
+            actionsFrame.Show();
+            AnimMgr.Add(actionsFrame, "<frame pos='"^actionsFrame.RelativePosition_V3.X^" "^((i+1) * -5 - offset)^"' />", Now+i*11, 100, CAnimManager::EAnimManagerEasing::ExpOut);
+            setAction(actionsFrame, actions[i]);
+        }
+
+        if(customActionsCount > 0){
+            separator.Size.Y = 0.0;
+            separator.Opacity = 0.0;
+            separator.Show();
+            AnimMgr.Add(separator, "<quad size='"^(separator.Size.X)^" "^(actions.count * 5)^"' opacity='1' />", 60, CAnimManager::EAnimManagerEasing::ExpOut);
+        }
+    }
+
+    Void hideMenu(){
+        declare menuFrame <=> (Page.MainFrame.GetFirstChild("menu") as CMlFrame);
+        menuFrame.Hide();
+    }
+
+    Void __specPlayer(Text targetLogin){
+        if(!IsSpectatorClient) RequestSpectatorClient(True);
+        SetSpectateTarget(targetLogin);
+    }
+
+    Void __showProfile(Text targetLogin){
+        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
+        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+    }
+
+    Void call(Text action, Text login){
+        switch(action){
+            case "__showProfile": __showProfile(login);
+            case "__specPlayer": __specPlayer(login);
+            default: TriggerPageAction(action^","^login);
+        }
+    }
+
+    main(){
+        declare EvoSC_PlayerContextMenuTarget for This = "";
+        visible = False;
+                customActionsCount = 0;
+
+        defaultActions.fromjson("""{$defaultActions->toJson()}""");
+
+        while(True){
+            yield;
+
+            if(EvoSC_PlayerContextMenuTarget != ""){
+                showContextMenu(EvoSC_PlayerContextMenuTarget);
+                EvoSC_PlayerContextMenuTarget = "";
+                declare EvoSC_ContextMenuAction[] EvoSC_CustomContextMenuActions for This;
+                EvoSC_CustomContextMenuActions = [];
+                customActionsCount = 0;
+            }
+
+            if(visible){
+                foreach(Event in PendingEvents){
+                    if(Event.Control == Null) continue;
+                    if(Event.Type == CMlScriptEvent::Type::MouseClick){
+                        if(Event.Control.HasClass("bg_trigger")){
+                            hideMenu();
+                            Event.Control.Hide();
+                        }else if(Event.Control.HasClass("action")){
+                            declare actionLabel = (Event.Control as CMlLabel);
+                            declare menuFrame = (Event.Control.Parent.Parent.Parent as CMlFrame);
+                            declare confirmAction = actionLabel.DataAttributeGet("confirm") == "True";
+                            if(confirmAction && !confirm(actionLabel.Value^" "^menuFrame.DataAttributeGet("name")^"?")){
+                                continue;
+                            }
+                            declare action = actionLabel.DataAttributeGet("action");
+                            declare login = menuFrame.DataAttributeGet("login");
+                            call(action, login);
+                            hideMenu();
+                            Page.MainFrame.GetFirstChild("bg_trigger").Hide();
+                        }
+                    }
+                }
+            }else{
+                sleep(50);
+            }
+        }
+    }
+    --></script>
+</manialink>

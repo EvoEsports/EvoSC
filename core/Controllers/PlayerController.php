@@ -63,7 +63,8 @@ class PlayerController implements ControllerInterface
         Hook::add('PlayerDisconnect', [self::class, 'playerDisconnect']);
         Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
-        Hook::add('PlayerConnect', [self::class, 'playerConnect']);
+        Hook::add('PlayerConnect', [self::class, 'playerConnect'], false, 10);
+        Hook::add('GroupChanged', [self::class, 'playerGroupChanged'], false, 10);
 
         ManiaLinkEvent::add('kick', [self::class, 'kickPlayerEvent'], 'player_kick');
         ManiaLinkEvent::add('forcespec', [self::class, 'forceSpecEvent'], 'player_force_spec');
@@ -148,6 +149,15 @@ class PlayerController implements ControllerInterface
         ]);
     }
 
+    /**
+     * @param Player $player
+     * @return void
+     */
+    public static function playerGroupChanged(Player $player)
+    {
+        self::$players->put($player->Login, $player);
+    }
+
     public static function cacheConnectedPlayers()
     {
         self::$players = collect(Server::getPlayerList())->map(function (PlayerInfo $playerInfo) {
@@ -164,6 +174,8 @@ class PlayerController implements ControllerInterface
                 'team'             => $playerInfo->teamId
             ]);
 
+            $player->load(['group', 'settings']);
+
             return $player;
         })->keyBy('Login');
 
@@ -172,7 +184,9 @@ class PlayerController implements ControllerInterface
 
     /**
      * @param Player $player
-     * @param mixed ...$pw
+     * @param $cmd
+     * @param ...$pw
+     * @return void
      */
     public static function cmdSetServerPassword(Player $player, $cmd, ...$pw)
     {
@@ -374,13 +388,22 @@ class PlayerController implements ControllerInterface
      */
     public static function kickPlayerEvent(Player $player, $login, $reason = "")
     {
+        $toBeKicked = null;
+
         /**
          * @var Player $toBeKicked
          */
         try {
             $toBeKicked = Player::find($login);
         } catch (\Exception $e) {
-            $toBeKicked = $login;
+        }
+
+        if (is_null($toBeKicked)) {
+            $toBeKicked = (object)[
+                'group' => (object)[
+                    'security_level' => 0
+                ]
+            ];
         }
 
         if ($toBeKicked->group->security_level > $player->group->security_level) {
@@ -506,8 +529,9 @@ class PlayerController implements ControllerInterface
 
     public static function specPlayer(Player $player, $targetLogin)
     {
-        Server::forceSpectator($player->Login, 3);
-        Server::forceSpectatorTarget($player->Login, $targetLogin, 1);
+        Server::forceSpectator($player->Login, Server::FORCE_TO_SPECTATORS_SELECTABLE);
+        usleep(100000);
+        Server::forceSpectatorTarget($player->Login, $targetLogin, Server::FORCE_TO_SPECTATORS);
     }
 
     public static function muteLoginToggle(Player $player, $targetLogin)
@@ -521,11 +545,12 @@ class PlayerController implements ControllerInterface
         }
     }
 
-    public static function warnPlayer(Player $player, string $targetLogin, string $message)
+    public static function warnPlayer(Player $player, string $targetLogin, string $message = '')
     {
         $target = Player::whereLogin($targetLogin)->first();
 
         if ($target) {
+            warningMessage("You have warned $target")->send($player);
             warningMessage("You have been warned by $player ", secondary($message))->send($target);
         }
     }

@@ -56,8 +56,8 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool sendHideManialinkPageToLogin(string $string)
  * @method static array getManialinkPageAnswers()
  * @method static bool sendOpenLinkToId(int $int, string $string, int $int)
- * @method static bool sendOpenLinkToLogin(string $string, string $string, int $int)
- * @method static bool kick(string $string, string $string)
+ * @method static bool sendOpenLinkToLogin(string $recipient, string $link, int $linkType)
+ * @method static bool kick(string $login, string $reason)
  * @method static bool kickId(int $int, string $string)
  * @method static bool ban(string $string, string $string)
  * @method static bool banAndBlackList(string $string, string $string, bool $boolean)
@@ -273,7 +273,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static bool forceScores(array $array, bool $boolean)
  * @method static bool forcePlayerTeam(string $string, int $int)
  * @method static bool forcePlayerTeamId(int $int, int $int)
- * @method static bool forceSpectator(string $string, int $int)
+ * @method static bool forceSpectator(string $string, int $int) 0: user selectable, 1: spectator, 2: player, 3: spectator but keep selectable
  * @method static bool forceSpectatorId(int $int, int $int)
  * @method static bool forceSpectatorTarget(string $string, string $string, int $int)
  * @method static bool forceSpectatorTargetId(int $int, int $int, int $int)
@@ -293,6 +293,12 @@ use Maniaplanet\DedicatedServer\Structures\Version;
 class Server
 {
     private static $rpc;
+
+    //0: user selectable, 1: spectator, 2: player, 3: spectator but keep selectable
+    const FORCE_TO_DRIVES_SELECTABLE = 0;
+    const FORCE_TO_SPECTATORS = 1;
+    const FORCE_TO_DRIVERS = 2;
+    const FORCE_TO_SPECTATORS_SELECTABLE = 3;
 
     /**
      * Initialize the connection to the maniaplanet-dedicated-server.
@@ -331,7 +337,12 @@ class Server
         return Server::triggerModeScriptEventArray('Trackmania.GetScores');
     }
 
-    public static function getModeScriptSetting(string $name)
+    /**
+     * @param string $name
+     * @param $default
+     * @return mixed|null
+     */
+    public static function getModeScriptSetting(string $name, $default = null)
     {
         $data = Server::getModeScriptSettings();
 
@@ -339,7 +350,19 @@ class Server
             return $data[$name];
         }
 
-        return null;
+        return $default;
+    }
+
+    /**
+     * @param string $filename
+     */
+    public static function addMapOrIgnore(string $filename)
+    {
+        try {
+            Server::addMap($filename);
+        } catch (\Exception $e) {
+            //map already in selection
+        }
     }
 
     /**

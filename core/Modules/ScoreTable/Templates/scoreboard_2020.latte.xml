@@ -1,130 +1,34 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="EvoSC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
-    {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
-    <framemodel id="button">
-        <quad class="btn" size="260 142" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_button_260x142.png" colorize="{config('theme.hud.bg-light')}" opacity="0.05" ScriptEvents="1" />
-        <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -1.65" textsize="0.3" z-index="1"/>
-        <label class="text-light" halign="center" valign="center" size="9.2 5.5" pos="5 -3.8" scale="0.75" z-index="1"/>
-    </framemodel>
-    <framemodel id="framemodel-trophy">
-        <label id="label-trophy" class="text-default text-light" pos="-3.5 -2.5" z-index="1" halign="center" size="5 5" textsize="2.2" textprefix="$i" opacity="0.9" />
-        <quad id="quad-trophy" class="quad-base" z-index="0" pos="-2 0.2" size="8 7" halign="left" />
-    </framemodel>
+<manialink name="EvoSC:scoretable" layer="ScoresTable" id="scoretable" version="3">
+    {include 'Components.stylesheet_noblur'}
 
-    <framemodel id="box" data-size="100 12">
-        <label class="text-light" pos="26.25 -2.5" size="25 3" z-index="5" scale="1.3"/> <!-- Name -->
-        <label class="text-light" pos="27 -8" scale="0.9" size="3 3" z-index="5" valign="center" halign="center" opacity="0.85"/> <!-- Group Icon -->
-        <frame size="15 10" pos="9.3 -5.6" halign="center" valign="center" z-index="5" scale="1.1">
-            <quad pos="-3 5" size="50 7" bgcolor="aaa2" halign="center" valign="center" rot="-45" z-index="-2" opacity="0"/>
-            <label pos="-4.9 2.75" size="5 5" halign="center" valign="center" text="" textsize="1" scale="0.7" textcolor="888"/>
-        </frame> <!-- Badge -->
-        <label class="text-light" pos="7 -5.5" size="10 10" textsize="1.1" scale="2" z-index="5" halign="center" valign="center"/> <!-- Pos/Rank -->
-        <label class="text-light" pos="87 -2.5" size="20 3" scale="1.3" z-index="5" halign="right"/> <!-- Score -->
-        <quad pos="14.75 -6" valign="center" size="9.75 8" z-index="5" /> <!-- Avatar -->
-        <quad pos="63 -7.7" bgcolor="0002" size="2.5 2" valign="center" opacity="0.85" hidden="1" z-index="5" /> <!-- Flag -->
-        <label class="text-light" pos="66.25 -7.5" size="19.5 3" scale="0.9" valign="center" opacity="0.75" hidden="1" z-index="5"/> <!-- Region -->
-        <label class="text-light" pos="28.5 -8" size="19.5 3" scale="0.9" valign="center" opacity="0.75" z-index="5"/> <!-- Group -->
-        <label class="text-light" pos="13 -6.5" scale="0.6" textcolor="eeea" halign="center" valign="center" textprefix="$s" z-index="6" rot="90"/> <!-- Fame Stars -->
-        <label class="text-light" pos="25 -7" size="11 3" z-index="5"/> <!-- Score BG-Layer -->
-        <label class="text-light" pos="61.5 -7.5" scale="0.9" textcolor="ddd" valign="cenert" halign="right" opacity="0.9" hidden="1"/> <!-- LP Gain -->
-
-        <quad class="bg-blur" pos="1 0" size="86 12" z-index="-12" opacity="0" hidden="1"/> <!-- Primary BG -->
-        <quad class="bg-accent" opacity="0" pos="1 0" size="86 12" z-index="-15" ScriptEvents="1" hidden="1"/> <!-- Primary BG -->
-        <quad size="355 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" opacity="0.2" />
-        <quad class="trigger" pos="1 0" size="86 12" bgcolor="0000" z-index="5" ScriptEvents="1"/> <!-- Controls Trigger -->
-
-        <frame pos="8 -5.5" hidden="1" z-index="10">
-            <frameinstance modelid="button" data-action="spec" data-icon="" data-access="" data-text="Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="profile" data-icon="" data-access="" data-text="Profile" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="pm" data-icon="" data-access="" data-text="PM" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="mute" data-icon="" data-access="player_mute" data-text="Mute" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="ban" data-icon="" data-access="player_ban" data-text="Ban" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="kick" data-icon="" data-access="player_kick" data-text="Kick" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="warn" data-icon="" data-access="player_warn" data-text="Warn" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-            <frameinstance modelid="button" data-action="force_spec" data-icon="" data-access="player_force_spec" data-text="Force Spec" autonewline="1" size="9.2 5.5" textsize="0.05"></frameinstance>
-        </frame>
-
-        <frame id="frame-trophies" pos="86 -6.25" scale="0.7">
-            <frame id="frame-trophies-style-2">
-                <frameinstance modelid="framemodel-trophy" pos="-26 0" />
-                <frameinstance modelid="framemodel-trophy" pos="-15 0" />
-                <frameinstance modelid="framemodel-trophy" pos="-4 0" />
-            </frame>
-            <frame id="frame-trophies-style-1" pos="-7 0">
-                <quad id="quad-best-trophy" class="text-light" halign="center" valign="center" pos="1.5 0.2" z-index="1" size="9 9" autoscale="0" />
-                <label id="label-big-trophy" class="text-light" valign="center2" pos="-14.5 0" z-index="2" halign="right" size="7 10" textprefix="$i" />
-                <label id="label-small-trophy" class="text-light" valign="center2" pos="-15 -0.4" z-index="2" halign="left" size="7 10" textprefix="$i" textsize="2" />
-            </frame>
-        </frame>
-
-        <label id="finalist-label" class="text-light" pos="86 -8" halign="right" valign="center" text="asd" opacity="0.85" textsize="0.8" />
-
-        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.accent')}" z-index="-12" opacity="0" />
-        <quad size="2294 300" pos="0 0" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.45" />
-    </framemodel>
-
-    <!-- end components -->
-
-    <frame id="main-frame" pos="-87.5 14" z-index="8000" scale="1">
-        <quad id="bg-dark" class="bg-dark" hidden="1" />
-        <frame z-index="0" pos="90 -12.5" scale="0.85">
-            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
-            <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
-        </frame>
-        <frame id="header-frame" pos="5.5 17" z-index="1">
-            {if !empty($logoUrl)}
-            <quad pos="177 13.5" bgcolor="000" valign="top" halign="right" size="12 12" image="{$logoUrl|noescape}" keepratio="Fit"/>
-            {/if}
-            <label id="server-name" class="text-light" pos="1 14" size="60 6" scale="1.8"/>
-            <label id="mode-name" class="text-light" pos="0.5 8.5" size="60 6" scale="0.9" textcolor="{config('theme.hud.accent')}" textprefix="$sMode: "/>
-            <label id="player-info" class="text-light" pos="-0.25 4.8" size="60 6" textprefix="$s "/>
-        </frame>
-        <frame id="boxes-frame" pos="0 15" z-index="100">
-            {for $i=0;$i<6;$i++}
-            <frameinstance modelid="box" pos="{$i*-2.3 + 1} {$i * -13}" z-index="100"></frameinstance>
-            {/for}
-            {for $i=0;$i<6;$i++}
-            <frameinstance modelid="box" pos="{$i*-2.3 + 92} {$i * -13}" z-index="100"></frameinstance>
-            {/for}
-            {for $i=0;$i<6;$i++}
-            <quad size="2294 300" pos="{$i*-2.3 + 1} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.25" />
-            {/for}
-            {for $i=0;$i<6;$i++}
-            <quad size="2294 300" pos="{$i*-2.3 + 92} {$i * -13}" scale="0.04" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.25" />
-            {/for}
-        </frame>
-        <frame pos="-14 -66" scale="1" z-index="1" hidden="0">
-            <label id="prev-page" class="floating prev-page" text="" pos="4 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-            <label id="page" class="text-light" text="1/1" pos="10 0" textsize="2.5" size="10 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-            <label id="next-page" class="floating next-page" text="" pos="18 0" size="5 5" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-            <label id="me" class="floating me" text="" pos="24.3 0" textsize="2.5" size="5 5"  ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0000" />
-        </frame>
-        <frame id="teams-frame" pos="3 15" z-index="10" hidden="1">
-            <!-- team 1 -->
-            <label id="team-one-label" class="text-light" textsize="4" textprefix="$i" text="Team 1" pos="0 0" />
-            <label id="team-one-points" class="text-light" textsize="2" textprefix="$i" text="0 Points" pos="-0.25 -6.5" />
-            <!-- team 2 -->
-            <label id="team-two-label" class="text-light" textsize="4" textprefix="$i" text="Team 2" pos="91 0" />
-            <label id="team-two-points" class="text-light" textsize="2" textprefix="$i" text="0 Points" pos="90.75 -6.5" />
-        </frame>
+    <frame id="main-frame" pos="-87.5 14" z-index="500" scale="1">
+        {include $layoutId}
     </frame>
-
 
     <script><!--
     #Include "MathLib" as ML
     #Include "TextLib" as TL
     #Include "ColorLib" as CL
+    #Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/ScoresTable_Common.Script.txt" as UIModules_ScoresTable
     #Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
     #Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
 
-    #Const SB_Update_Interval 250
+    #Const SB_Update_Interval 100
     #Const SB_Button_Padding 1
-    #Const SB_Per_Page 12
     #Const C_Status_Disconnected	0
     #Const C_Status_Spawned			1
     #Const C_Status_NotSpawned		2
     #Const C_Status_Spectating		3
+
+    #Const UIModules_ScoresTable::C_Mode_BestTime as C_Mode_BestTime
+    #Const UIModules_ScoresTable::C_Mode_PrevTime as C_Mode_PrevTime
+    #Const UIModules_ScoresTable::C_Mode_LapTime as C_Mode_LapTime
+    #Const UIModules_ScoresTable::C_Mode_Points as C_Mode_Points
+    #Const UIModules_ScoresTable::C_Mode_Laps as C_Mode_Laps
+    #Const UIModules_ScoresTable::C_Mode_Trophy as C_Mode_Trophy
+    #Const UIModules_ScoresTable::C_Mode_RaceProgression as C_Mode_RaceProgression
 
     #Struct EvoSC_Group {
         Text name;
@@ -143,25 +47,80 @@
         Integer Amount;
     }
 
+    declare Vec3 SB_Team1_Color;
+    declare Vec3 SB_Team2_Color;
     declare CMlFrame mainFrame;
     declare CMlFrame[] boxes;
     declare Integer page;
+    declare Integer perPage;
     declare Boolean forceUpdate;
+    declare Integer SB_Last_Update;
+    declare Integer SB_Last_Player_Count;
+
+*** SB_SetPlayerCount ***
+***
+    declare playerInfoLabel <=> (Page.MainFrame.GetFirstChild("player-info") as CMlLabel);
+    playerInfoLabel.Value = Players.count ^ "/{$maxPlayers}";
+    {if $roundsPerMap > 0}
+    declare Integer EvoSC_Round for This = 1;
+    playerInfoLabel.Value = playerInfoLabel.Value ^ "\t " ^ EvoSC_Round ^ "/{$roundsPerMap}";
+    {/if}
+***
+
+*** SB_Slot_Update ***
+***
+    yield;
+***
+
+*** SB_FindMe ***
+***
+if(findMe){
+    findMe = False;
+    declare i = 0;
+    foreach(Score => Weight in GetSortedScores()){
+        if(Score.User.Login == LocalUser.Login){
+            break;
+        }
+        i += 1;
+    }
+    page = ML::FloorInteger(i / perPage * 1.0) + 1;
+    forceUpdate = True;
+    updateScoreTable();
+    sleep(40);
+    declare fillableSlotsFrame <=> (Page.MainFrame.GetFirstChild("fillable_slots") as CMlFrame);
+    declare slot = (fillableSlotsFrame.Controls[i % perPage] as CMlFrame);
+    flashBox(slot.GetFirstChild("me"));
+}
+***
     --></script>
 
     {include 'Dialogues.confirm'}
     {include 'Scripts.mle'}
 
-    <script><!--
-    Boolean isRoundsTypeMode(){
-        declare roundsType = {\EvoSC\Controllers\ModeController::isRoundsType() ? 'True' : 'False'}; //{\EvoSC\Controllers\ModeController::isRoundsType()}
-        return (roundsType || CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
+    <frame>
+        <script><!--
+    Integer SB_GetMaxPage(){
+        if(Scores.count % perPage == 0){
+            return ML::NearestInteger(Scores.count / perPage * 1.0);
+        }
+
+        return ML::CeilingInteger(Scores.count / perPage * 1.0);
     }
 
-    Integer ceil(Real value){
-        declare Integer ceiled = ML::CeilingInteger(value);
+    Void SB_GoPageDown(){
+        page -= 1;
+        if(page < 1){
+            page = SB_GetMaxPage();
+        }
+        SB_Last_Update -= SB_Update_Interval;
+    }
 
-        return ceiled;
+    Void SB_GoPageUp(){
+        page += 1;
+        if(page > SB_GetMaxPage()){
+            page = 1;
+        }
+        SB_Last_Update -= SB_Update_Interval;
     }
 
     Text formatScoreCorrect(Integer scoreIn, Boolean cutZeroes){
@@ -225,11 +184,9 @@
         return group;
     }
 
-    Void flashBox(CMlFrame box){
-        declare quad <=> (box.Controls[18] as CMlQuad);
-        AnimMgr.Add(quad, "<quad opacity='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
-        sleep(220);
-        AnimMgr.Add(quad, "<quad opacity='0.0' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+    Void flashBox(CMlControl box){
+        AnimMgr.Add(box, "<quad opacity='0.8' />", 220, CAnimManager::EAnimManagerEasing::ExpOut);
+        AnimMgr.Add(box, "<quad opacity='0.0' />", Now+220, 220, CAnimManager::EAnimManagerEasing::ExpOut);
     }
 
     Void ApplyTrophyImage(CMlQuad _Quad_Tropy, Integer _Level) {
@@ -245,161 +202,6 @@
             case 9: _Quad_Tropy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
             default: _Quad_Tropy.ImageUrl = Constants::C_ImageUrl_Trophy_128_None;
         }
-    }
-
-    Void updateBox(CMlFrame box, CSmScore Score, Integer rank, Integer addedPoints){
-        declare CUser user <=> Score.User;
-        declare EvoSC_Group group = getGroup(Score.User.Login);
-        declare nameLabel <=> (box.Controls[0] as CMlLabel);
-        declare groupIconLabel <=> (box.Controls[1] as CMlLabel);
-        declare badgeQuad <=> ((box.Controls[2] as CMlFrame).Controls[0] as CMlQuad);
-        declare badgeLabel <=> ((box.Controls[2] as CMlFrame).Controls[1] as CMlLabel);
-        declare rankLabel <=> (box.Controls[3] as CMlLabel);
-        declare scoreLabel <=> (box.Controls[4] as CMlLabel);
-        declare scoreBgLabel <=> (box.Controls[10] as CMlLabel);
-        declare avatarQuad <=> (box.Controls[5] as CMlQuad);
-        declare flagQuad <=> (box.Controls[6] as CMlQuad);
-        declare regionLabel <=> (box.Controls[7] as CMlLabel);
-        declare groupLabel <=> (box.Controls[8] as CMlLabel);
-        declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
-        declare lpGainLabel <=> (box.Controls[11] as CMlLabel);
-        declare Text[Text] EvoSC_CustomNames for LocalUser;
-
-        declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
-        declare Frame_Trophies <=> (box.GetFirstChild("frame-trophies") as CMlFrame);
-        declare Frame_TrophiesGroup <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-1") as CMlFrame);
-        declare Frame_TrophiesDetails <=> (Frame_Trophies.GetFirstChild("frame-trophies-style-2") as CMlFrame);
-
-        declare _TrophyStyle = 2;
-        Frame_TrophiesGroup.Visible = (_TrophyStyle == 1);
-        Frame_TrophiesDetails.Visible = (_TrophyStyle == 2);
-
-        if (Frame_TrophiesDetails.Visible) {
-            foreach (Key => Control in Frame_TrophiesDetails.Controls) {
-                // Show the best trophies
-                declare Integer TrophyKey = Key;
-                if (LibTMxSM_ScoresTable_Trophies.count < Frame_TrophiesDetails.Controls.count) {
-                    TrophyKey = Key - (Frame_TrophiesDetails.Controls.count - LibTMxSM_ScoresTable_Trophies.count);
-                }
-                if (LibTMxSM_ScoresTable_Trophies.existskey(TrophyKey)) {
-                    declare CMlFrame Frame_Trophy <=> (Control as CMlFrame);
-                    declare CMlQuad Quad_Trophy <=> (Frame_Trophy.GetFirstChild("quad-trophy") as CMlQuad);
-                    declare CMlLabel Label_Trophy <=> (Frame_Trophy.GetFirstChild("label-trophy") as CMlLabel);
-                    Quad_Trophy.ImageUrl  = Constants::C_ImageUrl_Trophy_128_Gold3;
-                    ApplyTrophyImage(Quad_Trophy, LibTMxSM_ScoresTable_Trophies[TrophyKey].Level);
-                    Label_Trophy.Value = LibTMxSM_ScoresTable_Trophies[TrophyKey].Amount ^ "x";
-                    Frame_Trophy.Visible = True;
-                } else {
-                    Control.Visible = False;
-                }
-            }
-        }
-
-		declare LibST_Status for user = C_Status_Disconnected;
-		if(LibST_Status == C_Status_Disconnected){
-            badgeQuad.Show();
-            badgeLabel.Value = "";
-		}else if(LibST_Status == C_Status_Spectating){
-            badgeQuad.Show();
-            badgeLabel.Value = "$eee";
-		}else{
-            badgeQuad.Hide();
-            badgeLabel.Value = "";
-		}
-
-        declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
-        declare netread Text[][Text] Net_TMxSM_ScoresTable_CustomPoints for Teams[0];
-        declare _CustomPoints = Net_TMxSM_ScoresTable_CustomPoints;
-		declare Boolean CustomPointsEnabled = _CustomPoints.existskey(Score.User.WebServicesUserId);
-		if(CustomPointsEnabled){
-			if (_CustomPoints[Score.User.WebServicesUserId].existskey(0)) {
-				finalistLabel.Value = _CustomPoints[Score.User.WebServicesUserId][0];
-			}
-			if (_CustomPoints[Score.User.WebServicesUserId].existskey(1)) {
-				finalistLabel.TextColor = CL::HexToRgb(_CustomPoints[Score.User.WebServicesUserId][1]);
-			}
-		}else{
-            finalistLabel.Value = "";
-        }
-
-        if(UseClans){
-            declare Integer TRank for Score = 0;
-            rankLabel.Value = "" ^ (TRank);
-        }else{
-            rankLabel.Value = "" ^ (rank + (page-1) * SB_Per_Page);
-        }
-        declare Text userlogin for nameLabel = "";
-        if(userlogin != user.Login){
-            userlogin = user.Login;
-            if(EvoSC_CustomNames.existskey(user.Login)){
-                nameLabel.Value = EvoSC_CustomNames[user.Login];
-            }else{
-                nameLabel.Value = user.Name;
-            }
-        }
-        groupLabel.Value = group.name;
-        groupIconLabel.Value = "$" ^ group.color ^ group.icon;
-
-        scoreBgLabel.Value = "";
-        if(isRoundsTypeMode()){
-            if(Score.Points > 0 || addedPoints > 0){
-                scoreLabel.Opacity = 1.0;
-            }else{
-                scoreLabel.Opacity = 0.1;
-            }
-            scoreLabel.Value = Score.Points ^ " Pts";
-        }else{
-            if(CurrentServerModeName == "Evo_Royal_TA" || CurrentServerModeName == "TM_RoyalTimeAttack_Online"){
-                declare netread Int2 Net_TMxSM_ScoresTable_RaceProgression for Score;
-                if (Net_TMxSM_ScoresTable_RaceProgression.Y > 0) {
-                    declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
-                    finalistLabel.Value = "" ^ formatScoreCorrect(Net_TMxSM_ScoresTable_RaceProgression.Y, True);
-                    scoreLabel.Value = Net_TMxSM_ScoresTable_RaceProgression.X ^ " ";
-                    scoreLabel.Opacity = 1.0;
-                } else {
-                    scoreLabel.Value = "0 ";
-                    scoreLabel.Opacity = 0.1;
-                }
-            }else{
-                if(Score.BestLapTimes.count > 0 && Score.BestLapTimes[Score.BestLapTimes.count - 1] > 0){
-                    scoreLabel.Value = formatScoreCorrect(Score.BestLapTimes[Score.BestLapTimes.count - 1], True);
-                    scoreLabel.Opacity = 1.0;
-                }else{
-                    scoreLabel.Value = "--:--.---";
-                    scoreLabel.Opacity = 0.1;
-                }
-            }
-        }
-
-        avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ user.Login ^ "/country";
-        avatarQuad.AlphaMaskUrl = "https://i.imgur.com/MgqRGzI.png";
-
-		declare Zone = "Other";
-		declare ZoneArray = TL::Split("|", Score.User.LadderZoneName);
-		if (ZoneArray.existskey(2)) Zone = ZoneArray[2];
-		if (Score.User.LadderRank > 0){
-		    regionLabel.Value = TL::Compose("%1: %2", Zone, TL::ToText(Score.User.LadderRank));
-		}else{
-		    regionLabel.Value = TL::Compose("%1: %2", Zone, "Not ranked");
-		}
-
-		if (UI.UISequence == CUIConfig::EUISequence::Podium && Score.LadderScore != -1.) {
-			declare LadderPointsExplode = TL::Split(".", TL::ToText(Score.LadderScore));
-			declare LadderPoints = "0.0";
-			if (LadderPointsExplode.existskey(0)) LadderPoints = LadderPointsExplode[0];
-			if (LadderPointsExplode.existskey(1)) LadderPoints ^= "."^TL::SubString(LadderPointsExplode[1], 0, 2);
-			if (Score.LadderScore >= 0) lpGainLabel.Value = "+"^LadderPoints^" LP";
-			else lpGainLabel.Value = LadderPoints;
-
-			scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}" ^ lpGainLabel.Value;
-		}else{
-		    if(addedPoints > 0){
-                scoreLabel.Value = scoreLabel.Value ^ "  ${getShortColorCode(config('theme.hud.accent'))}$s(+" ^ addedPoints ^ ")";
-		    }
-		}
-
-        box.Show();
-        box.DataAttributeSet("login", user.Login);
     }
 
     Integer[CSmScore] GetSortedScores() {
@@ -427,150 +229,13 @@
         return SortedScores.sort();
     }
 
-    Integer getMaxPage(){
-        if(Scores.count % SB_Per_Page == 0){
-            return ML::NearestInteger(Scores.count / SB_Per_Page * 1.0);
-        }
-
-        return (ceil(Scores.count / SB_Per_Page * 1.0));
-    }
-
-    Void updateScoreTable_Default(){
-        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        declare rank = 1;
-        declare filled = 0;
-        declare skipped = 0;
-        declare toSkip = (page - 1) * SB_Per_Page;
-
-        foreach(Score => Weight in GetSortedScores()){
-            if(skipped < toSkip){
-                skipped += 1;
-                continue;
-            }
-
-            if(filled >= boxes.count / 2){ // divided by two because of background boxes
-                return;
-            }
-
-            declare SlotNeedUpdate = False;
-            declare LibST_LastTick for Score.User = -1;
-            declare LibST_Status for Score.User = C_Status_Disconnected;
-            if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
-                LibST_Status = C_Status_Disconnected;
-                SlotNeedUpdate = True;
-            }
-
-            declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
-            if (LibST_PrevStatus != LibST_Status) {
-                LibST_PrevStatus = LibST_Status;
-                SlotNeedUpdate = True;
-            }
-
-            declare addedPoints = 0;
-            if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
-                addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
-            }
-
-            declare LibST_PrevUpdate for Score = -1;
-            declare netread Integer Net_LibST_Update for Score;
-            if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
-                LibST_PrevUpdate = Net_LibST_Update;
-                updateBox(boxes[filled], Score, rank, addedPoints);
-            }
-            rank += 1;
-            filled += 1;
-        }
-
-        forceUpdate = False;
-
-        if(filled < SB_Per_Page){
-            for(i, filled, SB_Per_Page - 1){
-                boxes[i].Hide();
-            }
-        }
-    }
-
-    Void updateScoreTable_Teams(){
-        declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        declare CSmScore[Integer][Integer] sortedByTeams;
-        declare teamOneLabel <=> (Page.MainFrame.GetFirstChild("team-one-label") as CMlLabel);
-        declare teamOnePointsLabel <=> (Page.MainFrame.GetFirstChild("team-one-points") as CMlLabel);
-        declare teamTwoLabel <=> (Page.MainFrame.GetFirstChild("team-two-label") as CMlLabel);
-        declare teamTwoPointsLabel <=> (Page.MainFrame.GetFirstChild("team-two-points") as CMlLabel);
-
-        teamOneLabel.Value = Teams[0].ColorizedName;
-        teamTwoLabel.Value = Teams[1].ColorizedName;
-        teamOnePointsLabel.Value = ClanScores[1] ^ " Points";
-        teamTwoPointsLabel.Value = ClanScores[2] ^ " Points";
-
-        if(UseClans){
-            sortedByTeams[1] = CSmScore[Integer];
-            sortedByTeams[2] = CSmScore[Integer];
-            declare i = 1;
-
-            foreach(Score => Weight in GetSortedScores()){
-                declare Integer TRank for Score = 0;
-                TRank = i;
-                sortedByTeams[Score.TeamNum][Weight] <=> Score;
-                i += 1;
-            }
-
-            for(teamId, 1, 2){
-                declare filled = 0;
-                declare skipped = 0;
-                declare scores = sortedByTeams[teamId];
-                declare toSkip = (page - 1) * ((SB_Per_Page / 2) - 2);
-                declare fillOffset = (teamId - 1) * (SB_Per_Page / 2);
-
-                foreach(Score in scores){
-                    if(toSkip > 0){
-                        if(skipped <= toSkip){
-                            skipped += 1;
-                            continue;
-                        }
-                    }
-                    if(filled >= (SB_Per_Page / 2) - 1){
-                        break;
-                    }
-
-                    declare SlotNeedUpdate = False;
-                    declare LibST_LastTick for Score.User = -1;
-                    declare LibST_Status for Score.User = C_Status_Disconnected;
-                    if (LibST_LastTick != Now && LibST_Status != C_Status_Disconnected) {
-                        LibST_Status = C_Status_Disconnected;
-                        SlotNeedUpdate = True;
-                    }
-
-                    declare LibST_PrevStatus for Score.User = C_Status_Disconnected;
-                    if (LibST_PrevStatus != LibST_Status) {
-                        LibST_PrevStatus = LibST_Status;
-                        SlotNeedUpdate = True;
-                    }
-
-                    declare addedPoints = 0;
-                    if(EvoSC_RoundsPointsDistribution.existskey(Score.User.Login)){
-                        addedPoints = EvoSC_RoundsPointsDistribution[Score.User.Login];
-                    }
-
-                    declare LibST_PrevUpdate for Score = -1;
-                    declare netread Integer Net_LibST_Update for Score;
-                    if (LibST_PrevUpdate != Net_LibST_Update || SlotNeedUpdate || forceUpdate) {
-                        LibST_PrevUpdate = Net_LibST_Update;
-                        updateBox(boxes[filled + fillOffset], Score, 0, 0);
-                    }
-
-                    filled += 1;
-                }
-
-                for(i, filled, (SB_Per_Page / 2) - 1){
-                    boxes[i + fillOffset].Hide();
-                }
-            }
-        }
+    Void updateSlot(CMlFrame slot, CSmScore score, Integer rank){
+        +++ SB_Slot_Declarations +++
+        --- SB_Slot_Update ---
     }
 
     Void updateScoreTable(){
-        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ getMaxPage();
+        (Page.MainFrame.GetFirstChild("page") as CMlLabel).Value = page ^ "/" ^ SB_GetMaxPage();
 
         foreach (Player in Players) {
             declare LibST_LastTick for Player.User = -1;
@@ -585,141 +250,19 @@
         }
 
         (Page.MainFrame.GetFirstChild("server-name") as CMlLabel).Value = CurrentServerName;
-        declare playerInfoLabel <=> (Page.MainFrame.GetFirstChild("player-info") as CMlLabel);
-        playerInfoLabel.Value = Players.count ^ "/{$maxPlayers}";
 
-        {if $roundsPerMap > 0}
-        declare Integer EvoSC_Round for This = 1;
-        playerInfoLabel.Value = playerInfoLabel.Value ^ "\t " ^ EvoSC_Round ^ "/{$roundsPerMap}";
-        {/if}
+        --- SB_SetPlayerCount ---
 
         declare modeLabel <=> (Page.MainFrame.GetFirstChild("mode-name") as CMlLabel);
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        if(isRoundsTypeMode() && EvoSC_PointsLimit > 0){
+        declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
+        if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Points && EvoSC_PointsLimit > 0){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
         }
 
-        if(UseClans){
-            updateScoreTable_Teams();
-        }else{
-            updateScoreTable_Default();
-        }
-    }
-
-    Void goPageLeft(){
-        page -= 1;
-        if(page < 1){
-            page = getMaxPage();
-        }
-        forceUpdate = True;
-        updateScoreTable();
-    }
-
-    Void goPageRight(){
-        page += 1;
-        if(page > getMaxPage()){
-            page = 1;
-        }
-        forceUpdate = True;
-        updateScoreTable();
-    }
-
-    Void setupButtons(CMlFrame box){
-        declare Text[] EvoSC_Access_Rights for This;
-        declare buttonsFrame <=> (box.Controls[16] as CMlFrame);
-        declare widths = 0.0;
-
-        foreach(Control in buttonsFrame.Controls){
-            declare buttonFrame <=> (Control as CMlFrame);
-            declare quad = (buttonFrame.Controls[0] as CMlQuad);
-            declare icon = (buttonFrame.Controls[1] as CMlLabel);
-            declare label = (buttonFrame.Controls[2] as CMlLabel);
-
-            quad.DataAttributeSet("access", buttonFrame.DataAttributeGet("access"));
-            quad.DataAttributeSet("action", buttonFrame.DataAttributeGet("action"));
-            quad.Opacity = 0.05;
-
-            if(buttonFrame.DataAttributeGet("icon") != ""){
-                icon.Value = buttonFrame.DataAttributeGet("icon");
-                label.Value = buttonFrame.DataAttributeGet("text");
-                buttonFrame.DataAttributeSet("icon", "");
-            }
-
-            declare access = buttonFrame.DataAttributeGet("access");
-            if(access != ""){
-                if(!EvoSC_Access_Rights.exists(access)){
-                    buttonFrame.Visible = False;
-                }
-            }
-
-            if(buttonFrame.Visible){
-                declare Real width = 9.75;
-                buttonFrame.RelativePosition_V3[0] = widths - 5.5;
-                widths += width + SB_Button_Padding;
-            }
-        }
-    }
-
-    Void changeMode(Text mode){
-        switch(mode){
-            case "TM_Teams_Online": {
-                Page.MainFrame.GetFirstChild("teams-frame").Show();
-                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
-                boxesFrame.RelativePosition_V3 = <-2.0, 2.0>;
-                boxesFrame.Controls[5].Hide();
-                boxesFrame.Controls[11].Hide();
-                boxesFrame.Controls[17].Hide();
-                boxesFrame.Controls[23].Hide();
-                for(i, 12, 16){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[0].ColorPrimary;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
-                }
-                for(i, 17, 22){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[1].ColorPrimary;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
-                }
-            }
-            case "FSM_Teams": {
-                Page.MainFrame.GetFirstChild("teams-frame").Show();
-                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
-                boxesFrame.RelativePosition_V3 = <-2.0, 2.0>;
-                boxesFrame.Controls[5].Hide();
-                boxesFrame.Controls[11].Hide();
-                boxesFrame.Controls[17].Hide();
-                boxesFrame.Controls[23].Hide();
-                for(i, 12, 16){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[0].ColorPrimary;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
-                }
-                for(i, 17, 22){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = Teams[1].ColorPrimary;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.15;
-                }
-            }
-
-            default: {
-                Page.MainFrame.GetFirstChild("teams-frame").Hide();
-                declare boxesFrame = (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame);
-                declare bgDark = (Page.MainFrame.GetFirstChild("bg-dark") as CMlQuad);
-                boxesFrame.RelativePosition_V3 = <0.0, 15.0>;
-                declare lastBoxInColumn = (boxesFrame.Controls[17] as CMlQuad);
-                lastBoxInColumn.Show();
-                lastBoxInColumn.BgColor = bgDark.BgColor;
-                lastBoxInColumn = (boxesFrame.Controls[23] as CMlQuad);
-                lastBoxInColumn.Show();
-                lastBoxInColumn.BgColor = bgDark.BgColor;
-                for(i, 12, 16){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.25;
-                }
-                for(i, 17, 22){
-                    (boxesFrame.Controls[i] as CMlQuad).Colorize = bgDark.BgColor;
-                    (boxesFrame.Controls[i] as CMlQuad).Opacity = 0.25;
-                }
-            }
-        }
+        +++ SB_SetScores +++
     }
 
     Void handlePadEvents(){
@@ -727,11 +270,11 @@
         foreach (Event in Input.PendingEvents) {
             if (Event.Type == CInputEvent::EType::PadButtonPress && Event.Pad != Null && Event.Pad.Type != CInputPad::EPadType::Keyboard){
                 if(Event.Button == CInputEvent::EButton::Left){
-                    goPageLeft();
+                    SB_GoPageDown();
                     continue;
                 }
                 if(Event.Button == CInputEvent::EButton::Right){
-                    goPageRight();
+                    SB_GoPageUp();
                     continue;
                 }
                 if(Event.Button == CInputEvent::EButton::Down){
@@ -748,162 +291,25 @@
         }
     }
 
-    Void showControls(CMlFrame _box){
-        declare CMlFrame box = _box;
-        setupButtons(box);
-        declare finalistLabel <=> (box.GetFirstChild("finalist-label") as CMlLabel);
-        AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='27 -1.5' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //Name label
-        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='50 -2.5' scale='0.8' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //group icon
-        AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='7 -2.4' scale='0.85' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //Position label
-        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='87 -1.5' scale='0.9' halign='left' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //Score label
-        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='19 -1.5' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='52 -2.5' scale='0.8' />", 320, CAnimManager::EAnimManagerEasing::ExpOut); //group label
-        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -2.5' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -2.5' scale='0.8' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add(box.Controls[5], "<label opacity='0.0' />", 190, CAnimManager::EAnimManagerEasing::ExpOut);
-        finalistLabel.Hide();
-        box.Controls[2].Hide();
-        box.Controls[9].Hide();
-        box.Controls[11].Hide();
-        box.Controls[14].Hide();
-        box.Controls[16].Show();
-
-        declare Real xMin = box.AbsolutePosition_V3[0];
-        declare Real xMax = box.AbsolutePosition_V3[0] + box.Size[0] * mainFrame.RelativeScale;
-        declare Real yMin = box.AbsolutePosition_V3[1] - 12.0 * mainFrame.RelativeScale;
-        declare Real yMax = box.AbsolutePosition_V3[1];
-
-        declare Boolean ESC_Tab_Pressed for This;
-
-        while(MouseX > xMin && MouseX < xMax && MouseY < yMax && MouseY > yMin && ESC_Tab_Pressed){
-            handlePadEvents();
-
-            foreach(Event in PendingEvents){
-                if(Event.Control == Null) continue;
-                if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseOver){
-                    declare btnBackground <=> (Event.Control as CMlQuad);
-                    btnBackground.Opacity = 0.25;
-                }
-                if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseOut){
-                    declare btnBackground <=> (Event.Control as CMlQuad);
-                    btnBackground.Opacity = 0.05;
-                }
-                if(Event.Control.HasClass("btn") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare btnLabel <=> (Event.Control as CMlLabel);
-                    declare targetLogin = btnLabel.Parent.Parent.Parent.DataAttributeGet("login");
-
-                    if(Event.Control.DataAttributeGet("action") == "spec"){
-                        if(!IsSpectatorClient) RequestSpectatorClient(True);
-                        SetSpectateTarget(targetLogin);
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "pm"){
-                        TriggerPageAction("pm.dialog," ^ targetLogin);
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "mute"){
-                        TriggerPageAction("mute," ^ targetLogin);
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "kick"){
-                        if(confirm("Kick " ^ targetLogin ^ "$z from the server?")){
-                            TriggerPageAction("kick," ^ targetLogin);
-                        }
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "force_spec"){
-                        TriggerPageAction("forcespec," ^ targetLogin);
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "ban"){
-                        TriggerPageAction("banui.search," ^ targetLogin);
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "warn"){
-                        if(confirm("Warn player " ^ targetLogin ^ "$z?")){
-                            TriggerPageAction("warn," ^ targetLogin ^ ",");
-                        }
-                        continue;
-                    }
-                    if(Event.Control.DataAttributeGet("action") == "profile"){
-                        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
-                        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
-                    }
-                }
-            }
-
-            yield;
-        }
-
-
-        box.Controls[2].Show();
-        AnimMgr.Add((box.Controls[0] as CMlLabel), "<label pos='26.26 -2.5' scale='1.3' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[1] as CMlLabel), "<label pos='27 -8' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[3] as CMlLabel), "<label pos='7 -5.5' scale='2' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[4] as CMlLabel), "<label pos='87 -2.5' scale='1.2' halign='right' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add(box.Controls[5], "<label opacity='1.0' />", 640, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[6] as CMlLabel), "<label pos='63 -7.7' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[7] as CMlLabel), "<label pos='66.25 -7.5' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        AnimMgr.Add((box.Controls[8] as CMlLabel), "<label pos='28.5 -8' scale='0.9' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        box.Controls[9].Show();
-        AnimMgr.Add((box.Controls[10] as CMlLabel), "<label pos='25 -7' scale='1' />", 320, CAnimManager::EAnimManagerEasing::ExpOut);
-        box.Controls[14].Show();
-        box.Controls[16].Hide();
-        finalistLabel.Show();
+    Void SB_ShowControls(CMlFrame slot_){
+        +++ SB_MouseOverSlot +++
     }
 
     main() {
-        declare Integer EvoSC_LastPointsLimitUpdate for This = 0;
-        declare Boolean ESC_Tab_Pressed for This;
-        declare SB_Last_Update = 0;
-        declare podium = False;
-        declare lastPointsLimitUpdate = 0;
-        declare lastCurrentServerModeName = "";
-
-        declare lastTeam1Name = "";
-        declare lastTeam2Name = "";
-
-        declare headerFrame = (Page.MainFrame.GetFirstChild("header-frame") as CMlFrame);
-        declare prevPage = (Page.MainFrame.GetFirstChild("prev-page") as CMlLabel);
-        declare nextPage = (Page.MainFrame.GetFirstChild("next-page") as CMlLabel);
-        declare me = (Page.MainFrame.GetFirstChild("me") as CMlLabel);
-
-        declare Boolean findMe for This = False;
-
-        mainFrame <=> (Page.MainFrame.GetFirstChild("main-frame") as CMlFrame);
-        boxes = CMlFrame[];
         page = 1;
-        forceUpdate = True;
+        perPage = 12;
 
-        declare Integer EvoSC_PointsLimit for This = 0;
+        +++ SB_Boot +++
+
+        forceUpdate = True;
+        SB_Last_Update = 0;
+        declare Boolean findMe for This = False;
         declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
         declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
         declare TrophiesUpdate = -1;
 
-        foreach(Control in (Page.MainFrame.GetFirstChild("boxes-frame") as CMlFrame).Controls){
-            boxes.add((Control as CMlFrame));
-        }
-
         while(True){
             yield;
-
-            if(Teams[0].ColorizedName != lastTeam1Name || Teams[1].ColorizedName != lastTeam2Name){
-                lastTeam1Name = Teams[0].ColorizedName;
-                lastTeam2Name = Teams[1].ColorizedName;
-                changeMode(CurrentServerModeName);
-            }
-
-            ESC_Tab_Pressed = PageIsVisible;
-
-            if(CurrentServerModeName != lastCurrentServerModeName){
-                lastCurrentServerModeName = CurrentServerModeName;
-                changeMode(CurrentServerModeName);
-            }
-
-            if(lastPointsLimitUpdate < EvoSC_LastPointsLimitUpdate){
-                lastPointsLimitUpdate = EvoSC_LastPointsLimitUpdate;
-                updateScoreTable();
-            }
 
             if(GameTime - SB_Last_Update > SB_Update_Interval && PageIsVisible){
                 forceUpdate = True;
@@ -930,60 +336,28 @@
                 }
             }
 
-            if(findMe){
-                findMe = False;
-                declare i = 0;
-                foreach(Score => Weight in GetSortedScores()){
-                    if(Score.User.Login == LocalUser.Login){
-                        break;
-                    }
-                    i += 1;
-                }
-                page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
-                forceUpdate = True;
-                updateScoreTable();
-                sleep(40);
-                flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
-            }
+            --- SB_FindMe ---
 
-            handlePadEvents();
+            +++ SB_Loop +++
 
             foreach(Event in PendingEvents){
                 if(Event.Control == Null) continue;
-                declare control = Event.Control;
 
-                if(control.HasClass("trigger") && Event.Type == CMlScriptEvent::Type::MouseOver){
-                    showControls((Event.Control.Parent as CMlFrame));
-                    continue;
-                }
+                +++ SB_PendingEvents +++
 
-                if(control.HasClass("prev-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    goPageLeft();
-                    continue;
-                }
-
-                if(control.HasClass("next-page") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    goPageRight();
-                    continue;
-                }
-
-                if(control.HasClass("me") && Event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare i = 0;
-                    foreach(Score => Weight in GetSortedScores()){
-                        if(Score.User.Login == LocalUser.Login){
-                            break;
-                        }
-                        i += 1;
+                if(Event.Type == CMlScriptEvent::Type::MouseClick){
+                    if(Event.Control.HasClass("prev-page")){
+                        SB_GoPageDown();
+                        continue;
                     }
-                    page = ML::FloorInteger(i / SB_Per_Page * 1.0) + 1;
-                    forceUpdate = True;
-                    updateScoreTable();
-                    sleep(80);
-                    flashBox(boxes[i - ((page - 1) * SB_Per_Page)]);
-                    continue;
+                    if(Event.Control.HasClass("next-page")){
+                        SB_GoPageUp();
+                        continue;
+                    }
                 }
             }
         }
     }
     --></script>
+    </frame>
 </manialink>

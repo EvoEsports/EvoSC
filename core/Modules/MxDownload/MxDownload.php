@@ -88,8 +88,8 @@ class MxDownload extends Module implements ModuleInterface
 
     /**
      * @param int $mxId
-     * @return string|string[]|null
-     * @throws Exception
+     * @return string
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private static function downloadMapAndGetFilename(int $mxId)
     {
@@ -126,11 +126,11 @@ class MxDownload extends Module implements ModuleInterface
     }
 
     /**
-     * Download map from mx and add it to the map-cool
+     * Download map from mx and add it to the map-pool
      *
      * @param Player $player
-     * @param $mxId
-     * @throws Throwable
+     * @param int $mxId
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function addMap(Player $player, int $mxId)
     {
@@ -139,7 +139,7 @@ class MxDownload extends Module implements ModuleInterface
             return;
         }
 
-        $filename = self::downloadMapAndGetFilename(intval($mxId));
+        $filename = self::downloadMapAndGetFilename($mxId);
 
         if (!isManiaPlanet() && Server::getSystemInfo()->isDedicated) {
             $absoluteFilename = mapsDir($filename);
@@ -284,7 +284,7 @@ class MxDownload extends Module implements ModuleInterface
         $info = json_decode($detailsBody);
 
         if (!$info || isset($info->StatusCode)) {
-            throw new Exception("Unknown map '$tmxIdOrMapUid'.");
+            throw new Exception("Unknown exchange map '$tmxIdOrMapUid'.");
         }
 
         $info = $info[0];

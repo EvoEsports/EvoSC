@@ -26,15 +26,16 @@ class Timer
     public $callback;
     public int $runtime;
     public bool $repeat;
+    public bool $isPaused;
     public $delay;
 
     /**
      * Timer constructor.
      *
-     * @param  string  $id
+     * @param string $id
      * @param        $callback
-     * @param  int  $runtime
-     * @param  bool  $repeat
+     * @param int $runtime
+     * @param bool $repeat
      */
     private function __construct(string $id, $callback, int $runtime, bool $repeat = false)
     {
@@ -52,7 +53,7 @@ class Timer
     /**
      * Get timer by id.
      *
-     * @param  string  $id
+     * @param string $id
      *
      * @return Timer|null
      */
@@ -61,8 +62,6 @@ class Timer
         $timer = self::$timers->where('id', $id)->first();
 
         if (!$timer) {
-            Log::warning("Can not get non-existent timer: $id");
-
             return null;
         }
 
@@ -72,10 +71,10 @@ class Timer
     /**
      * Creates a new timer. Callback can be reference or closure.
      *
-     * @param  string  $id
-     * @param  string|array|callable  $callback
-     * @param  string  $delayTime
-     * @param  bool  $repeat
+     * @param string $id
+     * @param string|array|callable $callback
+     * @param string $delayTime
+     * @param bool $repeat
      */
     public static function create(string $id, $callback, string $delayTime, bool $repeat = false)
     {
@@ -102,7 +101,7 @@ class Timer
     /**
      * Remove a timer.
      *
-     * @param  string  $string
+     * @param string $string
      */
     public static function destroy(string $string)
     {
@@ -117,8 +116,8 @@ class Timer
     /**
      * Delays a timer
      *
-     * @param  string  $id
-     * @param  string  $timeString
+     * @param string $id
+     * @param string $timeString
      */
     public static function addDelay(string $id, string $timeString)
     {
@@ -132,7 +131,7 @@ class Timer
     /**
      * Gets seconds left until the timer is executed
      *
-     * @param  string  $id
+     * @param string $id
      *
      * @return int
      */
@@ -156,9 +155,10 @@ class Timer
             return;
         }
 
-        $toRun = self::$timers->where('runtime', '<', time());
-        $toRemove = $toRun->where('repeat', false);
-        self::$timers = self::$timers->diff($toRemove);
+        $toRun = self::$timers->where('runtime', '<', time())
+            ->where('isPaused', '=', false);
+
+        self::$timers = self::$timers->diff($toRun->where('repeat', false));
 
         foreach ($toRun as $timer) {
             if (gettype($timer->callback) == "object") {
@@ -205,7 +205,7 @@ class Timer
      * Example: 3h -> 180, 1d -> 1440, 1mo12h9m -> 43321
      * m = minutes, h = hours, d = days, w = weeks, mo = months
      *
-     * @param  string  $durationShort
+     * @param string $durationShort
      *
      * @return int
      */
@@ -236,7 +236,7 @@ class Timer
      * Converts time string to seconds
      * m = minutes, h = hours, d = days, w = weeks, mo = months
      *
-     * @param  string  $durationShort
+     * @param string $durationShort
      *
      * @return int
      */
@@ -254,7 +254,7 @@ class Timer
     /**
      * Set the fetch interval for the callbacks from the dedicated-server.
      *
-     * @param  int  $interval
+     * @param int $interval
      */
     public static function setInterval(int $interval): void
     {
@@ -267,5 +267,21 @@ class Timer
     public function __toString()
     {
         return "timer:$this->id";
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaused(): bool
+    {
+        return $this->isPaused;
+    }
+
+    /**
+     * Pauses a timer
+     */
+    public static function pause(string $id): void
+    {
+        self::$timers->where('id', '=', $id);
     }
 }
