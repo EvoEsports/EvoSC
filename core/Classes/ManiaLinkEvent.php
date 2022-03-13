@@ -145,12 +145,7 @@ class ManiaLinkEvent
         $arguments[0] = $ply;
 
         if ($formValues) {
-            $formValuesObject = new \stdClass();
-            foreach ($formValues as $value) {
-                $formValuesObject->{$value['Name']} = $value['Value'];
-            }
-            $formValuesObject = self::mapFormValues($formValuesObject);
-            array_push($arguments, $formValuesObject);
+            $arguments[] = self::mapValues($formValues);
         }
 
         try {
@@ -165,6 +160,33 @@ class ManiaLinkEvent
     }
 
     /**
+     * @param $formValues
+     * @return \stdClass
+     */
+    private static function mapValues($formValues)
+    {
+        $formValuesObject = new \stdClass();
+
+        foreach ($formValues as $value) {
+            if (preg_match('/(.+)\[(.+?)\]/', $value['Name'], $matches)) {
+                $parent = $matches[1];
+                $sub = $matches[2];
+
+                if (!isset($formValuesObject->{$parent})) {
+                    $formValuesObject->{$parent} = new \stdClass();
+                }
+
+                $formValuesObject->{$parent}->{$sub} = $value['Value'];
+            } else {
+                $formValuesObject->{$value['Name']} = $value['Value'];
+            }
+        }
+
+        return $formValuesObject;
+    }
+
+    /**
+     * @param Player $player
      * @param string $action
      * @return array|null
      */

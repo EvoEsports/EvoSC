@@ -306,39 +306,16 @@ class MatchSettingsManager extends Module implements ModuleInterface
     {
         $file = Server::getMapsDirectory() . "MatchSettings/$matchSettingsName.txt";
         $xml = new SimpleXMLElement(File::get($file));
-        $toSave = collect();
-
-        $modeScriptName = (string)$xml->gameinfos->script_name;
-        $availableSettings = ModeScriptSettings::getSettingsByMode($modeScriptName);
-
-        foreach ((array)$data as $setting => $value) {
-            /**
-             * @var ModeScriptSetting $availableSetting
-             */
-            if ($availableSetting = $availableSettings->get($setting)) {
-                $toSave->push((object)[
-                    'name'  => $setting,
-                    'value' => $value,
-                    'type'  => $availableSetting->getType()
-                ]);
-            } else {
-                $toSave->push((object)[
-                    'name'  => $setting,
-                    'value' => $value,
-                    'type'  => intval($value) > 0 ? 'real' : 'text'
-                ]);
-            }
-        }
 
         infoMessage($player, ' updated match-settings ', secondary($matchSettingsName))->sendAdmin();
 
         $scriptSettingsNodeName = is_object($xml->script_settings) ? 'script_settings' : 'mode_script_settings';
         unset($xml->{$scriptSettingsNodeName}->setting);
-        foreach ($toSave as $setting) {
+        foreach ((array)$data as $settingName => $data) {
             $node = $xml->{$scriptSettingsNodeName}->addChild('setting');
-            $node->addAttribute('name', $setting->name);
-            $node->addAttribute('value', $setting->value);
-            $node->addAttribute('type', $setting->type);
+            $node->addAttribute('name', $settingName);
+            $node->addAttribute('value', $data->value);
+            $node->addAttribute('type', $data->type);
         }
 
         File::put($file, Utility::simpleXmlPrettyPrint($xml));
