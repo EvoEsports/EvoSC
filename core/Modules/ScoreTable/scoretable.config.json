@@ -2,5 +2,6 @@
   "enabled": true,
   "isDefault": true,
   "logo-url": "",
-  "logo-dimensions": "22 8"
+  "logo-dimensions": "22 8",
+  "force-hide-default": true
 }

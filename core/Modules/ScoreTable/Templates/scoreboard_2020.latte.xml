@@ -1,10 +1,9 @@
 {contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<manialink name="EvoSC:ScoresTable" layer="ScoresTable" id="ScoresTable" version="3">
+<manialink name="EvoSC:scoretable" layer="ScoresTable" id="scoretable" version="3">
     {include 'Components.stylesheet_noblur'}
 
     <frame id="main-frame" pos="-87.5 14" z-index="500" scale="1">
-        {php $layoutId = \EvoSC\Modules\ScoreTable\ScoreTable::getLayoutId($mode)}
         {include $layoutId}
     </frame>
 
@@ -56,6 +55,7 @@
     declare Integer perPage;
     declare Boolean forceUpdate;
     declare Integer SB_Last_Update;
+    declare Integer SB_Last_Player_Count;
 
 *** SB_SetPlayerCount ***
 ***
@@ -69,7 +69,28 @@
 
 *** SB_Slot_Update ***
 ***
-log("implement me");
+    yield;
+***
+
+*** SB_FindMe ***
+***
+if(findMe){
+    findMe = False;
+    declare i = 0;
+    foreach(Score => Weight in GetSortedScores()){
+        if(Score.User.Login == LocalUser.Login){
+            break;
+        }
+        i += 1;
+    }
+    page = ML::FloorInteger(i / perPage * 1.0) + 1;
+    forceUpdate = True;
+    updateScoreTable();
+    sleep(40);
+    declare fillableSlotsFrame <=> (Page.MainFrame.GetFirstChild("fillable_slots") as CMlFrame);
+    declare slot = (fillableSlotsFrame.Controls[i % perPage] as CMlFrame);
+    flashBox(slot.GetFirstChild("me"));
+}
 ***
     --></script>
 
@@ -315,23 +336,7 @@ log("implement me");
                 }
             }
 
-            if(findMe){
-                findMe = False;
-                declare i = 0;
-                foreach(Score => Weight in GetSortedScores()){
-                    if(Score.User.Login == LocalUser.Login){
-                        break;
-                    }
-                    i += 1;
-                }
-                page = ML::FloorInteger(i / perPage * 1.0) + 1;
-                forceUpdate = True;
-                updateScoreTable();
-                sleep(40);
-                declare fillableSlotsFrame <=> (Page.MainFrame.GetFirstChild("fillable_slots") as CMlFrame);
-                declare slot = (fillableSlotsFrame.Controls[i % perPage] as CMlFrame);
-                flashBox(slot.GetFirstChild("me"));
-            }
+            --- SB_FindMe ---
 
             +++ SB_Loop +++
 

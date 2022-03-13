@@ -28,6 +28,7 @@ class ModeController implements ControllerInterface
 
     private static int $warmUpNb = 0;
     private static int $warmUpRound = 0;
+    private static bool $warmup = false;
 
     /**
      *
@@ -44,15 +45,31 @@ class ModeController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         self::setMode($mode);
+        Server::triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus');
 
         Hook::add('WarmUpEnd', [self::class, 'warmUpEnd']);
         Hook::add('Trackmania.WarmUp.StartRound', [self::class, 'warmUpRoundStarted']);
+        Hook::add('Maniaplanet.WarmUp.Status', [self::class, 'warmUpStatus']);
 
         ManiaLinkEvent::add('warmup.skip', [self::class, 'skipWarmUp'], 'warm_up_skip');
     }
 
+    /**
+     * @param $status
+     * @return void
+     */
+    public static function warmupStatus($status)
+    {
+        self::$warmup = json_decode($status[0])->active;
+    }
+
+    /**
+     * @return void
+     */
     public static function warmUpRoundStarted()
     {
+        self::$warmup = true;
+
         infoMessage('Warm-up ', secondary(++self::$warmUpRound . "/" . self::$warmUpNb), ' started.')
             ->setColor('f90')
             ->setIcon(' ')
@@ -64,6 +81,7 @@ class ModeController implements ControllerInterface
     public static function warmUpEnd()
     {
         self::$warmUpRound = 0;
+        self::$warmup = false;
 
         infoMessage('Warm-up ended, ', secondary('starting play-loop.'))
             ->setColor('f90')
@@ -148,6 +166,9 @@ class ModeController implements ControllerInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public static function rebootModules()
     {
         $mode = Server::getScriptName()['NextValue'];
@@ -237,5 +258,13 @@ class ModeController implements ControllerInterface
     public static function isRoyal(): bool
     {
         return self::$royal;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isWarmup(): bool
+    {
+        return self::$warmup;
     }
 }

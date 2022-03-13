@@ -14,10 +14,6 @@
 
     {block script}
     <script><!--
-    Boolean isRoundsType(){
-        declare roundsType = {\EvoSC\Controllers\ModeController::isRoundsType() ? 'True' : 'False'}; //{\EvoSC\Controllers\ModeController::isRoundsType()}
-        return (roundsType || CurrentServerModeName == "TM_Rounds_Online" || CurrentServerModeName == "TM_Cup_Online" || UseClans);
-    }
     --></script>
     {/block}
 
@@ -34,15 +30,8 @@
     {/block}
 
     {block loop}
-        wait(isRoundsType());
         roundsLabel.Value = "ROUND " ^ EvoSC_Round ^ "/{$roundsPerMap}";
-        sleep(100);
-
-        if(!isRoundsType()){
-            widgetSetHeight__(0.0);
-            widget.Hide();
-            return;
-        }
+        sleep(250);
     {/block}
 
     {block pendingEvents}

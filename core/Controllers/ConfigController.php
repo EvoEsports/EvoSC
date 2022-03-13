@@ -44,6 +44,8 @@ class ConfigController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         ChatCommand::add('//servername', [self::class, 'cmdSetServerName'], 'Set a new server name.', 'ma');
+        ChatCommand::add('//maxplayers', [self::class, 'cmdSetMaxPlayers'], 'Set max player slots for the server. Must restart map for changes.', 'ma');
+        ChatCommand::add('//maxspectators', [self::class, 'cmdSetMaxSpectators'], 'Set max spectator slots for the server. Must restart map for changes.', 'ma');
     }
 
     /**
@@ -56,6 +58,28 @@ class ConfigController implements ControllerInterface
         $name = implode(' ', $newName);
         Server::setServerName($name);
         infoMessage($player, ' changed the server name to ', secondary($name))->sendAdmin();
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param int $slots
+     */
+    public static function cmdSetMaxPlayers(Player $player, $cmd, int $slots)
+    {
+        Server::setMaxPlayers($slots);
+        infoMessage($player, ' changed max players to ', secondary($slots))->sendAdmin();
+    }
+
+    /**
+     * @param Player $player
+     * @param $cmd
+     * @param int $slots
+     */
+    public static function cmdSetMaxSpectators(Player $player, $cmd, int $slots)
+    {
+        Server::setMaxSpectators($slots);
+        infoMessage($player, ' changed max spectators to ', secondary($slots))->sendAdmin();
     }
 
     /**

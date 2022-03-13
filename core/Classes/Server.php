@@ -294,6 +294,12 @@ class Server
 {
     private static $rpc;
 
+    //0: user selectable, 1: spectator, 2: player, 3: spectator but keep selectable
+    const FORCE_TO_DRIVES_SELECTABLE = 0;
+    const FORCE_TO_SPECTATORS = 1;
+    const FORCE_TO_DRIVERS = 2;
+    const FORCE_TO_SPECTATORS_SELECTABLE = 3;
+
     /**
      * Initialize the connection to the maniaplanet-dedicated-server.
      *
@@ -331,7 +337,12 @@ class Server
         return Server::triggerModeScriptEventArray('Trackmania.GetScores');
     }
 
-    public static function getModeScriptSetting(string $name)
+    /**
+     * @param string $name
+     * @param $default
+     * @return mixed|null
+     */
+    public static function getModeScriptSetting(string $name, $default = null)
     {
         $data = Server::getModeScriptSettings();
 
@@ -339,7 +350,7 @@ class Server
             return $data[$name];
         }
 
-        return null;
+        return $default;
     }
 
     /**

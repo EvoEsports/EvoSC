@@ -1,45 +1,73 @@
 {contentType text}
-{extends 'Components.window'}
+ {extends 'Components.window'}
 
-{php $window_width = '60';}
-{php $window_height = '31';}
+ {php $window_width = '60';}
+ {php $window_height = '31';}
 
-{block id}pm-dialog{/block}
+ {block id}pm-dialog{/block}
 
-{block icon}
-
-{/block}
+ {block icon}
+ 
+ {/block}
 
-{block title}
-Personal Message
-{/block}
+ {block title}
+ Personal Message
+ {/block}
 
-{block content}
-<label class="text-light" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center" />
-<entry class="form" id="login" pos="11 -1" size="46 4" textsize="0.6" halign="left" valign="center" default="{$recipientLogin}" />
+ {block content}
+<label class="text-light" pos="10 -1" size="12 4" textsize="0.6" halign="right" text="To:" valign="center"/>
+<entry class="form login" id="login" pos="11 -1" size="22 4" textsize="0.6" halign="left" valign="center"
+       default="{$recipientLogin}" ScriptEvents="1"/>
+<label class="text-light" id="name" pos="34 -1" size="22.5 4" textsize="0.6" valign="center"/>
 <label class="text-light" pos="10 -5" size="12 4" textsize="0.6" halign="right" text="Message:" valign="center"/>
 <entry class="form" id="text" pos="11 -4" size="46 18" textsize="0.9" halign="left"/>
 
 <label class="btn-accent send" pos="18 -25" size="14 4" textsize="0.6" text=" Send" ScriptEvents="1"/>
 <label class="btn-default cancel" pos="33 -25" size="14 4" textsize="0.6" text="Cancel" ScriptEvents="1"/>
-{/block}
+ {/block}
 
-{include 'Scripts.mle'}
+ {include 'Scripts.mle'}
 
 <script><!--
 {block globals}
+#Struct EvoSC_User {
+    Text login;
+    Text name;
+    Integer groupId;
+}
 {/block}
 
 {block functions}
+Void setName(){
+    declare loginEntry <=> (Page.MainFrame.GetFirstChild("login") as CMlEntry);
+    declare nameLabel <=> (Page.MainFrame.GetFirstChild("name") as CMlLabel);
+    declare login = loginEntry.Value;
+    nameLabel.Value = "$f30Invalid login";
+
+    declare EvoSC_User[Text] EvoSC_Players for This;
+    if(EvoSC_Players.existskey(login)){
+        nameLabel.Value = EvoSC_Players[login].name;
+    }else{
+        foreach(Player in Players){
+            if(Player.User.Login == login){
+                nameLabel.Value = Player.User.Name;
+            }
+        }
+    }
+}
 {/block}
 
 {block loop}
 {/block}
 
 {block bootScript}
+setName();
 {/block}
 
 {block pendingEvents}
+if(event.Control.HasClass("login") && event.Type == CMlScriptEvent::Type::EntrySubmit){
+    setName();
+}
 if(event.Control.HasClass("send") && event.Type == CMlScriptEvent::Type::MouseClick){
     declare login = (Page.MainFrame.GetFirstChild("login") as CMlEntry).Value;
     declare text = (Page.MainFrame.GetFirstChild("text") as CMlEntry).Value;
