@@ -121,9 +121,9 @@ class EscRun extends Command
 
             $serverName = Server::getServerName();
 
-            if (!Server::isAutoSaveValidationReplaysEnabled()) {
+            /*if (!Server::isAutoSaveValidationReplaysEnabled()) {
                 Server::autoSaveValidationReplays(true);
-            }
+            }*/
             if (!Server::isAutoSaveReplaysEnabled()) {
                 Server::autoSaveReplays(true);
             }
