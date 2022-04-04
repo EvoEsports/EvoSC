@@ -120,15 +120,16 @@ class EscRun extends Command
             }
 
             $serverName = Server::getServerName();
+            $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
-            if (!Server::isAutoSaveValidationReplaysEnabled()) {
-                Server::autoSaveValidationReplays(true);
+            if(isManiaPlanet()){
+                if (!Server::isAutoSaveValidationReplaysEnabled()) {
+                    Server::autoSaveValidationReplays(true);
+                }
             }
             if (!Server::isAutoSaveReplaysEnabled()) {
                 Server::autoSaveReplays(true);
             }
-
-            $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
             Server::setCallVoteTimeOut(0);
 
