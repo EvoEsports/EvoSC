@@ -122,11 +122,13 @@ class EscRun extends Command
             $serverName = Server::getServerName();
             $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
-            if(isManiaPlanet()){
+            // Apparently Nadeo removed this on TM2020 server 2022-03-31
+            if($__Maniaplanet) {
                 if (!Server::isAutoSaveValidationReplaysEnabled()) {
                     Server::autoSaveValidationReplays(true);
                 }
             }
+
             if (!Server::isAutoSaveReplaysEnabled()) {
                 Server::autoSaveReplays(true);
             }
