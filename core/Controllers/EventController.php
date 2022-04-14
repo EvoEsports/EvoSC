@@ -246,7 +246,7 @@ class EventController implements ControllerInterface
     private static function mpBeginMap($arguments)
     {
         if (config('server.use-filename-to-identify-maps-in-db', false)) {
-            if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+            if (count($arguments[0]) >= 16 && is_string($arguments[0]['UId'])) {
                 $mapFile = $arguments[0]['FileName'];
 
                 $map = Map::whereFilename($mapFile)->get()->first();
@@ -266,7 +266,7 @@ class EventController implements ControllerInterface
                 throw new Exception('Malformed callback');
             }
         } else {
-            if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+            if (count($arguments[0]) >= 16 && is_string($arguments[0]['UId'])) {
                 $mapUid = $arguments[0]['UId'];
 
                 $map = Map::whereUid($mapUid)->get()->first();
@@ -295,7 +295,7 @@ class EventController implements ControllerInterface
      */
     private static function mpEndMap($arguments)
     {
-        if (count($arguments[0]) == 16 && is_string($arguments[0]['UId'])) {
+        if (count($arguments[0]) >= 16 && is_string($arguments[0]['UId'])) {
             $map = Map::getByUid($arguments[0]['UId']);
 
             try {
