@@ -30,9 +30,6 @@ class MatchStats extends Module implements ModuleInterface
 
         AccessRight::add('record_match_stats', 'Is allowed to control match stats recording.');
 
-        //Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
-        //Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
-        //Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('Scores', [self::class, 'scoresUpdated']);
     }
 
