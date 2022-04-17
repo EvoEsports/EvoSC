@@ -291,7 +291,8 @@ class ModeScriptSettings
             case 'FSM_Teams.Script.txt':
             case 'TM_Teams_Online.Script.txt':
                 return self::team();
-
+            
+            case 'LastManStandingCup.Script.txt':
             case 'Cup.Script.txt':
             case 'TM_Cup_Online.Script.txt':
                 return self::cup();

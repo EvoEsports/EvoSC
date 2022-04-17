@@ -9,11 +9,15 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Models\AccessRight;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
 
 class MatchStats extends Module implements ModuleInterface
 {
+    public static $roundStats = [];
+    public static $teamPoints = [];
+
     /**
      * @param string $mode
      * @param bool $isBoot
@@ -26,9 +30,9 @@ class MatchStats extends Module implements ModuleInterface
 
         AccessRight::add('record_match_stats', 'Is allowed to control match stats recording.');
 
-        Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
-        Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
-        Hook::add('PlayerFinish', [self::class, 'playerFinish']);
+        //Hook::add('Maniaplanet.StartRound_Start', [self::class, 'roundStart']);
+        //Hook::add('Maniaplanet.EndRound_End', [self::class, 'roundEnd']);
+        //Hook::add('PlayerFinish', [self::class, 'playerFinish']);
         Hook::add('Scores', [self::class, 'scoresUpdated']);
     }
 
@@ -58,8 +62,8 @@ class MatchStats extends Module implements ModuleInterface
                         'team'         => $team,
                         'round'        => MapController::getMatchRound(),
                         'total_points' => $player->matchpoints,
-                        'score'        => $player->prevracetime,
-                        'checkpoints'  => implode(',', $player->prevracecheckpoints),
+                        'score'        => $player->racetime,
+                        'checkpoints'  => implode(',', $player->racecheckpoints),
                         'position'     => $player->rank,
                         'end_match'    => $scores->section == 'EndMatch' ? 1 : 0,
                         'time'         => $time
