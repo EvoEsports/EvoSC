@@ -59,8 +59,8 @@ class MatchStats extends Module implements ModuleInterface
                         'team'         => $team,
                         'round'        => MapController::getMatchRound(),
                         'total_points' => $player->matchpoints,
-                        'score'        => $player->racetime,
-                        'checkpoints'  => implode(',', $player->racecheckpoints),
+                        'score'        => $player->prevracetime,
+                        'checkpoints'  => implode(',', $player->prevracecheckpoints),
                         'position'     => $player->rank,
                         'end_match'    => $scores->section == 'EndMatch' ? 1 : 0,
                         'time'         => $time
