@@ -273,6 +273,7 @@ class ModeScriptSettings
 
         switch ($mode) {
             case 'TM_Knockout_Online.Script.txt':
+            case 'TM_DeltaKO_Online.Script.txt':
                 return self::knockout();
 
             case 'TimeAttack.Script.txt':
