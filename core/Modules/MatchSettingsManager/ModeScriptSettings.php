@@ -282,6 +282,7 @@ class ModeScriptSettings
 
             case 'Rounds.Script.txt':
             case 'TM_Rounds_Online.Script.txt':
+            case 'TMKart.Script.txt':
                 return self::rounds();
 
             case 'Laps.Script.txt':
