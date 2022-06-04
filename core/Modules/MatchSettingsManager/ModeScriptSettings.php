@@ -273,6 +273,7 @@ class ModeScriptSettings
 
         switch ($mode) {
             case 'TM_Knockout_Online.Script.txt':
+            case 'TM_DeltaKO_Online.Script.txt':
                 return self::knockout();
 
             case 'TimeAttack.Script.txt':
@@ -281,6 +282,7 @@ class ModeScriptSettings
 
             case 'Rounds.Script.txt':
             case 'TM_Rounds_Online.Script.txt':
+            case 'TMKart.Script.txt':
                 return self::rounds();
 
             case 'Laps.Script.txt':
@@ -291,7 +293,8 @@ class ModeScriptSettings
             case 'FSM_Teams.Script.txt':
             case 'TM_Teams_Online.Script.txt':
                 return self::team();
-
+            
+            case 'LastManStandingCup.Script.txt':
             case 'Cup.Script.txt':
             case 'TM_Cup_Online.Script.txt':
                 return self::cup();
