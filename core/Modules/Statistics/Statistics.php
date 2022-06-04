@@ -184,8 +184,13 @@ WHERE 1=1;');
     {
     }
 
+    /**
+     * @param Player $player
+     * @return void
+     */
     public static function showRank(Player $player)
     {
+        $player->load(['stats']);
         $stats = $player->stats;
 
         if ($stats && $stats->Rank && $stats->Rank > 0) {
