@@ -100,9 +100,9 @@
     declare scoreLabel <=> (slot.GetFirstChild("score") as CMlLabel);
     declare customLabel <=> (slot.GetFirstChild("custom_label") as CMlLabel);
     declare badgeFrame = (slot.GetFirstChild("badge") as CMlFrame);
-    declare bgRankQuad = (slot.GetFirstChild("bg_rank") as CMlQuad);
-    declare bgSlotQuad = (slot.GetFirstChild("bg_slot") as CMlQuad);
-    declare avatarFrame = (slot.GetFirstChild("avatar_frame") as CMlQuad);
+    declare bgRankQuad = (slot.GetFirstChild("bg_rank") as CMlFrame);
+    declare bgSlotQuad = (slot.GetFirstChild("bg_slot") as CMlFrame);
+    declare avatarFrame = (slot.GetFirstChild("avatar_frame") as CMlFrame);
     declare avatarQuad = (slot.GetFirstChild("avatar") as CMlQuad);
     declare badgeQuad <=> (badgeFrame.Controls[0] as CMlQuad);
     declare badgeLabel <=> (badgeFrame.Controls[1] as CMlLabel);

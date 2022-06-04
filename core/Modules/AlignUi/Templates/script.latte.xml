@@ -6,7 +6,7 @@
         declare maxAlignments = 3;
 
         for(i, 1, maxAlignments){
-            log("[AlignUI] Aligning #" ^ i);
+            log("[AlignUI] Aligning " ^ i ^ "/" ^ maxAlignments);
             LastUiUpdate += i;
             sleep(5000);
         }
