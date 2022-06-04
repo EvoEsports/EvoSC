@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3">
+    <script><!--
+    Void align() {
+        declare Integer LastUiUpdate for This = 0;
+        declare maxAlignments = 3;
+
+        for(i, 1, maxAlignments){
+            log("[AlignUI] Aligning #" ^ i);
+            LastUiUpdate += i;
+            sleep(5000);
+        }
+    }
+
+    main() {
+        log("\n[AlignUI] Start");
+
+        declare Integer LastUiUpdate for This = 0;
+        declare endTime = Now + (300 * 1000); //wait five minutes for first widget
+
+        while(Now < endTime){
+            yield;
+
+            if(LastUiUpdate > 0){
+                log("[AlignUI] Widget(s) detected");
+                align();
+                return;
+            }
+
+            sleep(1000);
+        }
+    }
+    --></script>
+</manialink>
