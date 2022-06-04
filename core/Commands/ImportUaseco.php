@@ -167,6 +167,7 @@ class ImportUaseco extends Command
                 'filename' => $map->Filename,
                 'author' => $author->id,
                 'uid' => $map->Uid,
+                'folder' => dirname($map->Filename)
             ]);
 
             $bar->advance();

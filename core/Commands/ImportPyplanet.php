@@ -127,7 +127,8 @@ class ImportPyplanet extends Command
                     'title_id' => $map->title,
                     'filename' => $map->file,
                     'uid' => $map->uid,
-                    'author' => $authorId
+                    'author' => $authorId,
+                    'folder' => dirname($map->file)
                 ]);
             }
 
