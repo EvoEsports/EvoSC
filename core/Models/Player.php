@@ -139,7 +139,7 @@ class Player extends Model
             array_shift($parts);
         }
 
-        if (count($parts) > 1) {
+        if (count($parts) > 2) {
             array_pop($parts);
         }
 
