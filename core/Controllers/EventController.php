@@ -197,10 +197,11 @@ class EventController implements ControllerInterface
                     'team'      => $details->teamId
                 ]);
             } else {
-                if ($name_ = Cache::get('nicknames/' . $playerInfo[0])) {
-                    $name = $name_;
-                } else {
+                if (preg_match('/\*fakeplayer\d+\*/', $playerInfo[0])) {
+                    //is fakeplayer
                     $name = $details->nickName;
+                }else{
+                    $name = Cache::get('nicknames/' . $playerInfo[0], $details->nickName);
                 }
 
                 $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [

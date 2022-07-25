@@ -5,11 +5,13 @@ namespace EvoSC\Models;
 
 use Carbon\Carbon;
 use EvoSC\Controllers\UserSettingsController;
+use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Modules\Dedimania\Models\Dedi;
 use EvoSC\Modules\MxKarma\Models\Karma;
 use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -38,28 +40,34 @@ use Illuminate\Support\Collection;
  */
 class Player extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'players';
 
-    protected $fillable = [
-        'Login',
-        'NickName',
-        'Score',
-        'player_id',
-        'Afk',
-        'path',
-        'spectator_status',
-        'MaxRank',
-        'banned',
-        'last_visit',
-        'Group',
-    ];
+    /**
+     * @var string[]
+     */
+    protected $guarded = ['id'];
 
+    /**
+     * @var string
+     */
     protected $primaryKey = 'Login';
 
+    /**
+     * @var bool
+     */
     public $incrementing = false;
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @var string[]
+     */
     protected $dates = ['last_visit'];
 
     /**
@@ -179,9 +187,9 @@ class Player extends Model
     /**
      * Get the player group
      *
-     * @return HasOne
+     * @return HasOne|null
      */
-    public function group()
+    public function group(): ?HasOne
     {
         return $this->hasOne(Group::class, 'id', 'Group');
     }
@@ -312,5 +320,13 @@ class Player extends Model
     public function getNameBlankAttribute()
     {
         return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFakePlayer(): bool
+    {
+        return preg_match('/\*fakeplayer\d+\*/', $this->Login);
     }
 }

@@ -33,6 +33,7 @@ use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
+use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
@@ -116,14 +117,14 @@ class EscRun extends Command
 
             // if no config given, use original
             if (empty($pidPath)) {
-                $pidPath = baseDir($serverLogin.'_evosc.pid');
+                $pidPath = baseDir($serverLogin . '_evosc.pid');
             }
 
             $serverName = Server::getServerName();
             $__ManiaPlanet = Server::getVersion()->name == 'ManiaPlanet';
 
             // Apparently Nadeo removed this on TM2020 server 2022-03-31
-            if($__ManiaPlanet) {
+            if ($__ManiaPlanet) {
                 if (!Server::isAutoSaveValidationReplaysEnabled()) {
                     Server::autoSaveValidationReplays(true);
                 }
@@ -300,7 +301,8 @@ class EscRun extends Command
         }
     }
 
-    protected function shutdownEvoSC() {
+    protected function shutdownEvoSC()
+    {
         $this->keepRunning = false;
         warningMessage('EvoSC received signal ', secondary('SIGTERM'), '. EvoSC Exiting.')->sendAdmin();
         shutdown_evosc();

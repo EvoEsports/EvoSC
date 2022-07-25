@@ -225,15 +225,14 @@
 
     if(lastPointLimitUpdate != EvoSC_LastPointsLimitUpdate){
         lastPointLimitUpdate = EvoSC_LastPointsLimitUpdate;
-        declare Integer originalPointsLimit = {$originalPointsLimit ?? 30};
         declare Integer EvoSC_PointsLimit for This = -1;
 
         if(EvoSC_PointsLimit > 0){
-            declare pointsLimitText = "Points-Limit: " ^ EvoSC_PointsLimit;
-            if(EvoSC_PointsLimit > originalPointsLimit){
-                pointsLimitText = pointsLimitText ^ " (+" ^ (EvoSC_PointsLimit - originalPointsLimit) ^ ")";
+            declare pointsLimitText = EvoSC_PointsLimit;
+            if(EvoSC_PointsLimit == 0){
+                pointsLimitText = "INF";
             }
-            pointsLimitLabel.Value = pointsLimitText;
+            pointsLimitLabel.Value = "Points-Limit: " ^ pointsLimitText;
         }else{
             if(!isInLapsMode){
                 pointsLimitLabel.Value = "";
