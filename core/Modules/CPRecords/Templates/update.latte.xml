@@ -20,8 +20,6 @@
             EvoSC_CP_New = {$updatedCpId};
             EvoSC_CP_Records_V2.fromjson("""{$data|noescape}""");
             EvoSC_CP_Update = GameTime;
-
-            log(EvoSC_CP_Records_V2);
         }
         -->
     </script>

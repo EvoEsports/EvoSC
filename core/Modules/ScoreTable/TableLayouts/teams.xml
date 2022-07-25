@@ -118,7 +118,7 @@
     declare rankFrame = (slot.GetFirstChild("rank") as CMlFrame);
     declare bgRankQuad = (slot.GetFirstChild("bg_rank") as CMlQuad);
     declare bgSlotQuad = (slot.GetFirstChild("bg_slot") as CMlQuad);
-    declare avatarFrame = (slot.GetFirstChild("avatar_frame") as CMlQuad);
+    declare avatarFrame = (slot.GetFirstChild("avatar_frame") as CMlFrame);
     declare avatarQuad = (slot.GetFirstChild("avatar") as CMlQuad);
     declare badgeQuad <=> (badgeFrame.Controls[0] as CMlQuad);
     declare badgeLabel <=> (badgeFrame.Controls[1] as CMlLabel);
@@ -136,7 +136,8 @@
     nameLabel.Show();
     avatarFrame.Show();
 
-    rankLabel.Value = ((perPage * (page - 1)) + rank) ^ "";
+    declare Rank for score = 0;
+    rankLabel.Value = Rank ^ "";
     declare LibST_Status for user = C_Status_Disconnected;
     if(LibST_Status == C_Status_Disconnected){
         rankLabel.Value ^= "$aaa | ";
@@ -233,6 +234,7 @@ Void clearSlot(CMlFrame slot){
 *** SB_Boot ***
 ***
 perPage = 5;
+pageMultiplier = 0.5;
 SB_Team1_Color = CL::HexToRgb(TL::SubString(Teams[0].ColorText, 1, 3));
 SB_Team2_Color = CL::HexToRgb(TL::SubString(Teams[1].ColorText, 1, 3));
 ***
@@ -266,18 +268,14 @@ SB_Team2_Color = CL::HexToRgb(TL::SubString(Teams[1].ColorText, 1, 3));
     for(teamId, 1, 2){
         declare filled = 0;
         declare skipped = 0;
-        declare scores = sortedByTeams[teamId];
-        declare toSkip = (page - 1) * ((perPage / 2) - 2);
         declare fillOffset = 0;
 
-        foreach(Score in scores){
-            if(toSkip > 0){
-                if(skipped <= toSkip){
-                    skipped += 1;
-                    continue;
-                }
+        foreach(Score in sortedByTeams[teamId]){
+            if(toSkip > 0 && skipped <= toSkip){
+                skipped += 1;
+                continue;
             }
-            if(filled >= perPage - 1){
+            if(filled > perPage - 1){
                 break;
             }
 
@@ -331,7 +329,6 @@ SB_Team2_Color = CL::HexToRgb(TL::SubString(Teams[1].ColorText, 1, 3));
                 EvoSC_PlayerContextMenuTarget = targetLogin;
             }
         }else if(Event.Control.HasClass("me")){
-            log("me");
             declare Boolean findMe for This = False;
             findMe = True;
         }

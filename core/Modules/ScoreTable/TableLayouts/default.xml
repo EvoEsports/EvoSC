@@ -278,7 +278,7 @@ Void clearSlot(CMlFrame slot){
             continue;
         }
 
-        if(filled >= slotsCount){ // divided by two because of background boxes
+        if(filled >= slotsCount){
             return;
         }
 
