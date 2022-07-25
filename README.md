@@ -21,7 +21,7 @@ A modern server controller for the game Trackmania (TM² & 2020).
 
 
 ### Requirements
-* PHP 7.4 and simplexml, mbstring, gd, dom, mysql extension.
+* PHP 7.4 and simplexml, mbstring, gd, dom, mysql, curl extension.
 * Composer
 * MySQL/MariaDB Server
 
