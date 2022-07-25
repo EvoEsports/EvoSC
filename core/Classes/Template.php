@@ -84,7 +84,7 @@ class Template
         $xml = TemplateController::getTemplate($index, $data);
 
         $playerLogin = $player;
-        if($player instanceof Player){
+        if ($player instanceof Player) {
             $playerLogin = $player->Login;
         }
 
@@ -141,9 +141,9 @@ class Template
             }
         });
 
-        try{
+        try {
             Server::executeMulticall();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             //resend all manialinks individually (slower)
             self::$multiCalls->each(function ($xml, $login) {
                 try {
