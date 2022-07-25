@@ -65,6 +65,10 @@ class Template
      */
     public static function show($player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
+        if ($player->isFakePlayer()) {
+            return;
+        }
+
         global $__ManiaPlanet;
 
         if ($values instanceof Collection) {

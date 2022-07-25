@@ -7,7 +7,7 @@
             declare Integer EvoSC_ChatTime for This;
             declare Integer EvoSC_RaceStateChange for This;
 
-            EvoSC_RaceState = {$state};
+            EvoSC_RaceState = "{$state}";
             EvoSC_ChatTime = {$chatTime};
             EvoSC_RaceStateChange = GameTime;
         }

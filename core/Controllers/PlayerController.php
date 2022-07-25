@@ -171,40 +171,13 @@ class PlayerController implements ControllerInterface
     {
         self::$players = \Illuminate\Database\Eloquent\Collection::make(Server::getPlayerList())
             ->map(function (PlayerInfo $playerInfo) {
-                $name = $playerInfo->nickName;
-
                 try {
-                    /**
-                     * @var Player $player
-                     */
-                    $player = Player::where('Login', '=', $playerInfo->login)
+                    return Player::where('Login', '=', $playerInfo->login)
                         ->firstOrFail();
-
-                    if (isTrackmania() && !preg_match('/\*fakeplayer\d+\*/', $playerInfo->login)) {
-                        $name = Cache::get("nicknames/$playerInfo->login", $playerInfo->nickName);
-                    }
-
-                    $player->fill([
-                        'NickName'         => $name,
-                        'ubisoft_name'     => $playerInfo->nickName,
-                        'spectator_status' => $playerInfo->spectatorStatus,
-                        'player_id'        => $playerInfo->playerId,
-                        'team'             => $playerInfo->teamId
-                    ]);
-
-                    if ($player->isDirty([
-                        'NickName',
-                        'ubisoft_name',
-                        'spectator_status',
-                        'player_id',
-                        'team',
-                    ])) {
-                        $player->save();
-                    }
                 } catch (ModelNotFoundException $e) {
-                    $player = Player::create([
+                    return Player::create([
                         'Login'            => $playerInfo->login,
-                        'NickName'         => $name,
+                        'NickName'         => $playerInfo->nickName,
                         'ubisoft_name'     => $playerInfo->nickName,
                         'spectator_status' => $playerInfo->spectatorStatus,
                         'player_id'        => $playerInfo->playerId,
@@ -212,8 +185,6 @@ class PlayerController implements ControllerInterface
                         'group_id'         => Group::PLAYER
                     ]);
                 }
-
-                return $player;
             })
             ->load('group')
             ->keyBy('Login');
@@ -289,32 +260,27 @@ class PlayerController implements ControllerInterface
     {
         $diffString = $player->last_visit->diffForHumans();
 
-        if ($player->isFakePlayer()) {
-            $message = infoMessage($player, ' joined, last visit ', secondary($diffString), '.')
+        $stats = $player->stats;
+
+        if ($stats && !is_null($player->last_visit)) {
+            $serverRank = $stats->Rank;
+
+            if ($serverRank == -1) {
+                $serverRank = 'unranked';
+            }
+
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
+                ' joined, rank: ', secondary($serverRank), ' last visit ', secondary($diffString), '.')
                 ->setIcon('');
         } else {
-            $stats = $player->stats;
+            $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
+                ' joined for the first time.')
+                ->setIcon('');
 
-            if ($stats) {
-                $serverRank = $stats->Rank;
-
-                if ($serverRank == -1) {
-                    $serverRank = 'unranked';
-                }
-
-                $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
-                    ' joined, rank: ', secondary($serverRank), ' last visit ', secondary($diffString), '.')
-                    ->setIcon('');
-            } else {
-                $message = infoMessage($player->group, ' ', $player, ' from ', secondary($player->path ?: '?'),
-                    ' joined for the first time.')
-                    ->setIcon('');
-
-                DB::table('stats')->insertOrIgnore([
-                    'Player' => $player->id,
-                    'Visits' => 1,
-                ]);
-            }
+            DB::table('stats')->insertOrIgnore([
+                'Player' => $player->id,
+                'Visits' => 1,
+            ]);
         }
 
         Log::write($message->getMessage());

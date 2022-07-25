@@ -228,7 +228,7 @@
         declare Integer EvoSC_PointsLimit for This = -1;
 
         if(EvoSC_PointsLimit > 0){
-            declare pointsLimitText = EvoSC_PointsLimit;
+            declare Text pointsLimitText = "" ^ EvoSC_PointsLimit;
             if(EvoSC_PointsLimit == 0){
                 pointsLimitText = "INF";
             }
