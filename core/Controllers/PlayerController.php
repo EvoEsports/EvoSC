@@ -209,7 +209,7 @@ class PlayerController implements ControllerInterface
                         'spectator_status' => $playerInfo->spectatorStatus,
                         'player_id'        => $playerInfo->playerId,
                         'team'             => $playerInfo->teamId,
-                        'Group'            => Group::PLAYER
+                        'group_id'         => Group::PLAYER
                     ]);
                 }
 

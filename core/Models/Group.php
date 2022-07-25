@@ -62,7 +62,7 @@ class Group extends Model
      */
     public function player()
     {
-        return $this->hasMany(Player::class, 'Group');
+        return $this->hasMany(Player::class);
     }
 
     /**

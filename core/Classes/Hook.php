@@ -161,9 +161,6 @@ class Hook
         }
 
         foreach ($hooks as $hook) {
-            $f = json_encode($hook->getFunction());
-            echo "fire -> $f \n";
-
             try {
                 $hook->execute(...$arguments);
             } catch (Exception $e) {

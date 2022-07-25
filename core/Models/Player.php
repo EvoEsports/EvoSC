@@ -11,7 +11,6 @@ use EvoSC\Modules\MxKarma\Models\Karma;
 use EvoSC\Modules\Statistics\Models\Stats;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,6 +21,7 @@ use Illuminate\Support\Collection;
  *
  * @package EvoSC\Models
  * @property int $id
+ * @property int $group_id
  * @property string $Login
  * @property string $NickName
  * @property string $ubisoft_name
@@ -187,11 +187,11 @@ class Player extends Model
     /**
      * Get the player group
      *
-     * @return HasOne|null
+     * @return HasOne
      */
-    public function group(): ?HasOne
+    public function group(): HasOne
     {
-        return $this->hasOne(Group::class, 'id', 'Group');
+        return $this->hasOne(Group::class, 'id', 'group_id');
     }
 
     /**

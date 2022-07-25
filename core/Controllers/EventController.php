@@ -11,6 +11,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Group;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
@@ -200,7 +201,7 @@ class EventController implements ControllerInterface
                 if (preg_match('/\*fakeplayer\d+\*/', $playerInfo[0])) {
                     //is fakeplayer
                     $name = $details->nickName;
-                }else{
+                } else {
                     $name = Cache::get('nicknames/' . $playerInfo[0], $details->nickName);
                 }
 
@@ -209,10 +210,9 @@ class EventController implements ControllerInterface
                     'ubisoft_name' => $details->nickName,
                     'path'         => $details->path,
                     'player_id'    => $details->playerId,
-                    'team'         => $details->teamId
+                    'team'         => $details->teamId,
+                    'group_id'     => Group::PLAYER
                 ]);
-
-                $player->NickName = $name;
             }
 
             Hook::fire('PlayerConnect', $player);

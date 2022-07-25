@@ -28,12 +28,6 @@ class AccessRights extends Module implements ModuleInterface
      */
     public static function sendAccessRights(Player $player)
     {
-        dump('ayy', $player->Group);
-
-        dump($player->group()->toSql());
-
-        dump($player->group);
-
         if ($player->group->unrestricted) {
             $accessRights = AccessRight::all()->pluck('name')->values();
         } else {
