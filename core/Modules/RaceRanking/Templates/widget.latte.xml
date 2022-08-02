@@ -158,7 +158,7 @@
 
         declare lastCurrentServerModeName = "";
 
-        points.fromjson("{$points}");
+        points.fromjson("""{$points}""");
         sleep(10);
 
         wait(CurrentServerModeName != "TM_TimeAttack_Online" && CurrentServerModeName != "TimeAttack");
