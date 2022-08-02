@@ -33,10 +33,7 @@ class MxDownload extends Module implements ModuleInterface
     private static string $apiUrl;
     private static string $exchangeUrl;
 
-    /**
-     * @inheritDoc
-     */
-    public static function start(string $mode, bool $isBoot = false)
+    public function __construct()
     {
         if (isManiaPlanet()) {
             self::$apiUrl = Exchange::MANIAPLANET_MX_API_URL;
@@ -45,7 +42,13 @@ class MxDownload extends Module implements ModuleInterface
             self::$apiUrl = Exchange::TRACKMANIA_MX_API_URL;
             self::$exchangeUrl = Exchange::TRACKMANIA_MX_URL;
         }
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public static function start(string $mode, bool $isBoot = false)
+    {
         ChatCommand::add('//add', [self::class, 'showAddMapInfo'], 'Add a map from mx. Usage: //add <mx_id>', 'map_add');
 
         ManiaLinkEvent::add('mx.add', [self::class, 'addMap'], 'map_add');

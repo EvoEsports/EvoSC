@@ -5,6 +5,7 @@ namespace EvoSC\Models;
 
 use Carbon\Carbon;
 use EvoSC\Controllers\UserSettingsController;
+use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Modules\Dedimania\Models\Dedi;
 use EvoSC\Modules\MxKarma\Models\Karma;
 use EvoSC\Modules\Statistics\Models\Stats;
@@ -20,6 +21,7 @@ use Illuminate\Support\Collection;
  *
  * @package EvoSC\Models
  * @property int $id
+ * @property int $group_id
  * @property string $Login
  * @property string $NickName
  * @property string $ubisoft_name
@@ -38,28 +40,34 @@ use Illuminate\Support\Collection;
  */
 class Player extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'players';
 
-    protected $fillable = [
-        'Login',
-        'NickName',
-        'Score',
-        'player_id',
-        'Afk',
-        'path',
-        'spectator_status',
-        'MaxRank',
-        'banned',
-        'last_visit',
-        'Group',
-    ];
+    /**
+     * @var string[]
+     */
+    protected $guarded = ['id'];
 
+    /**
+     * @var string
+     */
     protected $primaryKey = 'Login';
 
+    /**
+     * @var bool
+     */
     public $incrementing = false;
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @var string[]
+     */
     protected $dates = ['last_visit'];
 
     /**
@@ -139,7 +147,7 @@ class Player extends Model
             array_shift($parts);
         }
 
-        if (count($parts) > 1) {
+        if (count($parts) > 2) {
             array_pop($parts);
         }
 
@@ -181,9 +189,9 @@ class Player extends Model
      *
      * @return HasOne
      */
-    public function group()
+    public function group(): HasOne
     {
-        return $this->hasOne(Group::class, 'id', 'Group');
+        return $this->hasOne(Group::class, 'id', 'group_id');
     }
 
     /**
@@ -312,5 +320,13 @@ class Player extends Model
     public function getNameBlankAttribute()
     {
         return preg_replace('/(?<![$])\${1}(([lm])(?:\[.+?])|[iwngosz]{1}|[\w\d]{1,3})/i', '', $this->NickName);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFakePlayer(): bool
+    {
+        return preg_match('/\*fakeplayer\d+\*/', $this->Login);
     }
 }

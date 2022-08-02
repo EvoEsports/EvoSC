@@ -92,8 +92,8 @@ class MatchMakerWidget extends Module implements ModuleInterface
      */
     public static function mleSetupTeams(Player $player, \stdClass $data = null)
     {
-        Server::setForcedClubLinks(TeamController::getClubLinkUrl($data->name[0], $data->primary[0], $data->secondary[0], $data->emblem[0]),
-            TeamController::getClubLinkUrl($data->name[1], $data->primary[1], $data->secondary[1], $data->emblem[1]));
+        Server::setForcedClubLinks(TeamController::getClubLinkUrl($data->name->{'0'}, $data->primary->{'0'}, $data->secondary->{'0'}, $data->emblem->{'0'}),
+            TeamController::getClubLinkUrl($data->name->{'1'}, $data->primary->{'1'}, $data->secondary->{'1'}, $data->emblem->{'1'}));
 
         $settings = Server::getModeScriptSettings();
         $settings['S_UseClublinks'] = true;

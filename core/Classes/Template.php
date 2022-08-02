@@ -65,6 +65,10 @@ class Template
      */
     public static function show($player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
+        if (($player instanceof Player && $player->isFakePlayer()) || is_string($player) && preg_match('/\*fakeplayer\d+\*/', $player)) {
+            return;
+        }
+
         global $__ManiaPlanet;
 
         if ($values instanceof Collection) {
@@ -84,7 +88,7 @@ class Template
         $xml = TemplateController::getTemplate($index, $data);
 
         $playerLogin = $player;
-        if($player instanceof Player){
+        if ($player instanceof Player) {
             $playerLogin = $player->Login;
         }
 
@@ -141,9 +145,9 @@ class Template
             }
         });
 
-        try{
+        try {
             Server::executeMulticall();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             //resend all manialinks individually (slower)
             self::$multiCalls->each(function ($xml, $login) {
                 try {

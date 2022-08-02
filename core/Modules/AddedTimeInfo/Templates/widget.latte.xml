@@ -33,6 +33,8 @@
             declare Text sign = "";
             declare netread Integer Net_Race_Helpers_CutOffTimeLimit for Teams[0];
             declare timeRemaining = 0;
+            declare Integer EvoSC_MapStartTime for This = 1;
+            declare lastMapStartTimeUpdate = EvoSC_MapStartTime;
 
             left__ = {config('added-time-info.ui.position') == 'left'|ms_bool};
             slot__ = {config('added-time-info.ui.slot')};
@@ -42,6 +44,11 @@
             timeRemaining = Net_Race_Helpers_CutOffTimeLimit - GameTime + 1000;
             buttons.Visible = timeRemaining > 0;
             timeLabel.Visible = timeRemaining > 0;
+
+            if(lastMapStartTimeUpdate != EvoSC_MapStartTime){
+                lastMapStartTimeUpdate = EvoSC_MapStartTime;
+                currentAddedTime = 0.0;
+            }
 
             if(UI.UISequence == CUIConfig::EUISequence::Podium){
                 timeLabel.Hide();

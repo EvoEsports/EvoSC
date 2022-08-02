@@ -1,12 +1,11 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink id="update-vote" name="EvoSC:update-vote" version="3">
 <script>
 <!--
     main() {
         declare Integer[Text] VoteState for LocalUser;
-        declare Text voteStateJson = {$voteStateJson};
-
-        VoteState.fromjson(voteStateJson);
+        VoteState.fromjson("""{$voteStateJson}""");
     }
 -->
 </script>

@@ -1,3 +1,4 @@
+{contentType text}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink name="EvoSC:update_time_limit" id="update_time_limit" version="3">
     <script><!--
@@ -9,7 +10,7 @@
         declare Text TL_Hash for InputPlayer;
         declare Integer TL_Limit for InputPlayer;
 
-        TL_Hash = {uniqid()};
+        TL_Hash = "{uniqid()}";
         TL_Limit = {$timeLimit};
     }
 

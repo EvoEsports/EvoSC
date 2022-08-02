@@ -14,13 +14,9 @@
         declare EvoSC_User[Text] new;
         new.fromjson("""{$players->toJson()|noescape}""");
 
-        log("update -> " ^ """{$players->toJson()|noescape}""");
-
         foreach(login => updatedEntry in new){
             EvoSC_Players[login] = updatedEntry;
         }
-
-        log(EvoSC_Players);
     }
     --></script>
 </manialink>

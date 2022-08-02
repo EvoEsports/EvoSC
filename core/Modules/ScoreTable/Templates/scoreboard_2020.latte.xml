@@ -51,6 +51,7 @@
     declare Vec3 SB_Team2_Color;
     declare CMlFrame mainFrame;
     declare CMlFrame[] boxes;
+    declare Real pageMultiplier;
     declare Integer page;
     declare Integer perPage;
     declare Boolean forceUpdate;
@@ -83,7 +84,7 @@ if(findMe){
         }
         i += 1;
     }
-    page = ML::FloorInteger(i / perPage * 1.0) + 1;
+    page = ML::FloorInteger(i / perPage * pageMultiplier) + 1;
     forceUpdate = True;
     updateScoreTable();
     sleep(40);
@@ -101,10 +102,10 @@ if(findMe){
         <script><!--
     Integer SB_GetMaxPage(){
         if(Scores.count % perPage == 0){
-            return ML::NearestInteger(Scores.count / perPage * 1.0);
+            return ML::NearestInteger(Scores.count / perPage * pageMultiplier);
         }
 
-        return ML::CeilingInteger(Scores.count / perPage * 1.0);
+        return ML::CeilingInteger(Scores.count / perPage * pageMultiplier);
     }
 
     Void SB_GoPageDown(){
@@ -298,6 +299,7 @@ if(findMe){
     main() {
         page = 1;
         perPage = 12;
+        pageMultiplier = 1.0;
 
         +++ SB_Boot +++
 
@@ -307,6 +309,8 @@ if(findMe){
         declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
         declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
         declare TrophiesUpdate = -1;
+        declare Integer EvoSC_MapStartTime for This = 1;
+        declare lastMapStartTimeUpdate = EvoSC_MapStartTime;
 
         while(True){
             yield;
@@ -315,6 +319,15 @@ if(findMe){
                 forceUpdate = True;
                 updateScoreTable();
                 SB_Last_Update = GameTime;
+            }
+
+            if(lastMapStartTimeUpdate != EvoSC_MapStartTime){
+                lastMapStartTimeUpdate = EvoSC_MapStartTime;
+                foreach (Score in Scores) {
+                    //clear trophies
+                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
+                    LibTMxSM_ScoresTable_Trophies = [];
+                }
             }
 
             if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {

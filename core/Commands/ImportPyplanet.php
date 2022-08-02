@@ -90,7 +90,7 @@ class ImportPyplanet extends Command
                     'NickName' => $player->nickname,
                     'Login' => $player->login,
                     'last_visit' => $player->last_seen,
-                    'Group' => $group
+                    'group_id' => $group
                 ]);
             }
 
@@ -127,7 +127,8 @@ class ImportPyplanet extends Command
                     'title_id' => $map->title,
                     'filename' => $map->file,
                     'uid' => $map->uid,
-                    'author' => $authorId
+                    'author' => $authorId,
+                    'folder' => dirname($map->file)
                 ]);
             }
 

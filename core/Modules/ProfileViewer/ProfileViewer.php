@@ -35,7 +35,7 @@ class ProfileViewer extends Module implements ModuleInterface
                 'Login' => $target->Login,
                 'Nickname' => $target->NickName,
                 'Location' => $target->path,
-                'Group' => $target->group->Name,
+                'group_id' => $target->group->Name,
                 'Last seen' => $target->last_visit->diffForHumans(),
                 'Server Rank' => ($target->stats->Rank ?? '?') . '.',
                 'Server Score' => ($target->stats->Score ?? 0) . ' Points',

@@ -21,12 +21,25 @@ class Group extends Model
     const ADMIN = 2;
     const PLAYER = 3;
 
+    /**
+     * @var string
+     */
     protected $table = 'groups';
 
-    protected $fillable = ['Name', 'chat_prefix', 'color'];
+    /**
+     * @var string[]
+     */
+    protected $guarded = ['id'];
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @param string $accessRightName
+     * @return bool
+     */
     public function hasAccess(string $accessRightName)
     {
         if ($this->unrestricted || empty($accessRightName)) {
@@ -36,16 +49,25 @@ class Group extends Model
         return $this->accessRights()->where('name', $accessRightName)->exists();
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function accessRights()
     {
         return $this->belongsToMany(AccessRight::class, 'access_right_group', 'group_id', 'access_right_name', 'id', 'name');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function player()
     {
-        return $this->hasMany(Player::class, 'Group');
+        return $this->hasMany(Player::class);
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         if ($this->color) {

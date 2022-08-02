@@ -45,14 +45,19 @@ class Cache
      * Gets an cache object (may be outdated, do check with "has" first!)
      *
      * @param string $id
+     * @param mixed $default
      *
      * @return mixed
      */
-    public static function get(string $id)
+    public static function get(string $id, $default = null)
     {
         $cacheObject = File::get(cacheDir($id), true);
 
-        return $cacheObject->data;
+        if ($cacheObject != null) {
+            return $cacheObject->data;
+        }
+
+        return $default;
     }
 
     /**
