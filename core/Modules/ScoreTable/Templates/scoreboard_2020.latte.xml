@@ -309,6 +309,8 @@ if(findMe){
         declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
         declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
         declare TrophiesUpdate = -1;
+        declare Integer EvoSC_MapStartTime for This = 1;
+        declare lastMapStartTimeUpdate = EvoSC_MapStartTime;
 
         while(True){
             yield;
@@ -317,6 +319,11 @@ if(findMe){
                 forceUpdate = True;
                 updateScoreTable();
                 SB_Last_Update = GameTime;
+            }
+
+            if(lastMapStartTimeUpdate != EvoSC_MapStartTime){
+                lastMapStartTimeUpdate = EvoSC_MapStartTime;
+                TrophiesUpdate += 1;
             }
 
             if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {
