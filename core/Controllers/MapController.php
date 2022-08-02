@@ -91,6 +91,7 @@ class MapController implements ControllerInterface
         Hook::add('Maniaplanet.Podium_Start', [self::class, 'endMatch']);
         Hook::add('Maniaplanet.StartRound_Start', [self::class, 'setRound']);
         Hook::add('Maniaplanet.EndMatch_End', [self::class, 'resetMatchRounds']);
+        Hook::add('BeginMatch', [self::class, 'beginMatch']);
 
         ChatCommand::add('//skip', [self::class, 'skip'], 'Skips map instantly', 'map_skip');
         ChatCommand::add('//settings', [self::class, 'settings'], 'Load match settings', 'matchsettings_load');
@@ -138,7 +139,8 @@ class MapController implements ControllerInterface
         self::$playersFinished = 0;
     }
 
-    public static function setRound($data){
+    public static function setRound($data)
+    {
         self::$round = json_decode($data[0])->count;
         self::$matchRound++;
         self::sendUpdatedRound();
@@ -234,6 +236,14 @@ class MapController implements ControllerInterface
                 }
             }
         }
+    }
+
+    /**
+     * @return void
+     */
+    public static function beginMatch()
+    {
+        Template::showAll('Helpers.update-map-start');
     }
 
     /**
@@ -548,7 +558,8 @@ class MapController implements ControllerInterface
     /**
      * @return void
      */
-    public static function resetMatchRounds(){
+    public static function resetMatchRounds()
+    {
         self::$matchRound = 0;
     }
 

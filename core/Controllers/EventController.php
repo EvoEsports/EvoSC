@@ -11,9 +11,11 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
+use EvoSC\Models\Group;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Class EventController
@@ -189,29 +191,46 @@ class EventController implements ControllerInterface
         if (count($playerInfo) == 2 && is_string($playerInfo[0])) {
             $details = Server::getDetailedPlayerInfo($playerInfo[0]);
 
-            if (isManiaPlanet()) {
-                $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
-                    'NickName'  => $details->nickName,
-                    'path'      => $details->path,
-                    'player_id' => $details->playerId,
-                    'team'      => $details->teamId
-                ]);
-            } else {
-                if ($name_ = Cache::get('nicknames/' . $playerInfo[0])) {
-                    $name = $name_;
+            try {
+                /**
+                 * @var Player $player
+                 */
+                $player = Player::where('Login', '=', $details->login)
+                    ->firstOrFail();
+
+                if (isTrackmania() && !preg_match('/\*fakeplayer\d+\*/', $details->login)) {
+                    $name = Cache::get("nicknames/$details->login", $details->nickName);
                 } else {
                     $name = $details->nickName;
                 }
 
-                $player = Player::updateOrCreate(['Login' => $playerInfo[0]], [
+                $player->fill([
                     'NickName'     => $name,
                     'ubisoft_name' => $details->nickName,
                     'path'         => $details->path,
                     'player_id'    => $details->playerId,
-                    'team'         => $details->teamId
+                    'team'         => $details->teamId,
                 ]);
 
-                $player->NickName = $name;
+                if ($player->isDirty([
+                    'NickName',
+                    'ubisoft_name',
+                    'path',
+                    'player_id',
+                    'team',
+                ])) {
+                    $player->save();
+                }
+            } catch (ModelNotFoundException $e) {
+                $player = Player::create([
+                    'Login'        => $details->login,
+                    'NickName'     => $details->nickName,
+                    'ubisoft_name' => $details->nickName,
+                    'path'         => $details->path,
+                    'player_id'    => $details->playerId,
+                    'team'         => $details->teamId,
+                    'group_id'     => Group::PLAYER
+                ]);
             }
 
             Hook::fire('PlayerConnect', $player);

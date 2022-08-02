@@ -1,0 +1,10 @@
+{contentType text}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<manialink version="3" id="update-map-start-time" name="EvoSC:update-map-start-time">
+    <script><!--
+    main(){
+        declare Integer EvoSC_MapStartTime for This = 1;
+        EvoSC_MapStartTime = Now;
+    }
+    --></script>
+</manialink>

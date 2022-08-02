@@ -32,19 +32,19 @@ class Database
         $capsule = new Capsule();
 
         $capsule->addConnection([
-            'driver' => 'mysql',
-            'host' => config('database.host'),
-            'database' => config('database.db'),
-            'username' => config('database.user'),
-            'password' => config('database.password'),
-            'charset' => 'utf8mb4',
+            'driver'    => 'mysql',
+            'host'      => config('database.host'),
+            'database'  => config('database.db'),
+            'username'  => config('database.user'),
+            'password'  => config('database.password'),
+            'charset'   => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => config('database.prefix'),
+            'prefix'    => config('database.prefix'),
         ]);
 
         $capsule->setAsGlobal();
-
         $capsule->bootEloquent();
+        $capsule->getConnection('default')->disableQueryLog();
 
         if ($capsule->getConnection() == null) {
             Log::error("Database connection failed. Exiting.");

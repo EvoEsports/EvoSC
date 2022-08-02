@@ -15,10 +15,12 @@ use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
+use EvoSC\Models\Group;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use Exception;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
 
@@ -136,12 +138,16 @@ class PlayerController implements ControllerInterface
         }
 
         $data = self::$players->map(function (Player $player) {
+            if ($player->NickName == $player->ubisoft_name) {
+                return null;
+            }
+
             return [
                 'login'   => $player->Login,
                 'name'    => $player->NickName,
                 'ubiname' => $player->ubisoft_name,
             ];
-        });
+        })->filter();
 
         Template::showAll('Helpers.update-custom-names', [
             'keyedByLogin'   => $data->pluck('name', 'login'),
@@ -158,26 +164,30 @@ class PlayerController implements ControllerInterface
         self::$players->put($player->Login, $player);
     }
 
+    /**
+     * @return void
+     */
     public static function cacheConnectedPlayers()
     {
-        self::$players = collect(Server::getPlayerList())->map(function (PlayerInfo $playerInfo) {
-            $name = $playerInfo->nickName;
-
-            if (isTrackmania() && Cache::has('nicknames/' . $playerInfo->login)) {
-                $name = Cache::get('nicknames/' . $playerInfo->login);
-            }
-
-            $player = Player::updateOrCreate(['Login' => $playerInfo->login], [
-                'NickName'         => $name,
-                'spectator_status' => $playerInfo->spectatorStatus,
-                'player_id'        => $playerInfo->playerId,
-                'team'             => $playerInfo->teamId
-            ]);
-
-            $player->load(['group', 'settings']);
-
-            return $player;
-        })->keyBy('Login');
+        self::$players = \Illuminate\Database\Eloquent\Collection::make(Server::getPlayerList())
+            ->map(function (PlayerInfo $playerInfo) {
+                try {
+                    return Player::where('Login', '=', $playerInfo->login)
+                        ->firstOrFail();
+                } catch (ModelNotFoundException $e) {
+                    return Player::create([
+                        'Login'            => $playerInfo->login,
+                        'NickName'         => $playerInfo->nickName,
+                        'ubisoft_name'     => $playerInfo->nickName,
+                        'spectator_status' => $playerInfo->spectatorStatus,
+                        'player_id'        => $playerInfo->playerId,
+                        'team'             => $playerInfo->teamId,
+                        'group_id'         => Group::PLAYER
+                    ]);
+                }
+            })
+            ->load('group')
+            ->keyBy('Login');
 
         self::playerPoolChanged();
     }
@@ -214,47 +224,45 @@ class PlayerController implements ControllerInterface
     public static function playerConnect(Player $player)
     {
         if (isManiaPlanet() || !self::$loadNicknamesFromEvoService) {
-            self::announceConnect($player, $player->NickName);
+            self::announceConnect($player);
+            return;
+        }
+
+        if (preg_match('/\*fakeplayer\d+\*/', $player->Login)) {
+            Log::info('Skip load nickname from cloud for fakeplayer: ' . $player->Login, isVerbose());
+            self::announceConnect($player);
             return;
         }
 
         RestClient::getAsync(sprintf(EVO_API_URL . '/nicknames/%s', $player->Login), [
-            'connect_timeout' => 1.5
+            'connect_timeout' => 2
         ])->then(function (Response $response) use ($player) {
             if ($response->getStatusCode() == 200) {
                 $data = json_decode($response->getBody()->getContents());
-                $name = 'error_loading_name';
 
-                if ($data == new \stdClass()) {
-                    $name = $player->NickName;
-                } else if ($player->NickName != $data->name) {
-                    $name = $data->name;
+                if ($player->NickName != $data->name) {
                     self::setName($player, $data->name, true, true);
                 }
 
-                self::announceConnect($player, $name);
+                self::announceConnect($player);
             }
         }, function () use ($player) {
             //connection to service failed
-            $name = $player->NickName;
-            if (Cache::has('nicknames/' . $player->Login)) {
-                $name = Cache::get('nicknames/' . $player->Login);
-            }
-            self::announceConnect($player, $name);
+            self::announceConnect($player);
         });
     }
 
     /**
      * @param Player $player
-     * @param $name
-     * @throws Exception
+     * @return void
      */
-    private static function announceConnect(Player $player, $name)
+    private static function announceConnect(Player $player)
     {
         $diffString = $player->last_visit->diffForHumans();
+
         $stats = $player->stats;
 
-        if ($stats) {
+        if ($stats && !is_null($player->last_visit)) {
             $serverRank = $stats->Rank;
 
             if ($serverRank == -1) {
@@ -501,6 +509,11 @@ class PlayerController implements ControllerInterface
         return self::$players->put($player->Login, $player);
     }
 
+    /**
+     * @param Player $player
+     * @param string $targetLogin
+     * @return void
+     */
     public static function forceSpecEvent(Player $player, string $targetLogin)
     {
         Server::forceSpectator($targetLogin, 3);
@@ -508,6 +521,12 @@ class PlayerController implements ControllerInterface
         infoMessage($player, ' forced ', player($targetLogin), ' into spectator mode.')->sendAll();
     }
 
+    /**
+     * @param Player $player
+     * @param string $cmd
+     * @param string $count
+     * @return void
+     */
     public static function addFakePlayer(Player $player, string $cmd, string $count = '1')
     {
         infoMessage($player, ' adds ', secondary($count), ' fake players.')->sendAll();
@@ -521,12 +540,21 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @return void
+     */
     public static function resetUserSettings(Player $player)
     {
         $player->settings()->delete();
         infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
     }
 
+    /**
+     * @param Player $player
+     * @param $targetLogin
+     * @return void
+     */
     public static function specPlayer(Player $player, $targetLogin)
     {
         Server::forceSpectator($player->Login, Server::FORCE_TO_SPECTATORS_SELECTABLE);
@@ -534,6 +562,11 @@ class PlayerController implements ControllerInterface
         Server::forceSpectatorTarget($player->Login, $targetLogin, Server::FORCE_TO_SPECTATORS);
     }
 
+    /**
+     * @param Player $player
+     * @param $targetLogin
+     * @return void
+     */
     public static function muteLoginToggle(Player $player, $targetLogin)
     {
         $target = player($targetLogin);
@@ -545,6 +578,12 @@ class PlayerController implements ControllerInterface
         }
     }
 
+    /**
+     * @param Player $player
+     * @param string $targetLogin
+     * @param string $message
+     * @return void
+     */
     public static function warnPlayer(Player $player, string $targetLogin, string $message = '')
     {
         $target = Player::whereLogin($targetLogin)->first();

@@ -503,7 +503,7 @@ function serverPlayer(): Player
 {
     $player = new Player();
     $player->id = 0;
-    $player->Group = 1;
+    $player->group_id = \EvoSC\Models\Group::MASTERADMIN;
     $player->Login = Server::getSystemInfo()->serverLogin;
     $player->NickName = Server::getServerName();
     $player->ubisoft_name = Server::getServerName();

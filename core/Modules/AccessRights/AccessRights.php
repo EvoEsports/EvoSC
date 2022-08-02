@@ -23,6 +23,7 @@ class AccessRights extends Module implements ModuleInterface
 
     /**
      * @param Player $player
+     * @return void
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function sendAccessRights(Player $player)

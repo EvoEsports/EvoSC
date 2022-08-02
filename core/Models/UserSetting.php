@@ -7,11 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserSetting extends Model
 {
+    /**
+     * @var string
+     */
     protected $table = 'user-settings';
 
-    protected $fillable = ['player_id', 'name', 'value'];
-
+    /**
+     * @var string
+     */
     protected $primaryKey = 'player_Login';
 
+    /**
+     * @var string[]
+     */
+    protected $guarded = ['player_Login'];
+
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 }
