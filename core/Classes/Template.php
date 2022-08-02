@@ -65,7 +65,7 @@ class Template
      */
     public static function show($player, string $index, $values = null, bool $multicall = false, int $timeoutInSeconds = 0)
     {
-        if ($player->isFakePlayer()) {
+        if (($player instanceof Player && $player->isFakePlayer()) || is_string($player) && preg_match('/\*fakeplayer\d+\*/', $player)) {
             return;
         }
 
