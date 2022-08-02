@@ -5,7 +5,7 @@
         <!--
         main(){
             declare Text MapSearchQuery for LocalUser;
-            MapSearchQuery = {$query == "" ? " " : $query};
+            MapSearchQuery = "{$query == '' ? ' ' : $query}";
         }
         -->
     </script>
