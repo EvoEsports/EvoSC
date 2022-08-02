@@ -323,7 +323,11 @@ if(findMe){
 
             if(lastMapStartTimeUpdate != EvoSC_MapStartTime){
                 lastMapStartTimeUpdate = EvoSC_MapStartTime;
-                TrophiesUpdate += 1;
+                foreach (Score in Scores) {
+                    //clear trophies
+                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
+                    LibTMxSM_ScoresTable_Trophies = [];
+                }
             }
 
             if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {
