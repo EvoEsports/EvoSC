@@ -2,7 +2,7 @@
 <frame>
     <framemodel id="flag">
         <quad id="avatar" pos="-0.6 0" valign="center" size="9 7" scale="0.84" z-index="3" />
-        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://cloud.evotm.com/s/8x6ArNnRQsK6AJH/preview?file=.png" keepratio="fit" />
+        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://cdn.evotm.com/evosc/logo.png" keepratio="fit" />
         <label class="text-light" valign="center" halign="center" scale="0.7" pos="3.25 -0.7" opacity="0.1" text="SC" />
     </framemodel>
 
@@ -154,7 +154,7 @@
         groupIconLabel.Value = groupIcon;
         groupNameLabel.Value = groupName;
         avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ score.User.Login ^ "/country";
-        avatarQuad.AlphaMaskUrl = "https://cloud.evotm.com/s/ZXDNYDYp4CB7esx/preview?file=.png";
+        avatarQuad.AlphaMaskUrl = "https://cdn.evotm.com/evosc/flag_alpha_mask.png";
         nameLabel.Value = name;
     //}
 
