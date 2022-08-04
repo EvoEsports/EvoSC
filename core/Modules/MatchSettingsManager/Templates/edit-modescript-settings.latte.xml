@@ -45,7 +45,7 @@ $o$nDefault: {$setting['default']|ml_escape}" autonewline="1" />
                             <frame pos="112 -2" valign="center" halign="right" size="14 4.1">
                                 <frame pos="{($setting['value'] ?: $setting['default']) == '' ? -20 : 0} 0">
                                     <quad class="bg-default" valign="center" size="20 5" />
-                                    <quad size="20 10" pos="-17.8" valign="center" colorize="{config('theme.hud.accent')}" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" z-index="1" />
+                                    <quad size="20 10" pos="-17.8" valign="center" colorize="{config('theme.hud.accent')}" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" z-index="1" />
                                     <label class="text-light" valign="center" halign="center" pos="-6.75 0.25" text=" ON" textsize="0.5" z-index="2" />
                                     <label class="text-light" valign="center" halign="center" pos="13.1 0.25" text=" OFF" textsize="0.5" z-index="2" />
                                     <label class="toggle" size="50 5" valign="center" halign="center" ScriptEvents="1" z-index="3" focusareacolor1="0000" focusareacolor2="0000" />

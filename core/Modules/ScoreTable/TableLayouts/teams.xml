@@ -2,7 +2,7 @@
 <frame>
     <framemodel id="flag">
         <quad id="avatar" pos="-0.6 0" valign="center" size="9 7" scale="0.84" z-index="3" />
-        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://i.imgur.com/3iuieZL.png" keepratio="fit" />
+        <quad pos="3.25 0.75" halign="center" valign="center" size="9 7" scale="0.5" opacity="0.1" z-index="2" image="https://cdn.evotm.com/evosc/logo_big.png" keepratio="fit" />
         <label class="text-light" valign="center" halign="center" scale="0.7" pos="3.25 -0.7" opacity="0.1" text="SC" />
     </framemodel>
 
@@ -104,8 +104,8 @@
     </framemodel>
 
     <frame z-index="0" pos="90 -12.5" scale="0.85">
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask_light.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
     </frame>
 
     <frame id="header-frame" pos="5.5 17" z-index="1">
@@ -208,7 +208,7 @@
         groupIconLabel.Value = groupIcon;
         groupNameLabel.Value = groupName;
         avatarQuad.ImageUrl = "file://ZoneFlags/Login/" ^ score.User.Login ^ "/country";
-        avatarQuad.AlphaMaskUrl = "https://i.imgur.com/MgqRGzI.png";
+        avatarQuad.AlphaMaskUrl = "https://cdn.evotm.com/evosc/flag_alpha_mask.png";
         nameLabel.Value = name;
     }
 

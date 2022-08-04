@@ -59,8 +59,8 @@
     </framemodel>
 
     <frame z-index="0" pos="90 -12.5" scale="0.85">
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_2.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_mask_1.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask_light.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
     </frame>
 
     <frame id="header-frame" pos="5.5 17" z-index="1">
