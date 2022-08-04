@@ -10,7 +10,7 @@
         <label class="text-light" z-index="5" id="wrench" pos="-9 0.5" text="" valign="center" textsize="0.5" textemboss="1" hidden="1"/>
         {else}
         <label id="speed" class="text-lighter" text="..." halign="left" valign="center" textsize="8" textemboss="0"/>
-        <quad id="label" image="https://i.imgur.com/fbn6wcc.png" pos="-9 -0.75" size="7.5 6.5" valign="center" scale="1"/>
+        <quad id="label" image="https://cdn.evotm.com/evosc/speedometer.png" pos="-9 -0.75" size="7.5 6.5" valign="center" scale="1"/>
         <label class="action btn-accent" pos="-12.5 2.5" size="22.5 6.75"  valign="top" halign="left" focusareacolor1="0000" ScriptEvents="1" z-index="1"/>
         <label class="text-light" id="wrench" pos="-1.5 -0.5" text=" SETTINGS" halign="center" valign="center" textsize="1.5" textemboss="1" hidden="1" z-index="2"/>
         {/if}

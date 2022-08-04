@@ -45,8 +45,8 @@
     <!-- end components -->
 
     {if !$is_maniaplanet}
-    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://i.imgur.com/Ikw7gGK.png" colorize="{config('theme.hud.bg-darker')}" z-index="102" />
-    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://i.imgur.com/qtWSs35.png" colorize="{config('theme.hud.accent')}" z-index="101" scale="0.999" />
+    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask_light.png" colorize="{config('theme.hud.bg-darker')}" z-index="102" />
+    <quad size="248.5 128.5" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask.png" colorize="{config('theme.hud.accent')}" z-index="101" scale="0.999" />
     <quad size="260 164.5" pos="0 5.5" halign="center" valign="center" image="file://Media/Manialinks/Nadeo/TMNext/Modes/Race/HUD_scorestable_body.dds" z-index="100" />
     {/if}
 

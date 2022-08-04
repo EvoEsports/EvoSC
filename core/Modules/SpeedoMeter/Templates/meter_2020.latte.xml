@@ -8,15 +8,15 @@
         <label class="text-light" id="wrench" pos="-1.5 -0.5" text=" SETTINGS" halign="center" valign="center" textsize="1.5" textemboss="1" hidden="1" z-index="2"/>
 
         <frame id="label" pos="-5.5 -1" scale="0.7">
-            <quad size="10 10" image="https://i.imgur.com/GlEaewr.png" colorize="fff" valign="center" halign="center" />
+            <quad size="10 10" image="https://cdn.evotm.com/evosc/speedometer_split_1.png" colorize="fff" valign="center" halign="center" />
             <frame id="rotation" z-index="1" valign="center" halign="center">
                 <frame rot="-30">
-                    <quad size="10 10" image="https://i.imgur.com/UlSsKHT.png" colorize="{config('theme.hud.accent')}" valign="center" halign="center" />
+                    <quad size="10 10" image="https://cdn.evotm.com/evosc/speedometer_split_2.png" colorize="{config('theme.hud.accent')}" valign="center" halign="center" />
                 </frame>
             </frame>
-            <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" />
+            <quad size="10 10" image="https://cdn.evotm.com/evosc/speedometer_split_3.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" />
             <label class="text-light" text="KPH" halign="center" pos="0 -3" textsize="0.15" />
-            <quad size="10 10" image="https://i.imgur.com/4i1xu0E.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" scale="0.95" />
+            <quad size="10 10" image="https://cdn.evotm.com/evosc/speedometer_split_3.png" colorize="{config('theme.hud.bg-light')}" valign="center" halign="center" scale="0.95" />
             <label id="gear" class="text-light" text="" halign="center" pos="0 1.5" textsize="2" />
         </frame>
     </frame>
