@@ -31,8 +31,8 @@ Add {$info->Name}
     <label id="progress" class="text-light" pos="4.5 -0.75" size="58 4" text="" textsize="0.5" />
     <quad class="bg-light" pos="4.5 0.5" size="49 0.5" opacity="0.25" />
     <quad id="progress-bar" class="bg-accent" pos="4.5 0.5" size="0 0.5" z-index="1" />
-    <quad id="spinner1" size="6 6" image="https://i.imgur.com/raBEPlW.png" valign="center" halign="center" colorize="{config('theme.hud.bg-light')}" scale="1.1" />
-    <quad id="spinner2" size="6 6" image="https://i.imgur.com/WuJWnZq.png" valign="center" halign="center" colorize="{config('theme.hud.accent')}" scale="1.2" />
+    <quad id="spinner1" size="6 6" image="https://cdn.evotm.com/evosc/spinner.png" valign="center" halign="center" colorize="{config('theme.hud.bg-light')}" scale="1.1" />
+    <quad id="spinner2" size="6 6" image="https://cdn.evotm.com/evosc/spinner_alt.png" valign="center" halign="center" colorize="{config('theme.hud.accent')}" scale="1.2" />
 </frame>
 
 <frame pos="102 -72">

@@ -53,7 +53,7 @@ class SocialMedia extends Module implements ModuleInterface
                 $entry = [
                     'title' => 'Discord',
                     'url' => $data->url,
-                    'icon' => 'https://i.imgur.com/RxQLC4y.png',
+                    'icon' => 'https://cdn.evotm.com/evosc/discordpng',
                     'color' => '7289da',
                     'size' => '1x1',
                     'bg_image' => ''
@@ -72,7 +72,7 @@ class SocialMedia extends Module implements ModuleInterface
                 $entry = [
                     'title' => 'Website',
                     'url' => $data->url,
-                    'icon' => 'https://i.imgur.com/PY8VOiI.png',
+                    'icon' => 'https://cdn.evotm.com/evosc/web.png',
                     'color' => config('theme.hud.accent'),
                     'size' => '1x1',
                     'bg_image' => ''
@@ -91,7 +91,7 @@ class SocialMedia extends Module implements ModuleInterface
                 $entry = [
                     'title' => 'PayPal',
                     'url' => $data->url,
-                    'icon' => 'https://i.imgur.com/c0zQ2of.png',
+                    'icon' => 'https://cdn.evotm.com/evosc/paypal.png',
                     'color' => '1f264f',
                     'size' => '1x1',
                     'bg_image' => ''
@@ -110,7 +110,7 @@ class SocialMedia extends Module implements ModuleInterface
                 $entry = [
                     'title' => 'Patreon',
                     'url' => $data->url,
-                    'icon' => 'https://i.imgur.com/0TXj7E9.png',
+                    'icon' => 'https://cdn.evotm.com/evosc/patreon.png',
                     'color' => 'ff424d',
                     'size' => '1x1',
                     'bg_image' => ''

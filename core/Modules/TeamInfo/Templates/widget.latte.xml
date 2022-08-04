@@ -4,18 +4,18 @@
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="widget" pos="0 90" scale="0.95">
-        <quad size="150 18" pos="0 7.5" halign="center" image="http://maniacdn.net/tmexperte/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />
+        <quad size="150 18" pos="0 7.5" halign="center" image="https://cdn.evotm.com/evosc/scoreboard_row_2294x300.png" colorize="{config('theme.hud.bg-dark')}" opacity="0.8" />
 
-        <quad id="team1quad" size="18 15" pos="16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
-        <quad id="team2quad" size="18 15" pos="-16 2" halign="center" z-index="2" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
+        <quad id="team1quad" size="18 15" pos="16 2" halign="center" z-index="2" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
+        <quad id="team2quad" size="18 15" pos="-16 2" halign="center" z-index="2" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.accent')}" />
 
-        <quad size="18 15" pos="15 2" halign="center" z-index="3" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
-        <quad size="18 15" pos="-15 2" halign="center" z-index="3" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
+        <quad size="18 15" pos="15 2" halign="center" z-index="3" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
+        <quad size="18 15" pos="-15 2" halign="center" z-index="3" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-darker')}" />
 
-        <quad size="18 15" pos="0.4 2" halign="center" z-index="4" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
-        <quad size="18 15" pos="-0.4 2" halign="center" z-index="4" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
+        <quad size="18 15" pos="0.4 2" halign="center" z-index="4" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
+        <quad size="18 15" pos="-0.4 2" halign="center" z-index="4" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="000" opacity="0.1" />
 
-        <quad size="18 15" pos="0 2" halign="center" z-index="19" image="http://maniacdn.net/tmexperte/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-dark')}" />
+        <quad size="18 15" pos="0 2" halign="center" z-index="19" image="https://cdn.evotm.com/evosc/scoreboard_pos_355x300.png" colorize="{config('theme.hud.bg-dark')}" />
 
         <frame pos="0 2" z-index="20">
             <label class="text-light" pos="0 -10.5" halign="center" text="ROUND" opacity="0.7" />
