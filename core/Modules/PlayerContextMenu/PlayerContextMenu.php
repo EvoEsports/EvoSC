@@ -38,7 +38,7 @@ class PlayerContextMenu extends Module implements ModuleInterface
             (object)['icon' => '', 'text' => 'Set to spectator', 'action' => 'forcespec', 'access' => 'player_force_spec', 'confirm' => false],
         ])->filter(function ($action) use ($player) {
             return $player->hasAccess($action->access);
-        });
+        })->values();
 
         Template::show($player, 'PlayerContextMenu.menu', compact('defaultActions'));
     }
