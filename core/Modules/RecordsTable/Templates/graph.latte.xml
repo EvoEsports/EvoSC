@@ -1,7 +1,7 @@
 {contentType text}
 {extends 'Components.tabbed-window'}
 {php $window_width = 180;}
-{php $window_height = 90;}
+{php $window_height = 0;}
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manialink version="3">
     {block id}records-table{/block}
@@ -18,7 +18,7 @@
 
     {block content}
     <frame pos="0 -7">
-        <quad class="bg-blur" size="176 50" z-index="-1"/>
+        <quad class="bg-blur" size="176 50" z-index="-1" opacity="0.05"/>
         {php $hMin = $diffs->min() - 100;}
         {php $hMax = $diffs->max() + 100;}
         {php $wMax = ($record->Score > $myRecord->Score ? $record->Score : $myRecord->Score) + 1000;}
