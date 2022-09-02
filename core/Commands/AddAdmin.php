@@ -86,7 +86,7 @@ class AddAdmin extends Command
         }
 
         $groupName = Group::findOrFail($groupId)->Name;
-        $player->group = $groupId;
+        $player->group_id = $groupId;
         $player->save();
         $output->writeln("Successfully added '{$login}' to {$groupName} group.");
 
