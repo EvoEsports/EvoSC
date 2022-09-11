@@ -3,8 +3,8 @@
 <manialink name="EvoSC:{include id}" id="{include id}" version="3">
 {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 <frame id="window" pos="{($window_width ?? 120)/-2.0} 0">
-    <quad class="bg-accent" size="{$window_width ?? 120} 11" opacity="0.9" z-index="-3"/>
-    <quad class="bg-accent" pos="0 -10.5" size="{$window_width ?? 120} 0.5" z-index="-1"/>
+    <quad class="bg-accent" size="{$window_width ?? 120} 11" opacity="0.7"/>
+    <quad class="bg-accent" pos="0 -10.5" size="{$window_width ?? 120} 0.5" z-index="1"/>
     <quad id="handle" data-id="help" pos="0 0" size="{($window_width ?? 120) - 5} 5" z-index="5"/>
     <quad id="bg" class="bg-dark" size="{$window_width ?? 120} {$window_height ?? 88}" opacity="0.9" z-index="-1" />
     <quad class="bg-blur" size="{$window_width ?? 120} {$window_height ?? 88}" opacity="0.9" z-index="-2" />

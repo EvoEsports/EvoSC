@@ -79,7 +79,7 @@ Void updateView(){
         (row.Controls[1] as CMlLabel).SetText(command.description);
 
         if(command.access != ""){
-            (row.Controls[0] as CMlLabel).SetText((row.Controls[0] as CMlLabel).Value ^ " ${config('colors.ui.window.header.color')|noescape}");
+            (row.Controls[0] as CMlLabel).SetText((row.Controls[0] as CMlLabel).Value ^ " ${config('theme.chat.danger')|noescape}");
             showRestricted();
         }
 
