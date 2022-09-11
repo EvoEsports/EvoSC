@@ -4,7 +4,7 @@
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
 
     <frame id="overview" pos="-65 {$groups->count() * 3 + 5}" scale="1.1">
-        <quad class="bg-dark" size="120 {$groups->count() * 6 + 10}" pos="0 -6" opacity="0.8" z-index="-1" />
+        <quad class="bg-dark" size="120 {$groups->count() * 6 + 10}" pos="0 -6" opacity="0.9" z-index="0" />
         <quad class="bg-accent" size="120 6"/>
         <quad id="handle" data-id="groupmgr" size="115 6" z-index="5"/>
         <label class="text-light" pos="2 -3" valign="center" text=" Groups Manager" z-index="1"/>

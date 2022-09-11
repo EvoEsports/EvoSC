@@ -46,7 +46,7 @@
                         <label /> <!-- spacer -->
                     {/foreach}
                 </frame>
-                <quad class="trigger" size="113 10000" ScriptEvents="1" />
+                <quad class="trigger" size="113 10000" ScriptEvents="1" z-index="-1" />
             </frame>
         </frame>
         <quad class="bg-accent" pos="-2 -64.7" size="120 0.3" opacity="0.5" z-index="50" />

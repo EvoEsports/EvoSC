@@ -3,7 +3,7 @@
 <manialink name="EvoSC:key-binds-settings" id="key-binds-settings" version="3">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="window" pos="-30 {(count($binds) * 4.0 + 16.0)/2.0}">
-        <quad class="bg-dark" size="60 {count($binds) * 4.0 + 16.0}" opacity="0.8" z-index="-2"/>
+        <quad class="bg-dark" size="60 {count($binds) * 4.0 + 16.0}" opacity="0.9" z-index="-2"/>
         <quad class="bg-accent" size="60 6" z-index="-3"/>
         <quad class="bg-accent" size="60 0.4" pos="0 -6" valign="center" z-index="1"/>
         <quad id="handle" data-id="keybinds" size="55 6"/>

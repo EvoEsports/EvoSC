@@ -73,8 +73,10 @@ class GroupManager extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param $formData
+     * @return void
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public function groupAccessRightsUpdate(Player $player, $formData)
+    public static function groupAccessRightsUpdate(Player $player, $formData)
     {
         $groupId = $formData->group_id;
         DB::table('access_right_group')->where('group_id', '=', $groupId)->delete();
