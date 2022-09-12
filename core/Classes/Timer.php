@@ -155,7 +155,7 @@ class Timer
             return;
         }
 
-        $toRun = self::$timers->where('runtime', '<', time())
+        $toRun = self::$timers->where('runtime', '<=', time())
             ->where('isPaused', '=', false);
 
         self::$timers = self::$timers->diff($toRun->where('repeat', false));
