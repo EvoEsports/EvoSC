@@ -15,7 +15,7 @@ class EscRunSignal extends EscRun implements SignalableCommandInterface {
     {
         // return here any of the constants defined by PCNTL extension
         // https://www.php.net/manual/en/pcntl.constants.php
-        return [SIGTERM];
+        return [SIGTERM, SIGINT];
     }
 
     /**
@@ -25,7 +25,7 @@ class EscRunSignal extends EscRun implements SignalableCommandInterface {
      */
     public function handleSignal(int $signal): void
     {
-        if ($signal == SIGTERM) {
+        if ($signal == SIGTERM || $signal == SIGINT) {
             $this->shutdownEvoSC();
         }
     }
