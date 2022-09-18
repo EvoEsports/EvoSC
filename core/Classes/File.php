@@ -3,6 +3,7 @@
 namespace EvoSC\Classes;
 
 
+use EvoSC\Exceptions\FileAlreadyExistsException;
 use EvoSC\Exceptions\FilePathNotAbsoluteException;
 use Illuminate\Support\Collection;
 
@@ -265,15 +266,22 @@ class File
     /**
      * @param string $source
      * @param string $target
+     * @param bool $overwrite
+     * @return void
+     * @throws FileAlreadyExistsException
      * @throws FilePathNotAbsoluteException
      */
-    public static function copy(string $source, string $target)
+    public static function copy(string $source, string $target, bool $overwrite = false)
     {
         $source = str_replace('/', DIRECTORY_SEPARATOR, $source);
         $target = str_replace('/', DIRECTORY_SEPARATOR, $target);
 
         if (!self::dirExists(dirname($target))) {
             self::makeDir(dirname($target));
+        }
+
+        if (file_exists($target) && !$overwrite) {
+            throw new FileAlreadyExistsException("The file $target already exists and should not be overwritten.");
         }
 
         copy($source, $target);

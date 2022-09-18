@@ -19,65 +19,62 @@
         />
 
         <frame pos="2 -14" n:if="count($matchsettings) > 0">
-            {foreach $matchsettings as $i => $name}
-            <label pos="13   {$i * -5}"
-                   text="{$name}  "
-                   size="26 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   ScriptEvents="1"
-                   class="edit btn-default"
-                   data-name="{$name}"
-            />
+            {foreach $matchsettings as $i => $matchSettings}
+            <frame data-name="{$matchSettings->name}">
+                <label pos="13   {$i * -5}"
+                       text="{str_replace('_', ' ', $matchSettings->name)}  "
+                       size="26 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       ScriptEvents="1"
+                       class="edit btn-default"
+                />
 
-            <label pos="28.5 {$i * -5}"
-                   text=""
-                   size="5 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   class="rename btn-default"
-                   data-name="{$name}"
-                   ScriptEvents="1"
-            />
+                <label pos="28.5 {$i * -5}"
+                       text=""
+                       size="5 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       class="rename btn-default"
+                       ScriptEvents="1"
+                />
 
-            <label pos="33.5 {$i * -5}"
-                   text=""
-                   size="5 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   class="load btn-default"
-                   data-name="{$name}"
-                   ScriptEvents="1"
-            />
+                <label pos="33.5 {$i * -5}"
+                       text=""
+                       size="5 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       class="load btn-default"
+                       ScriptEvents="1"
+                />
 
-            <label pos="38.5 {$i * -5}"
-                   text=""
-                   size="5 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   class="schedule btn-default"
-                   data-name="{$name}"
-                   ScriptEvents="1"
-            />
+                <label pos="38.5 {$i * -5}"
+                       text=""
+                       size="5 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       class="schedule btn-default"
+                       ScriptEvents="1"
+                />
 
-            <label pos="43.5 {$i * -5}"
-                   text=""
-                   size="5 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   class="btn-default"
-                   action="msm.duplicate,{$name}"
-            />
+                <label pos="43.5 {$i * -5}"
+                       text=""
+                       size="5 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       class="duplicate btn-default"
+                       ScriptEvents="1"
+                />
 
-            <label pos="48.5 {$i * -5}"
-                   text=""
-                   size="5 4"
-                   textsize="0.5"
-                   textprefix="$s"
-                   class="delete btn-danger"
-                   data-name="{$name}"
-                   ScriptEvents="1"
-            />
+                <label pos="48.5 {$i * -5}"
+                       text=""
+                       size="5 4"
+                       textsize="0.5"
+                       textprefix="$s"
+                       class="delete {$matchSettings->default ? 'btn-default' : 'btn-danger'}"
+                       ScriptEvents="1"
+                />
+            </frame>
             {/foreach}
         </frame>
     </frame>
@@ -111,47 +108,56 @@
                     }
 
                     if(event.Control.HasClass("edit") && event.Type == CMlScriptEvent::Type::MouseClick){
-                        declare name = event.Control.DataAttributeGet("name");
-                        TriggerPageAction("msm.edit," ^ name);
+                        declare name = event.Control.Parent.DataAttributeGet("name");
+                        ManiaLinkEvent("msm.edit", name);
                         window.Hide();
                         return;
                     }
 
                     if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
-                        declare name = event.Control.DataAttributeGet("name");
+                        declare name = event.Control.Parent.DataAttributeGet("name");
 
                         if(confirm("Delete " ^ name ^ "?")){
-                            TriggerPageAction("msm.delete," ^ name);
+                            ManiaLinkEvent("msm.delete", name);
                         }
                         continue;
                     }
 
                     if(event.Control.HasClass("schedule") && event.Type == CMlScriptEvent::Type::MouseClick){
-                        declare name = event.Control.DataAttributeGet("name");
+                        declare name = event.Control.Parent.DataAttributeGet("name");
                         declare Text input = input("Schedule load at (Format: YYYY-MM-DD HH:MM:SS)", "{date('Y-m-d H:i:s', time())}");
 
                         if(input != ""){
-                            TriggerPageAction("msm.schedule," ^ input ^ "," ^ name);
+                            ManiaLinkEvent("msm.schedule", input, name);
                         }
 
                         continue;
                     }
 
                     if(event.Control.HasClass("load") && event.Type == CMlScriptEvent::Type::MouseClick){
-                        declare name = event.Control.DataAttributeGet("name");
+                        declare name = event.Control.Parent.DataAttributeGet("name");
 
                         if(confirm("Do you really want to load " ^ name ^ " now?")){
-                            TriggerPageAction("msm.load," ^ name);
+                            ManiaLinkEvent("msm.load", name);
+                        }
+                        continue;
+                    }
+
+                    if(event.Control.HasClass("duplicate") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.Parent.DataAttributeGet("name");
+                        declare Text copyName = input("Duplicate match-settings: " ^ name, "");
+
+                        if(copyName != ""){
+                            ManiaLinkEvent("msm.duplicate", name, copyName);
                         }
                         continue;
                     }
 
                     if(event.Control.HasClass("rename") && event.Type == CMlScriptEvent::Type::MouseClick){
-                        declare name = event.Control.DataAttributeGet("name");
+                        declare name = event.Control.Parent.DataAttributeGet("name");
                         declare Text newName = input("Rename match-settings: " ^ name, name);
 
                         if(newName != ""){
-                            //TriggerPageAction("msm.rename," ^ name ^ "," ^ newName);
                             ManiaLinkEvent("msm.rename", name, newName);
                         }
                         continue;
