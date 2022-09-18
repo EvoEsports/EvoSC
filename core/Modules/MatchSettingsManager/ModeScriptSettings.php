@@ -255,13 +255,13 @@ class ModeScriptSettings
      */
     public static function getSettingsByMode(string $mode)
     {
-        $mode = basename($mode);
+        $mode = basename(str_replace(DIRECTORY_SEPARATOR, '/', $mode));
         $customSettings = collect(config('msm.custom'))->firstWhere('name', '=', $mode);
 
         if ($customSettings) {
             $settings = [];
             foreach ($customSettings->settings as $setting) {
-                array_push($settings, new ModeScriptSetting($setting->setting, $setting->type, $setting->description, $setting->default));
+                $settings[] = new ModeScriptSetting($setting->setting, $setting->type, $setting->description, $setting->default);
             }
 
             if (empty($customSettings->base)) {

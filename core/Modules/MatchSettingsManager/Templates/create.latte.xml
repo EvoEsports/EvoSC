@@ -26,6 +26,7 @@
                textprefix="$s"
                ScriptEvents="1"
                data-mode="{$mode}"
+               data-name="{preg_replace('/\.script\.txt$/i', '', basename($mode))}"
                class="btn-default mode"
         />
         {/foreach}
@@ -55,7 +56,12 @@
 
                     if(event.Control.HasClass("mode") && event.Type == CMlScriptEvent::Type::MouseClick){
                         declare modeFile = event.Control.DataAttributeGet("mode");
-                        TriggerPageAction("msm.new," ^ modeFile ^ "," ^ nameEntry.Value);
+                        declare name = nameEntry.Value;
+                        if(TL::Trim(name) == ""){
+                            name = event.Control.DataAttributeGet("name");
+                            nameEntry.Value = name;
+                        }
+                        TriggerPageAction("msm.new," ^ modeFile ^ "," ^ name);
                         continue;
                     }
                 }

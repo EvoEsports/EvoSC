@@ -523,7 +523,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
             File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
             Log::info($player . ' duplicated "' . $file . '" as "' . $targetFile . '"');
         } catch (FileAlreadyExistsException $e) {
-            warningMessage('A match-settings with the name ', secondary($name), 'already exists, please chose another name.')->send($player);
+            warningMessage('A match-settings with the name ', secondary($name), ' already exists, please chose another name.')->send($player);
             return;
         }
 
@@ -573,9 +573,19 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function getMatchsettings()
     {
-        return File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (string $file) {
-            return preg_replace('/\.txt$/', '', $file);
-        });
+        return File::getDirectoryContents(self::$path, '/\.txt$/')
+            ->sortBy(function ($file) {
+                $absoluteFilename = self::$path . $file;
+
+                if (self::isDefault(preg_replace('/\.\w+$/', '', basename($absoluteFilename)))) {
+                    return 0;
+                }
+
+                return filemtime($absoluteFilename);
+            })
+            ->map(function (string $file) {
+                return preg_replace('/\.txt$/', '', $file);
+            });
     }
 
     /**
