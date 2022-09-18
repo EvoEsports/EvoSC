@@ -3,16 +3,16 @@
 <manialink name="EvoSC:MatchSettingsManagerNew" id="ESC:matchsettings-manager" version="3" xmlns:n="http://www.w3.org/1999/xhtml">
     {include isManiaPlanet() ? 'Components.stylesheet' : 'Components.stylesheet_noblur'}
     <frame id="window" pos="-25 10">
-        <quad class="bg-accent" size="50 5" z-index="-1"/>
+        <quad class="bg-accent" size="55 5" z-index="-1"/>
         <quad id="handle" data-id="help" size="35 5" z-index="5"/>
-        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($matchsettings) * 5 + 8}" opacity="0.9" z-index="-1"/>
+        <quad id="bg" class="bg-dark" pos="0 -5" size="55 {count($matchsettings) * 5 + 8}" opacity="0.9" z-index="-1"/>
         <label class="text-light" pos="2 -2.5" textsize="0.8" text=" Matchsettings Manager" textprefix="$s" valign="center"/>
-        <label class="btn-accent close" pos="47.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1"/>
+        <label class="btn-accent close" pos="52.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1"/>
 
-        <label pos="25 -9"
+        <label pos="27.5 -9"
                class="btn-accent"
                text=" Create new"
-               size="46 4"
+               size="51 4"
                textsize="0.5"
                textprefix="$s"
                action="msm.create"
@@ -31,6 +31,16 @@
             />
 
             <label pos="28.5 {$i * -5}"
+                   text=""
+                   size="5 4"
+                   textsize="0.5"
+                   textprefix="$s"
+                   class="rename btn-default"
+                   data-name="{$name}"
+                   ScriptEvents="1"
+            />
+
+            <label pos="33.5 {$i * -5}"
                    text=""
                    size="5 4"
                    textsize="0.5"
@@ -40,7 +50,7 @@
                    ScriptEvents="1"
             />
 
-            <label pos="33.5 {$i * -5}"
+            <label pos="38.5 {$i * -5}"
                    text=""
                    size="5 4"
                    textsize="0.5"
@@ -50,7 +60,7 @@
                    ScriptEvents="1"
             />
 
-            <label pos="38.5 {$i * -5}"
+            <label pos="43.5 {$i * -5}"
                    text=""
                    size="5 4"
                    textsize="0.5"
@@ -59,7 +69,7 @@
                    action="msm.duplicate,{$name}"
             />
 
-            <label pos="43.5 {$i * -5}"
+            <label pos="48.5 {$i * -5}"
                    text=""
                    size="5 4"
                    textsize="0.5"
@@ -80,6 +90,7 @@
 
     {include 'Dialogues.confirm'}
     {include 'Dialogues.input'}
+    {include 'Scripts.mle'}
 
     <script><!--
     {(new EvoSC\Classes\ManiaLinkDrag())|noescape}
@@ -131,6 +142,17 @@
 
                         if(confirm("Do you really want to load " ^ name ^ " now?")){
                             TriggerPageAction("msm.load," ^ name);
+                        }
+                        continue;
+                    }
+
+                    if(event.Control.HasClass("rename") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare name = event.Control.DataAttributeGet("name");
+                        declare Text newName = input("Rename match-settings: " ^ name, name);
+
+                        if(newName != ""){
+                            //TriggerPageAction("msm.rename," ^ name ^ "," ^ newName);
+                            ManiaLinkEvent("msm.rename", name, newName);
                         }
                         continue;
                     }

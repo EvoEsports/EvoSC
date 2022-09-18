@@ -5,21 +5,28 @@
     <frame id="window" pos="-25 10">
         <quad class="bg-accent" size="50 5" z-index="-1"/>
         <quad id="handle" data-id="help" pos="0 0" size="35 5" z-index="5"/>
-        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($modes)*5+3}" opacity="0.8" z-index="-1"/>
+        <quad id="bg" class="bg-dark" pos="0 -5" size="50 {count($modes)*5+9}" opacity="0.8" z-index="-1"/>
         <label class="text-light" pos="5 -2.5" textsize="0.8" text="Select mode" textprefix="$s" valign="center"/>
         <label class="text-light" pos="2 -2.5" textsize="0.8" text="" textprefix="$s" valign="center" action="msm.overview"/>
         <label class="close text-light" pos="47.5 -2.5" size="5 5" textsize="0.75" text="" textprefix="$s" valign="center" halign="center" ScriptEvents="1" focusareacolor1="0000" focusareacolor2="0003"/>
 
+        <frame pos="2 -8.6">
+            <quad pos="0 0" class="bg-accent" size="10 4" valign="center" />
+            <label pos="1 0" class="text-light" text="Name" z-index="1" valign="center" />
+            <entry id="name" pos="10 0" class="form" size="36 4" valign="center" />
+        </frame>
+
         {foreach $modes as $i => $mode}
-        <label pos="25 {$i*-5 - 9}"
+        <label pos="25 {$i*-5 - 15}"
                text="{preg_replace('/\.script\.txt$/i', '', basename($mode))}"
                halign="center"
                valign="center"
                size="46 4"
                textsize="0.5"
                textprefix="$s"
-               action="msm.new,{$mode}"
-               class="btn-default"
+               ScriptEvents="1"
+               data-mode="{$mode}"
+               class="btn-default mode"
         />
         {/foreach}
     </frame>
@@ -32,6 +39,7 @@
 
     main(){
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+        declare nameEntry <=> (Page.MainFrame.GetFirstChild("name") as CMlEntry);
 
         while(True){
             yield;
@@ -43,6 +51,12 @@
                     if(event.Control.HasClass("close") && event.Type == CMlScriptEvent::Type::MouseClick){
                         window.Hide();
                         return;
+                    }
+
+                    if(event.Control.HasClass("mode") && event.Type == CMlScriptEvent::Type::MouseClick){
+                        declare modeFile = event.Control.DataAttributeGet("mode");
+                        TriggerPageAction("msm.new," ^ modeFile ^ "," ^ nameEntry.Value);
+                        continue;
                     }
                 }
 
