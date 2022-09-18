@@ -45,10 +45,10 @@ class File
      * Overwrite or create a file with the given content. Returns true if file exists.
      *
      * @param string $fileName
-     * @param string|mixed $content
-     *
+     * @param $content
      * @param bool $jsonEncode
      * @return bool
+     * @throws FilePathNotAbsoluteException
      */
     public static function put(string $fileName, $content, bool $jsonEncode = false): bool
     {
@@ -74,6 +74,8 @@ class File
      *
      * @param $fileName
      * @param $line
+     * @return void
+     * @throws FilePathNotAbsoluteException
      */
     public static function appendLine($fileName, $line)
     {

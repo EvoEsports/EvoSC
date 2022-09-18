@@ -28,6 +28,10 @@ A modern server controller for the game Trackmania (TM² & 2020).
 ### Installation
 [Wiki: Installation](https://wiki.evotm.com/books/evosc-users-guide/page/download-installation)
 
+### Modules
+Get modules to improve your EvoSC experience:
+[Modules for EvoSC](https://github.com/EvoTM/EvoSC/wiki/Modules)
+
 ___
 
 ## EvoSC Command Line Interface

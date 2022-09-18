@@ -469,6 +469,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
      * @param string $scriptName
      * @param string $matchSettingsName
      * @return void
+     * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function createNewMatchsettings(Player $player, string $scriptName, string $matchSettingsName = '')
@@ -490,8 +491,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         });
 
         $matchsettingsDirectory = mapsDir('/MatchSettings/');
-
-        $matchSettingsName = evo_str_slug($matchSettingsName, '_');
+        $matchSettingsName = evo_str_slug(preg_replace('/[\/\\\]/', '', $matchSettingsName), '_');
         $targetFile = "$matchsettingsDirectory$matchSettingsName.txt";
 
         if (File::exists($targetFile)) {
@@ -604,7 +604,8 @@ class MatchSettingsManager extends Module implements ModuleInterface
             return;
         }
 
-        $newName = evo_str_slug($newName, '_');
+        $newName = evo_str_slug(preg_replace('/[\/\\\]/', '', $newName), '_');
+
         if ($newName != $matchSettings) {
             $src = Server::getMapsDirectory() . 'MatchSettings/' . $matchSettings . '.txt';
             $target = Server::getMapsDirectory() . 'MatchSettings/' . $newName . '.txt';
@@ -623,5 +624,18 @@ class MatchSettingsManager extends Module implements ModuleInterface
     private static function isDefault(string $matchSettingsName): bool
     {
         return config('server.default-matchsettings') == $matchSettingsName . '.txt';
+    }
+
+    /**
+     * @param string $modeName
+     * @return bool
+     */
+    public static function gameModeExists(string $modeName): bool
+    {
+        $gameMode = basename($modeName);
+
+        return File::getFilesRecursively(modeScriptsDir())->map(function ($file) {
+            return basename($file);
+        })->contains($gameMode);
     }
 }

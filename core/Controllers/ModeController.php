@@ -30,6 +30,8 @@ class ModeController implements ControllerInterface
     private static int $warmUpRound = 0;
     private static bool $warmup = false;
 
+    private static array $thirdParty = [];
+
     /**
      *
      */
@@ -97,6 +99,16 @@ class ModeController implements ControllerInterface
 
     /**
      * @param string $mode
+     * @param string $base
+     * @return void
+     */
+    public static function addThridPartyMapping(string $mode, string $base)
+    {
+        self::$thirdParty[basename($mode)] = $base;
+    }
+
+    /**
+     * @param string $mode
      */
     public static function setMode(string $mode)
     {
@@ -108,18 +120,14 @@ class ModeController implements ControllerInterface
         self::$isTimeAttackType = false;
         self::$isRoundsType = false;
 
-        $customMode = collect(config('msm.custom'))->firstWhere('name', '=', basename($mode));
-        if ($customMode && !empty($customMode->base)) {
-            $mode = $customMode->base;
+        if (array_key_exists(basename($mode), self::$thirdParty)) {
+            $baseMode = self::$thirdParty[basename($mode)];
+            if (!empty($baseMode)) {
+                $mode = $baseMode;
+            }
         }
 
         switch ($mode) {
-            case 'TimeAttack.Script.txt':
-            case 'Trackmania/TM_TimeAttack_Online.Script.txt':
-                self::$isTimeAttackType = true;
-                self::$isRoundsType = false;
-                break;
-
             case 'Rounds.Script.txt':
             case 'Trackmania/TM_Rounds_Online.Script.txt':
                 self::$isTimeAttackType = false;
@@ -152,6 +160,13 @@ class ModeController implements ControllerInterface
             case 'Trackmania/Evo_Royal_TA.Script.txt':
                 self::$isTimeAttackType = true;
                 self::$royal = true;
+                break;
+
+            default:
+            case 'TimeAttack.Script.txt':
+            case 'Trackmania/TM_TimeAttack_Online.Script.txt':
+                self::$isTimeAttackType = true;
+                self::$isRoundsType = false;
                 break;
         }
 

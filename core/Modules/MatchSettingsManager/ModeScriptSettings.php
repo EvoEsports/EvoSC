@@ -4,7 +4,11 @@
 namespace EvoSC\Modules\MatchSettingsManager;
 
 
+use EvoSC\Classes\File;
+use EvoSC\Controllers\ModeController;
+use EvoSC\Modules\MatchSettingsManager\Classes\GameModeExtension;
 use EvoSC\Modules\MatchSettingsManager\Classes\ModeScriptSetting;
+use EvoSC\Modules\MatchSettingsManager\Exceptions\GameModeAlreadyDefinedException;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,6 +21,101 @@ use Illuminate\Support\Collection;
  */
 class ModeScriptSettings
 {
+    /**
+     * @var array
+     */
+    private static array $external = [];
+
+    /**
+     * @param string $scriptName
+     * @param string $extendsMode
+     * @param array $additionalSettings
+     * @return void
+     * @throws GameModeAlreadyDefinedException
+     */
+    public static function extend(string $scriptName, string $extendsMode, array $additionalSettings = [])
+    {
+        if (array_key_exists($scriptName, self::$external)) {
+            throw new GameModeAlreadyDefinedException("The game mode '$scriptName' was already defined, can not overwrite.");
+        }
+
+        $additionalSettings = collect($additionalSettings)->merge(self::getSettingsFromGameModeScript($scriptName))
+            ->unique(function (ModeScriptSetting $modeScriptSetting) {
+                return $modeScriptSetting->getSetting();
+            })
+            ->values();
+
+        self::$external[basename($scriptName)] = new GameModeExtension($scriptName, $additionalSettings, $extendsMode);
+        ModeController::addThridPartyMapping($scriptName, $extendsMode);
+    }
+
+    /**
+     * @param string $source
+     * @return Collection
+     */
+    private static function getSettingsFromGameModeScript(string $source)
+    {
+        $isDir = is_dir(modeScriptsDir($source));
+
+        if ($isDir) {
+            $files = File::getFilesRecursively(modeScriptsDir($source), '/\.txt$/');
+        } else {
+            $files = collect([modeScriptsDir($source)]);
+        }
+
+        return $files->map(function ($scriptFile) {
+            return self::getSettingsFromScriptContent($scriptFile);
+        })->flatten();
+    }
+
+    /**
+     * @param string $scriptFile
+     * @return array
+     */
+    private static function getSettingsFromScriptContent(string $scriptFile): array
+    {
+        $matched = [];
+
+        if (preg_match_all('/^\s*#Setting\s([A-Z][\w_]+)\s(.+?)(?:\s|$)(?:as\s_\("(.+)"\))?/m', File::get($scriptFile), $matches)) {
+            foreach ($matches[0] as $i => $matchedLine) {
+                [$type, $value] = self::parseValue($matches[2][$i]);
+                $matched[] = new ModeScriptSetting($matches[1][$i], $type, $matches[3][$i], $value);
+            }
+        }
+
+        return $matched;
+    }
+
+    /**
+     * @param string $value
+     * @return array
+     */
+    private static function parseValue(string $value): array
+    {
+        if (preg_match('/^(True|False)$/', $value)) {
+            switch ($value) {
+                case 'True':
+                    return ['boolean', true];
+                case 'False':
+                    return ['boolean', false];
+            }
+        } else if (preg_match('/^".+"$/', $value)) {
+            return ['text', substr($value, 1, -1)];
+        } else if (preg_match('/\./', $value)) {
+            return ['real', floatval($value)];
+        }
+
+        return ['integer', intval($value)];
+    }
+
+    /**
+     * @return void
+     */
+    public static function clearExternalGameModeSettings()
+    {
+        self::$external = [];
+    }
+
     /**
      * @return Collection
      */
@@ -226,78 +325,53 @@ class ModeScriptSettings
     }
 
     /**
-     * @param array $custom
-     * @param Collection ...$settings
-     * @return Collection
-     */
-    private static function combine(array $custom, Collection ...$settings)
-    {
-        $custom = collect($custom)->keyBy([self::class, 'keyBy']);
-        $toAdd = collect();
-
-        foreach ($settings as $otherSettings) {
-            foreach($otherSettings as $setting){
-                /**
-                 * @var ModeScriptSetting $setting
-                 */
-                if(!$custom->has($setting->getSetting())){
-                    $toAdd->put($setting->getSetting(), $setting);
-                }
-            }
-        }
-
-        return $custom->merge($toAdd);
-    }
-
-    /**
      * @param string $mode
      * @return Collection
      */
     public static function getSettingsByMode(string $mode)
     {
         $mode = basename(str_replace(DIRECTORY_SEPARATOR, '/', $mode));
-        $customSettings = collect(config('msm.custom'))->firstWhere('name', '=', $mode);
 
-        if ($customSettings) {
-            $settings = [];
-            foreach ($customSettings->settings as $setting) {
-                $settings[] = new ModeScriptSetting($setting->setting, $setting->type, $setting->description, $setting->default);
+        if (array_key_exists($mode, self::$external)) {
+            /**
+             * @var GameModeExtension $gameModeExtension
+             */
+            $gameModeExtension = self::$external[$mode];
+            $default = [];
+
+            if (!empty($gameModeExtension->getExtendsMode())) {
+                $default = self::getSettingsByMode($gameModeExtension->getExtendsMode());
             }
 
-            if (empty($customSettings->base)) {
-                return collect($settings)->keyBy([self::class, 'keyBy']);
+            return self::combine($gameModeExtension->getSettings(), $default);
+        } else {
+            switch ($mode) {
+                case 'TM_Knockout_Online.Script.txt':
+                case 'TM_DeltaKO_Online.Script.txt':
+                    return self::knockout();
+
+                case 'TimeAttack.Script.txt':
+                case 'TM_TimeAttack_Online.Script.txt':
+                    return self::timeAttack();
+
+                case 'Rounds.Script.txt':
+                case 'TM_Rounds_Online.Script.txt':
+                case 'TMKart.Script.txt':
+                    return self::rounds();
+
+                case 'Laps.Script.txt':
+                case 'TM_Laps_Online.Script.txt':
+                    return self::laps();
+
+                case 'Teams.Script.txt':
+                case 'FSM_Teams.Script.txt':
+                case 'TM_Teams_Online.Script.txt':
+                    return self::team();
+
+                case 'Cup.Script.txt':
+                case 'TM_Cup_Online.Script.txt':
+                    return self::cup();
             }
-
-            return self::combine($settings, self::getSettingsByMode($customSettings->base));
-        }
-
-        switch ($mode) {
-            case 'TM_Knockout_Online.Script.txt':
-            case 'TM_DeltaKO_Online.Script.txt':
-                return self::knockout();
-
-            case 'TimeAttack.Script.txt':
-            case 'TM_TimeAttack_Online.Script.txt':
-                return self::timeAttack();
-
-            case 'Rounds.Script.txt':
-            case 'TM_Rounds_Online.Script.txt':
-            case 'TMKart.Script.txt':
-                return self::rounds();
-
-            case 'Laps.Script.txt':
-            case 'TM_Laps_Online.Script.txt':
-                return self::laps();
-
-            case 'Teams.Script.txt':
-            case 'FSM_Teams.Script.txt':
-            case 'TM_Teams_Online.Script.txt':
-                return self::team();
-            
-            case 'LastManStandingCup.Script.txt':
-            case 'Cup.Script.txt':
-            case 'TM_Cup_Online.Script.txt':
-                return self::cup();
         }
 
         return self::all();
@@ -310,5 +384,29 @@ class ModeScriptSettings
     public static function keyBy(ModeScriptSetting $modeScriptSetting)
     {
         return $modeScriptSetting->getSetting();
+    }
+
+    /**
+     * @param iterable $custom
+     * @param Collection ...$settings
+     * @return Collection
+     */
+    private static function combine(iterable $custom, Collection ...$settings)
+    {
+        $custom = collect($custom)->keyBy([self::class, 'keyBy']);
+        $toAdd = collect();
+
+        foreach ($settings as $otherSettings) {
+            foreach ($otherSettings as $setting) {
+                /**
+                 * @var ModeScriptSetting $setting
+                 */
+                if (!$custom->has($setting->getSetting())) {
+                    $toAdd->put($setting->getSetting(), $setting);
+                }
+            }
+        }
+
+        return $custom->merge($toAdd);
     }
 }
