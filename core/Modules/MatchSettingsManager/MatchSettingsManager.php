@@ -12,6 +12,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Utility;
 use EvoSC\Controllers\MatchSettingsController;
+use EvoSC\Exceptions\FileAlreadyExistsException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
@@ -95,6 +96,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('msm.save_mode_script', [self::class, 'mleSaveModeScriptSettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.save_server_settings', [self::class, 'mleSaveServerSettings'], 'matchsettings_edit');
         ManiaLinkEvent::add('msm.schedule', [self::class, 'scheduleMatchSettings'], 'matchsettings_load');
+        ManiaLinkEvent::add('msm.rename', [self::class, 'mleRenameMatchSettings'], 'matchsettings_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'MatchSetting Manager', 'msm.overview', 'matchsettings_load');
@@ -108,7 +110,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function scheduleMatchSettings(Player $player, $timeStamp, $matchsettingsFile)
     {
-        Schedule::maniaLinkEvent($player, 'Load ' . $matchsettingsFile, $timeStamp, 'msm.load_and_skip', serverPlayer(), $matchsettingsFile);
+        Schedule::maniaLinkEvent($player, 'Load match-settings "' . $matchsettingsFile . '"', $timeStamp, 'msm.load_and_skip', serverPlayer(), $matchsettingsFile);
     }
 
     /**
@@ -212,7 +214,14 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function showOverview(Player $player)
     {
-        $matchsettings = self::getMatchsettings()->values();
+        $matchsettings = self::getMatchsettings()
+            ->values()
+            ->map(function ($matchSettingsName) {
+                return (object)[
+                    'name'    => $matchSettingsName,
+                    'default' => self::isDefault($matchSettingsName)
+                ];
+            });
 
         Template::show($player, 'MatchSettingsManager.overview', compact('matchsettings'));
     }
@@ -457,11 +466,19 @@ class MatchSettingsManager extends Module implements ModuleInterface
 
     /**
      * @param Player $player
-     * @param string $modeName
+     * @param string $scriptName
+     * @param string $matchSettingsName
+     * @return void
+     * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function createNewMatchsettings(Player $player, string $scriptName)
+    public static function createNewMatchsettings(Player $player, string $scriptName, string $matchSettingsName = '')
     {
+        if (empty($matchSettingsName)) {
+            dangerMessage('Please specify a name for the match-settings.')->send($player);
+            return;
+        }
+
         $baseMatchSettings = new SimpleXMLElement(File::get(__DIR__ . '/base.xml'));
         $baseMatchSettings->gameinfos->addChild('script_name', $scriptName);
         $scriptSettingsNode = $baseMatchSettings->addChild('script_settings');
@@ -473,18 +490,17 @@ class MatchSettingsManager extends Module implements ModuleInterface
             $node->addAttribute('value', $setting->getDefault());
         });
 
-        $i = 0;
-        do {
-            $matchsettingsDirectory = mapsDir('/MatchSettings/');
-            $filename = sprintf('%s_%d.txt', basename($scriptName), $i);
-            $i++;
-            $targetFile = $matchsettingsDirectory . $filename;
-        } while (File::exists($matchsettingsDirectory . $filename));
+        $matchsettingsDirectory = mapsDir('/MatchSettings/');
+        $matchSettingsName = evo_str_slug(preg_replace('/[\/\\\]/', '', $matchSettingsName), '_');
+        $targetFile = "$matchsettingsDirectory$matchSettingsName.txt";
 
-        $content = Utility::simpleXmlPrettyPrint($baseMatchSettings);
+        if (File::exists($targetFile)) {
+            dangerMessage('Match-settings with name ', secondary($matchSettingsName), 'already exists.')->send($player);
+            return;
+        }
 
-        File::put($targetFile, $content);
-        Log::info($player . ' created new "' . $filename . '" with mode "' . $scriptName . '"');
+        File::put($targetFile, Utility::simpleXmlPrettyPrint($baseMatchSettings));
+        Log::info($player . ' created new "' . basename($targetFile) . '" with mode "' . $scriptName . '"');
 
         self::showOverview($player);
     }
@@ -492,16 +508,24 @@ class MatchSettingsManager extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param string $matchsettingsFile
+     * @param string $name
+     * @return void
+     * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function duplicateMatchsettings(Player $player, string $matchsettingsFile)
+    public static function duplicateMatchsettings(Player $player, string $matchsettingsFile, string $name = '')
     {
         $file = $matchsettingsFile . '.txt';
-        $targetFile = $matchsettingsFile . '_copy.txt';
+        $targetFile = evo_str_slug($name, '_') . '.txt';
         $matchsettingsDirectory = Server::getMapsDirectory() . 'MatchSettings/';
 
-        File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
-        Log::info($player . ' duplicated "' . $file . '" as "' . $targetFile . '"');
+        try {
+            File::copy($matchsettingsDirectory . $file, $matchsettingsDirectory . $targetFile);
+            Log::info($player . ' duplicated "' . $file . '" as "' . $targetFile . '"');
+        } catch (FileAlreadyExistsException $e) {
+            warningMessage('A match-settings with the name ', secondary($name), ' already exists, please chose another name.')->send($player);
+            return;
+        }
 
         self::showOverview($player);
     }
@@ -513,8 +537,8 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function deleteMatchsettings(Player $player, string $matchsettingsFile)
     {
-        if (config('server.default-matchsettings') == $matchsettingsFile . '.txt') {
-            warningMessage('Can not delete default match-settings.')->send($player);
+        if (self::isDefault($matchsettingsFile)) {
+            warningMessage('Can not delete default match-settings ', $matchsettingsFile)->send($player);
 
             return;
         }
@@ -549,8 +573,69 @@ class MatchSettingsManager extends Module implements ModuleInterface
      */
     public static function getMatchsettings()
     {
-        return File::getDirectoryContents(self::$path, '/\.txt$/')->transform(function (string $file) {
-            return preg_replace('/\.txt$/', '', $file);
-        });
+        return File::getDirectoryContents(self::$path, '/\.txt$/')
+            ->sortBy(function ($file) {
+                $absoluteFilename = self::$path . $file;
+
+                if (self::isDefault(preg_replace('/\.\w+$/', '', basename($absoluteFilename)))) {
+                    return 0;
+                }
+
+                return filemtime($absoluteFilename);
+            })
+            ->map(function (string $file) {
+                return preg_replace('/\.txt$/', '', $file);
+            });
+    }
+
+    /**
+     * @param Player $player
+     * @param string $matchSettings
+     * @param string $newName
+     * @return void
+     * @throws \EvoSC\Exceptions\FilePathNotAbsoluteException
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function mleRenameMatchSettings(Player $player, string $matchSettings, string $newName)
+    {
+        if (self::isDefault($matchSettings)) {
+            warningMessage('Can not rename default match-settings ', secondary($matchSettings))->send($player);
+
+            return;
+        }
+
+        $newName = evo_str_slug(preg_replace('/[\/\\\]/', '', $newName), '_');
+
+        if ($newName != $matchSettings) {
+            $src = Server::getMapsDirectory() . 'MatchSettings/' . $matchSettings . '.txt';
+            $target = Server::getMapsDirectory() . 'MatchSettings/' . $newName . '.txt';
+
+            File::rename($src, $target);
+            Log::warning($player . ' renamed match-settings "' . $matchSettings . '" to "' . $newName . '"');
+        }
+
+        self::showOverview($player);
+    }
+
+    /**
+     * @param string $matchSettingsName
+     * @return bool
+     */
+    private static function isDefault(string $matchSettingsName): bool
+    {
+        return config('server.default-matchsettings') == $matchSettingsName . '.txt';
+    }
+
+    /**
+     * @param string $modeName
+     * @return bool
+     */
+    public static function gameModeExists(string $modeName): bool
+    {
+        $gameMode = basename($modeName);
+
+        return File::getFilesRecursively(modeScriptsDir())->map(function ($file) {
+            return basename($file);
+        })->contains($gameMode);
     }
 }
