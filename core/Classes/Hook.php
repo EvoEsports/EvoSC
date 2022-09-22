@@ -137,7 +137,7 @@ class Hook
     }
 
     /**
-     * TODO: Remove a hook
+     * Remove a hook
      *
      * @param string $event
      * @param callable $callback
