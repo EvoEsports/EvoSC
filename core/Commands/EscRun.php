@@ -63,6 +63,7 @@ class EscRun extends Command
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
             ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
             ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
+            ->addOption('no-logo', null, InputOption::VALUE_OPTIONAL, 'Hide startup logo.', false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -177,8 +178,8 @@ class EscRun extends Command
 
         $version = getEvoSCVersion();
 
-        if(self::$docker){
-            $motd = "EvoSC v$version <href=https://github.com/EvoTM/EvoSC>https://github.com/EvoTM/EvoSC</>";
+        if(self::$docker || $input->getOption('no-logo') !== false){
+            $motd = "Loaded EvoSC v$version <href=https://github.com/EvoTM/EvoSC>https://github.com/EvoTM/EvoSC</>";
         }else{
             $motd = "                   ▄▄▄▄▄▄▄▄▄
              ▄▄█████████████████▄▄

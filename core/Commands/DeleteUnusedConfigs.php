@@ -35,7 +35,8 @@ class DeleteUnusedConfigs extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $outdated = [
-            'match-tracker.config.json'
+            'match-tracker.config.json',
+            'evosc.config.json'
         ];
 
         $output->writeln("Deleting stale configs...");
