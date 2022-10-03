@@ -176,8 +176,11 @@ class EscRun extends Command
         global $serverLogin;
 
         $version = getEvoSCVersion();
-        $motd = "
-                   ▄▄▄▄▄▄▄▄▄
+
+        if(self::$docker){
+            $motd = "EvoSC v$version <href=https://github.com/EvoTM/EvoSC>https://github.com/EvoTM/EvoSC</>";
+        }else{
+            $motd = "                   ▄▄▄▄▄▄▄▄▄
              ▄▄█████████████████▄▄
           ▄█████████████████████▀▀
         ████████████████████▀▀
@@ -195,6 +198,7 @@ class EscRun extends Command
            ▀▀█████████████████████▀
                ▀▀▀██████████▀▀▀
                ";
+        }
 
         $output->writeln("<fg=#ff0058;options=bold>$motd</>");
 
