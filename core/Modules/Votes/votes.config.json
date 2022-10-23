@@ -24,6 +24,7 @@
     "cooldown-in-seconds": 60,
     "success-ratio": 0.5,
     "disable-in-first": 0,
-    "disable-in-last": 180
+    "disable-in-last": 180,
+    "allow-after-add-time": false
   }
 }

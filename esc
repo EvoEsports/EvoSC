@@ -8,6 +8,7 @@ use EvoSC\Commands\LoadAuthorNamesTMX;
 use EvoSC\Commands\GetVersion;
 use EvoSC\Commands\EscRun;
 use EvoSC\Commands\AddAdmin;
+use EvoSC\Commands\DeleteUnusedConfigs;
 use EvoSC\Commands\FakeLocals;
 use EvoSC\Commands\ImportUaseco;
 use EvoSC\Commands\ImportPyplanet;
@@ -56,6 +57,7 @@ $application->add(new FakeLocals());
 $application->add(new AddAdmin());
 $application->add(new SetupAccessRights());
 $application->add(new LoadAuthorNamesTMX());
+$application->add(new DeleteUnusedConfigs());
 $application->setDefaultCommand("list");
 
 try {
