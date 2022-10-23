@@ -346,13 +346,13 @@ class Votes extends Module implements ModuleInterface
      */
     public static function askSkip(Player $player)
     {
-        if (ModeController::isTimeAttackType() && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess)) {
-            infoMessage('Can not skip the map after time was added.')->send($player);
+        if (!config('votes.skip.enabled')) {
+            warningMessage('Skipping is disabled.')->send($player);
             return;
         }
 
-        if (!config('votes.skip.enabled')) {
-            warningMessage('Skipping is disabled.')->send($player);
+        if (ModeController::isTimeAttackType() && (!is_null(self::$addTimeSuccess) && self::$addTimeSuccess) && !config('votes.skip.allow-after-add-time', false)) {
+            infoMessage('Can not skip the map after time was added.')->send($player);
             return;
         }
 
