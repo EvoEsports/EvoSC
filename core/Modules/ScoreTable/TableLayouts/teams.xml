@@ -30,35 +30,29 @@
     </framemodel>
 
     <framemodel id="team1">
-        <label id="team_name" class="text-lighter" pos="0 4.6" size="70 6" scale="0.95" text="Teamname" />
-        <label id="team_points" class="text-light" pos="-1.2 -0.6" size="70 6" text="n/a Points" scale="1.46" opacity="0.8" />
-        <quad id="team_logo" pos="80.2 0" valign="center" halign="center" size="20 20" scale="0.5" z-index="3" keepratio="fit" />
+        <label id="team_name" class="text-lighter" pos="-0.6 4" size="70 6" scale="1.2" z-index="10" text="Teamname" />
+        <label id="team_points" class="text-lighter" pos="-2 -0.7" size="70 6" text="n/a Points" scale="1.46" z-index="10" opacity="0.9" />
+        <quad id="team_logo" pos="80.2 0" valign="center" halign="center" size="20 20" scale="0.5" z-index="10" keepratio="fit" />
         <frame pos="-13.5" valign="center" size="110 100">
-            <frame pos="0.61 3.6" size="1000 4.8" valign="center">
-                <quad id="team_bg2" class="bg-dark" pos="10" size="76.4 80" rot="10.42" valign="center" halign="left" opacity="0.8" z-index="1" />
-            </frame>
-            <frame pos="-0.52 -2.45" size="1000 7.1" valign="center">
-                <quad id="team_bg" class="bg-dark" pos="10" size="76.4 80" rot="10.42" valign="center" halign="left" opacity="0.3" z-index="1" />
+            <frame pos="-1.1 0" size="1000 12" valign="center" z-index="2">
+                <quad id="team_bg2" bgcolor="000" pos="10" size="40 80" rot="10.42" valign="center" halign="left" opacity="0.6" z-index="1" style="Bgs1" substyle="BgGradLeft" />
             </frame>
             <frame size="1000 12" valign="center">
-                <quad class="bg-darker" pos="10" size="88.5 80" rot="10.42" valign="center" halign="left" opacity="0.9" />
+                <quad id="team_bg3" bgcolor="000" pos="10" size="88.5 80" rot="10.42" valign="center" halign="left" opacity="0.2" />
             </frame>
         </frame>
     </framemodel>
 
     <framemodel id="team2">
-        <label id="team_name" class="text-lighter" pos="84 4.6" halign="right" size="70 6" scale="0.95" text="Teamname" />
-        <label id="team_points" class="text-light" pos="82.3 -0.6" halign="right" size="70 6" text="n/a Points" scale="1.46" opacity="0.8" />
-        <quad id="team_logo" pos="2.8 0" valign="center" halign="center" size="20 20" scale="0.5" z-index="3" keepratio="fit" />
+        <label id="team_name" class="text-lighter" pos="84.6 4" halign="right" size="70 6" scale="1.2" z-index="10" text="Teamname" />
+        <label id="team_points" class="text-lighter" pos="83.3 -0.7" halign="right" size="70 6" text="n/a Points" scale="1.46" z-index="10" opacity="0.9" />
+        <quad id="team_logo" pos="2.8 0" valign="center" halign="center" size="20 20" scale="0.5" z-index="10" keepratio="fit" />
         <frame pos="-13.5" valign="center" size="110 100">
-            <frame pos="13 3.6" size="1000 4.8" valign="center">
-                <quad id="team_bg2" class="bg-dark" pos="10" size="76.4 80" rot="10.42" valign="center" halign="left" opacity="0.8" z-index="1" />
-            </frame>
-            <frame pos="11.8 -2.45" size="1000 7.1" valign="center">
-                <quad id="team_bg" class="bg-dark" pos="10" size="76.4 80" rot="10.42" valign="center" halign="left" opacity="0.3" z-index="1" />
+            <frame pos="12.9 0" size="1000 12" valign="center" z-index="2">
+                <quad id="team_bg2" bgcolor="000" pos="47.5" size="40 80" rot="10.42" valign="center" halign="left" opacity="0.6" z-index="1" style="Bgs1" substyle="BgGradRight" />
             </frame>
             <frame size="1000 12" valign="center">
-                <quad class="bg-darker" pos="10" size="88.5 80" rot="10.42" valign="center" halign="left" opacity="0.9" />
+                <quad id="team_bg3" bgcolor="000" pos="10" size="88.5 80" rot="10.42" valign="center" halign="left" opacity="0.2" />
             </frame>
         </frame>
     </framemodel>
@@ -104,7 +98,7 @@
     </framemodel>
 
     <frame z-index="0" pos="90 -12.5" scale="0.85">
-        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask_light.png" colorize="{config('theme.hud.accent')}" z-index="2" opacity="0.15" />
+        <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask_light.png" colorize="{config('theme.hud.bg-darker')}" z-index="2" opacity="0.1" />
         <quad size="248.5 129" pos="-3.25 -8.5" halign="center" valign="center" image="https://cdn.evotm.com/evosc/scoreboard_alpha_mask.png" colorize="{config('theme.hud.bg-dark')}" z-index="1" scale="0.999" opacity="0.9" />
     </frame>
 
@@ -230,7 +224,7 @@
     bgcolors.add(SB_Team1_Color);
     bgcolors.add(SB_Team2_Color);
     bgRankQuad.BgColor = bgcolors[score.TeamNum - 1];
-    bgRankQuad.Opacity = 0.2;
+    bgRankQuad.Opacity = 0.15;
     bgSlotQuad.BgColor = bgcolors[score.TeamNum - 1];
     bgSlotQuad.Opacity = 0.2;
 
@@ -274,6 +268,12 @@ perPage = 5;
 pageMultiplier = 0.5;
 SB_Team1_Color = CL::HexToRgb(TL::SubString(Teams[0].ColorText, 1, 3));
 SB_Team2_Color = CL::HexToRgb(TL::SubString(Teams[1].ColorText, 1, 3));
+declare team1Frame = (Page.MainFrame.GetFirstChild("team1") as CMlFrame);
+declare team2Frame = (Page.MainFrame.GetFirstChild("team2") as CMlFrame);
+(team1Frame.GetFirstChild("team_bg2") as CMlQuad).BgColor = SB_Team1_Color;
+(team1Frame.GetFirstChild("team_bg3") as CMlQuad).BgColor = SB_Team1_Color;
+(team2Frame.GetFirstChild("team_bg2") as CMlQuad).BgColor = SB_Team2_Color;
+(team2Frame.GetFirstChild("team_bg3") as CMlQuad).BgColor = SB_Team2_Color;
 ***
 
 *** SB_SetScores ***
