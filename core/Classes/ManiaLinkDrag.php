@@ -33,7 +33,7 @@ class ManiaLinkDrag
         return '
 Void maniaLinkDrag(){
     declare Vec2[Text] lastFramePosition for This;
-    declare handle <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlFrame);
+    declare handle <=> (Page.MainFrame.GetFirstChild("' . $this->targetId . '") as CMlQuad);
     
     if(!handle.Parent.Visible){
         return;

@@ -6,8 +6,6 @@ namespace EvoSC\Modules\MatchStats;
 
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
-use EvoSC\Classes\Log;
-use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Models\AccessRight;
 use EvoSC\Controllers\MapController;

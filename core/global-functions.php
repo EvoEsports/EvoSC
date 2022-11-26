@@ -402,11 +402,12 @@ function __(string $id, array $vars = [], string $language = 'en')
 
 /**
  * @param $title
+ * @param string $separator
  * @return string
  */
-function evo_str_slug($title)
+function evo_str_slug($title, string $separator = '-')
 {
-    return Str::slug($title, '-', 'en');
+    return Str::slug($title, $separator, 'en');
 }
 
 /**

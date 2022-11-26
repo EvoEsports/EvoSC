@@ -137,13 +137,32 @@ class Hook
     }
 
     /**
-     * TODO: Remove a hook
+     * Remove a hook
      *
      * @param string $event
      * @param callable $callback
      */
     public static function remove(string $event, callable $callback)
     {
+        try
+        {
+            $hook = HookController::getHooks($event)->first(function($value, $key) use ($callback)
+            {
+                return $value->function === $callback;
+            });
+
+            if ($hook == null)
+            {
+                throw new Exception('Hook not found.');
+            }
+
+            HookController::removeHook($hook);
+        }
+        catch (Exception $e)
+        {
+            $message = sprintf('Hook %s not found for callback %s.', $event, serialize($callback));
+            Log::errorWithCause($message, $e);
+        }
     }
 
     /**

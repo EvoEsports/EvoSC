@@ -33,7 +33,6 @@ use EvoSC\Controllers\SetupController;
 use EvoSC\Controllers\TemplateController;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Map;
-use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
@@ -44,7 +43,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EscRun extends Command
 {
+    /**
+     * @var bool
+     */
     protected static bool $docker = false;
+
+    /**
+     * @var bool
+     */
     protected bool $keepRunning = true;
 
     /**
@@ -55,9 +61,9 @@ class EscRun extends Command
         $this->setName('run')
             ->addOption('docker', null, InputOption::VALUE_OPTIONAL, 'Set this flag if EvoSC runs inside docker.', false)
             ->addOption('setup', null, InputOption::VALUE_OPTIONAL, 'Start the setup on boot.', false)
-            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.',
-                false)
+            ->addOption('skip_map_check', 'f', InputOption::VALUE_OPTIONAL, 'Start without verifying map integrity.', false)
             ->addOption('skip_migrate', 's', InputOption::VALUE_OPTIONAL, 'Skip migrations at start.', false)
+            ->addOption('no-logo', null, InputOption::VALUE_OPTIONAL, 'Hide startup logo.', false)
             ->setDescription('Run Evo Server Controller');
     }
 
@@ -72,9 +78,11 @@ class EscRun extends Command
         global $pidPath;
         global $serverLogin;
 
-        ConfigController::init();
-        Log::setOutput($output);
+        $migrate = $this->getApplication()->find('configs:clean');
+        $migrate->execute($input, $output);
 
+        Log::setOutput($output);
+        ConfigController::init();
         ChatCommand::removeAll();
         Timer::destroyAll();
         QuickButtons::removeAll();
@@ -169,14 +177,31 @@ class EscRun extends Command
         global $serverLogin;
 
         $version = getEvoSCVersion();
-        $motd = "      ______           _____ ______
-     / ____/  _______ / ___// ____/
-    / __/| | / / __ \\__ \/ /
-   / /___| |/ / /_/ /__/ / /___
-  /_____/|___/\____/____/\____/  $version
-";
 
-        $output->writeln("<fg=cyan;options=bold>$motd</>");
+        if(self::$docker || $input->getOption('no-logo') !== false){
+            $motd = "Loaded EvoSC v$version <href=https://github.com/EvoTM/EvoSC>https://github.com/EvoTM/EvoSC</>";
+        }else{
+            $motd = "                   ▄▄▄▄▄▄▄▄▄
+             ▄▄█████████████████▄▄
+          ▄█████████████████████▀▀
+        ████████████████████▀▀
+      ▄████████████████▀▀
+     █████████████▀▀                  ▄▄▄
+    ▐████████▀▀               ▄▄▄█████████      <fg=white>EvoSC v$version</>
+    █████▀             ▄▄▄████████████████▌     <href=https://github.com/EvoTM/EvoSC>https://github.com/EvoTM/EvoSC</>
+    ▀▀         ▄▄▄████████████████████████▌
+        ▄▄████████████████████▀▀▀▀▀▀▀
+    ████████████▀▀▀▀▀▀
+     ▀▀
+         ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄═
+       ▀███████████████████████████████▀
+         ▀███████████████████████████▀
+           ▀▀█████████████████████▀
+               ▀▀▀██████████▀▀▀
+               ";
+        }
+
+        $output->writeln("<fg=#ff0058;options=bold>$motd</>");
 
         Log::info("Starting...");
 
