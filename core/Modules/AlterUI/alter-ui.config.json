@@ -1,4 +1,5 @@
 {
   "enabled": true,
-  "spec-info": true
+  "spec-info": true,
+  "show-default-scorestable": false
 }
