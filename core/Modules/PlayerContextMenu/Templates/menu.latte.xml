@@ -9,15 +9,25 @@
     </framemodel>
 
     <quad id="bg_trigger" class="bg_trigger" size="1000 1000" valign="center" halign="center" z-index="9000" hidden="1" ScriptEvents="1" />
-    <frame pos="0 80" id="menu" z-index="9001" hidden="1">
-        <frame id="info" size="40 9" z-index="1">
-            <quad class="bg-darker" size="100 100" opacity="0.9" />
-            <label id="player_login" class="text-light" pos="2 -2" z-index="2" scale="0.8" opacity="0.75" />
-            <label id="player_name" class="text-light" pos="2 -4.5" z-index="2" scale="1" />
+    <frame pos="0 80" id="menu" z-index="9001" hidden="1" scale="0.97">
+        <frame id="info" size="39.95 9" z-index="1">
+            <quad class="bg-darker" size="100 100" />
+            <label id="player_login" class="text-light" pos="2 -1.8" size="22" z-index="2" scale="0.8" opacity="0.85" />
+            <label id="player_ubiname" class="text-light" pos="19.8 -1.8" size="22 2" z-index="2" scale="0.74" opacity="0.85" textprefix=" | " />
+            <label id="player_name" class="text-light" pos="2 -4.8" z-index="2" scale="1" />
         </frame>
-        <frame id="actions" pos="0 -6.5">
+        <frame id="top_actions" pos="0 -13.8" z-index="2">
+            {foreach $topActions as $i => $action}
+            <frame pos="{round($i * 40 / 3, 8)} 0">
+                <label class="btn-muted action" size="{round(40 / 3, 8)} 8" pos="{round(40 / 6, 8)} 4.8" textsize="0.3" valign="top" halign="center" data-action="{$action->action}" ScriptEvents="1" focusareacolor1="{config('theme.hud.bg-dark')}" />
+                <label class="text-light" pos="{round(40 / 6, 8)} 2.5" text="{$action->icon}" z-index="1" halign="center" valign="center" />
+                <label class="btn-muted" pos="{round(40 / 6, 8)} -0.5" textsize="0.2" halign="center" text="{$action->text}" opacity="0.9"/>
+            </frame>
+            {/foreach}
+        </frame>
+        <frame id="actions" pos="0 -14.3">
             {for $i=0; $i<20; $i++}
-            <frameinstance modelid="action" />
+            <frameinstance modelid="action" z-index="{-$i}" />
             {/for}
         </frame>
         <frame pos="0 -9">
@@ -76,16 +86,38 @@
         actionLabel.DataAttributeSet("confirm", action.confirm ^ "");
     }
 
+    Text GetPlayerUbiNameByLogin(Text login){
+        foreach(player in Players){
+            if(player.User.Login == login){
+                return player.User.Name;
+            }
+        }
+
+        return "";
+    }
+
+    Text GetPlayerAccountIdByLogin(Text login){
+        foreach(player in Players){
+            if(player.User.Login == login){
+                return player.User.WebServicesUserId;
+            }
+        }
+
+        return "";
+    }
+
     Void showContextMenu(Text login){
         declare bgTrigger <=> (Page.MainFrame.GetFirstChild("bg_trigger") as CMlQuad);
         declare menuFrame <=> (Page.MainFrame.GetFirstChild("menu") as CMlFrame);
         declare infoFrame <=> (menuFrame.GetFirstChild("info") as CMlFrame);
         declare actionsFrame <=> (menuFrame.GetFirstChild("actions") as CMlFrame);
         declare playerLoginLabel = (menuFrame.GetFirstChild("player_login") as CMlLabel);
+        declare playerUbiNameLabel = (menuFrame.GetFirstChild("player_ubiname") as CMlLabel);
         declare playerNameLabel = (menuFrame.GetFirstChild("player_name") as CMlLabel);
         declare separator <=> (Page.MainFrame.GetFirstChild("separator") as CMlQuad);
         playerLoginLabel.Value = login;
         playerNameLabel.Value = login;
+        playerUbiNameLabel.Value = GetPlayerUbiNameByLogin(login);
         separator.Hide();
         declare actions = getActions();
 
@@ -150,8 +182,8 @@
     }
 
     Void __showProfile(Text targetLogin){
-        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
-        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+        declare Text LibTMxSMRaceScoresTable_OpenProfileUserId for ClientUI = "";
+        LibTMxSMRaceScoresTable_OpenProfileUserId = GetPlayerAccountIdByLogin(targetLogin);
     }
 
     Void call(Text action, Text login){
@@ -165,7 +197,7 @@
     main(){
         declare EvoSC_PlayerContextMenuTarget for This = "";
         visible = False;
-                customActionsCount = 0;
+        customActionsCount = 0;
 
         defaultActions.fromjson("""{$defaultActions->toJson()}""");
 

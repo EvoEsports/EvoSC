@@ -35,6 +35,7 @@ use Illuminate\Support\Collection;
  * @property boolean $banned
  * @property carbon $last_visit
  * @property Group $group
+ * @property HasOne|SetnameBlacklist $setnameBlacklist
  *
  * @method static find(string $login)
  */
@@ -328,5 +329,21 @@ class Player extends Model
     public function isFakePlayer(): bool
     {
         return preg_match('/\*fakeplayer\d+\*/', $this->Login);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function setnameBlacklist(): HasOne
+    {
+        return $this->hasOne(SetnameBlacklist::class, 'login', 'Login');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSetnameBlacklisted(): bool
+    {
+        return $this->setnameBlacklist()->exists();
     }
 }
