@@ -32,11 +32,18 @@ class FunCommands extends Module implements ModuleInterface
         }, 'Say Good Game All.');
 
         ChatCommand::add('/bootme', function (Player $player) {
-            infoMessage($player, ' boots back to the real world!')->sendAll();
+            if (!ChatController::isPlayerMuted($player)) {
+                infoMessage($player, ' boots back to the real world!')->sendAll();
+            }
+
             Server::kick($player->Login, 'cya');
         }, 'Boot yourself back to the real world.');
 
         ChatCommand::add('/me', function (Player $player, ...$message) {
+            if (ChatController::isPlayerMuted($player)) {
+                return;
+            }
+
             array_shift($message);
 
             $message = trim(implode(' ', $message));

@@ -158,13 +158,6 @@ class EventController implements ControllerInterface
                 return;
             }
 
-            if (collect(Server::getIgnoreList())->contains('login', $login)) {
-                //Player is muted
-                warningMessage('You are muted.')->send(player($login));
-
-                return;
-            }
-
             try {
                 Hook::fire('PlayerChat', player($login), $text);
             } catch (Exception $e) {
