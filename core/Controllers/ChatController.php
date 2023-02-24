@@ -29,6 +29,8 @@ class ChatController implements ControllerInterface
     private static string $primary;
 
     private static array $betterChatEnabledLogins = [];
+    private static array $mutedLogins = [];
+
 
     /**
      * Initialize ChatController.
@@ -60,6 +62,7 @@ class ChatController implements ControllerInterface
     public static function start(string $mode, bool $isBoot)
     {
         self::$primary = (string)config('theme.chat.default');
+        self::cacheMutedLogins();
 
         ChatCommand::add('//mute', [self::class, 'cmdMute'], 'Mutes a player by given nickname', 'player_mute');
         ChatCommand::add('//unmute', [self::class, 'cmdUnmute'], 'Unmute a player by given nickname', 'player_mute');
@@ -111,6 +114,7 @@ class ChatController implements ControllerInterface
     public static function mute(Player $admin, Player $target)
     {
         Server::ignore($target->Login);
+        self::cacheMutedLogins();
         infoMessage($admin, ' muted ', $target)->sendAll();
     }
 
@@ -123,6 +127,7 @@ class ChatController implements ControllerInterface
     public static function unmute(Player $player, Player $target)
     {
         Server::unIgnore($target->Login);
+        self::cacheMutedLogins();
         infoMessage($player, ' unmuted ', $target)->sendAll();
     }
 
@@ -159,14 +164,22 @@ class ChatController implements ControllerInterface
         self::mute($admin, $target);
     }
 
-    public static function isPlayerMuted(Player $player)
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public static function isPlayerMuted($player): bool
     {
-        return collect(Server::getIgnoreList())->contains('login', '=', $player->Login);
+        return in_array($player->Login, self::$mutedLogins);
     }
 
     public static function pmTo(Player $player, $login, $message)
     {
         if (empty($message)) {
+            return;
+        }
+
+        if (self::isPlayerMuted($player)) {
             return;
         }
 
@@ -193,7 +206,12 @@ class ChatController implements ControllerInterface
      */
     public static function playerChat(Player $player, $text)
     {
-        Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>', true);
+        if (self::isPlayerMuted($player)) {
+            Log::write('<fg=yellow>[' . $player . '][MUTED] <fg=white>' . $text . '</></>');
+            return;
+        }
+
+        Log::write('<fg=yellow>[' . $player . '] ' . $text . '</>');
 
         $name = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $player->NickName);
         $text = preg_replace('/(?:(?<=[^$])\$s|^\$s)/i', '', $text);
@@ -284,5 +302,13 @@ class ChatController implements ControllerInterface
         if (in_array($player->Login, self::$betterChatEnabledLogins)) {
             self::$betterChatEnabledLogins = array_diff(self::$betterChatEnabledLogins, [$player->Login]);
         }
+    }
+
+    /**
+     * @return void
+     */
+    private static function cacheMutedLogins()
+    {
+        self::$mutedLogins = array_column(Server::getIgnoreList(), 'login');
     }
 }

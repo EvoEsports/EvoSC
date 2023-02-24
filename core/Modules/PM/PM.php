@@ -7,6 +7,7 @@ namespace EvoSC\Modules\PM;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ChatController;
 use EvoSC\Controllers\PlayerController;
@@ -28,7 +29,7 @@ class PM extends Module implements ModuleInterface
         ManiaLinkEvent::add('pm', [self::class, 'mlePm']);
 
         ChatCommand::add('/pm', [self::class, 'cmdWritePM'], 'Send a private message to another player. Usage: /pm <partial_nickname> <message...> or click PM in the scoreboard, to message a player.')
-        ->addAlias('dm');
+            ->addAlias('dm');
     }
 
     /**
@@ -39,9 +40,14 @@ class PM extends Module implements ModuleInterface
      */
     public static function cmdWritePM(Player $player, $cmd, $target, ...$text)
     {
+        if (ChatController::isPlayerMuted($player) && !config('pm.allow-when-muted', false)) {
+            warningMessage('You can\'t message players privately while being muted.')->send($player);
+            return;
+        }
+
         $target = PlayerController::findPlayerByName($player, $target);
 
-        if($target){
+        if ($target) {
             self::mlePm($player, $target->Login, ...$text);
         }
     }

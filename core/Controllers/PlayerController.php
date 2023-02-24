@@ -122,7 +122,7 @@ class PlayerController implements ControllerInterface
         $player->NickName = $name;
         $player->save();
         self::$players->put($player->Login, $player);
-        if (!$silent) {
+        if (!$silent && !ChatController::isPlayerMuted($player)) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
         }
         Cache::put('nicknames/' . $player->Login, $name);

@@ -5,6 +5,7 @@ namespace EvoSC\Modules\PlayerContextMenu;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
@@ -73,9 +74,14 @@ class PlayerContextMenu extends Module implements ModuleInterface
      * @param string $access
      * @param bool $confirm
      * @return void
+     * @throws InvalidArgumentException
      */
     public static function extend(string $icon, string $text, string $action, string $access = '', bool $confirm = false): void
     {
+        if(empty($action)){
+            throw new InvalidArgumentException("Action can not be empty.");
+        }
+
         self::$customActions->push((object)['icon' => $icon, 'text' => $text, 'action' => $action, 'access' => $access, 'confirm' => $confirm]);
     }
 }

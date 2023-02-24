@@ -10,6 +10,7 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
+use EvoSC\Controllers\ChatController;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
@@ -326,7 +327,13 @@ class MxKarma extends Module implements ModuleInterface
         }
 
         if (!$silent) {
-            infoMessage($player, ' rated this map ', secondary(strtolower(self::ratings[$rating])))->sendAll();
+            $infoMessage = infoMessage($player, ' rated this map ', secondary(strtolower(self::ratings[$rating])));
+
+            if(ChatController::isPlayerMuted($player)){
+                $infoMessage->send($player);
+            }else{
+                $infoMessage->sendAll();
+            }
         }
 
         Template::show($player, 'MxKarma.update-my-rating', [
@@ -465,10 +472,15 @@ class MxKarma extends Module implements ModuleInterface
 
     /**
      * @param Player $player
+     * @return void
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function voteWorst(Player $player)
     {
         self::vote($player, 0, true);
-        infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
+
+        if(!ChatController::isPlayerMuted($player)){
+            infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
+        }
     }
 }
