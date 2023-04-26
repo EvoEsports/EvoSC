@@ -45,6 +45,12 @@ class ScoreTable extends Module implements ModuleInterface
                 'mode'    => 'Trackmania/TM_Teams_Online.Script.txt',
                 'file'    => __DIR__ . '/TableLayouts/teams.xml',
                 'id'      => "ScoreTable.Layouts.Teams"
+            ],
+            (object)[
+                'default' => false,
+                'mode'    => 'Trackmania/TM_TMWTTeams_Online.Script.txt',
+                'file'    => __DIR__ . '/TableLayouts/teams.xml',
+                'id'      => "ScoreTable.Layouts.Teams"
             ]
         ];
 
