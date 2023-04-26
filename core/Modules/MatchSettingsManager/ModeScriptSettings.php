@@ -119,7 +119,7 @@ class ModeScriptSettings
     /**
      * @return Collection
      */
-    public static function all(): Collection
+    public static function everyMode(): Collection
     {
         return collect([
             new ModeScriptSetting('S_ChatTime', 'integer', 'Chat time at the end of a map or match', 10),
@@ -211,7 +211,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpDuration', 'integer', 'Duration of one warm up', 0),
             new ModeScriptSetting('S_NbPlayersPerTeamMax', 'integer', 'Maximum number of players per team in matchmaking', 3),
             new ModeScriptSetting('S_NbPlayersPerTeamMin', 'integer', 'Minimum number of players per team in matchmaking', 3),
-        ], self::all(), self::matchMaking());
+        ], self::everyMode(), self::matchMaking());
     }
 
     /**
@@ -227,7 +227,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WaypointEventDelay', 'integer', "Waypoint event buffer delay", 300),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
-        ], self::all());
+        ], self::everyMode());
     }
 
     /**
@@ -242,7 +242,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_NbOfPlayersMax', 'integer', "Maximum number of players in matchmaking", 4),
             new ModeScriptSetting('S_NbOfPlayersMin', 'integer', "Minimum number of players in matchmaking", 4),
-        ], self::all(), self::roundsBase(), self::matchMaking());
+        ], self::everyMode(), self::roundsBase(), self::matchMaking());
     }
 
     /**
@@ -257,7 +257,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of warm up", 0),
             new ModeScriptSetting('S_DisableGiveUp', 'boolean', "Prevent players from giving up the race", false),
-        ], self::all());
+        ], self::everyMode());
     }
 
     /**
@@ -272,7 +272,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_UseTieBreak', 'boolean', "Continue to play the map until the tie is broken", true),
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
-        ], self::all(), self::roundsBase());
+        ], self::everyMode(), self::roundsBase());
     }
 
     /**
@@ -292,7 +292,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_NbPlayersPerTeamMax	', 'integer', "Maximum number of players per team in matchmaking", 3),
             new ModeScriptSetting('S_NbPlayersPerTeamMin', 'integer', "Minimum number of players per team in matchmaking", 3),
-        ], self::all(), self::roundsBase(), self::matchMaking());
+        ], self::everyMode(), self::roundsBase(), self::matchMaking());
     }
 
     /**
@@ -305,7 +305,7 @@ class ModeScriptSettings
             new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
             new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 0),
             new ModeScriptSetting('S_ForceLapsNb', 'integer', "Number of Laps (-1 to use the map default, 0 to disable laps limit)", 0),
-        ], self::all());
+        ], self::everyMode());
     }
 
     /**
@@ -321,7 +321,46 @@ class ModeScriptSettings
             new ModeScriptSetting('S_ChatTime', 'integer', "Time in seconds to chat at map end", 6),
             new ModeScriptSetting('S_EliminatedPlayersNbRanks', 'text', "Rank at which one more player is eliminated per round", "3"),
             new ModeScriptSetting('S_RoundsWithoutElimination', 'integer', "Numbers of rounds without elimination", 1),
-        ], self::all());
+        ], self::everyMode());
+    }
+
+    /**
+     * @return Collection
+     */
+    public static function tmwt(): Collection
+    {
+        return self::combine([
+            new ModeScriptSetting('S_DelayBeforeNextMap', 'int', "", 2000),
+            new ModeScriptSetting('S_ForceLapsNb', 'int', "", -1),
+            new ModeScriptSetting('S_InfiniteLaps', 'boolean', "", false),
+            new ModeScriptSetting('S_SeasonIds', 'string', "", ''),
+            new ModeScriptSetting('S_IsSplitScreen', 'boolean', "", false),
+            new ModeScriptSetting('S_DecoImageUrl_WhoAmIUrl', 'string', "", '/api/club/room/:ServerLogin/whoami'),
+            new ModeScriptSetting('S_DecoImageUrl_Checkpoint', 'string', "", ''),
+            new ModeScriptSetting('S_DecoImageUrl_DecalSponsor4x1', 'string', "", ''),
+            new ModeScriptSetting('S_DecoImageUrl_Screen16x9', 'string', "", ''),
+            new ModeScriptSetting('S_DecoImageUrl_Screen8x1', 'string', "", ''),
+            new ModeScriptSetting('S_DecoImageUrl_Screen16x1', 'string', "", ''),
+            new ModeScriptSetting('S_TrustClientSimu', 'boolean', "", true),
+            new ModeScriptSetting('S_UseCrudeExtrapolation', 'boolean', "", true),
+            new ModeScriptSetting('S_SynchronizePlayersAtMapStart', 'boolean', "", true),
+            new ModeScriptSetting('S_DisableGoToMap', 'boolean', "", false),
+            new ModeScriptSetting('S_PointsRepartition', 'string', "Custom points distribution", ''),
+            new ModeScriptSetting('S_SynchronizePlayersAtRoundStart', 'boolean', "", true),
+            new ModeScriptSetting('S_MapPointsLimit', 'int', "Track points limit", 10),
+            new ModeScriptSetting('S_MatchPointsLimit', 'int', "Match points limit. 4 Seems to be max possible value.", 4),
+            new ModeScriptSetting('S_FinishTimeout', 'int', "Finish timeout", -1),
+            new ModeScriptSetting('S_WarmUpNb', 'int', "Number of warm up", 0),
+            new ModeScriptSetting('S_WarmUpDuration', 'int', "Duration of one warm up", 0),
+            new ModeScriptSetting('S_WarmUpTimeout', 'int', "Warm up timeout", -1),
+            new ModeScriptSetting('S_MatchInfo', 'string', "Match info displayed in the UI. Shows a message in the waiting screen before the match.", ''),
+            new ModeScriptSetting('S_TeamsUrl', 'string', "Teams URL", ''),
+            new ModeScriptSetting('S_SponsorsUrl', 'string', "Sponsors URL", ''),
+            new ModeScriptSetting('S_ForceRoadSpectatorsNb', 'int', "", -1),
+            new ModeScriptSetting('S_EnablePreMatch', 'boolean', "", false),
+            new ModeScriptSetting('S_EarlyEndMatchCallback', 'boolean', "", true),
+            new ModeScriptSetting('S_EnableDossardColor', 'boolean', "", true),
+        ], self::everyMode());
     }
 
     /**
@@ -371,10 +410,13 @@ class ModeScriptSettings
                 case 'Cup.Script.txt':
                 case 'TM_Cup_Online.Script.txt':
                     return self::cup();
+
+                case 'TM_TMWTTeams_Online.Script.txt':
+                    return self::tmwt();
             }
         }
 
-        return self::all();
+        return self::everyMode();
     }
 
     /**

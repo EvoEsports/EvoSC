@@ -61,6 +61,7 @@ class MatchSettingsManager extends Module implements ModuleInterface
         'Laps'       => 'Trackmania/TM_Laps_Online.Script.txt',
         'Champion'   => 'Trackmania/TM_Champion_Online.Script.txt',
         'Knockout'   => 'Trackmania/TM_Knockout_Online.Script.txt',
+        'TMWT'       => 'Trackmania/TM_TMWTTeams_Online.Script.txt',
     ];
 
     /**
