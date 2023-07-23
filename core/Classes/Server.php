@@ -263,7 +263,7 @@ use Maniaplanet\DedicatedServer\Structures\Version;
  * @method static int appendPlaylistFromMatchSettings(string $string)
  * @method static int saveMatchSettings(string $string)
  * @method static int insertPlaylistFromMatchSettings(string $string)
- * @method static array getPlayerList(int $int = 0, int $int = 0, int $int = 0)
+ * @method static PlayerInfo[] getPlayerList(int $int = 0, int $int = 0, int $int = 0)
  * @method static PlayerInfo getPlayerInfo(string $string, int $int = 0)
  * @method static PlayerDetailedInfo getDetailedPlayerInfo(string $string)
  * @method static object getMainServerPlayerInfo(int $int)

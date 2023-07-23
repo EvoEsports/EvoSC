@@ -150,7 +150,7 @@
 
         {block bootScript}
         declare Integer[Text] EvoSC_RoundsPointsDistribution for This;
-        declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for LocalUser;
+        declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for UI;
         declare lastRaceRankingsSize = -1;
         declare rows <=> (Page.MainFrame.GetFirstChild("rows") as CMlFrame);
         header <=> (Page.MainFrame.GetFirstChild("header") as CMlQuad);

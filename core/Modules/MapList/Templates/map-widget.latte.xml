@@ -52,10 +52,10 @@
         declare widget = (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare widgetControls = (Page.MainFrame.GetFirstChild("controls") as CMlFrame);
         declare controlsVisible = False;
-        declare Text[Text][] Maps for LocalUser;
-        declare Text[Text][Integer] MapAuthors for LocalUser;
-        declare Text MapSearchQuery for LocalUser;
-        declare Integer MapUpdateTime for LocalUser = 0;
+        declare Text[Text][] Maps for UI;
+        declare Text[Text][Integer] MapAuthors for UI;
+        declare Text MapSearchQuery for UI;
+        declare Integer MapUpdateTime for UI = 0;
         declare lastMapUpdate = 0;
         declare Text[] ESC_Map_Favorite_Uids for This;
         declare Text currentMapUid;

@@ -34,7 +34,7 @@
     #Include "TextLib" as TL
 
     main() {
-        declare Integer[Text] VoteState for LocalUser = Integer[Text];
+        declare Integer[Text] VoteState for UI = Integer[Text];
         declare mainFr <=> (Page.MainFrame.GetFirstChild("main") as CMlFrame);
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare backgroundBar = (Page.MainFrame.GetFirstChild("bar_bg") as CMlQuad);

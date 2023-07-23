@@ -4,9 +4,9 @@
     <script>
         <!--
         main(){
-            declare Text[Text][] Maps for LocalUser;
-            declare Text[Text][Integer] MapAuthors for LocalUser;
-            declare Integer MapUpdateTime for LocalUser;
+            declare Text[Text][] Maps for UI;
+            declare Text[Text][Integer] MapAuthors for UI;
+            declare Integer MapUpdateTime for UI;
             declare Text mapAuthorsJson = """{$mapAuthors|noescape}""";
             MapAuthors.fromjson(mapAuthorsJson);
 

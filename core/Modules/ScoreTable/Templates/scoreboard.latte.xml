@@ -214,7 +214,7 @@
         declare groupLabel <=> (box.Controls[8] as CMlLabel);
         declare fameStarsLabel <=> (box.Controls[9] as CMlLabel);
         declare lpGainLabel <=> (box.Controls[11] as CMlLabel);
-        declare Text[Text] EvoSC_CustomNames for LocalUser;
+        declare Text[Text] EvoSC_CustomNames for UI;
 
 		declare LibST_Status for user = C_Status_Disconnected;
 		if(LibST_Status == C_Status_Disconnected){
