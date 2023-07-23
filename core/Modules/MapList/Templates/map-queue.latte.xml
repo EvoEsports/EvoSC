@@ -60,7 +60,7 @@ declare Real buttonsWidth;
     {block functions}
     <script><!--
 Text getLocal(Text mapId){
-    declare Integer[Text] Locals for LocalUser;
+    declare Integer[Text] Locals for UI;
 
     if(Locals.existskey(mapId)){
         return TL::ToText(Locals[mapId]) ^ ".";
@@ -70,7 +70,7 @@ Text getLocal(Text mapId){
 }
 
 Text getDedi(Text mapId){
-    declare Integer[Text] Dedis for LocalUser;
+    declare Integer[Text] Dedis for UI;
 
     if(Dedis.existskey(mapId)){
         return TL::ToText(Dedis[mapId]) ^ ".";
@@ -157,7 +157,7 @@ Void buttonPressed(CMlFrame mapFrame, CMlControl control){
         window.Hide();
         rearrangeButtons();
 
-        declare Text MapSearchQuery for LocalUser;
+        declare Text MapSearchQuery for UI;
         declare Text[Text][] MapQueue for This;
         declare Integer lastMapQueueUpdate for This = 0;
         declare Integer lastUpdate = 0;

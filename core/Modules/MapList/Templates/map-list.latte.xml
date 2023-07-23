@@ -199,12 +199,12 @@ Void rearrangeButtons(){
 }
 
 Boolean hasLocal(Text mapId){
-    declare Integer[Text] Locals for LocalUser;
+    declare Integer[Text] Locals for UI;
     return Locals.existskey(mapId);
 }
 
 Boolean hasDedi(Text mapId){
-    declare Integer[Text] Dedis for LocalUser;
+    declare Integer[Text] Dedis for UI;
     return Dedis.existskey(mapId);
 }
 
@@ -213,7 +213,7 @@ Boolean hasRecord(Text mapId){
 }
 
 Text getLocal(Text mapId){
-    declare Integer[Text] Locals for LocalUser;
+    declare Integer[Text] Locals for UI;
 
     if(Locals.existskey(mapId)){
         return TL::ToText(Locals[mapId]) ^ ".";
@@ -223,7 +223,7 @@ Text getLocal(Text mapId){
 }
 
 Text getDedi(Text mapId){
-    declare Integer[Text] Dedis for LocalUser;
+    declare Integer[Text] Dedis for UI;
 
     if(Dedis.existskey(mapId)){
         return TL::ToText(Dedis[mapId]) ^ ".";
@@ -388,7 +388,7 @@ Void search(){
                 }
             }
 
-            declare Integer[Text] Locals for LocalUser;
+            declare Integer[Text] Locals for UI;
             foreach(mapId => local in Locals){
                 if(selected.existskey(mapId)){
                     mapsFound.add(selected[mapId]);
@@ -407,7 +407,7 @@ Void search(){
 
             declare Text[] localsAsc = Text[];
 
-            declare Integer[Text] Locals for LocalUser;
+            declare Integer[Text] Locals for UI;
             foreach(mapId => local in Locals){
                 localsAsc.add(mapId);
             }
@@ -434,7 +434,7 @@ Void search(){
                 }
             }
 
-            declare Integer[Text] Dedis for LocalUser;
+            declare Integer[Text] Dedis for UI;
             foreach(mapId => dedi in Dedis){
                 if(selected.existskey(mapId)){
                     mapsFound.add(selected[mapId]);
@@ -453,7 +453,7 @@ Void search(){
 
             declare Text[] dedisAsc = Text[];
 
-            declare Integer[Text] Dedis for LocalUser;
+            declare Integer[Text] Dedis for UI;
             foreach(mapId => dedi in Dedis){
                 dedisAsc.add(mapId);
             }
@@ -613,7 +613,7 @@ Void jukeMapByCommand(Text query){
 }
 
 Void checkMapSearchQuery(){
-    declare Text MapSearchQuery for LocalUser;
+    declare Text MapSearchQuery for UI;
     if(MapSearchQuery != ""){
         if(TL::SubString(MapSearchQuery, 0, 5) == "juke:"){
             declare length = TL::Length(MapSearchQuery) - 5;
@@ -707,9 +707,9 @@ Void setCooldownToZero(Text uid){
         declare lastFavoritesUpdate = 0;
 
         mapListFrame = (Page.MainFrame.GetFirstChild("map-list-window") as CMlFrame);
-        declare Text[Text][] Maps for LocalUser;
-        declare Text[Text][Integer] MapAuthors for LocalUser;
-        declare Integer MapUpdateTime for LocalUser = 0;
+        declare Text[Text][] Maps for UI;
+        declare Text[Text][Integer] MapAuthors for UI;
+        declare Integer MapUpdateTime for UI = 0;
         declare Boolean showQueue for This = False;
         declare lastMapUpdate = 0;
         declare lastUid = Map.Id;

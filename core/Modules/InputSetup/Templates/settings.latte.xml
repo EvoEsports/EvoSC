@@ -48,7 +48,7 @@
 
     <script><!--
     main(){
-        declare Text[Text] CustomKeyBinds for LocalUser;
+        declare Text[Text] CustomKeyBinds for UI;
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare entries <=> (Page.MainFrame.GetFirstChild("entries") as CMlFrame);
 

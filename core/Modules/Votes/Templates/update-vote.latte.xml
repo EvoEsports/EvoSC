@@ -4,7 +4,7 @@
 <script>
 <!--
     main() {
-        declare Integer[Text] VoteState for LocalUser;
+        declare Integer[Text] VoteState for UI;
         VoteState.fromjson("""{$voteStateJson}""");
     }
 -->

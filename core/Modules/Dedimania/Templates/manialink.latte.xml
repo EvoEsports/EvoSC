@@ -199,8 +199,8 @@
     {/block}
 
     {block bootScript}
-        declare Record[] DediRecords for LocalUser;
-        declare Integer LastDediRecordsUpdate for LocalUser = 0;
+        declare Record[] DediRecords for UI;
+        declare Integer LastDediRecordsUpdate for UI = 0;
         declare Integer lastUpdate = 0;
         declare Integer playerCount = 0;
         declare Ident mapUid;

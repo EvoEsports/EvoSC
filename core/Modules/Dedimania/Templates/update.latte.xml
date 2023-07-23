@@ -12,8 +12,8 @@
         }
 
         main(){
-            declare Record[] DediRecords for LocalUser;
-            declare Integer LastDediRecordsUpdate for LocalUser;
+            declare Record[] DediRecords for UI;
+            declare Integer LastDediRecordsUpdate for UI;
             declare Text dedisJson = """{$recordsJson|noescape}""";
 
             DediRecords.fromjson(dedisJson);
