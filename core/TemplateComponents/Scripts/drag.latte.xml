@@ -5,6 +5,7 @@ declare Text handleId;
 declare Text D_Centered;
 
 Void __dragSetFocus(Text id){
+    declare Text EvoSC_Focused_Window_ID for This;
     declare Boolean[Text] EvoSC_Window_Focus for This;
     declare Boolean[Text] focus;
     foreach(ScriptId => Focused in EvoSC_Window_Focus){
@@ -12,9 +13,12 @@ Void __dragSetFocus(Text id){
     }
     focus[EVO_SCRIPT_ID] = True;
     EvoSC_Window_Focus = focus;
+    EvoSC_Focused_Window_ID = EVO_SCRIPT_ID;
 }
 
 Void maniaLinkDrag(){
+    declare Text EvoSC_Focused_Window_ID for This = "";
+    declare Boolean[Text] EvoSC_Window_Focus for This;
     declare Vec2[Text] lastFramePosition for This;
     declare Boolean G_Drag_Active for This = False;
 
@@ -61,11 +65,17 @@ Void maniaLinkDrag(){
         handle.Parent.DataAttributeSet("centered", "centered");
     }
 
+    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
+
+    if(EvoSC_Focused_Window_ID != "" && EvoSC_Focused_Window_ID != EVO_SCRIPT_ID){
+        return;
+    }
+
     if(MouseLeftButton && !G_Drag_Active){
         if(MouseX >= framePos[0]){
             if(MouseY <= framePos[1]){
                 if(MouseX <= (framePos[0] + frameSize[0]) && MouseY >= (framePos[1] - frameSize[1])){
-                    declare Real ZIndex for LocalUser = 305.0;
+                    declare Real ZIndex for UI = 305.0;
                     declare startPos = handle.Parent.RelativePosition_V3;
                     declare startX = MouseX;
                     declare startY = MouseY;
@@ -73,8 +83,7 @@ Void maniaLinkDrag(){
                     G_Drag_Active = True;
 
                     __dragSetFocus(EVO_SCRIPT_ID);
-                    declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
-                    window.ZIndex = 300.0;
+                    window.ZIndex = 310.0;
 
                     while(MouseLeftButton){
                         yield;

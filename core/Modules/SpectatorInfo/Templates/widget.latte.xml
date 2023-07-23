@@ -11,7 +11,7 @@
     main(){
         declare widget <=> (Page.MainFrame.GetFirstChild("widget") as CMlFrame);
         declare targetName <=> (Page.MainFrame.GetFirstChild("targetName") as CMlLabel);
-        declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
+        declare Text[Text] EvoSC_CustomNamesByUbiname for UI;
         declare Text FocusedPlayerLogin;
 
         while(True){

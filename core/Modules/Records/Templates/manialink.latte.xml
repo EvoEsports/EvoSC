@@ -99,7 +99,7 @@ Void stopLoading(){
     }
 
     Void updateRow(CMlFrame row, Record::K_TMxSM_Record_Record record, Boolean isOnline){
-        declare Text[Text] EvoSC_CustomNamesByUbiname for LocalUser;
+        declare Text[Text] EvoSC_CustomNamesByUbiname for UI;
         declare K_State Race_Record_State for UI;
         (row.Controls[0] as CMlLabel).Value = record.Rank ^ ".";
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
@@ -414,7 +414,7 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
         left__ = {config('records.ui.position') == 'left'|ms_bool};
         slot__ = {config('records.ui.slot')};
 
-        declare Integer EvoSC_CustomNamesUpdate for LocalUser;
+        declare Integer EvoSC_CustomNamesUpdate for UI;
         declare lastNamesUpdate = 0;
 
         declare K_State Race_Record_State for UI;

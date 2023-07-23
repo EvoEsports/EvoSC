@@ -4,8 +4,8 @@
     <script>
         <!--
         main(){
-            declare Integer[Text] Locals for LocalUser;
-            declare Integer[Text] Dedis for LocalUser;
+            declare Integer[Text] Locals for UI;
+            declare Integer[Text] Dedis for UI;
 
             declare Text localsJson = """{$locals|noescape}""";
             declare Text dedisJson = """{$dedis|noescape}""";

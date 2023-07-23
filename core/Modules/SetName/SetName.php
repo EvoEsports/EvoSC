@@ -28,11 +28,17 @@ class SetName extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param $cmd
-     * @param mixed ...$name
+     * @param ...$name
+     * @return void
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function cmdSetName(Player $player, $cmd, ...$name)
     {
+        if($player->isSetnameBlacklisted()){
+            dangerMessage("You've been banned from using ", secondary('/setname'))->send($player);
+            return;
+        }
+
         $name = str_replace("\n", '', trim(implode(' ', $name)));
         self::showSetNickname($player, $name);
     }

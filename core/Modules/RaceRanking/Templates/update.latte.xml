@@ -10,7 +10,7 @@
         }
 
         main(){
-            declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for LocalUser;
+            declare EvoSC_RaceRankingEntry[] EvoSC_RaceRankings for UI;
             EvoSC_RaceRankings.fromjson("""{$data}""");
         }
         -->

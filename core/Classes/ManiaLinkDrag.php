@@ -69,7 +69,7 @@ Void maniaLinkDrag(){
         if(MouseX >= framePos[0]){
             if(MouseY <= framePos[1]){
                 if(MouseX <= (framePos[0] + frameSize[0]) && MouseY >= (framePos[1] - frameSize[1])){
-                    declare Real ZIndex for LocalUser = 305.0;
+                    declare Real ZIndex for UI = 305.0;
                     declare startPos = handle.Parent.RelativePosition_V3;
                     declare startX = MouseX;
                     declare startY = MouseY;

@@ -17,6 +17,7 @@ use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
 use EvoSC\Models\Group;
 use EvoSC\Models\Player;
+use EvoSC\Models\SetnameBlacklist;
 use EvoSC\Modules\InputSetup\InputSetup;
 use Exception;
 use GuzzleHttp\Psr7\Response;
@@ -53,6 +54,7 @@ class PlayerController implements ControllerInterface
         AccessRight::add('player_warn', 'Warn a player.');
         AccessRight::add('player_force_spec', 'Force a player into spectator mode.');
         AccessRight::add('always_print_join_msg', 'Always announce join/leave.');
+        AccessRight::add('player_reset_name', 'Reset ones nickname to the ubi-name.');
     }
 
     /**
@@ -73,6 +75,9 @@ class PlayerController implements ControllerInterface
         ManiaLinkEvent::add('spec', [self::class, 'specPlayer']);
         ManiaLinkEvent::add('mute', [PlayerController::class, 'muteLoginToggle'], 'player_mute');
         ManiaLinkEvent::add('warn', [self::class, 'warnPlayer'], 'player_warn');
+        ManiaLinkEvent::add('reset_nickname', [self::class, 'resetName'], 'player_reset_name');
+        ManiaLinkEvent::add('allow_setname', [self::class, 'allowSetname'], 'player_reset_name');
+        ManiaLinkEvent::add('reset_nickname_and_block', [self::class, 'resetNameAndBlacklist'], 'player_reset_name');
 
         InputSetup::add('leave_spec', 'Leave spectator mode.', [self::class, 'leaveSpec'], 'Delete');
 
@@ -117,7 +122,7 @@ class PlayerController implements ControllerInterface
         $player->NickName = $name;
         $player->save();
         self::$players->put($player->Login, $player);
-        if (!$silent) {
+        if (!$silent && !ChatController::isPlayerMuted($player)) {
             infoMessage(secondary($oldName), ' changed their name to ', secondary($name))->sendAll();
         }
         Cache::put('nicknames/' . $player->Login, $name);
@@ -548,6 +553,68 @@ class PlayerController implements ControllerInterface
     {
         $player->settings()->delete();
         infoMessage('Your settings have been cleared. You may want to call ', secondary('/reset'))->send($player);
+    }
+
+    /**
+     * @param Player $admin
+     * @param string $targetLogin
+     * @return void
+     */
+    public static function allowSetname(Player $admin, string $targetLogin)
+    {
+        $targetPlayer = self::getPlayer($targetLogin);
+        if ($targetPlayer->isSetnameBlacklisted()) {
+            $targetPlayer->setnameBlacklist()->delete();
+
+            successMessage('You are allowed to use ', secondary('/setname'), ' again.')->send($targetPlayer);
+            successMessage('Removed ', $targetPlayer, ' from setname blacklist.')->send($admin);
+
+            Hook::fire('PlayerSetnameBlacklistRemoved', $targetPlayer, $admin);
+        }
+    }
+
+    /**
+     * @param Player $admin
+     * @param string $targetLogin
+     * @return void
+     */
+    public static function resetName(Player $admin, string $targetLogin)
+    {
+        $targetPlayer = self::getPlayer($targetLogin);
+        self::setName($targetPlayer, $targetPlayer->ubisoft_name, true);
+        warningMessage($admin, ' resets the custom name of ', $targetPlayer)->sendAll();
+    }
+
+    /**
+     * @param Player $admin
+     * @param string $targetLogin
+     * @param string|null $reason
+     * @return void
+     */
+    public static function resetNameAndBlacklist(Player $admin, string $targetLogin, string $reason = null)
+    {
+        $targetPlayer = self::getPlayer($targetLogin);
+
+        if ($targetPlayer->isSetnameBlacklisted()) {
+            $reason = $targetPlayer->setnameBlacklist->reason;
+
+            if ($reason) {
+                $reason = ", reason: " . secondary($reason);
+            }
+
+            warningMessage('Player ', $targetPlayer, ' is already banned from using ', secondary('/setname'), $reason)->send($admin);
+            return;
+        }
+
+        $blacklistEntry = SetnameBlacklist::create([
+            'login'          => $targetLogin,
+            'reason'         => $reason,
+            'blacklisted_by' => $admin->Login
+        ]);
+
+        self::resetName($admin, $targetLogin);
+
+        Hook::fire('PlayerSetnameBlacklisted', $blacklistEntry);
     }
 
     /**

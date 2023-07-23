@@ -88,7 +88,7 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
  		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -55. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
- 		<scorestable pos="1000." alt_visible="false" visible="false" />
+ 		<scorestable alt_visible="' . (config('alter-ui.show-default-scorestable') ? 'true' : 'false') . '" visible="' . (config('alter-ui.show-default-scorestable') ? 'true' : 'false') . '" />
  	</ui_properties>';
     }
 
@@ -145,7 +145,7 @@ class AlterUI extends Module implements ModuleInterface
  		<!-- Number of players spectating us displayed at the bottom right of the screen -->
  		<viewers_count visible="' . (config('alter-ui.spec-info') ? 'true' : 'false') . '" pos="157. -75. 5." />
  		<!-- Scores table displayed in the middle of the screen -->
- 		<scorestable alt_visible="false" visible="false" />
+ 		<scorestable alt_visible="' . (config('alter-ui.show-default-scorestable') ? 'true' : 'false') . '" visible="' . (config('alter-ui.show-default-scorestable') ? 'true' : 'false') . '" />
  	</ui_properties>';
     }
 
