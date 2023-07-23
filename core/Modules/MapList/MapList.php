@@ -8,7 +8,9 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Classes\Timer;
 use EvoSC\Controllers\MapController;
+use EvoSC\Controllers\PlayerController;
 use EvoSC\Controllers\QueueController;
 use EvoSC\Exceptions\UnauthorizedException;
 use EvoSC\Interfaces\ModuleInterface;
@@ -52,23 +54,28 @@ class MapList extends Module implements ModuleInterface
     public static function playerConnect(Player $player)
     {
         self::sendFavorites($player);
+        self::sendRecordsJson($player);
         self::sendUpdatedMapList($player);
         self::mapQueueUpdated(MapQueue::all());
-        self::sendRecordsJson($player);
         Template::show($player, 'MapList.map-queue');
         Template::show($player, 'MapList.map-widget');
         Template::show($player, 'MapList.map-list');
 
         $map = MapController::getCurrentMap();
         $mapInfo = json_encode((object)[
-            'name' => $map->name,
-            'id' => $map->id,
-            'uid' => $map->uid,
+            'name'        => $map->name,
+            'id'          => $map->id,
+            'uid'         => $map->uid,
             'authorLogin' => $map->author->Login,
-            'authorName' => $map->author->NickName,
+            'authorName'  => $map->author->NickName,
         ]);
 
         Template::show($player, 'MapList.update-current-map', compact('mapInfo'));
+
+        $playerLogin = $player->Login;
+        Timer::create("send_maps_$player->Login", function () use ($playerLogin) {
+            self::sendUpdatedMapList(PlayerController::getPlayer($playerLogin));
+        }, '5s');
     }
 
     /**
@@ -100,11 +107,11 @@ class MapList extends Module implements ModuleInterface
     public static function beginMap(Map $map)
     {
         $mapInfo = json_encode((object)[
-            'name' => $map->name,
-            'id' => $map->id,
-            'uid' => $map->uid,
+            'name'        => $map->name,
+            'id'          => $map->id,
+            'uid'         => $map->uid,
             'authorLogin' => $map->author->Login,
-            'authorName' => $map->author->NickName,
+            'authorName'  => $map->author->NickName,
         ]);
 
         Template::showAll('MapList.update-current-map', compact('mapInfo'));
@@ -182,12 +189,12 @@ class MapList extends Module implements ModuleInterface
 
         if ($player) {
             Template::show($player, 'MapList.update-map-list', [
-                'maps' => $maps->chunk(100),
+                'maps'       => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ], false, 2);
         } else {
             Template::showAll('MapList.update-map-list', [
-                'maps' => $maps->chunk(100),
+                'maps'       => $maps->chunk(100),
                 'mapAuthors' => $mapAuthors->toJson(),
             ], 2);
         }
@@ -212,13 +219,13 @@ class MapList extends Module implements ModuleInterface
                 }
 
                 return [
-                    'id' => (string)$data->id,
-                    'name' => $data->name,
-                    'a' => $data->author,
-                    'r' => sprintf('%.1f', $data->avg_rating),
-                    'uid' => $data->uid,
-                    'c' => $data->cooldown,
-                    'author_time' => $authorTime
+                    'id'          => (string)$data->id,
+                    'name'        => $data->name,
+                    'a'           => $data->author,
+                    'r'           => sprintf('%.1f', $data->avg_rating),
+                    'uid'         => $data->uid,
+                    'c'           => $data->cooldown,
+                    'author_time' => $authorTime,
                 ];
             });
     }
@@ -235,9 +242,9 @@ class MapList extends Module implements ModuleInterface
             ->get()
             ->transform(function ($player) {
                 return [
-                    'nick' => $player->nick,
+                    'nick'  => $player->nick,
                     'login' => $player->login,
-                    'id' => $player->id,
+                    'id'    => $player->id,
                 ];
             });
     }
@@ -255,18 +262,20 @@ class MapList extends Module implements ModuleInterface
             }
 
             return [
-                'id' => $item->map->id,
-                'uid' => $item->map->uid,
-                'name' => $item->map->name,
+                'id'     => $item->map->id,
+                'uid'    => $item->map->uid,
+                'name'   => $item->map->name,
                 'author' => $item->map->author->NickName,
-                'login' => $item->player->Login,
-                'nick' => $item->player->NickName,
+                'login'  => $item->player->Login,
+                'nick'   => $item->player->NickName,
             ];
         })
             ->filter()
             ->values();
 
-        Template::showAll('MapList.update-map-queue', compact('mapQueue'));
+        if($mapQueue->isNotEmpty()){
+            Template::showAll('MapList.update-map-queue', compact('mapQueue'));
+        }
     }
 
     /**
