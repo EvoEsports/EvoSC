@@ -5,11 +5,11 @@ A modern server controller for the game Trackmania (TM² & 2020).
 ![EvoSC Screenshot](https://i.imgur.com/cXMIv8Q.png "EvoSC Screenshot")
 
 [![GitHub](https://img.shields.io/badge/LICENSE-CC_BY--NC--ND_4.0-lightgrey.svg?style=for-the-badge)](https://github.com/EvoTM/EvoSC/blob/master/LICENSE)
-[![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/4PKKesS)
+[![Discord](https://img.shields.io/discord/384138149686935562.svg?color=7289DA&label=DISCORD&style=for-the-badge&logo=discord)](https://discord.gg/evoesports)
 
 | ⚠ Bug-Reports are only accepted for the master-branch ⚠ |
 | --- |
-| If you encounter a bug, create an [Issue](https://github.com/EvoTM/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
+| If you encounter a bug, create an [Issue](https://github.com/EvoEsports/EvoSC/issues) describing the problem and maybe the way that led to it. Console logs and screenshots of errors can help, too. |
 
 **Supported-Modes:**
 * TimeAttack
@@ -30,7 +30,7 @@ A modern server controller for the game Trackmania (TM² & 2020).
 
 ### Modules
 Get modules to improve your EvoSC experience:
-[Modules for EvoSC](https://github.com/EvoTM/EvoSC/wiki/Modules)
+[Modules for EvoSC](https://github.com/EvoEsports/EvoSC/wiki/Modules)
 
 ___
 
