@@ -182,8 +182,8 @@
     }
 
     Void __showProfile(Text targetLogin){
-        declare Text LibTMxSMRaceScoresTable_OpenProfileUserId for ClientUI = "";
-        LibTMxSMRaceScoresTable_OpenProfileUserId = GetPlayerAccountIdByLogin(targetLogin);
+        declare Text TMGame_ScoresTable_OpenProfileUserId for ClientUI = "";
+        TMGame_ScoresTable_OpenProfileUserId = GetPlayerAccountIdByLogin(targetLogin);
     }
 
     Void call(Text action, Text login){

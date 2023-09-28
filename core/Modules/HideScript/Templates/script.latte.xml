@@ -19,8 +19,8 @@ Boolean tabPressed(){
     declare Boolean ESC_Tab_Pressed for This;
     return ESC_Tab_Pressed;
     {else}
-    declare Boolean Net_TMxSM_ScoresTable_IsDisplayed for UI;
-    return Net_TMxSM_ScoresTable_IsDisplayed;
+    declare Boolean TMGame_ScoresTable_IsDisplayed for UI;
+    return TMGame_ScoresTable_IsDisplayed;
     {/if}
 }
 

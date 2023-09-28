@@ -72,8 +72,7 @@
 
     {block pendingEvents}
     if(event.Control.HasClass("profile") && event.Type == CMlScriptEvent::Type::MouseClick){
-        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
-        LibTMxSMRaceScoresTable_OpenProfileLogin = event.Control.DataAttributeGet("login");
+        //show profile
         continue;
     }
     {/block}

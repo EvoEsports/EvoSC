@@ -27,7 +27,7 @@ Void hidescript(){
 
     declare UISettings settings for This;
     declare Boolean ESC_Tab_Pressed for This;
-    declare Boolean Net_TMxSM_ScoresTable_IsDisplayed for UI;
+    declare Boolean TMGame_ScoresTable_IsDisplayed for UI;
     declare hideSpeed = {if $is_maniaplanet}settings.speed{else}10{/if};
 
     if(!settings.hide || InputPlayer == Null){
@@ -41,9 +41,9 @@ Void hidescript(){
             hs_hide(800);
         }
     }else{
-        if({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
+        if({if $is_maniaplanet}ESC_Tab_Pressed{else}TMGame_ScoresTable_IsDisplayed{/if} == True){
             hs_show(1);
-            while({if $is_maniaplanet}ESC_Tab_Pressed{else}Net_TMxSM_ScoresTable_IsDisplayed{/if} == True){
+            while({if $is_maniaplanet}ESC_Tab_Pressed{else}TMGame_ScoresTable_IsDisplayed{/if} == True){
                 yield;
                 sleep(50);
             }

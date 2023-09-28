@@ -30,12 +30,12 @@
         {/block}
 
         {block bootScript}
-        declare netread ComponentModeLibsUIModules_K_ModuleProperties[Text] Net_LibUI3_CustomizableModule_Properties for Teams[0];
-        declare netread Integer Net_LibUI3_CustomizableModule_PropertiesUpdate for Teams[0];
+        declare netread ComponentModeLibsUIModules_K_ModuleProperties[Text] K_ModuleProperties for Teams[0];
+        declare netread Integer K_ModulePropertiesUpdate for Teams[0];
         declare lastPos = 0.0;
 
 
-        Net_LibUI3_CustomizableModule_Properties["Race_Record"].Position[1] = 50.0;
+        K_ModuleProperties["Race_Record"].Position[1] = 50.0;
         return;
 
         left__ = {config('records.ui.position') == 'left'|ms_bool};
