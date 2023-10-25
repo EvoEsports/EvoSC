@@ -100,7 +100,7 @@ Void stopLoading(){
 
     Void updateRow(CMlFrame row, Record::K_TMxSM_Record_Record record, Boolean isOnline){
         declare Text[Text] EvoSC_CustomNamesByUbiname for UI;
-        declare K_State Race_Record_State for UI;
+        declare K_State TMGame_Record_State for UI;
         (row.Controls[0] as CMlLabel).Value = record.Rank ^ ".";
         (row.Controls[1] as CMlLabel).Value = formatScoreCorrect(record.Time, False);
         (row.Controls[2] as CMlLabel).Value = formatScoreCorrect(record.Time, True);
@@ -111,7 +111,7 @@ Void stopLoading(){
         }
 
         (row.Controls[3] as CMlLabel).Value = name;
-        if(Race_Record_State.LoadedRecordGhosts.existskey(record.AccountId)){
+        if(TMGame_Record_State.LoadedRecordGhosts.existskey(record.AccountId)){
             (row.Controls[4] as CMlLabel).Opacity = 1.0;
         }else{
             (row.Controls[4] as CMlLabel).Opacity = 0.25;
@@ -216,19 +216,19 @@ K_State ReleaseRecordGhost(K_State _State, Text _AccountId) {
 	return State;
 }
 Void SendRecordsStatusToML(K_State _State) {
-	declare Integer[Text] Race_Record_RecordsStatus for ClientUI;
-	declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
+	declare Integer[Text] TMGame_Record_RecordsStatus for ClientUI;
+	declare Integer TMGame_Record_RecordsStatusUpdate for ClientUI;
 
-	Race_Record_RecordsStatus = [];
+	TMGame_Record_RecordsStatus = [];
 
 	foreach (AccountId => Record in _State.LoadingRecordGhosts) {
-		Race_Record_RecordsStatus[AccountId] = C_RecordStatus_Loading;
+		TMGame_Record_RecordsStatus[AccountId] = C_RecordStatus_Loading;
 	}
 	foreach (AccountId => Record in _State.LoadedRecordGhosts) {
-		Race_Record_RecordsStatus[AccountId] = C_RecordStatus_Loaded;
+		TMGame_Record_RecordsStatus[AccountId] = C_RecordStatus_Loaded;
 	}
 
-	Race_Record_RecordsStatusUpdate += 1;
+	TMGame_Record_RecordsStatusUpdate += 1;
 }
 K_State RetrieveRecordGhost(K_State _State, Text _AccountId) {
 	declare K_State State = _State;
@@ -286,24 +286,24 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
 
     <script><!--
     {block globals}
-#Include "Libs/Nadeo/MenuLibs/Common/Manialink/ManiaView2.Script.txt" as MV
-#Include "Libs/Nadeo/ModeLibs/TrackMania/MV_Utils.Script.txt" as MV_Utils
-#Include "Libs/Nadeo/MenuLibs/Common/Menu/Components/MedalStack.Script.txt" as MedalStack
-#Include "Libs/Nadeo/MenuLibs/Common/Modes/Medals.Script.txt" as Medals
-#Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
-#Include "Libs/Nadeo/MenuLibs/Common/Menu/Components/LoadingSpinner.Script.txt" as LoadingSpinner
-#Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/Record_Common.Script.txt" as Record
-#Include "Libs/Nadeo/CommonLibs/Common/Http.Script.txt" as Http
-#Include "Libs/Nadeo/CommonLibs/Common/Task.Script.txt" as Task
-#Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Const
-#Include "Libs/Nadeo/TMNext/TrackMania/API/LeaderboardAPI.Script.txt" as LeaderboardAPI
-#Include "Libs/Nadeo/TMNext/TrackMania/Stores/ClubStore.Script.txt" as ClubStore
-#Include "Libs/Nadeo/TMNext/TrackMania/API/ClubAPI.Script.txt" as ClubAPI
-#Include "Libs/Nadeo/TMNext/TrackMania/Structures/ClubStruct.Script.txt" as ClubStruct
-#Include "Libs/Nadeo/TMNext/TrackMania/Stores/UserStore.Script.txt" as UserStore
-#Include "Libs/Nadeo/TMNext/TrackMania/RBAC.Script.txt" as RBAC
-#Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
-#Include "Libs/Nadeo/CommonLibs/Common/AudioManager.Script.txt" as AudioManager
+#Include "Libs/Nadeo/CMGame/Utils/ManiaView2.Script.txt" as MV
+#Include "Libs/Nadeo/TMGame/Modes/MV_Utils.Script.txt" as MV_Utils
+#Include "Libs/Nadeo/CMGame/Components/MedalStack.Script.txt" as MedalStack
+#Include "Libs/Nadeo/CMGame/Utils/Medals.Script.txt" as Medals
+#Include "Libs/Nadeo/CMGame/Utils/Tools.Script.txt" as Tools
+#Include "Libs/Nadeo/CMGame/Components/LoadingSpinner.Script.txt" as LoadingSpinner
+#Include "Libs/Nadeo/TMGame/Modes/Base/UIModules/Record_Common.Script.txt" as Record
+#Include "Libs/Nadeo/CMGame/Utils/Http.Script.txt" as Http
+#Include "Libs/Nadeo/CMGame/Utils/Task.Script.txt" as Task
+#Include "Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt" as Const
+#Include "Libs/Nadeo/Trackmania/API/LeaderboardAPI.Script.txt" as LeaderboardAPI
+#Include "Libs/Nadeo/Trackmania/Stores/ClubStore_ML.Script.txt" as ClubStore
+#Include "Libs/Nadeo/Trackmania/API/ClubAPI.Script.txt" as ClubAPI
+#Include "Libs/Nadeo/CMGame/Structures/ClubStruct.Script.txt" as ClubStruct
+#Include "Libs/Nadeo/Trackmania/Stores/UserStore_ML.Script.txt" as UserStore
+#Include "Libs/Nadeo/Trackmania/RBAC.Script.txt" as RBAC
+#Include "Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt" as Constants
+#Include "Libs/Nadeo/CMGame/Utils/AudioManager_ML.Script.txt" as AudioManager
 
 #Struct K_Scope {
 	Text Type;
@@ -417,18 +417,18 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
         declare Integer EvoSC_CustomNamesUpdate for UI;
         declare lastNamesUpdate = 0;
 
-        declare K_State Race_Record_State for UI;
-        declare Record::K_TMxSM_Record_Records[] Race_Record_ZonesRecords for ClientUI;
-        declare Boolean Race_Record_LoadingRecords for ClientUI;
-        declare Integer Race_Record_ZonesRecordsUpdate for ClientUI;
-        declare Integer[Text] Race_Record_RecordsStatus for ClientUI;
-        declare Integer Race_Record_RecordsStatusUpdate for ClientUI;
+        declare K_State TMGame_Record_State for UI;
+        declare Record::K_TMxSM_Record_Records[] TMGame_Record_ZonesRecords for ClientUI;
+        declare Boolean TMGame_Record_LoadingRecords for ClientUI;
+        declare Integer TMGame_Record_ZonesRecordsUpdate for ClientUI;
+        declare Integer[Text] TMGame_Record_RecordsStatus for ClientUI;
+        declare Integer TMGame_Record_RecordsStatusUpdate for ClientUI;
         declare lastRecordsUpdate = -1;
         declare lastRaceRecordRecordsStatusUpdate = -1;
         declare lastCurrentServerModeName = "";
         selectedZone = 0;
 
-        Race_Record_State = ReleaseAllRecordGhosts(Race_Record_State);
+        TMGame_Record_State = ReleaseAllRecordGhosts(TMGame_Record_State);
     {/block}
 
     {block loop}
@@ -442,15 +442,15 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
             modeChanged(CurrentServerModeName);
         }
 
-        if(lastRecordsUpdate != Race_Record_ZonesRecordsUpdate){
-            lastRecordsUpdate = Race_Record_ZonesRecordsUpdate;
-            update(Race_Record_ZonesRecords);
+        if(lastRecordsUpdate != TMGame_Record_ZonesRecordsUpdate){
+            lastRecordsUpdate = TMGame_Record_ZonesRecordsUpdate;
+            update(TMGame_Record_ZonesRecords);
         }
 
-        if(lastRaceRecordRecordsStatusUpdate != Race_Record_RecordsStatusUpdate){
-            lastRaceRecordRecordsStatusUpdate = Race_Record_RecordsStatusUpdate;
-            //log(Race_Record_State);
-            update(Race_Record_ZonesRecords);
+        if(lastRaceRecordRecordsStatusUpdate != TMGame_Record_RecordsStatusUpdate){
+            lastRaceRecordRecordsStatusUpdate = TMGame_Record_RecordsStatusUpdate;
+            //log(TMGame_Record_State);
+            update(TMGame_Record_ZonesRecords);
         }
     {/block}
 
@@ -459,8 +459,8 @@ K_State ReleaseAllRecordGhosts(K_State _State) {
             if(event.Control.HasClass("ghost")){
                 declare icon = (event.Control as CMlLabel);
                 declare Text AccountId = icon.DataAttributeGet("account-id");
-                Race_Record_State = RetrieveRecordGhost(Race_Record_State, AccountId);
-                //log(Race_Record_State);
+                TMGame_Record_State = RetrieveRecordGhost(TMGame_Record_State, AccountId);
+                //log(TMGame_Record_State);
                 log(DataFileMgr.TaskResults);
                 continue;
             }

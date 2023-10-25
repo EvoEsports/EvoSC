@@ -11,9 +11,9 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
     #Include "ColorLib" as CL
-    #Include "ManiaApps/Nadeo/TMxSM/Race/UIModules/ScoresTable_Common.Script.txt" as UIModules_ScoresTable
-    #Include "Libs/Nadeo/TMNext/TrackMania/Menu/Constants.Script.txt" as Constants
-    #Include "Libs/Nadeo/MenuLibs/Common/Components/Tools.Script.txt" as Tools
+    #Include "Libs/Nadeo/TMGame/Modes/Base/UIModules/ScoresTable_Common.Script.txt" as UIModules_ScoresTable
+    #Include "Libs/Nadeo/Trackmania/MainMenu/Constants.Script.txt" as Constants
+    #Include "Libs/Nadeo/CMGame/Utils/Tools.Script.txt" as Tools
 
     #Const SB_Update_Interval 100
     #Const SB_Button_Padding 1
@@ -258,8 +258,8 @@ if(findMe){
         declare Integer EvoSC_PointsLimit for This = 0;
         modeLabel.Value = CurrentServerModeName;
 
-        declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
-        if(Net_TMxSM_ScoresTable_ScoreMode == C_Mode_Points && EvoSC_PointsLimit > 0){
+        declare netread Integer Net_TMGame_ScoresTable_ScoreMode for Teams[0];
+        if(Net_TMGame_ScoresTable_ScoreMode == C_Mode_Points && EvoSC_PointsLimit > 0){
             modeLabel.Value = modeLabel.Value ^ " (Point-Limit: " ^ EvoSC_PointsLimit ^ ")";
         }
 
@@ -306,8 +306,8 @@ if(findMe){
         forceUpdate = True;
         SB_Last_Update = 0;
         declare Boolean findMe for This = False;
-        declare netread Integer[Integer][Text] Net_TMxSM_ScoresTable_Trophies for Teams[0];
-        declare netread Integer Net_TMxSM_ScoresTable_TrophiesUpdate for Teams[0];
+        declare netread Integer[Integer][Text] Net_TMGame_ScoresTable_Trophies for Teams[0];
+        declare netread Integer Net_TMGame_ScoresTable_TrophiesUpdate for Teams[0];
         declare TrophiesUpdate = -1;
         declare Integer EvoSC_MapStartTime for This = 1;
         declare lastMapStartTimeUpdate = EvoSC_MapStartTime;
@@ -325,21 +325,21 @@ if(findMe){
                 lastMapStartTimeUpdate = EvoSC_MapStartTime;
                 foreach (Score in Scores) {
                     //clear trophies
-                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
-                    LibTMxSM_ScoresTable_Trophies = [];
+                    declare K_Trophy[] TMGame_ScoresTable_Trophies for Score = [];
+                    TMGame_ScoresTable_Trophies = [];
                 }
             }
 
-            if (TrophiesUpdate != Net_TMxSM_ScoresTable_TrophiesUpdate) {
-                TrophiesUpdate = Net_TMxSM_ScoresTable_TrophiesUpdate;
+            if (TrophiesUpdate != Net_TMGame_ScoresTable_TrophiesUpdate) {
+                TrophiesUpdate = Net_TMGame_ScoresTable_TrophiesUpdate;
                 foreach (Score in Scores) {
-                    declare K_Trophy[] LibTMxSM_ScoresTable_Trophies for Score = [];
-                    LibTMxSM_ScoresTable_Trophies = [];
-                    if (Net_TMxSM_ScoresTable_Trophies.existskey(Score.User.WebServicesUserId)) {
-                        declare Integer[Integer] NewTrophies = Net_TMxSM_ScoresTable_Trophies[Score.User.WebServicesUserId].sortkeyreverse();
+                    declare K_Trophy[] TMGame_ScoresTable_Trophies for Score = [];
+                    TMGame_ScoresTable_Trophies = [];
+                    if (Net_TMGame_ScoresTable_Trophies.existskey(Score.User.WebServicesUserId)) {
+                        declare Integer[Integer] NewTrophies = Net_TMGame_ScoresTable_Trophies[Score.User.WebServicesUserId].sortkeyreverse();
                         foreach (TrophyLevel => TrophyAmount in NewTrophies) {
                             if (TrophyAmount > 0) {
-                                LibTMxSM_ScoresTable_Trophies.add(K_Trophy {
+                                TMGame_ScoresTable_Trophies.add(K_Trophy {
                                     Level = TrophyLevel,
                                     Amount = TrophyAmount
                                 });

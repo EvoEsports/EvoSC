@@ -206,8 +206,8 @@
         nameLabel.Value = name;
     }
 
-    declare netread Text[][Text] Net_TMxSM_ScoresTable_CustomPoints for Teams[0];
-    declare _CustomPoints = Net_TMxSM_ScoresTable_CustomPoints;
+    declare netread Text[][Text] Net_TMGame_ScoresTable_CustomPoints for Teams[0];
+    declare _CustomPoints = Net_TMGame_ScoresTable_CustomPoints;
     declare Boolean CustomPointsEnabled = _CustomPoints.existskey(score.User.WebServicesUserId);
     if(CustomPointsEnabled){
         if (_CustomPoints[score.User.WebServicesUserId].existskey(0)) {
@@ -229,7 +229,7 @@
     bgSlotQuad.Opacity = 0.2;
 
     declare scoreIsSet = False;
-    declare netread Integer Net_TMxSM_ScoresTable_ScoreMode for Teams[0];
+    declare netread Integer Net_TMGame_ScoresTable_ScoreMode for Teams[0];
 
     if(score.Points > 0){
         scoreIsSet = True;

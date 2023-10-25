@@ -496,8 +496,7 @@
                         ShowProfile(targetLogin);
                         continue;
                     {else}
-                        declare Text LibTMxSMRaceScoresTable_OpenProfileLogin for ClientUI = "";
-                        LibTMxSMRaceScoresTable_OpenProfileLogin = targetLogin;
+                        //show profile
                     {/if}
                     }
                 }
