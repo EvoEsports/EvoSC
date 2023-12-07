@@ -201,4 +201,38 @@ class Utility
         $dom->loadXML($simpleXMLElement->asXML());
         return $dom->saveXML();
     }
+
+    /**
+     * @param object $object
+     * @param string $dotNotatedPath
+     * @param $value
+     * @return void
+     */
+    public static function setPropertyViaDotNotation(object $object, string $dotNotatedPath, $value)
+    {
+        self::setPropertyViaPath($object, explode('.', $dotNotatedPath), $value);
+    }
+
+    /**
+     * @param object $object
+     * @param array $path
+     * @param $value
+     * @return void
+     */
+    public static function setPropertyViaPath(object $object, array $path, $value)
+    {
+        if (count($path) > 0) {
+            $branch = array_shift($path);
+
+            if (empty($path)) {
+                $object->{$branch} = $value;
+            } else {
+                if (!property_exists($object, $branch)) {
+                    $object->{$branch} = (object)[];
+                }
+
+                self::setPropertyViaPath($object->{$branch}, $path, $value);
+            }
+        }
+    }
 }

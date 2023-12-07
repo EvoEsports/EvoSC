@@ -27,4 +27,27 @@ class UtlityTest extends TestCase
         $this->assertEquals([87, 100], Utility::getRankRange(99, 3, 16, 100));
         $this->assertNotEquals([4, 17], Utility::getRankRange(4, 3, 16, 3));
     }
+
+    public function testSetPropertyViaDotNotation()
+    {
+        $targetObject = (object)[
+            'existing' => false,
+            'nested' => (object)[
+                'value' => 'nope'
+            ]
+        ];
+
+        Utility::setPropertyViaDotNotation($targetObject, 'existing', true);
+        Utility::setPropertyViaDotNotation($targetObject, 'unit.test', 'hey');
+        Utility::setPropertyViaDotNotation($targetObject, 'nested.value', 'yep');
+        Utility::setPropertyViaDotNotation($targetObject, 'array', [
+            'hey' => 'there',
+        ]);
+
+        $this->assertTrue($targetObject->existing);
+        $this->assertEquals('hey', $targetObject->unit->test);
+        $this->assertEquals('yep', $targetObject->nested->value);
+        $this->assertIsArray($targetObject->array);
+        $this->assertEquals('there', $targetObject->array['hey']);
+    }
 }

@@ -330,32 +330,29 @@ class MatchSettingsController implements ControllerInterface
         return -1;
     }
 
-    public static function updateSetting(string $matchSettingsFile, string $setting, $value)
+    public static function updateSetting(string $matchSettingsFile, string $settingPath, $value)
     {
         $file = self::getPath($matchSettingsFile);
         $settings = new SimpleXMLElement(File::get($file));
 
-        $root = explode('.', $setting)[0];
+        $settingPathParts = explode('.', $settingPath);
+        $root = $settingPathParts[0];
 
         if ($root == 'script_settings') {
             foreach ($settings->script_settings->setting as $setting_) {
-                if ($setting_['name'] == explode('.', $setting)[1]) {
+                if ($setting_['name'] == explode('.', $settingPath)[1]) {
                     $setting_['value'] = $value;
                 }
             }
         } else {
             if ($root == 'mode_script_settings') {
                 foreach ($settings->mode_script_settings->setting as $setting_) {
-                    if ($setting_['name'] == explode('.', $setting)[1]) {
+                    if ($setting_['name'] == explode('.', $settingPath)[1]) {
                         $setting_['value'] = $value;
                     }
                 }
             } else {
-                $nodePath = collect(explode('.', $setting))->transform(function ($node) {
-                    return "{$node}";
-                })->implode('->');
-
-                eval('$settings->' . $nodePath . ' = $value;');
+                Utility::setPropertyViaPath($settings, $settingPathParts, $value);
             }
         }
 
