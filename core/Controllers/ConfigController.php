@@ -8,6 +8,8 @@ use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\Server;
+use EvoSC\Classes\Utility;
+use EvoSC\Exceptions\FilePathNotAbsoluteException;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
@@ -124,24 +126,22 @@ class ConfigController implements ControllerInterface
     /**
      * @param string $id
      * @param string|stdClass|array|int|float|double|bool $value
+     * @throws FilePathNotAbsoluteException
      */
     public static function saveConfig(string $id, $value)
     {
         self::setConfig($id, $value);
 
-        $idParts = collect(explode('.', $id));
-        $file = $idParts->shift();
+        $idParts = explode('.', $id);
+        $file = array_shift($idParts);
 
         $configFile = configDir($file . '.config.json');
         $jsonData = File::get($configFile, true);
-        $path = $idParts->map(function ($part) {
-            return sprintf("{'%s'}", $part);
-        })->implode('->');
 
-        eval('$jsonData->' . $path . ' = $value;/** @noinspection PhpUndefinedVariableInspection */');
+        Utility::setPropertyViaPath($jsonData, $idParts, $value);
         File::put($configFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
-        Log::write("Updated config $id", isVerbose());
+        Log::write("Updated config $id.", isVerbose());
     }
 
     /**

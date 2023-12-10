@@ -151,7 +151,7 @@ log(i ^ " -> " ^ (searchResult.results.count - 1));
 
 {block pendingEvents}
 if(event.Control.HasClass("search_player") && event.Type == CMlScriptEvent::Type::EntrySubmit){
-    TriggerPageAction("{$MODULE|classpath}::mleSearchPlayer," ^ playerSearchEntry.Value);
+    TriggerPageAction("group.user.search," ^ playerSearchEntry.Value);
 }
 if(event.Control.HasClass("add") && event.Type == CMlScriptEvent::Type::MouseClick){
     clearSearchResultList();
