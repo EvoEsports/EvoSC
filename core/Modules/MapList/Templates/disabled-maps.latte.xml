@@ -30,7 +30,7 @@
                     <label class="filter-author text-light" pos="52 0" valign="center" size="30 3" text="{$map->author->NickName}" textsize="0.6" z-index="1" ScriptEvents="1" focusareacolor1="0000"/>
 
                     <frame id="buttons" pos="120 0" z-index="5">
-                        <label pos="25" class="btn juke btn-muted" size="13 3" text="  Enable" textsize="0.3" action="{$MODULE}::mleEnableMap,{$map->uid},{$page}"/>
+                        <label pos="25" class="btn juke btn-muted" size="13 3" text="  Enable" textsize="0.3" action="map_list.enable,{$map->uid},{$page}"/>
                     </frame>
                 </frame>
                 {/foreach}
@@ -40,10 +40,10 @@
                 <entry id="page-input" class="form page-input" pos="6.05 0" size="8.4 3.5" valign="center" halign="center" text="1" textsize="0.8" ScriptEvents="1" hidden="1"/>
                 <label id="page-info" class="btn-default enable-page-input" pos="6.05 0" size="8.4 3.5" text="{$page}/{$pages}" textsize="0.8" ScriptEvents="1"/>
                 {if $page - 1 > 0}
-                <label class="btn-default previous-page" size="3.5 3.5" text="⏴" action="{$MODULE}::mleShowDisableMaps,null,{$page - 1}"/>
+                <label class="btn-default previous-page" size="3.5 3.5" text="⏴" action="map_list.disabled,null,{$page - 1}"/>
                 {/if}
                 {if $page < $pages}
-                <label class="btn-default next-page" pos="12 0" size="3.5 3.5" text="⏵" action="{$MODULE}::mleShowDisableMaps,null,{$page + 1}"/>
+                <label class="btn-default next-page" pos="12 0" size="3.5 3.5" text="⏵" action="map_list.disabled,null,{$page + 1}"/>
                 {/if}
             </frame>
         </frame>

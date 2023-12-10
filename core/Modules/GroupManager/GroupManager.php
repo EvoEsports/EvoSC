@@ -37,6 +37,7 @@ class GroupManager extends Module implements ModuleInterface
         ManiaLinkEvent::add('group.member_add_form', [self::class, 'groupMemberAddForm'], 'group_edit');
         ManiaLinkEvent::add('group.member_add', [self::class, 'groupMemberAdd'], 'group_edit');
         ManiaLinkEvent::add('group.rights_update', [self::class, 'groupAccessRightsUpdate'], 'group_edit');
+        ManiaLinkEvent::add('group.user.search', [self::class, 'mleSearchPlayer'], 'group_edit');
 
         if (config('quick-buttons.enabled')) {
             QuickButtons::addButton('', 'Group Manager', 'group.overview', 'group_edit');

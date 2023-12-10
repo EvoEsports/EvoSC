@@ -110,11 +110,11 @@
     {block pendingEvents}
             if(event.Control.HasClass("fav") && event.Type == CMlScriptEvent::Type::MouseClick){
                 if(ESC_Map_Favorite_Uids.exists("" ^ Map.Id)){
-                    TriggerPageAction("{$MODULE|classpath}::favRemove," ^ Map.Id);
+                    TriggerPageAction("map_list.favorite.remove," ^ Map.Id);
                     favIconLabel.Value = "";
                     favLabelLabel.Value = "Add";
                 }else{
-                    TriggerPageAction("{$MODULE|classpath}::favAdd," ^ Map.Id);
+                    TriggerPageAction("map_list.favorite.add," ^ Map.Id);
                     favIconLabel.Value = "";
                     favLabelLabel.Value = "Remove";
                 }

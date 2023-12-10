@@ -604,11 +604,11 @@ Void jukeMapByCommand(Text query){
     }
 
     if(mapsFound.count == 1){
-        TriggerPageAction("{$MODULE|classpath}::mleJuke,1," ^ mapsFound[0]["uid"]);
+        TriggerPageAction("map_list.juke,1," ^ mapsFound[0]["uid"]);
     }else if(mapsFound.count == 0){
-        TriggerPageAction("{$MODULE|classpath}::mleJuke,0," ^ query);
+        TriggerPageAction("map_list.juke,0," ^ query);
     }else{
-        TriggerPageAction("{$MODULE|classpath}::mleJuke,2," ^ query ^ "," ^ mapsFound.count);
+        TriggerPageAction("map_list.juke,2," ^ query ^ "," ^ mapsFound.count);
     }
 }
 
@@ -808,9 +808,9 @@ Void setCooldownToZero(Text uid){
             declare isFav = label.Value != "";
 
             if(isFav){
-                ManiaLinkEvent("{$MODULE|classpath}::favRemove", event.Control.Parent.DataAttributeGet("map-uid"));
+                ManiaLinkEvent("map_list.favorite.remove", event.Control.Parent.DataAttributeGet("map-uid"));
             }else{
-                ManiaLinkEvent("{$MODULE|classpath}::favAdd", event.Control.Parent.DataAttributeGet("map-uid"));
+                ManiaLinkEvent("map_list.favorite.add", event.Control.Parent.DataAttributeGet("map-uid"));
             }
         }
 
@@ -824,7 +824,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("disable") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
             if(confirm("Disable map?")){
-                TriggerPageAction("{$MODULE|classpath}::mleDisableMap," ^ uid);
+                TriggerPageAction("map_list.disable," ^ uid);
             }
             continue;
         }
@@ -832,7 +832,7 @@ Void setCooldownToZero(Text uid){
         if(event.Control.HasClass("delete") && event.Type == CMlScriptEvent::Type::MouseClick){
             declare uid = event.Control.Parent.Parent.DataAttributeGet("map-uid");
             if(confirm("Delete map and all associated data?")){
-                TriggerPageAction("{$MODULE|classpath}::mleDeleteMap," ^ uid);
+                TriggerPageAction("map_list.delete," ^ uid);
             }
             continue;
         }

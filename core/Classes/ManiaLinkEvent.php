@@ -192,9 +192,7 @@ class ManiaLinkEvent
      */
     public static function getCallback(Player $player, string $action)
     {
-        if (preg_match('/^(.+)::(.+?),/', $action, $matches)) {
-            return [$matches[1], $matches[2]];
-        } else if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
+        if (preg_match('/(\w+[.\w]+)*(?:,[\d\w ]+)*/', $action, $matches)) {
             $event = self::getManiaLinkEvents()->where('id', $matches[1])->first();
 
             if (!$event) {
@@ -218,6 +216,10 @@ class ManiaLinkEvent
         return null;
     }
 
+    /**
+     * @param \stdClass $values
+     * @return \stdClass
+     */
     private static function mapFormValues(\stdClass $values): \stdClass
     {
         $arrays = [];
@@ -241,16 +243,27 @@ class ManiaLinkEvent
         return $out;
     }
 
+    /**
+     * @return void
+     */
     public static function removeAll()
     {
         self::$maniaLinkEvents = collect();
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->id . '(' . serialize($this->callback) . ')';
     }
 
+    /**
+     * @param string $icon
+     * @param string $name
+     * @return void
+     */
     public function withScoreTableButton(string $icon, string $name)
     {
         QuickButtons::addButton($icon, $name, $this->id, $this->access);

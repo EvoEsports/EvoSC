@@ -18,7 +18,7 @@
             sleep(10);
         }
         if(ML::NearestInteger(InputPlayer.Distance) - startMeters < METERS_TO_DRIVE){
-            TriggerPageAction("{$MODULE|classpath}::mlePutMeToSpec,null");
+            TriggerPageAction("anti_afk.spec");
             sleep(2000);
             return True;
         }
