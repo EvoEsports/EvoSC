@@ -6,6 +6,7 @@ use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
+use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Classes\Timer;
@@ -37,6 +38,14 @@ class MapList extends Module implements ModuleInterface
         Hook::add('PlayerConnect', [self::class, 'playerConnect']);
         Hook::add('GroupChanged', [self::class, 'playerConnect']);
         Hook::add('BeginMap', [self::class, 'beginMap']);
+
+        ManiaLinkEvent::add('map_list.enable', [self::class, 'mleEnableMap'], 'map_add');
+        ManiaLinkEvent::add('map_list.disable', [self::class, 'mleDisableMap'], 'map_disable');
+        ManiaLinkEvent::add('map_list.disabled', [self::class, 'mleShowDisableMaps'], 'map_add');
+        ManiaLinkEvent::add('map_list.delete', [self::class, 'mleDeleteMap'], 'map_delete');
+        ManiaLinkEvent::add('map_list.favorite.remove', [self::class, 'favRemove']);
+        ManiaLinkEvent::add('map_list.favorite.add', [self::class, 'favAdd']);
+        ManiaLinkEvent::add('map_list.juke', [self::class, 'mleJuke']);
 
         ChatCommand::add('/maps', [self::class, 'searchMap'], 'Open map-list.')
             ->addAlias('/list')
@@ -305,6 +314,8 @@ class MapList extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param $mapUid
+     * @return void
+     * @throws UnauthorizedException
      */
     public static function mleDeleteMap(Player $player, $mapUid)
     {
@@ -335,7 +346,10 @@ class MapList extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param string $mapUid
+     * @param int $page
+     * @return void
      * @throws UnauthorizedException
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
     public static function mleEnableMap(Player $player, string $mapUid, int $page)
     {
