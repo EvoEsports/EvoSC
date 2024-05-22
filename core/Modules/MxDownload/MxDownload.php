@@ -27,8 +27,8 @@ use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
 {
-    const MAP_SIZE_LIMIT_ONLINE = 6291456;
-    const MAP_SIZE_LIMIT_ONLINE_HUMAN_READABLE = '6mb';
+    const MAP_SIZE_LIMIT_ONLINE = 7336960;
+    const MAP_SIZE_LIMIT_ONLINE_HUMAN_READABLE = '7 MB';
 
     private static string $apiUrl;
     private static string $exchangeUrl;

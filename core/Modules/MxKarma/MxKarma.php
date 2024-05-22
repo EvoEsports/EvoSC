@@ -53,6 +53,7 @@ class MxKarma extends Module implements ModuleInterface
         ChatCommand::add('+', [self::class, 'votePlus'], 'Rate the map ok', null, true);
         ChatCommand::add('++', [self::class, 'votePlusPlus'], 'Rate the map good', null, true);
         ChatCommand::add('+++', [self::class, 'votePlusPlusPlus'], 'Rate the map fantastic', null, true);
+        ChatCommand::add('+++++', [self::class, 'voteBest'], 'Rate it the best map ever', null, true);
         ChatCommand::add('-', [self::class, 'voteMinus'], 'Rate the map playable', null, true);
         ChatCommand::add('--', [self::class, 'voteMinusMinus'], 'Rate the map bad', null, true);
         ChatCommand::add('---', [self::class, 'voteMinusMinusMinus'], 'Rate the map trash', null, true);
@@ -481,6 +482,20 @@ class MxKarma extends Module implements ModuleInterface
 
         if(!ChatController::isPlayerMuted($player)){
             infoMessage($player, ' rated this map ', secondary('the worst map ever'))->sendAll();
+        }
+    }
+
+        /**
+     * @param Player $player
+     * @return void
+     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     */
+    public static function voteBest(Player $player)
+    {
+        self::vote($player, 100, true);
+
+        if(!ChatController::isPlayerMuted($player)){
+            infoMessage($player, ' rated this map ', secondary('the best map of all times to be ever created.'))->sendAll();
         }
     }
 }

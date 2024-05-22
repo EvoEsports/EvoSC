@@ -49,6 +49,8 @@ class Statistics extends Module implements ModuleInterface
         Timer::create('update_playtimes', [self::class, 'updateConnectedPlayerPlaytimes'], '5s', true);
 
         ChatCommand::add('/rank', [self::class, 'showRank'], 'Show your current server rank.');
+        ChatCommand::add('/playtime', [self::class, 'showPlaytime'], 'Show your total play time.');
+        ChatCommand::add('/visits', [self::class, 'showVisits'], 'Show how much times you visited.');
     }
 
     public static function showScores(Collection $players)
@@ -198,6 +200,32 @@ WHERE 1=1;');
                 secondary($stats->Rank . '/' . self::$totalRankedPlayers . ' (Score: ' . $stats->Score . ')'))->send($stats->player);
         } else {
             infoMessage('You need at least one local record before receiving a rank.')->send($player);
+        }
+    }
+
+    public static function showPlaytime(Player $player)
+    {
+        $player->load(['stats']);
+        $stats = $player->stats;
+
+        if ($stats && $stats->Playtime && $stats->Playtime > 0) {
+            infoMessage('Your total play time is ',
+                secondary(round(($stats->Playtime / 60) / 60, 1) . 'h'))->send($stats->player);
+        } else {
+            infoMessage('Unable to calculate play time, Please try again later.')->send($player);
+        }
+    }
+
+    public static function showVisits(Player $player)
+    {
+        $player->load(['stats']);
+        $stats = $player->stats;
+
+        if ($stats && $stats->Visits && $stats->Visits > 0) {
+            infoMessage('Your total visits ',
+                secondary($stats->Visits))->send($stats->player);
+        } else {
+            infoMessage('Unable to calculate visits, Please try again later.')->send($player);
         }
     }
 
