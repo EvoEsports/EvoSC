@@ -364,6 +364,31 @@ class ModeScriptSettings
     }
 
     /**
+     * @return Collection
+     */
+    // Based on https://github.com/AmazingBeu/TM2020-Gamemodes/blob/master/TM_ReverseCup.Script.txt
+    public static function reverseCup(): Collection
+    {
+        return self::combine([
+            new ModeScriptSetting('S_WarmUpNb', 'integer', "Number of warm up", 0),
+            new ModeScriptSetting('S_WarmUpDuration', 'integer', "Duration of one warm up", 20),
+            new ModeScriptSetting('S_WarmUpTimeout', 'integer', "Warm up timeout", -1),
+            new ModeScriptSetting('S_NbOfWinners', 'integer', "Number of winners", 1),
+            new ModeScriptSetting('S_FinishTimeout', 'integer', "Finish timeout", -1),
+            new ModeScriptSetting('S_ComplexPointsRepartition', 'string', "JSON of PointsRepartition depending for the number of the Players Alive", ''),
+            new ModeScriptSetting('S_PointsRepartition', 'string', "Points Repartition", "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"),
+            new ModeScriptSetting('S_RoundsPerMap', 'integer', "Number of rounds per map", 5),
+            new ModeScriptSetting('S_PointsStartup', 'integer', "Points at start", 100),
+            new ModeScriptSetting('S_DisableLastChance', 'boolean', "When a player reaches 0 points he is automatically eliminated", false),
+            new ModeScriptSetting('S_FastForwardPointsRepartition', 'boolean', "Accelerate the distribution of points when the number of players alive decreases", true),
+            new ModeScriptSetting('S_DNF_LossPoints', 'integer', "Number of points a player loses if they give up a round", 20),
+            new ModeScriptSetting('S_LastChance_DNF_Mode', 'integer', "0 = Every Player in Last Chance who DNF will be eliminated | 1 = Only the Player in Last Chance who passed the least amount of checkpoints and DNF will be eliminated, others will stay alive", 0),
+            new ModeScriptSetting('S_NbOfPlayers', 'integer', "Number of players awaited before starting the match (0 is automatic)", 0),
+            new ModeScriptSetting('S_EnableCollisions', 'boolean', "Whether to enable collisions or not", false),
+        ], self::everyMode());
+    }
+
+    /**
      * @param string $mode
      * @return Collection
      */
@@ -413,6 +438,9 @@ class ModeScriptSettings
 
                 case 'TM_TMWTTeams_Online.Script.txt':
                     return self::tmwt();
+
+                case 'TM_ReverseCup.Script.txt':
+                    return self::reverseCup();
             }
         }
 
