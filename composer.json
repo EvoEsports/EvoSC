@@ -30,7 +30,7 @@
     "symfony/console": "^5.2",
     "guzzlehttp/guzzle": "^6.3",
     "latte/latte": "^2.10",
-    "symfony/process": "^4.2",
+    "symfony/process": "^5.4",
     "symfony/event-dispatcher": "^4.2",
     "composer/ca-bundle": "^1.1",
     "manialib/gbx": "^4.1",
