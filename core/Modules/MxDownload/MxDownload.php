@@ -23,6 +23,7 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use Exception;
+use GuzzleHttp\Psr7;
 use Throwable;
 
 class MxDownload extends Module implements ModuleInterface
@@ -111,11 +112,8 @@ class MxDownload extends Module implements ModuleInterface
         if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
             throw new Exception('File is not a valid GBX.');
         }
-
-        $filename = preg_replace('/^attachment; filename="(.+)"$/', '\1', $download->getHeader('content-disposition')[0]);
-        $filename = html_entity_decode(trim($filename), ENT_QUOTES | ENT_HTML5);
-        $filename = preg_replace('/[^a-z0-9\-_# .]/i', '', $filename);
-        $filename = preg_replace('/\s/i', '_', $filename);
+        $filename = Psr7\Header::parse($download->getHeader('content-disposition'));
+        $filename = str_replace(" ", "_", $filename[0]['filename']);
         $filename = "MX" . DIRECTORY_SEPARATOR . "$mxId" . "_$filename";
 
         Log::write('Saving map as ' . MapController::getMapsPath($filename), true);

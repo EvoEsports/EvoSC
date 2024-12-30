@@ -10,14 +10,14 @@ use EvoSC\Models\Map;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxPacks\MxPacks;
 use Exception;
-use Illuminate\Support\Collection;
-use ZipArchive;
+use GuzzleHttp\Exception\GuzzleException;
 use EvoSC\Classes\File;
 use EvoSC\Classes\RestClient;
 use EvoSC\Classes\Exchange;
 use EvoSC\Classes\Server;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
+use GuzzleHttp\Psr7;
 
 class MxPackJob
 {
@@ -26,6 +26,7 @@ class MxPackJob
     private string $path;
     private string $packsDir;
     private $info;
+    private $tracks;
     private string $secret;
 
     /**
@@ -44,8 +45,9 @@ class MxPackJob
         }
 
         $this->info = MxPacks::getPackInfo($packId, $secret);
-        $this->name = $this->info->ID . '_' . $this->info->ShortName;
-        $this->path = $this->packsDir . '/' . $this->name . '.zip';
+        $this->tracks = MxPacks::getPackMapInfos($packId, $secret);
+        $this->name = $this->info->ID;
+        $this->path = "MXPacks" . DIRECTORY_SEPARATOR . $this->name . DIRECTORY_SEPARATOR;
         $this->issuer = $player;
         $this->id = $packId;
         $this->secret = $secret;
@@ -78,83 +80,59 @@ class MxPackJob
             'finished' => false
         ]);
 
-        if (File::exists($this->path)) {
-            $this->unpackFiles($this->path);
-            return;
+        $this->downloadFiles();
+    }
+
+    private function downloadFiles() {
+        $url = isManiaPlanet() ? Exchange::MANIAPLANET_MX_URL : Exchange::TRACKMANIA_MX_URL;
+        $files = array();
+        for($i = 0; $i < count($this->tracks); $i++) {
+            $track = $this->tracks[$i];
+            try {
+                $download = RestClient::get($url . '/tracks/download/' . $track->TrackID);
+
+                if ($download->getStatusCode() != 200) {
+                    throw new Exception("Download $track->TrackID failed: " . $download->getReasonPhrase());
+                }
+
+                Log::write("Request $track->TrackID finished.", true);
+
+                if ($download->getHeader('Content-Type')[0] != 'application/x-gbx') {
+                    throw new Exception('File is not a valid GBX.');
+                }
+                $header_filename = Psr7\Header::parse($download->getHeader('content-disposition'));
+                $header_filename = str_replace(" ", "_", $header_filename[0]['filename']);
+                $filename = $this->path . $track->TrackID . "_$header_filename";
+                Log::write('Saving map as ' . MapController::getMapsPath($filename), true);
+                File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
+
+                if (!File::exists(MapController::getMapsPath($filename))) {
+                    throw new Exception('Map download failed, map does not exist.', true);
+                }
+                else {
+                    $files[$i] = (object)array("filename"=>$filename,"mxid"=>$track->TrackID);
+                }
+            } catch (Exception $ex) {
+                Log::errorWithCause($ex->getMessage(), $ex);
+            } catch (GuzzleException $ex) {
+                Log::errorWithCause($ex->getMessage(), $ex);
+            }
         }
-
-        if (isManiaPlanet()) {
-            $url = Exchange::MANIAPLANET_MX_URL;
-        } else {
-            $url = Exchange::TRACKMANIA_MX_API_URL;
-        }
-
-        $url = sprintf($url . '/mappack/download/%s?secret=%s', $this->info->ID, $this->secret);
-        $response = RestClient::get($url);
-
-        if ($response->getStatusCode() != 200) {
-            warningMessage('Failed to download map pack ', secondary($this->info->Name))->send($this->issuer);
-
-            return;
-        }
-
-        File::put($this->path, $response->getBody()->getContents());
-
-        $this->unpackFiles($this->path);
+        $this->addFiles($files);
     }
 
     /**
-     * @param string $path
-     * @throws Exception
+     * @param array $files
      */
-    private function unpackFiles(string $path)
-    {
-        $this->updateStatus([
-            'packId'   => $this->id,
-            'total'    => $this->info->TrackCount,
-            'current'  => 0,
-            'message'  => 'Extracting maps from archive...',
-            'finished' => false
-        ]);
-
-        $zip = new ZipArchive();
-        $dir = $this->packsDir . DIRECTORY_SEPARATOR . $this->name;
-
-        if (is_dir($dir)) {
-            File::delete($dir);
-        }
-
-        mkdir($dir);
-
-        if ($zip->open($path) === true) {
-            $zip->extractTo($dir);
-            $zip->close();
-        } else {
-            throw new Exception('Failed to unzip archive.');
-        }
-
-        $this->addFiles(File::getFiles($dir));
-    }
-
-    /**
-     * @param Collection $files
-     * @throws Exception
-     */
-    private function addFiles(Collection $files)
+    private function addFiles(array $files)
     {
         $mapInfos = collect(MxPacks::getPackMapInfos($this->id, $this->secret))
             ->keyBy('GbxMapName');
 
-        foreach ($files->values() as $i => $value) {
-            $name = basename($value);
-            $pattern = '/\((\d+)\)\.Map.Gbx$/';
-            if (isManiaPlanet()) {
-                $pattern = '/\((\d+)\)\.Gbx$/';
-            }
-
-            preg_match($pattern, $name, $matches);
-            $mx_id = $matches[1];
-            $filename = 'MXPacks'. DIRECTORY_SEPARATOR . $this->name . DIRECTORY_SEPARATOR . $name;
+        foreach ($files as $i => $value) {
+            $name = basename($value->filename);
+            $mx_id = $value->mxid;
+            $filename = 'MXPacks' . DIRECTORY_SEPARATOR . $this->name . DIRECTORY_SEPARATOR . $name;
 
             $gbx = MapController::getGbxInformation($filename, false);
             $uid = $gbx->MapUid;

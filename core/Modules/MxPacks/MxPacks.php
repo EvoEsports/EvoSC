@@ -59,7 +59,6 @@ class MxPacks extends Module implements ModuleInterface
             warningMessage($info->Message)->send($player);
             return;
         }
-
         $trackList = self::getPackMapInfos($packId, $secret);
 
         Template::show($player, 'MxPacks.confirm', compact('trackList', 'info', 'secret'));
@@ -80,7 +79,7 @@ class MxPacks extends Module implements ModuleInterface
         }
 
         //addpack 524 G5Gpl77r4B
-        dump($url);
+        //dump($url);
 
         try {
             $response = RestClient::get($url);
@@ -91,6 +90,7 @@ class MxPacks extends Module implements ModuleInterface
             }
 
             $trackList = json_decode($response->getBody()->getContents());
+            $trackList = $trackList->results;
             Cache::put($cacheKey, $trackList, now()->addMinute());
 
             return $trackList;
@@ -124,6 +124,7 @@ class MxPacks extends Module implements ModuleInterface
         }
 
         $info = isManiaPlanet() ? $info[0] : $info;
+        $info = $info->results[0];
         Cache::put($cacheIdInfo, $info, now()->addMinute());
 
         return $info;
