@@ -15,6 +15,7 @@ use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
+use Exception;
 use SimpleXMLElement;
 
 class CountdownController extends Controller implements ControllerInterface
@@ -34,6 +35,11 @@ class CountdownController extends Controller implements ControllerInterface
      */
     private static int $originalTimeLimit = -1;
 
+    /**
+     * @var Carbon|null
+     */
+    private static ?Carbon $huntModeStarted = null;
+
     public static function init()
     {
     }
@@ -41,11 +47,12 @@ class CountdownController extends Controller implements ControllerInterface
     /**
      * @param string $mode
      * @param bool $isBoot
-     * @return mixed|void
+     * @return void
+     * @throws Exception
      */
     public static function start(string $mode, bool $isBoot)
     {
-        if(ModeController::isRoundsType()){
+        if (ModeController::isRoundsType()) {
             return;
         }
 
@@ -62,43 +69,68 @@ class CountdownController extends Controller implements ControllerInterface
         Hook::add('EndMap', [self::class, 'endMap']);
         Hook::add('MatchSettingsLoaded', [self::class, 'matchSettingsLoaded']);
 
-        ChatCommand::add('//addtime', [self::class, 'addTimeManually'],
-            'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'manipulate_time');
-        ChatCommand::add('/hunt', [self::class, 'enableHuntMode'], 'Enable hunt mode (disable countdown).', 'manipulate_time');
+        ChatCommand::add('//addtime', [self::class, 'addTimeManually'], 'Add time in minutes to the countdown (you can add negative time or decimals like 0.5 for 30s)', 'manipulate_time');
+        ChatCommand::add('/hunt', [self::class, 'toggleHuntMode'], 'Enable/disable hunt mode (disable countdown).', 'manipulate_time');
 
         InputSetup::add('add_one_minute', 'Add one minute to the countdown.', [self::class, 'addMinute'], 'F9', 'manipulate_time');
     }
 
+    /**
+     * @return void
+     */
     public static function stop()
     {
         Cache::put('added-time', self::$addedSeconds, now()->addMinute());
         Cache::put('match-start', self::$matchStart, now()->addMinute());
     }
 
+    /**
+     * @return void
+     */
     public static function beginMatch()
     {
         self::$matchStart = time();
         self::$addedSeconds = 0;
+        self::$huntModeStarted = null;
         Cache::put('added-time', 0);
         Cache::put('match-start', self::$matchStart);
+        Hook::fire('AddedTimeChanged', 0);
         self::setTimeLimit(self::getOriginalTimeLimitInSeconds());
     }
 
+    /**
+     * @return void
+     */
     public static function endMap()
     {
         self::resetTimeLimit();
     }
 
+    /**
+     * @return void
+     */
     public static function resetTimeLimit()
     {
         self::setTimeLimit(self::$originalTimeLimit);
         Cache::put('added-time', 0);
     }
 
-    public static function enableHuntMode(Player $player)
+    /**
+     * @param Player $player
+     * @return void
+     */
+    public static function toggleHuntMode(Player $player)
     {
-        self::setTimeLimit(0);
-        infoMessage($player, ' enabled hunt mode.')->sendAll();
+        if (is_null(self::$huntModeStarted)) {
+            //Enable hunt mode.
+            self::$huntModeStarted = now();
+            self::setTimeLimit(0);
+            infoMessage($player, ' enabled hunt mode.')->sendAll();
+        } else {
+            //Disable hunt mode and restore previous time.
+            $timeToAdd = self::$huntModeStarted->diffInSeconds(now());
+            self::addTime($timeToAdd, $player);
+        }
     }
 
     /**
@@ -107,8 +139,15 @@ class CountdownController extends Controller implements ControllerInterface
      */
     public static function addTime(int $seconds, Player $player = null)
     {
-        $addedTime = self::$addedSeconds;
-        $addedTime += $seconds;
+        $addedTime = self::$addedSeconds + $seconds;
+
+        if (self::$huntModeStarted) {
+            self::$huntModeStarted = null;
+
+            if($player){
+                warningMessage($player, ' disabled hunt mode.')->sendAll();
+            }
+        }
 
         Hook::fire('AddedTimeChanged', $addedTime);
         Cache::put('added-time', $addedTime);
@@ -121,7 +160,6 @@ class CountdownController extends Controller implements ControllerInterface
                 infoMessage($player, ' added ', secondary(round($seconds / 60, 1) . ' minutes'),
                     ' of playtime.')->sendAdmin();
             } else {
-
                 infoMessage($player, ' removed ', secondary(round($seconds / -60, 1) . ' minutes'),
                     ' of playtime.')->sendAdmin();
             }
@@ -173,9 +211,7 @@ class CountdownController extends Controller implements ControllerInterface
 
         $calculatedProgressTime = self::getRoundStartTime() + self::getOriginalTimeLimitInSeconds() + self::$addedSeconds;
 
-        $timeLeft = $calculatedProgressTime - time();
-
-        return $timeLeft < 0 ? 0 : $timeLeft;
+        return max($calculatedProgressTime - time(), 0);
     }
 
     /**
@@ -193,6 +229,7 @@ class CountdownController extends Controller implements ControllerInterface
      *
      * @param string|null $file
      * @return int
+     * @throws Exception
      */
     private static function getTimeLimitFromMatchSettings(string $file = null): int
     {

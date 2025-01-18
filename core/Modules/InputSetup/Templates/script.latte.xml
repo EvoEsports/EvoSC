@@ -16,7 +16,7 @@
 
     Void SendKeyBind(Text bindId) {
         if(KeyCooldown.existskey(bindId)){
-            if(KeyCooldown[bindId] + 650 > Now){
+            if(KeyCooldown[bindId] + 450 > Now){
                 return;
             }
         }
