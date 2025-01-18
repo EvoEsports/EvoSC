@@ -3,12 +3,10 @@
 namespace EvoSC\Modules\Help;
 
 use EvoSC\Classes\ChatCommand;
-use EvoSC\Classes\Hook;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
-use EvoSC\Models\AccessRight;
 use EvoSC\Models\Player;
 use EvoSC\Modules\QuickButtons\QuickButtons;
 

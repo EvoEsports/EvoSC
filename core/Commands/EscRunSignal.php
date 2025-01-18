@@ -2,7 +2,6 @@
 
 namespace EvoSC\Commands;
 
-use EvoSC\Commands\EscRun;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 
 class EscRunSignal extends EscRun implements SignalableCommandInterface {

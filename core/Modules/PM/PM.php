@@ -7,7 +7,6 @@ namespace EvoSC\Modules\PM;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
-use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ChatController;
 use EvoSC\Controllers\PlayerController;

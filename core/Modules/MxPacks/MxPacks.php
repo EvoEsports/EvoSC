@@ -7,6 +7,7 @@ namespace EvoSC\Modules\MxPacks;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Exchange;
+use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\RestClient;
@@ -15,7 +16,6 @@ use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\MxPacks\Classes\MxPackJob;
 use Exception;
-use EvoSC\Classes\Log;
 
 class MxPacks extends Module implements ModuleInterface
 {

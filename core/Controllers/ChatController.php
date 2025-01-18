@@ -6,7 +6,6 @@ namespace EvoSC\Controllers;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
-use EvoSC\Classes\Question;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;

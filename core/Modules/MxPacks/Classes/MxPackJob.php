@@ -3,6 +3,12 @@
 
 namespace EvoSC\Modules\MxPacks\Classes;
 
+use EvoSC\Classes\Exchange;
+use EvoSC\Classes\File;
+use EvoSC\Classes\Hook;
+use EvoSC\Classes\Log;
+use EvoSC\Classes\RestClient;
+use EvoSC\Classes\Server;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\MapController;
 use EvoSC\Controllers\MatchSettingsController;
@@ -11,12 +17,6 @@ use EvoSC\Models\Player;
 use EvoSC\Modules\MxPacks\MxPacks;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use EvoSC\Classes\File;
-use EvoSC\Classes\RestClient;
-use EvoSC\Classes\Exchange;
-use EvoSC\Classes\Server;
-use EvoSC\Classes\Hook;
-use EvoSC\Classes\Log;
 use GuzzleHttp\Psr7;
 
 class MxPackJob

@@ -11,6 +11,7 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ChatController;
 use EvoSC\Controllers\PlayerController;
+use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\InputSetup\InputSetup;
@@ -25,7 +26,7 @@ class MemeMod extends Module implements ModuleInterface
      * @param string $mode
      * @param bool $isBoot
      * @return mixed|void
-     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function start(string $mode, bool $isBoot = false)
     {
@@ -73,7 +74,7 @@ class MemeMod extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @param string $text
-     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function chat(Player $player, string $text)
     {
@@ -152,27 +153,27 @@ class MemeMod extends Module implements ModuleInterface
     /**
      * @param Player $player
      * @return void
+     * @throws InvalidArgumentException
      */
     private static function stopSpam(Player $player)
     {
         $newBindJson = json_encode([
-            'code' => 41,
             'name' => 'F4',
-            'def'  => 'F',
-            'id'   => 'pay_respects'
+            'def' => 'F',
+            'id' => 'pay_respects'
         ]);
 
         dangerMessage('You have paid too many respects. The key to pay respects have been rebound to ', secondary('F4'), '. You can change it back in Input-Setup.')->send($player);
 
         InputSetup::updateBind($player, ...explode(',', $newBindJson));
-        InputSetup::sendScript($player);
+        InputSetup::sendBackgroundScript($player);
     }
 
     /**
      * @param string $in
      * @return string
      */
-    private static function mock(string $in)
+    private static function mock(string $in): string
     {
         $out = '';
         $split = str_split($in);

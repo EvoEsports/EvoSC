@@ -7,9 +7,9 @@ namespace EvoSC\Modules\MatchStats;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
-use EvoSC\Models\AccessRight;
 use EvoSC\Controllers\MapController;
 use EvoSC\Interfaces\ModuleInterface;
+use EvoSC\Models\AccessRight;
 
 class MatchStats extends Module implements ModuleInterface
 {

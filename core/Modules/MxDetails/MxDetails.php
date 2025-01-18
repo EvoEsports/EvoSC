@@ -15,7 +15,6 @@ use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Map;
 use EvoSC\Models\Player;
-use EvoSC\Modules\LocalRecords\LocalRecords;
 use EvoSC\Modules\MapList\MapList;
 use EvoSC\Modules\MxDownload\MxDownload;
 use stdClass;
