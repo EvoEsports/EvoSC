@@ -12,7 +12,18 @@
 
         <frame id="entries">
             {foreach $binds as $key => $bind}
-            <label class="select btn-default" size="8 4" pos="6 {$key * -4 - 10}" textsize="0.5" valign="center" halign="center" data-default="{$bind['default']}" data-id="{$bind['id']}" scale="0.9" ScriptEvents="1" />
+            <label class="select btn-default"
+                   size="8 4"
+                   pos="6 {$key * -4 - 10}"
+                   textsize="0.5"
+                   valign="center"
+                   halign="center"
+                   text="{$bind['name'] ?? $bind['default']}"
+                   data-default="{$bind['default']}"
+                   data-id="{$bind['id']}"
+                   scale="0.9"
+                   ScriptEvents="1"
+            />
             {/foreach}
         </frame>
 
@@ -33,8 +44,7 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct Bind {
-        Integer code;
+    #Struct KeyBind {
         Text name;
         Text def;
         Text id;
@@ -48,21 +58,8 @@
 
     <script><!--
     main(){
-        declare Text[Text] CustomKeyBinds for UI;
         declare window <=> (Page.MainFrame.GetFirstChild("window") as CMlFrame);
         declare entries <=> (Page.MainFrame.GetFirstChild("entries") as CMlFrame);
-
-        foreach(control in entries.Controls){
-            declare entry = (control as CMlLabel);
-            declare id = entry.DataAttributeGet("id");
-            if(CustomKeyBinds.existskey(id)){
-                entry.Value = CustomKeyBinds[id];
-                entry.DataAttributeSet("old", entry.Value);
-            }else{
-                entry.Value = entry.DataAttributeGet("default");
-                entry.DataAttributeSet("old", entry.Value);
-            }
-        }
 
         while(True){
             yield;
@@ -71,14 +68,13 @@
                 if(event.Control == Null) continue;
 
                 if(event.Control.HasClass("save") && event.Type == CMlScriptEvent::Type::MouseClick){
-                    declare Bind bind;
+                    declare KeyBind bind;
                     foreach(control in entries.Controls){
                         declare label = (control as CMlLabel);
                         declare id = label.DataAttributeGet("id");
                         declare bindString = label.DataAttributeGet("bind");
 
                         if(bindString != ""){
-                            CustomKeyBinds[id] = label.Value;
                             ManiaLinkEvent("update_bind", bindString);
                         }
                     }
@@ -92,7 +88,7 @@
                     declare id = label.DataAttributeGet("id");
                     declare old = label.DataAttributeGet("old");
                     declare def = label.DataAttributeGet("default");
-                    declare Bind bind;
+                    declare KeyBind bind;
 
                     (Page.MainFrame.GetFirstChild("overlay") as CMlFrame).Show();
                     (Page.MainFrame.GetFirstChild("overlay-text") as CMlLabel).Value = "\n$aaa$ipress " ^ old ^ " to abort";
@@ -101,7 +97,6 @@
                         yield;
                         foreach(event in PendingEvents){
                             if(event.Type == CMlScriptEvent::Type::KeyPress){
-                                bind.code = event.KeyCode;
                                 bind.name = event.KeyName;
                                 bind.def = def;
                                 bind.id = id;

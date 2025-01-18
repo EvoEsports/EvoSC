@@ -9,6 +9,7 @@ use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
+use EvoSC\Exceptions\InvalidArgumentException;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 use EvoSC\Modules\QuickButtons\QuickButtons;
@@ -27,11 +28,11 @@ class InputSetup extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
-        Hook::add('PlayerConnect', [self::class, 'sendScript']);
+        Hook::add('PlayerConnect', [self::class, 'sendBackgroundScript']);
 
         ManiaLinkEvent::add('show_key_bind_settings', [self::class, 'showSettings']);
         ManiaLinkEvent::add('bound_key_pressed', [self::class, 'keyPressed']);
-        ManiaLinkEvent::add('update_keybinds', [self::class, 'sendScript']);
+        ManiaLinkEvent::add('update_keybinds', [self::class, 'sendBackgroundScript']);
         ManiaLinkEvent::add('update_bind', [self::class, 'updateBind']);
 
         QuickButtons::addButton('🎮', 'Input-Setup', 'show_key_bind_settings');
@@ -39,28 +40,26 @@ class InputSetup extends Module implements ModuleInterface
 
     /**
      * @param Player $player
-     * @throws \EvoSC\Exceptions\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function showSettings(Player $player)
     {
-        $binds = self::getBinds($player)->values();
-
-        Template::show($player, 'InputSetup.settings', compact('binds'));
+        Template::show($player, 'InputSetup.settings', [
+            'binds' => self::getPlayerKeyBinds($player)
+        ]);
     }
 
     /**
+     * Send the key-bind script to the player
+     *
      * @param Player $player
-     * @return Collection
+     * @throws InvalidArgumentException
      */
-    public static function getBinds(Player $player)
+    public static function sendBackgroundScript(Player $player)
     {
-        return self::$binds->filter(function ($bind) use ($player) {
-            if ($bind['access']) {
-                return $player->hasAccess($bind['access']);
-            }
-
-            return true;
-        });
+        Template::show($player, 'InputSetup.script', [
+            'binds' => self::getPlayerKeyBinds($player)
+        ]);
     }
 
     /**
@@ -83,7 +82,6 @@ class InputSetup extends Module implements ModuleInterface
             'description' => $description,
             'callback' => $callback,
             'default' => $defaultKey,
-            'code' => 0,
             'access' => $access,
         ]);
     }
@@ -125,39 +123,38 @@ class InputSetup extends Module implements ModuleInterface
     }
 
     /**
-     * Send the key-bind script to the player
-     *
      * @param Player $player
+     * @return Collection
      */
-    public static function sendScript(Player $player)
+    private static function getPlayerKeyBinds(Player $player): Collection
     {
         $userBinds = $player->setting('key-binds', true);
         $userBinds = collect($userBinds)->keyBy('id');
 
-        $binds = self::$binds->map(function ($bind) use ($player, $userBinds) {
+        return self::$binds->map(function ($bind) use ($player, $userBinds) {
             if ($bind['access'] && !$player->hasAccess($bind['access'])) {
                 return null;
             }
 
+            $keyBindData = [
+                'id' => $bind['id'],
+                'name' => $bind['default'],
+                'default' => $bind['default'],
+                'description' => $bind['description']
+            ];
+
             if ($userBinds->has($bind['id'])) {
                 $b = $userBinds->get($bind['id']);
-                return [
-                    'id' => $bind['id'],
-                    'code' => $b->code,
-                    'name' => $b->name,
-                    'def' => $bind['default'],
-                ];
+
+                if (property_exists($b, 'name') && !empty($b->name)) {
+                    $keyBindData['name'] = $b->name;
+                }
             }
 
-            return [
-                'id' => $bind['id'],
-                'code' => $bind['code'],
-                'name' => $bind['default'],
-                'def' => $bind['default'],
-            ];
-        })->filter()->values();
-
-        Template::show($player, 'InputSetup.script', compact('binds'));
+            return $keyBindData;
+        })
+            ->filter()
+            ->values();
     }
 
     /**
@@ -165,31 +162,35 @@ class InputSetup extends Module implements ModuleInterface
      *
      * @param Player $player
      * @param string $id
+     * @throws Exception
      */
     public static function keyPressed(Player $player, string $id)
     {
-        self::$binds->where('id', $id)->each(function ($bind) use ($player) {
-            if ($bind['access']) {
-                if (!$player->hasAccess($bind['access'])) {
-                    return;
+        self::$binds->where('id', $id)
+            ->each(function ($bind) use ($player) {
+                if ($bind['access']) {
+                    if (!$player->hasAccess($bind['access'])) {
+                        return;
+                    }
                 }
-            }
 
-            if (gettype($bind['callback']) == "object") {
-                $func = $bind['callback'];
-                $func($player);
-            } else {
-                if (is_callable($bind['callback'], false, $callableName)) {
-                    Log::write("Execute: " . $bind['callback'][0] . " " . $bind['callback'][1],
-                        isVeryVerbose());
-                    call_user_func($bind['callback'], $player);
+                if (gettype($bind['callback']) == "object") {
+                    $func = $bind['callback'];
+                    $func($player);
                 } else {
-                    throw new Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
+                    if (is_callable($bind['callback'], false, $callableName)) {
+                        Log::write("Execute: " . $bind['callback'][0] . " " . $bind['callback'][1], isVeryVerbose());
+                        call_user_func($bind['callback'], $player);
+                    } else {
+                        throw new Exception("KeyBind callback invalid, must use: [ClassName, ClassFunctionName] or Closure");
+                    }
                 }
-            }
-        });
+            });
     }
 
+    /**
+     * @return void
+     */
     public static function clearAll()
     {
         self::$binds = collect();

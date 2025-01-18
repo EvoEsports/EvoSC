@@ -5,19 +5,18 @@
     #Include "MathLib" as ML
     #Include "TextLib" as TL
 
-    #Struct Bind {
-        Integer code;
+    #Struct KeyBind {
         Text name;
         Text def;
         Text id;
     }
 
-    declare Bind[] KeyBinds;
+    declare KeyBind[] KeyBinds;
     declare Integer[Text] KeyCooldown;
 
     Void SendKeyBind(Text bindId) {
         if(KeyCooldown.existskey(bindId)){
-            if(KeyCooldown[bindId] + 850 > Now){
+            if(KeyCooldown[bindId] + 650 > Now){
                 return;
             }
         }
@@ -33,15 +32,14 @@
             yield;
 
             foreach (event in PendingEvents) {
-                if(event.Type == CMlScriptEvent::Type::KeyPress){
-                    foreach(bind in KeyBinds){
-                        if(bind.code != 0 && event.KeyCode == bind.code){
-                            SendKeyBind(bind.id);
-                            break;
-                        }else if(event.KeyName == bind.def){
-                            SendKeyBind(bind.id);
-                            break;
-                        }
+                if(event.Type != CMlScriptEvent::Type::KeyPress){
+                    continue;
+                }
+
+                foreach(bind in KeyBinds){
+                    if(bind.name == event.KeyName){
+                        SendKeyBind(bind.id);
+                        break;
                     }
                 }
             }
