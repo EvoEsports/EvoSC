@@ -2,6 +2,7 @@
 
 namespace EvoSC\Modules\LastVisits;
 
+use Carbon\Carbon;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;
 use EvoSC\Classes\ManiaLinkEvent;
@@ -9,8 +10,6 @@ use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
-use EvoSC\Classes\Log;
-use Carbon\Carbon;
 
 
 class LastVisits extends Module implements ModuleInterface

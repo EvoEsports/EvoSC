@@ -4,9 +4,7 @@
 namespace EvoSC\Controllers;
 
 
-use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
-use Maniaplanet\DedicatedServer\Structures\Tag;
 
 class TeamController implements ControllerInterface
 {

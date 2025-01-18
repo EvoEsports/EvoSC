@@ -6,7 +6,6 @@ namespace EvoSC\Modules\HUD;
 
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Server;
-use EvoSC\Controllers\ConfigController;
 use EvoSC\Interfaces\ModuleInterface;
 
 class HUD extends Module implements ModuleInterface

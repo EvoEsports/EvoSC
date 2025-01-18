@@ -6,7 +6,6 @@ namespace EvoSC\Controllers;
 use Carbon\Carbon;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\File;
-use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
 use EvoSC\Exceptions\TemplateNameInvalidException;
 use EvoSC\Interfaces\ControllerInterface;

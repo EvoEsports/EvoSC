@@ -10,18 +10,12 @@ use EvoSC\Classes\DB;
 use EvoSC\Classes\File;
 use EvoSC\Classes\Hook;
 use EvoSC\Classes\Log;
-use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Server;
-use EvoSC\Classes\Timer;
 use EvoSC\Classes\Utility;
-use EvoSC\Commands\EscRun;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\Player;
-use EvoSC\Modules\InputSetup\InputSetup;
-use EvoSC\Modules\QuickButtons\QuickButtons;
 use Exception;
 use Illuminate\Support\Collection;
-use Maniaplanet\DedicatedServer\Structures\Map;
 use SimpleXMLElement;
 
 class MatchSettingsController implements ControllerInterface

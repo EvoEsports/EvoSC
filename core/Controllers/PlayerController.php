@@ -3,7 +3,6 @@
 namespace EvoSC\Controllers;
 
 
-use EvoSC\Classes\AwaitAction;
 use EvoSC\Classes\Cache;
 use EvoSC\Classes\ChatCommand;
 use EvoSC\Classes\DB;

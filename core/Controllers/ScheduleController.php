@@ -3,7 +3,6 @@
 namespace EvoSC\Controllers;
 
 use EvoSC\Classes\Controller;
-use EvoSC\Classes\DB;
 use EvoSC\Classes\Log;
 use EvoSC\Classes\ManiaLinkEvent;
 use EvoSC\Classes\Timer;

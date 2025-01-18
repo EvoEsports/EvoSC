@@ -8,7 +8,6 @@ use EvoSC\Classes\Hook;
 use EvoSC\Classes\Module;
 use EvoSC\Classes\Template;
 use EvoSC\Controllers\ModeController;
-use EvoSC\Controllers\PointsController;
 use EvoSC\Interfaces\ModuleInterface;
 use EvoSC\Models\Player;
 

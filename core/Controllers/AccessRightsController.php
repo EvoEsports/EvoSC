@@ -4,7 +4,6 @@
 namespace EvoSC\Controllers;
 
 
-use EvoSC\Classes\DB;
 use EvoSC\Classes\Server;
 use EvoSC\Interfaces\ControllerInterface;
 use EvoSC\Models\AccessRight;
