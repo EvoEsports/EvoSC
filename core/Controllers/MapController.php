@@ -42,6 +42,8 @@ class MapController implements ControllerInterface
     private static int $matchRound = 0;
     private static int $playersFinished = 0;
 
+    private static bool $isPaused = false;
+
     /**
      * Initialize MapController
      */
@@ -72,6 +74,7 @@ class MapController implements ControllerInterface
         AccessRight::add('map_disable', 'Disable map.');
         AccessRight::add('map_replay', 'Force a replay.');
         AccessRight::add('map_reset', 'Reset round.');
+        AccessRight::add('match_pause', 'Pause match.');
         AccessRight::add('force_end_round', 'Force the end of a round (Rounds/Laps).');
         AccessRight::add('manipulate_time', 'Change the countdown time.');
         AccessRight::add('manipulate_points', 'Change the points-limit.');
@@ -112,6 +115,8 @@ class MapController implements ControllerInterface
             Hook::add('Maniaplanet.StartPlayLoop', [self::class, 'startPlayLoop']);
             Hook::add('Trackmania.WarmUp.End', [self::class, 'resetRoundCounter']);
             Hook::add('BeginMap', [self::class, 'resetRoundCounter']);
+            ChatCommand::add('//pause', [self::class, 'cmdPauseMatch'], 'Skips current round and pauses the match.');
+            ChatCommand::add('//unpause', [self::class, 'cmdResumeMatch'], 'Resumes the currently paused match.');
             QuickButtons::addButton('', 'Force end of round', 'force_end_round', 'force_end_round');
         }
     }
@@ -199,6 +204,27 @@ class MapController implements ControllerInterface
         }
     }
 
+    public static function cmdPauseMatch(Player $player, $cmd)
+    {
+        if(self::$isPaused) {
+            warningMessage("Match is already paused, use //unpause to resume the match.")->send($player);
+        } else {
+            Server::triggerModeScriptEventArray("Maniaplanet.Pause.SetActive", ["true"]);
+            warningMessage(secondary($player), " has paused the match.")->sendAll();
+            self::$isPaused = true;
+        }
+    }
+
+    public static function cmdResumeMatch(Player $player, $cmd)
+    {
+        if(self::$isPaused) {
+            Server::triggerModeScriptEventArray("Maniaplanet.Pause.SetActive", ["false"]);
+            warningMessage(secondary($player), " has resumed the match.")->sendAll();
+            self::$isPaused = false;
+        } else {
+            warningMessage("Match is not paused, use //pause to pause the match.")->send($player);
+        }
+    }
     /**
      * @param Map $map
      * @throws GuzzleException
