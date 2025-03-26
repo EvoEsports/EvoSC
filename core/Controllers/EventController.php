@@ -145,27 +145,30 @@ class EventController implements ControllerInterface
             }
 
             $parts = explode(' ', trim($text));
+            $player = player($login);
 
             if (ChatCommand::has($parts[0])) {
-                ChatCommand::get($parts[0])->execute(player($login), $text);
+                ChatCommand::get($parts[0])->execute($player, $text);
 
                 return;
             }
 
             if (substr($text, 0, 1) == '/' || substr($text, 0, 2) == '//') {
-                warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send(player($login));
+                warningMessage('Invalid chat-command entered. See ', secondary('/help'), ' for all commands.')->send($player);
 
                 return;
             }
 
             try {
-                Hook::fire('PlayerChat', player($login), $text);
+                if (Hook::fire('PlayerChat', $player, $text) === false) {
+                    return;
+                }
             } catch (Exception $e) {
                 Log::errorWithCause("Failed to fire PlayerChat hook", $e);
             }
 
             try {
-                ChatController::playerChat(player($login), $text);
+                ChatController::playerChat($player, $text);
             } catch (Exception $e) {
                 Log::errorWithCause("Failed to send player text to chat", $e);
             }
@@ -198,11 +201,11 @@ class EventController implements ControllerInterface
                 }
 
                 $player->fill([
-                    'NickName'     => $name,
+                    'NickName' => $name,
                     'ubisoft_name' => $details->nickName,
-                    'path'         => $details->path,
-                    'player_id'    => $details->playerId,
-                    'team'         => $details->teamId,
+                    'path' => $details->path,
+                    'player_id' => $details->playerId,
+                    'team' => $details->teamId,
                 ]);
 
                 if ($player->isDirty([
@@ -216,13 +219,13 @@ class EventController implements ControllerInterface
                 }
             } catch (ModelNotFoundException $e) {
                 $player = Player::create([
-                    'Login'        => $details->login,
-                    'NickName'     => $details->nickName,
+                    'Login' => $details->login,
+                    'NickName' => $details->nickName,
                     'ubisoft_name' => $details->nickName,
-                    'path'         => $details->path,
-                    'player_id'    => $details->playerId,
-                    'team'         => $details->teamId,
-                    'group_id'     => Group::PLAYER
+                    'path' => $details->path,
+                    'player_id' => $details->playerId,
+                    'team' => $details->teamId,
+                    'group_id' => Group::PLAYER
                 ]);
             }
 
