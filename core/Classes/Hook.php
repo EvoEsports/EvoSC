@@ -67,16 +67,19 @@ class Hook
      * Warning: Calling a hook with the wrong number of arguments could result in an exception.
      *
      * @param array ...$arguments
+     * @return bool
      */
-    public function execute(...$arguments)
+    public function execute(...$arguments): bool
     {
+        $returnedValue = true;
+
         try {
             if (gettype($this->function) == "object") {
                 $func = $this->function;
-                $func(...$arguments);
+                $returnedValue = $func(...$arguments);
             } else {
                 if (is_callable($this->function, false, $callableName)) {
-                    call_user_func($this->function, ...$arguments);
+                    $returnedValue = call_user_func($this->function, ...$arguments);
                     // Log::write("Execute: " . $this->function[0] . "->" . $this->function[1] . "()", isDebug());
                 } else {
                     throw new Exception("Function call invalid, must use: [ClassName, FunctionName] or Closure. " . serialize($this->function));
@@ -95,6 +98,8 @@ class Hook
         if ($this->runOnce) {
             HookController::removeHook($this);
         }
+
+        return $returnedValue !== false;
     }
 
     /**
@@ -170,22 +175,28 @@ class Hook
      *
      * @param string $hookName
      * @param mixed ...$arguments
+     * @return bool
      */
-    public static function fire(string $hookName, ...$arguments)
+    public static function fire(string $hookName, ...$arguments): bool
     {
         $hooks = HookController::getHooks($hookName);
 
         if (!$hooks) {
-            return;
+            return true;
         }
 
         foreach ($hooks as $hook) {
+            /** @var Hook $hook */
             try {
-                $hook->execute(...$arguments);
+                if($hook->execute(...$arguments) === false){
+                    return false;
+                }
             } catch (Exception $e) {
                 Log::errorWithCause("Hook execution failed", $e);
             }
         }
+
+        return true;
     }
 
     /**
