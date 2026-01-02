@@ -8,15 +8,15 @@
     "Trackmania"
   ],
   "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License",
-  "homepage": "https://github.com/EvoTM/EvoSC",
+  "homepage": "https://github.com/EvoEsports/EvoSC",
   "repositories": [
     {
       "type": "vcs",
-      "url": "https://github.com/EvoTM/gbx.git"
+      "url": "https://github.com/EvoEsports/gbx.git"
     },
     {
       "type": "vcs",
-      "url": "https://github.com/EvoTM/dedicated-server-api.git"
+      "url": "https://github.com/EvoEsports/dedicated-server-api.git"
     }
   ],
   "require": {

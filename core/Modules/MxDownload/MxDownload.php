@@ -114,6 +114,7 @@ class MxDownload extends Module implements ModuleInterface
         }
         $filename = Psr7\Header::parse($download->getHeader('content-disposition'));
         $filename = str_replace(" ", "_", $filename[0]['filename']);
+        $filename = str_replace("?", "_", $filename);
         $filename = "MX" . DIRECTORY_SEPARATOR . "$mxId" . "_$filename";
 
         Log::write('Saving map as ' . MapController::getMapsPath($filename), true);
