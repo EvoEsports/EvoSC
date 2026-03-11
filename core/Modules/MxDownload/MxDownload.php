@@ -113,7 +113,10 @@ class MxDownload extends Module implements ModuleInterface
             throw new Exception('File is not a valid GBX.');
         }
         $filename = Psr7\Header::parse($download->getHeader('content-disposition'));
+        $filename = str_replace(" ", "_", $filename[0]['filename']);
         $filename = preg_replace('/[^a-zA-Z0-9\-\._]/','_', $filename);
+
+        $filename = "MX" . DIRECTORY_SEPARATOR . "$mxId" . "_$filename";
 
         Log::write('Saving map as ' . MapController::getMapsPath($filename), true);
         File::put(MapController::getMapsPath($filename), $download->getBody()->getContents());
