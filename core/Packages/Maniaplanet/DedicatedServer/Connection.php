@@ -55,6 +55,8 @@ class Connection
      */
     static function factory($host = '127.0.0.1', $port = 5000, $timeout = 5, $user = 'SuperAdmin', $password = 'SuperAdmin', $apiVersion = self::API_2013_04_16)
     {
+        $port = (int)$port;
+        $timeout = (int)$timeout;
         $key = $host . ':' . $port;
         if (!isset(self::$instances[$key])) {
             self::$instances[$key] = new self($host, $port, $timeout);

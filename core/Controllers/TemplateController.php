@@ -12,6 +12,7 @@ use EvoSC\Interfaces\ControllerInterface;
 use Exception;
 use Illuminate\Support\Collection;
 use Latte\Engine;
+use Latte\Essential\RawPhpExtension;
 use Latte\Loaders\StringLoader;
 
 /**
@@ -168,6 +169,7 @@ class TemplateController implements ControllerInterface
 
         self::$templates = collect();
         self::$latte = new Engine();
+        self::$latte->addExtension(new RawPhpExtension());
         self::addCustomFilters();
 
         //Get all template files in core directory

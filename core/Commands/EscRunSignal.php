@@ -21,11 +21,16 @@ class EscRunSignal extends EscRun implements SignalableCommandInterface {
      * Signal handler
      *
      * @param int $signal
+     * @param int|false $previousExitCode
+     * @return int|false
      */
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if ($signal == SIGTERM || $signal == SIGINT) {
             $this->shutdownEvoSC();
+            return 0;
         }
+
+        return false;
     }
 }

@@ -79,7 +79,7 @@ class Votes extends Module implements ModuleInterface
     public function stop()
     {
         $data = (object)[
-            'vote'               => self::$vote,
+            'vote'               => null,
             'voters'             => self::$voters,
             'lastTimeVote'       => self::$lastTimeVote,
             'lastSkipVote'       => self::$lastSkipVote,
@@ -105,7 +105,7 @@ class Votes extends Module implements ModuleInterface
             self::$lastTimeVote = time() - config('votes.time.cooldown-in-seconds');
             self::$lastSkipVote = time() - config('votes.skip.cooldown-in-seconds');
             $originalTimeLimit = CountdownController::getOriginalTimeLimitInSeconds();
-            self::$timeVotesThisRound = ceil(CountdownController::getAddedSeconds() / $originalTimeLimit);
+            self::$timeVotesThisRound = $originalTimeLimit > 0 ? ceil(CountdownController::getAddedSeconds() / $originalTimeLimit) : 0;
         }
 
         AccessRight::add('vote_custom', 'Create a custom vote. Enter question after command.');
@@ -166,7 +166,7 @@ class Votes extends Module implements ModuleInterface
         $everyoneVoted = $voteCount == self::$onlinePlayersCount;
 
         $voteState = self::getVoteState();
-        $voteRatioReached = ($voteState['yes'] / self::$onlinePlayersCount) > self::$vote->success_ratio;
+        $voteRatioReached = self::$onlinePlayersCount > 0 ? (($voteState['yes'] / self::$onlinePlayersCount) > self::$vote->success_ratio) : false;
 
         if ($timerRanOut || $everyoneVoted || $voteRatioReached) {
             $success = false;

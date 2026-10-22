@@ -15,12 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Log
 {
     /**
-     * @var OutputInterface
+     * @var OutputInterface|null
      */
-    private static OutputInterface $output;
+    private static ?OutputInterface $output = null;
 
-    private static bool $singleFileMode;
-    private static string $logPrefix;
+    private static bool $singleFileMode = false;
+    private static string $logPrefix = 'evosc';
 
     /**
      * Get the output-interface
@@ -182,15 +182,17 @@ class Log
     /**
      * Do not use (internal function). Set the output interface.
      *
-     * @param OutputInterface $output
+     * @param OutputInterface|null $output
      */
-    public static function setOutput(OutputInterface $output)
+    public static function setOutput(?OutputInterface $output = null)
     {
         self::$singleFileMode = (bool)config('server.logs.single-file', false);
         self::$logPrefix = (string)config('server.logs.prefix', 'evosc');
 
-        $warningOutputFormatterStyle = new OutputFormatterStyle('red');
-        $output->getFormatter()->setStyle('warning', $warningOutputFormatterStyle);
+        if ($output) {
+            $warningOutputFormatterStyle = new OutputFormatterStyle('red');
+            $output->getFormatter()->setStyle('warning', $warningOutputFormatterStyle);
+        }
 
         self::$output = $output;
     }

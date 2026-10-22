@@ -11,8 +11,6 @@ use EvoSC\Models\Player;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-require 'vendor/larapack/dd/src/helper.php';
-
 const EVO_API_URL = "https://api.evotm.com";
 
 /**
@@ -106,6 +104,8 @@ function formatScore(int $score, bool $cutZero = false): string
  */
 function stripAll(?string $styled = '', bool $keepLinks = false): string
 {
+    $styled = $styled ?? '';
+
     if ($keepLinks) {
         return preg_replace('/(?<![$])\${1}(?:[iwngosz<>]{1}|[a-f0-9]{1,3})/i', '', $styled);
     }
