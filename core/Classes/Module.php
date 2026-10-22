@@ -6,6 +6,7 @@ namespace EvoSC\Classes;
 
 use stdClass;
 
+#[\AllowDynamicProperties]
 class Module
 {
     const PRIORITY_HIGHEST = 4;
@@ -13,6 +14,8 @@ class Module
     const PRIORITY_NORMAL = 2;
     const PRIORITY_LOW = 1;
     const PRIORITY_LOWEST = 0;
+
+    public $configs = null;
 
     protected string $name;
     protected string $namespace;

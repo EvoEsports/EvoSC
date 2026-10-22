@@ -31,7 +31,7 @@ class PlayerMarkers extends Module implements ModuleInterface
      * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendScript(Player $player = null)
+    public static function sendScript(?Player $player = null)
     {
         if(is_null($player)){
             Template::showAll('PlayerMarkers.script');

@@ -354,7 +354,7 @@ class MxKarma extends Module implements ModuleInterface
      * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendVoteData(Map $map, Player $player = null)
+    public static function sendVoteData(Map $map, ?Player $player = null)
     {
         $average = -1;
 

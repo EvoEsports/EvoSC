@@ -106,7 +106,7 @@ class ServerHopper extends Module implements ModuleInterface
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      * @throws Exception
      */
-    public static function sendUpdatedServerInformation(Player $player = null)
+    public static function sendUpdatedServerInformation(?Player $player = null)
     {
         foreach (self::$connections as $connection) {
             self::updateServerInfo($connection);

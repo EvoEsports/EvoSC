@@ -71,7 +71,7 @@ class InputSetup extends Module implements ModuleInterface
      * @param string $defaultKey
      * @param string|null $access
      */
-    public static function add(string $id, string $description, $callback, string $defaultKey, string $access = null)
+    public static function add(string $id, string $description, $callback, string $defaultKey, ?string $access = null)
     {
         if (!self::$binds) {
             self::$binds = collect();

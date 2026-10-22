@@ -215,7 +215,7 @@ class DedimaniaApi extends Module
             $records = collect();
 
             foreach ($recordsXmlArray as $xmlRecord) {
-                $record = collect();
+                $record = new \stdClass();
                 $record->login = sprintf('%s', $xmlRecord->struct->member[0]->value->string);
                 $record->nickname = sprintf('%s', $xmlRecord->struct->member[1]->value->string);
                 $record->score = intval($xmlRecord->struct->member[2]->value->int);

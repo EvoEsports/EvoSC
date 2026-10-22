@@ -32,7 +32,7 @@ class MatchRounds extends Module implements ModuleInterface
         self::showWidget();
     }
 
-    public static function showWidget(Player $player = null)
+    public static function showWidget(?Player $player = null)
     {
         if (is_null($player)) {
             Template::showAll('MatchRounds.widget', ['roundsPerMap' => self::$roundsPerMap]);

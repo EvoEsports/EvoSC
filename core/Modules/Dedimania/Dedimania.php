@@ -155,7 +155,7 @@ class Dedimania extends DedimaniaApi implements ModuleInterface
      * @param Player|null $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendUpdatedDedis(Player $player = null)
+    public static function sendUpdatedDedis(?Player $player = null)
     {
         Utility::sendRecordsChunk(self::TABLE, 'dedi-records', 'Dedimania.update', $player);
     }

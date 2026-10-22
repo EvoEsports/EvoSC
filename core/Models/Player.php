@@ -39,6 +39,7 @@ use Illuminate\Support\Collection;
  *
  * @method static find(string $login)
  */
+#[\AllowDynamicProperties]
 class Player extends Model
 {
     /**

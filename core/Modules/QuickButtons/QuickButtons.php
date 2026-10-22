@@ -22,17 +22,18 @@ class QuickButtons extends Module implements ModuleInterface
      */
     public static function start(string $mode, bool $isBoot = false)
     {
+        self::$buttons = collect();
         Hook::add('PlayerConnect', [self::class, 'showButtons']);
         Hook::add('GroupChanged', [self::class, 'showButtons']);
     }
 
     public static function addButton(string $icon, string $text, string $maniaLinkAction, string $access = "")
     {
-        if (!self::$buttons) {
+        if (!isset(self::$buttons)) {
             self::$buttons = collect();
         }
 
-        $button = collect();
+        $button = new \stdClass();
         $button->icon = $icon;
         $button->text = $text;
         $button->action = $maniaLinkAction;

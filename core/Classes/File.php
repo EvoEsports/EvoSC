@@ -24,7 +24,7 @@ class File
      *
      * @return null|string|Object
      */
-    public static function get(string $fileName = null, bool $json_decode = false)
+    public static function get(?string $fileName = null, bool $json_decode = false)
     {
         $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
 
@@ -96,7 +96,7 @@ class File
      *
      * @return Collection
      */
-    public static function getDirectoryContents(string $path, string $filterPattern = null): Collection
+    public static function getDirectoryContents(string $path, ?string $filterPattern = null): Collection
     {
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
@@ -121,7 +121,7 @@ class File
      *
      * @return Collection
      */
-    public static function getFilesRecursively(string $baseDirectory, string $filterPattern = null): Collection
+    public static function getFilesRecursively(string $baseDirectory, ?string $filterPattern = null): Collection
     {
         $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();
@@ -149,7 +149,7 @@ class File
         return $files;
     }
 
-    public static function getFiles(string $baseDirectory, string $filterPattern = null)
+    public static function getFiles(string $baseDirectory, ?string $filterPattern = null)
     {
         $baseDirectory = str_replace('/', DIRECTORY_SEPARATOR, $baseDirectory);
         $files = collect();

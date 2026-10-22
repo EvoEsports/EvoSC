@@ -48,7 +48,7 @@ class AddTime extends Module implements ModuleInterface
      * @param Player $player
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function showWidget(Player $player = null)
+    public static function showWidget(?Player $player = null)
     {
         $buttons = collect(config('add-time.buttons'))
             ->sort()

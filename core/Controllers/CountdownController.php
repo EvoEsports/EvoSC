@@ -137,7 +137,7 @@ class CountdownController extends Controller implements ControllerInterface
      * @param int $seconds
      * @param Player|null $player
      */
-    public static function addTime(int $seconds, Player $player = null)
+    public static function addTime(int $seconds, ?Player $player = null)
     {
         $addedTime = self::$addedSeconds + $seconds;
 
@@ -231,7 +231,7 @@ class CountdownController extends Controller implements ControllerInterface
      * @return int
      * @throws Exception
      */
-    private static function getTimeLimitFromMatchSettings(string $file = null): int
+    private static function getTimeLimitFromMatchSettings(?string $file = null): int
     {
         if (!$file) {
             $file = MatchSettingsController::getCurrentMatchSettingsFile();

@@ -40,7 +40,7 @@ class ChatCommand
         string $command,
         $callback,
         string $description = '',
-        string $access = null,
+        ?string $access = null,
         bool $hidden = false
     )
     {
@@ -66,7 +66,7 @@ class ChatCommand
         string $command,
         $callback,
         string $description = '-',
-        string $access = null,
+        ?string $access = null,
         bool $hidden = false
     ): ChatCommand
     {
