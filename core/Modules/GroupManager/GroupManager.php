@@ -44,7 +44,7 @@ class GroupManager extends Module implements ModuleInterface
         }
     }
 
-    public static function sendGroupsInformation(Player $player = null)
+    public static function sendGroupsInformation(?Player $player = null)
     {
         $groups = DB::table('groups')
             ->select(['id', 'Name as name', 'chat_prefix as icon', 'color'])

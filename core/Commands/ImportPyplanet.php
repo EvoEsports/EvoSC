@@ -40,7 +40,7 @@ class ImportPyplanet extends Command
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $migrate = $this->getApplication()->find('migrate');
         $migrate->execute($input, $output);

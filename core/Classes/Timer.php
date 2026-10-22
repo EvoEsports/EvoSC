@@ -18,16 +18,16 @@ class Timer
     private static $uStart;
 
     /**
-     * @var Collection
+     * @var Collection|null
      */
-    private static Collection $timers;
+    private static ?Collection $timers = null;
 
     public string $id;
     public $callback;
     public int $runtime;
-    public bool $repeat;
-    public bool $isPaused;
-    public $delay;
+    public bool $repeat = false;
+    public bool $isPaused = false;
+    public $delay = null;
 
     /**
      * Timer constructor.
@@ -43,6 +43,7 @@ class Timer
         $this->callback = $callback;
         $this->runtime = $runtime;
         $this->repeat = $repeat;
+        $this->isPaused = false;
     }
 
     public function setNewRuntimeDelay($delay)
@@ -59,6 +60,10 @@ class Timer
      */
     public static function getTimer(string $id): ?Timer
     {
+        if (!self::$timers) {
+            return null;
+        }
+
         $timer = self::$timers->where('id', $id)->first();
 
         if (!$timer) {
@@ -105,7 +110,9 @@ class Timer
      */
     public static function destroy(string $string)
     {
-        self::$timers = self::$timers->where('id', '!=', $string);
+        if (self::$timers) {
+            self::$timers = self::$timers->where('id', '!=', $string);
+        }
     }
 
     public static function destroyAll()
@@ -282,6 +289,20 @@ class Timer
      */
     public static function pause(string $id): void
     {
-        self::$timers->where('id', '=', $id);
+        $timer = self::getTimer($id);
+        if ($timer) {
+            $timer->isPaused = true;
+        }
+    }
+
+    /**
+     * Resumes a timer
+     */
+    public static function resume(string $id): void
+    {
+        $timer = self::getTimer($id);
+        if ($timer) {
+            $timer->isPaused = false;
+        }
     }
 }

@@ -429,7 +429,7 @@ class MapController implements ControllerInterface
      *
      * @param Player $player
      */
-    public static function skip(Player $player = null)
+    public static function skip(?Player $player = null)
     {
         $map = MapController::getCurrentMap();
 
@@ -461,7 +461,7 @@ class MapController implements ControllerInterface
      * @param bool $asString
      * @return string|MPS_Map
      */
-    public static function getGbxInformation($filename, bool $asString = false): ?MPS_Map
+    public static function getGbxInformation($filename, bool $asString = false): MPS_Map|string|null
     {
         $mapFile = Server::GameDataDirectory() . 'Maps' . DIRECTORY_SEPARATOR . $filename;
 
@@ -515,7 +515,7 @@ class MapController implements ControllerInterface
      * @param string|null $name
      * @return int|mixed
      */
-    public static function createOrGetAuthor(string $login, string $name = null)
+    public static function createOrGetAuthor(string $login, ?string $name = null)
     {
         $author = DB::table('players')->where('Login', '=', $login)->first();
 
@@ -538,7 +538,7 @@ class MapController implements ControllerInterface
      *
      * @return string
      */
-    public static function getMapsPath(string $fileName = null): string
+    public static function getMapsPath(?string $fileName = null): string
     {
         if ($fileName) {
             return self::$mapsPath . $fileName;

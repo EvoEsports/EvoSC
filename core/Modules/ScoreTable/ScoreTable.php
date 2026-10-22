@@ -158,7 +158,7 @@ class ScoreTable extends Module implements ModuleInterface
      * @return void
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendScoreTable(Player $player = null, string $mode = '')
+    public static function sendScoreTable(?Player $player = null, string $mode = '')
     {
         $logoUrl = config('scoretable.logo-url');
         $maxPlayers = Server::getMaxPlayers()['CurrentValue'];
@@ -221,7 +221,7 @@ class ScoreTable extends Module implements ModuleInterface
      * @param bool $isDefaultLayout
      * @return void
      */
-    public static function addLayout(string $forMode = null, string $file, bool $isDefaultLayout = false)
+    public static function addLayout(?string $forMode, string $file, bool $isDefaultLayout = false)
     {
         if (!isset(self::$layouts)) {
             self::$layouts = collect();

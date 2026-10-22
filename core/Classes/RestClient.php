@@ -71,7 +71,7 @@ class RestClient
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function get(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
+    public static function get(string $url, ?array $options = null): \Psr\Http\Message\ResponseInterface
     {
         if(isVeryVerbose()){
             Log::write('GET: ' . $url);
@@ -85,7 +85,7 @@ class RestClient
      * @param array|null $options
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public static function getAsync(string $url, array $options = null)
+    public static function getAsync(string $url, ?array $options = null)
     {
         if(isVeryVerbose()){
             Log::write('ASYNC GET: ' . $url);
@@ -102,7 +102,7 @@ class RestClient
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function post(string $url, array $options = null): \Psr\Http\Message\ResponseInterface
+    public static function post(string $url, ?array $options = null): \Psr\Http\Message\ResponseInterface
     {
         if(isVeryVerbose()){
             Log::write('POST: ' . $url);
@@ -116,7 +116,7 @@ class RestClient
      * @param array|null $options
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public static function postAsync(string $url, array $options = null)
+    public static function postAsync(string $url, ?array $options = null)
     {
         if(isVeryVerbose()){
             Log::write('ASYNC POST: ' . $url);
@@ -130,7 +130,7 @@ class RestClient
      *
      * @return array
      */
-    private static function addUserAgentAndDefaultTimeout(array $options = null): array
+    private static function addUserAgentAndDefaultTimeout(?array $options = null): array
     {
         if (!$options) {
             $options = [];

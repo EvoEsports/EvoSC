@@ -112,7 +112,7 @@ class PlanetsController implements ControllerInterface
         int $amount,
         string $label,
         array $successFunction,
-        array $failFunction = null
+        ?array $failFunction = null
     )
     {
         $billId = Server::sendBill($player->Login, $amount, $label);

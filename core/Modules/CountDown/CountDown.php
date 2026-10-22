@@ -74,7 +74,7 @@ class CountDown extends Module implements ModuleInterface
         ]);
     }
 
-    public static function mapBegun(Map $map = null)
+    public static function mapBegun(?Map $map = null)
     {
         self::$state = 'play';
 

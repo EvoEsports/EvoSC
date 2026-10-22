@@ -14,6 +14,7 @@ class StatisticWidget
     public string $prefix;
     public string $suffix;
     public bool $nameLeft;
+    public $records;
 
     public function __construct(
         string $stat,

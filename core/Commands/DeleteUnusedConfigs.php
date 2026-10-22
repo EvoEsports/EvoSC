@@ -32,7 +32,7 @@ class DeleteUnusedConfigs extends Command
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $outdated = [
             'match-tracker.config.json',

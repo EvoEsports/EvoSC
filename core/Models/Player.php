@@ -39,6 +39,7 @@ use Illuminate\Support\Collection;
  *
  * @method static find(string $login)
  */
+#[\AllowDynamicProperties]
 class Player extends Model
 {
     /**
@@ -142,9 +143,9 @@ class Player extends Model
      */
     public function getPathAttribute($path)
     {
-        $parts = explode('|', $path);
+        $parts = explode('|', $path ?? '');
 
-        while (in_array($parts[0], ['World', 'Europe', 'Asia', 'North America', 'South America', 'Oceania', 'Africa'])) {
+        while (isset($parts[0]) && in_array($parts[0], ['World', 'Europe', 'Asia', 'North America', 'South America', 'Oceania', 'Africa'])) {
             array_shift($parts);
         }
 
@@ -286,7 +287,7 @@ class Player extends Model
         $setting = $this->settings()->whereName($settingName)->first();
 
         if ($jsonDecode) {
-            return json_decode($setting->value ?? null);
+            return $setting && $setting->value !== null ? json_decode($setting->value) : null;
         }
 
         return $setting->value ?? null;

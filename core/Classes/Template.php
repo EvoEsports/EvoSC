@@ -169,7 +169,7 @@ class Template
      *
      * @return string
      */
-    public static function toString(string $index, array $values = null): string
+    public static function toString(string $index, ?array $values = null): string
     {
         if (!$values) {
             $values = [];

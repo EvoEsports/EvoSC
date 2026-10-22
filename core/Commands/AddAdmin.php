@@ -46,7 +46,7 @@ class AddAdmin extends Command
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $login = $input->getArgument('login');
         $groupId = $input->getArgument('groupId');
@@ -92,11 +92,11 @@ class AddAdmin extends Command
 
         try {
             $server = Connection::factory(
-                config('server.ip'),
-                config('server.port'),
+                (string)config('server.ip'),
+                (int)config('server.port'),
                 2,
-                config('server.rpc.login'),
-                config('server.rpc.password')
+                (string)config('server.rpc.login'),
+                (string)config('server.rpc.password')
             );
 
             $server->chatSendServerMessage(

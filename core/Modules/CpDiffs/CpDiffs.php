@@ -129,7 +129,7 @@ class CpDiffs extends Module implements ModuleInterface
         }
     }
 
-    public static function cmdSetTarget(Player $player, $cmd, string $type = null, string $id = null)
+    public static function cmdSetTarget(Player $player, $cmd, ?string $type = null, ?string $id = null)
     {
         if ($type === null) {
             warningMessage('Invalid target specified. See ', secondary('/help'),

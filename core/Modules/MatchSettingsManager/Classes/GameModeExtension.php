@@ -27,9 +27,9 @@ class GameModeExtension
      * @param string|null $extendsMode
      * @throws \Exception
      */
-    public function __construct(string $name, Collection $settings, string $extendsMode = null)
+    public function __construct(string $name, Collection $settings, ?string $extendsMode = null)
     {
-        if (basename($name) == basename($extendsMode)) {
+        if ($extendsMode !== null && basename($name) == basename($extendsMode)) {
             throw new \Exception("Game modes may not extend themselves.");
         }
 

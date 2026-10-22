@@ -95,7 +95,7 @@ class Utility
      * @param Player|null $playerIn
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendRecordsChunk(string $table, string $configId, string $templateId, Player $playerIn = null)
+    public static function sendRecordsChunk(string $table, string $configId, string $templateId, ?Player $playerIn = null)
     {
         if (!$map = MapController::getCurrentMap()) {
             return;

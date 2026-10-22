@@ -55,7 +55,7 @@ class ManiaLinkEvent
      * @param callable|array $callback
      * @param string $access
      */
-    private function __construct(string $id, $callback, string $access = null)
+    private function __construct(string $id, $callback, ?string $access = null)
     {
         $this->id = $id;
         $this->callback = $callback;
@@ -80,7 +80,7 @@ class ManiaLinkEvent
      * @param string|null $access
      * @return ManiaLinkEvent
      */
-    public static function add(string $id, $callback, string $access = null): ManiaLinkEvent
+    public static function add(string $id, $callback, ?string $access = null): ManiaLinkEvent
     {
         $maniaLinkEvents = self::getManiaLinkEvents();
 
@@ -124,7 +124,7 @@ class ManiaLinkEvent
      * @param string $action
      * @param array|null $formValues
      */
-    public static function call(Player $ply, string $action, array $formValues = null)
+    public static function call(Player $ply, string $action, ?array $formValues = null)
     {
         $action = trim($action);
 

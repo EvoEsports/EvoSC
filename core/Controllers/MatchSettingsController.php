@@ -59,7 +59,7 @@ class MatchSettingsController implements ControllerInterface
      * @param Player|null $player
      * @param string|null $matchSettingsFile
      */
-    public static function loadMatchSettings(bool $rebootClasses = false, Player $player = null, string $matchSettingsFile = null)
+    public static function loadMatchSettings(bool $rebootClasses = false, ?Player $player = null, ?string $matchSettingsFile = null)
     {
         if ($player) {
             infoMessage($player, ' loads matchsettings ', secondary($matchSettingsFile))->sendAll();

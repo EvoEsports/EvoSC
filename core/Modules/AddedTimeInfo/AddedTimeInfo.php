@@ -55,7 +55,7 @@ class AddedTimeInfo extends Module implements ModuleInterface
         self::addedTimeChanged(0);
     }
 
-    public static function showWidget(Player $player = null)
+    public static function showWidget(?Player $player = null)
     {
         $addedTime = round(CountdownController::getAddedSeconds() / 60, 1);
         $buttons = config('added-time-info.buttons');

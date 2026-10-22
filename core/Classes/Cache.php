@@ -85,7 +85,7 @@ class Cache
      * @param                     $data
      * @param Carbon|null $expires
      */
-    public static function put($id, $data, Carbon $expires = null)
+    public static function put($id, $data, ?Carbon $expires = null)
     {
         try {
             $cacheObject = new stdClass();

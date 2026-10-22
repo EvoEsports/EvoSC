@@ -73,7 +73,7 @@ class Database
      * @param            $callback
      * @param array|null $seed
      */
-    public static function create(string $table, $callback, array $seed = null)
+    public static function create(string $table, $callback, ?array $seed = null)
     {
         if (!self::hasTable($table)) {
             Log::info("Creating table $table.");

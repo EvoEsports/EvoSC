@@ -91,7 +91,7 @@ class LocalRecords extends Module implements ModuleInterface
      * @param Player|null $playerIn
      * @throws \EvoSC\Exceptions\InvalidArgumentException
      */
-    public static function sendLocalsChunk(Player $playerIn = null)
+    public static function sendLocalsChunk(?Player $playerIn = null)
     {
         if (!self::$showWidget) {
             return;

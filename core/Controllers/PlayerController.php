@@ -590,7 +590,7 @@ class PlayerController implements ControllerInterface
      * @param string|null $reason
      * @return void
      */
-    public static function resetNameAndBlacklist(Player $admin, string $targetLogin, string $reason = null)
+    public static function resetNameAndBlacklist(Player $admin, string $targetLogin, ?string $reason = null)
     {
         $targetPlayer = self::getPlayer($targetLogin);
 

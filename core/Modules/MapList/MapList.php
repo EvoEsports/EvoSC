@@ -191,7 +191,7 @@ class MapList extends Module implements ModuleInterface
     /**
      * @param Player|null $player
      */
-    public static function sendUpdatedMapList(Player $player = null)
+    public static function sendUpdatedMapList(?Player $player = null)
     {
         $maps = self::getMapList();
         $mapAuthors = self::getMapAuthors($maps->pluck('a'))->keyBy('id');

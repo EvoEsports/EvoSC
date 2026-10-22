@@ -45,7 +45,7 @@ class HookController implements ControllerInterface
      *
      * @return Collection|null
      */
-    static function getHooks(string $eventName = null): ?Collection
+    static function getHooks(?string $eventName = null): ?Collection
     {
         if ($eventName) {
             return self::$hooks->get($eventName);

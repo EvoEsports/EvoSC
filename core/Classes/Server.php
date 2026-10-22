@@ -313,7 +313,7 @@ class Server
      */
     public static function init($host, $port, $timeout, $login, $password)
     {
-        self::$rpc = Connection::factory($host, $port, $timeout, $login, $password);
+        self::$rpc = Connection::factory((string)$host, (int)$port, (int)$timeout, (string)$login, (string)$password);
         self::$rpc->enableCallbacks();
     }
 
